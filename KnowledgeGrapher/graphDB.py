@@ -1,21 +1,41 @@
+import utils
 import config
 import cypher as cy
 from py2neo import Graph
+
+def getGraphDatabaseConnectionConfiguration():
+    host = config.dbURL
+    port = config.dbPort
+    user = config.dbUser
+    password = config.dbPassword
+
+    driver = connectToDB(host, port, user, password)
+
+    return driver
 
 def connectToDB(host = "localhost", port= 7687, user="neo4j", password = "password"):
     driver = Graph(host=host, port = port, user = user, password = password)
 
     return driver
 
-def createDB(imports = ["ontologies","proteins", "ppi"]):
-    host = config.dbURL
-    port = config.dbPort
-    user = config.dbUser
-    password = config.dbPassword
+def removeRelationshipDB(entity1, entity2, relationship):
+    driver = getGraphDatabaseConnectionConfiguration()
 
+    countCy = cy.COUNT_RELATIONSHIPS 
+    deleteCy = cy.REMOVE_RELATIONSHIPS
+    countst = countCy.replace('ENTITY1', entity1).replace('ENTITY2', entity2).replace('RELATIONSHIP', relationship)
+    deletest = deleteCy.replace('ENTITY1', entity1).replace('ENTITY2', entity2).replace('RELATIONSHIP', relationship)
+    print countst
+    print driver.run(countst).data()[0]
+    print "Removing %d entries in the database" % driver.run(countst).data()[0]['count']
+    driver.run(deletest)
+    print "Existing entries after deletion: %d" % driver.run(countst).data()[0]['count']
+
+
+def createDB(imports = ["ontologies","proteins", "ppi"]):
     entities = config.entities
     importDir = config.importDirectory
-    driver = connectToDB(host, port, user, password)
+    driver = getGraphDatabaseConnectionConfiguration()
 
     #Get the cypher queries to build the graph
     #Ontologies
@@ -52,9 +72,9 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
             driver.run(statement+";")
     #PPIs
     if "ppi" in imports:
-        ppiDataImportCode = cy.IMPORT_PPI_DATA
+        ppiDataImportCode = cy.IMPORT_CURATED_PPI_DATA
         for resource in config.PPI_resources:
-            for statement in ppiDataImportCode.replace("IMPORTDIR",importDir).replace("RESOURCE",resource.lower()).split(';')[0:-1]:
+            for statement in ppiDataImportCode.replace("IMPORTDIR",importDir).replace("RESOURCE",resource.upper()).split(';')[0:-1]:
                 print statement+";"
                 driver.run(statement+";")
 
@@ -68,11 +88,25 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
 
     #Drugs
     if "drugs" in imports:
-        drugsDataImportCode = cy.IMPORT_DRUG_DATA
+        drugsDataImportCode = cy.IMPORT_CURATED_DRUG_DATA
         for resource in config.drug_resources:
             for statement in drugsDataImportCode.replace("IMPORTDIR",importDir).replace("RESOURCE",resource.lower()).split(';')[0:-1]:
                 print statement+";"
                 driver.run(statement+";")
+
+    if "datasets" in imports:
+        importDir = config.datasetsImportDirectory
+        files = utils.listDirectoryFiles(importDir)
+        datasetsCode = cy.IMPORT_DATASETS
+        for f in files:
+            projectId, dtype = f.split('_')
+            dtype = dtype.split('.')[0]
+            code = datasetsCode[dtype]
+            for statement in code.replace("IMPORTDIR",importDir).replace('PROJECTID', projectId).split(';')[0:-1]:
+                print statement
+                driver.run(statement+';')
+        
+
 
 def updateDB(dataset):
     pass
@@ -88,4 +122,8 @@ def acquireOntologies(ontology = None):
 
 
 if __name__ == "__main__":
-    createDB(imports=["ontologies","chromosomes", "genes", "transcripts", "proteins", "ppi", "drugs", "diseases"])
+    #removeRelationshipDB(entity1 = 'Protein', entity2 = 'Protein', relationship = "intact_INTERACTS_WITH")
+    #removeRelationshipDB(entity1 = 'Protein', entity2 = 'Protein', relationship = "IntAct_INTERACTS_WITH")
+
+    createDB(imports=["datasets"])
+    #createDB(imports=["ontologies","chromosomes", "genes", "transcripts", "proteins", "ppi", "drugs", "diseases"])

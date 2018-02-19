@@ -7,6 +7,8 @@ import mapping as mp
 import csv
 import pandas as pd
 import re
+from lxml import etree
+import zipfile
 
 #########################
 # General functionality # 
@@ -21,7 +23,8 @@ def downloadDB(databaseURL, extraFolder =""):
     import urllib
     directory = os.path.join(config.databasesDir,extraFolder)
     fileName = databaseURL.split('/')[-1]
-
+    
+    urllib.URLopener.version = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36 SE 2.X MetaSr 1.0'
     requestedFile = urllib.URLopener()
     requestedFile.retrieve(databaseURL, os.path.join(directory, fileName))
 
@@ -98,6 +101,31 @@ def parseDGIdb(download = True, mapping = {}):
             relationships.add((drug, gene, "TARGETS", interactionType, "DGIdb: "+source))
 
     return relationships
+
+#################################
+#   Human Metabolome Database   # 
+#################################
+def parseHMDB(download = True, mapping = {}):
+    data = defaultdict()
+    prefix = "{http://www.hmdb.ca}"
+    url = config.HMDB_url
+    relationships = set()
+    directory = os.path.join(config.databasesDir,"HMDB")
+    fileName = os.path.join(directory, url.split('/')[-1])
+    if download:
+        downloadDB(url, "HMDB")
+    fields = config.HMDB_fields
+    with zipfile.ZipFile(filename, 'r') as associations:
+        #context = etree.iterwalk(, events=("end",), tag=prefix+"metabolite")
+        for _,elem in context:
+            [ child.tag for child in root.iterchildren() ]
+            values = {child.tag.replace(prefix,''):child.text for child in element.iterchildren() if child.tag.replace(prefix,'') in fileds and child.text is not None}
+            print values
+            sys.exit()
+                    
+
+    return relationships
+
 
 #########################
 #   OncoKB database     #
@@ -360,6 +388,7 @@ def parseRefSeqDatabase(download = False):
 #          IntAct       # 
 #########################
 def parseIntactDatabase(dataFile, proteins):
+    intact_dictionary = defaultdict()
     intact_interactions = set()
     regex = r"\((.*)\)"
     with open(dataFile, 'r') as idf:
@@ -389,11 +418,89 @@ def parseIntactDatabase(dataFile, proteins):
                 score = float(score)
             else:
                 continue
-
             if intA in proteins and intB in proteins:
-                intact_interactions.add((intA,intB,"INTACT_INTERACTS_WITH",score, itype, method, source, publications))
-    
+                if (intA, intB) in intact_dictionary:
+                    intact_dictionary[(intA,intB)]['methods'].add(method)
+                    intact_dictionary[(intA,intB)]['sources'].add(source)
+                    intact_dictionary[(intA,intB)]['publications'].add(publications.replace('|',','))
+                    intact_dictionary[(intA,intB)]['itype'].add(itype)
+                else:
+                    intact_dictionary[(intA,intB)]= {'methods': set([method]),'sources':set([source]),'publications':set([publications]), 'itype':set([itype]), 'score':score}
+    for (intA, intB) in intact_dictionary:
+        intact_interactions.add((intA,intB,"CURATED_INTERACTS_WITH",intact_dictionary[(intA, intB)]['score'], ",".join(intact_dictionary[(intA, intB)]['itype']), ",".join(intact_dictionary[(intA, intB)]['methods']), ",".join(intact_dictionary[(intA, intB)]['sources']), ",".join(intact_dictionary[(intA, intB)]['publications'])))
+
     return intact_interactions
+
+#########################
+#   STRING like DBs     #
+#########################
+def getSTRINGMapping(source = "BLAST_UniProt_AC", download = True):
+    mapping = defaultdict(set)
+    url = config.STRING_mapping_url
+    
+    directory = os.path.join(config.databasesDir, "STRING")
+    fileName = os.path.join(directory, url.split('/')[-1])
+
+    if download:
+        downloadDB(url, "STRING")
+    
+    f = os.path.join(directory, fileName)
+    mf = gzip.open(f, 'r')
+    first = True
+    for line in mf:
+        if first:
+            first = False
+            continue
+        data = line.rstrip("\r\n").split("\t")
+        stringID = data[0]
+        alias = data[1]
+        sources = data[2].split(' ')
+        if source in sources:
+            mapping[stringID].add(alias)
+        
+    return mapping
+
+def parseSTRINGLikeDatabase(mapping, db= "STRING", download = True):
+    string_interactions = set()
+    cutoff = config.STRING_cutoff
+    
+    if db == "STITCH":
+        evidences = ["experimental", "prediction", "database","textmining", "score"]
+        relationship = "COMPILED_INTERACTS_WITH"
+        url = config.STITCH_url
+    elif db == "STRING":
+        evidences = ["experimental", "prediction", "database","textmining", "score"]
+        relationship = "COMPILED_TARGETS"
+        url = config.STRING_url
+
+    directory = os.path.join(config.databasesDir, db)
+    fileName = os.path.join(directory, url.split('/')[-1])
+
+    if download:
+        downloadDB(url, db)
+    
+    f = os.path.join(directory, fileName)
+    associations = gzip.open(f, 'r')
+    first = True
+    for line in associations:
+        if first:
+            first = False
+            continue
+        data = line.rstrip("\r\n").split()
+        intA = data[0]
+        intB = data[1]
+        scores = data[2:]
+        fscores = [str(float(score)/1000) for score in scores]
+        if intA in mapping and intB in mapping and fscores[-1]>=cutoff:
+            for aliasA in mapping[intA]:
+                for aliasB in mapping[intB]:
+                    string_interactions.add((aliasA, aliasB, relationship, "association", db, ",".join(evidences), ",".join(fscores[0:-1]), fscores[-1]))
+        elif db == "STITCH":
+            if intB in mapping and fscores[-1]>=cutoff:
+                aliasA = intA
+                for aliasB in mapping[intB]:
+                    string_interactions.add((aliasA, aliasB, relationship, "association", db, ",".join(evidences), ",".join(fscores[0:-1]), fscores[-1]))
+    return string_interactions
 
 
 #########################
@@ -401,7 +508,9 @@ def parseIntactDatabase(dataFile, proteins):
 #########################
 def generateGraphFiles(importDirectory):
     mapping = getMapping()
+    string_mapping = getSTRINGMapping()
     databases = config.databases
+    
     for database in databases:
         print database
         if database.lower() == "hgnc":
@@ -438,6 +547,7 @@ def generateGraphFiles(importDirectory):
                 df.to_csv(path_or_buf=outputfile, 
                                 header=True, index=False, quotechar='"', 
                                 line_terminator='\n', escapechar='\\')
+
         if database.lower() == "uniprot":
             #UniProt
             uniprot_id_file = config.uniprot_id_file
@@ -483,7 +593,7 @@ def generateGraphFiles(importDirectory):
             #IntAct
             intact_file = os.path.join(config.databasesDir,config.intact_file)
             interactions = parseIntactDatabase(intact_file, proteins)
-            interactions_outputfile = os.path.join(importDirectory, "intact_interacts_with.csv")
+            interactions_outputfile = os.path.join(importDirectory, "INTACT_interacts_with.csv")
 
             interactionsDf = pd.DataFrame(list(interactions))
             interactionsDf.columns = ['START_ID', 'END_ID','TYPE', 'score', 'interaction_type', 'method', 'source', 'publications']
@@ -491,6 +601,32 @@ def generateGraphFiles(importDirectory):
             interactionsDf.to_csv(path_or_buf=interactions_outputfile, 
                                 header=True, index=False, quotechar='"', 
                                 line_terminator='\n', escapechar='\\')
+
+        if database.lower() == "string":
+            #STRING
+            interactions = parseSTRINGLikeDatabase(string_mapping)
+            interactions_outputfile = os.path.join(importDirectory, "STRING_interacts_with.csv")
+
+            interactionsDf = pd.DataFrame(list(interactions))
+            interactionsDf.columns = ['START_ID', 'END_ID','TYPE', 'interaction_type', 'source', 'evidences','scores', 'score']
+    
+            interactionsDf.to_csv(path_or_buf=interactions_outputfile, 
+                                header=True, index=False, quotechar='"', 
+                                line_terminator='\n', escapechar='\\')
+
+        if database.lower() == "stitch":
+            #STITCH
+            evidences = ["experimental", "prediction", "database","textmining", "score"]
+            interactions = parseSTRINGLikeDatabase(string_mapping, db = "STITCH")
+            interactions_outputfile = os.path.join(importDirectory, "STITCH_associated_with.csv")
+
+            interactionsDf = pd.DataFrame(list(interactions))
+            interactionsDf.columns = ['START_ID', 'END_ID','TYPE', 'interaction_type', 'source', 'evidences','scores', 'score'] 
+    
+            interactionsDf.to_csv(path_or_buf=interactions_outputfile, 
+                                header=True, index=False, quotechar='"', 
+                                line_terminator='\n', escapechar='\\')
+
         if database.lower() == "disgenet":
             #DisGeNet
             disease_relationships = parseDisGeNetDatabase()
@@ -537,3 +673,6 @@ def generateGraphFiles(importDirectory):
             relationshipsDf.to_csv(path_or_buf= oncokb_outputfile, 
                                             header=True, index=False, quotechar='"', 
                                             line_terminator='\n', escapechar='\\')
+
+        if database.lower() == "HMDB":
+            parseHMDB()

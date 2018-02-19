@@ -12,7 +12,7 @@ def searchPubmed(searchFields, sortby = 'relevance', num ="10", resultsFormat = 
     else:
         query = searchFields[0] +" [MeSH Terms] AND"
 
-    response = urllib2.urlopen(+urllib.quote_plus(pubmedQueryUrl.replace('TERMS',query).replace('NUM', num)
+    response = urllib2.urlopen(urllib.quote_plus(pubmedQueryUrl.replace('TERMS',query).replace('NUM', num)))
     jsonResponse = response.read()
     resultDict = json.loads(jsonResponse)
 
@@ -41,3 +41,10 @@ def getMedlineAbstracts(idList):
         results.append(aux)
 
     return results
+
+def listDirectoryFiles(directory):
+    from os import listdir
+    from os.path import isfile, join
+    onlyfiles = [f for f in listdir(directory) if isfile(join(directory, f)) and not f.startswith('.')]
+
+    return onlyfiles

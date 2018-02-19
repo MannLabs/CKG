@@ -1,3 +1,6 @@
+#Ontologies directory
+ontologiesDirectory = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/data/ontologies/"
+
 ontologies = {"Disease": "DO", 
                "Tissue": "BTO", 
                "Clinical_variable": "SNOMED-CT",
@@ -33,7 +36,6 @@ ontology_types = {"DO":-26,
 
 parser_filters = {-40:["308916002", "363787002", "373873005", "71388002", "48176007", "105590001"]}
 
-ontologiesDirectory = "../ontologies/"
 files = {-44: ["ICD/version_10/icd10_2016.tsv"],
          -40: ["SNOMED-CT/Full/Terminology/sct2_Description_Full-en_INT_20170731.txt", 
                "SNOMED-CT/Full/Terminology/sct2_Relationship_Full_INT_20170731.txt", 

@@ -3,7 +3,8 @@ from collections import defaultdict
 import numpy as np
 import config
 import sys
-import ontologyhandler as oh
+import ontologieshandler as oh
+import os.path
 
 #########################
 # General functionality # 
@@ -34,7 +35,7 @@ def readDataFromTXT(uri):
 
 def readDataFromExcel(uri):
     #Read the data from Excel file
-    data = pd.read_excel(open(uri), index_col=None, na_values=['NA'])
+    data = pd.read_excel(open(uri), index_col=None, na_values=['NA'], convert_float = False)
 
     return data
 
@@ -48,7 +49,6 @@ def extractSubjectReplicates(data, regex):
             subject = fields[1]
             ident = value + " " + subject 
             subjectDict[ident].append(c)
-
     return subjectDict
 
 def calculateMedianReplicates(data, log = "log2"):
@@ -61,26 +61,40 @@ def calculateMedianReplicates(data, log = "log2"):
 
     return median
 
+def updateGroups(data, groups):
+    del groups.index.name
+    print groups.to_frame()
+    data = data.join(groups.to_frame(), on='START_ID')
+
+    return data
+
 ############################
 #           Parsers        # 
 ############################
 ########### Clinical Variables Datasets ############
-def parseClinicalDataset(uri):
+def parseClinicalDataset(projectId):
     '''This function parses clinical data from subjects in the project
     Input: uri of the clinical data file. Format: Subjects as rows, clinical variables as columns
     Output: pandas DataFrame with the same input format but the clinical variables mapped to the
     right ontology (defined in config), i.e. type = -40 -> SNOMED CT'''
-    data = readDataset(uri)
-    data = data.set_index("subject id")
-    projectId = uri.split('/')[-2]
-        
-    return data, projectId
+    dataDir = config.datasetsDir
+    configuration = config.dataTypes["clinical"]
+    files = configuration['files']
+    filepath = os.path.join(dataDir, os.path.join(projectId,files['clinical']))
+    data = readDataset(filepath)
+    data['subject id'] = data['subject id'].astype('int64')
+    data = data.set_index('subject id')
+    
+    return data
 
 ########### Proteomics Datasets ############
-def parseProteomicsDataset(uri, qtype):
-    configuration = config[qtype]
-    data, regex = loadProteomicsDataset(uri, configuration)
-    log = configuration[log]
+def parseProteomicsDataset(projectId, qtype):
+    configuration = config.dataTypes[qtype]
+    dataDir = config.datasetsDir
+    files = configuration['files']
+    filepath = os.path.join(dataDir, os.path.join(projectId,files['proteins']))
+    data, regex = loadProteomicsDataset(filepath, configuration)
+    log = configuration['log']
 
     subjectDict = extractSubjectReplicates(data, regex)
     delCols = []
@@ -92,7 +106,7 @@ def parseProteomicsDataset(uri, qtype):
     data = data.drop(delCols, 1)
     
 
-    return data, projectId
+    return data
 
 ###############################
 #           Extractors        # 
@@ -105,9 +119,9 @@ def extractSubjectClinicalVariablesRelationships(data):
         data = data[cols]
     data = data.stack()
     data = data.reset_index()
-    data.columns = [':START_ID(Subject)', ':END_ID(Clinical_variable)', "score"]
-    data[':TYPE'] = "HAS_QUANTIFIED_CLINICAL"
-    data = data[[':START_ID(Sample)', ':END_ID(Clinical_variable)',':TYPE', 'score']]
+    data.columns = ['START_ID', 'END_ID', "score"]
+    data['TYPE'] = "HAS_QUANTIFIED_CLINICAL"
+    data = data[['START_ID', 'END_ID','TYPE', 'score']]
 
     return data
 
@@ -117,9 +131,10 @@ def extractProteinSubjectRelationships(data):
     aux.columns = [c.split(" ")[2] for c in aux.columns]
     aux = aux.stack()
     aux = aux.reset_index()
-    aux[':TYPE'] = "HAS_QUANTIFIED_PROTEIN"
-    aux.columns = [':END_ID(Protein)', ':START_ID(Sample)',"LFQ intensity", ':TYPE']
-    aux = aux[[':START_ID(Sample)', ':END_ID(Protein)', ':TYPE', "LFQ intensity"]]
+    aux['TYPE'] = "HAS_QUANTIFIED_PROTEIN"
+    aux.columns = ['END_ID', 'START_ID',"LFQ intensity", 'TYPE']
+    aux = aux[['START_ID', 'END_ID', 'TYPE', "LFQ intensity"]]
+    aux['START_ID'] = aux['START_ID'].astype('int64')
     
     return aux
 
@@ -132,10 +147,10 @@ def extractPTMSubjectRelationships(data, modification):
     aux.columns = [c.split(" ")[2] for c in aux.columns]
     aux = aux.stack()
     aux = aux.reset_index()
-    aux[':TYPE'] = "HAD_QUANTIFIED_"+modification.upper()
+    aux['TYPE'] = "HAD_QUANTIFIED_"+modification.upper()
     aux['code'] = code
-    aux.columns = [':END_ID('+modification+')', ':START_ID(Sample)', "Intensity", ':TYPE', 'code']
-    aux = aux[[':START_ID(Sample)', ':END_ID('+modification+')', ':TYPE', "Intensity", 'code']]
+    aux.columns = ['END_ID('+modification+')', 'START_ID(Sample)', "Intensity", 'TYPE', 'code']
+    aux = aux[['START_ID', 'END_ID', 'TYPE', "Intensity", 'code']]
     
     return aux
 
@@ -147,10 +162,17 @@ def extractPTMProteinRelationships(data, modification):
     aux["modId"] = aux["Protein"].str + "_" + aux["Amino acid"].str + aux["Positions"].str
     aux = aux.reset_index()
     aux = aux[["Protein", "modId"]]
-    aux[':TYPE'] = "IS_MODIFIED_AT"
+    aux['TYPE'] = "IS_MODIFIED_AT"
     aux['code'] = code
-    aux = aux[[':START_ID(Protein)', ':END_ID('+modification+')',':TYPE', 'code']]
+    aux = aux[['START_ID', 'END_ID','TYPE', 'code']]
     
+    return aux
+
+def extractProjectSampleRelationships(data, projectId):
+    samples = list(data['START_ID'])
+    aux = pd.DataFrame({'START_ID': projectId , 'END_ID': samples, 'TYPE': "HAS_ENROLLED"})
+    aux = aux[['START_ID', 'END_ID','TYPE']]
+    aux['START_ID'] = aux['START_ID'].astype(str)
     return aux
 
 ############ Whole Exome Sequencing Datasets ##############
@@ -226,21 +248,32 @@ def loadWESDataset(uri, configuration):
 ########################################
 #          Generate graph files        # 
 ########################################
-def generateGraphFiles(importDirectory, data):
-    outputfile = config.intact_file
-    interactions = parseIntactDatabase(dataFile, proteins)
-    interactions_outputfile = os.path.join(importDirectory, "intact_interacts_with.csv")
+def generateDatasetImports(projectId, dataType):
+    edata = parseProteomicsDataset(projectId, dataType)
+    cdata = parseClinicalDataset(projectId)
+
+    edataRows = extractProteinSubjectRelationships(edata)
+    edataRows = updateGroups(edataRows, cdata['group'])
+    print edataRows
+    cdataRows = extractSubjectClinicalVariablesRelationships(cdata)
+    proSamRows = extractProjectSampleRelationships(edataRows, projectId)
     
-    interactionsDf = pd.DataFrame(interactions) 
-    interactionsDf.columns = [':START_ID(Protein)', ':END_ID(Protein)',':TYPE', 'score', 'interaction_type', 'method', 'source', 'publications']
-    
-    interactionsDf.to_csv(path_or_buf=interactions_outputfile, 
+    generateGraphFiles(edataRows,dataType, projectId)
+    generateGraphFiles(cdataRows,'clinical', projectId)
+    generateGraphFiles(proSamRows,'project', projectId)
+  
+def generateGraphFiles(data, dataType, projectId):
+    importDir = config.datasetsImportDirectory
+    outputfile = os.path.join(importDir, projectId+"_"+dataType.lower()+".csv")
+      
+    data.to_csv(path_or_buf=outputfile, 
             header=True, index=False, quotechar='"', 
             line_terminator='\n', escapechar='\\')
 
 
 
 if __name__ == "__main__":
-    uri = sys.argv[1]
-
-    parseProteomics
+    #uri = sys.argv[1]
+    generateDatasetImports('000000000001', 'proteomicsData')
+    
+    

@@ -1,9 +1,9 @@
 #Database directory
-databasesDir = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/databases/"
-
+databasesDir = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/data/databases/"
 #Databases
-#databases = ["UniProt", "IntAct", "DisGEnet", "HGNC", "DGIdb", "OncoKB"]
-databases = ["HGNC", "RefSeq", "UniProt"]
+#databases = ["HGNC", "RefSeq", "UniProt", "IntAct", "DisGEnet", "HGNC", "DGIdb", "OncoKB"]
+databases = ["STRING","STITCH"]
+
 ###### UniProt Database ########
 uniprot_id_url = "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping.dat.gz"
 
@@ -49,6 +49,13 @@ cancerBioactivities_url = "https://www.cancergenomeinterpreter.org/data/cancer_b
 intact_psimitab_url = "ftp://ftp.ebi.ac.uk/pub/databases/intact/current/psimitab/intact.txt"
 intact_file = "Intact/intact/intact.txt"
 
+###### STRING database #######
+STRING_cutoff = 0.4
+STRING_mapping_url = "https://stringdb-static.org/download/protein.aliases.v10.5/9606.protein.aliases.v10.5.txt.gz"
+STRING_url = "https://stringdb-static.org/download/protein.links.detailed.v10.5/9606.protein.links.detailed.v10.5.txt.gz"
+###### STITCH database #######
+STITCH_url = "http://stitch.embl.de/download/protein_chemical.links.detailed.v5.0/9606.protein_chemical.links.detailed.v5.0.tsv.gz"
+
 ##### DisGeNet Database ######
 disgenet_url = "http://www.disgenet.org/ds/DisGeNET/results/"
 
@@ -60,3 +67,11 @@ disgenet_files = {"gene_curated":"curated_gene_disease_associations.tsv.gz",
 disgenet_mapping_files = {"protein_mapping":"mapa_geneid_4_uniprot_crossref.tsv.gz",
                             "disease_mapping":"disease_mappings.tsv.gz"
                         }
+
+##### Human Metabolome Database #######
+HMDB_url = "http://www.hmdb.ca/system/downloads/current/hmdb_metabolites.zip"
+HMDB_fields = ['accession', 'name', 'descriiption',  'synonym', 
+        'chemical_formula', 'average_molecular_weight', 'monoisotopic_molecular_weight', 'status','origin','cellular_location','biofluid_location', 'tissue', 
+        'name','smpdb_id','kegg_map', 'name','drugbank_id', 'foodb_id', 'knapsack_id', 'chemspider_id', 'kegg_id', 'biocyc_id', 
+        'bigg_id', 'wikipidia', 'mugowiki', 'mutagene', 'metlin_id', 'pubchem_compound_id','het_id', 'chebi_id'] 
+HMDB_parentFields = ['synonyms','ontology','origins', 'cellular_locations', 'biofluid_locations','tissue_locations', 'pathways','pathway', 'diseases','disease']

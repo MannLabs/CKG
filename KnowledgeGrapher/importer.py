@@ -8,7 +8,7 @@ def ontologyImport():
 def fullImport():
     importDirectory = config.importDirectory
     #Ontologies
-    oh.generateGraphFiles(importDirectory)
+    #oh.generateGraphFiles(importDirectory)
     #Databases
     dh.generateGraphFiles(importDirectory)
 
