@@ -27,8 +27,10 @@ datasetsDirectory = dataDirectory + "/experiments/"
 #Proteomics
 proteomicsDirectory = datasetsDirectory + "proteomics/"
 modifications = {"Glycation":{"code":"MOD:00764", "file":"GlycationSites.txt"}, "Oxidation(M)":{"code":"MOD:00256", "file":"Oxidation (M)Sites.txt"}}
-dataTypes = {"clinicalData":{"clinical":{"file":"clinicalData.xlsx"}},
-            "proteomicsData":{"proteins":{"columns":
+dataTypes = {"clinicalData":{"directory":proteomicsDirectory,
+                            "file":"clinicalData.xlsx"},
+            "proteomicsData":{"directory": proteomicsDirectory,
+                            "proteins":{"columns":
                                             ["Majority protein IDs",
                                             "Gene names", "Q-value", 
                                             "Score", 
@@ -41,6 +43,7 @@ dataTypes = {"clinicalData":{"clinical":{"file":"clinicalData.xlsx"}},
                                                         "Only identified by site"],
                                         "proteinCol" : "Majority protein IDs",
                                         "valueCol" : "LFQ intensity",
+                                        "indexCol" : "Majority protein IDs",
                                         "log": "log10",
                                         "file": "proteinGroups.txt"},
                             "peptides":{"columns":
@@ -60,6 +63,7 @@ dataTypes = {"clinicalData":{"clinical":{"file":"clinicalData.xlsx"}},
                                                         "Potential contaminant"],
                                         "proteinCol" : "Proteins",
                                         "valueCol" : "Intensity",
+                                        "indexCol" : "Sequence",
                                         "log": "log10",
                                         "file":"peptides.txt"},
                             },

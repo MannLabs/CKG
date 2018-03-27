@@ -105,15 +105,25 @@ IMPORT_COMPILED_DRUG_DATA =   '''
                         CREATE UNIQUE (d)-[:COMPILED_TARGETS{score:line.score, source:line.source,interaction_type:line.interaction_type,scores:SPLIT(line.evidences,','),evidences:SPLIT(line.evidences,',')}]->(g);'''
 
 IMPORT_DATASETS = {"proteomicsdata":'''USING PERIODIC COMMIT 10000 
-                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_proteomicsdata.csv" AS line 
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_proteins.csv" AS line 
                         MATCH (s:Sample{id:line.START_ID})
                         MATCH (p:Protein {id:line.END_ID)}) 
-                        CREATE UNIQUE (s)-[:HAS_QUANTIFIED_PROTEIN{quantification: line.quantification,group:line.group,quantification_type:line.quantification_type}]->(p);''',
+                        CREATE UNIQUE (s)-[:HAS_QUANTIFIED_PROTEIN{value: line.value}]->(p);
+                        USING PERIODIC COMMIT 10000 
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_peptides.csv" AS line 
+                        MATCH (s:Sample{id:line.START_ID})
+                        MATCH (p:Peptide {id:line.END_ID)}) 
+                        CREATE UNIQUE (s)-[:HAS_QUANTIFIED_PEPTIDE{value: line.value}]->(p);
+                        USING PERIODIC COMMIT 10000 
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_PeptideProtein.csv" AS line 
+                        MATCH (p1:Peptide{id:line.START_ID})
+                        MATCH (p2:Protein {id:line.END_ID)}) 
+                        CREATE UNIQUE (p1)-[:BELONGS_TO_PROTEIN]->(p2);''',
                     "clinical":'''USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_proteomicsdata.csv" AS line 
                         MATCH (s:Sample {id:line.START_ID})
                         MATCH (c:Clinical_variable {id:line.END_ID)}) 
-                        CREATE UNIQUE (s)-[:HAS_QUANTIFIED_CLINICAL{value: line.score}]->(c);''',
+                        CREATE UNIQUE (s)-[:HAS_QUANTIFIED_CLINICAL{value: line.value}]->(c);''',
                     "project":'''CREATE CONSTRAINT ON (p:Project) ASSERT p.id IS UNIQUE; 
                         CREATE CONSTRAINT ON (p:Project) ASSERT p.name IS UNIQUE; 
                         USING PERIODIC COMMIT 10000
