@@ -116,7 +116,7 @@ def parseHMDB(download = True, mapping = {}):
         downloadDB(url, "HMDB")
     fields = config.HMDB_fields
     with zipfile.ZipFile(filename, 'r') as associations:
-        #context = etree.iterwalk(, events=("end",), tag=prefix+"metabolite")
+        context = etree.iterwalk(associations, events=("end",), tag=prefix+"metabolite")
         for _,elem in context:
             [ child.tag for child in root.iterchildren() ]
             values = {child.tag.replace(prefix,''):child.text for child in element.iterchildren() if child.tag.replace(prefix,'') in fileds and child.text is not None}

@@ -9,7 +9,6 @@ import os.path
 #########################
 # General functionality # 
 #########################
-
 def readDataset(uri):
     if uri.endswith('.xlsx'):
         data = readDataFromExcel(uri)
@@ -47,7 +46,10 @@ def extractSubjectReplicates(data, regex):
             fields  = c.split('_')
             value = " ".join(fields[0].split(' ')[0:-1])
             subject = fields[1]
-            ident = value + " " + subject 
+            timepoint = ""
+            if fields > 2:
+                timepoint = " " + fields[2]
+            ident = value + " " + subject + timepoint
             subjectDict[ident].append(c)
     return subjectDict
 
@@ -58,12 +60,10 @@ def calculateMedianReplicates(data, log = "log2"):
         data = data.applymap(lambda x:np.log10(x) if x > 0 else np.nan)
     
     median = data.median(axis=1).sort_values(axis=0, ascending= True, na_position = 'first').to_frame()
-
     return median
 
 def updateGroups(data, groups):
     del groups.index.name
-    print groups.to_frame()
     data = data.join(groups.to_frame(), on='START_ID')
 
     return data
@@ -77,10 +77,10 @@ def parseClinicalDataset(projectId):
     Input: uri of the clinical data file. Format: Subjects as rows, clinical variables as columns
     Output: pandas DataFrame with the same input format but the clinical variables mapped to the
     right ontology (defined in config), i.e. type = -40 -> SNOMED CT'''
-    dataDir = config.datasetsDir
-    configuration = config.dataTypes["clinical"]
-    files = configuration['files']
-    filepath = os.path.join(dataDir, os.path.join(projectId,files['clinical']))
+    dataDir = config.proteomicsDirectory
+    configuration = config.dataTypes["clinicalData"]
+    dfile = configuration["clinical"]['file']
+    filepath = os.path.join(dataDir, os.path.join(projectId, dfile))
     data = readDataset(filepath)
     data['subject id'] = data['subject id'].astype('int64')
     data = data.set_index('subject id')
@@ -89,24 +89,25 @@ def parseClinicalDataset(projectId):
 
 ########### Proteomics Datasets ############
 def parseProteomicsDataset(projectId, qtype):
+    datasets = {}
     configuration = config.dataTypes[qtype]
-    dataDir = config.datasetsDir
-    files = configuration['files']
-    filepath = os.path.join(dataDir, os.path.join(projectId,files['proteins']))
-    data, regex = loadProteomicsDataset(filepath, configuration)
-    log = configuration['log']
-
-    subjectDict = extractSubjectReplicates(data, regex)
-    delCols = []
-    for subject in subjectDict:
+    dataDir = config.proteomicsDirectory
+    for ftype in configuration:
+        datasetConfig = configuration[ftype]
+        dfile = datasetConfig['file']
+        filepath = os.path.join(dataDir, os.path.join(projectId,dfile))
+        data, regex = loadProteomicsDataset(filepath, datasetConfig)
+        log = datasetConfig['log']
+        subjectDict = extractSubjectReplicates(data, regex)
+        delCols = []
+        for subject in subjectDict:
             delCols.extend(subjectDict[subject])
             aux = data[subjectDict[subject]]
             data[subject] = calculateMedianReplicates(aux, log)
-
-    data = data.drop(delCols, 1)
-    
-
-    return data
+        
+        datasets[ftype] = data.drop(delCols, 1)
+    print datasets
+    return datasets
 
 ###############################
 #           Extractors        # 
@@ -119,21 +120,21 @@ def extractSubjectClinicalVariablesRelationships(data):
         data = data[cols]
     data = data.stack()
     data = data.reset_index()
-    data.columns = ['START_ID', 'END_ID', "score"]
+    data.columns = ['START_ID', 'END_ID', "value"]
     data['TYPE'] = "HAS_QUANTIFIED_CLINICAL"
-    data = data[['START_ID', 'END_ID','TYPE', 'score']]
+    data = data[['START_ID', 'END_ID','TYPE', 'value']]
 
     return data
 
 ########### Proteomics Datasets ############
 def extractProteinSubjectRelationships(data):
-    aux =  data.filter(regex = 'LFQ intensity')
+    aux =  data.filter(regex = '[I|i]ntensity')
     aux.columns = [c.split(" ")[2] for c in aux.columns]
     aux = aux.stack()
     aux = aux.reset_index()
     aux['TYPE'] = "HAS_QUANTIFIED_PROTEIN"
-    aux.columns = ['END_ID', 'START_ID',"LFQ intensity", 'TYPE']
-    aux = aux[['START_ID', 'END_ID', 'TYPE', "LFQ intensity"]]
+    aux.columns = ['END_ID', 'START_ID',"value", 'TYPE']
+    aux = aux[['START_ID', 'END_ID', 'TYPE', "value"]]
     aux['START_ID'] = aux['START_ID'].astype('int64')
     
     return aux
@@ -149,8 +150,8 @@ def extractPTMSubjectRelationships(data, modification):
     aux = aux.reset_index()
     aux['TYPE'] = "HAD_QUANTIFIED_"+modification.upper()
     aux['code'] = code
-    aux.columns = ['END_ID('+modification+')', 'START_ID(Sample)', "Intensity", 'TYPE', 'code']
-    aux = aux[['START_ID', 'END_ID', 'TYPE', "Intensity", 'code']]
+    aux.columns = ['END_ID('+modification+')', 'START_ID(Sample)', "intensity", 'TYPE', 'code']
+    aux = aux[['START_ID', 'END_ID', 'TYPE', "intensity", 'code']]
     
     return aux
 
@@ -208,10 +209,18 @@ def loadProteomicsDataset(uri, configuration):
     data = data[data[filters].isnull().all(1)]
     data = data.drop(filters, axis=1)
 
-    #Select first protein form group, i.e. P01911;Q29830;Q9MXZ4 -> P01911
+    #Select all protein form protein groups, i.e. P01911;Q29830;Q9MXZ4
+    # P01911
+    # Q29830
+    # Q9MXZ4
     #Set protein as index
-    proteins = data[proteinCol].str.split(';').apply(pd.Series,1)[0]
-    data[proteinCol] = proteins
+    s = data[proteinCol].str.split(';').apply(pd.Series, 1).stack()
+    s.index = s.index.droplevel(-1)
+    s.name = proteinCol
+    del data[proteinCol]
+    data = data.join(s)
+    #proteins = data[proteinCol].str.split(';').apply(pd.Series,1)[0]
+    #data[proteinCol] = proteins
     data = data.set_index(proteinCol)
     filters.append(proteinCol)
     columns = set(columns).difference(filters)
@@ -251,10 +260,10 @@ def loadWESDataset(uri, configuration):
 def generateDatasetImports(projectId, dataType):
     edata = parseProteomicsDataset(projectId, dataType)
     cdata = parseClinicalDataset(projectId)
-
-    edataRows = extractProteinSubjectRelationships(edata)
+     
+    edataRows = extractProteinSubjectRelationships(edata["proteins"])
     edataRows = updateGroups(edataRows, cdata['group'])
-    print edataRows
+
     cdataRows = extractSubjectClinicalVariablesRelationships(cdata)
     proSamRows = extractProjectSampleRelationships(edataRows, projectId)
     

@@ -1,8 +1,8 @@
 #Database directory
 databasesDir = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/data/databases/"
 #Databases
-#databases = ["HGNC", "RefSeq", "UniProt", "IntAct", "DisGEnet", "HGNC", "DGIdb", "OncoKB"]
-databases = ["STRING","STITCH"]
+#databases = ["HGNC", "RefSeq", "UniProt", "IntAct", "DisGEnet", "HGNC", "DGIdb", "OncoKB", "STRING", "STITCH", "HMDB"]
+databases = ["HMDB"]
 
 ###### UniProt Database ########
 uniprot_id_url = "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping.dat.gz"
@@ -44,7 +44,7 @@ cancerGenes_url = "https://www.cancergenomeinterpreter.org/data/catalog_of_cance
 cancerVariants_url = "https://www.cancergenomeinterpreter.org/data/catalog_of_validated_oncogenic_mutations_latest.zip"
 cancerBiomarkers_url = "https://www.cancergenomeinterpreter.org/data/cgi_biomarkers_latest.zip"
 cancerBioactivities_url = "https://www.cancergenomeinterpreter.org/data/cancer_bioactivities_latest.zip"
-
+    
 ###### IntAct Database #######
 intact_psimitab_url = "ftp://ftp.ebi.ac.uk/pub/databases/intact/current/psimitab/intact.txt"
 intact_file = "Intact/intact/intact.txt"

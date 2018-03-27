@@ -104,15 +104,14 @@ IMPORT_COMPILED_DRUG_DATA =   '''
                         MATCH (g:Gene {id:line.END_ID})
                         CREATE UNIQUE (d)-[:COMPILED_TARGETS{score:line.score, source:line.source,interaction_type:line.interaction_type,scores:SPLIT(line.evidences,','),evidences:SPLIT(line.evidences,',')}]->(g);'''
 
-#START_ID	END_ID	TYPE	quantification	group	quantification_type
 IMPORT_DATASETS = {"proteomicsdata":'''USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_proteomicsdata.csv" AS line 
-                        MATCH (s:Subject {id:line.START_ID})
+                        MATCH (s:Sample{id:line.START_ID})
                         MATCH (p:Protein {id:line.END_ID)}) 
                         CREATE UNIQUE (s)-[:HAS_QUANTIFIED_PROTEIN{quantification: line.quantification,group:line.group,quantification_type:line.quantification_type}]->(p);''',
                     "clinical":'''USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_proteomicsdata.csv" AS line 
-                        MATCH (s:Subject {id:line.START_ID})
+                        MATCH (s:Sample {id:line.START_ID})
                         MATCH (c:Clinical_variable {id:line.END_ID)}) 
                         CREATE UNIQUE (s)-[:HAS_QUANTIFIED_CLINICAL{value: line.score}]->(c);''',
                     "project":'''CREATE CONSTRAINT ON (p:Project) ASSERT p.id IS UNIQUE; 
@@ -124,11 +123,11 @@ IMPORT_DATASETS = {"proteomicsdata":'''USING PERIODIC COMMIT 10000
                         CREATE CONSTRAINT ON (s:Subject) ASSERT s.id IS UNIQUE; 
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_subjects.csv" AS line
-                        MERGE (s:Subject {id:line.ID});
+                        MERGE (s:Sample {id:line.ID});
                         USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_project.csv" AS line 
                         MATCH (p:Project {id:line.START_ID})
-                        MATCH (s:Subject {id:line.END_ID}) 
+                        MATCH (s:Sample {id:line.END_ID}) 
                         CREATE UNIQUE (p)-[:HAS_ENROLLED]->(s);
                         '''
                 }
