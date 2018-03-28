@@ -114,9 +114,9 @@ def parseProteomicsDataset(projectId, configuration, dataDir):
 ########### Clinical Variables Datasets ############
 def extractSubjectClinicalVariablesRelationships(data):
     cols = list(data.columns)
-    #if "group" in data.columns:
-    #    cols.remove("group")
-    #    data = data[cols]
+    if "group" in data.columns:
+        cols.remove("group")
+        data = data[cols]
     data = data.stack()
     data = data.reset_index()
     data.columns = ['START_ID', 'END_ID', "value"]
@@ -125,11 +125,46 @@ def extractSubjectClinicalVariablesRelationships(data):
 
     return data
 
+def extractSubjectGroupRelationships(data):
+    cols = list(data.columns)
+    if "group" in data.columns:
+        data = data["goup"]
+    data = data.stack()
+    data = data.reset_index()
+    data.columns = ['START_ID', 'END_ID']
+    data['TYPE'] = "BELONGS_TO_GROUP"
+
+    return data
+
 ########### Proteomics Datasets ############
+def extractModificationProteinRelationships(data, configuration, dataType):
+    modificationId = configuration[dataType]["modId"]
+    cols = configuration[dataType]["positionCols"]
+    aux = data[cols]
+    aux = aux.reset_index()
+    aux.columns = ["START_ID", "position", "residue"]
+    aux["END_ID"] = modificationId
+    aux['TYPE'] = "HAS_MODIFICATION"
+    aux = aux[['START_ID', 'END_ID','TYPE', "position", "residue"]]
+    aux['position'] = aux['position'].astype('int64')
+    
+    return aux
+
+def extractModificationSubjectRelationships(data, configuration, dataType):
+    modificationId = configuration[dataType]["modId"]
+    aux =  data.filter(regex = configuration[dataType]["valueCol"])
+    aux.columns = [c.split(" ")[1] for c in aux.columns]
+    aux = aux.stack()
+    aux = aux.reset_index()
+    aux.columns = ["Protein", "START_ID", "value"]
+    aux["END_ID"] = modificationId
+    aux['TYPE'] = "HAS_QUANTIFIED_MODIFICATION"
+    aux = aux[['START_ID', 'END_ID', 'TYPE', "value"]]
+    
+    return aux
+
 def extractPeptideSubjectRelationships(data, configuration):
     aux =  data.filter(regex = configuration["peptides"]["valueCol"])
-    data = data.reset_index()
-    
     aux.columns = [c.split(" ")[1] for c in aux.columns]
     aux = aux.stack()
     aux = aux.reset_index()
@@ -142,11 +177,13 @@ def extractPeptideSubjectRelationships(data, configuration):
     return aux
 
 def extractPeptideProteinRelationships(data, configuration):
-    aux =  data[configuration["peptides"]["proteinCol"]]
+    cols = [configuration["peptides"]["proteinCol"]]
+    cols.extend(configuration["peptides"]["positionCols"])
+    aux =  data[cols]
     aux = aux.reset_index()
-    aux.columns = ["Sequence", "Protein"]
+    aux.columns = ["Sequence", "Protein", "Start", "End"]
     aux['TYPE'] = "BELONGS_TO_PROTEIN"
-    aux.columns = ['START_ID', 'END_ID', 'TYPE']
+    aux.columns = ['START_ID', 'END_ID', 'TYPE', "start", "end"]
     aux = aux[['START_ID', 'END_ID', 'TYPE']]
     return aux
 
@@ -212,7 +249,6 @@ def loadProteomicsDataset(uri, configuration):
     ''' This function gets the molecular data from a proteomics experiment.
         Input: uri of the processed file resulting from MQ
         Output: pandas DataFrame with the columns and filters defined in config.py '''
-
     aux = None
     #Get the columns from config and divide them into simple or regex columns
     columns = configuration["columns"]
@@ -237,10 +273,14 @@ def loadProteomicsDataset(uri, configuration):
     # P01911
     # Q29830
     # Q9MXZ4
-    s = data[proteinCol].str.split(';').apply(pd.Series, 1).stack()
-    s.index = s.index.droplevel(-1)
+    s = data[proteinCol].str.split(';').apply(pd.Series, 1).stack().reset_index(level=1, drop=True)
     del data[proteinCol]
-    data = data.join(s.to_frame(proteinCol))
+    pdf = s.to_frame(proteinCol)
+    if "multipositions" in configuration:
+        s2 = data[configuration["multipositions"]].str.split(';').apply(pd.Series, 1).stack().reset_index(level=1, drop=True)
+        del data[configuration["multipositions"]]
+        pdf = pd.concat([s,s2], axis=1, keys=[proteinCol,configuration["multipositions"]])
+    data = data.join(pdf)
     #proteins = data[proteinCol].str.split(';').apply(pd.Series,1)[0]
     #data[proteinCol] = proteins
     data = data.set_index(indexCol)
@@ -279,24 +319,33 @@ def generateDatasetImports(projectId, dataType):
         data = parseClinicalDataset(projectId, configuration, dataDir)
         dataRows = extractSubjectClinicalVariablesRelationships(data)
         generateGraphFiles(dataRows,'clinical', projectId)
+        dataRows = extractSubjectGroupRelationships(data)
+        generateGraphFiles(dataRows,'groups', projectId)
     elif dataType == "proteomicsData":
         data = parseProteomicsDataset(projectId, configuration, dataDir)
         for dtype in data:
+            print dtype
             if dtype == "proteins":
                 dataRows = extractProteinSubjectRelationships(data[dtype], configuration)
                 proSamRows = extractProjectSampleRelationships(dataRows, projectId)
                 generateGraphFiles(proSamRows,'project', projectId)
+                generateGraphFiles(dataRows,dtype, projectId)
             elif dtype == "peptides":
                 dataRows = extractPeptideSubjectRelationships(data[dtype], configuration) 
                 ppDataRows = extractPeptideProteinRelationships(data[dtype], configuration)
-                generateGraphFiles(ppDataRows,"PeptideProtein", projectId)
-            generateGraphFiles(dataRows,dtype, projectId)
+                generateGraphFiles(ppDataRows,"peptide_protein", projectId)
+                generateGraphFiles(dataRows,dtype, projectId)
+            else:
+                dataRows = extractModificationProteinRelationships(data[dtype], configuration, dtype)
+                generateGraphFiles(dataRows,"protein_modification", projectId, ot = 'a')
+                dataRows = extractModificationSubjectRelationships(data[dtype], configuration, dtype)
+                generateGraphFiles(dataRows, "modifications", projectId, ot = 'a')
             
-def generateGraphFiles(data, dataType, projectId):
+def generateGraphFiles(data, dataType, projectId, ot = 'w'):
     importDir = config.datasetsImportDirectory
     outputfile = os.path.join(importDir, projectId+"_"+dataType.lower()+".csv")
-      
-    data.to_csv(path_or_buf=outputfile, 
+    with open(outputfile, ot) as f:  
+        data.to_csv(path_or_buf = f, 
             header=True, index=False, quotechar='"', 
             line_terminator='\n', escapechar='\\')
 
