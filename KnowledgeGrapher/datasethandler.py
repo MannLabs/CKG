@@ -128,18 +128,17 @@ def extractSubjectClinicalVariablesRelationships(data):
 def extractSubjectGroupRelationships(data):
     cols = list(data.columns)
     if "group" in data.columns:
-        data = data["goup"]
-    data = data.stack()
+        data = data["group"].to_frame()
     data = data.reset_index()
     data.columns = ['START_ID', 'END_ID']
     data['TYPE'] = "BELONGS_TO_GROUP"
-
     return data
 
 ########### Proteomics Datasets ############
-def extractModificationProteinRelationships(data, configuration, dataType):
-    modificationId = configuration[dataType]["modId"]
-    cols = configuration[dataType]["positionCols"]
+############## ProteinModification entity ####################
+def extractModificationProteinRelationships(data, configuration):
+    modificationId = configuration["modId"]
+    cols = configuration["positionCols"]
     aux = data[cols]
     aux = aux.reset_index()
     aux.columns = ["START_ID", "position", "residue"]
@@ -150,21 +149,74 @@ def extractModificationProteinRelationships(data, configuration, dataType):
     
     return aux
 
-def extractModificationSubjectRelationships(data, configuration, dataType):
-    modificationId = configuration[dataType]["modId"]
-    aux =  data.filter(regex = configuration[dataType]["valueCol"])
+def extractProteinModificationSubjectRelationships(data, configuration):
+    positionCols = configuration["positionCols"]
+    proteinCol = configuration["proteinCol"]
+    cols = [proteinCol]
+    cols.extend(positionCols)
+    
+    aux = data.copy()
+    aux = aux.reset_index()
+    aux["END_ID"] = aux[proteinCol].map(str) + "_" + aux[positionCols[0]].map(str) + aux[positionCols[1]].map(str)
+    aux = aux.set_index("END_ID") 
+    aux = aux.drop(cols, axis=1)
+    aux =  aux.filter(regex = configuration["valueCol"])
     aux.columns = [c.split(" ")[1] for c in aux.columns]
     aux = aux.stack()
     aux = aux.reset_index()
-    aux.columns = ["Protein", "START_ID", "value"]
-    aux["END_ID"] = modificationId
-    aux['TYPE'] = "HAS_QUANTIFIED_MODIFICATION"
+    aux.columns = ["END_ID", "START_ID", "value"]
+    aux['TYPE'] = "HAS_QUANTIFIED_PROTEINMODIFICATION"
     aux = aux[['START_ID', 'END_ID', 'TYPE', "value"]]
     
     return aux
 
+def extractProteinProteinModificationRelationships(data, configuration):
+    modID = configuration["modId"]
+    positionCols = configuration["positionCols"]
+    proteinCol = configuration["proteinCol"]
+    cols = [proteinCol]
+    cols.extend(positionCols)
+    aux = data.copy().reset_index()
+    aux = aux[cols]
+    aux["START_ID"] =  aux[proteinCol].map(str) + "_" + aux[positionCols[0]].map(str) + aux[positionCols[1]].map(str)
+    aux = aux.drop(positionCols, axis=1)
+    aux = aux.set_index("START_ID")
+    aux = aux.reset_index()
+    aux.columns = ["START_ID", "END_ID"]
+    aux['TYPE'] = "BELONGS_TO_PROTEIN"
+    aux = aux[['START_ID', 'END_ID', 'TYPE']]
+    
+    return aux
+
+def extractProteinModifications(data, configuration):
+    positionCols = configuration["positionCols"]
+    proteinCol = configuration["proteinCol"]
+    sequenceCol = configuration["sequenceCol"]
+    cols = [proteinCol, sequenceCol]
+    cols.extend(positionCols)
+    aux = data.copy().reset_index()
+    aux = aux[cols] 
+    aux["ID"] = aux[proteinCol].map(str) + "_" + aux[positionCols[0]].map(str) + aux[positionCols[1]].map(str)
+    aux = aux.set_index("ID")
+    aux = aux.reset_index()
+    aux[sequenceCol] = aux[sequenceCol].str.replace('_', '-')
+    aux.columns = ["ID", "protein", "sequence_window", "position", "Amino acid"]
+    
+    return aux
+
+################# Peptide entity ####################
+def extractPeptides(data, configuration):
+    aux = data.copy()
+    modid = configuration["type"]
+    aux["type"] = modid
+    aux = aux["type"]
+    aux = aux.reset_index()
+    aux.columns = ["ID", "type"]
+
+    return aux
+
 def extractPeptideSubjectRelationships(data, configuration):
-    aux =  data.filter(regex = configuration["peptides"]["valueCol"])
+    aux =  data.filter(regex = configuration["valueCol"])
     aux.columns = [c.split(" ")[1] for c in aux.columns]
     aux = aux.stack()
     aux = aux.reset_index()
@@ -177,8 +229,8 @@ def extractPeptideSubjectRelationships(data, configuration):
     return aux
 
 def extractPeptideProteinRelationships(data, configuration):
-    cols = [configuration["peptides"]["proteinCol"]]
-    cols.extend(configuration["peptides"]["positionCols"])
+    cols = [configuration["proteinCol"]]
+    cols.extend(configuration["positionCols"])
     aux =  data[cols]
     aux = aux.reset_index()
     aux.columns = ["Sequence", "Protein", "Start", "End"]
@@ -187,8 +239,9 @@ def extractPeptideProteinRelationships(data, configuration):
     aux = aux[['START_ID', 'END_ID', 'TYPE']]
     return aux
 
+################# Protein entity #########################
 def extractProteinSubjectRelationships(data, configuration):
-    aux =  data.filter(regex = configuration["proteins"]["valueCol"])
+    aux =  data.filter(regex = configuration["valueCol"])
     aux.columns = [c.split(" ")[2] for c in aux.columns]
     aux = aux.stack()
     aux = aux.reset_index()
@@ -196,36 +249,6 @@ def extractProteinSubjectRelationships(data, configuration):
     aux.columns = ['END_ID', 'START_ID',"value", 'TYPE']
     aux = aux[['START_ID', 'END_ID', 'TYPE', "value"]]
     aux['START_ID'] = aux['START_ID'].astype('int64')
-    
-    return aux
-
-def extractPTMSubjectRelationships(data, modification):
-    code = config["modifications"][modification]["code"]
-    aux = data.copy()
-    aux["modId"] = aux["Protein"].str + "_" + aux["Amino acid"].str + aux["Positions"].str
-    aux = aux.set_index("modId")
-    aux =  aux.filter(regex = 'Intensity')
-    aux.columns = [c.split(" ")[2] for c in aux.columns]
-    aux = aux.stack()
-    aux = aux.reset_index()
-    aux['TYPE'] = "HAD_QUANTIFIED_"+modification.upper()
-    aux['code'] = code
-    aux.columns = ['END_ID('+modification+')', 'START_ID(Sample)', "intensity", 'TYPE', 'code']
-    aux = aux[['START_ID', 'END_ID', 'TYPE', "intensity", 'code']]
-    
-    return aux
-
-#Not sure this is necessary -- Would correspond to the relationship "IS_MODIFIED_IN" 
-#(MODIFIED needs to be substituted by the modification)
-def extractPTMProteinRelationships(data, modification):
-    code = config["modifications"][modification]["code"]
-    aux = data.copy()
-    aux["modId"] = aux["Protein"].str + "_" + aux["Amino acid"].str + aux["Positions"].str
-    aux = aux.reset_index()
-    aux = aux[["Protein", "modId"]]
-    aux['TYPE'] = "IS_MODIFIED_AT"
-    aux['code'] = code
-    aux = aux[['START_ID', 'END_ID','TYPE', 'code']]
     
     return aux
 
@@ -324,22 +347,27 @@ def generateDatasetImports(projectId, dataType):
     elif dataType == "proteomicsData":
         data = parseProteomicsDataset(projectId, configuration, dataDir)
         for dtype in data:
-            print dtype
             if dtype == "proteins":
-                dataRows = extractProteinSubjectRelationships(data[dtype], configuration)
+                dataRows = extractProteinSubjectRelationships(data[dtype], configuration[dtype])
                 proSamRows = extractProjectSampleRelationships(dataRows, projectId)
                 generateGraphFiles(proSamRows,'project', projectId)
                 generateGraphFiles(dataRows,dtype, projectId)
             elif dtype == "peptides":
-                dataRows = extractPeptideSubjectRelationships(data[dtype], configuration) 
-                ppDataRows = extractPeptideProteinRelationships(data[dtype], configuration)
-                generateGraphFiles(ppDataRows,"peptide_protein", projectId)
-                generateGraphFiles(dataRows,dtype, projectId)
+                dataRows = extractPeptideSubjectRelationships(data[dtype], configuration[dtype]) 
+                generateGraphFiles(dataRows, "subject_peptide", projectId)
+                dataRows = extractPeptideProteinRelationships(data[dtype], configuration[dtype])
+                generateGraphFiles(dataRows,"peptide_protein", projectId)
+                dataRows = extractPeptides(data[dtype], configuration[dtype])
+                generateGraphFiles(dataRows, dtype, projectId)
             else:
-                dataRows = extractModificationProteinRelationships(data[dtype], configuration, dtype)
+                dataRows = extractModificationProteinRelationships(data[dtype], configuration[dtype])
                 generateGraphFiles(dataRows,"protein_modification", projectId, ot = 'a')
-                dataRows = extractModificationSubjectRelationships(data[dtype], configuration, dtype)
-                generateGraphFiles(dataRows, "modifications", projectId, ot = 'a')
+                dataRows = extractProteinModificationSubjectRelationships(data[dtype], configuration[dtype])                
+                generateGraphFiles(dataRows, "modifiedprotein_subject", projectId, ot = 'a')
+                dataRows = extractProteinProteinModificationRelationships(data[dtype], configuration[dtype])
+                generateGraphFiles(dataRows, "modifiedprotein_protein", projectId, ot = 'a')
+                dataRows = extractProteinModifications(data[dtype], configuration[dtype])
+                generateGraphFiles(dataRows, "modifiedprotein", projectId, ot = 'a')
             
 def generateGraphFiles(data, dataType, projectId, ot = 'w'):
     importDir = config.datasetsImportDirectory

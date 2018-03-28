@@ -106,38 +106,68 @@ IMPORT_COMPILED_DRUG_DATA =   '''
 
 IMPORT_DATASETS = {"proteomicsdata":'''USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_proteins.csv" AS line 
-                        MATCH (s:Sample{id:line.START_ID})
+                        MATCH (s:Anlytical_sample{id:line.START_ID})
                         MATCH (p:Protein {id:line.END_ID)}) 
-                        CREATE UNIQUE (s)-[:HAS_QUANTIFIED_PROTEIN{value: line.value}]->(p);
-                        USING PERIODIC COMMIT 10000 
+                        CREATE UNIQUE (s)-[:HAS_QUANTIFIED_PROTEIN{value:line.value}]->(p);
+                        USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_peptides.csv" AS line 
-                        MATCH (s:Sample{id:line.START_ID})
+                        MATCH (s:Analytical_sample{id:line.START_ID})
                         MATCH (p:Peptide {id:line.END_ID)}) 
-                        CREATE UNIQUE (s)-[:HAS_QUANTIFIED_PEPTIDE{value: line.value}]->(p);
+                        CREATE UNIQUE (s)-[:HAS_QUANTIFIED_PEPTIDE{value:line.value}]->(p);
                         USING PERIODIC COMMIT 10000 
-                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_PeptideProtein.csv" AS line 
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_peptide_protein.csv" AS line 
                         MATCH (p1:Peptide{id:line.START_ID})
                         MATCH (p2:Protein {id:line.END_ID)}) 
-                        CREATE UNIQUE (p1)-[:BELONGS_TO_PROTEIN]->(p2);''',
-                    "clinical":'''USING PERIODIC COMMIT 10000 
-                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_proteomicsdata.csv" AS line 
-                        MATCH (s:Sample {id:line.START_ID})
-                        MATCH (c:Clinical_variable {id:line.END_ID)}) 
-                        CREATE UNIQUE (s)-[:HAS_QUANTIFIED_CLINICAL{value: line.value}]->(c);''',
-                    "project":'''CREATE CONSTRAINT ON (p:Project) ASSERT p.id IS UNIQUE; 
-                        CREATE CONSTRAINT ON (p:Project) ASSERT p.name IS UNIQUE; 
-                        USING PERIODIC COMMIT 10000
-                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID.csv" AS line
-                        MERGE (p:Project {id:line.ID}) 
-                        ON CREATE SET p.name=line.name,p.description=line.description,p.responsible=line.responsible;
-                        CREATE CONSTRAINT ON (s:Subject) ASSERT s.id IS UNIQUE; 
-                        USING PERIODIC COMMIT 10000
-                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_subjects.csv" AS line
-                        MERGE (s:Sample {id:line.ID});
+                        CREATE UNIQUE (p1)-[:BELONGS_TO_PROTEIN]->(p2);
                         USING PERIODIC COMMIT 10000 
-                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_project.csv" AS line 
-                        MATCH (p:Project {id:line.START_ID})
-                        MATCH (s:Sample {id:line.END_ID}) 
-                        CREATE UNIQUE (p)-[:HAS_ENROLLED]->(s);
-                        '''
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_subject_peptide.csv" AS line 
+                        MATCH (s:Analytical_sample{id:line.START_ID})
+                        MATCH (p:Peptide {id:line.END_ID)}) 
+                        CREATE UNIQUE (s)-[:HAS_QUANTIFIED_PEPTIDE{value:line.value}]->(p);
+                        USING PERIODIC COMMIT 10000 
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_protein_modification.csv" AS line 
+                        MATCH (p:Protein{id:line.START_ID})
+                        MATCH (m:Modification {id:line.END_ID)}) 
+                        CREATE UNIQUE (p)-[:HAS_MODIFICATION{position:line.position,residue:line.residue}]->(p);
+                        USING PERIODIC COMMIT 10000 
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_modifiedprotein_protein.csv" AS line 
+                        MATCH (mp:ModifiedProtein{id:line.START_ID})
+                        MATCH (p:Protein {id:line.END_ID)}) 
+                        CREATE UNIQUE (mp)-[:BELONGS_TO_PROTEIN]->(p);
+                        USING PERIODIC COMMIT 10000 
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_modifiedprotein_subject.csv" AS line
+                        MATCH (s:Analytical_sample{id:line.START_ID})
+                        MATCH (mp:ModifiedProtein {id:line.END_ID)}) 
+                        CREATE UNIQUE (s)-[:HAS_QUANTIFIED_PROTEINMODIFICATION{value:line.value}]->(mp);''',
+                    "clinical":'''USING PERIODIC COMMIT 10000 
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_clinical.csv" AS line 
+                        MATCH (s:Analytical_sample {id:line.START_ID})
+                        MATCH (c:Clinical_measurement {id:line.END_ID)}) 
+                        CREATE UNIQUE (s)-[:HAS_QUANTIFIED_CLINICAL{value: line.value}]->(c);'''
                 }
+CREATE_PROJECT = '''CREATE CONSTRAINT ON (p:Project) ASSERT p.id IS UNIQUE;
+                    CREATE CONSTRAINT ON (p:Project) ASSERT p.name IS UNIQUE; 
+                    USING PERIODIC COMMIT 10000
+                    LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID.csv" AS line
+                    MERGE (p:Project {id:line.ID}) 
+                    ON CREATE SET p.name=line.name,p.description=line.description,p.acronym=line.acronym,p.responsible=line.responsible;
+                    '''
+CREATE_BIOSAMPLES = '''CREATE CONSTRAINT ON (s:Biological_sample) ASSERT s.id IS UNIQUE; 
+                    USING PERIODIC COMMIT 10000
+                    LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_biological_samples.csv" AS line
+                    MERGE (s:Biological_sample {id:line.ID});
+                    USING PERIODIC COMMIT 10000 
+                    LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_project.csv" AS line 
+                    MATCH (p:Project {id:line.START_ID})
+                    MATCH (s:Biological_sample {id:line.END_ID}) 
+                    CREATE UNIQUE (p)-[:HAS_ENROLLED]->(s);'''
+
+CREATE_ANALYTICALSAMPLES = '''CREATE CONSTRAINT ON (s:Analytical_sample) ASSERT s.id IS UNIQUE; 
+                    USING PERIODIC COMMIT 10000
+                    LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_analytical_samples.csv" AS line
+                    MERGE (s:Analytical_sample {id:line.ID, group:line.group});
+                    USING PERIODIC COMMIT 10000
+                    LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_biosample_analytical.csv" AS line
+                    MATCH (s1:Biological_sample {id:line.START_ID})
+                    MATCH (s2:Analytical_sample {id:line.END_ID}) 
+                    CREATE UNIQUE (s1)-[:SPLITTED_INTO{quantity:line.quantity}]->(s2);'''
