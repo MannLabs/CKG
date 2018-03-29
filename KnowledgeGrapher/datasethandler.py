@@ -380,7 +380,7 @@ def generateGraphFiles(data, dataType, projectId, ot = 'w'):
 
 if __name__ == "__main__":
     #uri = sys.argv[1]
-    generateDatasetImports('000000000001', 'proteomicsData')
-    generateDatasetImports('000000000001', 'clinicalData')
+    generateDatasetImports('P0000001', 'proteomicsData')
+    generateDatasetImports('P0000001', 'clinicalData')
     
     

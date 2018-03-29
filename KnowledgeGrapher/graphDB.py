@@ -1,6 +1,7 @@
 import utils
 import config
 import cypher as cy
+from os.path import join
 from py2neo import Graph
 
 def getGraphDatabaseConnectionConfiguration():
@@ -93,7 +94,18 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
             for statement in drugsDataImportCode.replace("IMPORTDIR",importDir).replace("RESOURCE",resource.lower()).split(';')[0:-1]:
                 print statement+";"
                 driver.run(statement+";")
-
+    #Projects
+    if "project" in imports:
+        importDir = config.datasetsImportDirectory
+        projects = utils.listDirectoryFolders(importDir)
+        projectCode = cy.IMPORT_PROJECT
+        for project in projects:
+            projectDir = join(importDir, project)
+            for code in projectCode:
+                for statement in code.replace("IMPORTDIR",projectDir).replace('PROJECTID', project).split(';')[0:-1]:
+                    print statement
+                    driver.run(statement+';')
+    #Datasets
     if "datasets" in imports:
         importDir = config.datasetsImportDirectory
         files = utils.listDirectoryFiles(importDir)
@@ -105,6 +117,7 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
             for statement in code.replace("IMPORTDIR",importDir).replace('PROJECTID', projectId).split(';')[0:-1]:
                 print statement
                 driver.run(statement+';')
+
         
 
 
@@ -125,5 +138,5 @@ if __name__ == "__main__":
     #removeRelationshipDB(entity1 = 'Protein', entity2 = 'Protein', relationship = "intact_INTERACTS_WITH")
     #removeRelationshipDB(entity1 = 'Protein', entity2 = 'Protein', relationship = "IntAct_INTERACTS_WITH")
 
-    createDB(imports=["datasets"])
+    createDB(imports=["project"])
     #createDB(imports=["ontologies","chromosomes", "genes", "transcripts", "proteins", "ppi", "drugs", "diseases"])

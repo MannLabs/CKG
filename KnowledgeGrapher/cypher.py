@@ -129,6 +129,11 @@ IMPORT_DATASETS = {"proteomicsdata":'''USING PERIODIC COMMIT 10000
                         MATCH (p:Protein{id:line.START_ID})
                         MATCH (m:Modification {id:line.END_ID)}) 
                         CREATE UNIQUE (p)-[:HAS_MODIFICATION{position:line.position,residue:line.residue}]->(p);
+                        CREATE CONSTRAINT ON (m:Modified_protein) ASSERT m.id IS UNIQUE;
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_modifiedprotein.csv" AS line
+                        MERGE (m:Modified_protein {id:line.ID}) 
+                        ON CREATE SET m.protein=line.protein,m.position=line.position,m.residue=line.residue;
                         USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_modifiedprotein_protein.csv" AS line 
                         MATCH (mp:ModifiedProtein{id:line.START_ID})
@@ -145,6 +150,7 @@ IMPORT_DATASETS = {"proteomicsdata":'''USING PERIODIC COMMIT 10000
                         MATCH (c:Clinical_measurement {id:line.END_ID)}) 
                         CREATE UNIQUE (s)-[:HAS_QUANTIFIED_CLINICAL{value: line.value}]->(c);'''
                 }
+
 CREATE_PROJECT = '''CREATE CONSTRAINT ON (p:Project) ASSERT p.id IS UNIQUE;
                     CREATE CONSTRAINT ON (p:Project) ASSERT p.name IS UNIQUE; 
                     USING PERIODIC COMMIT 10000
@@ -152,22 +158,39 @@ CREATE_PROJECT = '''CREATE CONSTRAINT ON (p:Project) ASSERT p.id IS UNIQUE;
                     MERGE (p:Project {id:line.ID}) 
                     ON CREATE SET p.name=line.name,p.description=line.description,p.acronym=line.acronym,p.responsible=line.responsible;
                     '''
+CREATE_SUBJECTS = '''CREATE CONSTRAINT ON (s:Subject) ASSERT s.id IS UNIQUE;
+                    USING PERIODIC COMMIT 10000
+                    LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_subjects.csv" AS line
+                    MERGE (s:Subject {id:line.ID}) 
+                    ON CREATE SET s.external_id=line.external_id;
+                    USING PERIODIC COMMIT 10000
+                    LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_project.csv" AS line 
+                    MATCH (p:Project {id:line.START_ID})
+                    MATCH (s:Subject {id:line.END_ID}) 
+                    CREATE UNIQUE (p)-[:HAS_ENROLLED]->(s);
+                    '''
+
 CREATE_BIOSAMPLES = '''CREATE CONSTRAINT ON (s:Biological_sample) ASSERT s.id IS UNIQUE; 
                     USING PERIODIC COMMIT 10000
                     LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_biological_samples.csv" AS line
-                    MERGE (s:Biological_sample {id:line.ID});
-                    USING PERIODIC COMMIT 10000 
-                    LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_project.csv" AS line 
-                    MATCH (p:Project {id:line.START_ID})
-                    MATCH (s:Biological_sample {id:line.END_ID}) 
-                    CREATE UNIQUE (p)-[:HAS_ENROLLED]->(s);'''
+                    MERGE (s:Biological_sample {id:line.ID})
+                    ON CREATE SET s.source=line.source,s.external_id=line.external_id,s.owner=line.owner,s.collection_date=line.collection_date,s.conservation_conditions=line.conservation_conditions,s.storage=line.storage,s.status=line.status,s.quantity=line.quantity,s.quantity_units=line.quantity_units;
+                    USING PERIODIC COMMIT 10000
+                    LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_subject_biosample.csv" AS line 
+                    MATCH (b:Biological_sample {id:line.START_ID}) 
+                    MATCH (s:Subject {id:line.END_ID})
+                    CREATE UNIQUE (b)-[:BELONGS_TO_SUBJECT]->(s);'''
 
-CREATE_ANALYTICALSAMPLES = '''CREATE CONSTRAINT ON (s:Analytical_sample) ASSERT s.id IS UNIQUE; 
+CREATE_ANALYTICALSAMPLES = '''CREATE INDEX ON :Analytical_sample(group);
+                    CREATE CONSTRAINT ON (s:Analytical_sample) ASSERT s.id IS UNIQUE; 
                     USING PERIODIC COMMIT 10000
                     LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_analytical_samples.csv" AS line
-                    MERGE (s:Analytical_sample {id:line.ID, group:line.group});
+                    MERGE (s:Analytical_sample {id:line.ID})
+                    ON CREATE SET s.collection_date=line.collection_date,s.conservation_conditions=line.conservation_conditions,s.storage=line.storage,s.status=line.status,s.quantity=line.quantity,s.quantity_units=line.quantity_units,s.group=line.group;
                     USING PERIODIC COMMIT 10000
                     LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_biosample_analytical.csv" AS line
                     MATCH (s1:Biological_sample {id:line.START_ID})
                     MATCH (s2:Analytical_sample {id:line.END_ID}) 
-                    CREATE UNIQUE (s1)-[:SPLITTED_INTO{quantity:line.quantity}]->(s2);'''
+                    CREATE UNIQUE (s1)-[:SPLITTED_INTO{quantity:line.quantity,quantity_units:line.quantity_units}]->(s2);'''
+
+IMPORT_PROJECT = [CREATE_PROJECT, CREATE_SUBJECTS, CREATE_BIOSAMPLES, CREATE_ANALYTICALSAMPLES]

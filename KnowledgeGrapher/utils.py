@@ -48,3 +48,10 @@ def listDirectoryFiles(directory):
     onlyfiles = [f for f in listdir(directory) if isfile(join(directory, f)) and not f.startswith('.')]
 
     return onlyfiles
+
+def listDirectoryFolders(directory):
+    from os import listdir
+    from os.path import isdir, join
+    dircontent = [f for f in listdir(directory) if isdir(join(directory, f)) and not f.startswith('.')]
+
+    return dircontent
