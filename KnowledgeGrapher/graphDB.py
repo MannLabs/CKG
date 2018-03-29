@@ -108,15 +108,17 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
     #Datasets
     if "datasets" in imports:
         importDir = config.datasetsImportDirectory
-        files = utils.listDirectoryFiles(importDir)
         datasetsCode = cy.IMPORT_DATASETS
-        for f in files:
-            projectId, dtype = f.split('_')
-            dtype = dtype.split('.')[0]
-            code = datasetsCode[dtype]
-            for statement in code.replace("IMPORTDIR",importDir).replace('PROJECTID', projectId).split(';')[0:-1]:
-                print statement
-                driver.run(statement+';')
+        projects = utils.listDirectoryFolders(importDir)
+        for project in projects:
+            projectDir = join(importDir, project)
+            datasetTypes = utils.listDirectoryFolders(projectDir)
+            for dtype in datasetTypes:
+                datasetDir = join(projectDir, dtype)
+                code = datasetsCode[dtype]
+                for statement in code.replace("IMPORTDIR",datasetDir).replace('PROJECTID', project).split(';')[0:-1]:
+                    print statement
+                    driver.run(statement+';')
 
         
 
@@ -138,5 +140,5 @@ if __name__ == "__main__":
     #removeRelationshipDB(entity1 = 'Protein', entity2 = 'Protein', relationship = "intact_INTERACTS_WITH")
     #removeRelationshipDB(entity1 = 'Protein', entity2 = 'Protein', relationship = "IntAct_INTERACTS_WITH")
 
-    createDB(imports=["project"])
+    createDB(imports=["ontologies","chromosomes", "genes", "transcripts", "proteins", "ppi", "drugs", "diseases","datasets"])
     #createDB(imports=["ontologies","chromosomes", "genes", "transcripts", "proteins", "ppi", "drugs", "diseases"])

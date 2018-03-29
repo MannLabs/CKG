@@ -10,11 +10,11 @@ importDirectory = dataDirectory + "/imports"
 #Datasets directory
 datasetsImportDirectory = importDirectory + "/datasets/"
 #Imports 
-entities = ["Disease","Drug","Tissue","Biological_process", "Molecular_function", "Cellular_compartment", "Pathway"]
+entities = ["Disease","Drug","Tissue","Biological_process", "Molecular_function", "Cellular_compartment"]
 #Database resources
-PPI_resources = ["IntAct","STRING"]
+PPI_resources = ["IntAct"]
 disease_resources = ["DisGEnet"]
-drug_resources = ["DGIdb", "OncoKB", "STITCH"]
+drug_resources = ["DGIdb", "OncoKB"]
 
 #Analyses configuration
 similarityMeasures = ["pearson"]
