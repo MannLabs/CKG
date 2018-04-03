@@ -4,10 +4,16 @@ import os.path
 from collections import defaultdict
 import pandas as pd
 import csv
+import obonet
+import re
 
 #########################
 # General functionality # 
 #########################
+def convertOBOtoNet(ontologyFile):
+    graph = obonet.read_obo(ontologyFile)
+    return graph
+
 def entries_to_remove(entries, the_dict):
     for key in entries:
         if key in the_dict:
@@ -171,7 +177,37 @@ def parseReflectFiles(files, filters, qtype = None):
                         definitions[code] = definition.replace('\n', ' ').replace('"', '').replace('\\', '')
 
     return terms, relationships, definitions
-        
+
+##################
+# OBO ontologies # 
+##################
+def parseOBOFiles(files):
+    entity = {}
+    terms = defaultdict(list)
+    relationships = set()
+    definitions = defaultdict()
+    for f in files:
+        oboGraph = convertOBOtoNet(f)
+        for term,attr in oboGraph.nodes(data = True):
+            if "name" in attr:
+                terms[term].append(attr["name"])
+            else:
+                terms[term].append(term)
+            if "synonym" in attr:
+                for s in attr["synonym"]:
+                    terms[term].append(re.match(r'\"(.+?)\"',s).group(1))
+            if "def" in attr:
+                definitions[term] = attr["def"].replace('"','')
+            else:
+                definitions[term] = terms[term][0]
+            if "is_a" in attr:
+                for isa in attr["is_a"]:
+                    relationships.add((term, isa, "HAS_PARENT"))
+    return terms, relationships, definitions
+
+############################
+# Calling the right parser # 
+############################
 def parseOntology(ontology):
     ontologyDirectory = config.ontologiesDirectory
     ontologyFiles = []
@@ -193,7 +229,9 @@ def parseOntology(ontology):
         ontologyData = parseICD(ontologyFiles)
     if ontology in ["DO", "BTO", "GOBP", "GOMF", "GOCC", "STITCH"]:
         ontologyData = parseReflectFiles(ontologyFiles, filters, otype)
-    
+    if ontology in ["PSI-MOD"]:
+        ontologyData = parseOBOFiles(ontologyFiles)
+   
     return ontologyData
     
 #########################

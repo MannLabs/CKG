@@ -4,13 +4,13 @@ dbPort = 7687
 dbUser="neo4j"
 dbPassword = "bioinfo1112"
 ########################
-dataDirectory = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/Data"
+dataDirectory = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/data"
 #Import directory
 importDirectory = dataDirectory + "/imports"
 #Datasets directory
 datasetsImportDirectory = importDirectory + "/datasets/"
 #Imports 
-entities = ["Disease","Drug","Tissue","Biological_process", "Molecular_function", "Cellular_compartment"]
+entities = ["Disease","Drug","Tissue","Biological_process", "Molecular_function", "Cellular_compartment", "PTM"]
 #Database resources
 PPI_resources = ["IntAct"]
 disease_resources = ["DisGEnet"]

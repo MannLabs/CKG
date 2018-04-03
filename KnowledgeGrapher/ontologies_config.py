@@ -1,9 +1,9 @@
 #Ontologies directory
 ontologiesDirectory = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/data/ontologies/"
 
-ontologies = {"Disease": "DO", 
-               "Tissue": "BTO", 
-               "Clinical_variable": "SNOMED-CT",
+ontologies = {##"Disease": "DO", 
+               ##"Tissue": "BTO", 
+               ##"Clinical_variable": "SNOMED-CT",
                #"Phosphorylation":"PSI-MOD",
                #"Ubiquitination":"PSI-MOD",
                #"Glycation":"PSI-MOD",
@@ -11,13 +11,14 @@ ontologies = {"Disease": "DO",
                #"Experiment":"PSI-MS",
                #"Peptide_variant":"HGV",
                #"Gene_variant":"HGV",
-               "Drug":"STITCH",
+               ##"Drug":"STITCH",
                #"Food":"BBC",
                #"Physical_activity":"SMASH",
-               "Biological_process":"GOBP",
-               "Cellular_compartment":"GOCC",
-               "Molecular_function":"GOMF",
-               "Diagnose":"ICD"
+               "PTM":"PSI-MOD"
+               ##"Biological_process":"GOBP",
+               ##"Cellular_compartment":"GOCC",
+               ##"Molecular_function":"GOMF",
+               ##"Diagnose":"ICD"
             }
 
 ontology_types = {"DO":-26, 
@@ -70,7 +71,8 @@ files = {-44: ["ICD/version_10/icd10_2016.tsv"],
              "reflect/stitch_names.tsv",
              "reflect/stitch_groups.tsv",
              "reflect/stitch_texts.tsv"
-             ]
+             ],
+        -41: ["PSI/psi-mod.obo.txt"]
         }
 
 

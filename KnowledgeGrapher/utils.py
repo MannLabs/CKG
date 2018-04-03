@@ -55,3 +55,6 @@ def listDirectoryFolders(directory):
     dircontent = [f for f in listdir(directory) if isdir(join(directory, f)) and not f.startswith('.')]
 
     return dircontent
+
+
+

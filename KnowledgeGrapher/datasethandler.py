@@ -171,7 +171,6 @@ def extractProteinModificationSubjectRelationships(data, configuration):
     return aux
 
 def extractProteinProteinModificationRelationships(data, configuration):
-    modID = configuration["modId"]
     positionCols = configuration["positionCols"]
     proteinCol = configuration["proteinCol"]
     cols = [proteinCol]
@@ -201,6 +200,21 @@ def extractProteinModifications(data, configuration):
     aux = aux.reset_index()
     aux[sequenceCol] = aux[sequenceCol].str.replace('_', '-')
     aux.columns = ["ID", "protein", "sequence_window", "position", "Amino acid"]
+    
+    return aux
+
+def extractProteinModificationsModification(data, configuration):
+    modID = configuration["modId"]
+    positionCols = configuration["positionCols"]
+    proteinCol = configuration["proteinCol"]
+    sequenceCol = configuration["sequenceCol"]
+    cols = [proteinCol, sequenceCol]
+    cols.extend(positionCols)
+    aux = data.copy().reset_index()
+    aux = aux[cols] 
+    aux["START_ID"] = aux[proteinCol].map(str) + "_" + aux[positionCols[0]].map(str) + aux[positionCols[1]].map(str)
+    aux["END_ID"] = modID
+    aux = aux[["START_ID","END_ID"]]
     
     return aux
 
@@ -368,6 +382,8 @@ def generateDatasetImports(projectId, dataType):
                 generateGraphFiles(dataRows, "modifiedprotein_protein", projectId, ot = 'a')
                 dataRows = extractProteinModifications(data[dtype], configuration[dtype])
                 generateGraphFiles(dataRows, "modifiedprotein", projectId, ot = 'a')
+                dataRows = extractProteinModificationsModification(data[dtype], configuration[dtype])
+                generateGraphFiles(dataRows, "modifiedprotein_modification", projectId, ot = 'a')
             
 def generateGraphFiles(data, dataType, projectId, ot = 'w'):
     importDir = config.datasetsImportDirectory
