@@ -3,7 +3,7 @@ ontologiesDirectory = "/Users/albertosantos/Development/Clinical_Proteomics_Depa
 
 ontologies = {##"Disease": "DO", 
                ##"Tissue": "BTO", 
-               ##"Clinical_variable": "SNOMED-CT",
+               "Clinical_variable": "SNOMED-CT",
                #"Phosphorylation":"PSI-MOD",
                #"Ubiquitination":"PSI-MOD",
                #"Glycation":"PSI-MOD",
@@ -14,7 +14,7 @@ ontologies = {##"Disease": "DO",
                ##"Drug":"STITCH",
                #"Food":"BBC",
                #"Physical_activity":"SMASH",
-               "PTM":"PSI-MOD"
+               ##"PTM":"PSI-MOD"
                ##"Biological_process":"GOBP",
                ##"Cellular_compartment":"GOCC",
                ##"Molecular_function":"GOMF",

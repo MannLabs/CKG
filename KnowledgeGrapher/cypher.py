@@ -14,8 +14,8 @@ IMPORT_ONTOLOGY_DATA = '''CREATE INDEX ON :ENTITY(name);
                         ON CREATE SET e.name=line.name,e.description=line.description,e.type=line.type,e.synonyms=SPLIT(line.synonyms,','); 
                         USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/ENTITY_has_parent.csv" AS line
-                        MATCH (e1:ENTITY {id:line.START_ID})
-                        MATCH (e2:ENTITY {id:line.END_ID}) 
+                        MATCH (e1:ENTITY{id:line.START_ID})
+                        MATCH (e2:ENTITY{id:line.END_ID}) 
                         CREATE UNIQUE (e1)-[:HAS_PARENT]->(e2);
                         '''
 
@@ -83,6 +83,22 @@ IMPORT_COMPILED_PPI_DATA =   '''
                         MATCH (p2:Protein {id:line.END_ID})
                         CREATE UNIQUE (p1)-[:COMPILED_INTERACTS_WITH{score:line.score,interaction_type:line.interaction_type,method:SPLIT(line.method,','),source:SPLIT(line.source,','),scores:SPLIT(line.evidences,','),evidences:SPLIT(line.evidences,',')}]->(p2);'''
 
+IMPORT_INTERNAL_DATA =   '''
+                        CREATE CONSTRAINT ON (p:Publication) ASSERT p.id IS UNIQUE; 
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/Publications.csv" AS line
+                        MERGE (p:Publication {id:line.ID});
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/ENTITY1_ENTITY2_mentioned_in_publication.csv" AS line
+                        MATCH (p:ENTITY1 {id:line.START_ID})
+                        MATCH (d:ENTITY2 {id:line.END_ID})
+                        CREATE UNIQUE (p)-[:MENTIONED_IN_PUBLICATION]->(d);
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/ENTITY1_ENTITY2_associated_with_integrated.csv" AS line
+                        MATCH (p:ENTITY1 {id:line.START_ID})
+                        MATCH (d:ENTITY2 {id:line.END_ID})
+                        CREATE UNIQUE (p)-[:ASSOCIATED_WITH_INTEGRATED{score:line.score,source:line.source}]->(d);'''
+
 IMPORT_DISEASE_DATA =   '''
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_associated_with.csv" AS line
@@ -146,14 +162,14 @@ IMPORT_DATASETS = {"proteomics":'''USING PERIODIC COMMIT 10000
                         CREATE UNIQUE (mp)-[:BELONGS_TO_PROTEIN]->(p);
                         USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_modifiedprotein_subject.csv" AS line
-                        MATCH (s:Analytical_sample {id:line.START_ID})
-                        MATCH (mp:Modified_protein {id:line.END_ID}) 
+                        MATCH (s:Analytical_sample{id:line.START_ID})
+                        MATCH (mp:Modified_protein{id:line.END_ID}) 
                         CREATE UNIQUE (s)-[:HAS_QUANTIFIED_PROTEINMODIFICATION{value:line.value}]->(mp);
                         USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_clinical.csv" AS line 
-                        MATCH (s:Analytical_sample {id:line.START_ID})
-                        MATCH (c:Clinical_measurement {id:line.END_ID}) 
-                        CREATE UNIQUE (s)-[:HAS_QUANTIFIED_CLINICAL{value: line.value}]->(c);'''
+                        MATCH (s:Analytical_sample{id:line.START_ID})
+                        MATCH (c:Clinical_variable{id:line.END_ID}) 
+                        CREATE UNIQUE (s)-[:HAS_QUANTIFIED_CLINICAL{value:line.value}]->(c);'''
                 }
 
 CREATE_PROJECT = '''CREATE CONSTRAINT ON (p:Project) ASSERT p.id IS UNIQUE;

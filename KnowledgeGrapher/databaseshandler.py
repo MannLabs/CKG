@@ -9,6 +9,7 @@ import pandas as pd
 import re
 from lxml import etree
 import zipfile
+import utils
 
 #########################
 # General functionality # 
@@ -34,6 +35,68 @@ def is_number(s):
         return True
     except ValueError:
         return False
+
+#############################################
+#   Internal Databases (JensenLab.org)      # 
+#############################################
+def parseInternalDatabasePairs(qtype, mapping, download = True):
+    url = config.internal_db_url
+    ifile = config.internal_db_files[qtype]
+    source = config.internal_db_sources[qtype]
+    relationships = set()
+    directory = os.path.join(config.databasesDir, "InternalDatabases")
+    if download:
+        downloadDB(url.replace("FILE", ifile), os.path.join(directory,"integration"))
+    ifile = os.path.join(directory,os.path.join("integration",ifile))
+    with open(ifile, 'r') as idbf:
+        for line in idbf:
+            data = line.rstrip("\r\n").split('\t')
+            id1 = "9606."+data[0]
+            id2 = data[2]
+            score = float(data[4])
+
+            if id1 in mapping:
+                for ident in mapping[id1]:
+                    relationships.add((ident, id2, "ASSOCIATED_WITH_INTEGRATED", source, score))
+            else:
+                continue
+                
+    return relationships
+
+def parseInternalDatabaseMentions(qtype, mapping, download = True):
+    url = config.internal_db_url
+    ifile = config.internal_db_mentions_files[qtype]
+    entities = set()
+    relationships = pd.DataFrame()
+    directory = os.path.join(config.databasesDir, "InternalDatabases")
+    if download:
+        downloadDB(url.replace("FILE", ifile), os.path.join(directory,"textmining"))
+    ifile = os.path.join(directory,os.path.join("textmining",ifile))
+    downloaded_publications = set()
+    with open(ifile, 'r') as idbf:
+        for line in idbf:
+            data = line.rstrip("\r\n").split('\t')
+            id1 = data[0]
+            pubmedids = data[1].split(" ")
+            entities.update(set(pubmedids))
+            
+            if qtype == "9606":
+                id1 = "9606."+id1
+                if id1 in mapping:
+                    ident = mapping[id1]
+                else:
+                    continue
+            else:
+                ident = [id1]
+            for i in ident:
+                aux = pd.DataFrame()
+                aux["END_ID"] = pubmedids
+                aux["START_ID"] = i
+                aux["TYPE"] = "MENTIONED_IN_PUBLICATION"
+                relationships = relationships.append(aux)
+    
+    return relationships, entities
+    
     
 #########################
 #   PathwayCommons      # 
@@ -513,6 +576,33 @@ def generateGraphFiles(importDirectory):
     
     for database in databases:
         print database
+        if database.lower() == "internal":
+            for qtype in config.internal_db_types:
+                relationships, entity1, entity2 = parseInternalDatabasePairs(qtype, string_mapping)
+                entity1, entity2 = config.internal_db_types[qtype]
+                outputfile = os.path.join(importDirectory, entity1+"_"+entity2+"_associated_with_integrated.csv")
+                df = pd.DataFrame(list(relationships))
+                df.columns = ["START_ID", "END_ID", "TYPE", "source", "score"]
+                df.to_csv(path_or_buf=outputfile, 
+                                header=True, index=False, quotechar='"', 
+                                line_terminator='\n', escapechar='\\')
+        if database.lower() == "mentions":
+            publications = set()
+            for qtype in config.internal_db_mentions_types:
+                relationships, entities = parseInternalDatabaseMentions(qtype, string_mapping)
+                publications.update(entities)
+                entity1, entity2 = config.internal_db_mentions_types[qtype]
+                outputfile = os.path.join(importDirectory, entity1+"_"+entity2+"_mentioned_in_publication.csv")
+                relationships = relationships[["START_ID", "END_ID", "TYPE"]]
+                relationships.to_csv(path_or_buf=outputfile, 
+                                header=True, index=False, quotechar='"', 
+                                line_terminator='\n', escapechar='\\')
+            publications_outputfile = os.path.join(importDirectory, "Publications.csv")
+            with open(publications_outputfile, 'w') as csvfile:
+                writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
+                writer.writerow(['ID'])
+                for pubmedid in publications:
+                    writer.writerow([pubmedid])
         if database.lower() == "hgnc":
             #HGNC
             genes, relationships = parseHGNCDatabase()

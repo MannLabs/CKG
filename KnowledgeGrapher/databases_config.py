@@ -2,7 +2,7 @@
 databasesDir = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/data/databases/"
 #Databases
 #databases = ["HGNC", "RefSeq", "UniProt", "IntAct", "DisGEnet", "HGNC", "DGIdb", "OncoKB", "STRING", "STITCH", "HMDB"]
-databases = ["HMDB"]
+databases = ["Mentions"]
 
 ###### UniProt Database ########
 uniprot_id_url = "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping.dat.gz"
@@ -75,3 +75,24 @@ HMDB_fields = ['accession', 'name', 'descriiption',  'synonym',
         'name','smpdb_id','kegg_map', 'name','drugbank_id', 'foodb_id', 'knapsack_id', 'chemspider_id', 'kegg_id', 'biocyc_id', 
         'bigg_id', 'wikipidia', 'mugowiki', 'mutagene', 'metlin_id', 'pubchem_compound_id','het_id', 'chebi_id'] 
 HMDB_parentFields = ['synonyms','ontology','origins', 'cellular_locations', 'biofluid_locations','tissue_locations', 'pathways','pathway', 'diseases','disease']
+
+##### Internal Databases (jensenlab.org) #####
+internal_db_directory = databasesDir + "InternalDatabases/"
+internal_db_url = "http://download.jensenlab.org/FILE"
+internal_db_files = {"-26":"human_disease_integrated_full.tsv", 
+                    "-25":"human_tissue_integrated_full.tsv",
+                    "-23":"human_compartment_integrated_full.tsv"}
+internal_db_mentions_files = {"-26":"disease_textmining_mentions.tsv", 
+                    "-25":"tissue_textmining_mentions.tsv",
+                    "-23":"compartment_textmining_mentions.tsv",
+                    "9606": "human_textmining_mentions.tsv",
+                    "-1": "chemical_textmining_mentions.tsv"}
+internal_db_types = {"-26":("Protein","Disease"),
+                    "-25":("Protein","Tissue"),
+                    "-23":("Protein","Cellular_compartment")}
+internal_db_mentions_types = {"-26":("Disease", "Publication"),
+                            "-25":("Tissue", "Publication"),
+                            "-23":("Cellular_compartment", "Publication"), 
+                            "9606":("Protein","Publication"), 
+                            "-1":("Chemical","Publication")}
+internal_db_sources = {"-25": "TISSUES", "-26": "DISEASES", "-23": "COMPARTMENTS"}

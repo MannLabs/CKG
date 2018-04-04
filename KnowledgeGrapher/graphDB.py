@@ -45,6 +45,7 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
         for entity in entities:
             cypherCode = ontologyDataImportCode.replace("ENTITY", entity).replace("IMPORTDIR",importDir).split(';')[0:-1]
             for statement in cypherCode:
+                print statement
                 driver.run(statement+";")
     #Databases
     #Chromosomes
@@ -94,6 +95,13 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
             for statement in drugsDataImportCode.replace("IMPORTDIR",importDir).replace("RESOURCE",resource.lower()).split(';')[0:-1]:
                 print statement+";"
                 driver.run(statement+";")
+    #Internal
+    if "internal" in imports:
+        internalDataImportCode = cy.IMPORT_INTERNAL_DATA
+        for (entity1, entity2) in config.internalEntities:
+            for statement in internalDataImportCode.replace("IMPORTDIR", importDir).replace("ENTITY1", entity1).replace("ENTITY2", entity2).split(';')[0:-1]:
+                print statement+";"
+                driver.run(statement+";")
     #Projects
     if "project" in imports:
         importDir = config.datasetsImportDirectory
@@ -141,4 +149,5 @@ if __name__ == "__main__":
     #removeRelationshipDB(entity1 = 'Protein', entity2 = 'Protein', relationship = "IntAct_INTERACTS_WITH")
 
     #createDB(imports=["ontologies","chromosomes", "genes", "transcripts", "proteins", "ppi", "drugs", "diseases","datasets"])
-    createDB(imports=["ontologies","datasets"])
+    #createDB(imports=["ontologies","datasets"])
+    createDB(imports=["internal"])
