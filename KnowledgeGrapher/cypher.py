@@ -5,6 +5,7 @@ ADD_ROLE_TO_USER = "CALL dbms.security.addRoleToUser(rolename, username)"
 
 COUNT_RELATIONSHIPS = "MATCH (:ENTITY1)-[:RELATIONSHIP]->(:ENTITY2) return count(*) AS count;"
 REMOVE_RELATIONSHIPS = "MATCH (:ENTITY1)-[r:RELATIONSHIP]->(:ENTITY2) delete r;"
+REMOVE_NODE = "all apoc.periodic.iterate(\"MATCH (n:Publication) return n\", \"DETACH DELETE n\", {batchSize:1000}) yield batches, total return batches, total"
 
 IMPORT_ONTOLOGY_DATA = '''CREATE INDEX ON :ENTITY(name);
                         CREATE CONSTRAINT ON (e:ENTITY) ASSERT e.id IS UNIQUE; 
@@ -84,20 +85,27 @@ IMPORT_COMPILED_PPI_DATA =   '''
                         CREATE UNIQUE (p1)-[:COMPILED_INTERACTS_WITH{score:line.score,interaction_type:line.interaction_type,method:SPLIT(line.method,','),source:SPLIT(line.source,','),scores:SPLIT(line.evidences,','),evidences:SPLIT(line.evidences,',')}]->(p2);'''
 
 IMPORT_INTERNAL_DATA =   '''
-                        CREATE CONSTRAINT ON (p:Publication) ASSERT p.id IS UNIQUE; 
-                        USING PERIODIC COMMIT 10000
-                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/Publications.csv" AS line
-                        MERGE (p:Publication {id:line.ID});
-                        USING PERIODIC COMMIT 10000
-                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/ENTITY1_ENTITY2_mentioned_in_publication.csv" AS line
-                        MATCH (p:ENTITY1 {id:line.START_ID})
-                        MATCH (d:ENTITY2 {id:line.END_ID})
-                        CREATE UNIQUE (p)-[:MENTIONED_IN_PUBLICATION]->(d);
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/ENTITY1_ENTITY2_associated_with_integrated.csv" AS line
                         MATCH (p:ENTITY1 {id:line.START_ID})
                         MATCH (d:ENTITY2 {id:line.END_ID})
-                        CREATE UNIQUE (p)-[:ASSOCIATED_WITH_INTEGRATED{score:line.score,source:line.source}]->(d);'''
+                        CREATE UNIQUE (p)-[:ASSOCIATED_WITH_INTEGRATED{score:line.score,source:line.source}]->(d);
+                        '''
+CREATE_PUBLICATIONS = '''
+                    CREATE CONSTRAINT ON (p:Publication) ASSERT p.id IS UNIQUE; 
+                    USING PERIODIC COMMIT 10000
+                    LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/Publications.csv" AS line
+                    MERGE (p:Publication{id:line.ID})
+                    ON CREATE SET p.linkout=line.linkout;
+                    '''
+                    
+IMPORT_MENTIONS =   '''
+                    USING PERIODIC COMMIT 10000
+                    LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/ENTITY_Publication_mentioned_in_publication.csv" AS line
+                    MATCH (p:ENTITY {id:line.END_ID})
+                    MATCH (d:Publication {id:line.START_ID})
+                    CREATE UNIQUE (p)-[:MENTIONED_IN_PUBLICATION]->(d);
+                    '''
 
 IMPORT_DISEASE_DATA =   '''
                         USING PERIODIC COMMIT 10000

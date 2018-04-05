@@ -19,6 +19,9 @@ drug_resources = ["DGIdb", "OncoKB"]
 #Internal Databases entities
 internalEntities = [("Protein","Disease"), ("Protein", "Tissue"), ("Protein","Cellular_compartment")]
 
+#Mentions entities
+mentionEntities = ["Disease", "Tissue", "Protein", "Cellular_compartment", "Chemical"]
+
 #Analyses configuration
 similarityMeasures = ["pearson"]
 ########################

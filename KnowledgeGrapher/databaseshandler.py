@@ -63,39 +63,47 @@ def parseInternalDatabasePairs(qtype, mapping, download = True):
                 
     return relationships
 
-def parseInternalDatabaseMentions(qtype, mapping, download = True):
+def parseInternalDatabaseMentions(qtype, mapping, importDirectory, download = True):
     url = config.internal_db_url
     ifile = config.internal_db_mentions_files[qtype]
+    filters = []
+    if qtype in config.internal_db_mentions_filters:
+        filters = config.internal_db_mentions_filters[qtype]
+    entity1, entity2 = config.internal_db_mentions_types[qtype]
+    outputfile = os.path.join(importDirectory, entity1+"_"+entity2+"_mentioned_in_publication.csv")
     entities = set()
     relationships = pd.DataFrame()
     directory = os.path.join(config.databasesDir, "InternalDatabases")
     if download:
         downloadDB(url.replace("FILE", ifile), os.path.join(directory,"textmining"))
     ifile = os.path.join(directory,os.path.join("textmining",ifile))
-    downloaded_publications = set()
-    with open(ifile, 'r') as idbf:
-        for line in idbf:
-            data = line.rstrip("\r\n").split('\t')
-            id1 = data[0]
-            pubmedids = data[1].split(" ")
-            entities.update(set(pubmedids))
-            
-            if qtype == "9606":
-                id1 = "9606."+id1
-                if id1 in mapping:
-                    ident = mapping[id1]
-                else:
-                    continue
-            else:
-                ident = [id1]
-            for i in ident:
-                aux = pd.DataFrame()
-                aux["END_ID"] = pubmedids
-                aux["START_ID"] = i
-                aux["TYPE"] = "MENTIONED_IN_PUBLICATION"
-                relationships = relationships.append(aux)
     
-    return relationships, entities
+    with open(outputfile,'a') as f:
+        f.write("START_ID,END_ID,TYPE\n")
+        with open(ifile, 'r') as idbf:
+            for line in idbf:
+                data = line.rstrip("\r\n").split('\t')
+                id1 = data[0]
+                pubmedids = data[1].split(" ")
+                entities.update(set(pubmedids))
+#            print entities
+                
+                if qtype == "9606":
+                    id1 = "9606."+id1
+                    if id1 in mapping:
+                        ident = mapping[id1]
+                    else:
+                        continue
+                else:
+                    ident = [id1]
+                for i in ident:
+                    if i not in filters:
+                        aux = pd.DataFrame(data = {"Pubmedids":pubmedids})
+                        aux["START_ID"] = i
+                        aux["TYPE"] = "MENTIONED_IN_PUBLICATION"
+                        aux.to_csv(path_or_buf=f, header=False, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
+    
+    return entities
     
     
 #########################
@@ -587,22 +595,17 @@ def generateGraphFiles(importDirectory):
                                 header=True, index=False, quotechar='"', 
                                 line_terminator='\n', escapechar='\\')
         if database.lower() == "mentions":
+            plinkout = config.pubmed_linkout
             publications = set()
             for qtype in config.internal_db_mentions_types:
-                relationships, entities = parseInternalDatabaseMentions(qtype, string_mapping)
-                publications.update(entities)
-                entity1, entity2 = config.internal_db_mentions_types[qtype]
-                outputfile = os.path.join(importDirectory, entity1+"_"+entity2+"_mentioned_in_publication.csv")
-                relationships = relationships[["START_ID", "END_ID", "TYPE"]]
-                relationships.to_csv(path_or_buf=outputfile, 
-                                header=True, index=False, quotechar='"', 
-                                line_terminator='\n', escapechar='\\')
+                entities = parseInternalDatabaseMentions(qtype, string_mapping, importDirectory)
+                publications.update(entities)                
             publications_outputfile = os.path.join(importDirectory, "Publications.csv")
             with open(publications_outputfile, 'w') as csvfile:
                 writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
-                writer.writerow(['ID'])
+                writer.writerow(['ID', "linkout"])
                 for pubmedid in publications:
-                    writer.writerow([pubmedid])
+                    writer.writerow([pubmedid, plinkout.replace("PUBMEDID", pubmedid)])
         if database.lower() == "hgnc":
             #HGNC
             genes, relationships = parseHGNCDatabase()

@@ -32,6 +32,8 @@ def removeRelationshipDB(entity1, entity2, relationship):
     driver.run(deletest)
     print "Existing entries after deletion: %d" % driver.run(countst).data()[0]['count']
 
+def removeNodes(entity):
+   pass 
 
 def createDB(imports = ["ontologies","proteins", "ppi"]):
     entities = config.entities
@@ -102,6 +104,18 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
             for statement in internalDataImportCode.replace("IMPORTDIR", importDir).replace("ENTITY1", entity1).replace("ENTITY2", entity2).split(';')[0:-1]:
                 print statement+";"
                 driver.run(statement+";")
+    #Mentions
+    if "mentions" in imports:
+        publicationsImportCode = cy.CREATE_PUBLICATIONS
+        for statement in publicationsImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
+            print statement+";"
+            driver.run(statement+";")
+        
+        mentionsImportCode = cy.IMPORT_MENTIONS
+        for entity in config.mentionEntities:
+            for statement in mentionsImportCode.replace("IMPORTDIR", importDir).replace("ENTITY", entity).split(';')[0:-1]:
+                print statement+";"
+                driver.run(statement+";")
     #Projects
     if "project" in imports:
         importDir = config.datasetsImportDirectory
@@ -148,6 +162,6 @@ if __name__ == "__main__":
     #removeRelationshipDB(entity1 = 'Protein', entity2 = 'Protein', relationship = "intact_INTERACTS_WITH")
     #removeRelationshipDB(entity1 = 'Protein', entity2 = 'Protein', relationship = "IntAct_INTERACTS_WITH")
 
-    #createDB(imports=["ontologies","chromosomes", "genes", "transcripts", "proteins", "ppi", "drugs", "diseases","datasets"])
+    #createDB(imports=["ontologies","chromosomes", "genes", "transcripts", "proteins", "ppi", "drugs", "diseases","internal","datasets"])
     #createDB(imports=["ontologies","datasets"])
-    createDB(imports=["internal"])
+    createDB(imports=["mentions"])
