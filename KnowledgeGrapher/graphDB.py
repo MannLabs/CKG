@@ -164,4 +164,4 @@ if __name__ == "__main__":
 
     #createDB(imports=["ontologies","chromosomes", "genes", "transcripts", "proteins", "ppi", "drugs", "diseases","internal","datasets"])
     #createDB(imports=["ontologies","datasets"])
-    createDB(imports=["mentions"])
+    createDB(imports=["project","datasets"])

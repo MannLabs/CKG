@@ -32,9 +32,10 @@ mappingFile = dataDirectory + "/ontologies/mapping.tsv"
 datasetsDirectory = dataDirectory + "/experiments/"
 #Proteomics
 proteomicsDirectory = datasetsDirectory + "proteomics/"
-dataTypes = {"clinicalData":{"directory":proteomicsDirectory,
+genomicsDirectory = datasetsDirectory + "wes/"
+dataTypes = {"clinical":{"directory":proteomicsDirectory,
                             "file":"clinicalData.xlsx"},
-            "proteomicsData":{"directory": proteomicsDirectory,
+            "proteomics":{"directory": proteomicsDirectory,
                             "proteins":{"columns":
                                             ["Majority protein IDs",
                                             "Gene names", "Q-value", 
@@ -126,10 +127,46 @@ dataTypes = {"clinicalData":{"directory":proteomicsDirectory,
                             "proteinCol" : "Protein",
                             "log": "log10"
                             },
-            "WESData":{"columns" : [],
-                "filters" : ["Reverse", "Potential contaminant"],
-                "proteinCol" : "Protein",
-                "log": "log2"
+            "wes":{"directory": genomicsDirectory,
+                        "columns" : ["Chr", "Start", "Ref", "Alt", 
+                                    "Func.refGene", "Gene.refGene", 
+                                    "ExonicFunc.refGene", "AAChange.refGene", 
+                                    "Xref.refGene", "SIFT_score", "SIFT_pred", "Polyphen2_HDIV_score",
+                                    "Polyphen2_HDIV_pred", "Polyphen2_HVAR_score",
+                                    "Polyphen2_HVAR_pred", "LRT_score", "LRT_pred",
+                                    "MutationTaster_score", "MutationTaster_pred",
+                                    "MutationAssessor_score", "MutationAssessor_pred",
+                                    "FATHMM_score", "FATHMM_pred", "PROVEAN_score",
+                                    "PROVEAN_pred", "VEST3_score", "CADD_raw", "CLINSIG",
+                                    "CLNDBN", "CLNACC", "CLNDSDB", "CLNDSDBID", "cosmic70", 
+                                    "ICGC_Id", "ICGC_Occurrence"],
+                        "position" : "Start",
+                        "id_fields" : ["Chr", "Start", "Ref", "Alt"],
+                        "somatic_mutation_attributes":["chr", "position", "reference", "alternative",
+                                    "region", "gene",
+                                    "function", "AAChange", "Xref", 
+                                    "SIFT_score", "SIFT_pred", "Polyphen2_HDIV_score",
+                                    "Polyphen2_HDIV_pred", "Polyphen2_HVAR_score",
+                                    "Polyphen2_HVAR_pred", "LRT_score", "LRT_pred",
+                                    "MutationTaster_score", "MutationTaster_pred",
+                                    "MutationAssessor_score", "MutationAssessor_pred",
+                                    "FATHMM_score", "FATHMM_pred", "PROVEAN_score",
+                                    "PROVEAN_pred", "VEST3_score", "CADD_raw", "CLINSIG",
+                                    "CLNDBN", "CLNACC", "CLNDSDB", "CLNDSDBID", "cosmic70", 
+                                    "ICGC_Id", "ICGC_Occurrence","ID"],
+                        "new_columns": ["chr", "position", "reference", "alternative",
+                                    "region", "gene",
+                                    "function", "AAChange", "Xref", 
+                                    "SIFT_score", "SIFT_pred", "Polyphen2_HDIV_score",
+                                    "Polyphen2_HDIV_pred", "Polyphen2_HVAR_score",
+                                    "Polyphen2_HVAR_pred", "LRT_score", "LRT_pred",
+                                    "MutationTaster_score", "MutationTaster_pred",
+                                    "MutationAssessor_score", "MutationAssessor_pred",
+                                    "FATHMM_score", "FATHMM_pred", "PROVEAN_score",
+                                    "PROVEAN_pred", "VEST3_score", "CADD_raw", "CLINSIG",
+                                    "CLNDBN", "CLNACC", "CLNDSDB", "CLNDSDBID", "cosmic70", 
+                                    "ICGC_Id", "ICGC_Occurrence", "sample", "variantCallingMethod", "annotated", "ID"],
+                        "types" :{"Somatic_mutation": "KEEP", "Germline_mutation": "REJECT"}                       
                 }
         }
 ###Variant sources

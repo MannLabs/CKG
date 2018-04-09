@@ -128,7 +128,13 @@ IMPORT_COMPILED_DRUG_DATA =   '''
                         MATCH (g:Gene {id:line.END_ID})
                         CREATE UNIQUE (d)-[:COMPILED_TARGETS{score:line.score, source:line.source,interaction_type:line.interaction_type,scores:SPLIT(line.evidences,','),evidences:SPLIT(line.evidences,',')}]->(g);'''
 
-IMPORT_DATASETS = {"proteomics":'''USING PERIODIC COMMIT 10000 
+IMPORT_DATASETS = {"clinical":'''USING PERIODIC COMMIT 10000 
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_clinical.csv" AS line 
+                        MATCH (s:Analytical_sample{id:line.START_ID})
+                        MATCH (c:Clinical_variable{id:line.END_ID}) 
+                        CREATE UNIQUE (s)-[:HAS_QUANTIFIED_CLINICAL{value:line.value}]->(c);
+                        '''
+                    "proteomics":'''USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_proteins.csv" AS line
                         MATCH (s:Analytical_sample {id:line.START_ID}) 
                         MATCH (p:Protein{id:line.END_ID}) 
@@ -173,11 +179,31 @@ IMPORT_DATASETS = {"proteomics":'''USING PERIODIC COMMIT 10000
                         MATCH (s:Analytical_sample{id:line.START_ID})
                         MATCH (mp:Modified_protein{id:line.END_ID}) 
                         CREATE UNIQUE (s)-[:HAS_QUANTIFIED_PROTEINMODIFICATION{value:line.value}]->(mp);
-                        USING PERIODIC COMMIT 10000 
-                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_clinical.csv" AS line 
-                        MATCH (s:Analytical_sample{id:line.START_ID})
-                        MATCH (c:Clinical_variable{id:line.END_ID}) 
-                        CREATE UNIQUE (s)-[:HAS_QUANTIFIED_CLINICAL{value:line.value}]->(c);'''
+                        ''',
+                    "wes":'''
+                        CREATE CONSTRAINT ON (s:Somatic_mutation) ASSERT s.id IS UNIQUE; 
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_somatic_mutation.csv" AS line
+                        MERGE (s:Somatic_mutation{id:line.ID})
+                        ON CREATE SET s.region=line.region,s.function=line.function,s.AAChange=line.AAChange,s.Xref=line.Xref,s.SIFT_score=line.SIFT_score,
+                                    s.SIFT_pred=line.SIFT_pred,s.Polyphen2_HDIV_score=line.Polyphen2_HDIV_score,s.Polyphen2_HDIV_pred=line.Polyphen2_HDIV_pred,
+                                    s.Polyphen2_HVAR_score=line.Polyphen2_HVAR_score,s.Polyphen2_HVAR_pred=line.Polyphen2_HVAR_pred,s.LRT_score=line.LRT_score,
+                                    s.LRT_pred=line.LRT_pred,s.MutationTaster_score=line.MutationTaster_score,s.MutationTaster_pred=line.MutationTaster_pred,
+                                    s.MutationAssessor_score=line.MutationAssessor_score,s.MutationAssessor_pred=line.MutationAssessor_pred,s.FATHMM_score=line.FATHMM_score,
+                                    s.FATHMM_pred=line.FATHMM_pred,s.PROVEAN_score=line.PROVEAN_score,s.PROVEAN_pred=line.PROVEAN_pred,s.VEST3_score=line.VEST3_score,
+                                    s.CADD_raw=line.CADD_raw,s.CLINSIG=line.CLINSIG,s.CLNDBN=line.CLNDBN,s.CLNACC=line.CLNACC,s.CLNDSDB=line.CLNDSDB,s.CLNDSDBID=line.CLNDSDBID,
+                                    s.cosmic70=line.cosmic70,s.ICGC_Id=line.ICGC_Id,s.ICGC_Occurrence=line.ICGC_Occurrence;
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_somatic_mutation_gene.csv" AS line
+                        MATCH (s:Somatic_mutation {id:line.START_ID}) 
+                        MATCH (g:Gene {id:line.END_ID})
+                        CREATE UNIQUE (s)-[:VARIANT_FOUND_IN_GENE]->(g);
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_somatic_mutation_sample.csv" AS line
+                        MATCH (a:Analytical_sample {id:line.START_ID})
+                        MATCH (s:Somatic_mutation {id:line.END_ID}) 
+                        CREATE UNIQUE (a)-[:CALLED_VARIANT]->(s);
+                        '''
                 }
 
 CREATE_PROJECT = '''CREATE CONSTRAINT ON (p:Project) ASSERT p.id IS UNIQUE;

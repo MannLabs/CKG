@@ -6,6 +6,7 @@ import sys
 import ontologieshandler as oh
 import os.path
 import re
+import utils
 
 #########################
 # General functionality # 
@@ -106,6 +107,17 @@ def parseProteomicsDataset(projectId, configuration, dataDir):
             aux = data[subjectDict[subject]]
             data[subject] = calculateMedianReplicates(aux, log)
         datasets[ftype] = data.drop(delCols, 1)
+    return datasets
+
+########### Genomics Datasets ############
+def parseWESDataset(projectId, configuration, dataDir):
+    datasets = {}
+    files = utils.listDirectoryFiles(os.path.join(dataDir,projectId))
+    for dfile in files:
+        filepath = os.path.join(dataDir, os.path.join(projectId,dfile))
+        sample, data = loadWESDataset(filepath, configuration)
+        datasets[sample] = data
+
     return datasets
 
 ###############################
@@ -275,8 +287,28 @@ def extractProjectSampleRelationships(data, projectId):
     return aux
 
 ############ Whole Exome Sequencing Datasets ##############
-def extractWESSubjectRelationships(data):
-    pass
+def extractWESRelationships(data, configuration):
+
+    data.columns = configuration["new_columns"]
+    entityAux = data.copy()
+    entityAux = entityAux[configuration["somatic_mutation_attributes"]] 
+    entityAux = entityAux.set_index("ID")
+
+    sampleAux = data.copy()
+    sampleAux = data.rename(index=str, columns={"ID": "END_ID", "sample": "START_ID"})   
+    sampleAux["TYPE"] = "CALLED_VARIANT"
+    sampleAux = sampleAux[["START_ID", "END_ID", "TYPE"]]
+    
+    geneAux = data.copy()
+    geneAux = data.rename(index=str, columns={"ID": "START_ID", "gene": "END_ID"})   
+    geneAux["TYPE"] = "VARIANT_FOUND_IN_GENE"
+    geneAux = geneAux[["START_ID", "END_ID", "TYPE"]]
+    s = geneAux["END_ID"].str.split(';').apply(pd.Series, 1).stack().reset_index(level=1, drop=True)
+    del geneAux["END_ID"]
+    aux = s.to_frame("END_ID")
+    geneAux = geneAux.join(aux)
+
+    return entityAux, sampleAux, geneAux
 
 ############################
 #           Loaders        # 
@@ -337,14 +369,24 @@ def loadProteomicsDataset(uri, configuration):
 def loadWESDataset(uri, configuration):
     ''' This function gets the molecular data from a Whole Exome Sequencing experiment.
         Input: uri of the processed file resulting from the WES analysis pipeline. The resulting
-        annotated VCF file from Mutect
+        Annovar annotated VCF file from Mutect (sampleID_mutect_annovar.vcf)
         Output: pandas DataFrame with the columns and filters defined in config.py '''
-    aux = None
     
-    #Get the columns from config and divide them into simple or regex columns
+    aux = uri.split("/")[-1].split("_")
+    #Get the columns from config 
     columns = configuration["columns"]
-    regexCols = [c for c in columns if '+' in c]
-    columns = set(columns).difference(regexCols)
+    #Read the data from file
+    data = readDataset(uri)
+    data = data[columns]
+    data["sample"] = aux[0]
+    data["variantCallingMethod"] = aux[1]
+    data["annotated"] = aux[2].split('.')[0]
+    
+    data = data.iloc[1:]
+    data = data.replace('.', np.nan)
+    data["ID"] = data[configuration["id_fields"]].apply(lambda x: ' '.join(x), axis=1)
+
+    return aux[0], data
     
 ########################################
 #          Generate graph files        # 
@@ -352,13 +394,13 @@ def loadWESDataset(uri, configuration):
 def generateDatasetImports(projectId, dataType):
     dataDir = config.dataTypes[dataType]["directory"]
     configuration = config.dataTypes[dataType]
-    if dataType == "clinicalData":
+    if dataType == "clinical":
         data = parseClinicalDataset(projectId, configuration, dataDir)
         dataRows = extractSubjectClinicalVariablesRelationships(data)
         generateGraphFiles(dataRows,'clinical', projectId)
         dataRows = extractSubjectGroupRelationships(data)
         generateGraphFiles(dataRows,'groups', projectId)
-    elif dataType == "proteomicsData":
+    elif dataType == "proteomics":
         data = parseProteomicsDataset(projectId, configuration, dataDir)
         for dtype in data:
             if dtype == "proteins":
@@ -384,19 +426,31 @@ def generateDatasetImports(projectId, dataType):
                 generateGraphFiles(dataRows, "modifiedprotein", projectId, ot = 'a')
                 dataRows = extractProteinModificationsModification(data[dtype], configuration[dtype])
                 generateGraphFiles(dataRows, "modifiedprotein_modification", projectId, ot = 'a')
+    elif dataType == "wes":
+        data = parseWESDataset(projectId, configuration, dataDir)
+        somatic_mutations = pd.DataFrame()
+        for sample in data:
+            entities, sampleRows, geneRows = extractWESRelationships(data[sample], configuration)
+            generateGraphFiles(sampleRows, "somatic_mutation_sample", projectId, d = dataType)
+            generateGraphFiles(geneRows, "somatic_mutation_gene", projectId, d = dataType)
+            if somatic_mutations.empty:
+                somatic_mutations = entities
+            else:
+                somatic_mutations.join(entities, on="ID")
+        somatic_mutations = somatic_mutations.reset_index()
+        generateGraphFiles(somatic_mutations, "somatic_mutation", projectId, dataType, d= dataType)
             
-def generateGraphFiles(data, dataType, projectId, ot = 'w'):
-    importDir = config.datasetsImportDirectory
+def generateGraphFiles(data, dataType, projectId, ot = 'w', d = 'proteomics'):
+    importDir = os.path.join(config.datasetsImportDirectory, os.path.join(projectId,d))
     outputfile = os.path.join(importDir, projectId+"_"+dataType.lower()+".csv")
     with open(outputfile, ot) as f:  
         data.to_csv(path_or_buf = f, 
             header=True, index=False, quotechar='"', 
             line_terminator='\n', escapechar='\\')
 
-
 if __name__ == "__main__":
     #uri = sys.argv[1]
-    generateDatasetImports('P0000001', 'proteomicsData')
-    generateDatasetImports('P0000001', 'clinicalData')
-    
+    #generateDatasetImports('P0000001', 'proteomicsData')
+    #generateDatasetImports('P0000001', 'clinicalData')
+    generateDatasetImports('P0000002', 'wes') 
     
