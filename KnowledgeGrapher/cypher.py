@@ -133,7 +133,7 @@ IMPORT_DATASETS = {"clinical":'''USING PERIODIC COMMIT 10000
                         MATCH (s:Analytical_sample{id:line.START_ID})
                         MATCH (c:Clinical_variable{id:line.END_ID}) 
                         CREATE UNIQUE (s)-[:HAS_QUANTIFIED_CLINICAL{value:line.value}]->(c);
-                        '''
+                        ''',
                     "proteomics":'''USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_proteins.csv" AS line
                         MATCH (s:Analytical_sample {id:line.START_ID}) 
@@ -185,7 +185,7 @@ IMPORT_DATASETS = {"clinical":'''USING PERIODIC COMMIT 10000
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_somatic_mutation.csv" AS line
                         MERGE (s:Somatic_mutation{id:line.ID})
-                        ON CREATE SET s.region=line.region,s.function=line.function,s.AAChange=line.AAChange,s.Xref=line.Xref,s.SIFT_score=line.SIFT_score,
+                        ON CREATE SET s.region=line.region,s.function=line.function,s.alternative_names=SPLIT(line.alternative_names, ','),s.Xref=line.Xref,s.SIFT_score=line.SIFT_score,
                                     s.SIFT_pred=line.SIFT_pred,s.Polyphen2_HDIV_score=line.Polyphen2_HDIV_score,s.Polyphen2_HDIV_pred=line.Polyphen2_HDIV_pred,
                                     s.Polyphen2_HVAR_score=line.Polyphen2_HVAR_score,s.Polyphen2_HVAR_pred=line.Polyphen2_HVAR_pred,s.LRT_score=line.LRT_score,
                                     s.LRT_pred=line.LRT_pred,s.MutationTaster_score=line.MutationTaster_score,s.MutationTaster_pred=line.MutationTaster_pred,
@@ -198,6 +198,11 @@ IMPORT_DATASETS = {"clinical":'''USING PERIODIC COMMIT 10000
                         MATCH (s:Somatic_mutation {id:line.START_ID}) 
                         MATCH (g:Gene {id:line.END_ID})
                         CREATE UNIQUE (s)-[:VARIANT_FOUND_IN_GENE]->(g);
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_somatic_mutation_chromosome.csv" AS line
+                        MATCH (s:Somatic_mutation {id:line.START_ID}) 
+                        MATCH (c:Chromosome {id:line.END_ID})
+                        CREATE UNIQUE (s)-[:VARIANT_FOUND_IN_CHROMOSOME]->(c);
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_somatic_mutation_sample.csv" AS line
                         MATCH (a:Analytical_sample {id:line.START_ID})

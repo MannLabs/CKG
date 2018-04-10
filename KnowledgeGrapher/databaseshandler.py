@@ -140,6 +140,23 @@ def parsePathwayCommons(download = True):
     
     return entities, relationships
 
+#######################################
+#   The Cancer Genome Interpreter     # 
+#######################################
+def parseCGI(download = True, mapping = {}):
+    url = config.cancerBiomarkers_url
+    fileName = config.cancerBiomarkers_variant_file
+    relationships = set()
+    directory = os.path.join(config.databasesDir,"CancerGenomeInterpreter")
+    fileName = os.path.join(os.path.join(directory, url.split('/')[-1]), fileName)
+
+    if download:
+        downloadDB(url, "CancerGenomeInterpreter")
+
+    with open
+
+
+
 ############################################
 #   The Drug Gene Interaction Database     # 
 ############################################
@@ -373,6 +390,26 @@ def addUniProtTexts(textsFile, proteins):
             
             if protein in proteins:
                 proteins[protein].update({"description":function})
+
+def parseUniProtVariants(dataFile, download = True):
+    data = defaultdict()
+    url = config.uniprot_variant_file
+    relationships = set()
+    directory = os.path.join(config.databasesDir,"UniProt")
+    fileName = os.path.join(directory, url.split('/')[-1])
+    if download:
+        downloadDB(url, "UniProt")
+    with gzip.open(filename, 'r') as f:
+        din = False
+        i = 0
+        for line in f:
+            if not line.startswith('#') and !din:
+                continue
+            elif i<2:
+                din = True
+                i += 1
+                continue
+            data = line.rstrip("\r\n").split("\t")
 
 #########################################
 #          HUGO Gene Nomenclature       # 

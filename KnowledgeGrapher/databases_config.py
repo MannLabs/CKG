@@ -8,6 +8,7 @@ databases = ["Mentions"]
 uniprot_id_url = "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping.dat.gz"
 uniprot_id_file = "/Users/albertosantos/Development/UniProt/HUMAN_9606_idmapping.dat"
 uniprot_text_file = "/Users/albertosantos/Development/UniProt/uniprot-human.tab" #### Downloaded manually from UniProt until we know url (organism:human AND reviewed:yes)
+uniprot_variant_file = "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/variants/homo_sapiens_variation.txt.gz"
 uniprot_ids = ["UniProtKB-ID", 
                 "NCBI_TaxID", 
                 "Gene_Name", 
@@ -51,6 +52,8 @@ cancerGenes_url = "https://www.cancergenomeinterpreter.org/data/catalog_of_cance
 cancerVariants_url = "https://www.cancergenomeinterpreter.org/data/catalog_of_validated_oncogenic_mutations_latest.zip"
 cancerBiomarkers_url = "https://www.cancergenomeinterpreter.org/data/cgi_biomarkers_latest.zip"
 cancerBioactivities_url = "https://www.cancergenomeinterpreter.org/data/cancer_bioactivities_latest.zip"
+cancerBioactivities_variant_file = "cgi_biomarkers_per_variant.tsv"
+
 ###### IntAct Database #######
 intact_psimitab_url = "ftp://ftp.ebi.ac.uk/pub/databases/intact/current/psimitab/intact.txt"
 intact_file = "Intact/intact/intact.txt"

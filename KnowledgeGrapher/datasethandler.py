@@ -308,7 +308,13 @@ def extractWESRelationships(data, configuration):
     aux = s.to_frame("END_ID")
     geneAux = geneAux.join(aux)
 
-    return entityAux, sampleAux, geneAux
+    chrAux = data.copy()
+    chrAux = data.rename(index=str, columns={"ID": "START_ID", "chr": "END_ID"})   
+    chrAux["END_ID"] = chrAux["END_ID"].str.replace("chr",'')
+    chrAux["TYPE"] = "VARIANT_FOUND_IN_CHROMOSOME"
+    chrAux = chrAux[["START_ID", "END_ID", "TYPE"]]
+
+    return entityAux, sampleAux, geneAux, chrAux
 
 ############################
 #           Loaders        # 
@@ -371,7 +377,7 @@ def loadWESDataset(uri, configuration):
         Input: uri of the processed file resulting from the WES analysis pipeline. The resulting
         Annovar annotated VCF file from Mutect (sampleID_mutect_annovar.vcf)
         Output: pandas DataFrame with the columns and filters defined in config.py '''
-    
+    regex = r"p\.(\w\d+\w)"
     aux = uri.split("/")[-1].split("_")
     #Get the columns from config 
     columns = configuration["columns"]
@@ -381,7 +387,8 @@ def loadWESDataset(uri, configuration):
     data["sample"] = aux[0]
     data["variantCallingMethod"] = aux[1]
     data["annotated"] = aux[2].split('.')[0]
-    
+    data["alternative_names"] = data[configuration["alt_names"]].apply(lambda x: ','.join([match.group(1) for (matchNum,match) in enumerate(re.finditer(regex, x))]))
+    data = data.drop(configuration["alt_names"], axis = 1)
     data = data.iloc[1:]
     data = data.replace('.', np.nan)
     data["ID"] = data[configuration["id_fields"]].apply(lambda x: ' '.join(x), axis=1)
@@ -430,9 +437,10 @@ def generateDatasetImports(projectId, dataType):
         data = parseWESDataset(projectId, configuration, dataDir)
         somatic_mutations = pd.DataFrame()
         for sample in data:
-            entities, sampleRows, geneRows = extractWESRelationships(data[sample], configuration)
+            entities, sampleRows, geneRows, chrRows = extractWESRelationships(data[sample], configuration)
             generateGraphFiles(sampleRows, "somatic_mutation_sample", projectId, d = dataType)
             generateGraphFiles(geneRows, "somatic_mutation_gene", projectId, d = dataType)
+            generateGraphFiles(chrRows, "somatic_mutation_chromosome", projectId, d = dataType)
             if somatic_mutations.empty:
                 somatic_mutations = entities
             else:
