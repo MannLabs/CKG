@@ -288,19 +288,32 @@ def extractProjectSampleRelationships(data, projectId):
 
 ############ Whole Exome Sequencing Datasets ##############
 def extractWESRelationships(data, configuration):
-
     data.columns = configuration["new_columns"]
     entityAux = data.copy()
     entityAux = entityAux[configuration["somatic_mutation_attributes"]] 
     entityAux = entityAux.set_index("ID")
 
+    variantAux = data.copy()
+    variantAux = variantAux.rename(index=str, columns={"ID": "START_ID"})
+    variantAux["END_ID"] = variantAux["alternative_names"]
+    variantAux = variantAux[["START_ID", "END_ID"]]
+    s = variantAux["END_ID"].str.split(',').apply(pd.Series, 1).stack().reset_index(level=1, drop=True)
+    del variantAux["END_ID"]
+    variants = s.to_frame("END_ID")
+    variantAux = variantAux.join(variants)
+    variantAux["TYPE"] = "IS_KNOWN_VARIANT"
+    variantAux = variantAux.drop_duplicates()
+    variantAux = variantAux.dropna(how="any")
+    variantAux = variantAux[["START_ID", "END_ID", "TYPE"]]
+
+
     sampleAux = data.copy()
-    sampleAux = data.rename(index=str, columns={"ID": "END_ID", "sample": "START_ID"})   
-    sampleAux["TYPE"] = "CALLED_VARIANT"
+    sampleAux = sampleAux.rename(index=str, columns={"ID": "END_ID", "sample": "START_ID"})   
+    sampleAux["TYPE"] = "HAS_MUTATION"
     sampleAux = sampleAux[["START_ID", "END_ID", "TYPE"]]
     
     geneAux = data.copy()
-    geneAux = data.rename(index=str, columns={"ID": "START_ID", "gene": "END_ID"})   
+    geneAux = geneAux.rename(index=str, columns={"ID": "START_ID", "gene": "END_ID"})   
     geneAux["TYPE"] = "VARIANT_FOUND_IN_GENE"
     geneAux = geneAux[["START_ID", "END_ID", "TYPE"]]
     s = geneAux["END_ID"].str.split(';').apply(pd.Series, 1).stack().reset_index(level=1, drop=True)
@@ -309,12 +322,12 @@ def extractWESRelationships(data, configuration):
     geneAux = geneAux.join(aux)
 
     chrAux = data.copy()
-    chrAux = data.rename(index=str, columns={"ID": "START_ID", "chr": "END_ID"})   
+    chrAux = chrAux.rename(index=str, columns={"ID": "START_ID", "chr": "END_ID"})   
     chrAux["END_ID"] = chrAux["END_ID"].str.replace("chr",'')
     chrAux["TYPE"] = "VARIANT_FOUND_IN_CHROMOSOME"
     chrAux = chrAux[["START_ID", "END_ID", "TYPE"]]
 
-    return entityAux, sampleAux, geneAux, chrAux
+    return entityAux, variantAux, sampleAux, geneAux, chrAux
 
 ############################
 #           Loaders        # 
@@ -379,6 +392,7 @@ def loadWESDataset(uri, configuration):
         Output: pandas DataFrame with the columns and filters defined in config.py '''
     regex = r"p\.(\w\d+\w)"
     aux = uri.split("/")[-1].split("_")
+    sample = aux[0]
     #Get the columns from config 
     columns = configuration["columns"]
     #Read the data from file
@@ -391,9 +405,9 @@ def loadWESDataset(uri, configuration):
     data = data.drop(configuration["alt_names"], axis = 1)
     data = data.iloc[1:]
     data = data.replace('.', np.nan)
-    data["ID"] = data[configuration["id_fields"]].apply(lambda x: ' '.join(x), axis=1)
-
-    return aux[0], data
+    data["ID"] = data[configuration["id_fields"]].apply(lambda x: x[0]+":g."+x[1]+x[2]+'>'+x[3], axis=1)
+    
+    return sample, data
     
 ########################################
 #          Generate graph files        # 
@@ -437,7 +451,8 @@ def generateDatasetImports(projectId, dataType):
         data = parseWESDataset(projectId, configuration, dataDir)
         somatic_mutations = pd.DataFrame()
         for sample in data:
-            entities, sampleRows, geneRows, chrRows = extractWESRelationships(data[sample], configuration)
+            entities, variantRows, sampleRows, geneRows, chrRows = extractWESRelationships(data[sample], configuration)
+            generateGraphFiles(variantRows, "somatic_mutation_known_variant", projectId, d = dataType)
             generateGraphFiles(sampleRows, "somatic_mutation_sample", projectId, d = dataType)
             generateGraphFiles(geneRows, "somatic_mutation_gene", projectId, d = dataType)
             generateGraphFiles(chrRows, "somatic_mutation_chromosome", projectId, d = dataType)

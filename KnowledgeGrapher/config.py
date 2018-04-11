@@ -13,8 +13,9 @@ datasetsImportDirectory = importDirectory + "/datasets/"
 entities = ["Disease","Drug","Tissue","Biological_process", "Molecular_function", "Cellular_compartment", "PTM", "Clinical_variable"]
 #Database resources
 PPI_resources = ["IntAct"]
-disease_resources = ["DisGEnet"]
-drug_resources = ["DGIdb", "OncoKB"]
+disease_resources = [("Protein","DisGEnet"),("Known_variant","CGI"),("Known_variant","OncoKB")]
+drug_resources = ["DGIdb","CGI","OncoKB"]
+variant_resources = ["CGI","OncoKB"]
 
 #Internal Databases entities
 internalEntities = [("Protein","Disease"), ("Protein", "Tissue"), ("Protein","Cellular_compartment")]

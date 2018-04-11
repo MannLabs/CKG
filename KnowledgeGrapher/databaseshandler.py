@@ -144,18 +144,125 @@ def parsePathwayCommons(download = True):
 #   The Cancer Genome Interpreter     # 
 #######################################
 def parseCGI(download = True, mapping = {}):
+    regex = r"chr(\d+)\:g\.(\d+)(\w)>(\w)"
     url = config.cancerBiomarkers_url
     fileName = config.cancerBiomarkers_variant_file
-    relationships = set()
+    relationships = defaultdict(set)
+    entities = set()
     directory = os.path.join(config.databasesDir,"CancerGenomeInterpreter")
-    fileName = os.path.join(os.path.join(directory, url.split('/')[-1]), fileName)
+    zipFile = os.path.join(directory, url.split('/')[-1])
 
     if download:
         downloadDB(url, "CancerGenomeInterpreter")
+    #-f1,11,12,13,14,15,17,22
+    with zipfile.ZipFile(zipFile) as z:
+        if fileName in z.namelist():
+            with z.open(fileName, 'r') as associations:
+                first = True
+                for line in associations:
+                    if first:
+                        first = False
+                        continue
+                    data = line.rstrip("\r\n").split("\t")
+                    alteration = data[0]
+                    alterationType = data[1]
+                    association = data[3]
+                    drugs = data[10].split(';')
+                    status = data[11].split(';')
+                    evidence = data[12]
+                    gene = data[13]
+                    tumors = data[16].split(';')
+                    publications = data[17].split(';')
+                    identifier = data[21]
+                    matches = re.match(regex, identifier)
+                    if matches is not None:
+                        chromosome, position, reference, alternative = list(matches.groups())
+                        alteration = alteration.split(':')[1]
+                    else:
+                        continue
 
-    with open
+                    for variant in alteration.split(','):
+                        entities.add((variant, "Known_variant", identifier, "chr"+chromosome, position, reference, alternative, "", ""))
+                        for tumor in tumors:                         
+                            if tumor.lower() in mapping:
+                                tumor = mapping[tumor.lower()]
+                            relationships["associated_with"].add((variant, tumor, "ASSOCIATED_WITH", "curated","curated", "Cancer Genome Interpreter", len(publications)))
+                            for drug in drugs:
+                                if drug.lower() in mapping:
+                                    drug = mapping[drug.lower()]
+                                elif drug.split(" ")[0].lower() in mapping:
+                                    drug = mapping[drug.split(" ")[0].lower()]
+                                relationships["targets_known_variant"].add((drug, variant, "TARGETS_KNOWN_VARIANT", evidence, association, tumor, "curated", "Cancer Genome Interpreter"))
+                                relationships["targets"].add((drug, gene, "CURATED_TARGETS", "curated", "OncoKB"))
 
+                        relationships["variant_found_in_gene"].add((variant, gene, "VARIANT_FOUND_IN_GENE"))
+                        relationships["variant_found_in_chromosome"].add((variant, chromosome, "VARIANT_FOUND_IN_CHROMOSOME"))
+        
+    return entities, relationships
 
+#########################
+#   OncoKB database     #
+#########################
+def parseOncoKB(download = False, mapping = {}):
+    url_actionable = config.OncoKB_actionable_url
+    url_annotated = config.OncoKB_annotated_url
+    levels = config.OncoKB_levels
+    entities = set()
+    relationships = defaultdict(set)
+    directory = os.path.join(config.databasesDir,"OncoKB")
+    acfileName = os.path.join(directory,url_actionable.split('/')[-1])
+    anfileName = os.path.join(directory,url_annotated.split('/')[-1])
+    if download:
+        downloadDB(url_actionable, "OncoKB")
+        downloadDB(url_annotation, "OncoKB")
+
+    regex = r"\w\d+(\w|\*|\.)"
+    with open(anfileName, 'r') as variants:
+        first = True
+        for line in variants:
+            if first:
+                first = False
+                continue
+            data = line.rstrip("\r\n").split("\t")
+            gene = data[3]
+            variant = data[4]
+            oncogenicity = data[5]
+            effect = data[6]          
+            entities.add((variant,"Known_variant", "", "", "", "", "", effect, oncogenicity))
+            relationships["variant_found_in_gene"].add((variant, gene, "VARIANT_FOUND_IN_GENE"))
+
+    with open(acfileName, 'r') as associations:
+        first = True
+        for line in associations:
+            if first:
+                first = False
+                continue
+            data = line.rstrip("\r\n").split("\t")
+            isoform = data[1]
+            gene = data[3]
+            variant = data[4]
+            disease = data[5]
+            level = data[6]
+            drugs = data[7].split(', ')
+            pubmed_ids = data[8].split(',')
+            if level in levels:
+                level = levels[level]
+            for drug in drugs:
+                if drug.lower() in mapping:
+                    drug = mapping[drug.lower()]
+                else:
+                    pass
+                    #print drug
+                if disease.lower() in mapping:
+                    disease = mapping[disease.lower()]
+                else:
+                    pass
+                    #print disease
+                relationships["targets_known_variant"].add((drug, variant, "TARGETS_KNOWN_VARIANT", level[0], level[1], disease, "curated", "OncoKB"))
+                relationships["associated_with"].add((variant, disease, "ASSOCIATED_WITH", "curated","curated", "OncoKB", len(pubmed_ids)))   
+                relationships["targets"].add((drug, gene, "CURATED_TARGETS", "curated", "OncoKB"))
+        relationships["variant_found_in_chromosome"].add(("","",""))
+    return entities, relationships
 
 ############################################
 #   The Drug Gene Interaction Database     # 
@@ -177,7 +284,7 @@ def parseDGIdb(download = True, mapping = {}):
             gene = data[0]
             source = data[3]
             interactionType = data[4]
-            drug = data[8]
+            drug = data[8].lower()
             if drug == "":
                 drug = data[7] 
                 if drug == "" and data[6] != "":
@@ -212,43 +319,6 @@ def parseHMDB(download = True, mapping = {}):
             sys.exit()
                     
 
-    return relationships
-
-
-#########################
-#   OncoKB database     #
-#########################
-def parseOncoKB(download = False, mapping = {}):
-    url = config.OncoKB_url
-    relationships = set()
-    directory = os.path.join(config.databasesDir,"OncoKB")
-    fileName = os.path.join(directory,url.split('/')[-1])
-    if download:
-        downloadDB(url, "OncoKB")
-    
-    with open(fileName, 'r') as associations:
-        first = True
-        for line in associations:
-            if first:
-                first = False
-                continue
-            data = line.rstrip("\r\n").split("\t")
-            isoform = data[1]
-            gene = data[3]
-            variant = gene+"_"+data[4]
-            disease = data[5]
-            level = data[6]
-            drugs = data[7].split(',')
-            pubmed_ids = data[8].split(',')
-            
-            for drug in drugs:
-                if drug in mapping:
-                    drug = mapping[drug]
-                if disease in mapping:
-                    disease = mapping[disease]
-                relationships.add((drug, gene, "TARGETS", "", "OncoKB"))
-                #relationships[drug].add((drug, variant, "TARGETS", "", "OncoKB"))
-                #relationships[variant].add((variant, disease, "ASSOCIATED_WITH", "OncoKB"))   
     return relationships
 
 #########################
@@ -403,7 +473,7 @@ def parseUniProtVariants(dataFile, download = True):
         din = False
         i = 0
         for line in f:
-            if not line.startswith('#') and !din:
+            if not line.startswith('#') and not din:
                 continue
             elif i<2:
                 din = True
@@ -618,7 +688,6 @@ def generateGraphFiles(importDirectory):
     mapping = getMapping()
     string_mapping = getSTRINGMapping()
     databases = config.databases
-    
     for database in databases:
         print database
         if database.lower() == "internal":
@@ -796,11 +865,48 @@ def generateGraphFiles(importDirectory):
                                             line_terminator='\n', escapechar='\\')
 
         if database.lower() == "oncokb":
-            relationships = parseOncoKB(mapping = mapping)
-            oncokb_outputfile = os.path.join(importDirectory, "oncokb_targets.csv")
-            relationshipsDf = pd.DataFrame(list(relationships))
-            relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'type', 'source']    
-            relationshipsDf.to_csv(path_or_buf= oncokb_outputfile, 
+            entities, relationships = parseOncoKB(mapping = mapping)
+            entity_outputfile = os.path.join(importDirectory, "oncokb_Known_variant.csv")
+            with open(entity_outputfile, 'w') as csvfile:
+                writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
+                writer.writerow(['ID', ':LABEL', 'alternative_names', 'chromosome', 'position', 'reference', 'alternative', 'effect', 'oncogeneicity'])
+                for entity in entities:
+                    writer.writerow(entity)
+            for relationship in relationships:
+                oncokb_outputfile = os.path.join(importDirectory, "oncokb_"+relationship+".csv")
+                relationshipsDf = pd.DataFrame(list(relationships[relationship]))
+                if relationship == "targets_known_variant":
+                    relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'association', 'evidence', 'tumor', 'type', 'source']
+                elif relationship == "targets":
+                    relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'type', 'source']
+                elif relationship == "associated_with":
+                    relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'score', 'evidence_type', 'source', 'number_publications'] 
+                else:
+                    relationshipsDf.columns = ['START_ID', 'END_ID','TYPE']
+                relationshipsDf.to_csv(path_or_buf= oncokb_outputfile, 
+                                            header=True, index=False, quotechar='"', 
+                                            line_terminator='\n', escapechar='\\')
+        
+        if database.lower() == "cancergenomeinterpreter":
+            entities, relationships = parseCGI(mapping = mapping)
+            entity_outputfile = os.path.join(importDirectory, "cgi_Known_variant.csv")
+            with open(entity_outputfile, 'w') as csvfile:
+                writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
+                writer.writerow(['ID', ':LABEL', 'alternative_names', 'chromosome', 'position', 'reference', 'alternative', 'effect', 'oncogeneicity'])
+                for entity in entities:
+                    writer.writerow(entity)
+            for relationship in relationships:
+                cgi_outputfile = os.path.join(importDirectory, "cgi_"+relationship+".csv")
+                relationshipsDf = pd.DataFrame(list(relationships[relationship]))
+                if relationship == "targets_known_variant":
+                    relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'evidence', 'association', 'tumor', 'type', 'source']
+                elif relationship == "targets":
+                    relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'type', 'source']
+                elif relationship == "associated_with":
+                    relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'score', 'evidence_type', 'source', 'number_publications']
+                else:
+                    relationshipsDf.columns = ['START_ID', 'END_ID','TYPE']
+                relationshipsDf.to_csv(path_or_buf= cgi_outputfile, 
                                             header=True, index=False, quotechar='"', 
                                             line_terminator='\n', escapechar='\\')
 

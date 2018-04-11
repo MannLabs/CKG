@@ -81,15 +81,13 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
             for statement in ppiDataImportCode.replace("IMPORTDIR",importDir).replace("RESOURCE",resource.upper()).split(';')[0:-1]:
                 print statement+";"
                 driver.run(statement+";")
-
     #Diseases
     if "diseases" in imports:
         diseaseDataImportCode = cy.IMPORT_DISEASE_DATA
-        for resource in config.disease_resources:
-            for statement in diseaseDataImportCode.replace("IMPORTDIR",importDir).replace("RESOURCE",resource.lower()).split(';')[0:-1]:
+        for entity,resource in config.disease_resources:
+            for statement in diseaseDataImportCode.replace("IMPORTDIR",importDir).replace("ENTITY", entity).replace("RESOURCE",resource.lower()).split(';')[0:-1]:
                 print statement+";"
                 driver.run(statement+";")
-
     #Drugs
     if "drugs" in imports:
         drugsDataImportCode = cy.IMPORT_CURATED_DRUG_DATA
@@ -114,6 +112,13 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
         mentionsImportCode = cy.IMPORT_MENTIONS
         for entity in config.mentionEntities:
             for statement in mentionsImportCode.replace("IMPORTDIR", importDir).replace("ENTITY", entity).split(';')[0:-1]:
+                print statement+";"
+                driver.run(statement+";")
+    #Known_variants
+    if "variants" in imports:
+        variantsImportCode = cy.IMPORT_KNOWN_VARIANT_DATA
+        for source in config.variant_resources:
+            for statement in variantsImportCode.replace("IMPORTDIR", importDir).replace("SOURCE",source.lower()).split(';')[0:-1]:
                 print statement+";"
                 driver.run(statement+";")
     #Projects
@@ -162,6 +167,6 @@ if __name__ == "__main__":
     #removeRelationshipDB(entity1 = 'Protein', entity2 = 'Protein', relationship = "intact_INTERACTS_WITH")
     #removeRelationshipDB(entity1 = 'Protein', entity2 = 'Protein', relationship = "IntAct_INTERACTS_WITH")
 
-    #createDB(imports=["ontologies","chromosomes", "genes", "transcripts", "proteins", "ppi", "drugs", "diseases","internal","datasets"])
+    #createDB(imports=["ontologies","chromosomes", "genes", "transcripts", "proteins", "ppi", "drugs", "diseases","internal", "variants", "project", "datasets"])
     #createDB(imports=["ontologies","datasets"])
-    createDB(imports=["project","datasets"])
+    createDB(imports=["drugs", "diseases", "variants", "project", "datasets"])

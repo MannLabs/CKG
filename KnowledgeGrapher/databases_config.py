@@ -1,8 +1,8 @@
 #Database directory
 databasesDir = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/data/databases/"
 #Databases
-#databases = ["HGNC", "RefSeq", "UniProt", "IntAct", "DisGEnet", "HGNC", "DGIdb", "OncoKB", "STRING", "STITCH", "HMDB"]
-databases = ["Mentions"]
+#databases = ["HGNC", "RefSeq", "UniProt", "IntAct", "DisGEnet", "HGNC", "DGIdb", "OncoKB", "STRING", "STITCH", "HMDB", "Mentions"]
+databases = ["OncoKB","CancerGenomeInterpreter"]
 
 ###### UniProt Database ########
 uniprot_id_url = "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping.dat.gz"
@@ -46,13 +46,23 @@ pathway_type = -45
 ###### The Drug Gene Interaction Database (DGIdb) #########
 DGIdb_url = "http://www.dgidb.org/data/interactions.tsv"
 ###### OncoKB Database #########
-OncoKB_url = "http://oncokb.org/api/v1/utils/allActionableVariants.txt"
+OncoKB_annotated_url = "http://oncokb.org/api/v1/utils/allAnnotatedVariants.txt"
+OncoKB_actionable_url = "http://oncokb.org/api/v1/utils/allActionableVariants.txt"
+OncoKB_levels = {"1": ("approved", "Responsive"), 
+                "2A": ("approved","Responsive"), 
+                "2B": ("approved", "Responsive other"), 
+                "3A": ("Clinical evidence", "Responsive"), 
+                "3B":("Clinical evidence", "Responsive other"), 
+                "4":("Biological evidence","Responsive"), 
+                "4B":("FDA approved","Resistant")}
+
 ##### Cancer Genome Interpreter ######
 cancerGenes_url = "https://www.cancergenomeinterpreter.org/data/catalog_of_cancer_genes_latest.zip"
 cancerVariants_url = "https://www.cancergenomeinterpreter.org/data/catalog_of_validated_oncogenic_mutations_latest.zip"
-cancerBiomarkers_url = "https://www.cancergenomeinterpreter.org/data/cgi_biomarkers_latest.zip"
 cancerBioactivities_url = "https://www.cancergenomeinterpreter.org/data/cancer_bioactivities_latest.zip"
-cancerBioactivities_variant_file = "cgi_biomarkers_per_variant.tsv"
+
+cancerBiomarkers_url = "https://www.cancergenomeinterpreter.org/data/cgi_biomarkers_latest.zip"
+cancerBiomarkers_variant_file = "cgi_biomarkers_per_variant.tsv"
 
 ###### IntAct Database #######
 intact_psimitab_url = "ftp://ftp.ebi.ac.uk/pub/databases/intact/current/psimitab/intact.txt"

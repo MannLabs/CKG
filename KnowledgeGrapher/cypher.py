@@ -110,9 +110,9 @@ IMPORT_MENTIONS =   '''
 IMPORT_DISEASE_DATA =   '''
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_associated_with.csv" AS line
-                        MATCH (p:Protein {id:line.START_ID})
+                        MATCH (e:ENTITY {id:line.START_ID})
                         MATCH (d:Disease {id:line.END_ID})
-                        CREATE UNIQUE (p)-[:ASSOCIATED_WITH{score:line.score,evidence_type:line.evidence_type,source:line.source,number_publications:line.number_publications}]->(d);'''
+                        CREATE UNIQUE (e)-[:ASSOCIATED_WITH{score:line.score,evidence_type:line.evidence_type,source:line.source,number_publications:line.number_publications}]->(d);'''
 
 IMPORT_CURATED_DRUG_DATA =   '''
                         USING PERIODIC COMMIT 10000
@@ -127,6 +127,29 @@ IMPORT_COMPILED_DRUG_DATA =   '''
                         MATCH (d:Drug {id:line.START_ID})
                         MATCH (g:Gene {id:line.END_ID})
                         CREATE UNIQUE (d)-[:COMPILED_TARGETS{score:line.score, source:line.source,interaction_type:line.interaction_type,scores:SPLIT(line.evidences,','),evidences:SPLIT(line.evidences,',')}]->(g);'''
+
+IMPORT_KNOWN_VARIANT_DATA = '''
+                            CREATE CONSTRAINT ON (k:Known_variant) ASSERT k.id IS UNIQUE; 
+                            USING PERIODIC COMMIT 10000
+                            LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_Known_variant.csv" AS line
+                            MERGE (k:Known_variant {id:line.ID})
+                            ON CREATE SET k.alternative_names=line.alternative_names,k.chromosome=line.chromosome,k.position=toInt(line.position),k.reference=line.reference,k.alternative=line.alternative,k.effect=line.effect,k.oncogeneicity=line.oncogeneicity;
+                            USING PERIODIC COMMIT 10000
+                            LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_variant_found_in_chromosome.csv" AS line
+                            MATCH (k:Known_variant {id:line.START_ID})
+                            MATCH (c:Chromosome {id:line.END_ID}) 
+                            CREATE UNIQUE (k)-[:VARIANT_FOUND_IN_CHROMOSOME]->(c);
+                            USING PERIODIC COMMIT 10000
+                            LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_variant_found_in_gene.csv" AS line
+                            MATCH (k:Known_variant {id:line.START_ID})
+                            MATCH (g:Gene {id:line.END_ID}) 
+                            CREATE UNIQUE (k)-[:VARIANT_FOUND_IN_GENE]->(g);
+                            USING PERIODIC COMMIT 10000
+                            LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_targets_known_variant.csv" AS line
+                            MATCH (d:Drug {id:line.START_ID}) 
+                            MATCH (k:Known_variant {id:line.END_ID})
+                            CREATE UNIQUE (d)-[:TARGETS_KNOWN_VARIANT{association:line.association, evidence:line.evidence, tumor:line.tumor, type:line.type, source:line.source}]->(k);
+                            '''
 
 IMPORT_DATASETS = {"clinical":'''USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_clinical.csv" AS line 
@@ -194,6 +217,11 @@ IMPORT_DATASETS = {"clinical":'''USING PERIODIC COMMIT 10000
                                     s.CADD_raw=line.CADD_raw,s.CLINSIG=line.CLINSIG,s.CLNDBN=line.CLNDBN,s.CLNACC=line.CLNACC,s.CLNDSDB=line.CLNDSDB,s.CLNDSDBID=line.CLNDSDBID,
                                     s.cosmic70=line.cosmic70,s.ICGC_Id=line.ICGC_Id,s.ICGC_Occurrence=line.ICGC_Occurrence;
                         USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_somatic_mutation_known_variant.csv" AS line
+                        MATCH (s:Somatic_mutation {id:line.START_ID}) 
+                        MATCH (k:Known_variant {id:line.END_ID})
+                        CREATE UNIQUE (s)-[:IS_A_KNOWN_VARIANT]->(k);
+                        USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_somatic_mutation_gene.csv" AS line
                         MATCH (s:Somatic_mutation {id:line.START_ID}) 
                         MATCH (g:Gene {id:line.END_ID})
@@ -207,7 +235,7 @@ IMPORT_DATASETS = {"clinical":'''USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_somatic_mutation_sample.csv" AS line
                         MATCH (a:Analytical_sample {id:line.START_ID})
                         MATCH (s:Somatic_mutation {id:line.END_ID}) 
-                        CREATE UNIQUE (a)-[:CALLED_VARIANT]->(s);
+                        CREATE UNIQUE (a)-[:CONTAINS_MUTATION]->(s);
                         '''
                 }
 
