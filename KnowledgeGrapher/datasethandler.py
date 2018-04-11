@@ -49,10 +49,11 @@ def extractSubjectReplicates(data, regex):
             value = " ".join(fields[0].split(' ')[0:-1])
             subject = fields[1]
             timepoint = ""
-            if fields > 2:
+            if len(fields) > 2:
                 timepoint = " " + fields[2]
             ident = value + " " + subject + timepoint
             subjectDict[ident].append(c)
+    print subjectDict    
     return subjectDict
 
 def calculateMedianReplicates(data, log = "log2"):
@@ -81,10 +82,12 @@ def parseClinicalDataset(projectId, configuration, dataDir):
     right ontology (defined in config), i.e. type = -40 -> SNOMED CT'''
     
     dfile = configuration['file']
-    filepath = os.path.join(dataDir, os.path.join(projectId, dfile))
-    data = readDataset(filepath)
-    data['subject id'] = data['subject id'].astype('int64')
-    data = data.set_index('subject id')
+    filepath = os.path.join(dataDir, dfile)
+    data = None
+    if os.path.isfile(filepath):
+        data = readDataset(filepath)
+        data['subject id'] = data['subject id'].astype('int64')
+        data = data.set_index('subject id')
     
     return data
 
@@ -96,17 +99,18 @@ def parseProteomicsDataset(projectId, configuration, dataDir):
             continue
         datasetConfig = configuration[ftype]
         dfile = datasetConfig['file']
-        filepath = os.path.join(dataDir, os.path.join(projectId,dfile))
-        data, regex = loadProteomicsDataset(filepath, datasetConfig)
-        data = data.sort_index()
-        log = datasetConfig['log']
-        subjectDict = extractSubjectReplicates(data, regex)
-        delCols = []
-        for subject in subjectDict:
-            delCols.extend(subjectDict[subject])
-            aux = data[subjectDict[subject]]
-            data[subject] = calculateMedianReplicates(aux, log)
-        datasets[ftype] = data.drop(delCols, 1)
+        filepath = os.path.join(dataDir, dfile)
+        if os.path.isfile(filepath):
+            data, regex = loadProteomicsDataset(filepath, datasetConfig)
+            data = data.sort_index()
+            log = datasetConfig['log']
+            subjectDict = extractSubjectReplicates(data, regex)
+            delCols = []
+            for subject in subjectDict:
+                delCols.extend(subjectDict[subject])
+                aux = data[subjectDict[subject]]
+                data[subject] = calculateMedianReplicates(aux, log)
+            datasets[ftype] = data.drop(delCols, 1)
     return datasets
 
 ########### Genomics Datasets ############
@@ -114,9 +118,10 @@ def parseWESDataset(projectId, configuration, dataDir):
     datasets = {}
     files = utils.listDirectoryFiles(os.path.join(dataDir,projectId))
     for dfile in files:
-        filepath = os.path.join(dataDir, os.path.join(projectId,dfile))
-        sample, data = loadWESDataset(filepath, configuration)
-        datasets[sample] = data
+        filepath = os.path.join(dataDir, dfile)
+        if os.path.isfile(filepath):
+            sample, data = loadWESDataset(filepath, configuration)
+            datasets[sample] = data
 
     return datasets
 
@@ -237,7 +242,8 @@ def extractPeptides(data, configuration):
     aux["type"] = modid
     aux = aux["type"]
     aux = aux.reset_index()
-    aux.columns = ["ID", "type"]
+    aux = aux.groupby(aux.columns.tolist()).size().reset_index().rename(columns={0:'count'})
+    aux.columns = ["ID", "type", "count"]
 
     return aux
 
@@ -250,7 +256,7 @@ def extractPeptideSubjectRelationships(data, configuration):
     aux['TYPE'] = "HAS_QUANTIFIED_PEPTIDE"
     aux.columns = ['END_ID', 'START_ID',"value", 'TYPE']
     aux = aux[['START_ID', 'END_ID', 'TYPE', "value"]]
-    aux['START_ID'] = aux['START_ID'].astype('int64')
+    aux = aux.drop_duplicates()
     
     return aux
 
@@ -261,7 +267,7 @@ def extractPeptideProteinRelationships(data, configuration):
     aux = aux.reset_index()
     aux.columns = ["Sequence", "Protein", "Start", "End"]
     aux['TYPE'] = "BELONGS_TO_PROTEIN"
-    aux.columns = ['START_ID', 'END_ID', 'TYPE', "start", "end"]
+    aux.columns = ['START_ID', 'END_ID', "start", "end", 'TYPE']
     aux = aux[['START_ID', 'END_ID', 'TYPE']]
     return aux
 
@@ -274,15 +280,6 @@ def extractProteinSubjectRelationships(data, configuration):
     aux['TYPE'] = "HAS_QUANTIFIED_PROTEIN"
     aux.columns = ['END_ID', 'START_ID',"value", 'TYPE']
     aux = aux[['START_ID', 'END_ID', 'TYPE', "value"]]
-    aux['START_ID'] = aux['START_ID'].astype('int64')
-    
-    return aux
-
-def extractProjectSampleRelationships(data, projectId):
-    samples = list(data['START_ID'])
-    aux = pd.DataFrame({'START_ID': projectId , 'END_ID': samples, 'TYPE': "HAS_ENROLLED"})
-    aux = aux[['START_ID', 'END_ID','TYPE']]
-    aux['START_ID'] = aux['START_ID'].astype(str)
     
     return aux
 
@@ -413,7 +410,7 @@ def loadWESDataset(uri, configuration):
 #          Generate graph files        # 
 ########################################
 def generateDatasetImports(projectId, dataType):
-    dataDir = config.dataTypes[dataType]["directory"]
+    dataDir = config.dataTypes[dataType]["directory"].replace("PROJECTID", projectId)
     configuration = config.dataTypes[dataType]
     if dataType == "clinical":
         data = parseClinicalDataset(projectId, configuration, dataDir)
@@ -426,8 +423,6 @@ def generateDatasetImports(projectId, dataType):
         for dtype in data:
             if dtype == "proteins":
                 dataRows = extractProteinSubjectRelationships(data[dtype], configuration[dtype])
-                proSamRows = extractProjectSampleRelationships(dataRows, projectId)
-                generateGraphFiles(proSamRows,'project', projectId)
                 generateGraphFiles(dataRows,dtype, projectId)
             elif dtype == "peptides":
                 dataRows = extractPeptideSubjectRelationships(data[dtype], configuration[dtype]) 
@@ -466,6 +461,7 @@ def generateDatasetImports(projectId, dataType):
 def generateGraphFiles(data, dataType, projectId, ot = 'w', d = 'proteomics'):
     importDir = os.path.join(config.datasetsImportDirectory, os.path.join(projectId,d))
     outputfile = os.path.join(importDir, projectId+"_"+dataType.lower()+".csv")
+    print data.shape
     with open(outputfile, ot) as f:  
         data.to_csv(path_or_buf = f, 
             header=True, index=False, quotechar='"', 
@@ -473,7 +469,7 @@ def generateGraphFiles(data, dataType, projectId, ot = 'w', d = 'proteomics'):
 
 if __name__ == "__main__":
     #uri = sys.argv[1]
-    #generateDatasetImports('P0000001', 'proteomicsData')
+    #generateDatasetImports('P0000001', 'proteomics')
     #generateDatasetImports('P0000001', 'clinicalData')
-    generateDatasetImports('P0000002', 'wes') 
-    
+    #generateDatasetImports('P0000002', 'wes')
+    generateDatasetImports('P0000002', 'proteomics')

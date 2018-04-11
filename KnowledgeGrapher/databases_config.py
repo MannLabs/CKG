@@ -1,8 +1,8 @@
 #Database directory
 databasesDir = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/data/databases/"
 #Databases
-#databases = ["HGNC", "RefSeq", "UniProt", "IntAct", "DisGEnet", "HGNC", "DGIdb", "OncoKB", "STRING", "STITCH", "HMDB", "Mentions"]
-databases = ["OncoKB","CancerGenomeInterpreter"]
+#databases = ["HGNC", "RefSeq", "UniProt", "IntAct", "DisGEnet", "HGNC", "DGIdb", "OncoKB", "STRING", "STITCH", "HMDB", "Mentions", "OncoKB","CancerGenomeInterpreter"]
+databases = ["Reactome"]
 
 ###### UniProt Database ########
 uniprot_id_url = "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping.dat.gz"
@@ -43,6 +43,10 @@ headerEntities = {"Transcript":["ID", ":LABEL", "name", "class", "assembly", "ta
 ###### PathwayCommons Database #######
 pathwayCommons_pathways_url = "http://www.pathwaycommons.org/archives/PC2/v9/PathwayCommons9.All.uniprot.gmt.gz"
 pathway_type = -45
+##### Reactome ######
+reactome_urls = {"pathways" : "https://reactome.org/download/current/ReactomePathways.txt",
+                "hierarchy" : "https://reactome.org/download/current/ReactomePathwaysRelation.txt",
+                "protein_pathways" : "https://reactome.org/download/current/UniProt2Reactome_All_Levels.txt"}
 ###### The Drug Gene Interaction Database (DGIdb) #########
 DGIdb_url = "http://www.dgidb.org/data/interactions.tsv"
 ###### OncoKB Database #########

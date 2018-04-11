@@ -105,7 +105,53 @@ def parseInternalDatabaseMentions(qtype, mapping, importDirectory, download = Tr
     
     return entities
     
-    
+############################
+#   Reactome Pathways      # 
+############################
+def parseReactomePathways(download = True):
+    database_urls = config.reactome_urls
+    entities = set()
+    relationships = defaultdict(set)
+    directory = os.path.join(config.databasesDir,"Reactome")
+    files = {}
+    if download:
+        for ident in database_urls:
+            downloadDB(database_urls[ident], "Reactome")
+            files[ident] = os.path.join(directory, database_urls[ident].split('/')[-1])
+
+    pathwaysFile = files["pathways"]
+    pathways = set()
+    with open(pathwaysFile, 'r') as pf:
+        for line in pf:
+            data = line.rstrip("\r\n").split("\t")
+            pid = data[0]
+            pname = data[1]
+            pspecies = data[2]
+            if pspecies == "Homo sapiens":
+                entities.add((pid, "Pathway", pname, "Reactome"))
+                pathways.add(pid)
+    hierarchyFile = files["hierarchy"]
+    with open(hierarchyFile, 'r') as hf:
+        for line in hf:
+            data = line.rstrip("\r\n").split("\t")
+            parent = data[0]
+            child = data[1]
+
+            if parent in pathways and child in pathways:
+                relationships["has_parent"].add((child, parent, "HAS_PARENT"))
+    proteinsFile = files["protein_pathways"]
+    with open(proteinsFile, 'r') as ppf:
+        for line in ppf:
+            data = line.rstrip("\r\n").split("\t")
+            protein = data[0]
+            pathway = data[1]
+            linkout = data[2]
+            evidence = data[4]
+            if pathway in pathways:
+                relationships["annotated_in_pathway"].add((protein, pathway, "ANNOTATED_IN_PATHWAY", evidence, linkout, "Reactome"))
+
+    return entities, relationships
+
 #########################
 #   PathwayCommons      # 
 #########################
@@ -134,7 +180,7 @@ def parsePathwayCommons(download = True):
         
         entities.add((code, "Pathway", name, source, linkout))
         for protein in proteins:
-            relationships.add((protein, code, "MEMBER_OF_PATHWAY", "PathwayCommons: "+source))
+            relationships.add((protein, code, "ANNOTATED_IN_PATHWAY", "PathwayCommons: "+source))
 
     associations.close()
     
@@ -837,6 +883,25 @@ def generateGraphFiles(importDirectory):
                 disease_relationshipsDf.to_csv(path_or_buf=disease_outputfile, 
                                                 header=True, index=False, quotechar='"', 
                                                 line_terminator='\n', escapechar='\\')
+
+        if database.lower() == "reactome":
+            entities, relationships = parseReactomePathways()
+            entity_outputfile = os.path.join(importDirectory, "reactome_Pathway.csv")
+            with open(entity_outputfile, 'w') as csvfile:
+                writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
+                writer.writerow(['ID', ':LABEL', 'name', 'source'])
+                for entity in entities:
+                    writer.writerow(entity)
+            for relationship in relationships:
+                outputfile = os.path.join(importDirectory, "reactome_"+relationship+".csv")
+                relationshipsDf = pd.DataFrame(list(relationships[relationship]))
+                if relationship == "annotated_in_pathway":
+                    relationshipsDf.columns = ['START_ID', 'END_ID', 'TYPE', 'evidence', 'linkout', 'source']
+                else:
+                    relationshipsDf.columns = ['START_ID', 'END_ID','TYPE']
+                relationshipsDf.to_csv(path_or_buf= outputfile, 
+                                            header=True, index=False, quotechar='"', 
+                                            line_terminator='\n', escapechar='\\')
 
         if database.lower() == "pathwaycommons":
             #PathwayCommons pathways

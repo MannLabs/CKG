@@ -16,6 +16,7 @@ PPI_resources = ["IntAct"]
 disease_resources = [("Protein","DisGEnet"),("Known_variant","CGI"),("Known_variant","OncoKB")]
 drug_resources = ["DGIdb","CGI","OncoKB"]
 variant_resources = ["CGI","OncoKB"]
+pathway_resources = ["Reactome"]
 
 #Internal Databases entities
 internalEntities = [("Protein","Disease"), ("Protein", "Tissue"), ("Protein","Cellular_compartment")]
@@ -32,16 +33,17 @@ mappingFile = dataDirectory + "/ontologies/mapping.tsv"
 #Dataset types
 datasetsDirectory = dataDirectory + "/experiments/"
 #Proteomics
-proteomicsDirectory = datasetsDirectory + "proteomics/"
-genomicsDirectory = datasetsDirectory + "wes/"
-dataTypes = {"clinical":{"directory":proteomicsDirectory,
+clinicalDirectory = datasetsDirectory + "PROJECTID/clinical/"
+proteomicsDirectory = datasetsDirectory + "PROJECTID/proteomics/"
+genomicsDirectory = datasetsDirectory + "PROJECTID/wes/"
+dataTypes = {"clinical":{"directory":clinicalDirectory,
                             "file":"clinicalData.xlsx"},
             "proteomics":{"directory": proteomicsDirectory,
                             "proteins":{"columns":
                                             ["Majority protein IDs",
                                             "Gene names", "Q-value", 
                                             "Score", 
-                                            "LFQ intensity \d+_\d+_?\d*",  #subject_replicate_timepoint
+                                            "LFQ intensity \d+_AS\d+_?\d*",  #subject_replicate_timepoint
                                             "Reverse",
                                             "Potential contaminant",
                                             "Only identified by site"],
@@ -65,7 +67,7 @@ dataTypes = {"clinical":{"directory":proteomicsDirectory,
                                             "Start position",
                                             "End position",
                                             "Score", 
-                                            "Intensity \d+_\d+_?\d*", 
+                                            "Intensity \d+_AS\d+_?\d*", 
                                             "Reverse",
                                             "Potential contaminant"],
                                         "filters" : ["Reverse",

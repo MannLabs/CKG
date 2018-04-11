@@ -128,6 +128,23 @@ IMPORT_COMPILED_DRUG_DATA =   '''
                         MATCH (g:Gene {id:line.END_ID})
                         CREATE UNIQUE (d)-[:COMPILED_TARGETS{score:line.score, source:line.source,interaction_type:line.interaction_type,scores:SPLIT(line.evidences,','),evidences:SPLIT(line.evidences,',')}]->(g);'''
 
+IMPORT_PATHWAY_DATA = '''
+                        CREATE CONSTRAINT ON (p:Pathway) ASSERT p.id IS UNIQUE; 
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_Pathway.csv" AS line
+                        MERGE (p:Pathway{id:line.ID})
+                        ON CREATE SET p.name=line.name,p.source=line.source;
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_annotated_in_pathway.csv" AS line
+                        MATCH (p:Protein{id:line.START_ID})
+                        MATCH (a:Pathway{id:line.END_ID}) 
+                        CREATE UNIQUE (p)-[:ANNOTATED_IN_PATHWAY{evidence:line.evidence,linkout:line.linkout,source:line.source}]->(a);
+                        USING PERIODIC COMMIT 10000 
+                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/SOURCE_has_parent.csv" AS line
+                        MATCH (p1:Pathway{id:line.START_ID})
+                        MATCH (p2:Pathway{id:line.END_ID}) 
+                        CREATE UNIQUE (p1)-[:HAS_PARENT]->(p2);
+                        '''
 IMPORT_KNOWN_VARIANT_DATA = '''
                             CREATE CONSTRAINT ON (k:Known_variant) ASSERT k.id IS UNIQUE; 
                             USING PERIODIC COMMIT 10000
@@ -166,7 +183,7 @@ IMPORT_DATASETS = {"clinical":'''USING PERIODIC COMMIT 10000
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_peptides.csv" AS line
                         MERGE (p:Peptide{id:line.ID}) 
-                        ON CREATE SET p.type=line.type;
+                        ON CREATE SET p.type=line.type,p.count=line.count;
                         USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_peptide_protein.csv" AS line 
                         MATCH (p1:Peptide {id:line.START_ID})

@@ -114,6 +114,15 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
             for statement in mentionsImportCode.replace("IMPORTDIR", importDir).replace("ENTITY", entity).split(';')[0:-1]:
                 print statement+";"
                 driver.run(statement+";")
+
+    #Pathway
+    if 'pathway' in imports:
+        pathwayImportCode = cy.IMPORT_PATHWAY_DATA
+        for source in config.pathway_resources:
+            for statement in pathwayImportCode.replace("IMPORTDIR", importDir).replace("SOURCE", source.lower()).split(';')[0:-1]:
+                print statement+';'
+                driver.run(statement+';')
+
     #Known_variants
     if "variants" in imports:
         variantsImportCode = cy.IMPORT_KNOWN_VARIANT_DATA
@@ -147,9 +156,6 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
                     print statement
                     driver.run(statement+';')
 
-        
-
-
 def updateDB(dataset):
     pass
 
@@ -169,4 +175,4 @@ if __name__ == "__main__":
 
     #createDB(imports=["ontologies","chromosomes", "genes", "transcripts", "proteins", "ppi", "drugs", "diseases","internal", "variants", "project", "datasets"])
     #createDB(imports=["ontologies","datasets"])
-    createDB(imports=["drugs", "diseases", "variants", "project", "datasets"])
+    createDB(imports=["pathway"])
