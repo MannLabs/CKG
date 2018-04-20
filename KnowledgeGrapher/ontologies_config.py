@@ -1,24 +1,20 @@
 #Ontologies directory
 ontologiesDirectory = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/data/ontologies/"
 
-ontologies = {##"Disease": "DO", 
-               ##"Tissue": "BTO", 
+ontologies = {"Disease": "DO", 
+               "Tissue": "BTO", 
                "Clinical_variable": "SNOMED-CT",
-               #"Phosphorylation":"PSI-MOD",
-               #"Ubiquitination":"PSI-MOD",
-               #"Glycation":"PSI-MOD",
-               #"Amidation":"PSI-MOD",
                #"Experiment":"PSI-MS",
                #"Peptide_variant":"HGV",
                #"Gene_variant":"HGV",
-               ##"Drug":"STITCH",
+               "Drug":"STITCH",
                #"Food":"BBC",
                #"Physical_activity":"SMASH",
-               ##"PTM":"PSI-MOD"
-               ##"Biological_process":"GOBP",
-               ##"Cellular_compartment":"GOCC",
-               ##"Molecular_function":"GOMF",
-               ##"Diagnose":"ICD"
+               "Postranslational_modification":"PSI-MOD"
+               "Biological_process":"GOBP",
+               "Cellular_compartment":"GOCC",
+               "Molecular_function":"GOMF",
+               "Diagnose":"ICD"
             }
 
 ontology_types = {"DO":-26, 

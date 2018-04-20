@@ -1,8 +1,7 @@
 #Database directory
 databasesDir = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/data/databases/"
 #Databases
-#databases = ["HGNC", "RefSeq", "UniProt", "IntAct", "DisGEnet", "HGNC", "DGIdb", "OncoKB", "STRING", "STITCH", "HMDB", "Mentions", "OncoKB","CancerGenomeInterpreter"]
-databases = ["Reactome"]
+databases = ["HGNC", "RefSeq", "UniProt", "IntAct", "DisGEnet", "HGNC", "DGIdb", "OncoKB", "STRING", "STITCH", "Mentions", "OncoKB","CancerGenomeInterpreter", "Reactome"]
 
 ###### UniProt Database ########
 uniprot_id_url = "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping.dat.gz"
@@ -30,7 +29,8 @@ uniprot_synonyms = ["UniProtKB-ID",
 uniprot_protein_relationships = {"KEGG": ("Pathway", "IS_PART_OF_KEGG_PATHWAY"), 
                                 "Reactome":("Pathway","IS_PART_OF_REACTOME_PATHWAY"), 
                                 "RefSeq": ("Transcript", "TRANSLATED_INTO"), 
-                                "Gene_Name":("Gene","TRANSLATED_INTO")
+                                "Gene_Name":("Gene","TRANSLATED_INTO"),
+                                             "PDB":("Structure","FOUND")
                                 }
 ##### HUGO Gene Nomenclature #######
 hgnc_url = "ftp://ftp.ebi.ac.uk/pub/databases/genenames/new/tsv/hgnc_complete_set.txt"

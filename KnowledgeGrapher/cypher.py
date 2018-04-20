@@ -145,6 +145,7 @@ IMPORT_PATHWAY_DATA = '''
                         MATCH (p2:Pathway{id:line.END_ID}) 
                         CREATE UNIQUE (p1)-[:HAS_PARENT]->(p2);
                         '''
+                        
 IMPORT_KNOWN_VARIANT_DATA = '''
                             CREATE CONSTRAINT ON (k:Known_variant) ASSERT k.id IS UNIQUE; 
                             USING PERIODIC COMMIT 10000
@@ -197,7 +198,7 @@ IMPORT_DATASETS = {"clinical":'''USING PERIODIC COMMIT 10000
                         USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_protein_modification.csv" AS line 
                         MATCH (p:Protein {id:line.START_ID})
-                        MATCH (m:PTM {id:line.END_ID}) 
+                        MATCH (m:Postranslational_modification {id:line.END_ID}) 
                         CREATE UNIQUE (p)-[:HAS_MODIFICATION{position:line.position,residue:line.residue}]->(m);
                         CREATE CONSTRAINT ON (m:Modified_protein) ASSERT m.id IS UNIQUE;
                         USING PERIODIC COMMIT 10000
@@ -207,7 +208,7 @@ IMPORT_DATASETS = {"clinical":'''USING PERIODIC COMMIT 10000
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_modifiedprotein_modification.csv" AS line
                         MATCH (mp:Modified_protein {id:line.START_ID})
-                        MATCH (p:PTM {id:line.END_ID}) 
+                        MATCH (p:Postranslational_modification {id:line.END_ID}) 
                         CREATE UNIQUE (mp)-[:MODIFIED_WITH]->(p);
                         USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_modifiedprotein_protein.csv" AS line 

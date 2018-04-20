@@ -1,7 +1,7 @@
 import pandas as pd
 from collections import defaultdict
 import numpy as np
-import config
+import datasets_config as config
 import sys
 import ontologieshandler as oh
 import os.path

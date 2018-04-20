@@ -173,6 +173,4 @@ if __name__ == "__main__":
     #removeRelationshipDB(entity1 = 'Protein', entity2 = 'Protein', relationship = "intact_INTERACTS_WITH")
     #removeRelationshipDB(entity1 = 'Protein', entity2 = 'Protein', relationship = "IntAct_INTERACTS_WITH")
 
-    #createDB(imports=["ontologies","chromosomes", "genes", "transcripts", "proteins", "ppi", "drugs", "diseases","internal", "variants", "project", "datasets"])
-    #createDB(imports=["ontologies","datasets"])
-    createDB(imports=["pathway"])
+    createDB(imports=["ontologies","chromosomes", "genes", "transcripts", "proteins", "ppi", "drugs", "diseases", "pathway", "internal", "mentions", "variants", "project", "datasets"])
