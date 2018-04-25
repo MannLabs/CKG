@@ -5,7 +5,7 @@ ADD_ROLE_TO_USER = "CALL dbms.security.addRoleToUser(rolename, username)"
 
 COUNT_RELATIONSHIPS = "MATCH (:ENTITY1)-[:RELATIONSHIP]->(:ENTITY2) return count(*) AS count;"
 REMOVE_RELATIONSHIPS = "MATCH (:ENTITY1)-[r:RELATIONSHIP]->(:ENTITY2) delete r;"
-REMOVE_NODE = "all apoc.periodic.iterate(\"MATCH (n:Publication) return n\", \"DETACH DELETE n\", {batchSize:1000}) yield batches, total return batches, total"
+REMOVE_NODE = "all apoc.periodic.iterate(\"MATCH (n:ENTITY) return n\", \"DETACH DELETE n\", {batchSize:1000}) yield batches, total return batches, total"
 
 IMPORT_ONTOLOGY_DATA = '''CREATE INDEX ON :ENTITY(name);
                         CREATE CONSTRAINT ON (e:ENTITY) ASSERT e.id IS UNIQUE; 
