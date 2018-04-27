@@ -1,6 +1,0 @@
-import dash
-import dash_html_components as html
-from dash.dependencies import Input, Output
-from plots import basicFigures
-import pandas as pd
-import dash_auth
