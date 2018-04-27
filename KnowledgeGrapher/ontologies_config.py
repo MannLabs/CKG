@@ -10,7 +10,7 @@ ontologies = {"Disease": "DO",
                "Drug":"STITCH",
                #"Food":"BBC",
                #"Physical_activity":"SMASH",
-               "Postranslational_modification":"PSI-MOD"
+               "Postranslational_modification":"PSI-MOD",
                "Biological_process":"GOBP",
                "Cellular_compartment":"GOCC",
                "Molecular_function":"GOMF",

@@ -1,4 +1,8 @@
+
+dataDirectory = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/data"
 mappingFile = dataDirectory + "/ontologies/mapping.tsv"
+importDirectory = dataDirectory + "/imports"
+datasetsImportDirectory = importDirectory + "/datasets/"
 
 #Dataset types
 datasetsDirectory = dataDirectory + "/experiments/"

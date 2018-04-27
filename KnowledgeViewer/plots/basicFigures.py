@@ -246,3 +246,29 @@ def get3DNetworkFigure(data, sourceCol, targetCol, node_properties, identifier, 
     figure=Figure(data=data, layout=layout)
 
     return dcc.Graph(id = identifier, figure = figure)
+
+
+def get2DPCAFigure(data, groups, components, identifier, title):
+    traces = []
+
+    for name in groups:
+        trace = Scatter(
+            x=Y_sklearn[y==name,components[0]],
+            y=Y_sklearn[y==name,components[1]],
+            mode='markers',
+            name=name,
+            marker=Marker(
+                size=12,
+                line=Line(
+                    color='rgba(217, 217, 217, 0.14)',
+                    width=0.5),
+                opacity=0.8))
+        traces.append(trace)
+
+    d = Data(traces)
+    layout = Layout(xaxis=XAxis(title='PC'+str(components[0]), showline=False),
+                    yaxis=YAxis(title='PC'+str(components[1]), showline=False))
+    figure = Figure(data=d, layout=layout)
+
+    return  dcc.Graph(id = identifier, figure = figure)
+
