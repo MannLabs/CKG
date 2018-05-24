@@ -5,6 +5,7 @@ import plotly.figure_factory as FF
 from scipy.spatial.distance import pdist, squareform
 from plotly.graph_objs import *
 import networkx as nx
+from utils import hex2rgb
 
 def getBarPlotFigure(data, identifier, title):
     '''This function plots a simple barplot
@@ -293,7 +294,7 @@ def getSankeyPlot(data, sourceCol, targetCol, weightCol, edgeColorCol, node_colo
         ),
         orientation = 'h' if 'orientation' not in plot_attr else plot_attr['orientation'],
         valueformat = ".0f" if 'valueformat' not in plot_attr else plot_attr['valueformat'],
-        arrangement = 'freeform' if 'arrangement' not in plot_attr else plot_attr['arrengement'],
+        arrangement = 'freeform' if 'arrangement' not in plot_attr else plot_attr['arrangement'],
         node = dict(
             pad = 15 if 'pad' not in plot_attr else plot_attr['pad'],
             thickness = 25 if 'thickness' not in plot_attr else plot_attr['thickness'],
@@ -301,25 +302,67 @@ def getSankeyPlot(data, sourceCol, targetCol, weightCol, edgeColorCol, node_colo
                 color = "black",
                 width = 0.3
             ),
-            label =  list(colors.keys()),
-            color =  list(colors.values())
+            label =  list(node_colors.keys()),
+            color =  ["rgba"+str(hex2rgb(c)) if c.startswith('#') else c  for c in list(node_colors.values())]
         ),    
         link = dict(
-            source =  [list(colors.keys()).index(i) for i in data[sourceCol].tolist()],
-            target =  [list(colors.keys()).index(i) for i in data[targetCol].tolist()],
+            source =  [list(node_colors.keys()).index(i) for i in data[sourceCol].tolist()],
+            target =  [list(node_colors.keys()).index(i) for i in data[targetCol].tolist()],
             value =  data[weightCol].tolist(),
-            color = data[edgeColorCol].tolist()
+            color = ["rgba"+str(hex2rgb(c)) if c.startswith('#') else c for c in data[edgeColorCol].tolist()]
         ))
     layout =  dict(
-        width= 800 if 'width' not in plot_attr else plot_att['width'],
-        height= 800 if 'height' not in plot_attr else plot_att['height'],
+        width= 800 if 'width' not in plot_attr else plot_attr['width'],
+        height= 800 if 'height' not in plot_attr else plot_attr['height'],
         title = title,
         font = dict(
-            size = 12 if 'font' not in plot_attr else plot_att['font'],
+            size = 12 if 'font' not in plot_attr else plot_attr['font'],
         )
     )
+    
     figure = dict(data=[data_trace], layout=layout)
     
     return dcc.Graph(id = identifier, figure = figure)
 
+def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':800, 'height':800, 'font':12}):
+    if subset is not None:
+        data = data[subset]
+
+    data_trace = go.Table(header=dict(values=data.columns,
+                    fill = dict(color = colors[0]),
+                    align = ['left'] * 5),
+                    cells=dict(values=[data[c] for c in data.columns],
+                    fill = dict(color= colors[1]),
+                    align = ['left'] * 5))
+    layout =  dict(
+        width= 800 if 'width' not in plot_attr else plot_attr['width'],
+        height= 800 if 'height' not in plot_attr else plot_attr['height'],
+        title = title,
+        font = dict(
+            size = 12 if 'font' not in plot_attr else plot_attr['font'],
+        )
+    )
+    
+    figure = dict(data=[data_trace], layout=layout)
+    
+    return dcc.Graph(id = identifier, figure = figure)
+
+def getViolinPlot(data, variableCol, groupCol, colors, identifier, title, plot_attr={'width':600, 'height':600, 'colorScale': False}):
+
+    figure = FF.create_violin(data, 
+                    data_header=variableCol, 
+                    group_header= groupCol,
+                    colors= colors, 
+                    height=500 if 'height' not in plot_attr else plot_attr['height'], 
+                    width=800 if 'width' not in plot_attr else plot_attr['width'],
+                    use_colorscale= False if 'colorScale' not in plot_attr else plot_attr['colorScale'])
+    layout =  dict(
+        title = title,
+        font = dict(
+            size = 12 if 'font' not in plot_attr else plot_attr['font'],
+        )
+    )
+    
+    
+    return dcc.Graph(id = identifier, figure = figure)
 

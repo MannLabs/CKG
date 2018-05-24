@@ -36,4 +36,16 @@ class ProjectApp(basicApp.BasicApp):
         figure5 = basicFigures.get3DNetworkFigure(data, sourceCol = "source", targetCol = "target", node_properties = properties, identifier = "Net", title= "This is a 3D network")
         self.addToLayout(figure5)
 
-
+        data = pd.DataFrame([("Protein 1", "Protein 4", 2, 5, "#edf8fb"), ("Protein 2", "Protein 5", 3, 3, "#bfd3e6"), ("Protein 3", "Protein 4", 0.5, 0, "#9ebcda"), ("Protein 1","Protein 6" ,4, 10, "#8c96c6"),("Protein 2","Protein 4" ,4, 10, "#8c6bb1"),("Protein 1","Protein 5" ,4, 10, "#88419d"),("Protein 5","Protein 7" ,4, 10, "#edf8fb"),("Protein 4","Protein 7" ,4, 10, "#6e016b"),("Protein 6","Protein 7" ,4, 10, "#6e016b"),("Protein 3","Protein 5" ,4, 10, "#6e016b")], columns = ["source", "target", "weight", "score", "edgeColor"])
+        colors =  {"Protein 1":"#edf8fb", "Protein 2":"#bfd3e6", "Protein 3":"#9ebcda", "Protein 4":"#8c96c6", "Protein 5":"#8c6bb1", "Protein 6":"#88419d", "Protein 7":"#6e016b"}
+        figure6 = basicFigures.getSankeyPlot(data, sourceCol ="source", targetCol = "target", weightCol = "weight", node_colors = colors, edgeColorCol = "edgeColor", identifier = "sankey", title = "This is a Sankey plot")
+        self.addToLayout(figure6)
+        
+        figure7 = basicFigures.getBasicTable(data, identifier = "TableInteractions", title = "Table with Protein-protein interactions", colors = ('#C2D4FF','#F5F8FF'), subset = None)
+        self.addToLayout(figure7)
+        
+        data = pd.DataFrame([("Protein 1", "Disease", 25), ("Protein 1", "Disease", 30),("Protein 1", "Disease", 45),("Protein 1", "Disease", 25),("Protein 1", "Disease", 20),
+                            ("Protein 1", "Control", 5),("Protein 1", "Control", 1),("Protein 1", "Control", 10),("Protein 1", "Control", 10),("Protein 1", "Control", 0.3)], columns = ["Protein", "Group", "Value"])
+        colors  = {"Disease":"#bfd3e6", "Control": "#8c96c6"}
+        figure8 = basicFigures.getViolinPlot(data, variableCol = "Value", groupCol = "Group", colors = colors, identifier= "violin", title = "Violin plot")
+        self.addToLayout(figure8)
