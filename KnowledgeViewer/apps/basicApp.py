@@ -4,7 +4,7 @@ from dash.dependencies import Input, Output
 from plots import basicFigures
 import pandas as pd
 import dash_auth
-import apps_config
+from apps import apps_config
 
 
 class BasicApp:

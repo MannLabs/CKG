@@ -272,3 +272,54 @@ def get2DPCAFigure(data, groups, components, identifier, title):
 
     return  dcc.Graph(id = identifier, figure = figure)
 
+
+def getSankeyPlot(data, sourceCol, targetCol, weightCol, edgeColorCol, node_colors, identifier, title, plot_attr = {'orientation': 'h', 'valueformat': '.0f', 'arrangement':'freeform','width':800, 'height':800, 'font':12} ):
+    '''This function generates a Sankey plot in Plotly
+        --> Input:
+            - data: Pandas DataFrame with the format: source    target  weight
+            - sourceCol: name of the column with the source node
+            - targetCol: name of the column with the target node
+            - weightCol: name of the column with the edge weight
+            - edgeColorCol: name of the column with the edge color
+            - colors: dictionary with the color for each node: {node: rgba(r,g,b,alpha)}
+            - identifier: identifier used to label the div that contains the network figure
+            - Title of the plot
+    '''
+    data_trace = dict(
+        type='sankey',
+        domain = dict(
+            x =  [0,1],
+            y =  [0,1]
+        ),
+        orientation = 'h' if 'orientation' not in plot_attr else plot_attr['orientation'],
+        valueformat = ".0f" if 'valueformat' not in plot_attr else plot_attr['valueformat'],
+        arrangement = 'freeform' if 'arrangement' not in plot_attr else plot_attr['arrengement'],
+        node = dict(
+            pad = 15 if 'pad' not in plot_attr else plot_attr['pad'],
+            thickness = 25 if 'thickness' not in plot_attr else plot_attr['thickness'],
+            line = dict(
+                color = "black",
+                width = 0.3
+            ),
+            label =  list(colors.keys()),
+            color =  list(colors.values())
+        ),    
+        link = dict(
+            source =  [list(colors.keys()).index(i) for i in data[sourceCol].tolist()],
+            target =  [list(colors.keys()).index(i) for i in data[targetCol].tolist()],
+            value =  data[weightCol].tolist(),
+            color = data[edgeColorCol].tolist()
+        ))
+    layout =  dict(
+        width= 800 if 'width' not in plot_attr else plot_att['width'],
+        height= 800 if 'height' not in plot_attr else plot_att['height'],
+        title = title,
+        font = dict(
+            size = 12 if 'font' not in plot_attr else plot_att['font'],
+        )
+    )
+    figure = dict(data=[data_trace], layout=layout)
+    
+    return dcc.Graph(id = identifier, figure = figure)
+
+

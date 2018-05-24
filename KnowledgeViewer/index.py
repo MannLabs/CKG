@@ -19,8 +19,10 @@ def display_page(pathname):
         if pathname == '/apps/initial' or pathname == '/':
             return initialApp.layout
         elif pathname.startswith('/apps/project'):
-            project = pathname.split('/')[-1]
-            return projectApp.getLayout(project)
+            projectId = pathname.split('/')[-1]
+            project = projectApp.ProjectApp(projectId, "This is the Project page for Project: "+projectId, "This is just a test but wait and see...", "We are generating different plots relevant for the project view", layout = [], logo = None, footer = None)
+
+            return project.getLayout()
         else:
             return '404'
 
