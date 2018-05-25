@@ -4,7 +4,8 @@ from dash.dependencies import Input, Output
 from plots import basicFigures
 import pandas as pd
 import dash_auth
-from apps import apps_config
+from apps import apps_config as config
+import utils
 
 
 class BasicApp:
@@ -13,12 +14,13 @@ class BasicApp:
         Attributes: Title, subtitle, description, logo, footer
         Functionality: setters, getters'''
     
-    def __init__(self, title, subtitle, description, layout = [], logo = None, footer = None):
+    def __init__(self, title, subtitle, description, pageType, layout = [], logo = None, footer= None):
         self.title = title
         self.subtitle = subtitle
         self.description = description
-        self.logo = logo if logo is not None else apps_config.logo
-        self.footer = footer if footer is not None else apps_config.footer
+        self.pageType = pageType
+        self.logo = logo if logo is not None else config.logo
+        self.footer = footer if footer is not None else config.footer
         self.layout = layout
     
     #Setters
@@ -30,6 +32,9 @@ class BasicApp:
 
     def setDescription(self, description):
         self.description = description
+
+    def setPageType(self, pageType):
+        self.pageType = pageType
 
     def setLogo(self,logo):
         self.logo = logo
@@ -59,17 +64,23 @@ class BasicApp:
     def getDescription(self):
         return self.description
 
+    def getPageType(self):
+        return self.pageType
+
     def getHTMLDescription(self):
         return html.Div(children = self.getDescription())
-
-    def getLogo(self):
-        return self.logo
 
     def getFooter(self):
         return self.footer
 
+    def getLogo(self):
+        return self.logo
+
     def getLayout(self):
         return self.layout
+
+    def getPageConfiguration(self):
+        return config.pages[self.getPageType()]
 
     #Functionality
     def addBasicLayout(self):

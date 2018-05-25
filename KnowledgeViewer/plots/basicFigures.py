@@ -1,13 +1,14 @@
 import numpy as np
 import dash_core_components as dcc
+import dash_html_components as html
 import plotly.graph_objs as go
 import plotly.figure_factory as FF
 from scipy.spatial.distance import pdist, squareform
 from plotly.graph_objs import *
 import networkx as nx
-from utils import hex2rgb
+from utils import hex2rgb, getNumberText
 
-def getBarPlotFigure(data, identifier, title):
+def getBarPlotFigure(data, identifier, title, subplot = False):
     '''This function plots a simple barplot
     --> input:
         - data: is a Pandas DataFrame with three columns: "name" of the bars, 'x' values and 'y' values to plot
@@ -18,14 +19,18 @@ def getBarPlotFigure(data, identifier, title):
     '''
     figure = {}
     figure["data"] = []
-    figure["layout"] = {"title":title}
+    figure["layout"] = {"title":title,
+                        "height":500,
+                        "width":500}
     for name in data.name.unique():
         figure["data"].append({'x': np.unique(data['x'].values), 'y':data.loc[data['name'] == name,'y'].values , 'type': 'bar', 'name': name})
-
+    
+    if subplot:
+        return (identifier, figure)
         
     return dcc.Graph(id= identifier, figure = figure)
 
-def getScatterPlotFigure(data, identifier, x, y, x_title, y_title, title):
+def getScatterPlotFigure(data, identifier, x, y, x_title, y_title, title, subplot = False):
     '''This function plots a simple Scatterplot
     --> input:
         - data: is a Pandas DataFrame with four columns: "name", x values and y values (provided as variables) to plot
@@ -39,9 +44,11 @@ def getScatterPlotFigure(data, identifier, x, y, x_title, y_title, title):
     figure["layout"] = go.Layout(title = title,
                                 xaxis={'title': x_title},
                                 yaxis={'title': y_title},
-                                margin={'l': 40, 'b': 40, 't': 10, 'r': 10},
+                                margin={'l': 40, 'b': 40, 't': 30, 'r': 10},
                                 legend={'x': 0, 'y': 1},
-                                hovermode='closest'
+                                hovermode='closest',
+                                height=500,
+                                width= 500
                                 )
     for name in data.name.unique():
         figure["data"].append(go.Scatter(x = data.loc[data["name"] == name, x], 
@@ -54,11 +61,13 @@ def getScatterPlotFigure(data, identifier, x, y, x_title, y_title, title):
                                             'line': {'width': 0.5, 'color': 'white'}
                                             },
                                         name=name))
-       
+    if subplot:
+        return (identifier, figure)
+
     return dcc.Graph(id= identifier, figure = figure)
 
 
-def getHeatmapFigure(data, identifier, title):
+def getHeatmapFigure(data, identifier, title, subplot = False):
     '''This function plots a simple Heatmap
     --> input:
         - data: is a Pandas DataFrame with the shape of the heatmap where index corresponds to rows
@@ -70,13 +79,19 @@ def getHeatmapFigure(data, identifier, title):
     '''
     figure = {}
     figure["data"] = []
-    figure["layout"] = {"title":title}
+    figure["layout"] = {"title":title,
+                        "height":500,
+                        "width":700}
     figure['data'].append(go.Heatmap(z=data.values.tolist(),
                                     x = list(data.columns),
                                     y = list(data.index)))
+
+    if subplot:
+        return (identifier, figure)
+
     return dcc.Graph(id = identifier, figure = figure)
 
-def getComplexHeatmapFigure(data, identifier, title):
+def getComplexHeatmapFigure(data, identifier, title, subplot = False):
     figure = FF.create_dendrogram(data.values, orientation='bottom', labels=list(data.columns))
     for i in range(len(figure['data'])):
         figure['data'][i]['yaxis'] = 'y2'
@@ -146,9 +161,13 @@ def getComplexHeatmapFigure(data, identifier, title):
                                        'showticklabels': False,
                                        'ticks':""}})
 
+    if subplot:
+        return (identifier, figure)
+
+
     return dcc.Graph(id = identifier, figure = figure)
 
-def get3DNetworkFigure(data, sourceCol, targetCol, node_properties, identifier, title):
+def get3DNetworkFigure(data, sourceCol, targetCol, node_properties, identifier, title, subplot = False):
     '''This function generates a 3D network in plotly
         --> Input:
             - data: Pandas DataFrame with the format: source    target  edge_property1 ...
@@ -188,19 +207,19 @@ def get3DNetworkFigure(data, sourceCol, targetCol, node_properties, identifier, 
                y=Yed,
                z=Zed,
                mode='lines',
-               line=Line(color='rgb(125,125,125)', width=1),
+               line=Line(color='rgb(125,125,125)', width=2),
                hoverinfo='none'
                )
     trace2=Scatter3d(x=Xn,
                y=Yn,
                z=Zn,
                mode='markers',
-               name='actors',
+               name='proteins',
                marker=Marker(symbol='dot',
                              size=sizes,
                              color=colors,
                              colorscale='Viridis',
-                             line=Line(color='rgb(50,50,50)', width=0.5)
+                             line=Line(color='rgb(50,50,50)', width=5.5)
                              ),
                text=labels,
                hoverinfo='text'
@@ -216,9 +235,9 @@ def get3DNetworkFigure(data, sourceCol, targetCol, node_properties, identifier, 
 
     layout = Layout(
          title=title + "(3D visualization)",
-         width=1600,
-         height=1600,
-         showlegend=False,
+         width=800,
+         height=800,
+         showlegend=True,
          scene=Scene(
          xaxis=XAxis(axis),
          yaxis=YAxis(axis),
@@ -228,28 +247,19 @@ def get3DNetworkFigure(data, sourceCol, targetCol, node_properties, identifier, 
         t=100
     ),
     hovermode='closest',
-    annotations=Annotations([
-           Annotation(
-           showarrow=False,
-            text=title,
-            xref='paper',
-            yref='paper',
-            x=0,
-            y=0.1,
-            xanchor='left',
-            yanchor='bottom',
-            font=Font(size=14)
-            )
-        ]),
+    
     )
 
     data=Data([trace1, trace2])
     figure=Figure(data=data, layout=layout)
 
+    if subplot:
+        return (identifier, figure)
+
     return dcc.Graph(id = identifier, figure = figure)
 
 
-def get2DPCAFigure(data, groups, components, identifier, title):
+def get2DPCAFigure(data, groups, components, identifier, title, subplot = False):
     traces = []
 
     for name in groups:
@@ -271,10 +281,14 @@ def get2DPCAFigure(data, groups, components, identifier, title):
                     yaxis=YAxis(title='PC'+str(components[1]), showline=False))
     figure = Figure(data=d, layout=layout)
 
+    if subplot:
+        return (identifier, figure)
+
+
     return  dcc.Graph(id = identifier, figure = figure)
 
 
-def getSankeyPlot(data, sourceCol, targetCol, weightCol, edgeColorCol, node_colors, identifier, title, plot_attr = {'orientation': 'h', 'valueformat': '.0f', 'arrangement':'freeform','width':800, 'height':800, 'font':12} ):
+def getSankeyPlot(data, sourceCol, targetCol, weightCol, edgeColorCol, node_colors, identifier, title, plot_attr = {'orientation': 'h', 'valueformat': '.0f', 'arrangement':'freeform','width':800, 'height':800, 'font':12}, subplot = False):
     '''This function generates a Sankey plot in Plotly
         --> Input:
             - data: Pandas DataFrame with the format: source    target  weight
@@ -321,10 +335,13 @@ def getSankeyPlot(data, sourceCol, targetCol, weightCol, edgeColorCol, node_colo
     )
     
     figure = dict(data=[data_trace], layout=layout)
+
+    if subplot:
+        return (identifier, figure)
     
     return dcc.Graph(id = identifier, figure = figure)
 
-def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':800, 'height':800, 'font':12}):
+def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':800, 'height':800, 'font':12}, subplot = False):
     if subset is not None:
         data = data[subset]
 
@@ -335,8 +352,8 @@ def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subse
                     fill = dict(color= colors[1]),
                     align = ['left'] * 5))
     layout =  dict(
-        width= 800 if 'width' not in plot_attr else plot_attr['width'],
-        height= 800 if 'height' not in plot_attr else plot_attr['height'],
+        width= 200 if 'width' not in plot_attr else plot_attr['width'],
+        height= 200 if 'height' not in plot_attr else plot_attr['height'],
         title = title,
         font = dict(
             size = 12 if 'font' not in plot_attr else plot_attr['font'],
@@ -344,25 +361,79 @@ def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subse
     )
     
     figure = dict(data=[data_trace], layout=layout)
+
+    if subplot:
+        return (identifier, figure)
     
     return dcc.Graph(id = identifier, figure = figure)
 
-def getViolinPlot(data, variableCol, groupCol, colors, identifier, title, plot_attr={'width':600, 'height':600, 'colorScale': False}):
+def getViolinPlot(data, variableCol, groupCol, colors, identifier, title, plot_attr={'width':600, 'height':600, 'colorScale': False}, subplot = False):
 
     figure = FF.create_violin(data, 
                     data_header=variableCol, 
                     group_header= groupCol,
                     colors= colors, 
+                    title = title,
                     height=500 if 'height' not in plot_attr else plot_attr['height'], 
-                    width=800 if 'width' not in plot_attr else plot_attr['width'],
+                    width=500 if 'width' not in plot_attr else plot_attr['width'],
                     use_colorscale= False if 'colorScale' not in plot_attr else plot_attr['colorScale'])
-    layout =  dict(
-        title = title,
-        font = dict(
-            size = 12 if 'font' not in plot_attr else plot_attr['font'],
-        )
-    )
-    
+    if subplot:
+        return (identifier, figure)
     
     return dcc.Graph(id = identifier, figure = figure)
 
+def getDashboardLayout():
+    layout = dict(
+                autosize=True,
+                height=500,
+                font=dict(color='#CCCCCC'),
+                titlefont=dict(color='#CCCCCC', size='14'),
+                margin=dict(
+                           l=35,
+                           r=35,
+                           b=35,
+                           t=45
+                           ),
+                hovermode="closest",
+                plot_bgcolor="#191A1A",
+                paper_bgcolor="#020202",
+                legend=dict(font=dict(size=10), orientation='h'),
+                title='Satellite Overview',
+                mapbox=dict(
+                            style="dark",
+                            center=dict(
+                            lon=-78.05,
+                            lat=42.54
+                            ),
+                zoom=7,
+                )
+            )
+
+    return layout
+
+
+def getDashboardPlots(figures, cols, distribution):   
+    divs = []
+    
+    className = getNumberText(cols)+' columns offset-by-one'
+    i = 0
+    for name,dist in distribution:
+        row = [html.H5(
+                        '',
+                        id = name,
+                        className= getNumberText(len(dist))+' columns'
+                        )
+        ]
+        for c in dist:
+            identifier, figure = figures[i]
+            i = i + 1
+            row.append(html.Div([
+                            dcc.Graph(id= identifier, figure = dict(data= figure, layout=getDashboardLayout()))
+                            ],
+                            className=str(c)+' columns',
+                            style={'margin-top': '20'}
+                            )
+                        )
+        divs.append(html.Div(row, className = 'row'))
+    
+    return html.Div(divs, className = className)

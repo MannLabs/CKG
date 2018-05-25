@@ -6,38 +6,40 @@ footer = '<div id="PageFooter"><p> The Clinical Knowledge Graph has been impleme
 
 
 proteomicsPage= {"overview":[
-                                ("numberProteinsAnalyticalSample",["basicBarPlot"]),
-                                ("numberPepetidesAnlyticalSample", ["basicBarPlot"]),
-                                ("numberModifiedProteinsAnalyticalSample", ["basicPlot"])
+                                ("number_proteins_analytical_sample",["basicBarPlot"]),
+                                ("number_pepetides_anlytical_sample", ["basicBarPlot"]),
+                                ("number_modified_proteins_analytical_sample", ["basicBarPlot"])
                                 ],
                     "stratification":[
                                 ("pca", "pcaPlot")
                                 ],
                     "correlation":[
-                                ("correlationAnalysis", ["complexHeatmapPlot", "3dNetwork"])
+                                ("correlation_analysis", ["complexHeatmapPlot", "3dNetwork"])
                                 ],
                     "regulation":[
-                                ("differentialRegulation", ["volcanoPlot", "basicTable", "ppiNetwork"])
+                                ("differential_regulation", ["volcanoPlot", "basicTable", "ppiNetwork"])
                                 ],
                     "targets":[
-                                ("targetAnalysisGenes", ["basicTable", "3dNetwork"])
+                                ("target_analysis_proteins", ["basicTable", "3dNetwork"])
                                 ]
                     }
 wesPage= {"overview":[
-                        ("numberSomaticMutationsByTypeAnalyticalSample",["basicBarPlot", "basicTable"]),
+                        ("number_somatic_mutations_by_type_analytical_sample",["basicBarPlot", "basicTable"]),
                     ],
         "targets":[
-                        ("targetAnalysisVariants",["basicTable", "3dNetwork"])
+                        ("target_analysis_variants",["basicTable", "3dNetwork"])
                     ]
         }
 
 
 ### Project Page configuration
-projectPage= {"overview":[
-                            ("projectOverview", )
-                        ],
+pages = {"projectPage":
+                {"overview":[
+                            ("project_overview", )
+                            ],
                 "proteomics": proteomicsPage,
                 "wes": wesPage
+                }
             }
 ## Overview 
 ## Project Name
