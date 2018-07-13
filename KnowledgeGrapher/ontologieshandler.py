@@ -222,7 +222,7 @@ def parseOntology(ontology):
         filters = None
         if otype in config.parser_filters:
             filters = config.parser_filters[otype]
-    print ontology
+    print(ontology)
     if ontology == "SNOMED-CT":
         ontologyData = parseSNOMED(ontologyFiles, filters)
     if ontology == "ICD":

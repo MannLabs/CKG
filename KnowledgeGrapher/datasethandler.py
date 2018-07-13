@@ -53,7 +53,6 @@ def extractSubjectReplicates(data, regex):
                 timepoint = " " + fields[2]
             ident = value + " " + subject + timepoint
             subjectDict[ident].append(c)
-    print subjectDict    
     return subjectDict
 
 def calculateMedianReplicates(data, log = "log2"):
@@ -274,12 +273,33 @@ def extractPeptideProteinRelationships(data, configuration):
 ################# Protein entity #########################
 def extractProteinSubjectRelationships(data, configuration):
     aux =  data.filter(regex = configuration["valueCol"])
-    aux.columns = [c.split(" ")[2] for c in aux.columns]
+    attributes = configuration["attributes"]
+    auxAttr_col = pd.DataFrame(index = data.index)
+    auxAttr_reg = pd.DataFrame(index = data.index)
+    for ctype in attributes:
+        if ctype =="regex":
+            for r in attributes[ctype]:
+                auxAttr_reg = auxAttr_reg.join(data.filter(regex = r))
+        else:
+            auxAttr_col = auxAttr_col.join(data[attributes[ctype]])
+    
+    auxAttr_reg.columns = [c.split(" ")[-1] for c in auxAttr_reg.columns]
+    auxAttr_reg = auxAttr_reg.stack()
+    auxAttr_reg = auxAttr_reg.reset_index()
+
+    aux.columns = [c.split(" ")[-1] for c in aux.columns]
     aux = aux.stack()
     aux = aux.reset_index()
+
+    aux = pd.concat([aux, auxAttr_reg], axis=1, ignore_index=True)
+    aux = aux.join(auxAttr_col)
+    columns = ['END_ID', 'START_ID',"value","original_intensity"]
+    columns.extend(list(auxAttr_col.columns))
     aux['TYPE'] = "HAS_QUANTIFIED_PROTEIN"
-    aux.columns = ['END_ID', 'START_ID',"value", 'TYPE']
-    aux = aux[['START_ID', 'END_ID', 'TYPE', "value"]]
+    columns.append("TYPE")
+    aux.columns = columns
+    aux = aux[['START_ID', 'END_ID', 'TYPE', "value"] + list(auxAttr.columns)]
+    print(aux.head())
     
     return aux
 
@@ -378,7 +398,7 @@ def loadProteomicsDataset(uri, configuration):
         columns.update(set(filter(r.match, data.columns)))
     #Add simple and regex columns into a single DataFrame
     data = data[list(columns)]
-    
+    print("1", data.head())
     return data, regexCols
 
 ############ Whole Exome Sequencing #############
@@ -461,7 +481,6 @@ def generateDatasetImports(projectId, dataType):
 def generateGraphFiles(data, dataType, projectId, ot = 'w', d = 'proteomics'):
     importDir = os.path.join(config.datasetsImportDirectory, os.path.join(projectId,d))
     outputfile = os.path.join(importDir, projectId+"_"+dataType.lower()+".csv")
-    print data.shape
     with open(outputfile, ot) as f:  
         data.to_csv(path_or_buf = f, 
             header=True, index=False, quotechar='"', 

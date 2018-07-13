@@ -200,7 +200,6 @@ def parseCGI(download = True, mapping = {}):
 
     if download:
         downloadDB(url, "CancerGenomeInterpreter")
-    #-f1,11,12,13,14,15,17,22
     with zipfile.ZipFile(zipFile) as z:
         if fileName in z.namelist():
             with z.open(fileName, 'r') as associations:

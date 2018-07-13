@@ -1,4 +1,4 @@
-import urllib2
+import urllib3
 import json
 import urllib
 from Bio import Entrez
@@ -12,7 +12,7 @@ def searchPubmed(searchFields, sortby = 'relevance', num ="10", resultsFormat = 
     else:
         query = searchFields[0] +" [MeSH Terms] AND"
 
-    response = urllib2.urlopen(urllib.quote_plus(pubmedQueryUrl.replace('TERMS',query).replace('NUM', num)))
+    response = urllib3.urlopen(urllib.quote_plus(pubmedQueryUrl.replace('TERMS',query).replace('NUM', num)))
     jsonResponse = response.read()
     resultDict = json.loads(jsonResponse)
 

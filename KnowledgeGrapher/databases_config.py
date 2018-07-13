@@ -90,7 +90,7 @@ disgenet_mapping_files = {"protein_mapping":"mapa_geneid_4_uniprot_crossref.tsv.
 
 ##### Human Metabolome Database #######
 HMDB_url = "http://www.hmdb.ca/system/downloads/current/hmdb_metabolites.zip"
-HMDB_fields = ['accession', 'name', 'descriiption',  'synonym', 
+HMDB_fields = ['accession', 'name', 'description',  'synonym', 
         'chemical_formula', 'average_molecular_weight', 'monoisotopic_molecular_weight', 'status','origin','cellular_location','biofluid_location', 'tissue', 
         'name','smpdb_id','kegg_map', 'name','drugbank_id', 'foodb_id', 'knapsack_id', 'chemspider_id', 'kegg_id', 'biocyc_id', 
         'bigg_id', 'wikipidia', 'mugowiki', 'mutagene', 'metlin_id', 'pubchem_compound_id','het_id', 'chebi_id'] 
