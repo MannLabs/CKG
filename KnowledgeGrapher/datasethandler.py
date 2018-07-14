@@ -247,15 +247,46 @@ def extractPeptides(data, configuration):
     return aux
 
 def extractPeptideSubjectRelationships(data, configuration):
+    data = data[~data.index.duplicated(keep='first')]
     aux =  data.filter(regex = configuration["valueCol"])
-    aux.columns = [c.split(" ")[1] for c in aux.columns]
+    attributes = configuration["attributes"]
+    auxAttr_col = pd.DataFrame(index = data.index)
+    auxAttr_reg = pd.DataFrame(index = data.index)
+    cCols = []
+    regexCols = []
+    for ctype in attributes:
+        if ctype =="regex":
+            for r in attributes[ctype]:
+                regexCols.append(r)
+                auxAttr_reg = auxAttr_reg.join(data.filter(regex = r))
+        else:
+            auxAttr_col = auxAttr_col.join(data[attributes[ctype]])
+            cCols = attributes[ctype]
+    
+    aux.columns = [c.split(" ")[-1] for c in aux.columns]
     aux = aux.stack()
     aux = aux.reset_index()
-    aux.columns = ["Sequence", "Subject", "value"]
+    aux.columns = ["c"+str(i) for i in range(len(aux.columns))]
+    columns = ['END_ID', 'START_ID',"value"]
+
+    if not auxAttr_reg.empty:
+        auxAttr_reg.columns = [c.split(" ")[-1] for c in auxAttr_reg.columns]
+        auxAttr_reg = auxAttr_reg.stack()
+        auxAttr_reg = auxAttr_reg.reset_index()
+        auxAttr_reg.columns = ["c"+str(i) for i in range(len(auxAttr_reg.columns))]
+        aux = pd.merge(aux, auxAttr_reg, on =["c0","c1"])
+        columns.extend(regexCols)
+    if not auxAttr_col.empty:
+        aux = aux.set_index("c0")
+        aux = aux.join(auxAttr_col)
+        aux = aux.reset_index()
+        columns.extend(cCols)
+    
     aux['TYPE'] = "HAS_QUANTIFIED_PEPTIDE"
-    aux.columns = ['END_ID', 'START_ID',"value", 'TYPE']
-    aux = aux[['START_ID', 'END_ID', 'TYPE', "value"]]
-    aux = aux.drop_duplicates()
+    columns.append("TYPE")
+    aux.columns = columns
+    aux = aux[['START_ID', 'END_ID', 'TYPE', "value"] + regexCols + cCols]
+    print(aux.head())
     
     return aux
 
@@ -276,30 +307,39 @@ def extractProteinSubjectRelationships(data, configuration):
     attributes = configuration["attributes"]
     auxAttr_col = pd.DataFrame(index = data.index)
     auxAttr_reg = pd.DataFrame(index = data.index)
+    cCols = []
+    regexCols = []
     for ctype in attributes:
         if ctype =="regex":
             for r in attributes[ctype]:
+                regexCols.append(r)
                 auxAttr_reg = auxAttr_reg.join(data.filter(regex = r))
         else:
             auxAttr_col = auxAttr_col.join(data[attributes[ctype]])
+            cCols = attributes[ctype]
     
-    auxAttr_reg.columns = [c.split(" ")[-1] for c in auxAttr_reg.columns]
-    auxAttr_reg = auxAttr_reg.stack()
-    auxAttr_reg = auxAttr_reg.reset_index()
-
     aux.columns = [c.split(" ")[-1] for c in aux.columns]
     aux = aux.stack()
     aux = aux.reset_index()
+    aux.columns = ["c"+str(i) for i in range(len(aux.columns))]
+    columns = ['END_ID', 'START_ID',"value"]
 
-    aux = pd.concat([aux, auxAttr_reg], axis=1, ignore_index=True)
-    aux = aux.join(auxAttr_col)
-    columns = ['END_ID', 'START_ID',"value","original_intensity"]
-    columns.extend(list(auxAttr_col.columns))
+    if not auxAttr_reg.empty:
+        auxAttr_reg.columns = [c.split(" ")[-1] for c in auxAttr_reg.columns]
+        auxAttr_reg = auxAttr_reg.stack()
+        auxAttr_reg = auxAttr_reg.reset_index()
+        auxAttr_reg.columns = ["c"+str(i) for i in range(len(auxAttr_reg.columns))]
+        aux = pd.merge(aux, auxAttr_reg, on =["c0","c1"])
+        columns.extend(regexCols)
+    if not auxAttr_col.empty:
+        aux = aux.set_index("c0")
+        aux = aux.join(auxAttr_col)
+        aux = aux.reset_index()
+        columns.extend(cCols)
     aux['TYPE'] = "HAS_QUANTIFIED_PROTEIN"
     columns.append("TYPE")
     aux.columns = columns
-    aux = aux[['START_ID', 'END_ID', 'TYPE', "value"] + list(auxAttr.columns)]
-    print(aux.head())
+    aux = aux[['START_ID', 'END_ID', 'TYPE', "value"] + regexCols + cCols]
     
     return aux
 
@@ -398,7 +438,6 @@ def loadProteomicsDataset(uri, configuration):
         columns.update(set(filter(r.match, data.columns)))
     #Add simple and regex columns into a single DataFrame
     data = data[list(columns)]
-    print("1", data.head())
     return data, regexCols
 
 ############ Whole Exome Sequencing #############
