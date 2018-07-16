@@ -55,6 +55,41 @@ def extractSubjectReplicates(data, regex):
             subjectDict[ident].append(c)
     return subjectDict
 
+
+def extractAttributes(data, attributes):
+    auxAttr_col = pd.DataFrame(index = data.index)
+    auxAttr_reg = pd.DataFrame(index = data.index)
+    cCols = []
+    regexCols = []
+    for ctype in attributes:
+        if ctype =="regex":
+            for r in attributes[ctype]:
+                regexCols.append(r.replace(' ','_'))
+                auxAttr_reg = auxAttr_reg.join(data.filter(regex = r))
+        else:
+            auxAttr_col = auxAttr_col.join(data[attributes[ctype]])
+            cCols = [c.replace(' ','_') for c in attributes[ctype]]
+
+    return (auxAttr_col,cCols), (auxAttr_reg,regexCols)
+
+def mergeRegexAttributes(data, attributes, index):
+    if not attributes.empty:
+        attributes.columns = [c.split(" ")[-1] for c in attributes.columns]
+        attributes = attributes.stack()
+        attributes = attributes.reset_index()
+        attributes.columns = ["c"+str(i) for i in range(len(attributes.columns))]
+        data = pd.merge(data, attributes, on = index)
+
+    return data
+
+def mergeColAttributes(data, attributes, index):
+    if not attributes.empty:
+        data = data.set_index(index)
+        data = data.join(attributes)
+        data = data.reset_index()
+    
+    return data
+
 def calculateMedianReplicates(data, log = "log2"):
     if log == "log2":
         data = data.applymap(lambda x:np.log2(x) if x > 0 else np.nan)
@@ -115,7 +150,7 @@ def parseProteomicsDataset(projectId, configuration, dataDir):
 ########### Genomics Datasets ############
 def parseWESDataset(projectId, configuration, dataDir):
     datasets = {}
-    files = utils.listDirectoryFiles(os.path.join(dataDir,projectId))
+    files = utils.listDirectoryFiles(dataDir)
     for dfile in files:
         filepath = os.path.join(dataDir, dfile)
         if os.path.isfile(filepath):
@@ -170,19 +205,33 @@ def extractProteinModificationSubjectRelationships(data, configuration):
     proteinCol = configuration["proteinCol"]
     cols = [proteinCol]
     cols.extend(positionCols)
-    
     aux = data.copy()
     aux = aux.reset_index()
     aux["END_ID"] = aux[proteinCol].map(str) + "_" + aux[positionCols[0]].map(str) + aux[positionCols[1]].map(str)
-    aux = aux.set_index("END_ID") 
+    aux = aux.set_index("END_ID")
+    newIndexdf = aux.copy()
     aux = aux.drop(cols, axis=1)
     aux =  aux.filter(regex = configuration["valueCol"])
     aux.columns = [c.split(" ")[1] for c in aux.columns]
     aux = aux.stack()
     aux = aux.reset_index()
-    aux.columns = ["END_ID", "START_ID", "value"]
+    aux.columns = ["c"+str(i) for i in range(len(aux.columns))]
+    columns = ['END_ID', 'START_ID',"value"]
+    
+    attributes = configuration["attributes"]
+    (cAttributes,cCols), (rAttributes,regexCols) = extractAttributes(newIndexdf, attributes)
+    if not rAttributes.empty:
+        aux = mergeRegexAttributes(aux, rAttributes, ["c0","c1"])
+        columns.extend(regexCols)
+    if not cAttributes.empty:
+        aux = mergeColAttributes(aux, cAttributes, "c0")
+        columns.extend(cCols)
+    
+
     aux['TYPE'] = "HAS_QUANTIFIED_PROTEINMODIFICATION"
-    aux = aux[['START_ID', 'END_ID', 'TYPE', "value"]]
+    columns.append("TYPE")
+    aux.columns = columns
+    aux = aux[['START_ID', 'END_ID', 'TYPE', "value"] + regexCols + cCols]
     
     return aux
 
@@ -250,43 +299,24 @@ def extractPeptideSubjectRelationships(data, configuration):
     data = data[~data.index.duplicated(keep='first')]
     aux =  data.filter(regex = configuration["valueCol"])
     attributes = configuration["attributes"]
-    auxAttr_col = pd.DataFrame(index = data.index)
-    auxAttr_reg = pd.DataFrame(index = data.index)
-    cCols = []
-    regexCols = []
-    for ctype in attributes:
-        if ctype =="regex":
-            for r in attributes[ctype]:
-                regexCols.append(r)
-                auxAttr_reg = auxAttr_reg.join(data.filter(regex = r))
-        else:
-            auxAttr_col = auxAttr_col.join(data[attributes[ctype]])
-            cCols = attributes[ctype]
-    
     aux.columns = [c.split(" ")[-1] for c in aux.columns]
     aux = aux.stack()
     aux = aux.reset_index()
     aux.columns = ["c"+str(i) for i in range(len(aux.columns))]
     columns = ['END_ID', 'START_ID',"value"]
 
-    if not auxAttr_reg.empty:
-        auxAttr_reg.columns = [c.split(" ")[-1] for c in auxAttr_reg.columns]
-        auxAttr_reg = auxAttr_reg.stack()
-        auxAttr_reg = auxAttr_reg.reset_index()
-        auxAttr_reg.columns = ["c"+str(i) for i in range(len(auxAttr_reg.columns))]
-        aux = pd.merge(aux, auxAttr_reg, on =["c0","c1"])
+    (cAttributes,cCols), (rAttributes,regexCols) = extractAttributes(data, attributes)
+    if not rAttributes.empty:
+        aux = mergeRegexAttributes(aux, rAttributes, ["c0","c1"])
         columns.extend(regexCols)
-    if not auxAttr_col.empty:
-        aux = aux.set_index("c0")
-        aux = aux.join(auxAttr_col)
-        aux = aux.reset_index()
+    if not cAttributes.empty:
+        aux = mergeColAttributes(aux, cAttributes, "c0")
         columns.extend(cCols)
-    
+        
     aux['TYPE'] = "HAS_QUANTIFIED_PEPTIDE"
     columns.append("TYPE")
     aux.columns = columns
     aux = aux[['START_ID', 'END_ID', 'TYPE', "value"] + regexCols + cCols]
-    print(aux.head())
     
     return aux
 
@@ -304,38 +334,21 @@ def extractPeptideProteinRelationships(data, configuration):
 ################# Protein entity #########################
 def extractProteinSubjectRelationships(data, configuration):
     aux =  data.filter(regex = configuration["valueCol"])
-    attributes = configuration["attributes"]
-    auxAttr_col = pd.DataFrame(index = data.index)
-    auxAttr_reg = pd.DataFrame(index = data.index)
-    cCols = []
-    regexCols = []
-    for ctype in attributes:
-        if ctype =="regex":
-            for r in attributes[ctype]:
-                regexCols.append(r)
-                auxAttr_reg = auxAttr_reg.join(data.filter(regex = r))
-        else:
-            auxAttr_col = auxAttr_col.join(data[attributes[ctype]])
-            cCols = attributes[ctype]
-    
+    attributes = configuration["attributes"]  
     aux.columns = [c.split(" ")[-1] for c in aux.columns]
     aux = aux.stack()
     aux = aux.reset_index()
     aux.columns = ["c"+str(i) for i in range(len(aux.columns))]
     columns = ['END_ID', 'START_ID',"value"]
 
-    if not auxAttr_reg.empty:
-        auxAttr_reg.columns = [c.split(" ")[-1] for c in auxAttr_reg.columns]
-        auxAttr_reg = auxAttr_reg.stack()
-        auxAttr_reg = auxAttr_reg.reset_index()
-        auxAttr_reg.columns = ["c"+str(i) for i in range(len(auxAttr_reg.columns))]
-        aux = pd.merge(aux, auxAttr_reg, on =["c0","c1"])
+    (cAttributes,cCols), (rAttributes,regexCols) = extractAttributes(data, attributes)
+    if not rAttributes.empty:
+        aux = mergeRegexAttributes(aux, rAttributes, ["c0","c1"])
         columns.extend(regexCols)
-    if not auxAttr_col.empty:
-        aux = aux.set_index("c0")
-        aux = aux.join(auxAttr_col)
-        aux = aux.reset_index()
+    if not cAttributes.empty:
+        aux = mergeColAttributes(aux, cAttributes, "c0")
         columns.extend(cCols)
+    
     aux['TYPE'] = "HAS_QUANTIFIED_PROTEIN"
     columns.append("TYPE")
     aux.columns = columns
@@ -461,61 +474,66 @@ def loadWESDataset(uri, configuration):
     data = data.drop(configuration["alt_names"], axis = 1)
     data = data.iloc[1:]
     data = data.replace('.', np.nan)
-    data["ID"] = data[configuration["id_fields"]].apply(lambda x: x[0]+":g."+x[1]+x[2]+'>'+x[3], axis=1)
-    
+    data["ID"] = data[configuration["id_fields"]].apply(lambda x: str(x[0])+":g."+str(x[1])+str(x[2])+'>'+str(x[3]), axis=1)
     return sample, data
     
 ########################################
 #          Generate graph files        # 
 ########################################
 def generateDatasetImports(projectId, dataType):
-    dataDir = config.dataTypes[dataType]["directory"].replace("PROJECTID", projectId)
-    configuration = config.dataTypes[dataType]
-    if dataType == "clinical":
-        data = parseClinicalDataset(projectId, configuration, dataDir)
-        dataRows = extractSubjectClinicalVariablesRelationships(data)
-        generateGraphFiles(dataRows,'clinical', projectId)
-        dataRows = extractSubjectGroupRelationships(data)
-        generateGraphFiles(dataRows,'groups', projectId)
-    elif dataType == "proteomics":
-        data = parseProteomicsDataset(projectId, configuration, dataDir)
-        for dtype in data:
-            if dtype == "proteins":
-                dataRows = extractProteinSubjectRelationships(data[dtype], configuration[dtype])
-                generateGraphFiles(dataRows,dtype, projectId)
-            elif dtype == "peptides":
-                dataRows = extractPeptideSubjectRelationships(data[dtype], configuration[dtype]) 
-                generateGraphFiles(dataRows, "subject_peptide", projectId)
-                dataRows = extractPeptideProteinRelationships(data[dtype], configuration[dtype])
-                generateGraphFiles(dataRows,"peptide_protein", projectId)
-                dataRows = extractPeptides(data[dtype], configuration[dtype])
-                generateGraphFiles(dataRows, dtype, projectId)
-            else:
-                dataRows = extractModificationProteinRelationships(data[dtype], configuration[dtype])
-                generateGraphFiles(dataRows,"protein_modification", projectId, ot = 'a')
-                dataRows = extractProteinModificationSubjectRelationships(data[dtype], configuration[dtype])                
-                generateGraphFiles(dataRows, "modifiedprotein_subject", projectId, ot = 'a')
-                dataRows = extractProteinProteinModificationRelationships(data[dtype], configuration[dtype])
-                generateGraphFiles(dataRows, "modifiedprotein_protein", projectId, ot = 'a')
-                dataRows = extractProteinModifications(data[dtype], configuration[dtype])
-                generateGraphFiles(dataRows, "modifiedprotein", projectId, ot = 'a')
-                dataRows = extractProteinModificationsModification(data[dtype], configuration[dtype])
-                generateGraphFiles(dataRows, "modifiedprotein_modification", projectId, ot = 'a')
-    elif dataType == "wes":
-        data = parseWESDataset(projectId, configuration, dataDir)
-        somatic_mutations = pd.DataFrame()
-        for sample in data:
-            entities, variantRows, sampleRows, geneRows, chrRows = extractWESRelationships(data[sample], configuration)
-            generateGraphFiles(variantRows, "somatic_mutation_known_variant", projectId, d = dataType)
-            generateGraphFiles(sampleRows, "somatic_mutation_sample", projectId, d = dataType)
-            generateGraphFiles(geneRows, "somatic_mutation_gene", projectId, d = dataType)
-            generateGraphFiles(chrRows, "somatic_mutation_chromosome", projectId, d = dataType)
-            if somatic_mutations.empty:
-                somatic_mutations = entities
-            else:
-                somatic_mutations.join(entities, on="ID")
-        somatic_mutations = somatic_mutations.reset_index()
-        generateGraphFiles(somatic_mutations, "somatic_mutation", projectId, dataType, d= dataType)
+    if dataType in config.dataTypes:
+        if "directory" in config.dataTypes[dataType]:
+            dataDir = config.dataTypes[dataType]["directory"].replace("PROJECTID", projectId)
+            configuration = config.dataTypes[dataType]
+            if dataType == "clinical":
+                data = parseClinicalDataset(projectId, configuration, dataDir)
+                if data is not None:
+                    dataRows = extractSubjectClinicalVariablesRelationships(data)
+                    generateGraphFiles(dataRows,'clinical', projectId)
+                    dataRows = extractSubjectGroupRelationships(data)
+                    generateGraphFiles(dataRows,'groups', projectId)
+            elif dataType == "proteomics":
+                data = parseProteomicsDataset(projectId, configuration, dataDir)
+                if data is not None:
+                    for dtype in data:
+                        if dtype == "proteins":
+                            dataRows = extractProteinSubjectRelationships(data[dtype], configuration[dtype])
+                            generateGraphFiles(dataRows,dtype, projectId)
+                        elif dtype == "peptides":
+                            dataRows = extractPeptideSubjectRelationships(data[dtype], configuration[dtype]) 
+                            generateGraphFiles(dataRows, "subject_peptide", projectId)
+                            dataRows = extractPeptideProteinRelationships(data[dtype], configuration[dtype])
+                            generateGraphFiles(dataRows,"peptide_protein", projectId)
+                            dataRows = extractPeptides(data[dtype], configuration[dtype])
+                            generateGraphFiles(dataRows, dtype, projectId)
+                        else:
+                            dataRows = extractModificationProteinRelationships(data[dtype], configuration[dtype])
+                            generateGraphFiles(dataRows,"protein_modification", projectId, ot = 'a')
+                            dataRows = extractProteinModificationSubjectRelationships(data[dtype], configuration[dtype])                
+                            generateGraphFiles(dataRows, "modifiedprotein_subject", projectId, ot = 'a')
+                            dataRows = extractProteinProteinModificationRelationships(data[dtype], configuration[dtype])
+                            generateGraphFiles(dataRows, "modifiedprotein_protein", projectId, ot = 'a')
+                            dataRows = extractProteinModifications(data[dtype], configuration[dtype])
+                            generateGraphFiles(dataRows, "modifiedprotein", projectId, ot = 'a')
+                            dataRows = extractProteinModificationsModification(data[dtype], configuration[dtype])
+                            generateGraphFiles(dataRows, "modifiedprotein_modification", projectId, ot = 'a')
+            elif dataType == "wes":
+                data = parseWESDataset(projectId, configuration, dataDir)
+                if data is not None:
+                    somatic_mutations = pd.DataFrame()
+                    for sample in data:
+                        entities, variantRows, sampleRows, geneRows, chrRows = extractWESRelationships(data[sample], configuration)
+                        generateGraphFiles(variantRows, "somatic_mutation_known_variant", projectId, d = dataType)
+                        generateGraphFiles(sampleRows, "somatic_mutation_sample", projectId, d = dataType)
+                        generateGraphFiles(geneRows, "somatic_mutation_gene", projectId, d = dataType)
+                        generateGraphFiles(chrRows, "somatic_mutation_chromosome", projectId, d = dataType)
+                        if somatic_mutations.empty:
+                            somatic_mutations = entities
+                        else:
+                            new = set(entities.index).difference(set(somatic_mutations.index))
+                            somatic_mutations = somatic_mutations.append(entities.loc[new,:], ignore_index=False)
+                    somatic_mutations = somatic_mutations.reset_index()
+                    generateGraphFiles(somatic_mutations, "somatic_mutation", projectId, d= dataType, ot = 'w')
             
 def generateGraphFiles(data, dataType, projectId, ot = 'w', d = 'proteomics'):
     importDir = os.path.join(config.datasetsImportDirectory, os.path.join(projectId,d))
@@ -529,5 +547,6 @@ if __name__ == "__main__":
     #uri = sys.argv[1]
     #generateDatasetImports('P0000001', 'proteomics')
     #generateDatasetImports('P0000001', 'clinicalData')
-    #generateDatasetImports('P0000002', 'wes')
+    generateDatasetImports('P0000002', 'clinical')
+    generateDatasetImports('P0000002', 'wes')
     generateDatasetImports('P0000002', 'proteomics')
