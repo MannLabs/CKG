@@ -51,7 +51,7 @@ def buildMappingFromOBO(oboFile, ontology):
             if line.startswith("xref:"):
                 source_ref = line.rstrip("\r\n").split(":")[1:]
                 if len(source_ref) == 2:
-                    identifiers[ident].append((source_ref[0].strip(), source_ref[1]))
+                    identifiers[ident.strip()].append((source_ref[0].strip(), source_ref[1]))
     with open(outputFile, 'w') as out:
         for ident in identifiers:
             for source, ref in identifiers[ident]:

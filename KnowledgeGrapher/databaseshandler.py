@@ -56,7 +56,7 @@ def parseSIDER(download = True):
     associations = gzip.open(fileName, 'r')
     for line in associations:
         data = line.decode('utf-8').rstrip("\r\n").split("\t")
-        drug = data[1].replace("CID", "CIDs")
+        drug = re.sub(r'CID\d', 'CIDs', data[1]).replace("CID0", "CIDs")
         se = data[3]
         if se in mapping:
             do = mapping[se]
