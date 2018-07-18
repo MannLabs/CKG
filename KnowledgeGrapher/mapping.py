@@ -27,3 +27,17 @@ def generateMappingFromReflect():
                 name = data[1]
                 mapping[name.lower()] = entities[internal]
     return mapping
+
+
+def getMappingFromOntology(ontology, source):
+    mapping = {}
+    ont = config.ontologies[ontology]
+    dirFile = os.path.join(config.ontologiesDirectory,ont)
+    dataFile = os.path.join(dirFile,"mapping.tsv")
+    with open(dataFile, 'r') as f:
+        for line in f:
+            data = line.rstrip("\r\n").split("\t")
+            if data[1] == source:
+                mapping[data[2]] = data[0]
+
+    return mapping

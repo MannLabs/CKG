@@ -1,7 +1,24 @@
 #Database directory
 databasesDir = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/data/databases/"
 #Databases
-databases = ["HGNC", "RefSeq", "UniProt", "IntAct", "DisGEnet", "HGNC", "DGIdb", "OncoKB", "STRING", "STITCH", "Mentions", "OncoKB","CancerGenomeInterpreter", "Reactome"]
+databases = [
+            #"Internal",
+            #"HGNC", 
+            #"RefSeq", 
+            #"UniProt", 
+            #"IntAct", 
+            #"DisGEnet", 
+            #"HGNC", 
+            #"DGIdb", 
+            #"OncoKB", 
+            #"STRING", 
+            #"STITCH", 
+            #"Mentions", 
+            #"OncoKB",
+            #"CancerGenomeInterpreter", 
+            #"Reactome", 
+            "SIDER"
+            ]
 
 ###### UniProt Database ########
 uniprot_id_url = "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping.dat.gz"
@@ -119,5 +136,10 @@ internal_db_mentions_filters = {"-25": ["BTO:0000000"],
                                 "-26": ["DOID:4", "DOID:162"],
                                 "-23":["GO:0005575", "GO:0005623", "GO:0044464", "GO:0030054"]}
 internal_db_sources = {"-25": "TISSUES", "-26": "DISEASES", "-23": "COMPARTMENTS"}
+
+#### SIDER database #####
+SIDER_url = "http://sideeffects.embl.de/media/download/meddra_all_label_se.tsv.gz"
+SIDRE_source = "UMLS_CUI"
+
 #### Pubmed ######
 pubmed_linkout = "https://www.ncbi.nlm.nih.gov/pubmed/PUBMEDID"

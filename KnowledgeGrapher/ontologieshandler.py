@@ -40,6 +40,23 @@ def trimSNOMEDTree(relationships, filters):
     
     return filteredRelationships, toRemove
 
+def buildMappingFromOBO(oboFile, ontology):
+    outputDir = os.path.join(config.ontologiesDirectory, config.ontologies[ontology])
+    outputFile = os.path.join(outputDir, "mapping.tsv")
+    identifiers = defaultdict(list)
+    with open(oboFile, 'r') as f:
+        for line in f:
+            if line.startswith("id:"):
+                ident = ":".join(line.rstrip("\r\n").split(":")[1:])
+            if line.startswith("xref:"):
+                source_ref = line.rstrip("\r\n").split(":")[1:]
+                if len(source_ref) == 2:
+                    identifiers[ident].append((source_ref[0].strip(), source_ref[1]))
+    with open(outputFile, 'w') as out:
+        for ident in identifiers:
+            for source, ref in identifiers[ident]:
+                out.write(ident+"\t"+source+"\t"+ref+"\n")
+
 #################################
 # Clinical_variable - SNOMED-CT # 
 #################################
@@ -260,3 +277,5 @@ def generateGraphFiles(importDirectory):
                                 quoting=csv.QUOTE_ALL,
                                 line_terminator='\n', escapechar='\\')
 
+if __name__ == "__main__":
+    buildMappingFromOBO(oboFile= "../../data/ontologies/DO/HumanDO.obo", ontology = "Disease")

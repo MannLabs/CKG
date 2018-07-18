@@ -20,13 +20,18 @@ def getMapping():
 
     return mapping
 
+def getMappingFromOntology(ontology, source):
+    mapping = mp.getMappingFromOntology(ontology, source)
+
+    return mapping
+
 def downloadDB(databaseURL, extraFolder =""):
     import urllib
     directory = os.path.join(config.databasesDir,extraFolder)
     fileName = databaseURL.split('/')[-1]
     
-    urllib.URLopener.version = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36 SE 2.X MetaSr 1.0'
-    requestedFile = urllib.URLopener()
+    urllib.request.URLopener.version = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36 SE 2.X MetaSr 1.0'
+    requestedFile = urllib.request.URLopener()
     requestedFile.retrieve(databaseURL, os.path.join(directory, fileName))
 
 def is_number(s):
@@ -35,6 +40,31 @@ def is_number(s):
         return True
     except ValueError:
         return False
+
+#############################################
+#              SIDER database               # 
+#############################################
+def parseSIDER(download = True):
+    url = config.SIDER_url
+    relationships = set()
+    mapping = getMappingFromOntology(ontology = "Disease", source = config.SIDRE_source)
+    directory = os.path.join(config.databasesDir,"SIDER")
+    utils.checkDirectory(directory)
+    fileName = os.path.join(directory, url.split('/')[-1])
+    if download:
+        downloadDB(url, "SIDER")
+    associations = gzip.open(fileName, 'r')
+    for line in associations:
+        data = line.decode('utf-8').rstrip("\r\n").split("\t")
+        drug = data[1].replace("CID", "CIDs")
+        se = data[3]
+        if se in mapping:
+            do = mapping[se]
+            relationships.add((drug, do, "HAS_SIDE_EFFECT", "SIDER", se))
+    associations.close()
+
+    return relationships
+
 
 #############################################
 #   Internal Databases (JensenLab.org)      # 
@@ -360,7 +390,7 @@ def parseHMDB(download = True, mapping = {}):
         for _,elem in context:
             [ child.tag for child in root.iterchildren() ]
             values = {child.tag.replace(prefix,''):child.text for child in element.iterchildren() if child.tag.replace(prefix,'') in fileds and child.text is not None}
-            print values
+            print(values)
             sys.exit()
                     
 
@@ -674,7 +704,7 @@ def getSTRINGMapping(source = "BLAST_UniProt_AC", download = True):
         if first:
             first = False
             continue
-        data = line.rstrip("\r\n").split("\t")
+        data = line.decode('utf-8').rstrip("\r\n").split("\t")
         stringID = data[0]
         alias = data[1]
         sources = data[2].split(' ')
@@ -734,7 +764,7 @@ def generateGraphFiles(importDirectory):
     string_mapping = getSTRINGMapping()
     databases = config.databases
     for database in databases:
-        print database
+        print(database)
         if database.lower() == "internal":
             for qtype in config.internal_db_types:
                 relationships, entity1, entity2 = parseInternalDatabasePairs(qtype, string_mapping)
@@ -925,6 +955,15 @@ def generateGraphFiles(importDirectory):
             relationshipsDf = pd.DataFrame(list(relationships))
             relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'type', 'source']    
             relationshipsDf.to_csv(path_or_buf= dgidb_outputfile, 
+                                            header=True, index=False, quotechar='"', 
+                                            line_terminator='\n', escapechar='\\')
+
+        if database.lower() == "sider":
+            relationships = parseSIDER()
+            sider_outputfile = os.path.join(importDirectory, "sider_has_side_effect.csv")
+            relationshipsDf = pd.DataFrame(list(relationships))
+            relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'source', 'original_side_effect']    
+            relationshipsDf.to_csv(path_or_buf= sider_outputfile, 
                                             header=True, index=False, quotechar='"', 
                                             line_terminator='\n', escapechar='\\')
 

@@ -128,6 +128,13 @@ IMPORT_COMPILED_DRUG_DATA =   '''
                         MATCH (g:Gene {id:line.END_ID})
                         MERGE (d)-[:COMPILED_TARGETS{score:line.score, source:line.source,interaction_type:line.interaction_type,scores:SPLIT(line.evidences,','),evidences:SPLIT(line.evidences,',')}]->(g);'''
 
+IMPORT_DRUG_SIDE_EFFECTS =   '''
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_has_side_effect.csv" AS line
+                        MATCH (d1:Drug {id:line.START_ID})
+                        MATCH (d2:Disease {id:line.END_ID})
+                        MERGE (d1)-[:HAS_SIDE_EFFECT{source:line.source,original_side_effect_code:line.original_side_effect}]->(d2);'''
+
 IMPORT_PATHWAY_DATA = '''
                         CREATE CONSTRAINT ON (p:Pathway) ASSERT p.id IS UNIQUE; 
                         USING PERIODIC COMMIT 10000

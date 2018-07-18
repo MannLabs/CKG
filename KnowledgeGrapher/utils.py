@@ -3,6 +3,7 @@ import json
 import urllib
 from Bio import Entrez
 from Bio import Medline
+import os.path
 
 
 def searchPubmed(searchFields, sortby = 'relevance', num ="10", resultsFormat = 'json'):
@@ -55,6 +56,10 @@ def listDirectoryFolders(directory):
     dircontent = [f for f in listdir(directory) if isdir(join(directory, f)) and not f.startswith('.')]
 
     return dircontent
+
+def checkDirectory(directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
 
 

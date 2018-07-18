@@ -15,6 +15,7 @@ entities = ["Disease","Drug","Tissue","Biological_process", "Molecular_function"
 PPI_resources = ["IntAct"]
 disease_resources = [("Protein","DisGEnet"),("Known_variant","CGI"),("Known_variant","OncoKB")]
 drug_resources = ["DGIdb","CGI","OncoKB"]
+side_effects_resources = ["SIDER"]
 variant_resources = ["CGI","OncoKB"]
 pathway_resources = ["Reactome"]
 
