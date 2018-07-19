@@ -375,8 +375,8 @@ def parseDGIdb(download = True, mapping = {}):
 #################################
 #   Human Metabolome Database   # 
 #################################
-def parseHMDB(download = True, mapping = {}):
-    data = defaultdict()
+def parseHMDB(download = False):
+    metabolites = defaultdict()
     prefix = "{http://www.hmdb.ca}"
     url = config.HMDB_url
     relationships = set()
@@ -385,15 +385,68 @@ def parseHMDB(download = True, mapping = {}):
     if download:
         downloadDB(url, "HMDB")
     fields = config.HMDB_fields
-    with zipfile.ZipFile(filename, 'r') as associations:
-        context = etree.iterwalk(associations, events=("end",), tag=prefix+"metabolite")
-        for _,elem in context:
-            [ child.tag for child in root.iterchildren() ]
-            values = {child.tag.replace(prefix,''):child.text for child in element.iterchildren() if child.tag.replace(prefix,'') in fileds and child.text is not None}
-            print(values)
-            sys.exit()
-                    
+    parentFields = config.HMDB_parentFields
+    structuredFields = config.HMDB_structures
+    with zipfile.ZipFile(fileName, 'r') as zipped:
+        for f in zipped.namelist():
+            data = zipped.read(f) 
+            root = etree.fromstring(data)
+            context = etree.iterwalk(root, events=("end",), tag=prefix+"metabolite")
+            for _,elem in context:
+                values = {child.tag.replace(prefix,''):child.text for child in elem.iterchildren() if child.tag.replace(prefix,'') in fields and child.text is not None}
+                for child in elem.iterchildren(): 
+                    if child.tag.replace(prefix,'') in parentFields:
+                        label = child.tag.replace(prefix,'')
+                        values[label] = set()
+                        for intchild in child.iter():
+                            if intchild.text is not None and intchild.text.strip() != "":
+                                if label in structuredFields:
+                                    if intchild.tag.replace(prefix,'') in structuredFields[label]:
+                                        values[label].add(intchild.text) 
+                                elif intchild.tag.replace(prefix,'') in fields and intchild.text:
+                                    values[label].add(intchild.text) 
+                            
+                if "accession" in values:
+                    metabolites[values["accession"]] = values
+    return metabolites
 
+def build_metabolite_entity(metabolites):
+    entities = set()
+    attributes = config.HMDB_attributes
+    for metid in metabolites:
+        entity = set()
+        entity.add(metid)
+        for attr in attributes:
+            if attr in metabolites[metid]:
+                if type(metabolites[metid][attr]) == set:
+                    entity.add(list(metabolites[metid][attr]))
+                else:
+                    entity.add(metabolites[metid][attr])
+            else:
+                entity.add('')
+        entities.add(tuple(entity))
+    
+    return entities, attributes
+    
+def build_relationships_from_HMDB(metabolites, mapping):
+    relationships = defaultdict(set)
+    associations = config.HMDB_associations
+    for metid in metabolites:
+        for ass in associations:
+            if ass in metabolites[metid]:
+                if type(metabolites[metid][ass]) == list:
+                    for partner in metabolites[metid][ass]:
+                        if partner in mapping:
+                            partner = mapping[partner]
+                            relationships[ass].add((metid, partner, associations[ass], "HMDB"))
+                        else:
+                            print(partner)
+                else:
+                    if metabolites[metid][ass] in mapping:
+                        partner = mapping[metabolites[metid][ass]]
+                        relationships[ass].add((metid, partner, associations[ass], "HMDB"))
+                        print(partner)
+        
     return relationships
 
 #########################
@@ -1013,5 +1066,23 @@ def generateGraphFiles(importDirectory):
                                             header=True, index=False, quotechar='"', 
                                             line_terminator='\n', escapechar='\\')
 
-        if database.lower() == "HMDB":
-            parseHMDB()
+        if database.lower() == "hmdb":
+            metabolites = parseHMDB()
+            entities, attributes =  build_metabolite_entity(metabolites)
+            relationships = build_relationships_from_HMDB(metabolites, mapping)
+            
+            entity_outputfile = os.path.join(importDirectory, "metabolite.csv")
+            with open(entity_outputfile, 'w') as csvfile:
+                writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
+                writer.writerow(['ID'] + attributes)
+                for entity in entities:
+                    writer.writerow(entity)
+            
+            for relationship in relationships:
+                hmdb_outputfile = os.path.join(importDirectory, "hmdb_"+relationship.lower()+".csv")
+                relationshipsDf = pd.DataFrame(list(relationships[relationship]))
+                relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'source']
+                relationshipsDf.to_csv(path_or_buf= hmdb_outputfile, 
+                                            header=True, index=False, quotechar='"', 
+                                            line_terminator='\n', escapechar='\\')
+

@@ -17,7 +17,8 @@ databases = [
             #"OncoKB",
             #"CancerGenomeInterpreter", 
             #"Reactome", 
-            "SIDER"
+            #"SIDER",
+            "HMDB"
             ]
 
 ###### UniProt Database ########
@@ -107,11 +108,82 @@ disgenet_mapping_files = {"protein_mapping":"mapa_geneid_4_uniprot_crossref.tsv.
 
 ##### Human Metabolome Database #######
 HMDB_url = "http://www.hmdb.ca/system/downloads/current/hmdb_metabolites.zip"
-HMDB_fields = ['accession', 'name', 'description',  'synonym', 
-        'chemical_formula', 'average_molecular_weight', 'monoisotopic_molecular_weight', 'status','origin','cellular_location','biofluid_location', 'tissue', 
-        'name','smpdb_id','kegg_map', 'name','drugbank_id', 'foodb_id', 'knapsack_id', 'chemspider_id', 'kegg_id', 'biocyc_id', 
-        'bigg_id', 'wikipidia', 'mugowiki', 'mutagene', 'metlin_id', 'pubchem_compound_id','het_id', 'chebi_id'] 
-HMDB_parentFields = ['synonyms','ontology','origins', 'cellular_locations', 'biofluid_locations','tissue_locations', 'pathways','pathway', 'diseases','disease']
+HMDB_fields = ['accession', 
+                'name', 
+                'description',  
+                'kingdom', 
+                'super_class', 
+                'class', 
+                'sub_class', 
+                'chemical_formula', 
+                'average_molecular_weight', 
+                'monoisotopic_molecular_weight', 
+                'status',
+                'origin',
+                'drugbank_id', 
+                'foodb_id', 
+                'knapsack_id', 
+                'chemspider_id', 
+                'biocyc_id', 
+                'bigg_id', 
+                'wikipidia', 
+                'mugowiki', 
+                'mutagene', 
+                'metlin_id', 
+                'pubchem_compound_id',
+                'het_id', 
+                'chebi_id',
+                'tissue',
+                'cellular_location'] 
+HMDB_parentFields = ['synonyms',
+                    'origins', 
+                    'tissues',
+                    'cellular_locations', 
+                    'biofluid_locations',
+                    'tissue_locations', 
+                    'pathways', 
+                    'diseases',
+                    'general_references',
+                    'protein_associations']
+HMDB_structures = {"pathways": ["smpdb_id"], 
+                    "diseases":["omim_id"],
+                    "synonyms":["synonym"],
+                    'protein_associations':["uniprot_id"],
+                    "cellular_locations":["cellular_location"], 
+                    "biofluid_locations":["biofluid"],
+                    "general_references":["pubmed_id"]
+                  }
+HMDB_associations = {"pathways": "ANNOTATED_IN_PATHWAY", 
+                    "diseases": "ASSOCIATED_WITH", 
+                    'protein_associations': "ASSOCIATED_WITH",
+                    "cellular_locations": "ASSOCIATED_WITH", 
+                    "biofluid_locations": "ASSOCIATED_WITH",
+                    "general_references": "MENTIONED_IN_PUBLICATION",
+                    "tissues":"ASSOCIATED_WITH",
+                    "pubchem_compound_id":"IS_A",
+                    "foodb_id":"IS_A"
+                    }
+
+HMDB_attributes = ['name', 
+                   'description',  
+                   'kingdom', 
+                   'super_class', 
+                   'class', 
+                   'sub_class', 
+                   'chemical_formula', 
+                   'average_molecular_weight', 
+                   'monoisotopic_molecular_weight', 
+                   'status',
+                   'knapsack_id', 
+                   'chemspider_id', 
+                   'biocyc_id', 
+                   'bigg_id', 
+                   'wikipidia', 
+                   'mugowiki', 
+                   'mutagene', 
+                   'metlin_id', 
+                   'het_id', 
+                   'chebi_id']
 
 ##### Internal Databases (jensenlab.org) #####
 internal_db_directory = databasesDir + "InternalDatabases/"
