@@ -16,9 +16,9 @@ databases = [
             #"Mentions", 
             #"OncoKB",
             #"CancerGenomeInterpreter", 
-            #"Reactome", 
             #"SIDER",
-            "HMDB"
+            "HMDB",
+            #"PathwayCommons"
             ]
 
 ###### UniProt Database ########
@@ -108,6 +108,7 @@ disgenet_mapping_files = {"protein_mapping":"mapa_geneid_4_uniprot_crossref.tsv.
 
 ##### Human Metabolome Database #######
 HMDB_url = "http://www.hmdb.ca/system/downloads/current/hmdb_metabolites.zip"
+HMDB_DO_source = "OMIM"
 HMDB_fields = ['accession', 
                 'name', 
                 'description',  
@@ -137,7 +138,6 @@ HMDB_fields = ['accession',
                 'cellular_location'] 
 HMDB_parentFields = ['synonyms',
                     'origins', 
-                    'tissues',
                     'cellular_locations', 
                     'biofluid_locations',
                     'tissue_locations', 
@@ -153,15 +153,13 @@ HMDB_structures = {"pathways": ["smpdb_id"],
                     "biofluid_locations":["biofluid"],
                     "general_references":["pubmed_id"]
                   }
-HMDB_associations = {"pathways": "ANNOTATED_IN_PATHWAY", 
-                    "diseases": "ASSOCIATED_WITH", 
-                    'protein_associations': "ASSOCIATED_WITH",
-                    "cellular_locations": "ASSOCIATED_WITH", 
-                    "biofluid_locations": "ASSOCIATED_WITH",
-                    "general_references": "MENTIONED_IN_PUBLICATION",
-                    "tissues":"ASSOCIATED_WITH",
-                    "pubchem_compound_id":"IS_A",
-                    "foodb_id":"IS_A"
+HMDB_associations = {"pathways": ("ANNOTATED_IN_PATHWAY","hmdb_annotated_in_pathway"), 
+                    "diseases": ("ASSOCIATED_WITH", "hmdb_associated_with_disease"), 
+                    'protein_associations': ("ASSOCIATED_WITH", "hmdb_associated_with_protein"),
+                    "cellular_locations": ("ASSOCIATED_WITH", "hmdb_associated_with_cellular_location"), 
+                    "biofluid_locations": ("ASSOCIATED_WITH","hmdb_associated_with_biofluid_location"),
+                    "general_references": ("MENTIONED_IN_PUBLICATION","Metabolite_Publication_mentioned_in_publication"),
+                    "tissue_locations":("ASSOCIATED_WITH","hmdb_associated_with_tissue")
                     }
 
 HMDB_attributes = ['name', 
@@ -173,6 +171,8 @@ HMDB_attributes = ['name',
                    'chemical_formula', 
                    'average_molecular_weight', 
                    'monoisotopic_molecular_weight', 
+                   'pubchem_compound_id',
+                   'food_id',
                    'status',
                    'knapsack_id', 
                    'chemspider_id', 
@@ -183,7 +183,8 @@ HMDB_attributes = ['name',
                    'mutagene', 
                    'metlin_id', 
                    'het_id', 
-                   'chebi_id']
+                   'chebi_id',
+                   'synonyms']
 
 ##### Internal Databases (jensenlab.org) #####
 internal_db_directory = databasesDir + "InternalDatabases/"
@@ -211,7 +212,7 @@ internal_db_sources = {"-25": "TISSUES", "-26": "DISEASES", "-23": "COMPARTMENTS
 
 #### SIDER database #####
 SIDER_url = "http://sideeffects.embl.de/media/download/meddra_all_label_se.tsv.gz"
-SIDRE_source = "UMLS_CUI"
+SIDER_source = "UMLS_CUI"
 
 #### Pubmed ######
 pubmed_linkout = "https://www.ncbi.nlm.nih.gov/pubmed/PUBMEDID"

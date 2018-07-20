@@ -10,20 +10,21 @@ importDirectory = dataDirectory + "/imports"
 #Datasets directory
 datasetsImportDirectory = importDirectory + "/datasets/"
 #Imports 
-entities = ["Disease","Drug","Tissue","Biological_process", "Molecular_function", "Cellular_compartment", "Postranslational_modification", "Clinical_variable"]
+entities = ["Disease","Drug","Tissue","Biological_process", "Molecular_function", "Cellular_compartment", "Postranslational_modification", "Clinical_variable", "Metabolite"]
 #Database resources
 PPI_resources = ["IntAct"]
 disease_resources = [("Protein","DisGEnet"),("Known_variant","CGI"),("Known_variant","OncoKB")]
 drug_resources = ["DGIdb","CGI","OncoKB"]
 side_effects_resources = ["SIDER"]
 variant_resources = ["CGI","OncoKB"]
-pathway_resources = ["Reactome"]
+pathway_resources = ["PathwayCommons"]
+metabolite_resources = ["hmdb"]
 
 #Internal Databases entities
 internalEntities = [("Protein","Disease"), ("Protein", "Tissue"), ("Protein","Cellular_compartment")]
 
 #Mentions entities
-mentionEntities = ["Disease", "Tissue", "Protein", "Cellular_compartment", "Chemical"]
+mentionEntities = ["Disease", "Tissue", "Protein", "Cellular_compartment", "Chemical", "Metabolite"]
 
 #Analyses configuration
 similarityMeasures = ["pearson"]

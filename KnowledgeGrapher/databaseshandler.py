@@ -47,7 +47,7 @@ def is_number(s):
 def parseSIDER(download = True):
     url = config.SIDER_url
     relationships = set()
-    mapping = getMappingFromOntology(ontology = "Disease", source = config.SIDRE_source)
+    mapping = getMappingFromOntology(ontology = "Disease", source = config.SIDER_source)
     directory = os.path.join(config.databasesDir,"SIDER")
     utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
@@ -191,13 +191,13 @@ def parsePathwayCommons(download = True):
     relationships = set()
     directory = os.path.join(config.databasesDir, "PathwayCommons")
     fileName = url.split('/')[-1]
+
     if download:
         downloadDB(url, "PathwayCommons")
-    
     f = os.path.join(directory, fileName)
     associations = gzip.open(f, 'r')
     for line in associations:
-        data = line.rstrip("\r\n").split("\t")
+        data = line.decode('utf-8').rstrip("\r\n").split("\t")
         linkout = data[0]
         code = data[0].split("/")[-1]
         ptw_dict = dict([item.split(": ")[0],":".join(item.split(": ")[1:])] for item in data[1].split("; "))
@@ -210,10 +210,9 @@ def parsePathwayCommons(download = True):
         
         entities.add((code, "Pathway", name, source, linkout))
         for protein in proteins:
-            relationships.add((protein, code, "ANNOTATED_IN_PATHWAY", "PathwayCommons: "+source))
+            relationships.add((protein, code, "ANNOTATED_IN_PATHWAY", "", linkout, "PathwayCommons: "+source))
 
     associations.close()
-    
     return entities, relationships
 
 #######################################
@@ -414,38 +413,41 @@ def build_metabolite_entity(metabolites):
     entities = set()
     attributes = config.HMDB_attributes
     for metid in metabolites:
-        entity = set()
-        entity.add(metid)
+        entity = []
+        entity.append(metid)
         for attr in attributes:
             if attr in metabolites[metid]:
                 if type(metabolites[metid][attr]) == set:
-                    entity.add(list(metabolites[metid][attr]))
+                    lattr = ";".join(list(metabolites[metid][attr]))
+                    entity.append(lattr)
                 else:
-                    entity.add(metabolites[metid][attr])
+                    entity.append(metabolites[metid][attr])
             else:
-                entity.add('')
+                entity.append('')
         entities.add(tuple(entity))
     
     return entities, attributes
     
 def build_relationships_from_HMDB(metabolites, mapping):
-    relationships = defaultdict(set)
+    mapping.update(getMappingFromOntology(ontology = "Disease", source = config.HMDB_DO_source))
+    relationships = defaultdict(list)
     associations = config.HMDB_associations
     for metid in metabolites:
         for ass in associations:
+            ident = ass
+            if len(associations[ass]) > 1:
+                ident = associations[ass][1]
             if ass in metabolites[metid]:
-                if type(metabolites[metid][ass]) == list:
+                if type(metabolites[metid][ass]) == set:
                     for partner in metabolites[metid][ass]:
-                        if partner in mapping:
-                            partner = mapping[partner]
-                            relationships[ass].add((metid, partner, associations[ass], "HMDB"))
-                        else:
-                            print(partner)
+                        if partner.lower() in mapping:
+                            partner = mapping[partner.lower()]
+                        relationships[ident].append((metid, partner, associations[ass][0], "HMDB"))
                 else:
-                    if metabolites[metid][ass] in mapping:
-                        partner = mapping[metabolites[metid][ass]]
-                        relationships[ass].add((metid, partner, associations[ass], "HMDB"))
-                        print(partner)
+                    partner = metabolites[metid][ass]
+                    if metabolites[metid][ass].lower() in mapping:
+                        partner = mapping[metabolites[metid][ass].lower()]
+                    relationships[ident].append((metid, partner, associations[ass][0], "HMDB"))
         
     return relationships
 
@@ -874,7 +876,6 @@ def generateGraphFiles(importDirectory):
                 df.to_csv(path_or_buf=outputfile, 
                                 header=True, index=False, quotechar='"', 
                                 line_terminator='\n', escapechar='\\')
-
         if database.lower() == "uniprot":
             #UniProt
             uniprot_id_file = config.uniprot_id_file
@@ -998,7 +999,7 @@ def generateGraphFiles(importDirectory):
             
             pathway_outputfile = os.path.join(importDirectory, "pathwaycommons_protein_associated_with_pathway.csv")
             relationshipsDf = pd.DataFrame(list(relationships))
-            relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'source']    
+            relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'evidence', 'linkout', 'source']    
             relationshipsDf.to_csv(path_or_buf= pathway_outputfile, 
                                             header=True, index=False, quotechar='"', 
                                             line_terminator='\n', escapechar='\\')
@@ -1071,7 +1072,7 @@ def generateGraphFiles(importDirectory):
             entities, attributes =  build_metabolite_entity(metabolites)
             relationships = build_relationships_from_HMDB(metabolites, mapping)
             
-            entity_outputfile = os.path.join(importDirectory, "metabolite.csv")
+            entity_outputfile = os.path.join(importDirectory, "Metabolite.csv")
             with open(entity_outputfile, 'w') as csvfile:
                 writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
                 writer.writerow(['ID'] + attributes)
@@ -1079,7 +1080,7 @@ def generateGraphFiles(importDirectory):
                     writer.writerow(entity)
             
             for relationship in relationships:
-                hmdb_outputfile = os.path.join(importDirectory, "hmdb_"+relationship.lower()+".csv")
+                hmdb_outputfile = os.path.join(importDirectory, relationship+".csv")
                 relationshipsDf = pd.DataFrame(list(relationships[relationship]))
                 relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'source']
                 relationshipsDf.to_csv(path_or_buf= hmdb_outputfile, 

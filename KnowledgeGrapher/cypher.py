@@ -138,7 +138,7 @@ IMPORT_DRUG_SIDE_EFFECTS =   '''
 IMPORT_PATHWAY_DATA = '''
                         CREATE CONSTRAINT ON (p:Pathway) ASSERT p.id IS UNIQUE; 
                         USING PERIODIC COMMIT 10000
-                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_Pathway.csv" AS line
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/Pathway.csv" AS line
                         MERGE (p:Pathway{id:line.ID})
                         ON CREATE SET p.name=line.name,p.source=line.source;
                         USING PERIODIC COMMIT 10000
@@ -152,6 +152,34 @@ IMPORT_PATHWAY_DATA = '''
                         MATCH (p2:Pathway{id:line.END_ID}) 
                         MERGE (p1)-[:HAS_PARENT]->(p2);
                         '''
+IMPORT_METABOLITE_DATA = '''
+                        CREATE CONSTRAINT ON (m:Metabolite) ASSERT m.id IS UNIQUE; 
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/Metabolite.csv" AS line
+                        MERGE (m:Metabolite{id:line.ID})
+                        ON CREATE SET m.name=line.name,m.synonyms=line.synonyms,m.description=line.description,m.kingdom=line.kingdom,m.class=line.class,m.super_class=line.super_class,m.sub_class=line.sub_class,m.chemical_formula=line.chemical_formula,m.average_molecular_weight=line.average_molecular_weight,m.monoisotopic_molecular_weight=line.monoisotopic_molecular_weight,m.chebi_id=line.chebi_id,m.pubchem_compound_id=line.pubchem_compound_id,m.food_id=line.food_id;
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_annotated_in_pathway.csv" AS line
+                        MATCH (m:Metabolite{id:line.START_ID})
+                        MATCH (p:Pathway{id:line.END_ID}) 
+                        MERGE (m)-[:ANNOTATED_IN_PATHWAY{evidence:line.evidence,linkout:line.linkout,source:line.source}]->(p);
+                        USING PERIODIC COMMIT 10000 
+                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/SOURCE_associated_with_protein.csv" AS line
+                        MATCH (m:Metabolite{id:line.START_ID})
+                        MATCH (p:Protein{id:line.END_ID}) 
+                        MERGE (m)-[:ASSOCIATED_WITH]->(p);
+                        USING PERIODIC COMMIT 10000 
+                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/SOURCE_associated_with_disease.csv" AS line
+                        MATCH (m:Metabolite{id:line.START_ID})
+                        MATCH (d:Disease{id:line.END_ID}) 
+                        MERGE (m)-[:ASSOCIATED_WITH]->(d);
+                        USING PERIODIC COMMIT 10000 
+                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/SOURCE_associated_with_tissue.csv" AS line
+                        MATCH (m:Metabolite{id:line.START_ID})
+                        MATCH (t:Tissue{id:line.END_ID}) 
+                        MERGE (m)-[:ASSOCIATED_WITH]->(t);
+                        '''
+
                         
 IMPORT_KNOWN_VARIANT_DATA = '''
                             CREATE CONSTRAINT ON (k:Known_variant) ASSERT k.id IS UNIQUE; 

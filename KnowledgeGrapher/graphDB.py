@@ -131,6 +131,14 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
                 print(statement+';')
                 driver.run(statement+';')
 
+    #Metabolite
+    if 'metabolite' in imports:
+        metaboliteImportCode = cy.IMPORT_METABOLITE_DATA
+        for source in config.metabolite_resources:
+            for statement in metaboliteImportCode.replace("IMPORTDIR", importDir).replace("SOURCE", source.lower()).split(';')[0:-1]:
+                print(statement+';')
+                driver.run(statement+';')
+
     #Known_variants
     if "variants" in imports:
         variantsImportCode = cy.IMPORT_KNOWN_VARIANT_DATA
@@ -181,5 +189,5 @@ if __name__ == "__main__":
     #removeRelationshipDB(entity1 = 'Protein', entity2 = 'Protein', relationship = "intact_INTERACTS_WITH")
     #removeRelationshipDB(entity1 = 'Protein', entity2 = 'Protein', relationship = "IntAct_INTERACTS_WITH")
     #createDB(imports=["ontologies","chromosomes", "genes", "transcripts", "proteins", "ppi", "drugs", "diseases", "pathway", "internal", "mentions", "variants", "project", "datasets"])
-    createDB(imports=["side effects"])
+    createDB(imports=["mentions"])
 
