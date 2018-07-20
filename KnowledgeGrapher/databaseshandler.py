@@ -41,6 +41,20 @@ def is_number(s):
     except ValueError:
         return False
 
+def write_relationships(relationships, header, outputfile):
+    df = pd.DataFrame(list(relationships))
+    df.columns = header 
+    df.to_csv(path_or_buf=outputfile, 
+                header=True, index=False, quotechar='"', 
+                line_terminator='\n', escapechar='\\')
+
+def write_entities(entities, header, outputfile):
+    with open(outputfile, 'w') as csvfile:
+        writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
+        writer.writerow(header)
+        for entity in entities:
+            writer.writerow(entity)
+
 #############################################
 #              SIDER database               # 
 #############################################
@@ -93,6 +107,35 @@ def parseInternalDatabasePairs(qtype, mapping, download = True):
                 
     return relationships
 
+def parsePMClist(download = False):
+    url = config.PMC_db_url
+    plinkout = config.pubmed_linkout
+    entities = set()
+    directory = os.path.join(config.databasesDir, "InternalDatabases")
+    utils.checkDirectory(directory)
+    directory = os.path.join(directory,"textmining")
+    utils.checkDirectory(directory)
+    fileName = os.path.join(directory, url.split('/')[-1])
+    
+    if download:
+        downloadDB(url, directory)
+
+    first = True
+    with open(fileName, 'r') as dbf:
+        for line in dbf:
+            if first:
+                first = False
+                continue
+            data = line.rstrip("\r\n").split('\t')
+            fileName = data[0]
+            jdp = data[1]
+            idPMC = data[2]
+            if data[3] != "":
+                pubmedid = data[3].split(":")[1]
+                entities.add((pubmedid, jdp, idPMC, fileName, plinkout.replace("PUBMEDID", pubmedid)))
+
+    return entities
+
 def parseInternalDatabaseMentions(qtype, mapping, importDirectory, download = True):
     url = config.internal_db_url
     ifile = config.internal_db_mentions_files[qtype]
@@ -101,13 +144,11 @@ def parseInternalDatabaseMentions(qtype, mapping, importDirectory, download = Tr
         filters = config.internal_db_mentions_filters[qtype]
     entity1, entity2 = config.internal_db_mentions_types[qtype]
     outputfile = os.path.join(importDirectory, entity1+"_"+entity2+"_mentioned_in_publication.csv")
-    entities = set()
     relationships = pd.DataFrame()
     directory = os.path.join(config.databasesDir, "InternalDatabases")
     if download:
         downloadDB(url.replace("FILE", ifile), os.path.join(directory,"textmining"))
     ifile = os.path.join(directory,os.path.join("textmining",ifile))
-    
     with open(outputfile,'a') as f:
         f.write("START_ID,END_ID,TYPE\n")
         with open(ifile, 'r') as idbf:
@@ -115,8 +156,6 @@ def parseInternalDatabaseMentions(qtype, mapping, importDirectory, download = Tr
                 data = line.rstrip("\r\n").split('\t')
                 id1 = data[0]
                 pubmedids = data[1].split(" ")
-                entities.update(set(pubmedids))
-#            print entities
                 
                 if qtype == "9606":
                     id1 = "9606."+id1
@@ -133,55 +172,6 @@ def parseInternalDatabaseMentions(qtype, mapping, importDirectory, download = Tr
                         aux["TYPE"] = "MENTIONED_IN_PUBLICATION"
                         aux.to_csv(path_or_buf=f, header=False, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
     
-    return entities
-    
-############################
-#   Reactome Pathways      # 
-############################
-def parseReactomePathways(download = True):
-    database_urls = config.reactome_urls
-    entities = set()
-    relationships = defaultdict(set)
-    directory = os.path.join(config.databasesDir,"Reactome")
-    files = {}
-    if download:
-        for ident in database_urls:
-            downloadDB(database_urls[ident], "Reactome")
-            files[ident] = os.path.join(directory, database_urls[ident].split('/')[-1])
-
-    pathwaysFile = files["pathways"]
-    pathways = set()
-    with open(pathwaysFile, 'r') as pf:
-        for line in pf:
-            data = line.rstrip("\r\n").split("\t")
-            pid = data[0]
-            pname = data[1]
-            pspecies = data[2]
-            if pspecies == "Homo sapiens":
-                entities.add((pid, "Pathway", pname, "Reactome"))
-                pathways.add(pid)
-    hierarchyFile = files["hierarchy"]
-    with open(hierarchyFile, 'r') as hf:
-        for line in hf:
-            data = line.rstrip("\r\n").split("\t")
-            parent = data[0]
-            child = data[1]
-
-            if parent in pathways and child in pathways:
-                relationships["has_parent"].add((child, parent, "HAS_PARENT"))
-    proteinsFile = files["protein_pathways"]
-    with open(proteinsFile, 'r') as ppf:
-        for line in ppf:
-            data = line.rstrip("\r\n").split("\t")
-            protein = data[0]
-            pathway = data[1]
-            linkout = data[2]
-            evidence = data[4]
-            if pathway in pathways:
-                relationships["annotated_in_pathway"].add((protein, pathway, "ANNOTATED_IN_PATHWAY", evidence, linkout, "Reactome"))
-
-    return entities, relationships
-
 #########################
 #   PathwayCommons      # 
 #########################
@@ -208,7 +198,7 @@ def parsePathwayCommons(download = True):
         else:
             continue
         
-        entities.add((code, "Pathway", name, source, linkout))
+        entities.add((code, "Pathway", name, name, source, linkout))
         for protein in proteins:
             relationships.add((protein, code, "ANNOTATED_IN_PATHWAY", "", linkout, "PathwayCommons: "+source))
 
@@ -620,6 +610,7 @@ def parseHGNCDatabase(download = True):
     relationships = set()
     directory = os.path.join(config.databasesDir,"HGNC")
     fileName = os.path.join(directory, url.split('/')[-1])
+    taxid = 9606
     
     if download:
         downloadDB(url, "HGNC")
@@ -640,7 +631,7 @@ def parseHGNCDatabase(download = True):
             if status != "Approved":
                 continue
 
-            entities.add((geneSymbol, geneName, geneFamily, ",".join(synonyms)))
+            entities.add((geneSymbol, "Gene", geneName, geneFamily, ",".join(synonyms), taxid))
             relationships.add((geneSymbol, transcript, "TRANSCRIBED_INTO"))
 
     return entities, relationships
@@ -654,6 +645,7 @@ def parseRefSeqDatabase(download = False):
     relationships = defaultdict(set)
     directory = os.path.join(config.databasesDir,"RefSeq")
     fileName = os.path.join(directory, url.split('/')[-1])
+    taxid = 9606
     
     if download:
         downloadDB(url, "RefSeq")
@@ -677,16 +669,16 @@ def parseRefSeqDatabase(download = False):
         symbol = data[14]
         
         if protAcc != "":
-            entities["Transcript"].add((protAcc, "Transcript", name, tclass, assembly))
+            entities["Transcript"].add((protAcc, "Transcript", name, tclass, assembly, taxid))
             if chrom != "":
-                entities["Chromosome"].add((chrom, "Chromosome", chrom))
+                entities["Chromosome"].add((chrom, "Chromosome", chrom, taxid))
                 relationships["LOCATED_IN"].add((protAcc, chrom, "LOCATED_IN", start, end, strand, "RefSeq"))
             if symbol != "":
                 relationships["TRANSCRIBED_INTO"].add((symbol, protAcc, "TRANSCRIBED_INTO", "RefSeq"))
         elif geneAcc != "":
-            entities["Transcript"].add((geneAcc, "Transcript", name, tclass, assembly))
+            entities["Transcript"].add((geneAcc, "Transcript", name, tclass, assembly, taxid))
             if chrom != "":
-                entities["Chromosome"].add((chrom, "Chromosome", chrom))
+                entities["Chromosome"].add((chrom, "Chromosome", chrom, taxid))
                 relationships["LOCATED_IN"].add((protAcc, chrom, "LOCATED_IN", start, end, strand, "RefSeq"))
     df.close()
 
@@ -825,34 +817,23 @@ def generateGraphFiles(importDirectory):
                 relationships, entity1, entity2 = parseInternalDatabasePairs(qtype, string_mapping)
                 entity1, entity2 = config.internal_db_types[qtype]
                 outputfile = os.path.join(importDirectory, entity1+"_"+entity2+"_associated_with_integrated.csv")
-                df = pd.DataFrame(list(relationships))
-                df.columns = ["START_ID", "END_ID", "TYPE", "source", "score"]
-                df.to_csv(path_or_buf=outputfile, 
-                                header=True, index=False, quotechar='"', 
-                                line_terminator='\n', escapechar='\\')
+                header = ["START_ID", "END_ID", "TYPE", "source", "score"]
+                write_relationships(relationships, header, outputfile)
         if database.lower() == "mentions":
             plinkout = config.pubmed_linkout
-            publications = set()
-            for qtype in config.internal_db_mentions_types:
-                entities = parseInternalDatabaseMentions(qtype, string_mapping, importDirectory)
-                publications.update(entities)                
+            entities = parsePMClist()
             publications_outputfile = os.path.join(importDirectory, "Publications.csv")
-            with open(publications_outputfile, 'w') as csvfile:
-                writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
-                writer.writerow(['ID', "linkout"])
-                for pubmedid in publications:
-                    writer.writerow([pubmedid, plinkout.replace("PUBMEDID", pubmedid)])
+            header = ['ID', "journal", "PMC_id", "file_location", "linkout"]
+            write_entities(entities, header, publications_outputfile)
+            for qtype in config.internal_db_mentions_types:
+                parseInternalDatabaseMentions(qtype, mapping, importDirectory)
+                
         if database.lower() == "hgnc":
             #HGNC
             genes, relationships = parseHGNCDatabase()
             genes_outputfile = os.path.join(importDirectory, "Gene.csv")
-
-            with open(genes_outputfile, 'w') as csvfile:
-                writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
-                writer.writerow(['ID', ':LABEL', 'name', 'family', 'synonyms', 'taxid'])
-                taxid = 9606
-                for symbol, name, family, synonyms in genes:
-                    writer.writerow([symbol, "Gene", name, family, synonyms, taxid])
+            header = ['ID', ':LABEL', 'name', 'family', 'synonyms', 'taxid']
+            write_entities(genes, header, genes_outputfile)
         if database.lower() == "refseq":
             #RefSeq
             headers = config.headerEntities
@@ -860,32 +841,18 @@ def generateGraphFiles(importDirectory):
             for entity in entities:
                 header = headers[entity]
                 outputfile = os.path.join(importDirectory, entity+".csv")
-                with open(outputfile, 'w') as csvfile:
-                    writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
-                    writer.writerow(header)
-                    taxid = 9606
-                    for item in entities[entity]:
-                        row = list(item)
-                        row.append(taxid)
-                        writer.writerow(row)
+                write_entities(entity, header, outputfile)
             for rel in relationships:
                 header = headers[rel]
                 outputfile = os.path.join(importDirectory, "refseq_"+rel.lower()+".csv")
-                df = pd.DataFrame(list(relationships[rel]))
-                df.columns = header
-                df.to_csv(path_or_buf=outputfile, 
-                                header=True, index=False, quotechar='"', 
-                                line_terminator='\n', escapechar='\\')
+                write_relationships(relationships[rel], header, outputfile)
         if database.lower() == "uniprot":
             #UniProt
             uniprot_id_file = config.uniprot_id_file
             uniprot_texts_file = config.uniprot_text_file
-
             proteins, relationships = parseUniProtDatabase(uniprot_id_file)
             addUniProtTexts(uniprot_texts_file, proteins)
-
             proteins_outputfile = os.path.join(importDirectory, "Protein.csv")
-
             with open(proteins_outputfile, 'w') as csvfile:
                 writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
                 writer.writerow(['ID', ':LABEL', 'accession','name', 'synonyms', 'description', 'taxid'])
@@ -905,55 +872,34 @@ def generateGraphFiles(importDirectory):
                         taxid = int(proteins[protein]["NCBI_TaxID"])
                     if "description" in proteins[protein]:
                         description = proteins[protein]["description"]
-
                     writer.writerow([protein, "Protein", accession , name, ",".join(synonyms), description, taxid])
 
             for entity, rel in relationships:
                 outputfile = os.path.join(importDirectory, "uniprot_"+entity.lower()+"_"+rel.lower()+".csv")
-                df = pd.DataFrame(list(relationships[(entity,rel)]))
-                df.columns = ['START_ID', 'END_ID','TYPE', 'source']
-                df.to_csv(path_or_buf=outputfile, 
-                                header=True, index=False, quotechar='"', 
-                                line_terminator='\n', escapechar='\\')
-
-
+                header = ['START_ID', 'END_ID','TYPE', 'source']
+                write_relationships(relationships[(entity,rel)], header, outputfile)
         if database.lower() == "intact":
             #IntAct
             intact_file = os.path.join(config.databasesDir,config.intact_file)
             interactions = parseIntactDatabase(intact_file, proteins)
             interactions_outputfile = os.path.join(importDirectory, "INTACT_interacts_with.csv")
-
-            interactionsDf = pd.DataFrame(list(interactions))
-            interactionsDf.columns = ['START_ID', 'END_ID','TYPE', 'score', 'interaction_type', 'method', 'source', 'publications']
+            header = ['START_ID', 'END_ID','TYPE', 'score', 'interaction_type', 'method', 'source', 'publications']
+            write_relationships(interactions, header, interactions_outputfile)
     
-            interactionsDf.to_csv(path_or_buf=interactions_outputfile, 
-                                header=True, index=False, quotechar='"', 
-                                line_terminator='\n', escapechar='\\')
-
         if database.lower() == "string":
             #STRING
             interactions = parseSTRINGLikeDatabase(string_mapping)
             interactions_outputfile = os.path.join(importDirectory, "STRING_interacts_with.csv")
-
-            interactionsDf = pd.DataFrame(list(interactions))
-            interactionsDf.columns = ['START_ID', 'END_ID','TYPE', 'interaction_type', 'source', 'evidences','scores', 'score']
-    
-            interactionsDf.to_csv(path_or_buf=interactions_outputfile, 
-                                header=True, index=False, quotechar='"', 
-                                line_terminator='\n', escapechar='\\')
+            header = ['START_ID', 'END_ID','TYPE', 'interaction_type', 'source', 'evidences','scores', 'score']
+            write_relationships(interactions, header, interactions_outputfile)
 
         if database.lower() == "stitch":
             #STITCH
             evidences = ["experimental", "prediction", "database","textmining", "score"]
             interactions = parseSTRINGLikeDatabase(string_mapping, db = "STITCH")
             interactions_outputfile = os.path.join(importDirectory, "STITCH_associated_with.csv")
-
-            interactionsDf = pd.DataFrame(list(interactions))
-            interactionsDf.columns = ['START_ID', 'END_ID','TYPE', 'interaction_type', 'source', 'evidences','scores', 'score'] 
-    
-            interactionsDf.to_csv(path_or_buf=interactions_outputfile, 
-                                header=True, index=False, quotechar='"', 
-                                line_terminator='\n', escapechar='\\')
+            header = ['START_ID', 'END_ID','TYPE', 'interaction_type', 'source', 'evidences','scores', 'score']
+            write_relationships(interactions, header, interactions_outputfile)
 
         if database.lower() == "disgenet":
             #DisGeNet
@@ -961,129 +907,73 @@ def generateGraphFiles(importDirectory):
 
             for idType in disease_relationships:
                 disease_outputfile = os.path.join(importDirectory, "disgenet_associated_with.csv")
-                disease_relationshipsDf = pd.DataFrame(list(disease_relationships[idType]))
-                disease_relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'score', 'evidence_type', 'source', 'number_publications']    
-                disease_relationshipsDf.to_csv(path_or_buf=disease_outputfile, 
-                                                header=True, index=False, quotechar='"', 
-                                                line_terminator='\n', escapechar='\\')
-
-        if database.lower() == "reactome":
-            entities, relationships = parseReactomePathways()
-            entity_outputfile = os.path.join(importDirectory, "reactome_Pathway.csv")
-            with open(entity_outputfile, 'w') as csvfile:
-                writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
-                writer.writerow(['ID', ':LABEL', 'name', 'source'])
-                for entity in entities:
-                    writer.writerow(entity)
-            for relationship in relationships:
-                outputfile = os.path.join(importDirectory, "reactome_"+relationship+".csv")
-                relationshipsDf = pd.DataFrame(list(relationships[relationship]))
-                if relationship == "annotated_in_pathway":
-                    relationshipsDf.columns = ['START_ID', 'END_ID', 'TYPE', 'evidence', 'linkout', 'source']
-                else:
-                    relationshipsDf.columns = ['START_ID', 'END_ID','TYPE']
-                relationshipsDf.to_csv(path_or_buf= outputfile, 
-                                            header=True, index=False, quotechar='"', 
-                                            line_terminator='\n', escapechar='\\')
+                header = ['START_ID', 'END_ID','TYPE', 'score', 'evidence_type', 'source', 'number_publications']
+                write_relationships(disease_relationships[idType], header, disease_outputfile)
 
         if database.lower() == "pathwaycommons":
             #PathwayCommons pathways
             ontologyType = config.pathway_type
             entities, relationships = parsePathwayCommons()
             entity_outputfile = os.path.join(importDirectory, "Pathway.csv")
-            with open(entity_outputfile, 'w') as csvfile:
-                writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
-                writer.writerow(['ID', ':LABEL', 'name', 'description', 'type', 'source', 'linkout'])
-                for term, label, name, source, linkout in entities:
-                    writer.writerow([term, label, name, name, ontologyType, source, linkout])
-            
+            header = ['ID', ':LABEL', 'name', 'description', 'type', 'source', 'linkout']
+            write_entities(entities, header, entity_outputfile)
             pathway_outputfile = os.path.join(importDirectory, "pathwaycommons_protein_associated_with_pathway.csv")
-            relationshipsDf = pd.DataFrame(list(relationships))
-            relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'evidence', 'linkout', 'source']    
-            relationshipsDf.to_csv(path_or_buf= pathway_outputfile, 
-                                            header=True, index=False, quotechar='"', 
-                                            line_terminator='\n', escapechar='\\')
+            header = ['START_ID', 'END_ID','TYPE', 'evidence', 'linkout', 'source']
+            write_relationships(relationships, header, pathway_outputfile)
+        
         if database.lower() == "dgidb":
             relationships = parseDGIdb(mapping = mapping)
             dgidb_outputfile = os.path.join(importDirectory, "dgidb_targets.csv")
-            relationshipsDf = pd.DataFrame(list(relationships))
-            relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'type', 'source']    
-            relationshipsDf.to_csv(path_or_buf= dgidb_outputfile, 
-                                            header=True, index=False, quotechar='"', 
-                                            line_terminator='\n', escapechar='\\')
+            header = ['START_ID', 'END_ID','TYPE', 'type', 'source']
+            write_relationships(relationships, header, dgidb_outputfile)
 
         if database.lower() == "sider":
             relationships = parseSIDER()
             sider_outputfile = os.path.join(importDirectory, "sider_has_side_effect.csv")
-            relationshipsDf = pd.DataFrame(list(relationships))
-            relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'source', 'original_side_effect']    
-            relationshipsDf.to_csv(path_or_buf= sider_outputfile, 
-                                            header=True, index=False, quotechar='"', 
-                                            line_terminator='\n', escapechar='\\')
+            header = ['START_ID', 'END_ID','TYPE', 'source', 'original_side_effect']
+            write_relationships(relationships, header, sider_outputfile)
 
         if database.lower() == "oncokb":
             entities, relationships = parseOncoKB(mapping = mapping)
             entity_outputfile = os.path.join(importDirectory, "oncokb_Known_variant.csv")
-            with open(entity_outputfile, 'w') as csvfile:
-                writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
-                writer.writerow(['ID', ':LABEL', 'alternative_names', 'chromosome', 'position', 'reference', 'alternative', 'effect', 'oncogeneicity'])
-                for entity in entities:
-                    writer.writerow(entity)
+            header = ['ID', ':LABEL', 'alternative_names', 'chromosome', 'position', 'reference', 'alternative', 'effect', 'oncogeneicity']
+            write_entities(entities, header, entity_outputfile)
             for relationship in relationships:
                 oncokb_outputfile = os.path.join(importDirectory, "oncokb_"+relationship+".csv")
-                relationshipsDf = pd.DataFrame(list(relationships[relationship]))
+                header = ['START_ID', 'END_ID','TYPE']
                 if relationship == "targets_known_variant":
-                    relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'association', 'evidence', 'tumor', 'type', 'source']
+                    header = ['START_ID', 'END_ID','TYPE', 'association', 'evidence', 'tumor', 'type', 'source']
                 elif relationship == "targets":
-                    relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'type', 'source']
+                    header = ['START_ID', 'END_ID','TYPE', 'type', 'source']
                 elif relationship == "associated_with":
-                    relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'score', 'evidence_type', 'source', 'number_publications'] 
-                else:
-                    relationshipsDf.columns = ['START_ID', 'END_ID','TYPE']
-                relationshipsDf.to_csv(path_or_buf= oncokb_outputfile, 
-                                            header=True, index=False, quotechar='"', 
-                                            line_terminator='\n', escapechar='\\')
+                    header = ['START_ID', 'END_ID','TYPE', 'score', 'evidence_type', 'source', 'number_publications'] 
+                write_relationships(relationships, header, oncokb_outputfile)
         
         if database.lower() == "cancergenomeinterpreter":
             entities, relationships = parseCGI(mapping = mapping)
             entity_outputfile = os.path.join(importDirectory, "cgi_Known_variant.csv")
-            with open(entity_outputfile, 'w') as csvfile:
-                writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
-                writer.writerow(['ID', ':LABEL', 'alternative_names', 'chromosome', 'position', 'reference', 'alternative', 'effect', 'oncogeneicity'])
-                for entity in entities:
-                    writer.writerow(entity)
+            header = ['ID', ':LABEL', 'alternative_names', 'chromosome', 'position', 'reference', 'alternative', 'effect', 'oncogeneicity']
+            write_entities(entities, header, entity_outputfile)
             for relationship in relationships:
                 cgi_outputfile = os.path.join(importDirectory, "cgi_"+relationship+".csv")
-                relationshipsDf = pd.DataFrame(list(relationships[relationship]))
+                header = ['START_ID', 'END_ID','TYPE']
                 if relationship == "targets_known_variant":
-                    relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'evidence', 'association', 'tumor', 'type', 'source']
+                    header = ['START_ID', 'END_ID','TYPE', 'evidence', 'association', 'tumor', 'type', 'source']
                 elif relationship == "targets":
-                    relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'type', 'source']
+                    header = ['START_ID', 'END_ID','TYPE', 'type', 'source']
                 elif relationship == "associated_with":
-                    relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'score', 'evidence_type', 'source', 'number_publications']
-                else:
-                    relationshipsDf.columns = ['START_ID', 'END_ID','TYPE']
-                relationshipsDf.to_csv(path_or_buf= cgi_outputfile, 
-                                            header=True, index=False, quotechar='"', 
-                                            line_terminator='\n', escapechar='\\')
+                    header = ['START_ID', 'END_ID','TYPE', 'score', 'evidence_type', 'source', 'number_publications']
+                write_relationships(relationships, header, cgi_outputfile)
 
         if database.lower() == "hmdb":
             metabolites = parseHMDB()
             entities, attributes =  build_metabolite_entity(metabolites)
             relationships = build_relationships_from_HMDB(metabolites, mapping)
-            
             entity_outputfile = os.path.join(importDirectory, "Metabolite.csv")
-            with open(entity_outputfile, 'w') as csvfile:
-                writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
-                writer.writerow(['ID'] + attributes)
-                for entity in entities:
-                    writer.writerow(entity)
+            header = ['ID'] + attributes
+            write_entities(entities, header, entity_outputfile)
             
             for relationship in relationships:
                 hmdb_outputfile = os.path.join(importDirectory, relationship+".csv")
-                relationshipsDf = pd.DataFrame(list(relationships[relationship]))
-                relationshipsDf.columns = ['START_ID', 'END_ID','TYPE', 'source']
-                relationshipsDf.to_csv(path_or_buf= hmdb_outputfile, 
-                                            header=True, index=False, quotechar='"', 
-                                            line_terminator='\n', escapechar='\\')
-
+                header = ['START_ID', 'END_ID','TYPE', 'source']
+                write_relationships(relationship, header, hmdb_outputfile)

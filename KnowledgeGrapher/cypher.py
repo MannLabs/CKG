@@ -96,7 +96,7 @@ CREATE_PUBLICATIONS = '''
                     USING PERIODIC COMMIT 10000
                     LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/Publications.csv" AS line
                     MERGE (p:Publication{id:line.ID})
-                    ON CREATE SET p.linkout=line.linkout;
+                    ON CREATE SET p.linkout=line.linkout,p.journal=line.journal,p.PMC_id=line.PMC_id,p.file_location=line.file_location;
                     '''
                     
 IMPORT_MENTIONS =   '''

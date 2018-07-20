@@ -13,11 +13,11 @@ databases = [
             #"OncoKB", 
             #"STRING", 
             #"STITCH", 
-            #"Mentions", 
+            "Mentions", 
             #"OncoKB",
             #"CancerGenomeInterpreter", 
             #"SIDER",
-            "HMDB",
+            #"HMDB",
             #"PathwayCommons"
             ]
 
@@ -215,4 +215,5 @@ SIDER_url = "http://sideeffects.embl.de/media/download/meddra_all_label_se.tsv.g
 SIDER_source = "UMLS_CUI"
 
 #### Pubmed ######
+PMC_db_url = "ftp://ftp.ncbi.nlm.nih.gov/pub/pmc/oa_file_list.txt"
 pubmed_linkout = "https://www.ncbi.nlm.nih.gov/pubmed/PUBMEDID"
