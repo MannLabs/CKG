@@ -102,6 +102,36 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
             for statement in sideEffectsDataImportCode.replace("IMPORTDIR",importDir).replace("RESOURCE",resource.lower()).split(';')[0:-1]:
                 print(statement+";")
                 driver.run(statement+";")
+    #Pathway
+    if 'pathway' in imports:
+        pathwayImportCode = cy.IMPORT_PATHWAY_DATA
+        for source in config.pathway_resources:
+            for statement in pathwayImportCode.replace("IMPORTDIR", importDir).replace("SOURCE", source.lower()).split(';')[0:-1]:
+                print(statement+';')
+                driver.run(statement+';')
+
+    #Metabolite
+    if 'metabolite' in imports:
+        metaboliteImportCode = cy.IMPORT_METABOLITE_DATA
+        for source in config.metabolite_resources:
+            for statement in metaboliteImportCode.replace("IMPORTDIR", importDir).replace("SOURCE", source.lower()).split(';')[0:-1]:
+                print(statement+';')
+                driver.run(statement+';')
+
+    #GWAS
+    if "gwas" in imports:
+        code = cy.IMPORT_GWAS
+        for statement in code.replace("IMPORTDIR",importDir).split(';')[0:-1]:
+            print(statement+';')
+            driver.run(statement+';')
+
+    #Known_variants
+    if "variants" in imports:
+        variantsImportCode = cy.IMPORT_KNOWN_VARIANT_DATA
+        for source in config.variant_resources:
+            for statement in variantsImportCode.replace("IMPORTDIR", importDir).replace("SOURCE",source.lower()).split(';')[0:-1]:
+                print(statement+";")
+                driver.run(statement+";")
 
     #Internal
     if "internal" in imports:
@@ -123,27 +153,11 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
                 print(statement+";")
                 driver.run(statement+";")
 
-    #Pathway
-    if 'pathway' in imports:
-        pathwayImportCode = cy.IMPORT_PATHWAY_DATA
-        for source in config.pathway_resources:
-            for statement in pathwayImportCode.replace("IMPORTDIR", importDir).replace("SOURCE", source.lower()).split(';')[0:-1]:
-                print(statement+';')
-                driver.run(statement+';')
-
-    #Metabolite
-    if 'metabolite' in imports:
-        metaboliteImportCode = cy.IMPORT_METABOLITE_DATA
-        for source in config.metabolite_resources:
-            for statement in metaboliteImportCode.replace("IMPORTDIR", importDir).replace("SOURCE", source.lower()).split(';')[0:-1]:
-                print(statement+';')
-                driver.run(statement+';')
-
-    #Known_variants
-    if "variants" in imports:
-        variantsImportCode = cy.IMPORT_KNOWN_VARIANT_DATA
-        for source in config.variant_resources:
-            for statement in variantsImportCode.replace("IMPORTDIR", importDir).replace("SOURCE",source.lower()).split(';')[0:-1]:
+     #Published in
+    if "published" in imports:
+        publicationImportCode = cy.IMPORT_PUBLISHED_IN
+        for entity in config.publicationEntities:
+            for statement in publicationImportCode.replace("IMPORTDIR", importDir).replace("ENTITY", entity).split(';')[0:-1]:
                 print(statement+";")
                 driver.run(statement+";")
     #Projects
@@ -189,5 +203,5 @@ if __name__ == "__main__":
     #removeRelationshipDB(entity1 = 'Protein', entity2 = 'Protein', relationship = "intact_INTERACTS_WITH")
     #removeRelationshipDB(entity1 = 'Protein', entity2 = 'Protein', relationship = "IntAct_INTERACTS_WITH")
     #createDB(imports=["ontologies","chromosomes", "genes", "transcripts", "proteins", "ppi", "drugs", "diseases", "pathway", "internal", "mentions", "variants", "project", "datasets"])
-    createDB(imports=["mentions"])
+    createDB(imports=["gwas", 'published'])
 

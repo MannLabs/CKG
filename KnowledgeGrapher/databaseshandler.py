@@ -79,7 +79,6 @@ def parseSIDER(download = True):
 
     return relationships
 
-
 #############################################
 #   Internal Databases (JensenLab.org)      # 
 #############################################
@@ -107,7 +106,7 @@ def parseInternalDatabasePairs(qtype, mapping, download = True):
                 
     return relationships
 
-def parsePMClist(download = False):
+def parsePMClist(download = True):
     url = config.PMC_db_url
     plinkout = config.pubmed_linkout
     entities = set()
@@ -120,21 +119,17 @@ def parsePMClist(download = False):
     if download:
         downloadDB(url, directory)
 
-    first = True
-    with open(fileName, 'r') as dbf:
-        for line in dbf:
-            if first:
-                first = False
-                continue
-            data = line.rstrip("\r\n").split('\t')
-            fileName = data[0]
-            jdp = data[1]
-            idPMC = data[2]
-            if data[3] != "":
-                pubmedid = data[3].split(":")[1]
-                entities.add((pubmedid, jdp, idPMC, fileName, plinkout.replace("PUBMEDID", pubmedid)))
-
-    return entities
+    entities = pd.read_csv(fileName, sep = ',', dtype = str, compression = 'gzip', low_memory=False)
+    entities = entities[config.PMC_fields]
+    entities = entities[entities.iloc[:,0].notnull()]
+    entities = entities.set_index(list(entities.columns)[0])
+    entities['linkout'] = [plinkout.replace("PUBMEDID", str(int(pubmedid))) for pubmedid in list(entities.index)]
+    entities.index = entities.index.rename('ID')
+    entitites = entities.reset_index()
+    header = list(entities.columns)
+    entities = list(entities.itertuples(index=False)) 
+    
+    return entities, header
 
 def parseInternalDatabaseMentions(qtype, mapping, importDirectory, download = True):
     url = config.internal_db_url
@@ -536,6 +531,43 @@ def readDisGeNetDiseaseMapping():
     return mapping, synonyms
 
 #########################
+#   GWAS Catalog EBI    #
+#########################
+def parseGWASCatalog(download= True, mapping = {}):
+    url = config.GWASCat_url
+    entities = set()
+    relationships = defaultdict(set)
+    directory = os.path.join(config.databasesDir,"GWAScatalog")
+    utils.checkDirectory(directory)
+    fileName = os.path.join(directory, url.split('/')[-1])
+    if download:
+        downloadDB(url, "GWAScatalog")
+    with open(fileName, 'r') as catalog:
+        for line in catalog:
+            data = line.rstrip("\r\n").split("\t")
+            pubmedid = data[1]
+            date = data[3]
+            title = data[6]
+            sample_size = data[8]
+            replication_size = data[9]
+            chromosome = data[11]
+            position = data[12]
+            genes_mapped = data[14].split(" - ")
+            snp_id = data[20]
+            freq = data[26]
+            pval = data[27]
+            odds_ratio = data[30]
+            trait = data[34]
+            study = data[36]
+            
+            entities.add((study, "GWAS_study", title, date, sample_size, replication_size, trait))
+            if pubmedid != "":
+                relationships["published_in_publication"].add((study, pubmedid, "PUBLISHED_IN", "GWAS Catalog"))
+    
+    return entities, relationships
+
+
+#########################
 #       UniProt         # 
 #########################
 def parseUniProtDatabase(dataFile):
@@ -601,6 +633,19 @@ def parseUniProtVariants(dataFile, download = True):
                 continue
             data = line.rstrip("\r\n").split("\t")
 
+def parseUniProtUniquePeptides(download=True):
+    url = config.uniprot_unique_peptides_file
+    entities = set()
+    directory = os.path.join(config.databasesDir,"UniProt")
+    checkDirectory
+    fileName = os.path.join(directory, url.split('/')[-1])
+    if download:
+        downloadDB(url, "UniProt")
+
+    with open(fileName, 'r') as f:
+        for line in f:
+            data = line.rstrip("\r\n").split("\t")
+            
 #########################################
 #          HUGO Gene Nomenclature       # 
 #########################################
@@ -819,11 +864,10 @@ def generateGraphFiles(importDirectory):
                 outputfile = os.path.join(importDirectory, entity1+"_"+entity2+"_associated_with_integrated.csv")
                 header = ["START_ID", "END_ID", "TYPE", "source", "score"]
                 write_relationships(relationships, header, outputfile)
+        
         if database.lower() == "mentions":
-            plinkout = config.pubmed_linkout
-            entities = parsePMClist()
+            entities, header = parsePMClist()
             publications_outputfile = os.path.join(importDirectory, "Publications.csv")
-            header = ['ID', "journal", "PMC_id", "file_location", "linkout"]
             write_entities(entities, header, publications_outputfile)
             for qtype in config.internal_db_mentions_types:
                 parseInternalDatabaseMentions(qtype, mapping, importDirectory)
@@ -947,7 +991,7 @@ def generateGraphFiles(importDirectory):
                     header = ['START_ID', 'END_ID','TYPE', 'type', 'source']
                 elif relationship == "associated_with":
                     header = ['START_ID', 'END_ID','TYPE', 'score', 'evidence_type', 'source', 'number_publications'] 
-                write_relationships(relationships, header, oncokb_outputfile)
+                write_relationships(relationships[relationship], header, oncokb_outputfile)
         
         if database.lower() == "cancergenomeinterpreter":
             entities, relationships = parseCGI(mapping = mapping)
@@ -963,7 +1007,7 @@ def generateGraphFiles(importDirectory):
                     header = ['START_ID', 'END_ID','TYPE', 'type', 'source']
                 elif relationship == "associated_with":
                     header = ['START_ID', 'END_ID','TYPE', 'score', 'evidence_type', 'source', 'number_publications']
-                write_relationships(relationships, header, cgi_outputfile)
+                write_relationships(relationships[relationship], header, cgi_outputfile)
 
         if database.lower() == "hmdb":
             metabolites = parseHMDB()
@@ -977,3 +1021,13 @@ def generateGraphFiles(importDirectory):
                 hmdb_outputfile = os.path.join(importDirectory, relationship+".csv")
                 header = ['START_ID', 'END_ID','TYPE', 'source']
                 write_relationships(relationship, header, hmdb_outputfile)
+
+        if database.lower() == "gwascatalog":
+            entities, relationships = parseGWASCatalog()
+            entity_outputfile = os.path.join(importDirectory, "GWAS_study.csv")
+            header = ['ID', 'TYPE', 'title', 'date', 'sample_size', 'replication_size', 'trait'] 
+            write_entities(entities, header, entity_outputfile)
+            for relationship in relationships:
+                outputfile = os.path.join(importDirectory, "GWAS_study_"+relationship+".csv")
+                header = ['START_ID', 'END_ID','TYPE', 'source']
+                write_relationships(relationships[relationship], header, outputfile)

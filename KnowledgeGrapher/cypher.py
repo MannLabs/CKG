@@ -107,6 +107,14 @@ IMPORT_MENTIONS =   '''
                     MERGE (p)-[:MENTIONED_IN_PUBLICATION]->(d);
                     '''
 
+IMPORT_PUBLISHED_IN =   '''
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/ENTITY_published_in_publication.csv" AS line
+                        MATCH (g:ENTITY {id:line.START_ID})
+                        MATCH (p:Publication {id:line.END_ID})
+                        MERGE (g)-[:PUBLISHED_IN]->(p);
+                    '''
+
 IMPORT_DISEASE_DATA =   '''
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_associated_with.csv" AS line
@@ -203,6 +211,14 @@ IMPORT_KNOWN_VARIANT_DATA = '''
                             MATCH (k:Known_variant {id:line.END_ID})
                             MERGE (d)-[:TARGETS_KNOWN_VARIANT{association:line.association, evidence:line.evidence, tumor:line.tumor, type:line.type, source:line.source}]->(k);
                             '''
+
+IMPORT_GWAS = '''
+                CREATE CONSTRAINT ON (g:GWAS_study) ASSERT g.id IS UNIQUE; 
+                USING PERIODIC COMMIT 10000
+                LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/GWAS_study.csv" AS line
+                MERGE (g:GWAS_study {id:line.ID})
+                ON CREATE SET g.title=line.title,g.date=line.date,g.sample_size=line.sample_size,g.replication_size=line.replication_size,g.trait=line.trait;
+                '''
 
 IMPORT_DATASETS = {"clinical":'''USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_clinical.csv" AS line 

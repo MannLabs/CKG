@@ -18,7 +18,8 @@ databases = [
             #"CancerGenomeInterpreter", 
             #"SIDER",
             #"HMDB",
-            #"PathwayCommons"
+            #"PathwayCommons",
+            #'GWASCatalog'
             ]
 
 ###### UniProt Database ########
@@ -26,6 +27,7 @@ uniprot_id_url = "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/kn
 uniprot_id_file = "/Users/albertosantos/Development/UniProt/HUMAN_9606_idmapping.dat"
 uniprot_text_file = "/Users/albertosantos/Development/UniProt/uniprot-human.tab" #### Downloaded manually from UniProt until we know url (organism:human AND reviewed:yes)
 uniprot_variant_file = "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/variants/homo_sapiens_variation.txt.gz"
+uniprot_unique_peptides_file = "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/proteomics_mapping/UP000005640_9606_uniquePeptides.tsv"
 uniprot_ids = ["UniProtKB-ID", 
                 "NCBI_TaxID", 
                 "Gene_Name", 
@@ -215,5 +217,11 @@ SIDER_url = "http://sideeffects.embl.de/media/download/meddra_all_label_se.tsv.g
 SIDER_source = "UMLS_CUI"
 
 #### Pubmed ######
-PMC_db_url = "ftp://ftp.ncbi.nlm.nih.gov/pub/pmc/oa_file_list.txt"
+PMC_db_url = "ftp://ftp.ncbi.nlm.nih.gov/pub/pmc/PMC-ids.csv.gz"
+PMC_fields = ["PMID","Journal Title","ISSN","Year","Volume","Issue","Page","DOI","PMCID"]
 pubmed_linkout = "https://www.ncbi.nlm.nih.gov/pubmed/PUBMEDID"
+
+
+#### GWAS Catalog #####
+GWASCat_url = "https://www.ebi.ac.uk/gwas/api/search/downloads/alternative"
+
