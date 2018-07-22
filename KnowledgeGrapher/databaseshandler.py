@@ -241,7 +241,7 @@ def parseCGI(download = True, mapping = {}):
                         continue
 
                     for variant in alteration.split(','):
-                        entities.add((variant, "Known_variant", identifier, "chr"+chromosome, position, reference, alternative, "", ""))
+                        entities.add((variant, "Clinically_relevant_variant", identifier, "chr"+chromosome, position, reference, alternative, "", ""))
                         for tumor in tumors:                         
                             if tumor.lower() in mapping:
                                 tumor = mapping[tumor.lower()]
@@ -251,11 +251,12 @@ def parseCGI(download = True, mapping = {}):
                                     drug = mapping[drug.lower()]
                                 elif drug.split(" ")[0].lower() in mapping:
                                     drug = mapping[drug.split(" ")[0].lower()]
-                                relationships["targets_known_variant"].add((drug, variant, "TARGETS_KNOWN_VARIANT", evidence, association, tumor, "curated", "Cancer Genome Interpreter"))
-                                relationships["targets"].add((drug, gene, "CURATED_TARGETS", "curated", "OncoKB"))
+                                relationships["targets_clinically_relevant_variant"].add((drug, variant, "TARGETS_KNOWN_VARIANT", evidence, association, tumor, "curated", "Cancer Genome Interpreter"))
+                                relationships["targets"].add((drug, gene, "CURATED_TARGETS", "curated", "CGI"))
 
-                        relationships["variant_found_in_gene"].add((variant, gene, "VARIANT_FOUND_IN_GENE"))
-                        relationships["variant_found_in_chromosome"].add((variant, chromosome, "VARIANT_FOUND_IN_CHROMOSOME"))
+                        #relationships["variant_found_in_gene"].add((variant, gene, "VARIANT_FOUND_IN_GENE"))
+                        #relationships["variant_found_in_chromosome"].add((variant, chromosome, "VARIANT_FOUND_IN_CHROMOSOME"))
+                        relationships["known_variant_is_clinically_relevant"].add((variant, variant, "KNOWN_VARIANT_IS_CLINICALLY_RELEVANT", "CGI"))
         
     return entities, relationships
 
@@ -287,7 +288,7 @@ def parseOncoKB(download = False, mapping = {}):
             variant = data[4]
             oncogenicity = data[5]
             effect = data[6]          
-            entities.add((variant,"Known_variant", "", "", "", "", "", effect, oncogenicity))
+            entities.add((variant,"Clinically_relevant_variant", "", "", "", "", "", effect, oncogenicity))
             relationships["variant_found_in_gene"].add((variant, gene, "VARIANT_FOUND_IN_GENE"))
 
     with open(acfileName, 'r') as associations:
@@ -317,9 +318,10 @@ def parseOncoKB(download = False, mapping = {}):
                 else:
                     pass
                     #print disease
-                relationships["targets_known_variant"].add((drug, variant, "TARGETS_KNOWN_VARIANT", level[0], level[1], disease, "curated", "OncoKB"))
+                relationships["targets_clinically_relevant_variant"].add((drug, variant, "TARGETS_KNOWN_VARIANT", level[0], level[1], disease, "curated", "OncoKB"))
                 relationships["associated_with"].add((variant, disease, "ASSOCIATED_WITH", "curated","curated", "OncoKB", len(pubmed_ids)))   
                 relationships["targets"].add((drug, gene, "CURATED_TARGETS", "curated", "OncoKB"))
+                relationships["known_variant_is_clinically_relevant"].add((variant, variant, "KNOWN_VARIANT_IS_CLINICALLY_RELEVANT", "OncoKB"))
         relationships["variant_found_in_chromosome"].add(("","",""))
     return entities, relationships
 
@@ -613,18 +615,20 @@ def addUniProtTexts(textsFile, proteins):
             if protein in proteins:
                 proteins[protein].update({"description":function})
 
-def parseUniProtVariants(dataFile, download = True):
+def parseUniProtVariants(download = True):
     data = defaultdict()
     url = config.uniprot_variant_file
-    relationships = set()
+    entities = set()
+    relationships = defaultdict(set)
     directory = os.path.join(config.databasesDir,"UniProt")
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
         downloadDB(url, "UniProt")
-    with gzip.open(filename, 'r') as f:
+    with gzip.open(fileName, 'r') as f:
         din = False
         i = 0
         for line in f:
+            line = line.decode('utf-8')
             if not line.startswith('#') and not din:
                 continue
             elif i<2:
@@ -632,6 +636,23 @@ def parseUniProtVariants(dataFile, download = True):
                 i += 1
                 continue
             data = line.rstrip("\r\n").split("\t")
+            gene = data[0]
+            protein = data[1]
+            ident = re.sub('[a-z|\.]','', data[2])
+            altName = [data[3]]
+            altName.append(data[5])
+            consequence = data[4]
+            mutIdent = re.sub('NC_\d+\.', 'chr', data[9])
+            altName.append(mutIdent)
+            chromosome = 'chr'+data[9].split('.')[1].split(':')[0]
+
+            entities.add((ident, "Known_variant", ",".join(altName)))
+            relationships['known_variant_found_in_chromosome'].add((ident, chromosome, "VARIANT_FOUND_IN_CHROMOSOME"))
+            relationships['known_variant_found_in_gene'].add((ident, gene, "VARIANT_FOUND_IN_GENE"))
+            relationships['known_variant_found_in_protein'].add((ident, protein, "VARIANT_FOUND_IN_PROTEIN"))
+
+    return entities, relationships
+
 
 def parseUniProtUniquePeptides(download=True):
     url = config.uniprot_unique_peptides_file
@@ -922,6 +943,17 @@ def generateGraphFiles(importDirectory):
                 outputfile = os.path.join(importDirectory, "uniprot_"+entity.lower()+"_"+rel.lower()+".csv")
                 header = ['START_ID', 'END_ID','TYPE', 'source']
                 write_relationships(relationships[(entity,rel)], header, outputfile)
+            #Variants
+            entities, relationships = parseUniProtVariants()
+            variants_outputfile = os.path.join(importDirectory, "Known_variant.csv")
+            header = ['ID', ':LABEL', 'alternative_names']
+            write_entities(entities, header, variants_outputfile)
+            for relationship in relationships:
+                outputfile = os.path.join(importDirectory, relationship+".csv")
+                header = ['START_ID', 'END_ID','TYPE']
+                write_relationships(relationships[relationship], header, outputfile)
+
+
         if database.lower() == "intact":
             #IntAct
             intact_file = os.path.join(config.databasesDir,config.intact_file)
@@ -979,34 +1011,38 @@ def generateGraphFiles(importDirectory):
 
         if database.lower() == "oncokb":
             entities, relationships = parseOncoKB(mapping = mapping)
-            entity_outputfile = os.path.join(importDirectory, "oncokb_Known_variant.csv")
+            entity_outputfile = os.path.join(importDirectory, "oncokb_Clinically_relevant_variant.csv")
             header = ['ID', ':LABEL', 'alternative_names', 'chromosome', 'position', 'reference', 'alternative', 'effect', 'oncogeneicity']
             write_entities(entities, header, entity_outputfile)
             for relationship in relationships:
                 oncokb_outputfile = os.path.join(importDirectory, "oncokb_"+relationship+".csv")
                 header = ['START_ID', 'END_ID','TYPE']
-                if relationship == "targets_known_variant":
+                if relationship == "targets_clinically_relevant_variant":
                     header = ['START_ID', 'END_ID','TYPE', 'association', 'evidence', 'tumor', 'type', 'source']
                 elif relationship == "targets":
                     header = ['START_ID', 'END_ID','TYPE', 'type', 'source']
                 elif relationship == "associated_with":
                     header = ['START_ID', 'END_ID','TYPE', 'score', 'evidence_type', 'source', 'number_publications'] 
+                elif relationship == "known_variant_is_clinically_relevant":
+                    header = ['START_ID', 'END_ID','TYPE', 'source']
                 write_relationships(relationships[relationship], header, oncokb_outputfile)
         
         if database.lower() == "cancergenomeinterpreter":
             entities, relationships = parseCGI(mapping = mapping)
-            entity_outputfile = os.path.join(importDirectory, "cgi_Known_variant.csv")
+            entity_outputfile = os.path.join(importDirectory, "cgi_Clinically_relevant_variant.csv")
             header = ['ID', ':LABEL', 'alternative_names', 'chromosome', 'position', 'reference', 'alternative', 'effect', 'oncogeneicity']
             write_entities(entities, header, entity_outputfile)
             for relationship in relationships:
                 cgi_outputfile = os.path.join(importDirectory, "cgi_"+relationship+".csv")
                 header = ['START_ID', 'END_ID','TYPE']
-                if relationship == "targets_known_variant":
+                if relationship == "targets_clinically_relevant_variant":
                     header = ['START_ID', 'END_ID','TYPE', 'evidence', 'association', 'tumor', 'type', 'source']
                 elif relationship == "targets":
                     header = ['START_ID', 'END_ID','TYPE', 'type', 'source']
                 elif relationship == "associated_with":
                     header = ['START_ID', 'END_ID','TYPE', 'score', 'evidence_type', 'source', 'number_publications']
+                elif relationship == "known_variant_is_clinically_relevant":
+                    header = ['START_ID', 'END_ID','TYPE', 'source']
                 write_relationships(relationships[relationship], header, cgi_outputfile)
 
         if database.lower() == "hmdb":

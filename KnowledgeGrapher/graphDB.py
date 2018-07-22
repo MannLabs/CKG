@@ -125,10 +125,17 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
             print(statement+';')
             driver.run(statement+';')
 
-    #Known_variants
-    if "variants" in imports:
+    #Known variants
+    if "known_variants" in imports:
         variantsImportCode = cy.IMPORT_KNOWN_VARIANT_DATA
-        for source in config.variant_resources:
+        for statement in variantsImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
+            print(statement+";")
+            driver.run(statement+";")
+
+    #Clinically_relevant_variants
+    if "clinical variants" in imports:
+        variantsImportCode = cy.IMPORT_CLINICALLY_RELEVANT_VARIANT_DATA
+        for source in config.clinical_variant_resources:
             for statement in variantsImportCode.replace("IMPORTDIR", importDir).replace("SOURCE",source.lower()).split(';')[0:-1]:
                 print(statement+";")
                 driver.run(statement+";")

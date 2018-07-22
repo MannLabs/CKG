@@ -16,7 +16,7 @@ PPI_resources = ["IntAct"]
 disease_resources = [("Protein","DisGEnet"),("Known_variant","CGI"),("Known_variant","OncoKB")]
 drug_resources = ["DGIdb","CGI","OncoKB"]
 side_effects_resources = ["SIDER"]
-variant_resources = ["CGI","OncoKB"]
+clinical_variant_resources = ["CGI","OncoKB"]
 pathway_resources = ["PathwayCommons"]
 metabolite_resources = ["hmdb"]
 

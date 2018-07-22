@@ -188,29 +188,47 @@ IMPORT_METABOLITE_DATA = '''
                         MERGE (m)-[:ASSOCIATED_WITH]->(t);
                         '''
 
-                        
 IMPORT_KNOWN_VARIANT_DATA = '''
                             CREATE CONSTRAINT ON (k:Known_variant) ASSERT k.id IS UNIQUE; 
                             USING PERIODIC COMMIT 10000
-                            LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_Known_variant.csv" AS line
+                            LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/Known_variant.csv" AS line
                             MERGE (k:Known_variant {id:line.ID})
-                            ON CREATE SET k.alternative_names=line.alternative_names,k.chromosome=line.chromosome,k.position=toInt(line.position),k.reference=line.reference,k.alternative=line.alternative,k.effect=line.effect,k.oncogeneicity=line.oncogeneicity;
+                            ON CREATE SET k.alternative_names=line.alternative_names;
                             USING PERIODIC COMMIT 10000
-                            LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_variant_found_in_chromosome.csv" AS line
+                            LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/known_variant_found_in_chromosome.csv" AS line
                             MATCH (k:Known_variant {id:line.START_ID})
                             MATCH (c:Chromosome {id:line.END_ID}) 
                             MERGE (k)-[:VARIANT_FOUND_IN_CHROMOSOME]->(c);
                             USING PERIODIC COMMIT 10000
-                            LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_variant_found_in_gene.csv" AS line
+                            LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/known_variant_found_in_gene.csv" AS line
                             MATCH (k:Known_variant {id:line.START_ID})
                             MATCH (g:Gene {id:line.END_ID}) 
                             MERGE (k)-[:VARIANT_FOUND_IN_GENE]->(g);
                             USING PERIODIC COMMIT 10000
-                            LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_targets_known_variant.csv" AS line
-                            MATCH (d:Drug {id:line.START_ID}) 
-                            MATCH (k:Known_variant {id:line.END_ID})
-                            MERGE (d)-[:TARGETS_KNOWN_VARIANT{association:line.association, evidence:line.evidence, tumor:line.tumor, type:line.type, source:line.source}]->(k);
+                            LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/known_variant_found_in_protein.csv" AS line
+                            MATCH (k:Known_variant {id:line.START_ID})
+                            MATCH (p:Protein {id:line.END_ID}) 
+                            MERGE (k)-[:VARIANT_FOUND_IN_GENE]->(p);
                             '''
+
+                        
+IMPORT_CLINICALLY_RELEVANT_VARIANT_DATA = '''
+                                        CREATE CONSTRAINT ON (k:Clinically_relevant_variant) ASSERT k.id IS UNIQUE; 
+                                        USING PERIODIC COMMIT 10000
+                                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_Clinically_relevant_variant.csv" AS line
+                                        MERGE (k:Clinically_relevant_variant {id:line.ID})
+                                        ON CREATE SET k.alternative_names=line.alternative_names,k.chromosome=line.chromosome,k.position=toInt(line.position),k.reference=line.reference,k.alternative=line.alternative,k.effect=line.effect,k.oncogeneicity=line.oncogeneicity;
+                                        USING PERIODIC COMMIT 10000
+                                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_known_variant_is_clinically_relevant.csv" AS line
+                                        MATCH (k:Known_variant {id:line.START_ID})
+                                        MATCH (c:Clinically_relevant_variant {id:line.END_ID}) 
+                                        MERGE (k)-[:VARIANT_IS_CLINICALLY_RELEVANT{source:line.source}]->(c);
+                                        USING PERIODIC COMMIT 10000
+                                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_targets_known_variant.csv" AS line
+                                        MATCH (d:Drug {id:line.START_ID}) 
+                                        MATCH (k:Clinically_relevant_variant {id:line.END_ID})
+                                        MERGE (d)-[:TARGETS_KNOWN_VARIANT{association:line.association, evidence:line.evidence, tumor:line.tumor, type:line.type, source:line.source}]->(k);
+                                        '''
 
 IMPORT_GWAS = '''
                 CREATE CONSTRAINT ON (g:GWAS_study) ASSERT g.id IS UNIQUE; 
