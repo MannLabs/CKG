@@ -62,7 +62,7 @@ def buildMappingFromOBO(oboFile, ontology):
 #################################
 def parseSNOMED(files, filters):
     terms = defaultdict(list)
-    relationships = defaultdict(set)
+    relationships = set()
     definitions = defaultdict()
     for f in files:
         first = True
@@ -78,7 +78,7 @@ def parseSNOMED(files, filters):
                         term = data[7]
                         terms[conceptID].append(term)
                         definitions[conceptID] = term
-            if "Relationship" in f:
+            elif "Relationship" in f:
                 for line in fh:
                     if first:
                         first = False
@@ -87,8 +87,8 @@ def parseSNOMED(files, filters):
                     if int(data[2]) == 1:
                         sourceID = data[4] #child
                         destinationID = data[5] #parent
-                        relationships[sourceID].add(destinationID)
-            if "Definition" in f:
+                        relationships.add((sourceID, destinationID, "HAS_PARENT"))
+            elif "Definition" in f:
                 for line in fh:
                     if first:
                         first = False
@@ -99,12 +99,12 @@ def parseSNOMED(files, filters):
                         definition = data[7].replace('\n', ' ').replace('"', '').replace('\\', '')
 
                         definitions[conceptID] = definition
-    for f in filters:
-        relationships[f].add(f)
+    #for f in filters:
+    #    relationships[f].add(f)
 
-    relationships, toRemove = trimSNOMEDTree(relationships, filters)
+    #relationships, toRemove = trimSNOMEDTree(relationships, filters)
     
-    entries_to_remove(toRemove, terms)
+    #entries_to_remove(toRemove, terms)
     
     return terms, relationships, definitions
 
@@ -270,6 +270,7 @@ def generateGraphFiles(importDirectory):
                 for term in terms:
                     writer.writerow([term, entity, list(terms[term])[0], definitions[term], ontologyType, ",".join(terms[term])])
         relationshipsDf = pd.DataFrame(list(relationships))
+        print(relationshipsDf.head())
         relationshipsDf.columns = ['START_ID', 'END_ID', 'TYPE']
 
         relationshipsDf.to_csv(path_or_buf=relationships_outputfile, 
