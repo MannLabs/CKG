@@ -208,7 +208,7 @@ IMPORT_KNOWN_VARIANT_DATA = '''
                             LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/known_variant_found_in_protein.csv" AS line
                             MATCH (k:Known_variant {id:line.START_ID})
                             MATCH (p:Protein {id:line.END_ID}) 
-                            MERGE (k)-[:VARIANT_FOUND_IN_GENE]->(p);
+                            MERGE (k)-[:VARIANT_FOUND_IN_PROTEIN]->(p);
                             '''
 
                         
@@ -227,7 +227,7 @@ IMPORT_CLINICALLY_RELEVANT_VARIANT_DATA = '''
                                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_targets_known_variant.csv" AS line
                                         MATCH (d:Drug {id:line.START_ID}) 
                                         MATCH (k:Clinically_relevant_variant {id:line.END_ID})
-                                        MERGE (d)-[:TARGETS_KNOWN_VARIANT{association:line.association, evidence:line.evidence, tumor:line.tumor, type:line.type, source:line.source}]->(k);
+                                        MERGE (d)-[:TARGETS_CLINICALLY_RELEVANT_VARIANT{association:line.association, evidence:line.evidence, tumor:line.tumor, type:line.type, source:line.source}]->(k);
                                         '''
 
 IMPORT_GWAS = '''

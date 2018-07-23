@@ -4,7 +4,7 @@ import urllib
 from Bio import Entrez
 from Bio import Medline
 import os.path
-
+import collections
 
 def searchPubmed(searchFields, sortby = 'relevance', num ="10", resultsFormat = 'json'):
     pubmedQueryUrl = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=TERM&retmode=json&retmax=NUM'
@@ -63,3 +63,17 @@ def checkDirectory(directory):
 
 
 
+def flatten(t):
+    """
+    Code from: https://gist.github.com/shaxbee/0ada767debf9eefbdb6e
+    Acknowledgements: Zbigniew Mandziejewicz (shaxbee)
+    Generator flattening the structure
+    
+    >>> list(flatten([2, [2, (4, 5, [7], [2, [6, 2, 6, [6], 4]], 6)]]))
+    [2, 2, 4, 5, 7, 2, 6, 2, 6, 6, 4, 6]
+    """
+    for x in t:
+        if not isinstance(x, collections.Iterable) or isinstance(x, str):
+            yield x
+        else:
+            yield from flatten(x)
