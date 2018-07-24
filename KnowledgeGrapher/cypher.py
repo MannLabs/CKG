@@ -120,7 +120,16 @@ IMPORT_DISEASE_DATA =   '''
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_associated_with.csv" AS line
                         MATCH (e:ENTITY {id:line.START_ID})
                         MATCH (d:Disease {id:line.END_ID})
-                        MERGE (e)-[:ASSOCIATED_WITH{score:line.score,evidence_type:line.evidence_type,source:line.source,number_publications:line.number_publications}]->(d);'''
+                        MERGE (e)-[:ASSOCIATED_WITH{score:line.score,evidence_type:line.evidence_type,source:line.source,number_publications:line.number_publications}]->(d);
+                        '''
+
+IMPORT_DRUG_DATA = '''CREATE INDEX ON :Drug(name);
+                        CREATE CONSTRAINT ON (d:Drug) ASSERT d.id IS UNIQUE; 
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Drug.csv" AS line
+                        MERGE (d:Drug {id:line.ID})
+                        ON CREATE SET d.name=line.name,d.description=line.description,d.indication=line.indication,d.synonyms=SPLIT(line.synonyms,';'),d.mechanism-of-action=line.mechanism-of-action,d.metabolism=line.metabolism,d.pharmacodynamics=line.pharmacodynamics,d.prices=line.prices,d.route-of-elimination=line.route-of-elimination,d.toxicity=line.toxicity,d.absorption=line.absorption,d.half-life=line.half-life,d.groups=line.groups,d.experimental-properties=line.experimental-properties,d.Melting_Point=line.Melting_Point,d.Hydrophobicity=line.Hydrophobicity,d.Isoelectric_Point=line.Isoelectric_Point,d.Molecular_Weight,d.Molecular_Formula=line.Molecular_Formula,d.Water_Solubility=line.Water_Solubility,d.Monoisotopic_Weight=line.Monoisotopic_Weight,d.Polar_Surface_Area_(PSA)=line.Polar_Surface_Area_(PSA),d.Refractivity=line.Refractivity,d.Polarizability=line.Polarizability,d.Rotatable_Bond_Count=line.Rotatable_Bond_Count,d.H_Bond_Acceptor_Count=line.H_Bond_Acceptor_Count,d.H_Bond_Donor_Count=line.H_Bond_Donor_Count,d.pKa_(strongest_acidic)=line.pKa_(strongest_acidic),d.pKa_(strongest_basic)=line.pKa_(strongest_basic),d.Physiological_Charge=line.Physiological_Charge,d.Number_of_Rings=line.Number_of_Rings,d.Bioavailability=line.Bioavailability,d.Rule_of_Five=line.Rule_of_Five,d.Ghose_Filter=line.Ghose_Filter,d.MDDR-Like_Rule=line.MDDR-Like_Rule,d.caco2_Permeability=line.caco2_Permeability,d.pKa=line.pKa,d.Boiling_Point=line.Boiling_Point
+                        '''
 
 IMPORT_CURATED_DRUG_DATA =   '''
                         USING PERIODIC COMMIT 10000

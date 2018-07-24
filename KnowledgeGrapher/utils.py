@@ -43,6 +43,17 @@ def getMedlineAbstracts(idList):
 
     return results
 
+def getMappingFromDatabase(mappingFile):
+    mapping = {}
+    with open(mappingFile, 'r') as mf:
+        for line in mf:
+            data = line.rstrip("\r\n")
+            ident = data[0]
+            alias = data[1]
+            mapping[alias] = ident
+
+    return mapping
+
 def listDirectoryFiles(directory):
     from os import listdir
     from os.path import isfile, join

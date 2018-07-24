@@ -279,4 +279,4 @@ def generateGraphFiles(importDirectory):
                                 line_terminator='\n', escapechar='\\')
 
 if __name__ == "__main__":
-    buildMappingFromOBO(oboFile= "../../data/ontologies/DO/HumanDO.obo", ontology = "Disease")
+    pass

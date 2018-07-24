@@ -2,26 +2,33 @@
 databasesDir = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/data/databases/"
 #Databases
 databases = [
-            #"Internal",
-            #"HGNC", 
-            #"RefSeq", 
-            #"UniProt", 
-            #"IntAct", 
-            #"DisGEnet", 
-            #"HGNC", 
-            #"DGIdb", 
-            #"OncoKB", 
-            #"STRING", 
+            "Internal",
+            "HGNC", 
+            "RefSeq", 
+            "UniProt", 
+            "IntAct", 
+            "DisGEnet", 
+            "HGNC", 
+            'DrugBank',
+            "DGIdb", 
+            "OncoKB", 
+            "STRING", 
             #"STITCH", 
-            #"Mentions", 
-            #"OncoKB",
-            #"CancerGenomeInterpreter", 
-            #"SIDER",
-            #"HMDB",
-            #"PathwayCommons",
-            #'GWASCatalog',
-            'DrugBank'
+            "Mentions", 
+            "OncoKB",
+            "CancerGenomeInterpreter", 
+            "SIDER",
+            "HMDB",
+            "PathwayCommons",
+            'GWASCatalog'
             ]
+
+sources = {
+            "Drug":"DrugBank",
+            "Metabolite":"HMDB",
+            "Protein":"UniProt",
+            "Gene":"HGNC"    
+            }
 
 ###### UniProt Database ########
 uniprot_id_url = "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping.dat.gz"
@@ -112,6 +119,7 @@ disgenet_mapping_files = {"protein_mapping":"mapa_geneid_4_uniprot_crossref.tsv.
 ##### Human Metabolome Database #######
 HMDB_url = "http://www.hmdb.ca/system/downloads/current/hmdb_metabolites.zip"
 HMDB_DO_source = "OMIM"
+HMDB_dictionary_file = "mapping.tsv"
 HMDB_fields = ['accession', 
                 'name', 
                 'description',  
@@ -192,7 +200,7 @@ HMDB_attributes = ['name',
 ###### Drug bank ########
 DrugBank_url = "https://www.drugbank.ca/releases/5-1-1/downloads/drugbank_all_full_database.xml.zip" ## Manual download need to login
 DrugBank_vocabulary_url = "https://www.drugbank.ca/releases/5-1-1/downloads/drugbank_all_drugbank_vocabulary.csv.zip"
-DrugBank_DO_source = "OMIM"
+DrugBank_dictionary_file = "mapping.tsv"
 DrugBank_fields = ['drugbank-id', 
                 'name', 
                 'description',  

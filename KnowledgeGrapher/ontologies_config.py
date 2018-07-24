@@ -22,7 +22,7 @@ ontology_types = {"DO":-26,
                   "SNOMED-CT":-40,
                   "PSI-MOD":-41,
                   "PSI-MS":-42,
-                  "STITCH":-1,
+                  #"STITCH":-1,
                   "BBC":-43,
                   "SMASH":-42,
                   "GOBP":-21,
@@ -63,11 +63,11 @@ files = {-44: ["ICD/version_10/icd10_2016.tsv"],
              "reflect/go_groups.tsv",
              "reflect/go_texts.tsv"
              ],
-         -1: ["reflect/stitch_entities.tsv",
-             "reflect/stitch_names.tsv",
-             "reflect/stitch_groups.tsv",
-             "reflect/stitch_texts.tsv"
-             ],
+         #-1: ["reflect/stitch_entities.tsv",
+         #    "reflect/stitch_names.tsv",
+         #    "reflect/stitch_groups.tsv",
+         #    "reflect/stitch_texts.tsv"
+         #   ],
         -41: ["PSI/psi-mod.obo.txt"]
         }
 

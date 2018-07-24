@@ -60,8 +60,14 @@ def write_entities(entities, header, outputfile):
 #############################################
 def parseSIDER(download = True):
     url = config.SIDER_url
+    
+    drugsource = config.sources["Drug"]
+    directory = os.path.join(config.databasesDir, drugsource)
+    mappingFile = os.path.join(directory, "mapping.tsv")
+    drugmapping = utils.getMappingFromDatabase(mappingFile)
+    diseasemapping = getMappingFromOntology(ontology = "Disease", source = config.SIDER_source)
+    
     relationships = set()
-    mapping = getMappingFromOntology(ontology = "Disease", source = config.SIDER_source)
     directory = os.path.join(config.databasesDir,"SIDER")
     utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
@@ -70,10 +76,11 @@ def parseSIDER(download = True):
     associations = gzip.open(fileName, 'r')
     for line in associations:
         data = line.decode('utf-8').rstrip("\r\n").split("\t")
-        drug = re.sub(r'CID\d', 'CIDs', data[1]).replace("CID0", "CIDs")
+        drug = re.sub(r'CID\d0+', '', data[1])
         se = data[3]
-        if se in mapping:
-            do = mapping[se]
+        if se in diseasemapping and drug in drugmapping:
+            do = diseasemapping[se]
+            drug = drugmapping[drug]            
             relationships.add((drug, do, "HAS_SIDE_EFFECT", "SIDER", se))
     associations.close()
 
@@ -206,6 +213,12 @@ def parsePathwayCommons(download = True):
 def parseCGI(download = True, mapping = {}):
     regex = r"chr(\d+)\:g\.(\d+)(\w)>(\w)"
     url = config.cancerBiomarkers_url
+    
+    drugsource = config.sources["Drug"]
+    directory = os.path.join(config.databasesDir, drugsource)
+    mappingFile = os.path.join(directory, "mapping.tsv")
+    drugmapping = utils.getMappingFromDatabase(mappingFile)
+    
     fileName = config.cancerBiomarkers_variant_file
     relationships = defaultdict(set)
     entities = set()
@@ -247,10 +260,10 @@ def parseCGI(download = True, mapping = {}):
                                 tumor = mapping[tumor.lower()]
                             relationships["associated_with"].add((variant, tumor, "ASSOCIATED_WITH", "curated","curated", "Cancer Genome Interpreter", len(publications)))
                             for drug in drugs:
-                                if drug.lower() in mapping:
-                                    drug = mapping[drug.lower()]
-                                elif drug.split(" ")[0].lower() in mapping:
-                                    drug = mapping[drug.split(" ")[0].lower()]
+                                if drug.lower() in drugmapping:
+                                    drug = drugmapping[drug.lower()]
+                                elif drug.split(" ")[0].lower() in drugmapping:
+                                    drug = drugmapping[drug.split(" ")[0].lower()]
                                 relationships["targets_clinically_relevant_variant"].add((drug, variant, "TARGETS_KNOWN_VARIANT", evidence, association, tumor, "curated", "Cancer Genome Interpreter"))
                                 relationships["targets"].add((drug, gene, "CURATED_TARGETS", "curated", "CGI"))
 
@@ -266,6 +279,12 @@ def parseCGI(download = True, mapping = {}):
 def parseOncoKB(download = False, mapping = {}):
     url_actionable = config.OncoKB_actionable_url
     url_annotated = config.OncoKB_annotated_url
+
+    drugsource = config.sources["Drug"]
+    directory = os.path.join(config.databasesDir, drugsource)
+    mappingFile = os.path.join(directory, "mapping.tsv")
+    drugmapping = utils.getMappingFromDatabase(mappingFile)
+
     levels = config.OncoKB_levels
     entities = set()
     relationships = defaultdict(set)
@@ -308,8 +327,8 @@ def parseOncoKB(download = False, mapping = {}):
             if level in levels:
                 level = levels[level]
             for drug in drugs:
-                if drug.lower() in mapping:
-                    drug = mapping[drug.lower()]
+                if drug.lower() in drugmapping:
+                    drug = drugmapping[drug.lower()]
                 else:
                     pass
                     #print drug
@@ -328,8 +347,14 @@ def parseOncoKB(download = False, mapping = {}):
 ############################################
 #   The Drug Gene Interaction Database     # 
 ############################################
-def parseDGIdb(download = True, mapping = {}):
+def parseDGIdb(download = True):
     url = config.DGIdb_url
+
+    drugsource = config.sources["Drug"]
+    directory = os.path.join(config.databasesDir, drugsource)
+    mappingFile = os.path.join(directory, "mapping.tsv")
+    drugmapping = utils.getMappingFromDatabase(mappingFile)
+
     relationships = set()
     directory = os.path.join(config.databasesDir,"DGIdb")
     fileName = os.path.join(directory, url.split('/')[-1])
@@ -352,8 +377,8 @@ def parseDGIdb(download = True, mapping = {}):
                     drug = data[6]
                 else:
                     continue
-            if drug in mapping:
-                drug = mapping[drug]
+            if drug in drugmapping:
+                drug = drugmapping[drug]
             relationships.add((drug, gene, "TARGETS", interactionType, "DGIdb: "+source))
 
     return relationships
@@ -438,6 +463,20 @@ def build_relationships_from_HMDB(metabolites, mapping):
         
     return relationships
 
+def build_HMDB_dictionary(metabolites):
+    directory = os.path.join(config.databasesDir,"HMDB")
+    filename = config.HMDB_dictionary_file
+    outputfile = os.path.join(directory, filename)
+    
+    with open(outputfile, 'w') as out:
+        for metid in metabolites:
+            if "name" in metabolites[metid]:
+                name = metabolites[metid]["name"]
+                out.write(metid+"\t"+name.lower()+"\n")
+            if "synonyms" in metabolites[metid]:
+                for synonym in metabolites[metid]["synonyms"]:
+                    out.write(metid+"\t"+synonym.lower()+"\n")
+
 #########################
 #       Drug Bank       #
 #########################
@@ -481,6 +520,7 @@ def parseDrugBank():
                 if "drugbank-id" in values and len(values) > 2:
                     if values["drugbank-id"] in vocabulary:
                         values["id"] = vocabulary[values["drugbank-id"]]
+                        synonyms.append(values["drugbank-id"])
                         #values["alt_drugbank-id"] = vocabulary[values['id']]
                         values["synonyms"] = list(synonyms)
                         drugs[values["id"]] = values
@@ -536,7 +576,7 @@ def build_drug_entity(drugs):
     entities = set()
     attributes = config.DrugBank_attributes
     properties = config.DrugBank_exp_prop
-    allAttr = attributes + properties
+    allAttr = attributes + [p.replace(' ','_') for p in properties]
     for did in drugs:
         entity = []
         entity.append(did)
@@ -548,7 +588,7 @@ def build_drug_entity(drugs):
                         for prop in properties:
                             if prop in newAttr:
                                 entity.append(newAttr[prop])
-                            else:
+                            else:1
                                 entity.append('')
                     else:
                         lattr = ";".join(drugs[did][attr])
@@ -559,12 +599,21 @@ def build_drug_entity(drugs):
                 entity.append('')
         entities.add(tuple(entity))
     
-    import pprint
-    pp = pprint.PrettyPrinter(indent=4)
-    pp.pprint(entities) 
-    pp.pprint(allAttr)
     return entities, allAttr
+
+def build_DrugBank_dictionary(drugs):
+    directory = os.path.join(config.databasesDir,"DrugBank")
+    filename = config.DrugBank_dictionary_file
+    outputfile = os.path.join(directory, filename)
     
+    with open(outputfile, 'w') as out:
+        for did in drugs:
+            if "name" in drugs[did]:
+                name = drugs[did]["name"]
+                out.write(did+"\t"+name.lower()+"\n")
+            if "synonyms" in drugs[did]:
+                for synonym in drugs[did]["synonyms"]:
+                    out.write(did+"\t"+synonym.lower()+"\n")
 
 #########################
 #   PhosphositePlus     # 
@@ -1013,14 +1062,12 @@ def generateGraphFiles(importDirectory):
                 outputfile = os.path.join(importDirectory, entity1+"_"+entity2+"_associated_with_integrated.csv")
                 header = ["START_ID", "END_ID", "TYPE", "source", "score"]
                 write_relationships(relationships, header, outputfile)
-        
         if database.lower() == "mentions":
             entities, header = parsePMClist()
             publications_outputfile = os.path.join(importDirectory, "Publications.csv")
             write_entities(entities, header, publications_outputfile)
             for qtype in config.internal_db_mentions_types:
                 parseInternalDatabaseMentions(qtype, mapping, importDirectory)
-                
         if database.lower() == "hgnc":
             #HGNC
             genes, relationships = parseHGNCDatabase()
@@ -1080,8 +1127,6 @@ def generateGraphFiles(importDirectory):
                 outputfile = os.path.join(importDirectory, relationship+".csv")
                 header = ['START_ID', 'END_ID','TYPE']
                 write_relationships(relationships[relationship], header, outputfile)
-
-
         if database.lower() == "intact":
             #IntAct
             intact_file = os.path.join(config.databasesDir,config.intact_file)
@@ -1089,14 +1134,12 @@ def generateGraphFiles(importDirectory):
             interactions_outputfile = os.path.join(importDirectory, "INTACT_interacts_with.csv")
             header = ['START_ID', 'END_ID','TYPE', 'score', 'interaction_type', 'method', 'source', 'publications']
             write_relationships(interactions, header, interactions_outputfile)
-    
         if database.lower() == "string":
             #STRING
             interactions = parseSTRINGLikeDatabase(string_mapping)
             interactions_outputfile = os.path.join(importDirectory, "STRING_interacts_with.csv")
             header = ['START_ID', 'END_ID','TYPE', 'interaction_type', 'source', 'evidences','scores', 'score']
             write_relationships(interactions, header, interactions_outputfile)
-
         if database.lower() == "stitch":
             #STITCH
             evidences = ["experimental", "prediction", "database","textmining", "score"]
@@ -1104,7 +1147,6 @@ def generateGraphFiles(importDirectory):
             interactions_outputfile = os.path.join(importDirectory, "STITCH_associated_with.csv")
             header = ['START_ID', 'END_ID','TYPE', 'interaction_type', 'source', 'evidences','scores', 'score']
             write_relationships(interactions, header, interactions_outputfile)
-
         if database.lower() == "disgenet":
             #DisGeNet
             disease_relationships = parseDisGeNetDatabase()
@@ -1126,7 +1168,7 @@ def generateGraphFiles(importDirectory):
             write_relationships(relationships, header, pathway_outputfile)
         
         if database.lower() == "dgidb":
-            relationships = parseDGIdb(mapping = mapping)
+            relationships = parseDGIdb()
             dgidb_outputfile = os.path.join(importDirectory, "dgidb_targets.csv")
             header = ['START_ID', 'END_ID','TYPE', 'type', 'source']
             write_relationships(relationships, header, dgidb_outputfile)
@@ -1213,6 +1255,4 @@ def generateGraphFiles(importDirectory):
 
 
 if __name__ == "__main__":
-    drugs = parseDrugBank()
-    relationships = build_relationships_from_DrugBank(drugs)
-    entities, attributes = build_drug_entity(drugs)
+    pass
