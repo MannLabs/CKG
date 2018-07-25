@@ -1,18 +1,27 @@
+import os.path
+from KnowledgeGrapher.databases import databases_config as dbconfig
+from KnowledgeGrapher.databases.config import hmdbConfig as iconfig
+from collections import defaultdict
+from lxml import etree
+import zipfile
+from KnowledgeGrapher import utils
+
+
 #################################
 #   Human Metabolome Database   # 
 #################################
-def parseHMDB(download = False):
+def parser(download = False):
     metabolites = defaultdict()
     prefix = "{http://www.hmdb.ca}"
-    url = config.HMDB_url
+    url = iconfig.HMDB_url
     relationships = set()
-    directory = os.path.join(config.databasesDir,"HMDB")
+    directory = os.path.join(dbconfig.databasesDir,"HMDB")
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
-        downloadDB(url, "HMDB")
-    fields = config.HMDB_fields
-    parentFields = config.HMDB_parentFields
-    structuredFields = config.HMDB_structures
+        utils.downloadDB(url, "HMDB")
+    fields = iconfig.HMDB_fields
+    parentFields = iconfig.HMDB_parentFields
+    structuredFields = iconfig.HMDB_structures
     with zipfile.ZipFile(fileName, 'r') as zipped:
         for f in zipped.namelist():
             data = zipped.read(f) 
@@ -41,7 +50,7 @@ def parseHMDB(download = False):
 
 def build_metabolite_entity(metabolites):
     entities = set()
-    attributes = config.HMDB_attributes
+    attributes = iconfig.HMDB_attributes
     for metid in metabolites:
         entity = []
         entity.append(metid)
@@ -61,7 +70,7 @@ def build_metabolite_entity(metabolites):
 def build_relationships_from_HMDB(metabolites, mapping):
     mapping.update(getMappingFromOntology(ontology = "Disease", source = config.HMDB_DO_source))
     relationships = defaultdict(list)
-    associations = config.HMDB_associations
+    associations = iconfig.HMDB_associations
     for metid in metabolites:
         for ass in associations:
             ident = ass
@@ -82,8 +91,8 @@ def build_relationships_from_HMDB(metabolites, mapping):
     return relationships
 
 def build_HMDB_dictionary(metabolites):
-    directory = os.path.join(config.databasesDir,"HMDB")
-    filename = config.HMDB_dictionary_file
+    directory = os.path.join(dbconfig.databasesDir,"HMDB")
+    filename = iconfig.HMDB_dictionary_file
     outputfile = os.path.join(directory, filename)
     
     with open(outputfile, 'w') as out:

@@ -1,4 +1,4 @@
-import ontologies_config as config
+from KnowledgeGrapher.ontologies import ontologies_config as config
 import os.path
 
 def generateMappingFromReflect():

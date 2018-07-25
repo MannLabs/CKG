@@ -1,7 +1,13 @@
+import os.path
+from KnowledgeGrapher.databases import databases_config as dbconfig
+from KnowledgeGrapher.databases.config import drugbankConfig as iconfig
+from collections import defaultdict
+from KnowledgeGrapher import utils
+
 #########################
 #          IntAct       # 
 #########################
-def parseIntactDatabase(dataFile, proteins):
+def parser(dataFile, proteins):
     intact_dictionary = defaultdict()
     intact_interactions = set()
     regex = r"\((.*)\)"

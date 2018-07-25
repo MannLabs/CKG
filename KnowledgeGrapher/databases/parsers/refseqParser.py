@@ -1,16 +1,23 @@
+import os.path
+import gzip
+from KnowledgeGrapher.databases import databases_config as dbconfig
+from KnowledgeGrapher.databases.config import refseqConfig as iconfig
+from collections import defaultdict
+from KnowledgeGrapher import utils
+
 #########################
 #          RefSeq       # 
 #########################
-def parseRefSeqDatabase(download = False):
-    url = config.refseq_url
+def parser(download = False):
+    url = iconfig.refseq_url
     entities = defaultdict(set)
     relationships = defaultdict(set)
-    directory = os.path.join(config.databasesDir,"RefSeq")
+    directory = os.path.join(dbconfig.databasesDir,"RefSeq")
     fileName = os.path.join(directory, url.split('/')[-1])
     taxid = 9606
     
     if download:
-        downloadDB(url, "RefSeq")
+        utils.downloadDB(url, "RefSeq")
 
     df = gzip.open(fileName, 'r')
     first = True

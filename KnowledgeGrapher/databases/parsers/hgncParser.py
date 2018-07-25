@@ -1,11 +1,16 @@
+import os.path
+from KnowledgeGrapher.databases import databases_config as dbconfig
+from KnowledgeGrapher.databases.config import drugbankConfig as iconfig
+from KnowledgeGrapher import utils
+
 #########################################
 #          HUGO Gene Nomenclature       # 
 #########################################
-def parseHGNCDatabase(download = True):
-    url = config.hgnc_url
+def parser(download = True):
+    url = iconfig.hgnc_url
     entities = set()
     relationships = set()
-    directory = os.path.join(config.databasesDir,"HGNC")
+    directory = os.path.join(dbconfig.databasesDir,"HGNC")
     fileName = os.path.join(directory, url.split('/')[-1])
     taxid = 9606
     

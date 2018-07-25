@@ -1,19 +1,24 @@
+import os.path
+from KnowledgeGrapher.databases import databases_config as dbconfig
+from KnowledgeGrapher.databases.config import drugGeneInteractionDBConfig as iconfig
+from KnowledgeGrapher import utils
+
 ############################################
 #   The Drug Gene Interaction Database     # 
 ############################################
-def parseDGIdb(download = True):
-    url = config.DGIdb_url
+def parser(download = True):
+    url = iconfig.DGIdb_url
 
-    drugsource = config.sources["Drug"]
-    directory = os.path.join(config.databasesDir, drugsource)
+    drugsource = dbconfig.sources["Drug"]
+    directory = os.path.join(dbconfig.databasesDir, drugsource)
     mappingFile = os.path.join(directory, "mapping.tsv")
     drugmapping = utils.getMappingFromDatabase(mappingFile)
 
     relationships = set()
-    directory = os.path.join(config.databasesDir,"DGIdb")
+    directory = os.path.join(dbconfig.databasesDir,"DGIdb")
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
-        downloadDB(url, "DGIdb")
+        utils.downloadDB(url, "DGIdb")
     with open(fileName, 'r') as associations:
         first = True
         for line in associations:

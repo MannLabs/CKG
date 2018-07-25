@@ -1,4 +1,5 @@
 import urllib3
+import urllib
 import json
 import urllib
 from Bio import Entrez
@@ -6,6 +7,13 @@ from Bio import Medline
 import os.path
 import collections
 import pprint
+
+def downloadDB(databaseURL, extraFolder =""):
+    directory = os.path.join(config.databasesDir,extraFolder)
+    fileName = databaseURL.split('/')[-1]    
+    urllib.request.URLopener.version = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36 SE 2.X MetaSr 1.0'
+    requestedFile = urllib.request.URLopener()
+    requestedFile.retrieve(databaseURL, os.path.join(directory, fileName))
 
 def searchPubmed(searchFields, sortby = 'relevance', num ="10", resultsFormat = 'json'):
     pubmedQueryUrl = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=TERM&retmode=json&retmax=NUM'
@@ -23,6 +31,13 @@ def searchPubmed(searchFields, sortby = 'relevance', num ="10", resultsFormat = 
         result = resultDict['esearchresult']
     
     return result
+
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
 
 def getMedlineAbstracts(idList):
     fields = {"TI":"title", "AU":"authors", "JT":"journal", "DP":"date", "MH":"keywords", "AB":"abstract", "PMID":"PMID"}
@@ -43,6 +58,16 @@ def getMedlineAbstracts(idList):
         results.append(aux)
 
     return results
+
+def getMapping():
+    mapping = mp.generateMappingFromReflect()
+
+    return mapping
+
+def getMappingFromOntology(ontology, source):
+    mapping = mp.getMappingFromOntology(ontology, source)
+
+    return mapping
 
 def getMappingFromDatabase(mappingFile):
     mapping = {}

@@ -1,24 +1,30 @@
+import os.path
+from KnowledgeGrapher.databases import databases_config as dbconfig
+from KnowledgeGrapher.databases.config import oncokbConfig as iconfig
+from collections import defaultdict
+from KnowledgeGrapher import utils
+import re
 #########################
 #   OncoKB database     #
 #########################
-def parseOncoKB(download = False, mapping = {}):
-    url_actionable = config.OncoKB_actionable_url
-    url_annotated = config.OncoKB_annotated_url
+def parser(download = False, mapping = {}):
+    url_actionable = iconfig.OncoKB_actionable_url
+    url_annotated = iconfig.OncoKB_annotated_url
 
-    drugsource = config.sources["Drug"]
-    directory = os.path.join(config.databasesDir, drugsource)
+    drugsource = dbconfig.sources["Drug"]
+    directory = os.path.join(dbconfig.databasesDir, drugsource)
     mappingFile = os.path.join(directory, "mapping.tsv")
     drugmapping = utils.getMappingFromDatabase(mappingFile)
 
-    levels = config.OncoKB_levels
+    levels = iconfig.OncoKB_levels
     entities = set()
     relationships = defaultdict(set)
     directory = os.path.join(config.databasesDir,"OncoKB")
     acfileName = os.path.join(directory,url_actionable.split('/')[-1])
     anfileName = os.path.join(directory,url_annotated.split('/')[-1])
     if download:
-        downloadDB(url_actionable, "OncoKB")
-        downloadDB(url_annotation, "OncoKB")
+        utils.downloadDB(url_actionable, "OncoKB")
+        utils.downloadDB(url_annotation, "OncoKB")
 
     regex = r"\w\d+(\w|\*|\.)"
     with open(anfileName, 'r') as variants:

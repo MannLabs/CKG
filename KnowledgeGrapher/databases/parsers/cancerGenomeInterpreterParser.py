@@ -1,23 +1,31 @@
+import os.path
+from KnowledgeGrapher.databases import databases_config as dbconfig
+from KnowledgeGrapher.databases.config import cancerGenomeInterpreterConfig as iconfig
+from collections import defaultdict
+import zipfile
+from KnowledgeGrapher import utils
+
+
 #######################################
 #   The Cancer Genome Interpreter     # 
 #######################################
-def parseCGI(download = True, mapping = {}):
+def parser(download = True, mapping = {}):
     regex = r"chr(\d+)\:g\.(\d+)(\w)>(\w)"
-    url = config.cancerBiomarkers_url
+    url = iconfig.cancerBiomarkers_url
     
-    drugsource = config.sources["Drug"]
-    directory = os.path.join(config.databasesDir, drugsource)
+    drugsource = dbconfig.sources["Drug"]
+    directory = os.path.join(dbconfig.databasesDir, drugsource)
     mappingFile = os.path.join(directory, "mapping.tsv")
     drugmapping = utils.getMappingFromDatabase(mappingFile)
     
-    fileName = config.cancerBiomarkers_variant_file
+    fileName = iconfig.cancerBiomarkers_variant_file
     relationships = defaultdict(set)
     entities = set()
-    directory = os.path.join(config.databasesDir,"CancerGenomeInterpreter")
+    directory = os.path.join(dbconfig.databasesDir,"CancerGenomeInterpreter")
     zipFile = os.path.join(directory, url.split('/')[-1])
 
     if download:
-        downloadDB(url, "CancerGenomeInterpreter")
+        utils.downloadDB(url, "CancerGenomeInterpreter")
     with zipfile.ZipFile(zipFile) as z:
         if fileName in z.namelist():
             with z.open(fileName, 'r') as associations:

@@ -1,3 +1,12 @@
+import os.path
+import gzip
+from KnowledgeGrapher.databases import databases_config as dbconfig
+from KnowledgeGrapher.databases.config import uniprotConfig as iconfig
+from collections import defaultdict
+from KnowledgeGrapher import utils
+import pandas as pd
+import re
+
 #########################
 #       UniProt         # 
 #########################
@@ -5,9 +14,9 @@ def parseUniProtDatabase(dataFile):
     proteins = {}
     relationships = defaultdict(set)
 
-    fields = config.uniprot_ids
+    fields = iconfig.uniprot_ids
     synonymFields = config.uniprot_synonyms
-    protein_relationships = config.uniprot_protein_relationships
+    protein_relationships = iconfig.uniprot_protein_relationships
     identifier = None
     with open(dataFile, 'r') as uf:
         for line in uf:
@@ -46,13 +55,13 @@ def addUniProtTexts(textsFile, proteins):
 
 def parseUniProtVariants(download = True):
     data = defaultdict()
-    url = config.uniprot_variant_file
+    url = iconfig.uniprot_variant_file
     entities = set()
     relationships = defaultdict(set)
-    directory = os.path.join(config.databasesDir,"UniProt")
+    directory = os.path.join(dbconfig.databasesDir,"UniProt")
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
-        downloadDB(url, "UniProt")
+        utils.downloadDB(url, "UniProt")
     with gzip.open(fileName, 'r') as f:
         din = False
         i = 0
@@ -84,13 +93,13 @@ def parseUniProtVariants(download = True):
 
 
 def parseUniProtUniquePeptides(download=True):
-    url = config.uniprot_unique_peptides_file
+    url = iconfig.uniprot_unique_peptides_file
     entities = set()
-    directory = os.path.join(config.databasesDir,"UniProt")
+    directory = os.path.join(dbconfig.databasesDir,"UniProt")
     checkDirectory
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
-        downloadDB(url, "UniProt")
+        utils.downloadDB(url, "UniProt")
 
     with open(fileName, 'r') as f:
         for line in f:

@@ -1,15 +1,21 @@
+import os.path
+import gzip
+from KnowledgeGrapher.databases import databases_config as dbconfig
+from KnowledgeGrapher.databases.config import pathwayCommonsConfig as iconfig
+from KnowledgeGrapher import utils
+
 #########################
 #   PathwayCommons      # 
 #########################
-def parsePathwayCommons(download = True):
-    url = config.pathwayCommons_pathways_url
+def parser(download = True):
+    url = iconfig.pathwayCommons_pathways_url
     entities = set()
     relationships = set()
-    directory = os.path.join(config.databasesDir, "PathwayCommons")
+    directory = os.path.join(dbconfig.databasesDir, "PathwayCommons")
     fileName = url.split('/')[-1]
 
     if download:
-        downloadDB(url, "PathwayCommons")
+        utils.downloadDB(url, "PathwayCommons")
     f = os.path.join(directory, fileName)
     associations = gzip.open(f, 'r')
     for line in associations:

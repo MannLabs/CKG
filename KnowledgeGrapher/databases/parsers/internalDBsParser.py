@@ -1,14 +1,20 @@
+import os.path
+from KnowledgeGrapher.databases import databases_config as dbconfig
+from KnowledgeGrapher.databases.config import internalDBsConfig as iconfig
+from KnowledgeGrapher import utils
+import pandas as pd
+
 #############################################
 #   Internal Databases (JensenLab.org)      # 
 #############################################
 def parseInternalDatabasePairs(qtype, mapping, download = True):
-    url = config.internal_db_url
-    ifile = config.internal_db_files[qtype]
-    source = config.internal_db_sources[qtype]
+    url = iconfig.internal_db_url
+    ifile = iconfig.internal_db_files[qtype]
+    source = iconfig.internal_db_sources[qtype]
     relationships = set()
-    directory = os.path.join(config.databasesDir, "InternalDatabases")
+    directory = os.path.join(dbconfig.databasesDir, "InternalDatabases")
     if download:
-        downloadDB(url.replace("FILE", ifile), os.path.join(directory,"integration"))
+        utils.downloadDB(url.replace("FILE", ifile), os.path.join(directory,"integration"))
     ifile = os.path.join(directory,os.path.join("integration",ifile))
     with open(ifile, 'r') as idbf:
         for line in idbf:
@@ -26,20 +32,20 @@ def parseInternalDatabasePairs(qtype, mapping, download = True):
     return relationships
 
 def parsePMClist(download = True):
-    url = config.PMC_db_url
-    plinkout = config.pubmed_linkout
+    url = iconfig.PMC_db_url
+    plinkout = iconfig.pubmed_linkout
     entities = set()
-    directory = os.path.join(config.databasesDir, "InternalDatabases")
+    directory = os.path.join(dbconfig.databasesDir, "InternalDatabases")
     utils.checkDirectory(directory)
     directory = os.path.join(directory,"textmining")
     utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     
     if download:
-        downloadDB(url, directory)
+        utils.downloadDB(url, directory)
 
     entities = pd.read_csv(fileName, sep = ',', dtype = str, compression = 'gzip', low_memory=False)
-    entities = entities[config.PMC_fields]
+    entities = entities[iconfig.PMC_fields]
     entities = entities[entities.iloc[:,0].notnull()]
     entities = entities.set_index(list(entities.columns)[0])
     entities['linkout'] = [plinkout.replace("PUBMEDID", str(int(pubmedid))) for pubmedid in list(entities.index)]
@@ -51,15 +57,15 @@ def parsePMClist(download = True):
     return entities, header
 
 def parseInternalDatabaseMentions(qtype, mapping, importDirectory, download = True):
-    url = config.internal_db_url
-    ifile = config.internal_db_mentions_files[qtype]
+    url = iconfig.internal_db_url
+    ifile = iconfig.internal_db_mentions_files[qtype]
     filters = []
-    if qtype in config.internal_db_mentions_filters:
-        filters = config.internal_db_mentions_filters[qtype]
-    entity1, entity2 = config.internal_db_mentions_types[qtype]
+    if qtype in iconfig.internal_db_mentions_filters:
+        filters = iconfig.internal_db_mentions_filters[qtype]
+    entity1, entity2 = iconfig.internal_db_mentions_types[qtype]
     outputfile = os.path.join(importDirectory, entity1+"_"+entity2+"_mentioned_in_publication.csv")
     relationships = pd.DataFrame()
-    directory = os.path.join(config.databasesDir, "InternalDatabases")
+    directory = os.path.join(dbconfig.databasesDir, "InternalDatabases")
     if download:
         downloadDB(url.replace("FILE", ifile), os.path.join(directory,"textmining"))
     ifile = os.path.join(directory,os.path.join("textmining",ifile))

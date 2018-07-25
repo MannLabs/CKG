@@ -1,16 +1,25 @@
+import os.path
+from KnowledgeGrapher.databases import databases_config as dbconfig
+from KnowledgeGrapher.databases.config import drugbankConfig as iconfig
+from collections import defaultdict
+from lxml import etree
+import zipfile
+from KnowledgeGrapher import utils
+
+
 #########################
 #       Drug Bank       #
 #########################
-def parseDrugBank():
+def parser():
     drugs = {}
     prefix = '{http://www.drugbank.ca}'
     relationships = set()
-    url = config.DrugBank_url
-    directory = os.path.join(config.databasesDir,"DrugBank")
+    url = iconfig.DrugBank_url
+    directory = os.path.join(dbconfig.databasesDir,"DrugBank")
     fileName = os.path.join(directory, url.split('/')[-1])
-    fields = config.DrugBank_fields
-    parentFields = config.DrugBank_parentFields
-    structuredFields = config.DrugBank_structures
+    fields = iconfig.DrugBank_fields
+    parentFields = iconfig.DrugBank_parentFields
+    structuredFields = iconfig.DrugBank_structures
     vocabulary = parseDrugBankVocabulary()
     i = 1
     with zipfile.ZipFile(fileName, 'r') as zipped:
@@ -50,8 +59,8 @@ def parseDrugBank():
 
 def parseDrugBankVocabulary():
     vocabulary = {}
-    url = config.DrugBank_vocabulary_url
-    directory = os.path.join(config.databasesDir,"DrugBank")
+    url = iconfig.DrugBank_vocabulary_url
+    directory = os.path.join(dbconfig.databasesDir,"DrugBank")
     fileName = os.path.join(directory, url.split('/')[-1])
     with zipfile.ZipFile(fileName, 'r') as zipped:
         for f in zipped.namelist():
@@ -68,7 +77,7 @@ def parseDrugBankVocabulary():
 
 def build_relationships_from_DrugBank(drugs):
     relationships = defaultdict(list)
-    associations = config.DrugBank_associations
+    associations = iconfig.DrugBank_associations
     for did in drugs:
         for ass in associations:
             ident = ass
@@ -95,8 +104,8 @@ def build_relationships_from_DrugBank(drugs):
 
 def build_drug_entity(drugs):
     entities = set()
-    attributes = config.DrugBank_attributes
-    properties = config.DrugBank_exp_prop
+    attributes = iconfig.DrugBank_attributes
+    properties = iconfig.DrugBank_exp_prop
     allAttr = attributes + [p.replace(' ','_') for p in properties]
     for did in drugs:
         entity = []
@@ -123,8 +132,8 @@ def build_drug_entity(drugs):
     return entities, allAttr
 
 def build_DrugBank_dictionary(drugs):
-    directory = os.path.join(config.databasesDir,"DrugBank")
-    filename = config.DrugBank_dictionary_file
+    directory = os.path.join(dbconfig.databasesDir,"DrugBank")
+    filename = iconfig.DrugBank_dictionary_file
     outputfile = os.path.join(directory, filename)
     
     with open(outputfile, 'w') as out:

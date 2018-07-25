@@ -1,15 +1,22 @@
+import os.path
+from KnowledgeGrapher.databases import databases_config as dbconfig
+from KnowledgeGrapher.databases.config import drugbankConfig as iconfig
+from collections import defaultdict
+from KnowledgeGrapher import utils
+
+
 #########################
 #   GWAS Catalog EBI    #
 #########################
-def parseGWASCatalog(download= True, mapping = {}):
-    url = config.GWASCat_url
+def parser(download= True, mapping = {}):
+    url = iconfig.GWASCat_url
     entities = set()
     relationships = defaultdict(set)
-    directory = os.path.join(config.databasesDir,"GWAScatalog")
+    directory = os.path.join(iconfig.databasesDir,"GWAScatalog")
     utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
-        downloadDB(url, "GWAScatalog")
+        utils.downloadDB(url, "GWAScatalog")
     with open(fileName, 'r') as catalog:
         for line in catalog:
             data = line.rstrip("\r\n").split("\t")

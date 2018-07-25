@@ -1,15 +1,22 @@
+import os.path
+import gzip
+from KnowledgeGrapher.databases import databases_config as dbconfig
+from KnowledgeGrapher.databases.config import disgenetConfig as iconfig
+from collections import defaultdict
+from KnowledgeGrapher import utils
+
 #########################
 #       DisGeNet        # 
 #########################
-def parseDisGeNetDatabase(download = True):
+def parser(download = True):
     relationships = defaultdict(set)
-    files = config.disgenet_files
-    url = config.disgenet_url
-    directory = os.path.join(config.databasesDir,"disgenet")
+    files = iconfig.disgenet_files
+    url = iconfig.disgenet_url
+    directory = os.path.join(dbconfig.databasesDir,"disgenet")
 
     if download:
         for f in files:
-            downloadDB(url+files[f], "disgenet")
+            utils.downloadDB(url+files[f], "disgenet")
 
     proteinMapping = readDisGeNetProteinMapping() 
     diseaseMapping, diseaseSynonyms = readDisGeNetDiseaseMapping()
@@ -43,8 +50,8 @@ def parseDisGeNetDatabase(download = True):
     return relationships
     
 def readDisGeNetProteinMapping():
-    files = config.disgenet_mapping_files
-    directory = os.path.join(config.databasesDir,"disgenet")
+    files = iconfig.disgenet_mapping_files
+    directory = os.path.join(dbconfig.databasesDir,"disgenet")
     
     first = True
     mapping = defaultdict(set)
@@ -63,8 +70,8 @@ def readDisGeNetProteinMapping():
     return mapping
 
 def readDisGeNetDiseaseMapping():
-    files = config.disgenet_mapping_files
-    directory =  os.path.join(config.databasesDir,"disgenet")
+    files = iconfig.disgenet_mapping_files
+    directory =  os.path.join(dbconfig.databasesDir,"disgenet")
     first = True
     mapping = defaultdict(set)
     synonyms = defaultdict(set)

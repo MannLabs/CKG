@@ -1,15 +1,22 @@
+import os.path
+import gzip
+from KnowledgeGrapher.databases import databases_config as dbconfig
+from KnowledgeGrapher.databases.config import stringConfig as iconfig
+from collections import defaultdict
+from KnowledgeGrapher import utils
+
 #########################
 #   STRING like DBs     #
 #########################
 def getSTRINGMapping(source = "BLAST_UniProt_AC", download = True):
     mapping = defaultdict(set)
-    url = config.STRING_mapping_url
+    url = iconfig.STRING_mapping_url
     
-    directory = os.path.join(config.databasesDir, "STRING")
+    directory = os.path.join(dbconfig.databasesDir, "STRING")
     fileName = os.path.join(directory, url.split('/')[-1])
 
     if download:
-        downloadDB(url, "STRING")
+        utils.downloadDB(url, "STRING")
     
     f = os.path.join(directory, fileName)
     mf = gzip.open(f, 'r')
@@ -27,24 +34,24 @@ def getSTRINGMapping(source = "BLAST_UniProt_AC", download = True):
         
     return mapping
 
-def parseSTRINGLikeDatabase(mapping, db= "STRING", download = True):
+def parser(mapping, db= "STRING", download = True):
     string_interactions = set()
-    cutoff = config.STRING_cutoff
+    cutoff = iconfig.STRING_cutoff
     
     if db == "STITCH":
         evidences = ["experimental", "prediction", "database","textmining", "score"]
         relationship = "COMPILED_INTERACTS_WITH"
-        url = config.STITCH_url
+        url = iconfig.STITCH_url
     elif db == "STRING":
         evidences = ["experimental", "prediction", "database","textmining", "score"]
         relationship = "COMPILED_TARGETS"
-        url = config.STRING_url
+        url = iconfig.STRING_url
 
-    directory = os.path.join(config.databasesDir, db)
+    directory = os.path.join(dbconfig.databasesDir, db)
     fileName = os.path.join(directory, url.split('/')[-1])
 
     if download:
-        downloadDB(url, db)
+        utils.downloadDB(url, db)
     
     f = os.path.join(directory, fileName)
     associations = gzip.open(f, 'r')
