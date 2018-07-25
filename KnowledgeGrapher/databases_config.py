@@ -122,11 +122,7 @@ HMDB_DO_source = "OMIM"
 HMDB_dictionary_file = "mapping.tsv"
 HMDB_fields = ['accession', 
                 'name', 
-                'description',  
-                'kingdom', 
-                'super_class', 
-                'class', 
-                'sub_class', 
+                'description',
                 'chemical_formula', 
                 'average_molecular_weight', 
                 'monoisotopic_molecular_weight', 
@@ -149,6 +145,7 @@ HMDB_fields = ['accession',
                 'cellular_location'] 
 HMDB_parentFields = ['synonyms',
                     'origins', 
+                    'taxonomy',
                     'cellular_locations', 
                     'biofluid_locations',
                     'tissue_locations', 
@@ -162,7 +159,8 @@ HMDB_structures = {"pathways": ["smpdb_id"],
                     'protein_associations':["uniprot_id"],
                     "cellular_locations":["cellular_location"], 
                     "biofluid_locations":["biofluid"],
-                    "general_references":["pubmed_id"]
+                    "general_references":["pubmed_id"],
+                    "taxonomy":['direct_parent', 'kingdom', 'super_class', 'class', 'sub_class']
                   }
 HMDB_associations = {"pathways": ("ANNOTATED_IN_PATHWAY","hmdb_annotated_in_pathway"), 
                     "diseases": ("ASSOCIATED_WITH", "hmdb_associated_with_disease"), 
@@ -174,7 +172,8 @@ HMDB_associations = {"pathways": ("ANNOTATED_IN_PATHWAY","hmdb_annotated_in_path
                     }
 
 HMDB_attributes = ['name', 
-                   'description',  
+                   'description',
+                   'direct_parent',
                    'kingdom', 
                    'super_class', 
                    'class', 

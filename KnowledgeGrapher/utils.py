@@ -5,6 +5,7 @@ from Bio import Entrez
 from Bio import Medline
 import os.path
 import collections
+import pprint
 
 def searchPubmed(searchFields, sortby = 'relevance', num ="10", resultsFormat = 'json'):
     pubmedQueryUrl = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=TERM&retmode=json&retmax=NUM'
@@ -88,3 +89,7 @@ def flatten(t):
             yield x
         else:
             yield from flatten(x)
+
+def pretty_print(data):
+    pp = pprint.PrettyPrinter(indent=4)
+    pp.pprint(data)

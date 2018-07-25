@@ -413,7 +413,10 @@ def parseHMDB(download = False):
                             if intchild.text is not None and intchild.text.strip() != "":
                                 if label in structuredFields:
                                     if intchild.tag.replace(prefix,'') in structuredFields[label]:
-                                        values[label].add(intchild.text) 
+                                        if len(structuredFields[label]) >1:
+                                            values[intchild.tag.replace(prefix,'')] = intchild.text
+                                        else:
+                                            values[label].add(intchild.text) 
                                 elif intchild.tag.replace(prefix,'') in fields and intchild.text:
                                     values[label].add(intchild.text) 
                             
@@ -588,7 +591,7 @@ def build_drug_entity(drugs):
                         for prop in properties:
                             if prop in newAttr:
                                 entity.append(newAttr[prop])
-                            else:1
+                            else:
                                 entity.append('')
                     else:
                         lattr = ";".join(drugs[did][attr])
@@ -1255,4 +1258,4 @@ def generateGraphFiles(importDirectory):
 
 
 if __name__ == "__main__":
-    pass
+    parseHMDB()
