@@ -22,9 +22,9 @@ uniprot_synonyms = ["UniProtKB-ID",
                     "Ensembl", 
                     "ChEMBL", 
                     "PDB"]
-uniprot_protein_relationships = {"KEGG": ("Pathway", "IS_PART_OF_KEGG_PATHWAY"), 
-                                "Reactome":("Pathway","IS_PART_OF_REACTOME_PATHWAY"), 
-                                "RefSeq": ("Transcript", "TRANSLATED_INTO"), 
-                                "Gene_Name":("Gene","TRANSLATED_INTO"),
-                                             "PDB":("Structure","FOUND")
+uniprot_protein_relationships = {"RefSeq": ("Transcript", "TRANSLATED_INTO"), 
+                                "Gene_Name":("Gene","TRANSLATED_INTO")
                                 }
+proteins_header = ['ID', ':LABEL', 'accession','name', 'synonyms', 'description', 'taxid']
+variants_header = ['ID', ':LABEL', 'alternative_names']
+relationships_header = ['START_ID', 'END_ID','TYPE', 'source']

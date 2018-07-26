@@ -8,6 +8,8 @@ from KnowledgeGrapher import utils
 ############################################
 def parser(download = True):
     url = iconfig.DGIdb_url
+    header = iconfig.header
+    outputfileName = iconfig.outputfileName
 
     drugsource = dbconfig.sources["Drug"]
     directory = os.path.join(dbconfig.databasesDir, drugsource)
@@ -40,4 +42,4 @@ def parser(download = True):
                 drug = drugmapping[drug]
             relationships.add((drug, gene, "TARGETS", interactionType, "DGIdb: "+source))
 
-    return relationships
+    return (relationships, header, outputfileName)

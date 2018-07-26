@@ -1,5 +1,5 @@
+
 ##### Internal Databases (jensenlab.org) #####
-internal_db_directory = databasesDir + "InternalDatabases/"
 internal_db_url = "http://download.jensenlab.org/FILE"
 internal_db_files = {"-26":"human_disease_integrated_full.tsv", 
                     "-25":"human_tissue_integrated_full.tsv",
@@ -21,7 +21,8 @@ internal_db_mentions_filters = {"-25": ["BTO:0000000"],
                                 "-26": ["DOID:4", "DOID:162"],
                                 "-23":["GO:0005575", "GO:0005623", "GO:0044464", "GO:0030054"]}
 internal_db_sources = {"-25": "TISSUES", "-26": "DISEASES", "-23": "COMPARTMENTS"}
-
+string_url = "https://stringdb-static.org/download/protein.aliases.v10.5/9606.protein.aliases.v10.5.txt.gz"
+header = ["START_ID", "END_ID", "TYPE", "source", "score"]
 #### Pubmed ######
 PMC_db_url = "ftp://ftp.ncbi.nlm.nih.gov/pub/pmc/PMC-ids.csv.gz"
 PMC_fields = ["PMID","Journal Title","ISSN","Year","Volume","Issue","Page","DOI","PMCID"]

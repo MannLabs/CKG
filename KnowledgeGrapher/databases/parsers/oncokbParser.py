@@ -10,6 +10,8 @@ import re
 def parser(download = False, mapping = {}):
     url_actionable = iconfig.OncoKB_actionable_url
     url_annotated = iconfig.OncoKB_annotated_url
+    entities_header = iconfig.entities_header
+    relationships_headers = iconfig.relationships_headers
 
     drugsource = dbconfig.sources["Drug"]
     directory = os.path.join(dbconfig.databasesDir, drugsource)
@@ -73,4 +75,6 @@ def parser(download = False, mapping = {}):
                 relationships["targets"].add((drug, gene, "CURATED_TARGETS", "curated", "OncoKB"))
                 relationships["known_variant_is_clinically_relevant"].add((variant, variant, "KNOWN_VARIANT_IS_CLINICALLY_RELEVANT", "OncoKB"))
         relationships["variant_found_in_chromosome"].add(("","",""))
-    return entities, relationships
+
+
+    return (entities, relationships, entities_header, relationships_headers)

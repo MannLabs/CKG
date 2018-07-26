@@ -2,6 +2,7 @@
 HMDB_url = "http://www.hmdb.ca/system/downloads/current/hmdb_metabolites.zip"
 HMDB_DO_source = "OMIM"
 HMDB_dictionary_file = "mapping.tsv"
+relationships_header = ['START_ID', 'END_ID','TYPE', 'source']
 HMDB_fields = ['accession', 
                 'name', 
                 'description',

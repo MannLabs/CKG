@@ -10,6 +10,45 @@ import re
 #########################
 #       UniProt         # 
 #########################
+def parser():
+    result = {"Protein":None, "Known_variants":None}
+    uniprot_id_file = iconfig.uniprot_id_file
+    uniprot_texts_file = iconfig.uniprot_text_file
+    relationships_header = iconfig.relationships_header
+    proteins, proteins_relationships = parseUniProtDatabase(uniprot_id_file)
+    addUniProtTexts(uniprot_texts_file, proteins)
+    proteins_outputfileName = "Protein.csv"
+    proteins_header = iconfig.proteins_header
+    protein_entities = set()
+    for protein in proteins:
+        accession = ""
+        name = ""
+        synonyms = []
+        taxid = 9606
+        description = ""
+        if "UniProtKB-ID" in proteins[protein]:
+            accession  = proteins[protein]["UniProtKB-ID"]
+        if "Gene_Name" in proteins[protein]:
+            name = proteins[protein]["Gene_Name"]
+        if "synonyms" in proteins[protein]:
+            synonyms = proteins[protein]["synonyms"]
+        if "NCBI_TaxID" in proteins[protein]:
+            taxid = int(proteins[protein]["NCBI_TaxID"])
+        if "description" in proteins[protein]:
+            description = proteins[protein]["description"]
+        protein_entities.add((protein, "Protein", accession , name, ",".join(synonyms), description, taxid))
+
+    result["Protein"] = (protein_entities, proteins_relationships, proteins_headers, relationships_header)
+    
+    #Variants
+    variants, variants_relationships = parseUniProtVariants()
+    variants_outputfile = "Known_variant.csv"
+    variants_header = iconfig.variants_header
+    result["Known_variant"] = (variants, variants_relationships, variants_headers, relationships_header)
+
+    return result
+
+
 def parseUniProtDatabase(dataFile):
     proteins = {}
     relationships = defaultdict(set)
@@ -85,9 +124,9 @@ def parseUniProtVariants(download = True):
             chromosome = 'chr'+data[9].split('.')[1].split(':')[0]
 
             entities.add((ident, "Known_variant", ",".join(altName)))
-            relationships['known_variant_found_in_chromosome'].add((ident, chromosome, "VARIANT_FOUND_IN_CHROMOSOME"))
-            relationships['known_variant_found_in_gene'].add((ident, gene, "VARIANT_FOUND_IN_GENE"))
-            relationships['known_variant_found_in_protein'].add((ident, protein, "VARIANT_FOUND_IN_PROTEIN"))
+            relationships[('Chromosome','known_variant_found_in_chromosome')].add((ident, chromosome, "VARIANT_FOUND_IN_CHROMOSOME"))
+            relationships[('Gene','known_variant_found_in_gene')].add((ident, gene, "VARIANT_FOUND_IN_GENE"))
+            relationships[('Protein','known_variant_found_in_protein')].add((ident, protein, "VARIANT_FOUND_IN_PROTEIN"))
 
     return entities, relationships
 

@@ -7,6 +7,28 @@ import pandas as pd
 #############################################
 #   Internal Databases (JensenLab.org)      # 
 #############################################
+
+def parser(download = True):
+    result = {}
+    string_url = iconfig.string_url
+    string_mapping = utils.getSTRINGMapping(string_url, download=False)
+    for qtype in iconfig.internal_db_types:
+        relationships, entity1, entity2 = parseInternalDatabasePairs(qtype, string_mapping)
+        entity1, entity2 = iconfig.internal_db_types[qtype]
+        outputfileName =  entity1+"_"+entity2+"_associated_with_integrated.csv"
+        header = iconfig.header
+        result[qtype] = (relationships, header, outputfileName)
+    
+    return result
+
+def parserMentions(importDirectory,download = True):
+    entities, header = parsePMClist()
+    outputfileName = "Publications.csv"
+    for qtype in iconfig.internal_db_mentions_types:
+        parseInternalDatabaseMentions(qtype, mapping, importDirectory)
+
+    return (entities, header, outputfileName)
+
 def parseInternalDatabasePairs(qtype, mapping, download = True):
     url = iconfig.internal_db_url
     ifile = iconfig.internal_db_files[qtype]

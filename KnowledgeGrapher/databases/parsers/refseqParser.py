@@ -14,6 +14,7 @@ def parser(download = False):
     relationships = defaultdict(set)
     directory = os.path.join(dbconfig.databasesDir,"RefSeq")
     fileName = os.path.join(directory, url.split('/')[-1])
+    headers = iconfig.headerEntities
     taxid = 9606
     
     if download:
@@ -51,4 +52,4 @@ def parser(download = False):
                 relationships["LOCATED_IN"].add((protAcc, chrom, "LOCATED_IN", start, end, strand, "RefSeq"))
     df.close()
 
-    return entities, relationships
+    return (entities, relationships, headers)

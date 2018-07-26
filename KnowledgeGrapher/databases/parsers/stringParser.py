@@ -34,17 +34,21 @@ def getSTRINGMapping(source = "BLAST_UniProt_AC", download = True):
         
     return mapping
 
-def parser(mapping, db= "STRING", download = True):
-    string_interactions = set()
+def parser(download = True, db="STRING"):
+    mapping = getSTRINGMapping()
+    relationships = set()
     cutoff = iconfig.STRING_cutoff
+    header = iconfig.header
     
     if db == "STITCH":
         evidences = ["experimental", "prediction", "database","textmining", "score"]
         relationship = "COMPILED_INTERACTS_WITH"
         url = iconfig.STITCH_url
+        outputfileName = "STITCH_associated_with.csv"
     elif db == "STRING":
         evidences = ["experimental", "prediction", "database","textmining", "score"]
         relationship = "COMPILED_TARGETS"
+        outputfileName = "STRING_interacts_with.csv"
         url = iconfig.STRING_url
 
     directory = os.path.join(dbconfig.databasesDir, db)
@@ -68,11 +72,12 @@ def parser(mapping, db= "STRING", download = True):
         if intA in mapping and intB in mapping and fscores[-1]>=cutoff:
             for aliasA in mapping[intA]:
                 for aliasB in mapping[intB]:
-                    string_interactions.add((aliasA, aliasB, relationship, "association", db, ",".join(evidences), ",".join(fscores[0:-1]), fscores[-1]))
+                    relationships.add((aliasA, aliasB, relationship, "association", db, ",".join(evidences), ",".join(fscores[0:-1]), fscores[-1]))
         elif db == "STITCH":
             if intB in mapping and fscores[-1]>=cutoff:
                 aliasA = intA
                 for aliasB in mapping[intB]:
-                    string_interactions.add((aliasA, aliasB, relationship, "association", db, ",".join(evidences), ",".join(fscores[0:-1]), fscores[-1]))
-    return string_interactions
+                    relationships.add((aliasA, aliasB, relationship, "association", db, ",".join(evidences), ",".join(fscores[0:-1]), fscores[-1]))
+
+    return (relationships, header, outputfileName)
 

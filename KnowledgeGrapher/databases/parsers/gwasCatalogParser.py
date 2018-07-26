@@ -1,6 +1,6 @@
 import os.path
 from KnowledgeGrapher.databases import databases_config as dbconfig
-from KnowledgeGrapher.databases.config import drugbankConfig as iconfig
+from KnowledgeGrapher.databases.config import gwasCatalogConfig as iconfig
 from collections import defaultdict
 from KnowledgeGrapher import utils
 
@@ -10,6 +10,8 @@ from KnowledgeGrapher import utils
 #########################
 def parser(download= True, mapping = {}):
     url = iconfig.GWASCat_url
+    entities_header = iconfig.entities_header
+    relationships_header = iconfig.relationships_header
     entities = set()
     relationships = defaultdict(set)
     directory = os.path.join(iconfig.databasesDir,"GWAScatalog")
@@ -39,4 +41,4 @@ def parser(download= True, mapping = {}):
             if pubmedid != "":
                 relationships["published_in_publication"].add((study, pubmedid, "PUBLISHED_IN", "GWAS Catalog"))
     
-    return entities, relationships
+    return (entities, relationships, entities_header, relationship_header)

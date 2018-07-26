@@ -10,6 +10,8 @@ import re
 #############################################
 def parser(download = True):
     url = iconfig.SIDER_url
+    header = iconfig.header
+    outputfileName = iconfig.outputfileName
     
     drugsource = dbconfig.sources["Drug"]
     directory = os.path.join(dbconfig.databasesDir, drugsource)
@@ -34,4 +36,4 @@ def parser(download = True):
             relationships.add((drug, do, "HAS_SIDE_EFFECT", "SIDER", se))
     associations.close()
 
-    return relationships
+    return (relationships, header, outputfileName)

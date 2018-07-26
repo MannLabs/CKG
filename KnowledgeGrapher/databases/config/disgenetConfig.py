@@ -9,3 +9,6 @@ disgenet_mapping_files = {"protein_mapping":"mapa_geneid_4_uniprot_crossref.tsv.
                             "disease_mapping":"disease_mappings.tsv.gz"
                         }
 disgenet_Disease_ontology = "DO"
+disgenet_header = ['START_ID', 'END_ID','TYPE', 'score', 'evidence_type', 'source', 'number_publications']
+
+outputfileName = "disgenet_associated_with.csv"

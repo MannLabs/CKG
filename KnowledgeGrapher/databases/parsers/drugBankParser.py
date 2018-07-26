@@ -1,6 +1,6 @@
 import os.path
 from KnowledgeGrapher.databases import databases_config as dbconfig
-from KnowledgeGrapher.databases.config import drugbankConfig as iconfig
+from KnowledgeGrapher.databases.config import drugBankConfig as iconfig
 from collections import defaultdict
 from lxml import etree
 import zipfile
@@ -11,6 +11,16 @@ from KnowledgeGrapher import utils
 #       Drug Bank       #
 #########################
 def parser():
+    drugs = extract_drugs()
+    relationships = build_relationships_from_DrugBank(drugs)
+    entities, attributes = build_metabolite_entity(drugs)
+    entity_outputfile = os.path.join(importDirectory, "Drug.csv")
+    entities_header = ['ID'] + attributes
+    relationships_headers = iconfig.relationships_headers
+    
+    return (entities, relationships, entities_header, relationships_headers)
+
+def extract_drugs():
     drugs = {}
     prefix = '{http://www.drugbank.ca}'
     relationships = set()

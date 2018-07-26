@@ -1,17 +1,26 @@
 import os.path
 from KnowledgeGrapher.databases import databases_config as dbconfig
-from KnowledgeGrapher.databases.config import drugbankConfig as iconfig
+from KnowledgeGrapher.databases.config import intactConfig as iconfig
 from collections import defaultdict
 from KnowledgeGrapher import utils
+import re
 
 #########################
 #          IntAct       # 
 #########################
-def parser(dataFile, proteins):
+def parser(download = True):
     intact_dictionary = defaultdict()
-    intact_interactions = set()
+    relationships = set()
+    header = iconfig.header
+    outputfileName = "INTACT_interacts_with.csv"
     regex = r"\((.*)\)"
-    with open(dataFile, 'r') as idf:
+    url = iconfig.intact_psimitab_url
+    directory = os.path.join(dbconfig.databasesDir,"Intact")
+    fileName = os.path.join(directory, url.split('/')[-1])
+    if download:
+        utils.downloadDB(url, "UniProt")
+
+    with open(fileName, 'r') as idf:
         first = True
         for line in idf:
             if first:
@@ -38,7 +47,7 @@ def parser(dataFile, proteins):
                 score = float(score)
             else:
                 continue
-            if intA in proteins and intB in proteins:
+            if taxidA == "9606" and taxidB == "9606":
                 if (intA, intB) in intact_dictionary:
                     intact_dictionary[(intA,intB)]['methods'].add(method)
                     intact_dictionary[(intA,intB)]['sources'].add(source)
@@ -47,6 +56,6 @@ def parser(dataFile, proteins):
                 else:
                     intact_dictionary[(intA,intB)]= {'methods': set([method]),'sources':set([source]),'publications':set([publications]), 'itype':set([itype]), 'score':score}
     for (intA, intB) in intact_dictionary:
-        intact_interactions.add((intA,intB,"CURATED_INTERACTS_WITH",intact_dictionary[(intA, intB)]['score'], ",".join(intact_dictionary[(intA, intB)]['itype']), ",".join(intact_dictionary[(intA, intB)]['methods']), ",".join(intact_dictionary[(intA, intB)]['sources']), ",".join(intact_dictionary[(intA, intB)]['publications'])))
+        relationships.add((intA,intB,"CURATED_INTERACTS_WITH",intact_dictionary[(intA, intB)]['score'], ",".join(intact_dictionary[(intA, intB)]['itype']), ",".join(intact_dictionary[(intA, intB)]['methods']), ",".join(intact_dictionary[(intA, intB)]['sources']), ",".join(intact_dictionary[(intA, intB)]['publications'])))
 
-    return intact_interactions
+    return (relationships, header, outputfileName)

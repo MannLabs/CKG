@@ -2,6 +2,7 @@
 DrugBank_url = "https://www.drugbank.ca/releases/5-1-1/downloads/drugbank_all_full_database.xml.zip" ## Manual download need to login
 DrugBank_vocabulary_url = "https://www.drugbank.ca/releases/5-1-1/downloads/drugbank_all_drugbank_vocabulary.csv.zip"
 DrugBank_dictionary_file = "mapping.tsv"
+relationships_headers = ['START_ID', 'END_ID','TYPE', 'interaction_description', 'source']
 DrugBank_fields = ['drugbank-id', 
                 'name', 
                 'description',  

@@ -7,6 +7,7 @@ from Bio import Medline
 import os.path
 import collections
 import pprint
+from KnowledgeGrapher import mapping as mp
 
 def downloadDB(databaseURL, extraFolder =""):
     directory = os.path.join(config.databasesDir,extraFolder)
@@ -78,6 +79,31 @@ def getMappingFromDatabase(mappingFile):
             alias = data[1]
             mapping[alias] = ident
 
+    return mapping
+
+def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True):
+    mapping = collections.defaultdict(set)
+    
+    directory = os.path.join(config.databasesDir, "STRING")
+    fileName = os.path.join(directory, url.split('/')[-1])
+
+    if download:
+        downloadDB(url, "STRING")
+    
+    f = os.path.join(directory, fileName)
+    mf = gzip.open(f, 'r')
+    first = True
+    for line in mf:
+        if first:
+            first = False
+            continue
+        data = line.decode('utf-8').rstrip("\r\n").split("\t")
+        stringID = data[0]
+        alias = data[1]
+        sources = data[2].split(' ')
+        if source in sources:
+            mapping[stringID].add(alias)
+        
     return mapping
 
 def listDirectoryFiles(directory):

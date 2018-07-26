@@ -1,6 +1,6 @@
 import os.path
 from KnowledgeGrapher.databases import databases_config as dbconfig
-from KnowledgeGrapher.databases.config import drugbankConfig as iconfig
+from KnowledgeGrapher.databases.config import hgncConfig as iconfig
 from KnowledgeGrapher import utils
 
 #########################################
@@ -13,6 +13,7 @@ def parser(download = True):
     directory = os.path.join(dbconfig.databasesDir,"HGNC")
     fileName = os.path.join(directory, url.split('/')[-1])
     taxid = 9606
+    entities_header = iconfig.header
     
     if download:
         downloadDB(url, "HGNC")
@@ -34,7 +35,7 @@ def parser(download = True):
                 continue
 
             entities.add((geneSymbol, "Gene", geneName, geneFamily, ",".join(synonyms), taxid))
-            relationships.add((geneSymbol, transcript, "TRANSCRIBED_INTO"))
+            #relationships.add((geneSymbol, transcript, "TRANSCRIBED_INTO"))
 
-    return entities, relationships
+    return entities, entities_header
 

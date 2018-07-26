@@ -13,6 +13,8 @@ def parser(download = True):
     files = iconfig.disgenet_files
     url = iconfig.disgenet_url
     directory = os.path.join(dbconfig.databasesDir,"disgenet")
+    header = iconfig.disgenet_header
+    outputfileName = iconfig.outputfileName
 
     if download:
         for f in files:
@@ -47,7 +49,7 @@ def parser(download = True):
                             code = "DOID:"+code
                             relationships[idType].add((identifier, code,"ASSOCIATED_WITH", score, atype, "DisGeNet: "+source, pmids))
         associations.close()
-    return relationships
+    return (relationships,header,outputfileName)
     
 def readDisGeNetProteinMapping():
     files = iconfig.disgenet_mapping_files

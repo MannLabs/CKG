@@ -12,6 +12,8 @@ from KnowledgeGrapher import utils
 def parser(download = True, mapping = {}):
     regex = r"chr(\d+)\:g\.(\d+)(\w)>(\w)"
     url = iconfig.cancerBiomarkers_url
+    entities_header = iconfig.entities_header
+    relationships_headers = iconfig.relationships_headers
     
     drugsource = dbconfig.sources["Drug"]
     directory = os.path.join(dbconfig.databasesDir, drugsource)
@@ -70,4 +72,4 @@ def parser(download = True, mapping = {}):
                         #relationships["variant_found_in_chromosome"].add((variant, chromosome, "VARIANT_FOUND_IN_CHROMOSOME"))
                         relationships["known_variant_is_clinically_relevant"].add((variant, variant, "KNOWN_VARIANT_IS_CLINICALLY_RELEVANT", "CGI"))
         
-    return entities, relationships
+    return (entities, relationships, entities_header, relationships_headers)

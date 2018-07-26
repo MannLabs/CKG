@@ -2,7 +2,7 @@ from KnowledgeGrapher.ontologies import ontologies_config as config
 import os.path
 
 def generateMappingFromReflect():
-    types = [-26,-25,-1]
+    types = [-26,-25]
     ofiles = config.files
     odir = config.ontologiesDirectory
     mapping = {}

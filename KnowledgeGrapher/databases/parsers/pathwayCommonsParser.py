@@ -13,6 +13,9 @@ def parser(download = True):
     relationships = set()
     directory = os.path.join(dbconfig.databasesDir, "PathwayCommons")
     fileName = url.split('/')[-1]
+    entities_header = iconfig.pathways_header
+    relationships_header = iconfig.relationships_header
+    
 
     if download:
         utils.downloadDB(url, "PathwayCommons")

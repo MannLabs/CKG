@@ -13,7 +13,7 @@ databases = [
             "DGIdb", 
             "OncoKB", 
             "STRING", 
-            #"STITCH", 
+            "STITCH", 
             "Mentions", 
             "OncoKB",
             "CancerGenomeInterpreter", 
