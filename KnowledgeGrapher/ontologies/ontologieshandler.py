@@ -213,6 +213,9 @@ def parseOBOFiles(files):
             if "synonym" in attr:
                 for s in attr["synonym"]:
                     terms[term].append(re.match(r'\"(.+?)\"',s).group(1))
+            if "xref" in attr:
+                for s in attr["xref"]:
+                    terms[term].append(s)
             if "def" in attr:
                 definitions[term] = attr["def"].replace('"','')
             else:
@@ -246,7 +249,7 @@ def parseOntology(ontology):
         ontologyData = parseICD(ontologyFiles)
     if ontology in ["DO", "BTO", "GOBP", "GOMF", "GOCC", "STITCH"]:
         ontologyData = parseReflectFiles(ontologyFiles, filters, otype)
-    if ontology in ["PSI-MOD"]:
+    if ontology in ["PSI-MOD", "HPO"]:
         ontologyData = parseOBOFiles(ontologyFiles)
    
     return ontologyData
