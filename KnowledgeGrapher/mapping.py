@@ -3,6 +3,7 @@ from KnowledgeGrapher.databases import databases_config as dbconfig
 import os.path
 from collections import defaultdict
 import re
+import gzip
 
 def generateMappingFromReflect():
     types = [-26,-25]
@@ -57,7 +58,7 @@ def getMappingFromDatabase(mappingFile):
     return mapping
 
 def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True):
-    mapping = collections.defaultdict(set)
+    mapping = defaultdict(set)
     
     directory = os.path.join(dbconfig.databasesDir, "STRING")
     fileName = os.path.join(directory, url.split('/')[-1])

@@ -78,7 +78,7 @@ def generateGraphFiles(importDirectory):
         if ontology in config.ontology_types:
             ontologyType = config.ontology_types[ontology]
         
-        relationships_outputfile = os.path.join(importDirectory, ontology.capitalize()+"_has_parent.csv")
+        relationships_outputfile = os.path.join(importDirectory, entity.capitalize()+"_has_parent.csv")
         terms, relationships, definitions = parseOntology(ontology)
         for namespace in terms:
             entity_outputfile = os.path.join(importDirectory, namespace.capitalize()+".csv")

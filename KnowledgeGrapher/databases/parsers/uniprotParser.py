@@ -11,7 +11,7 @@ import re
 #       UniProt         # 
 #########################
 def parser():
-    result = {"Protein":None, "Known_variants":None}
+    result = {"Protein":None, "Known_variant":None}
     uniprot_id_file = iconfig.uniprot_id_file
     uniprot_texts_file = iconfig.uniprot_text_file
     relationships_header = iconfig.relationships_header
@@ -38,14 +38,13 @@ def parser():
             description = proteins[protein]["description"]
         protein_entities.add((protein, "Protein", accession , name, ",".join(synonyms), description, taxid))
 
-    result["Protein"] = (protein_entities, proteins_relationships, proteins_headers, relationships_header)
+    result["Protein"] = (protein_entities, proteins_relationships, proteins_header, relationships_header)
     
     #Variants
     variants, variants_relationships = parseUniProtVariants()
     variants_outputfile = "Known_variant.csv"
     variants_header = iconfig.variants_header
-    result["Known_variant"] = (variants, variants_relationships, variants_headers, relationships_header)
-
+    result["Known_variant"] = (variants, variants_relationships, variants_header, relationships_header)
     return result
 
 
@@ -54,7 +53,7 @@ def parseUniProtDatabase(dataFile):
     relationships = defaultdict(set)
 
     fields = iconfig.uniprot_ids
-    synonymFields = config.uniprot_synonyms
+    synonymFields = iconfig.uniprot_synonyms
     protein_relationships = iconfig.uniprot_protein_relationships
     identifier = None
     with open(dataFile, 'r') as uf:
@@ -92,7 +91,7 @@ def addUniProtTexts(textsFile, proteins):
             if protein in proteins:
                 proteins[protein].update({"description":function})
 
-def parseUniProtVariants(download = True):
+def parseUniProtVariants(download = False):
     data = defaultdict()
     url = iconfig.uniprot_variant_file
     entities = set()
@@ -108,30 +107,34 @@ def parseUniProtVariants(download = True):
             line = line.decode('utf-8')
             if not line.startswith('#') and not din:
                 continue
-            elif i<2:
+            elif i<=2:
                 din = True
                 i += 1
                 continue
             data = line.rstrip("\r\n").split("\t")
-            gene = data[0]
-            protein = data[1]
-            ident = re.sub('[a-z|\.]','', data[2])
-            altName = [data[3]]
-            altName.append(data[5])
-            consequence = data[4]
-            mutIdent = re.sub('NC_\d+\.', 'chr', data[9])
-            altName.append(mutIdent)
-            chromosome = 'chr'+data[9].split('.')[1].split(':')[0]
+            if len(data) > 9:
+                gene = data[0]
+                protein = data[1]
+                ident = re.sub('[a-z|\.]','', data[2])
+                altName = [data[3]]
+                altName.append(data[5])
+                consequence = data[4]
+                mutIdent = re.sub('NC_\d+\.', 'chr', data[9])
+                altName.append(mutIdent)
+                if len(data[9].split('.')) >1:
+                    chromosome = 'chr'+data[9].split('.')[1].split(':')[0]
+                else:
+                    chromosome = 'chr'+data[9]
 
-            entities.add((ident, "Known_variant", ",".join(altName)))
-            relationships[('Chromosome','known_variant_found_in_chromosome')].add((ident, chromosome, "VARIANT_FOUND_IN_CHROMOSOME"))
-            relationships[('Gene','known_variant_found_in_gene')].add((ident, gene, "VARIANT_FOUND_IN_GENE"))
-            relationships[('Protein','known_variant_found_in_protein')].add((ident, protein, "VARIANT_FOUND_IN_PROTEIN"))
+                entities.add((ident, "Known_variant", ",".join(altName)))
+                relationships[('Chromosome','known_variant_found_in_chromosome')].add((ident, chromosome, "VARIANT_FOUND_IN_CHROMOSOME","UniProt"))
+                relationships[('Gene','known_variant_found_in_gene')].add((ident, gene, "VARIANT_FOUND_IN_GENE", "UniProt"))
+                relationships[('Protein','known_variant_found_in_protein')].add((ident, protein, "VARIANT_FOUND_IN_PROTEIN", "UniProt"))
 
     return entities, relationships
 
 
-def parseUniProtUniquePeptides(download=True):
+def parseUniProtUniquePeptides(download=False):
     url = iconfig.uniprot_unique_peptides_file
     entities = set()
     directory = os.path.join(dbconfig.databasesDir,"UniProt")
@@ -143,3 +146,7 @@ def parseUniProtUniquePeptides(download=True):
     with open(fileName, 'r') as f:
         for line in f:
             data = line.rstrip("\r\n").split("\t")
+
+
+if __name__ == "__main__":
+    pass

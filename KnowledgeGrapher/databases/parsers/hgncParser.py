@@ -16,7 +16,7 @@ def parser(download = True):
     entities_header = iconfig.header
     
     if download:
-        downloadDB(url, "HGNC")
+        utils.downloadDB(url, "HGNC")
     
     with open(fileName, 'r') as df:
         first = True

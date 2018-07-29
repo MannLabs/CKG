@@ -1,17 +1,19 @@
 import os.path
 from KnowledgeGrapher.databases import databases_config as dbconfig
 from KnowledgeGrapher.databases.config import oncokbConfig as iconfig
+from KnowledgeGrapher import mapping as mp
 from collections import defaultdict
 from KnowledgeGrapher import utils
 import re
 #########################
 #   OncoKB database     #
 #########################
-def parser(download = False, mapping = {}):
+def parser(download = False):
     url_actionable = iconfig.OncoKB_actionable_url
     url_annotated = iconfig.OncoKB_annotated_url
     entities_header = iconfig.entities_header
     relationships_headers = iconfig.relationships_headers
+    mapping = mp.getMappingFromOntology(ontology = "Disease", source = None)
 
     drugsource = dbconfig.sources["Drug"]
     directory = os.path.join(dbconfig.databasesDir, drugsource)

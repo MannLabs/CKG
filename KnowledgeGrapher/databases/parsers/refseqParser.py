@@ -26,7 +26,7 @@ def parser(download = False):
         if first:
             first = False
             continue
-        data = line.rstrip("\r\n").split("\t")
+        data = line.decode('utf-8').rstrip("\r\n").split("\t")
         tclass = data[1]
         assembly = data[2]
         chrom = data[5]

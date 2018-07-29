@@ -3,6 +3,7 @@ import gzip
 from KnowledgeGrapher.databases import databases_config as dbconfig
 from KnowledgeGrapher.databases.config import siderConfig as iconfig
 from KnowledgeGrapher import utils
+from KnowledgeGrapher import mapping as mp
 import re
 
 #############################################
@@ -16,8 +17,8 @@ def parser(download = True):
     drugsource = dbconfig.sources["Drug"]
     directory = os.path.join(dbconfig.databasesDir, drugsource)
     mappingFile = os.path.join(directory, "mapping.tsv")
-    drugmapping = utils.getMappingFromDatabase(mappingFile)
-    diseasemapping = utils.getMappingFromOntology(ontology = "Disease", source = config.SIDER_source)
+    drugmapping = mp.getMappingFromDatabase(mappingFile)
+    phenotypemapping = mp.getMappingFromOntology(ontology = "Phenotype", source = config.SIDER_source)
     
     relationships = set()
     directory = os.path.join(dbconfig.databasesDir,"SIDER")
@@ -30,8 +31,8 @@ def parser(download = True):
         data = line.decode('utf-8').rstrip("\r\n").split("\t")
         drug = re.sub(r'CID\d0+', '', data[1])
         se = data[3]
-        if se in diseasemapping and drug in drugmapping:
-            do = diseasemapping[se]
+        if se in phenotypemapping and drug in drugmapping:
+            do = phenotypemapping[se]
             drug = drugmapping[drug]            
             relationships.add((drug, do, "HAS_SIDE_EFFECT", "SIDER", se))
     associations.close()

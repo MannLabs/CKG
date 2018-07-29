@@ -2,7 +2,7 @@
 databasesDir = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/data/databases/"
 #Databases
 databases = [
-            "Internal",
+            #"Internal",
             "HGNC", 
             "RefSeq", 
             "UniProt", 

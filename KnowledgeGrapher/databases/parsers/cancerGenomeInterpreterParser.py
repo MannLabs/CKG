@@ -4,16 +4,18 @@ from KnowledgeGrapher.databases.config import cancerGenomeInterpreterConfig as i
 from collections import defaultdict
 import zipfile
 from KnowledgeGrapher import utils
+from KnowledgeGrapher import mapping as mp
 
 
 #######################################
 #   The Cancer Genome Interpreter     # 
 #######################################
-def parser(download = True, mapping = {}):
+def parser(download = True):
     regex = r"chr(\d+)\:g\.(\d+)(\w)>(\w)"
     url = iconfig.cancerBiomarkers_url
     entities_header = iconfig.entities_header
     relationships_headers = iconfig.relationships_headers
+    mapping = mp.getMappingFromOntology(ontology = "Disease", source = None)
     
     drugsource = dbconfig.sources["Drug"]
     directory = os.path.join(dbconfig.databasesDir, drugsource)

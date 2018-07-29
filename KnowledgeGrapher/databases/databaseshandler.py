@@ -3,7 +3,6 @@ import gzip
 import databases_config as dbconfig
 from collections import defaultdict
 from KnowledgeGrapher import utils
-from KnowledgeGrapher import mapping as mp
 import csv
 import pandas as pd
 import re
@@ -32,7 +31,6 @@ def write_entities(entities, header, outputfile):
 #       Graph files     # 
 #########################
 def generateGraphFiles(importDirectory, databases):
-    mapping = mp.generateMappingFromReflect()
     for database in databases:
         print(database)
         if database.lower() == "internal":
@@ -49,33 +47,31 @@ def generateGraphFiles(importDirectory, databases):
             #HGNC
             entities, header = hgncParser.parser()
             outputfile = os.path.join(importDirectory, "Gene.csv")            
-            write_entities(genes, header, outputfile)
+            write_entities(entities, header, outputfile)
         elif database.lower() == "refseq":
-            entities, relationships, headers = parser()
+            entities, relationships, headers = refseqParser.parser()
             for entity in entities:
                 header = headers[entity]
                 outputfile = os.path.join(importDirectory, entity+".csv")
-                write_entities(entity, header, outputfile)
+                write_entities(entities[entity], header, outputfile)
             for rel in relationships:
                 header = headers[rel]
                 outputfile = os.path.join(importDirectory, "refseq_"+rel.lower()+".csv")
                 write_relationships(relationships[rel], header, outputfile)
         elif database.lower() == "uniprot":
             #UniProt
-            result = uniprotParser()
+            result = uniprotParser.parser()
             for dataset in result:
                 entities, relationships, entities_header, relationship_header = result[dataset]
                 outputfile = os.path.join(importDirectory, dataset+".csv")
-                with open(outputfile, 'w') as csvfile:
-                    writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
-                    writer.writerow(entities_header)
-                    writer.writerow(entities)
+                write_entities(entities, entities_header, outputfile)
                 for entity, rel in relationships:
                     outputfile = os.path.join(importDirectory, "uniprot_"+entity.lower()+"_"+rel.lower()+".csv")
-                    write_relationships(relationships[(entity,rel)], relationshop_header, outputfile)
+                    write_relationships(relationships[(entity,rel)], relationship_header, outputfile)
         elif database.lower() == "intact":
             #IntAct
             relationships, header, outputfileName = intactParser.parser()
+            print(relationships)
             outputfile = os.path.join(importDirectory, outputfileName)
             write_relationships(relationships, header, outputfile)
         elif database.lower() == "string":
@@ -110,7 +106,7 @@ def generateGraphFiles(importDirectory, databases):
             outputfile = os.path.join(importDirectory, outputfileName)
             write_relationships(relationships, header, outputfile)
         elif database.lower() == "oncokb":
-            entities, relationships, entities_header,  relationships_headers = oncokbParser.parser(mapping = mapping)
+            entities, relationships, entities_header,  relationships_headers = oncokbParser.parser()
             outputfile = os.path.join(importDirectory, "oncokb_Clinically_relevant_variant.csv")
             write_entities(entities, entities_header, outputfile)
             for relationship in relationships:
@@ -121,7 +117,7 @@ def generateGraphFiles(importDirectory, databases):
                     header = ['START_ID', 'END_ID','TYPE']
                 write_relationships(relationships[relationship], header, oncokb_outputfile)
         elif database.lower() == "cancergenomeinterpreter":
-            entities, relationships, entities_header, relationships_headers = cancerGenomeInterpreterParser.parser(mapping = mapping)
+            entities, relationships, entities_header, relationships_headers = cancerGenomeInterpreterParser.parser()
             entity_outputfile = os.path.join(importDirectory, "cgi_Clinically_relevant_variant.csv")
             write_entities(entities, entities_header, entity_outputfile)
             for relationship in relationships:
@@ -159,10 +155,10 @@ def generateGraphFiles(importDirectory, databases):
 
 if __name__ == "__main__":
     generateGraphFiles(importDirectory = '/Users/albertosantos/Downloads/test/', databases = [
-            "Internal",
-            "HGNC", 
-            "RefSeq", 
-            "UniProt", 
+            #"Internal",
+            #"HGNC", 
+            #"RefSeq", 
+            #"UniProt", 
             "IntAct", 
             "DisGEnet", 
             "HGNC", 

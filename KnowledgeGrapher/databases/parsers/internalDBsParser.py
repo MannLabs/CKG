@@ -2,6 +2,7 @@ import os.path
 from KnowledgeGrapher.databases import databases_config as dbconfig
 from KnowledgeGrapher.databases.config import internalDBsConfig as iconfig
 from KnowledgeGrapher import utils
+from KnowledgeGrapher import mapping as mp
 import pandas as pd
 
 #############################################
@@ -11,9 +12,9 @@ import pandas as pd
 def parser(download = True):
     result = {}
     string_url = iconfig.string_url
-    string_mapping = utils.getSTRINGMapping(string_url, download=False)
+    string_mapping = mp.getSTRINGMapping(string_url, download=False)
     for qtype in iconfig.internal_db_types:
-        relationships, entity1, entity2 = parseInternalDatabasePairs(qtype, string_mapping)
+        relationships = parseInternalDatabasePairs(qtype, string_mapping)
         entity1, entity2 = iconfig.internal_db_types[qtype]
         outputfileName =  entity1+"_"+entity2+"_associated_with_integrated.csv"
         header = iconfig.header
@@ -78,9 +79,10 @@ def parsePMClist(download = True):
     
     return entities, header
 
-def parseInternalDatabaseMentions(qtype, mapping, importDirectory, download = True):
+def parseInternalDatabaseMentions(qtype, importDirectory, download = True):
     url = iconfig.internal_db_url
     ifile = iconfig.internal_db_mentions_files[qtype]
+    mapping = mp.getSTRINGMapping(string_url, download=False)
     filters = []
     if qtype in iconfig.internal_db_mentions_filters:
         filters = iconfig.internal_db_mentions_filters[qtype]
