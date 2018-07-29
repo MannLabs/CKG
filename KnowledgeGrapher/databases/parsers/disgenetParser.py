@@ -2,6 +2,7 @@ import os.path
 import gzip
 from KnowledgeGrapher.databases import databases_config as dbconfig
 from KnowledgeGrapher.databases.config import disgenetConfig as iconfig
+from KnowledgeGrapher.ontologies import ontologies_config as oconfig
 from collections import defaultdict
 from KnowledgeGrapher import utils
 
@@ -36,7 +37,8 @@ def parser(download = True):
             if first:
                 first = False
                 continue
-            data = line.rstrip("\r\n").split("\t")
+            print(line)
+            data = line.decode('utf-8').rstrip("\r\n").split("\t")
             geneId = data[0]
             diseaseId = data[2]
             score = float(data[4])
@@ -64,7 +66,7 @@ def readDisGeNetProteinMapping():
             if first:
                 first = False
                 continue
-            data = line.rstrip("\r\n").split("\t")
+            data = line.decode('utf-8').rstrip("\r\n").split("\t")
             identifier = data[0]
             intIdentifier = data[1]
             mapping[intIdentifier].add(identifier)
@@ -84,11 +86,11 @@ def readDisGeNetDiseaseMapping():
             if first:
                 first = False
                 continue
-            data = line.rstrip("\r\n").split("\t")
+            data = line.decode('utf-8').rstrip("\r\n").split("\t")
             identifier = data[0]
             vocabulary = data[2]
             code = data[3]
-            if vocabulary == onto_config.ontologies["Disease"]:
+            if vocabulary == oconfig.ontologies["Disease"]:
                 mapping[identifier].add(code)
             else:
                 synonyms[identifier].add(code)

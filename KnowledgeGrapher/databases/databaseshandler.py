@@ -159,7 +159,7 @@ if __name__ == "__main__":
             #"HGNC", 
             #"RefSeq", 
             #"UniProt", 
-            "IntAct", 
+            #"IntAct", 
             "DisGEnet", 
             "HGNC", 
             'DrugBank',
