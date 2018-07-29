@@ -1,6 +1,8 @@
 from KnowledgeGrapher.ontologies import ontologies_config as oconfig
 from KnowledgeGrapher.databases import databases_config as dbconfig
 import os.path
+from collections import defaultdict
+import re
 
 def generateMappingFromReflect():
     types = [-26,-25]
@@ -30,7 +32,7 @@ def generateMappingFromReflect():
     return mapping
 
 
-def getMappingFromOntology(ontology, source):
+def getMappingFromOntology(ontology, source = None):
     mapping = {}
     ont = oconfig.ontologies[ontology]
     dirFile = os.path.join(oconfig.ontologiesDirectory,ont)
@@ -38,7 +40,7 @@ def getMappingFromOntology(ontology, source):
     with open(dataFile, 'r') as f:
         for line in f:
             data = line.rstrip("\r\n").split("\t")
-            if data[1] == source:
+            if data[1] == source or source is None:
                 mapping[data[2]] = data[0]
 
     return mapping
@@ -80,9 +82,11 @@ def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True):
     return mapping
 
 def buildMappingFromOBO(oboFile, ontology):
-    outputDir = os.path.join(oconfig.ontologiesDirectory, oconfig.ontologies[ontology])
+    print(oboFile)
+    outputDir = os.path.join(oconfig.ontologiesDirectory, ontology)
     outputFile = os.path.join(outputDir, "mapping.tsv")
     identifiers = defaultdict(list)
+    re_synonyms = r'\"(.+)\"'
     with open(oboFile, 'r') as f:
         for line in f:
             if line.startswith("id:"):
@@ -91,6 +95,11 @@ def buildMappingFromOBO(oboFile, ontology):
                 source_ref = line.rstrip("\r\n").split(":")[1:]
                 if len(source_ref) == 2:
                     identifiers[ident.strip()].append((source_ref[0].strip(), source_ref[1]))
+            if line.startswith("synonym:"):
+                synonym_type = "".join(line.rstrip("\r\n").split(":")[1:])
+                matches = re.search(re_synonyms, synonym_type)
+                if matches:
+                     identifiers[ident.strip()].append(("SYN",matches.group(1)))
     with open(outputFile, 'w') as out:
         for ident in identifiers:
             for source, ref in identifiers[ident]:

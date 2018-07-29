@@ -158,24 +158,24 @@ def generateGraphFiles(importDirectory, databases):
 
 
 if __name__ == "__main__":
-    generateGraphFiles(importDirectory = '~/Downloads/test/', databases = [
+    generateGraphFiles(importDirectory = '/Users/albertosantos/Downloads/test/', databases = [
             "Internal",
-            #"HGNC", 
-            #"RefSeq", 
-            #"UniProt", 
-            #"IntAct", 
-            #"DisGEnet", 
-            #"HGNC", 
-            #'DrugBank',
-            #"DGIdb", 
-            #"OncoKB", 
-            #"STRING", 
-            #"STITCH", 
-            #"Mentions", 
-            #"OncoKB",
-            #"CancerGenomeInterpreter", 
-            #"SIDER",
-            #"HMDB",
-            #"PathwayCommons",
-            #'GWASCatalog'
+            "HGNC", 
+            "RefSeq", 
+            "UniProt", 
+            "IntAct", 
+            "DisGEnet", 
+            "HGNC", 
+            'DrugBank',
+            "DGIdb", 
+            "OncoKB", 
+            "STRING", 
+            "STITCH", 
+            "Mentions", 
+            "OncoKB",
+            "CancerGenomeInterpreter", 
+            "SIDER",
+            "HMDB",
+            "PathwayCommons",
+            'GWASCatalog'
             ])

@@ -1,5 +1,6 @@
 import urllib
 import ontologies_config as config
+from KnowledgeGrapher import mapping as mp
 from parsers import *
 import os.path
 from collections import defaultdict
@@ -64,6 +65,7 @@ def parseOntology(ontology):
         ontologyData = icdParser.parser(ontologyFiles)
     if ontology in ["DO","BTO","PSI-MOD", "HPO", "GO","PSI-MS"]:
         ontologyData = oboParser.parser(ontology, ontologyFiles)
+        mp.buildMappingFromOBO(ontologyFiles.pop(), ontology)
    
     return ontologyData
     

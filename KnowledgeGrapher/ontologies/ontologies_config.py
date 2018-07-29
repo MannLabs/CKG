@@ -32,8 +32,8 @@ files = {-26: ["DO/do.obo"],
                "SNOMED-CT/Full/Terminology/sct2_Relationship_Full_INT_20170731.txt", 
                "SNOMED-CT/Full/Terminology/sct2_TextDefinition_Full-en_INT_20170731.txt"
               ],
-        -41: ["PSI/psi-mod.obo.txt"],
-        -42: ["PSI/psi-ms.obo.txt"],
+        -41: ["PSI-MOD/psi-mod.obo.txt"],
+        -42: ["PSI-MS/psi-ms.obo.txt"],
         -44: ["HPO/hp.obo",
               "phenotype_annotation_hpoteam.tab",
               "ALL_SOURCES_ALL_FREQUENCIES_genes_to_phenotype.txt"
