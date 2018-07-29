@@ -3,6 +3,7 @@ import gzip
 import databases_config as dbconfig
 from collections import defaultdict
 from KnowledgeGrapher import utils
+from KnowledgeGrapher import mapping as mp
 import csv
 import pandas as pd
 import re
@@ -31,7 +32,7 @@ def write_entities(entities, header, outputfile):
 #       Graph files     # 
 #########################
 def generateGraphFiles(importDirectory, databases):
-    mapping = utils.getMapping()
+    mapping = mp.generateMappingFromReflect()
     for database in databases:
         print(database)
         if database.lower() == "internal":

@@ -7,7 +7,8 @@ from Bio import Medline
 import os.path
 import collections
 import pprint
-from KnowledgeGrapher import mapping as mp
+import obonet
+from KnowledgeGrapher.ontologies import ontologies_config as config
 
 def downloadDB(databaseURL, extraFolder =""):
     directory = os.path.join(config.databasesDir,extraFolder)
@@ -60,52 +61,6 @@ def getMedlineAbstracts(idList):
 
     return results
 
-def getMapping():
-    mapping = mp.generateMappingFromReflect()
-
-    return mapping
-
-def getMappingFromOntology(ontology, source):
-    mapping = mp.getMappingFromOntology(ontology, source)
-
-    return mapping
-
-def getMappingFromDatabase(mappingFile):
-    mapping = {}
-    with open(mappingFile, 'r') as mf:
-        for line in mf:
-            data = line.rstrip("\r\n")
-            ident = data[0]
-            alias = data[1]
-            mapping[alias] = ident
-
-    return mapping
-
-def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True):
-    mapping = collections.defaultdict(set)
-    
-    directory = os.path.join(config.databasesDir, "STRING")
-    fileName = os.path.join(directory, url.split('/')[-1])
-
-    if download:
-        downloadDB(url, "STRING")
-    
-    f = os.path.join(directory, fileName)
-    mf = gzip.open(f, 'r')
-    first = True
-    for line in mf:
-        if first:
-            first = False
-            continue
-        data = line.decode('utf-8').rstrip("\r\n").split("\t")
-        stringID = data[0]
-        alias = data[1]
-        sources = data[2].split(' ')
-        if source in sources:
-            mapping[stringID].add(alias)
-        
-    return mapping
-
 def listDirectoryFiles(directory):
     from os import listdir
     from os.path import isfile, join
@@ -144,3 +99,9 @@ def flatten(t):
 def pretty_print(data):
     pp = pprint.PrettyPrinter(indent=4)
     pp.pprint(data)
+
+def convertOBOtoNet(ontologyFile):
+    graph = obonet.read_obo(ontologyFile)
+    
+    return graph
+

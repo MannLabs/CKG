@@ -1,10 +1,11 @@
-from KnowledgeGrapher.ontologies import ontologies_config as config
+from KnowledgeGrapher.ontologies import ontologies_config as oconfig
+from KnowledgeGrapher.databases import databases_config as dbconfig
 import os.path
 
 def generateMappingFromReflect():
     types = [-26,-25]
-    ofiles = config.files
-    odir = config.ontologiesDirectory
+    ofiles = oconfig.files
+    odir = oconfig.ontologiesDirectory
     mapping = {}
     for t in types:
         files = ofiles[t]
@@ -31,8 +32,8 @@ def generateMappingFromReflect():
 
 def getMappingFromOntology(ontology, source):
     mapping = {}
-    ont = config.ontologies[ontology]
-    dirFile = os.path.join(config.ontologiesDirectory,ont)
+    ont = oconfig.ontologies[ontology]
+    dirFile = os.path.join(oconfig.ontologiesDirectory,ont)
     dataFile = os.path.join(dirFile,"mapping.tsv")
     with open(dataFile, 'r') as f:
         for line in f:
@@ -41,3 +42,56 @@ def getMappingFromOntology(ontology, source):
                 mapping[data[2]] = data[0]
 
     return mapping
+
+def getMappingFromDatabase(mappingFile):
+    mapping = {}
+    with open(mappingFile, 'r') as mf:
+        for line in mf:
+            data = line.rstrip("\r\n")
+            ident = data[0]
+            alias = data[1]
+            mapping[alias] = ident
+
+    return mapping
+
+def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True):
+    mapping = collections.defaultdict(set)
+    
+    directory = os.path.join(dbconfig.databasesDir, "STRING")
+    fileName = os.path.join(directory, url.split('/')[-1])
+
+    if download:
+        downloadDB(url, "STRING")
+    
+    f = os.path.join(directory, fileName)
+    mf = gzip.open(f, 'r')
+    first = True
+    for line in mf:
+        if first:
+            first = False
+            continue
+        data = line.decode('utf-8').rstrip("\r\n").split("\t")
+        stringID = data[0]
+        alias = data[1]
+        sources = data[2].split(' ')
+        if source in sources:
+            mapping[stringID].add(alias)
+        
+    return mapping
+
+def buildMappingFromOBO(oboFile, ontology):
+    outputDir = os.path.join(oconfig.ontologiesDirectory, oconfig.ontologies[ontology])
+    outputFile = os.path.join(outputDir, "mapping.tsv")
+    identifiers = defaultdict(list)
+    with open(oboFile, 'r') as f:
+        for line in f:
+            if line.startswith("id:"):
+                ident = ":".join(line.rstrip("\r\n").split(":")[1:])
+            if line.startswith("xref:"):
+                source_ref = line.rstrip("\r\n").split(":")[1:]
+                if len(source_ref) == 2:
+                    identifiers[ident.strip()].append((source_ref[0].strip(), source_ref[1]))
+    with open(outputFile, 'w') as out:
+        for ident in identifiers:
+            for source, ref in identifiers[ident]:
+                out.write(ident+"\t"+source+"\t"+ref+"\n")
