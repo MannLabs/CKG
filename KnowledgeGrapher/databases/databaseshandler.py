@@ -99,7 +99,10 @@ def generateGraphFiles(importDirectory, databases):
             outputfile = os.path.join(importDirectory, outputfileName)           
             write_relationships(relationships, header, outputfile)
         elif database.lower() == "sider":
-            relationships,header, outputfileName = siderParser.parser()
+            relationships,header, outputfileName, drugMapping, phenotypeMapping = siderParser.parser()
+            outputfile = os.path.join(importDirectory, outputfileName)
+            write_relationships(relationships, header, outputfile)
+            relationships, header, outputfileName = parserIndications(drugMapping, phenotypeMapping, download = True)
             outputfile = os.path.join(importDirectory, outputfileName)
             write_relationships(relationships, header, outputfile)
         elif database.lower() == "oncokb":
@@ -161,14 +164,13 @@ if __name__ == "__main__":
             #'DrugBank',
             #"DGIdb", 
             #"OncoKB", 
-            "STRING", 
+            #"STRING", 
             #"STITCH", 
-            "Mentions", 
-            "OncoKB",
-            "CancerGenomeInterpreter", 
-            "SIDER",
+            #"CancerGenomeInterpreter", 
+            #"SIDER",
             "HMDB",
             "PathwayCommons",
-            'GWASCatalog'
+            'GWASCatalog',
+            "Mentions" 
             ])
 

@@ -5,6 +5,7 @@ from collections import defaultdict
 import zipfile
 from KnowledgeGrapher import utils
 from KnowledgeGrapher import mapping as mp
+import re
 
 
 #######################################
@@ -20,7 +21,7 @@ def parser(download = True):
     drugsource = dbconfig.sources["Drug"]
     directory = os.path.join(dbconfig.databasesDir, drugsource)
     mappingFile = os.path.join(directory, "mapping.tsv")
-    drugmapping = utils.getMappingFromDatabase(mappingFile)
+    drugmapping = mp.getMappingFromDatabase(mappingFile)
     
     fileName = iconfig.cancerBiomarkers_variant_file
     relationships = defaultdict(set)
@@ -38,7 +39,7 @@ def parser(download = True):
                     if first:
                         first = False
                         continue
-                    data = line.rstrip("\r\n").split("\t")
+                    data = line.decode('utf-8').rstrip("\r\n").split("\t")
                     alteration = data[0]
                     alterationType = data[1]
                     association = data[3]

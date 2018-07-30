@@ -43,7 +43,7 @@ def getMappingFromOntology(ontology, source = None):
         for line in f:
             data = line.rstrip("\r\n").split("\t")
             if data[1] == source or source is None:
-                mapping[data[2]] = data[0]
+                mapping[data[2].lower()] = data[0]
 
     return mapping
 

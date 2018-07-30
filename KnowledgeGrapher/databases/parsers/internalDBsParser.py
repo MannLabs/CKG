@@ -81,6 +81,7 @@ def parsePMClist(download = True):
 
 def parseInternalDatabaseMentions(qtype, importDirectory, download = True):
     url = iconfig.internal_db_url
+    string_url = iconfig.string_url
     ifile = iconfig.internal_db_mentions_files[qtype]
     mapping = mp.getSTRINGMapping(string_url, download=False)
     filters = []
