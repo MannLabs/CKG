@@ -101,4 +101,4 @@ def generateGraphFiles(importDirectory, ontologies=None):
                                 line_terminator='\n', escapechar='\\')
 
 if __name__ == "__main__":
-    generateGraphFiles("/Users/albertosantos/Downloads/test/")
+    pass

@@ -156,23 +156,4 @@ def generateGraphFiles(importDirectory, databases = None):
 
 
 if __name__ == "__main__":
-    generateGraphFiles(importDirectory = '/Users/albertosantos/Downloads/test/', databases = [
-            #"Internal",
-            #"HGNC", 
-            #"RefSeq", 
-            #"UniProt", 
-            #"IntAct", 
-            #"DisGEnet", 
-            #'DrugBank',
-            #"DGIdb", 
-            #"OncoKB", 
-            #"STRING", 
-            #"STITCH", 
-            #"CancerGenomeInterpreter", 
-            #"SIDER",
-            #"HMDB",
-            #"PathwayCommons",
-            #'GWASCatalog',
-            "Mentions" 
-            ])
-
+    pass
