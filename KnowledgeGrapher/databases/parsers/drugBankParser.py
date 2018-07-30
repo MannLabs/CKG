@@ -12,9 +12,9 @@ from KnowledgeGrapher import utils
 #########################
 def parser():
     drugs = extract_drugs()
+    build_DrugBank_dictionary(drugs)
     relationships = build_relationships_from_DrugBank(drugs)
-    entities, attributes = build_metabolite_entity(drugs)
-    entity_outputfile = os.path.join(importDirectory, "Drug.csv")
+    entities, attributes = build_drug_entity(drugs)
     entities_header = ['ID'] + attributes
     relationships_headers = iconfig.relationships_headers
     
@@ -60,7 +60,7 @@ def extract_drugs():
                 if "drugbank-id" in values and len(values) > 2:
                     if values["drugbank-id"] in vocabulary:
                         values["id"] = vocabulary[values["drugbank-id"]]
-                        synonyms.append(values["drugbank-id"])
+                        synonyms.add(values["drugbank-id"])
                         #values["alt_drugbank-id"] = vocabulary[values['id']]
                         values["synonyms"] = list(synonyms)
                         drugs[values["id"]] = values

@@ -37,19 +37,21 @@ def parser(download = True):
             if first:
                 first = False
                 continue
-            print(line)
-            data = line.decode('utf-8').rstrip("\r\n").split("\t")
-            geneId = data[0]
-            diseaseId = data[2]
-            score = float(data[4])
-            pmids = data[5]
-            source = data[scorePos]
-            if geneId in proteinMapping:
-                for identifier in proteinMapping[geneId]:
-                    if diseaseId in diseaseMapping:
-                        for code in diseaseMapping[diseaseId]:
-                            code = "DOID:"+code
-                            relationships[idType].add((identifier, code,"ASSOCIATED_WITH", score, atype, "DisGeNet: "+source, pmids))
+            try:
+                data = line.decode('utf-8').rstrip("\r\n").split("\t")
+                geneId = data[0]
+                diseaseId = data[2]
+                score = float(data[4])
+                pmids = data[5]
+                source = data[scorePos]
+                if geneId in proteinMapping:
+                    for identifier in proteinMapping[geneId]:
+                        if diseaseId in diseaseMapping:
+                            for code in diseaseMapping[diseaseId]:
+                                code = "DOID:"+code
+                                relationships[idType].add((identifier, code,"ASSOCIATED_WITH", score, atype, "DisGeNet: "+source, pmids))
+            except UnicodeDecodeError:
+                continue
         associations.close()
     return (relationships,header,outputfileName)
     

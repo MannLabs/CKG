@@ -71,24 +71,19 @@ def generateGraphFiles(importDirectory, databases):
         elif database.lower() == "intact":
             #IntAct
             relationships, header, outputfileName = intactParser.parser()
-            print(relationships)
             outputfile = os.path.join(importDirectory, outputfileName)
             write_relationships(relationships, header, outputfile)
         elif database.lower() == "string":
             #STRING
-            relationships, header, outputfileName = stringParser.parser()
-            outputfile = os.path.join(importDirectory, outputfileName)
-            write_relationships(relationships, header, outputfile)
+            stringParser.parser(importDirectory)
         elif database.lower() == "stitch":
             #STITCH
-            relationships, header, outputfileName = stringParser.parser(db="STITCH")
-            outputfile = os.path.join(importDirectory, outputfileName)
-            write_relationships(relationships, header, outputfile)
+            stringParser.parser(importDirectory, db="STITCH")
         elif database.lower() == "disgenet":
             #DisGeNet
             relationships, header, outputfileName = disgenetParser.parser()
             for idType in relationships:
-                outputfile = os.path.join(importDirectory, dtype+"_"+outputfileName)
+                outputfile = os.path.join(importDirectory, idType+"_"+outputfileName)
                 write_relationships(relationships[idType], header, outputfile)
         elif database.lower() == "pathwaycommons":
             #PathwayCommons pathways
@@ -160,12 +155,11 @@ if __name__ == "__main__":
             #"RefSeq", 
             #"UniProt", 
             #"IntAct", 
-            "DisGEnet", 
-            "HGNC", 
-            'DrugBank',
-            "DGIdb", 
-            "OncoKB", 
-            "STRING", 
+            #"DisGEnet", 
+            #'DrugBank',
+            #"DGIdb", 
+            #"OncoKB", 
+            #"STRING", 
             "STITCH", 
             "Mentions", 
             "OncoKB",
@@ -175,3 +169,4 @@ if __name__ == "__main__":
             "PathwayCommons",
             'GWASCatalog'
             ])
+

@@ -18,12 +18,12 @@ def parser(download = False):
     drugsource = dbconfig.sources["Drug"]
     directory = os.path.join(dbconfig.databasesDir, drugsource)
     mappingFile = os.path.join(directory, "mapping.tsv")
-    drugmapping = utils.getMappingFromDatabase(mappingFile)
+    drugmapping = mp.getMappingFromDatabase(mappingFile)
 
     levels = iconfig.OncoKB_levels
     entities = set()
     relationships = defaultdict(set)
-    directory = os.path.join(config.databasesDir,"OncoKB")
+    directory = os.path.join(dbconfig.databasesDir,"OncoKB")
     acfileName = os.path.join(directory,url_actionable.split('/')[-1])
     anfileName = os.path.join(directory,url_annotated.split('/')[-1])
     if download:

@@ -1,5 +1,6 @@
 from KnowledgeGrapher.ontologies import ontologies_config as oconfig
 from KnowledgeGrapher.databases import databases_config as dbconfig
+from KnowledgeGrapher import utils
 import os.path
 from collections import defaultdict
 import re
@@ -57,14 +58,14 @@ def getMappingFromDatabase(mappingFile):
 
     return mapping
 
-def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True):
+def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True, db = "STRING"):
     mapping = defaultdict(set)
     
-    directory = os.path.join(dbconfig.databasesDir, "STRING")
+    directory = os.path.join(dbconfig.databasesDir, db)
     fileName = os.path.join(directory, url.split('/')[-1])
 
     if download:
-        downloadDB(url, "STRING")
+        utils.downloadDB(url, "STRING")
     
     f = os.path.join(directory, fileName)
     mf = gzip.open(f, 'r')
@@ -74,10 +75,15 @@ def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True):
             first = False
             continue
         data = line.decode('utf-8').rstrip("\r\n").split("\t")
-        stringID = data[0]
-        alias = data[1]
-        sources = data[2].split(' ')
-        if source in sources:
+        if db == "STRING":
+            stringID = data[0]
+            alias = data[1]
+            sources = data[2].split(' ')
+        else:
+            stringID = data[0]
+            alias = data[2]
+            sources = data[3].split(' ')
+        if source in sources and alias.startswith('DB'):
             mapping[stringID].add(alias)
         
     return mapping
@@ -105,3 +111,4 @@ def buildMappingFromOBO(oboFile, ontology):
         for ident in identifiers:
             for source, ref in identifiers[ident]:
                 out.write(ident+"\t"+source+"\t"+ref+"\n")
+

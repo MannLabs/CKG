@@ -2,6 +2,7 @@ import os.path
 from KnowledgeGrapher.databases import databases_config as dbconfig
 from KnowledgeGrapher.databases.config import drugGeneInteractionDBConfig as iconfig
 from KnowledgeGrapher import utils
+from KnowledgeGrapher import mapping as mp 
 
 ############################################
 #   The Drug Gene Interaction Database     # 
@@ -14,7 +15,7 @@ def parser(download = True):
     drugsource = dbconfig.sources["Drug"]
     directory = os.path.join(dbconfig.databasesDir, drugsource)
     mappingFile = os.path.join(directory, "mapping.tsv")
-    drugmapping = utils.getMappingFromDatabase(mappingFile)
+    drugmapping = mp.getMappingFromDatabase(mappingFile)
 
     relationships = set()
     directory = os.path.join(dbconfig.databasesDir,"DGIdb")
