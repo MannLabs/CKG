@@ -36,6 +36,7 @@ def parseInternalDatabasePairs(qtype, mapping, download = True):
     source = iconfig.internal_db_sources[qtype]
     relationships = set()
     directory = os.path.join(dbconfig.databasesDir, "InternalDatabases")
+    utils.checkDirectory(directory)
     if download:
         utils.downloadDB(url.replace("FILE", ifile), os.path.join(directory,"integration"))
     ifile = os.path.join(directory,os.path.join("integration",ifile))
@@ -73,7 +74,7 @@ def parsePMClist(download = True):
     entities = entities.set_index(list(entities.columns)[0])
     entities['linkout'] = [plinkout.replace("PUBMEDID", str(int(pubmedid))) for pubmedid in list(entities.index)]
     entities.index = entities.index.rename('ID')
-    entitites = entities.reset_index()
+    entities = entities.reset_index()
     header = list(entities.columns)
     entities = list(entities.itertuples(index=False)) 
     
@@ -82,8 +83,12 @@ def parsePMClist(download = True):
 def parseInternalDatabaseMentions(qtype, importDirectory, download = True):
     url = iconfig.internal_db_url
     string_url = iconfig.string_url
+    stitch_url = iconfig.stitch_url
     ifile = iconfig.internal_db_mentions_files[qtype]
-    mapping = mp.getSTRINGMapping(string_url, download=False)
+    if qtype == "9606":
+        mapping = mp.getSTRINGMapping(string_url, download=False)
+    elif qtype == "-1":
+        mapping = mp.getSTRINGMapping(stitch_url, source = dbconfig.internal_db_sources["Drug"], download = False, db = "STITCH")
     filters = []
     if qtype in iconfig.internal_db_mentions_filters:
         filters = iconfig.internal_db_mentions_filters[qtype]
@@ -92,7 +97,7 @@ def parseInternalDatabaseMentions(qtype, importDirectory, download = True):
     relationships = pd.DataFrame()
     directory = os.path.join(dbconfig.databasesDir, "InternalDatabases")
     if download:
-        downloadDB(url.replace("FILE", ifile), os.path.join(directory,"textmining"))
+        utils.downloadDB(url.replace("FILE", ifile), os.path.join(directory,"textmining"))
     ifile = os.path.join(directory,os.path.join("textmining",ifile))
     with open(outputfile,'a') as f:
         f.write("START_ID,END_ID,TYPE\n")
@@ -108,6 +113,9 @@ def parseInternalDatabaseMentions(qtype, importDirectory, download = True):
                         ident = mapping[id1]
                     else:
                         continue
+                elif qtype == "-1":
+                    if id1 in mapping:
+                        ident = mapping[id1]
                 else:
                     ident = [id1]
                 for i in ident:

@@ -33,6 +33,7 @@ def parser(importDirectory, download = True, db="STRING"):
         outputfile = os.path.join(importDirectory, "STRING_interacts_with.csv")
         url = iconfig.STRING_url
     directory = os.path.join(dbconfig.databasesDir, db)
+    utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
 
     if download:
@@ -85,6 +86,7 @@ def parseActions(importDirectory, proteinMapping, drugMapping = None, download =
         outputfile = os.path.join(importDirectory, "STITCH_drug_acts_on_protein.csv")
     
     directory = os.path.join(dbconfig.databasesDir, db)
+    utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
         utils.downloadDB(url, db)

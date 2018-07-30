@@ -12,6 +12,7 @@ def parser(download = True):
     entities = set()
     relationships = set()
     directory = os.path.join(dbconfig.databasesDir, "PathwayCommons")
+    utils.checkDirectory(directory)
     fileName = url.split('/')[-1]
     entities_header = iconfig.pathways_header
     relationships_header = iconfig.relationships_header
@@ -38,4 +39,4 @@ def parser(download = True):
             relationships.add((protein, code, "ANNOTATED_IN_PATHWAY", "", linkout, "PathwayCommons: "+source))
 
     associations.close()
-    return entities, relationships
+    return (entities, relationships, entities_header, relationships_header)

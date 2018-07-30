@@ -11,6 +11,7 @@ def parser(download = True):
     entities = set()
     relationships = set()
     directory = os.path.join(dbconfig.databasesDir,"HGNC")
+    utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     taxid = 9606
     entities_header = iconfig.header

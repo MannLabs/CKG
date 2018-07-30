@@ -24,6 +24,7 @@ def parser(download = False):
     entities = set()
     relationships = defaultdict(set)
     directory = os.path.join(dbconfig.databasesDir,"OncoKB")
+    utils.checkDirectory(directory)
     acfileName = os.path.join(directory,url_actionable.split('/')[-1])
     anfileName = os.path.join(directory,url_annotated.split('/')[-1])
     if download:

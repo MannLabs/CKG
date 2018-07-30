@@ -14,7 +14,7 @@ def parser(download= True, mapping = {}):
     relationships_header = iconfig.relationships_header
     entities = set()
     relationships = defaultdict(set)
-    directory = os.path.join(iconfig.databasesDir,"GWAScatalog")
+    directory = os.path.join(dbconfig.databasesDir,"GWAScatalog")
     utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
@@ -41,4 +41,4 @@ def parser(download= True, mapping = {}):
             if pubmedid != "":
                 relationships["published_in_publication"].add((study, pubmedid, "PUBLISHED_IN", "GWAS Catalog"))
     
-    return (entities, relationships, entities_header, relationship_header)
+    return (entities, relationships, entities_header, relationships_header)

@@ -14,6 +14,7 @@ def parser(download = True):
     files = iconfig.disgenet_files
     url = iconfig.disgenet_url
     directory = os.path.join(dbconfig.databasesDir,"disgenet")
+    utils.checkDirectory(directory)
     header = iconfig.disgenet_header
     outputfileName = iconfig.outputfileName
 

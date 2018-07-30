@@ -13,12 +13,12 @@ from KnowledgeGrapher import mapping as mp
 #################################
 def parser(download = True):
     metabolites = extract_metabolites(download)
-    mapping = mp.generateMappingFromReflect()
+    mapping = mp.getMappingFromOntology(ontology = "Disease", source = iconfig.HMDB_DO_source)
+    mapping.update(mp.getMappingFromOntology(ontology = "Tissue", source = None))
     entities, attributes =  build_metabolite_entity(metabolites)
     relationships = build_relationships_from_HMDB(metabolites, mapping)
-    entity_outputfile = os.path.join(importDirectory, "Metabolite.csv")
     entities_header = ['ID'] + attributes
-    relationships_header = iconfig.relationship_header
+    relationships_header = iconfig.relationships_header
     
     return (entities, relationships, entities_header, relationships_header)
 
@@ -28,6 +28,7 @@ def extract_metabolites(download = True):
     url = iconfig.HMDB_url
     relationships = set()
     directory = os.path.join(dbconfig.databasesDir,"HMDB")
+    utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
         utils.downloadDB(url, "HMDB")
@@ -80,7 +81,6 @@ def build_metabolite_entity(metabolites):
     return entities, attributes
     
 def build_relationships_from_HMDB(metabolites, mapping):
-    mapping.update(mp.getMappingFromOntology(ontology = "Disease", source = config.HMDB_DO_source))
     relationships = defaultdict(list)
     associations = iconfig.HMDB_associations
     for metid in metabolites:

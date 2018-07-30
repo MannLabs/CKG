@@ -27,6 +27,7 @@ def parser(download = True):
     relationships = defaultdict(set)
     entities = set()
     directory = os.path.join(dbconfig.databasesDir,"CancerGenomeInterpreter")
+    utils.checkDirectory(directory)
     zipFile = os.path.join(directory, url.split('/')[-1])
 
     if download:

@@ -1,8 +1,9 @@
 #Database directory
 databasesDir = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/data/databases/"
+databasesImportDir = "databases"
 #Databases
 databases = [
-            #"Internal",
+            "Internal",
             "HGNC", 
             "RefSeq", 
             "UniProt", 

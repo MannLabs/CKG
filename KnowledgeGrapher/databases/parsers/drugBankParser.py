@@ -26,6 +26,7 @@ def extract_drugs():
     relationships = set()
     url = iconfig.DrugBank_url
     directory = os.path.join(dbconfig.databasesDir,"DrugBank")
+    utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     fields = iconfig.DrugBank_fields
     parentFields = iconfig.DrugBank_parentFields

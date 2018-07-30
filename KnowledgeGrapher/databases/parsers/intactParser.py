@@ -17,6 +17,7 @@ def parser(download = False):
     taxid_regex =  r"\:(\d+)"
     url = iconfig.intact_psimitab_url
     directory = os.path.join(dbconfig.databasesDir,"Intact")
+    utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
         utils.downloadDB(url, "Intact")

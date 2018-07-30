@@ -13,6 +13,7 @@ def parser(download = False):
     entities = defaultdict(set)
     relationships = defaultdict(set)
     directory = os.path.join(dbconfig.databasesDir,"RefSeq")
+    utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     headers = iconfig.headerEntities
     taxid = 9606

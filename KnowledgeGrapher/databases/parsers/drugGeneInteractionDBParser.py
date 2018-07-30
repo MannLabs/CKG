@@ -19,6 +19,7 @@ def parser(download = True):
 
     relationships = set()
     directory = os.path.join(dbconfig.databasesDir,"DGIdb")
+    utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
         utils.downloadDB(url, "DGIdb")

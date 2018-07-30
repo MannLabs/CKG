@@ -168,9 +168,9 @@ if __name__ == "__main__":
             #"STITCH", 
             #"CancerGenomeInterpreter", 
             #"SIDER",
-            "HMDB",
-            "PathwayCommons",
-            'GWASCatalog',
+            #"HMDB",
+            #"PathwayCommons",
+            #'GWASCatalog',
             "Mentions" 
             ])
 
