@@ -65,7 +65,7 @@ def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True, db = "ST
     fileName = os.path.join(directory, url.split('/')[-1])
 
     if download:
-        utils.downloadDB(url, "STRING")
+        utils.downloadDB(url, db)
     
     f = os.path.join(directory, fileName)
     mf = gzip.open(f, 'r')
@@ -83,7 +83,10 @@ def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True, db = "ST
             stringID = data[0]
             alias = data[2]
             sources = data[3].split(' ')
-        if source in sources and alias.startswith('DB'):
+            if not alias.startswith('DB'):
+                continue
+        
+        if source in sources:
             mapping[stringID].add(alias)
         
     return mapping

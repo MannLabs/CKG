@@ -26,7 +26,7 @@ def parserMentions(importDirectory,download = True):
     entities, header = parsePMClist()
     outputfileName = "Publications.csv"
     for qtype in iconfig.internal_db_mentions_types:
-        parseInternalDatabaseMentions(qtype, mapping, importDirectory)
+        parseInternalDatabaseMentions(qtype, importDirectory)
 
     return (entities, header, outputfileName)
 

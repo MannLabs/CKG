@@ -51,7 +51,6 @@ def parser(importDirectory, download = True, db="STRING"):
             data = line.decode('utf-8').rstrip("\r\n").split()
             intA = data[0]
             intB = data[1]
-            print(intA, intB)
             scores = data[2:]
             fscores = [str(float(score)/1000) for score in scores]
             if db == "STRING":
@@ -61,26 +60,30 @@ def parser(importDirectory, download = True, db="STRING"):
                             row = (aliasA, aliasB, relationship, "association", db, ",".join(evidences), ",".join(fscores[0:-1]), fscores[-1])
                             writer.writerow(row)
             elif db == "STITCH":
-                print(intA in drugmapping, intB in mapping, float(fscores[-1])>=cutoff)
                 if intA in drugmapping and intB in mapping and float(fscores[-1])>=cutoff:
                     for aliasA in drugmapping[intA]:
-                        print(aliasA)
                         for aliasB in mapping[intB]:
                             row = (aliasA, aliasB, relationship, "association", db, ",".join(evidences), ",".join(fscores[0:-1]), fscores[-1])
                             writer.writerow(row)
     associations.close()
 
+    return mapping, drugmapping
 
 
-def parseActions(db="STRING"):
+
+def parseActions(importDirectory, proteinMapping, drugMapping = None, download = True, db="STRING"):
     url = None
-    actions = defaultdict(set)
+    bool_dict = {'t':True, 'T':True, 'True':True, 'TRUE': True, 'f':False, 'F':False, 'False': False, 'FALSE':False}
+    header = iconfig.header_actions
+    relationship = "COMPILED_ACTS_ON"
 
     if db == "STRING":
         url = iconfig.STRING_actions_url
-    if db == "STITCH":
+        outputfile = os.path.join(importDirectory, "STRING_protein_acts_on_protein.csv")
+    elif db == "STITCH":
         url = iconfig.STITCH_actions_url
-
+        outputfile = os.path.join(importDirectory, "STITCH_drug_acts_on_protein.csv")
+    
     directory = os.path.join(dbconfig.databasesDir, db)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
@@ -89,9 +92,29 @@ def parseActions(db="STRING"):
     f = os.path.join(directory, fileName)
     associations = gzip.open(f, 'r')
     first = True
-    for line in associations:
-        if first:
-            first = False
-            continue
-        data = line.decode('utf-8').rstrip("\r\n").split()
-        actions[(data[0],data[1])].add((data[2],data[3]))
+    with open(outputfile, 'w') as csvfile:
+        writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
+        writer.writerow(header)
+        for line in associations:
+            if first:
+                first = False
+                continue
+            data = line.decode('utf-8').rstrip("\r\n").split()
+            intA = data[0]
+            intB = data[1]
+            action = data[2]
+            score = float(data[-1])/1000
+            directionality = bool_dict[data[-3]] if db == "STRING" else True
+            
+            if intB in proteinMapping:
+                aliasesA = []
+                if intA in drugMapping:
+                    aliasesA = drugMapping[intA]
+                elif intA in proteinMapping:
+                    aliasesA = proteinMapping[intA]
+
+                for aliasA in aliasesA:
+                    for aliasB in proteinMapping[intB]:
+                        row = (aliasA, aliasB, relationship, action, directionality, score, db)
+                        writer.writerow(row)
+    associations.close()

@@ -75,10 +75,12 @@ def generateGraphFiles(importDirectory, databases):
             write_relationships(relationships, header, outputfile)
         elif database.lower() == "string":
             #STRING
-            stringParser.parser(importDirectory)
+            proteinMapping, drugMapping = stringParser.parser(importDirectory)
+            stringParser.parseActions(importDirectory, proteinMapping, drugMapping, download = True, db="STRING")
         elif database.lower() == "stitch":
             #STITCH
-            stringParser.parser(importDirectory, db="STITCH")
+            proteinMapping, drugMapping = stringParser.parser(importDirectory, db="STITCH")
+            stringParser.parseActions(importDirectory, proteinMapping, drugMapping, download = True, db="STITCH")
         elif database.lower() == "disgenet":
             #DisGeNet
             relationships, header, outputfileName = disgenetParser.parser()
@@ -159,8 +161,8 @@ if __name__ == "__main__":
             #'DrugBank',
             #"DGIdb", 
             #"OncoKB", 
-            #"STRING", 
-            "STITCH", 
+            "STRING", 
+            #"STITCH", 
             "Mentions", 
             "OncoKB",
             "CancerGenomeInterpreter", 
