@@ -547,6 +547,7 @@ if __name__ == "__main__":
     #uri = sys.argv[1]
     #generateDatasetImports('P0000001', 'proteomics')
     #generateDatasetImports('P0000001', 'clinicalData')
-    generateDatasetImports('P0000002', 'clinical')
-    generateDatasetImports('P0000002', 'wes')
-    generateDatasetImports('P0000002', 'proteomics')
+    #generateDatasetImports('P0000002', 'clinical')
+    #generateDatasetImports('P0000002', 'wes')
+    #generateDatasetImports('P0000002', 'proteomics')
+    pass

@@ -30,7 +30,9 @@ def write_entities(entities, header, outputfile):
 #########################
 #       Graph files     # 
 #########################
-def generateGraphFiles(importDirectory, databases):
+def generateGraphFiles(importDirectory, databases = None):
+    if databases is None:
+        databases = config.databases
     for database in databases:
         print(database)
         if database.lower() == "internal":

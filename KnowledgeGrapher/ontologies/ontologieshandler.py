@@ -72,8 +72,12 @@ def parseOntology(ontology):
 #########################
 #       Graph files     # 
 #########################
-def generateGraphFiles(importDirectory):
-    for entity in config.ontologies:
+def generateGraphFiles(importDirectory, ontologies=None):
+    entities = config.ontologies
+    if ontologies is not None:
+        for ontology in ontologies:
+            entities = {ontology:ontologies[ontology]}
+    for entity in entities:
         ontology = config.ontologies[entity]
         if ontology in config.ontology_types:
             ontologyType = config.ontology_types[ontology]

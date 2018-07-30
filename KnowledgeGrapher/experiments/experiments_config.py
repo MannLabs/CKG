@@ -1,11 +1,10 @@
 
 dataDirectory = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/data"
 mappingFile = dataDirectory + "/ontologies/mapping.tsv"
-importDirectory = dataDirectory + "/imports"
-datasetsImportDirectory = importDirectory + "/datasets/"
+experimentsImportDirectory = "experiments"
 
 #Dataset types
-datasetsDirectory = dataDirectory + "/experiments/"
+experimentsDirectory = dataDirectory + "/experiments/"
 #Proteomics
 clinicalDirectory = datasetsDirectory + "PROJECTID/clinical/"
 proteomicsDirectory = datasetsDirectory + "PROJECTID/proteomics/"
