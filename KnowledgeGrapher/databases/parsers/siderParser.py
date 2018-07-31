@@ -40,7 +40,7 @@ def parser(download = True):
 
 def parserIndications(drugMapping, phenotypeMapping, download = True):
     url = iconfig.SIDER_indications
-    header = iconfig.SIDER_indications_header
+    header = iconfig.indications_header
     outputfileName = iconfig.indications_outputfileName
 
     relationships = set()
@@ -56,8 +56,8 @@ def parserIndications(drugMapping, phenotypeMapping, download = True):
         se = data[1]
         evidence = data[2]
         if se in phenotypeMapping and drug in drugMapping:
-            for d in drugmapping[drug]:
-                p = phenotypemapping[se]
+            for d in drugMapping[drug]:
+                p = phenotypeMapping[se]
                 relationships.add((d, p, "IS_INDICATED_FOR", evidence, "SIDER", se))
     
     associations.close()

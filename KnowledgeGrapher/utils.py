@@ -8,6 +8,7 @@ import os.path
 import collections
 import pprint
 import obonet
+import datetime
 from KnowledgeGrapher.ontologies import ontologies_config as oconfig
 from KnowledgeGrapher.databases import databases_config as dbconfig
 
@@ -107,3 +108,24 @@ def convertOBOtoNet(ontologyFile):
     
     return graph
 
+def getCurrentTime():
+    now = datetime.datetime.now()
+    return '{}-{}-{}'.format(now.year, now.month, now.day), '{}:{}:{}'.format(now.hour, now.minute, now.second) 
+
+def convert_bytes(num):
+    """
+    this function will convert bytes to MB.... GB... etc
+    """
+    for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+        if num < 1024.0:
+            return "%3.1f %s" % (num, x)
+        num /= 1024.0
+
+
+def file_size(file_path):
+    """
+    this function will return the file size
+    """
+    if os.path.isfile(file_path):
+        file_info = os.stat(file_path)
+        return (file_info.st_size >> 20)

@@ -10,7 +10,7 @@ dataDirectory = "/Users/albertosantos/Development/Clinical_Proteomics_Department
 importDirectory = dataDirectory + "/imports"
 #Stats directory
 statsDirectory = importDirectory + "/stats"
-statsFile = "stats."
+statsFile = "stats.hdf"
 #Datasets directory
 datasetsImportDirectory = importDirectory + "/datasets/"
 #Imports 
