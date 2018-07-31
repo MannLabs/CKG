@@ -38,7 +38,7 @@ def readDataFromTXT(uri):
 
 def readDataFromExcel(uri):
     #Read the data from Excel file
-    data = pd.read_excel(open(uri), index_col=None, na_values=['NA'], convert_float = False)
+    data = pd.read_excel(uri, index_col=None, na_values=['NA'], convert_float = False)
 
     return data
 
@@ -483,6 +483,7 @@ def loadWESDataset(uri, configuration):
 #          Generate graph files        # 
 ########################################
 def generateDatasetImports(projectId, dataType):
+    print(dataType)
     if dataType in config.dataTypes:
         if "directory" in config.dataTypes[dataType]:
             dataDir = config.dataTypes[dataType]["directory"].replace("PROJECTID", projectId)
@@ -491,9 +492,9 @@ def generateDatasetImports(projectId, dataType):
                 data = parseClinicalDataset(projectId, configuration, dataDir)
                 if data is not None:
                     dataRows = extractSubjectClinicalVariablesRelationships(data)
-                    generateGraphFiles(dataRows,'clinical', projectId)
+                    generateGraphFiles(dataRows,'clinical', projectId, d = dataType)
                     dataRows = extractSubjectGroupRelationships(data)
-                    generateGraphFiles(dataRows,'groups', projectId)
+                    generateGraphFiles(dataRows,'groups', projectId, d = dataType)
             elif dataType == "proteomics":
                 data = parseProteomicsDataset(projectId, configuration, dataDir)
                 if data is not None:
@@ -538,7 +539,7 @@ def generateDatasetImports(projectId, dataType):
                     generateGraphFiles(somatic_mutations, "somatic_mutation", projectId, d= dataType, ot = 'w')
             
 def generateGraphFiles(data, dataType, projectId, ot = 'w', d = 'proteomics'):
-    importDir = os.path.join(config.datasetsImportDirectory, os.path.join(projectId,d))
+    importDir = os.path.join(config.experimentsImportDirectory, os.path.join(projectId,d))
     outputfile = os.path.join(importDir, projectId+"_"+dataType.lower()+".csv")
     with open(outputfile, ot) as f:  
         data.to_csv(path_or_buf = f, 

@@ -1,14 +1,14 @@
 
 dataDirectory = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/data"
 mappingFile = dataDirectory + "/ontologies/mapping.tsv"
-experimentsImportDirectory = "experiments"
+experimentsImportDirectory = dataDirectory+"/imports/experiments"
 
 #Dataset types
-experimentsDirectory = dataDirectory + "/experiments/"
+experimentsDir = dataDirectory + "/experiments/"
 #Proteomics
-clinicalDirectory = experimentsDirectory + "PROJECTID/clinical/"
-proteomicsDirectory = experimentsDirectory + "PROJECTID/proteomics/"
-genomicsDirectory = experimentsDirectory + "PROJECTID/wes/"
+clinicalDirectory = experimentsDir + "PROJECTID/clinical/"
+proteomicsDirectory = experimentsDir + "PROJECTID/proteomics/"
+genomicsDirectory = experimentsDir + "PROJECTID/wes/"
 dataTypes = {"clinical":{"directory":clinicalDirectory,
                             "file":"clinicalData.xlsx"},
             "proteomics":{"directory": proteomicsDirectory,

@@ -12,6 +12,16 @@ ontologies = {"Disease": "DO",
               "Postranslational_modification":"PSI-MOD",
               "Gene_ontology": "GO"
             }
+entities = {"DO":"Disease",
+            "BTO":"Tissue",
+            "SNOMED-CT":"Clinical_variable",
+            "HPO":"Phenotype",
+            "PSI-MS":"Experiment",
+            "PSI-MOD":"Postranslational_modification",
+            "biological_process":"Biological_process",
+            "molecular_function":"Molecular_function",
+            "cellular_component":"Cellular_component"
+            }
 
 ontology_types = {"DO":-26, 
                   "BTO":-25,

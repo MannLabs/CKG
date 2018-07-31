@@ -11,8 +11,7 @@ importDirectory = dataDirectory + "/imports"
 #Stats directory
 statsDirectory = importDirectory + "/stats"
 statsFile = "stats.hdf"
-#Datasets directory
-datasetsImportDirectory = importDirectory + "/datasets/"
+
 #Imports 
 entities = ["Disease","Drug","Tissue","Biological_process", "Molecular_function", "Cellular_compartment", "Postranslational_modification", "Clinical_variable", "Metabolite", "GWAS_study","Clinically_relevant_variant", "Known_variant", "Phenotype", "Experiment"]
 #Database resources

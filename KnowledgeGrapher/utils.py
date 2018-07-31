@@ -129,3 +129,8 @@ def file_size(file_path):
     if os.path.isfile(file_path):
         file_info = os.stat(file_path)
         return (file_info.st_size >> 20)
+
+def buildStats(count, otype, name, dataset, filename):
+    y,t = getCurrentTime()
+    size = file_size(filename)
+    return(y, t, dataset, filename, size, count, otype, name)
