@@ -3,17 +3,21 @@ dbURL = "localhost"
 dbPort = 7687
 dbUser="neo4j"
 dbPassword = "bioinfo1112"
+version = 1.0
 ########################
 dataDirectory = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/data"
 #Import directory
 importDirectory = dataDirectory + "/imports"
+#Stats directory
+statsDirectory = importDirectory + "/stats"
+statsFile = "stats."
 #Datasets directory
 datasetsImportDirectory = importDirectory + "/datasets/"
 #Imports 
-entities = ["Disease","Drug","Tissue","Biological_process", "Molecular_function", "Cellular_compartment", "Postranslational_modification", "Clinical_variable", "Metabolite", "GWAS_study"]
+entities = ["Disease","Drug","Tissue","Biological_process", "Molecular_function", "Cellular_compartment", "Postranslational_modification", "Clinical_variable", "Metabolite", "GWAS_study","Clinically_relevant_variant", "Known_variant", "Phenotype", "Experiment"]
 #Database resources
-PPI_resources = ["IntAct"]
-disease_resources = [("Protein","DisGEnet"),("Known_variant","CGI"),("Known_variant","OncoKB")]
+PPI_resources = ["IntAct", "STRING"]
+disease_resources = [("Protein","DisGEnet"),("Clinically_relevant_variant","CGI"),("Clinically_relevant_variant","OncoKB")]
 drug_resources = ["DGIdb","CGI","OncoKB"]
 side_effects_resources = ["SIDER"]
 clinical_variant_resources = ["CGI","OncoKB"]
@@ -27,21 +31,7 @@ internalEntities = [("Protein","Disease"), ("Protein", "Tissue"), ("Protein","Ce
 mentionEntities = ["Disease", "Tissue", "Protein", "Cellular_compartment", "Chemical", "Metabolite"]
 publicationEntities = ["GWAS_study"]
 
-#Analyses configuration
-similarityMeasures = ["pearson"]
-########################
 
+#Import statistics
+statsCols = ["date", "dataset", "dataset_type", "Original_number", "Imported_number", "Import_type", "name", "file_name", "file_size"]
 
-###Variant sources
-'''
-COSMIC
-dbNSFP
-dbSNP
-Linkage-Physical Map
-Database of Genomic Variants
-Exome Sequencing Project
-gwasCatalog
-HapMap
-Thousand Genomes
-'''
-#####

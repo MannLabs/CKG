@@ -1,7 +1,7 @@
 import urllib
-import ontologies_config as config
+from KnowledgeGrapher.ontologies import ontologies_config as config
 from KnowledgeGrapher import mapping as mp
-from parsers import *
+from KnowledgeGrapher.ontologies.parsers import *
 import os.path
 from collections import defaultdict
 import pandas as pd
@@ -92,7 +92,6 @@ def generateGraphFiles(importDirectory, ontologies=None):
                 for term in terms[namespace]:
                     writer.writerow([term, entity, list(terms[namespace][term])[0], definitions[term], ontologyType, ",".join(terms[namespace][term])])
         relationshipsDf = pd.DataFrame(list(relationships))
-        print(relationshipsDf.head())
         relationshipsDf.columns = ['START_ID', 'END_ID', 'TYPE']
 
         relationshipsDf.to_csv(path_or_buf=relationships_outputfile, 

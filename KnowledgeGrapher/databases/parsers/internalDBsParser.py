@@ -88,7 +88,7 @@ def parseInternalDatabaseMentions(qtype, importDirectory, download = True):
     if qtype == "9606":
         mapping = mp.getSTRINGMapping(string_url, download=False)
     elif qtype == "-1":
-        mapping = mp.getSTRINGMapping(stitch_url, source = dbconfig.internal_db_sources["Drug"], download = False, db = "STITCH")
+        mapping = mp.getSTRINGMapping(stitch_url, source = iconfig.internal_db_sources["Drug"], download = False, db = "STITCH")
     filters = []
     if qtype in iconfig.internal_db_mentions_filters:
         filters = iconfig.internal_db_mentions_filters[qtype]

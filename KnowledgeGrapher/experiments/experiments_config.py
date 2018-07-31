@@ -6,9 +6,9 @@ experimentsImportDirectory = "experiments"
 #Dataset types
 experimentsDirectory = dataDirectory + "/experiments/"
 #Proteomics
-clinicalDirectory = datasetsDirectory + "PROJECTID/clinical/"
-proteomicsDirectory = datasetsDirectory + "PROJECTID/proteomics/"
-genomicsDirectory = datasetsDirectory + "PROJECTID/wes/"
+clinicalDirectory = experimentsDirectory + "PROJECTID/clinical/"
+proteomicsDirectory = experimentsDirectory + "PROJECTID/proteomics/"
+genomicsDirectory = experimentsDirectory + "PROJECTID/wes/"
 dataTypes = {"clinical":{"directory":clinicalDirectory,
                             "file":"clinicalData.xlsx"},
             "proteomics":{"directory": proteomicsDirectory,

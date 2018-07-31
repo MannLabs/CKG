@@ -1,12 +1,14 @@
-import pandas as pd
-from collections import defaultdict
-import numpy as np
-import datasets_config as config
+from KnowledgeGrapher.experiments import experiments_config as config
+from KnowledgeGrapher.ontologies import ontologieshandler as oh
+from KnowledgeGrapher import utils
+
 import sys
-import ontologieshandler as oh
-import os.path
 import re
-import utils
+import os.path
+import pandas as pd
+import numpy as np
+from collections import defaultdict
+
 
 #########################
 # General functionality # 

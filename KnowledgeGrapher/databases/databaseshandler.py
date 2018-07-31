@@ -1,6 +1,6 @@
 import os.path
 import gzip
-import databases_config as dbconfig
+from KnowledgeGrapher.databases import databases_config as dbconfig
 from collections import defaultdict
 from KnowledgeGrapher import utils
 import csv
@@ -8,7 +8,7 @@ import pandas as pd
 import re
 from lxml import etree
 import zipfile
-from parsers import *
+from KnowledgeGrapher.databases.parsers import *
 
 #########################
 # General functionality # 
@@ -32,7 +32,7 @@ def write_entities(entities, header, outputfile):
 #########################
 def generateGraphFiles(importDirectory, databases = None):
     if databases is None:
-        databases = config.databases
+        databases = dbconfig.databases
     for database in databases:
         print(database)
         if database.lower() == "internal":
