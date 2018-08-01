@@ -133,4 +133,6 @@ def file_size(file_path):
 def buildStats(count, otype, name, dataset, filename):
     y,t = getCurrentTime()
     size = file_size(filename)
+    filename = filename.split('/')[-1]
+    
     return(y, t, dataset, filename, size, count, otype, name)

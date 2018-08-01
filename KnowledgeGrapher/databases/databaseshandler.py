@@ -178,7 +178,7 @@ def generateGraphFiles(importDirectory, databases = None):
                 write_relationships(relationships[relationship], relationships_header, outputfile)
                 stats.add(utils.buildStats(len(relationships[relationship]), "relationships", relationship, database, outputfile))
 
-        return stats
+    return stats
 
 
 if __name__ == "__main__":

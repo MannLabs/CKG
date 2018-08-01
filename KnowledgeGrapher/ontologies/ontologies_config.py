@@ -9,7 +9,7 @@ ontologies = {"Disease": "DO",
               "Experiment":"PSI-MS",
                #"Food":"BBC",
                #"Physical_activity":"SMASH",
-              "Postranslational_modification":"PSI-MOD",
+              "Modification":"PSI-MOD",
               "Gene_ontology": "GO"
             }
 entities = {"DO":"Disease",
@@ -17,7 +17,7 @@ entities = {"DO":"Disease",
             "SNOMED-CT":"Clinical_variable",
             "HPO":"Phenotype",
             "PSI-MS":"Experiment",
-            "PSI-MOD":"Postranslational_modification",
+            "PSI-MOD":"Modification",
             "biological_process":"Biological_process",
             "molecular_function":"Molecular_function",
             "cellular_component":"Cellular_component"

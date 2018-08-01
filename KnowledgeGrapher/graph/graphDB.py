@@ -179,7 +179,7 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
                     print(statement+';')
                     driver.run(statement+';')
     #Datasets
-    if "datasets" in imports:
+    if "experiment" in imports:
         importDir = config.datasetsImportDirectory
         datasetsCode = cy.IMPORT_DATASETS
         projects = utils.listDirectoryFolders(importDir)
@@ -194,21 +194,11 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
                     driver.run(statement+';')
 
 def updateDB(dataset):
-    pass
+    createDB(imports = [dataset])
 
-def updateSimilarity(context, entity):
-    pass
-
-def acquireKnowledge(database = None):
-    pass
-
-def acquireOntologies(ontology = None):
-    pass
-
+def populateDB():
+    imports = config.graph
+    createDB(imports)
 
 if __name__ == "__main__":
-    #removeRelationshipDB(entity1 = 'Protein', entity2 = 'Protein', relationship = "intact_INTERACTS_WITH")
-    #removeRelationshipDB(entity1 = 'Protein', entity2 = 'Protein', relationship = "IntAct_INTERACTS_WITH")
-    #createDB(imports=["ontologies","chromosomes", "genes", "transcripts", "proteins", "ppi", "drugs", "diseases", "pathway", "internal", "mentions", "variants", "project", "datasets"])
-    createDB(imports=["gwas", 'published'])
-
+    populateDB()

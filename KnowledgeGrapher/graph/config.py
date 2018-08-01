@@ -11,6 +11,29 @@ importDirectory = dataDirectory + "/imports"
 #Stats directory
 statsDirectory = importDirectory + "/stats"
 statsFile = "stats.hdf"
+statsCols = ["date", "time", "dataset", "filename", "file_size", "Imported_number", "Import_type", "name"]
+
+#Full Graph
+graph = ["ontologies", 
+         "internal",
+         "chromosomes", 
+         "genes", 
+         "transcripts", 
+         "proteins", 
+         "ppi", 
+         "diseases", 
+         "drugs", 
+         "side effects",
+         'pathway',
+         'metabolite',
+         'mentions',
+         "gwas",
+         "published",
+         "known_variants",
+         "clinical variants",
+         "project",
+         "experiment"
+         ]
 
 #Imports 
 entities = ["Disease","Drug","Tissue","Biological_process", "Molecular_function", "Cellular_compartment", "Postranslational_modification", "Clinical_variable", "Metabolite", "GWAS_study","Clinically_relevant_variant", "Known_variant", "Phenotype", "Experiment"]
@@ -29,8 +52,3 @@ internalEntities = [("Protein","Disease"), ("Protein", "Tissue"), ("Protein","Ce
 #Mentions entities
 mentionEntities = ["Disease", "Tissue", "Protein", "Cellular_compartment", "Chemical", "Metabolite"]
 publicationEntities = ["GWAS_study"]
-
-
-#Import statistics
-statsCols = ["date", "time", "dataset", "filename", "file_size", "Imported_number", "Import_type", "name"]
-
