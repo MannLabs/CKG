@@ -1,6 +1,6 @@
 import urllib
 from KnowledgeGrapher.ontologies import ontologies_config as config
-from KnowledgeGrapher import mapping as mp
+from KnowledgeGrapher import mapping as mp, utils
 from KnowledgeGrapher.ontologies.parsers import *
 import os.path
 from collections import defaultdict
@@ -90,14 +90,13 @@ def generateGraphFiles(importDirectory, ontologies=None):
             if namespace in config.entities:
                 name = config.entities[namespace]
             entity_outputfile = os.path.join(importDirectory, name+".csv")
-            stats.add(utils.buildStats(len(terms[namespace]), "entity", name, ontology, entity_outputfile))
             with open(entity_outputfile, 'w') as csvfile:
                 writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
                 writer.writerow(['ID', ':LABEL', 'name', 'description', 'type', 'synonyms'])
                 for term in terms[namespace]:
                     writer.writerow([term, entity, list(terms[namespace][term])[0], definitions[term], ontologyType, ",".join(terms[namespace][term])])
+            stats.add(utils.buildStats(len(terms[namespace]), "entity", name, ontology, entity_outputfile))
         
-        stats.add(utils.buildStats(len(relationships), "relationships", "has_parent", ontology, relationships_outputfile))
         relationshipsDf = pd.DataFrame(list(relationships))
         relationshipsDf.columns = ['START_ID', 'END_ID', 'TYPE']
 
@@ -105,6 +104,7 @@ def generateGraphFiles(importDirectory, ontologies=None):
                                 header=True, index=False, quotechar='"', 
                                 quoting=csv.QUOTE_ALL,
                                 line_terminator='\n', escapechar='\\')
+        stats.add(utils.buildStats(len(relationships), "relationships", "has_parent", ontology, relationships_outputfile))
     return stats
 
 if __name__ == "__main__":

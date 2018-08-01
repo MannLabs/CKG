@@ -32,5 +32,5 @@ publicationEntities = ["GWAS_study"]
 
 
 #Import statistics
-statsCols = ["date", "dataset", "dataset_type", "Original_number", "Imported_number", "Import_type", "name", "file_name", "file_size"]
+statsCols = ["date", "time", "dataset", "filename", "file_size", "Imported_number", "Import_type", "name"]
 

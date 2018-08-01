@@ -182,10 +182,24 @@ def extractSubjectGroupRelationships(data):
     cols = list(data.columns)
     if "group" in data.columns:
         data = data["group"].to_frame()
-    data = data.reset_index()
-    data.columns = ['START_ID', 'END_ID']
-    data['TYPE'] = "BELONGS_TO_GROUP"
-    return data
+        data = data.reset_index()
+        data.columns = ['START_ID', 'END_ID']
+        data['TYPE'] = "BELONGS_TO_GROUP"
+        return data
+    else:
+        return None
+
+def extractSubjectDiseaseRelationships(data):
+    cols = list(data.columns)
+    if "disease" in data.columns:
+        data = data["disease"].to_frame()
+        data = data.reset_index()
+        data.columns = ['START_ID', 'END_ID']
+        data['TYPE'] = "HAS_DISEASE"
+        data = data.dropna()
+        return data
+    else:
+        return None
 
 ########### Proteomics Datasets ############
 ############## ProteinModification entity ####################
@@ -428,7 +442,6 @@ def loadProteomicsDataset(uri, configuration):
     #Apply filters
     data = data[data[filters].isnull().all(1)]
     data = data.drop(filters, axis=1)
-
     #Select all protein form protein groups, i.e. P01911;Q29830;Q9MXZ4
     # P01911
     # Q29830
@@ -444,8 +457,8 @@ def loadProteomicsDataset(uri, configuration):
     #proteins = data[proteinCol].str.split(';').apply(pd.Series,1)[0]
     #data[proteinCol] = proteins
     data = data.set_index(indexCol)
-    filters.append(indexCol)
     columns = set(columns).difference(filters)
+    columns.remove(indexCol)
 
     #Get columns using regex
     for regex in regexCols:
@@ -494,7 +507,11 @@ def generateDatasetImports(projectId, dataType):
                     dataRows = extractSubjectClinicalVariablesRelationships(data)
                     generateGraphFiles(dataRows,'clinical', projectId, d = dataType)
                     dataRows = extractSubjectGroupRelationships(data)
-                    generateGraphFiles(dataRows,'groups', projectId, d = dataType)
+                    if dataRows is not None:
+                        generateGraphFiles(dataRows,'groups', projectId, d = dataType)
+                    dataRows = extractSubjectDiseaseRelationships(data)
+                    if dataRows is not None:
+                        generateGraphFiles(dataRows,'disease', projectId, d = dataType)
             elif dataType == "proteomics":
                 data = parseProteomicsDataset(projectId, configuration, dataDir)
                 if data is not None:
