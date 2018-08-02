@@ -1,8 +1,9 @@
-import utils
+from KnowledgeGrapher import utils
 import config
 import cypher as cy
 from os.path import join
 from py2neo import Graph
+import time
 
 def getGraphDatabaseConnectionConfiguration():
     host = config.dbURL
@@ -199,6 +200,16 @@ def updateDB(dataset):
 def populateDB():
     imports = config.graph
     createDB(imports)
-
+    archiveImportDirectory()
+    
+def archiveImportDirectory():
+    dest_folder = config.archiveDirectory
+    utils.checkDirectory(dest_folder)
+    folder_to_backup = config.importDirectory
+    date, t = utils.getCurrentTime()
+    file_name = "{}_{}".format(date.replace('-',''), t.replace(':',''))
+    
+    utils.compress_directory(folder_to_backup, dest_folder, file_name)
+    
 if __name__ == "__main__":
     populateDB()

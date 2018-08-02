@@ -8,6 +8,8 @@ version = 1.0
 dataDirectory = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/data"
 #Import directory
 importDirectory = dataDirectory + "/imports"
+#Archive directory
+archiveDirectory = dataDirectory+"/archive"
 #Stats directory
 statsDirectory = importDirectory + "/stats"
 statsFile = "stats.hdf"

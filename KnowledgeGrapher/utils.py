@@ -9,6 +9,7 @@ import collections
 import pprint
 import obonet
 import datetime
+import tarfile
 from KnowledgeGrapher.ontologies import ontologies_config as oconfig
 from KnowledgeGrapher.databases import databases_config as dbconfig
 
@@ -147,3 +148,12 @@ def buildStats(count, otype, name, dataset, filename):
     filename = filename.split('/')[-1]
     
     return(y, t, dataset, filename, size, count, otype, name)
+
+def compress_directory(folder_to_backup, dest_folder, file_name):
+    #tar cf - paths-to-archive | pigz -9 -p 32 > archive.tar.gz
+    filePath = os.path.join(dest_folder,file_name+".tar.gz")
+    filePath = filePath.replace("(","\(").replace(")","\)")
+    folder_to_backup = folder_to_backup.replace("(","\(").replace(")","\)")
+    os.system("tar -zcf {} {}".format(filePath, folder_to_backup))
+
+    
