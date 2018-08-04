@@ -12,6 +12,10 @@ importDirectory = dataDirectory + "/imports"
 archiveDirectory = dataDirectory+"/archive"
 #Stats directory
 statsDirectory = importDirectory + "/stats"
+#experiments directory
+experimentsDirectory = importDirectory +"/experiments"
+
+
 statsFile = "stats.hdf"
 statsCols = ["date", "time", "dataset", "filename", "file_size", "Imported_number", "Import_type", "name"]
 

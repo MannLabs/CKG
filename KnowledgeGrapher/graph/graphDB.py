@@ -1,9 +1,8 @@
-from KnowledgeGrapher import utils
-import config
-import cypher as cy
 from os.path import join
 from py2neo import Graph
-import time
+import config
+import cypher as cy
+from KnowledgeGrapher import utils
 
 def getGraphDatabaseConnectionConfiguration():
     host = config.dbURL
@@ -15,15 +14,15 @@ def getGraphDatabaseConnectionConfiguration():
 
     return driver
 
-def connectToDB(host = "localhost", port= 7687, user="neo4j", password = "password"):
-    driver = Graph(host=host, port = port, user = user, password = password)
+def connectToDB(host="localhost", port=7687, user="neo4j", password="password"):
+    driver = Graph(host=host, port=port, user=user, password=password)
 
     return driver
 
 def removeRelationshipDB(entity1, entity2, relationship):
     driver = getGraphDatabaseConnectionConfiguration()
 
-    countCy = cy.COUNT_RELATIONSHIPS 
+    countCy = cy.COUNT_RELATIONSHIPS
     deleteCy = cy.REMOVE_RELATIONSHIPS
     countst = countCy.replace('ENTITY1', entity1).replace('ENTITY2', entity2).replace('RELATIONSHIP', relationship)
     deletest = deleteCy.replace('ENTITY1', entity1).replace('ENTITY2', entity2).replace('RELATIONSHIP', relationship)
@@ -33,10 +32,10 @@ def removeRelationshipDB(entity1, entity2, relationship):
     driver.run(deletest)
     print("Existing entries after deletion: %d" % driver.run(countst).data()[0]['count'])
 
-def removeNodes(entity):
-   pass 
-
-def createDB(imports = ["ontologies","proteins", "ppi"]):
+def createDB(imports=None):
+    if imports is None:
+        imports = config.graph
+    
     entities = config.entities
     importDir = config.importDirectory
     driver = getGraphDatabaseConnectionConfiguration()
@@ -46,7 +45,7 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
     if "ontologies" in imports:
         ontologyDataImportCode = cy.IMPORT_ONTOLOGY_DATA
         for entity in entities:
-            cypherCode = ontologyDataImportCode.replace("ENTITY", entity).replace("IMPORTDIR",importDir).split(';')[0:-1]
+            cypherCode = ontologyDataImportCode.replace("ENTITY", entity).replace("IMPORTDIR", importDir).split(';')[0:-1]
             for statement in cypherCode:
                 print(statement)
                 driver.run(statement+";")
@@ -79,28 +78,28 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
     if "ppi" in imports:
         ppiDataImportCode = cy.IMPORT_CURATED_PPI_DATA
         for resource in config.PPI_resources:
-            for statement in ppiDataImportCode.replace("IMPORTDIR",importDir).replace("RESOURCE",resource.upper()).split(';')[0:-1]:
+            for statement in ppiDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.upper()).split(';')[0:-1]:
                 print(statement+";")
                 driver.run(statement+";")
     #Diseases
     if "diseases" in imports:
         diseaseDataImportCode = cy.IMPORT_DISEASE_DATA
-        for entity,resource in config.disease_resources:
-            for statement in diseaseDataImportCode.replace("IMPORTDIR",importDir).replace("ENTITY", entity).replace("RESOURCE",resource.lower()).split(';')[0:-1]:
+        for entity, resource in config.disease_resources:
+            for statement in diseaseDataImportCode.replace("IMPORTDIR", importDir).replace("ENTITY", entity).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                 print(statement+";")
                 driver.run(statement+";")
     #Drugs
     if "drugs" in imports:
         drugsDataImportCode = cy.IMPORT_CURATED_DRUG_DATA
         for resource in config.drug_resources:
-            for statement in drugsDataImportCode.replace("IMPORTDIR",importDir).replace("RESOURCE",resource.lower()).split(';')[0:-1]:
+            for statement in drugsDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                 print(statement+";")
                 driver.run(statement+";")
     #Side effects
     if "side effects" in imports:
         sideEffectsDataImportCode = cy.IMPORT_DRUG_SIDE_EFFECTS
         for resource in config.side_effects_resources:
-            for statement in sideEffectsDataImportCode.replace("IMPORTDIR",importDir).replace("RESOURCE",resource.lower()).split(';')[0:-1]:
+            for statement in sideEffectsDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                 print(statement+";")
                 driver.run(statement+";")
     #Pathway
@@ -122,7 +121,7 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
     #GWAS
     if "gwas" in imports:
         code = cy.IMPORT_GWAS
-        for statement in code.replace("IMPORTDIR",importDir).split(';')[0:-1]:
+        for statement in code.replace("IMPORTDIR", importDir).split(';')[0:-1]:
             print(statement+';')
             driver.run(statement+';')
 
@@ -137,7 +136,7 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
     if "clinical variants" in imports:
         variantsImportCode = cy.IMPORT_CLINICALLY_RELEVANT_VARIANT_DATA
         for source in config.clinical_variant_resources:
-            for statement in variantsImportCode.replace("IMPORTDIR", importDir).replace("SOURCE",source.lower()).split(';')[0:-1]:
+            for statement in variantsImportCode.replace("IMPORTDIR", importDir).replace("SOURCE", source.lower()).split(';')[0:-1]:
                 print(statement+";")
                 driver.run(statement+";")
 
@@ -154,7 +153,7 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
         for statement in publicationsImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
             print(statement+";")
             driver.run(statement+";")
-        
+
         mentionsImportCode = cy.IMPORT_MENTIONS
         for entity in config.mentionEntities:
             for statement in mentionsImportCode.replace("IMPORTDIR", importDir).replace("ENTITY", entity).split(';')[0:-1]:
@@ -170,18 +169,18 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
                 driver.run(statement+";")
     #Projects
     if "project" in imports:
-        importDir = config.datasetsImportDirectory
+        importDir = config.experimentsDirectory
         projects = utils.listDirectoryFolders(importDir)
         projectCode = cy.IMPORT_PROJECT
         for project in projects:
             projectDir = join(importDir, project)
             for code in projectCode:
-                for statement in code.replace("IMPORTDIR",projectDir).replace('PROJECTID', project).split(';')[0:-1]:
+                for statement in code.replace("IMPORTDIR", projectDir).replace('PROJECTID', project).split(';')[0:-1]:
                     print(statement+';')
                     driver.run(statement+';')
     #Datasets
     if "experiment" in imports:
-        importDir = config.datasetsImportDirectory
+        importDir = config.experimentsDirectory
         datasetsCode = cy.IMPORT_DATASETS
         projects = utils.listDirectoryFolders(importDir)
         for project in projects:
@@ -190,12 +189,12 @@ def createDB(imports = ["ontologies","proteins", "ppi"]):
             for dtype in datasetTypes:
                 datasetDir = join(projectDir, dtype)
                 code = datasetsCode[dtype]
-                for statement in code.replace("IMPORTDIR",datasetDir).replace('PROJECTID', project).split(';')[0:-1]:
+                for statement in code.replace("IMPORTDIR", datasetDir).replace('PROJECTID', project).split(';')[0:-1]:
                     print(statement+';')
                     driver.run(statement+';')
 
 def updateDB(dataset):
-    createDB(imports = [dataset])
+    createDB(imports=[dataset])
 
 def populateDB():
     imports = config.graph
@@ -206,10 +205,10 @@ def archiveImportDirectory():
     dest_folder = config.archiveDirectory
     utils.checkDirectory(dest_folder)
     folder_to_backup = config.importDirectory
-    date, t = utils.getCurrentTime()
-    file_name = "{}_{}".format(date.replace('-',''), t.replace(':',''))
-    
+    date, time = utils.getCurrentTime()
+    file_name = "{}_{}".format(date.replace('-', ''), time.replace(':', ''))
+
     utils.compress_directory(folder_to_backup, dest_folder, file_name)
-    
+
 if __name__ == "__main__":
     populateDB()
