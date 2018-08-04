@@ -4,8 +4,8 @@ from collections import defaultdict
 # Clinical_variable - SNOMED-CT # 
 #################################
 def parser(files, filters):
-    terms = {"Clinical_variable":defaultdict(list)}
-    relationships = set()
+    terms = {"SNOMED-CT":defaultdict(list)}
+    relationships = defaultdict(set)
     definitions = defaultdict()
     for f in files:
         first = True
@@ -19,7 +19,7 @@ def parser(files, filters):
                     if int(data[2]) == 1:
                         conceptID = data[4]
                         term = data[7]
-                        terms["Clinical_variable"][conceptID].append(term)
+                        terms["SNOMED-CT"][conceptID].append(term)
                         definitions[conceptID] = term
             elif "Relationship" in f:
                 for line in fh:
@@ -30,7 +30,7 @@ def parser(files, filters):
                     if int(data[2]) == 1:
                         sourceID = data[4] #child
                         destinationID = data[5] #parent
-                        relationships.add((sourceID, destinationID, "HAS_PARENT"))
+                        relationships["SNOMED-CT"].add((sourceID, destinationID, "HAS_PARENT"))
             elif "Definition" in f:
                 for line in fh:
                     if first:

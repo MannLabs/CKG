@@ -7,7 +7,7 @@ import re
 def parser(ontology, files):
     entity = {}
     terms = defaultdict(list)
-    relationships = set()
+    relationships = defaultdict(set)
     definitions = defaultdict()
     for f in files:
         oboGraph = utils.convertOBOtoNet(f)
@@ -33,6 +33,6 @@ def parser(ontology, files):
                 definitions[term] = terms[namespace][term][0]
             if "is_a" in attr:
                 for isa in attr["is_a"]:
-                    relationships.add((term, isa, "HAS_PARENT"))
+                    relationships[namespace].add((term, isa, "HAS_PARENT"))
     return terms, relationships, definitions
 

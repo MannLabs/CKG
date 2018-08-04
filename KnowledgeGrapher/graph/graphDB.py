@@ -36,13 +36,13 @@ def createDB(imports=None):
     if imports is None:
         imports = config.graph
     
-    entities = config.entities
-    importDir = config.importDirectory
     driver = getGraphDatabaseConnectionConfiguration()
-
+    importDir = config.databasesDirectory
     #Get the cypher queries to build the graph
     #Ontologies
     if "ontologies" in imports:
+        entities = config.ontology_entities
+        importDir = config.ontologiesDirectory
         ontologyDataImportCode = cy.IMPORT_ONTOLOGY_DATA
         for entity in entities:
             cypherCode = ontologyDataImportCode.replace("ENTITY", entity).replace("IMPORTDIR", importDir).split(';')[0:-1]

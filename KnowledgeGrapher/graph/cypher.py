@@ -158,6 +158,19 @@ IMPORT_DRUG_SIDE_EFFECTS =   '''
                         MERGE (d)-[:IS_INDICATED_FOR{source:line.source,original_side_effect_code:line.original_side_effect;evidence:line.evidence}]->(p);
                         '''
 
+IMPORT_DRUG_ACTS_ON =   '''
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_drug_acts_on_protein.csv" AS line
+                        MATCH (d:Drug {id:line.START_ID})
+                        MATCH (p:Protein {id:line.END_ID})
+                        MERGE (d1)-[:ACTS_ON{source:line.source,original_side_effect_code:line.original_side_effect}]->(d2);
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_is_indicated_for.csv" AS line
+                        MATCH (d:Drug {id:line.START_ID})
+                        MATCH (p:Phenotype {id:line.END_ID})
+                        MERGE (d)-[:IS_INDICATED_FOR{source:line.source,original_side_effect_code:line.original_side_effect;evidence:line.evidence}]->(p);
+                        '''
+
 IMPORT_PATHWAY_DATA = '''
                         CREATE CONSTRAINT ON (p:Pathway) ASSERT p.id IS UNIQUE; 
                         USING PERIODIC COMMIT 10000

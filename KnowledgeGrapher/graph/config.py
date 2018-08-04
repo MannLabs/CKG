@@ -1,6 +1,7 @@
 #Database configuration
 dbURL = "localhost"
-dbPort = 7687
+dbPort = 7688 #Production environment
+#dbPort = 7687 #Test environment
 dbUser="neo4j"
 dbPassword = "bioinfo1112"
 version = 1.0
@@ -12,9 +13,12 @@ importDirectory = dataDirectory + "/imports"
 archiveDirectory = dataDirectory+"/archive"
 #Stats directory
 statsDirectory = importDirectory + "/stats"
-#experiments directory
+#experiments import directory
 experimentsDirectory = importDirectory +"/experiments"
-
+#databases import diretory
+databasesDirectory = importDirectory + "/databases"
+#ontologies import diretory
+ontologiesDirectory = importDirectory + "/ontologies"
 
 statsFile = "stats.hdf"
 statsCols = ["date", "time", "dataset", "filename", "file_size", "Imported_number", "Import_type", "name"]
@@ -42,7 +46,7 @@ graph = ["ontologies",
          ]
 
 #Imports 
-entities = ["Disease","Drug","Tissue","Biological_process", "Molecular_function", "Cellular_compartment", "Postranslational_modification", "Clinical_variable", "Metabolite", "GWAS_study","Clinically_relevant_variant", "Known_variant", "Phenotype", "Experiment"]
+ontology_entities = ["Disease","Tissue","Biological_process", "Molecular_function", "Cellular_component", "Modification", "Clinical_variable", "Phenotype", "Experiment"]
 #Database resources
 PPI_resources = ["IntAct", "STRING"]
 disease_resources = [("Protein","DisGEnet"),("Clinically_relevant_variant","CGI"),("Clinically_relevant_variant","OncoKB")]

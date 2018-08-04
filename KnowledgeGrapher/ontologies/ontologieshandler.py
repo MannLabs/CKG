@@ -84,9 +84,9 @@ def generateGraphFiles(importDirectory, ontologies=None):
         if ontology in config.ontology_types:
             ontologyType = config.ontology_types[ontology]
         
-        relationships_outputfile = os.path.join(importDirectory, entity.capitalize()+"_has_parent.csv")
         terms, relationships, definitions = parseOntology(ontology)
         for namespace in terms:
+            print(namespace)
             if namespace in config.entities:
                 name = config.entities[namespace]
             entity_outputfile = os.path.join(importDirectory, name+".csv")
@@ -96,15 +96,15 @@ def generateGraphFiles(importDirectory, ontologies=None):
                 for term in terms[namespace]:
                     writer.writerow([term, entity, list(terms[namespace][term])[0], definitions[term], ontologyType, ",".join(terms[namespace][term])])
             stats.add(utils.buildStats(len(terms[namespace]), "entity", name, ontology, entity_outputfile))
-        
-        relationshipsDf = pd.DataFrame(list(relationships))
-        relationshipsDf.columns = ['START_ID', 'END_ID', 'TYPE']
-
-        relationshipsDf.to_csv(path_or_buf=relationships_outputfile, 
-                                header=True, index=False, quotechar='"', 
-                                quoting=csv.QUOTE_ALL,
-                                line_terminator='\n', escapechar='\\')
-        stats.add(utils.buildStats(len(relationships), "relationships", "has_parent", ontology, relationships_outputfile))
+            if namespace in relationships:
+                relationships_outputfile = os.path.join(importDirectory, name+"_has_parent.csv")
+                relationshipsDf = pd.DataFrame(list(relationships[namespace]))
+                relationshipsDf.columns = ['START_ID', 'END_ID', 'TYPE']
+                relationshipsDf.to_csv(path_or_buf=relationships_outputfile, 
+                                            header=True, index=False, quotechar='"',
+                                            quoting=csv.QUOTE_ALL,
+                                            line_terminator='\n', escapechar='\\')
+                stats.add(utils.buildStats(len(relationships[namespace]), "relationships", name+"_has_parent", ontology, relationships_outputfile))
     return stats
 
 if __name__ == "__main__":
