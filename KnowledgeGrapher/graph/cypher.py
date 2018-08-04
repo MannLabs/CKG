@@ -96,7 +96,7 @@ CREATE_PUBLICATIONS = '''
                     USING PERIODIC COMMIT 10000
                     LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/Publications.csv" AS line
                     MERGE (p:Publication{id:line.ID})
-                    ON CREATE SET p.linkout=line.linkout,p.journal=line.journal,p.PMC_id=line.PMC_id,p.file_location=line.file_location;
+                    ON CREATE SET p.linkout=line.linkout,p.journal=line.journal_title,p.PMC_id=line.pmcid,p.ISSN=line.issn,p.DOI=line.doi,p.page=line.page,p.volume=line.volume,p.year=line.year,p.issue=line.issue;
                     '''
                     
 IMPORT_MENTIONS =   '''
@@ -136,7 +136,7 @@ IMPORT_CURATED_DRUG_DATA =   '''
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_targets.csv" AS line
                         MATCH (d:Drug {id:line.START_ID})
                         MATCH (g:Gene {id:line.END_ID})
-                        MERGE (d)-[:CURATED_TARGETS{source:line.source,interaction_type:line.interaction_type, score: line.score}]->(g);'''
+                        MERGE (d)-[:CURATED_TARGETS{source:line.source,interaction_type:line.type,score:'curated'}]->(g);'''
 
 IMPORT_COMPILED_DRUG_DATA =   '''
                         USING PERIODIC COMMIT 10000

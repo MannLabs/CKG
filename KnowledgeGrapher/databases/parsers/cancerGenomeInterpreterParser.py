@@ -71,6 +71,8 @@ def parser(download = True):
                                     drug = drugmapping[drug.split(" ")[0].lower()]
                                 elif " ".join(drug.split(" ")[1:]).lower() in drugmapping:
                                     drug = drugmapping[" ".join(drug.split(" ")[1:]).lower()]
+                                else:
+                                    continue
                                 relationships["targets_clinically_relevant_variant"].add((drug, variant, "TARGETS_KNOWN_VARIANT", evidence, association, tumor, "curated", "Cancer Genome Interpreter"))
                                 relationships["targets"].add((drug, gene, "CURATED_TARGETS", "curated", "CGI"))
 

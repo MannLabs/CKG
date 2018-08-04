@@ -66,8 +66,7 @@ def parser(download = False):
                 if drug.lower() in drugmapping:
                     drug = drugmapping[drug.lower()]
                 else:
-                    pass
-                    #print drug
+                    continue
                 if disease.lower() in mapping:
                     disease = mapping[disease.lower()]
                 else:

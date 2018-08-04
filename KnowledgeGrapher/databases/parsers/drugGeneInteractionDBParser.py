@@ -32,7 +32,7 @@ def parser(download = True):
             data = line.rstrip("\r\n").split("\t")
             gene = data[0]
             source = data[3]
-            interactionType = data[4]
+            interactionType = data[4] if data[4] != '' else 'unknown'
             drug = data[8].lower()
             if drug == "":
                 drug = data[7] 
@@ -42,6 +42,6 @@ def parser(download = True):
                     continue
             if drug in drugmapping:
                 drug = drugmapping[drug]
-            relationships.add((drug, gene, "TARGETS", interactionType, "DGIdb: "+source))
+                relationships.add((drug, gene, "TARGETS", interactionType, "DGIdb: "+source))
 
     return (relationships, header, outputfileName)

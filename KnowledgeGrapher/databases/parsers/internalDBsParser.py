@@ -75,7 +75,7 @@ def parsePMClist(download = True):
     entities['linkout'] = [plinkout.replace("PUBMEDID", str(int(pubmedid))) for pubmedid in list(entities.index)]
     entities.index = entities.index.rename('ID')
     entities = entities.reset_index()
-    header = list(entities.columns)
+    header = [c.replace(' ','_').lower() for c in list(entities.columns)]
     entities = list(entities.itertuples(index=False)) 
     
     return entities, header
