@@ -79,12 +79,12 @@ def createDB(imports=None):
         elif "ppi" == i:
             ppiDataImportCode = cy.IMPORT_CURATED_PPI_DATA
             for resource in config.curated_PPI_resources:
-                for statement in ppiDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.upper()).split(';')[0:-1]:
+                for statement in ppiDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                     print(statement+";")
                     driver.run(statement+";")
             ppiDataImportCode = cy.IMPORT_COMPILED_PPI_DATA
             for resource in config.compiled_PPI_resources:
-                for statement in ppiDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.upper()).split(';')[0:-1]:
+                for statement in ppiDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                     print(statement+";")
                     driver.run(statement+";")
             ppiDataImportCode = cy.IMPORT_PPI_ACTION
@@ -99,7 +99,7 @@ def createDB(imports=None):
                 for statement in diseaseDataImportCode.replace("IMPORTDIR", importDir).replace("ENTITY", entity).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                     print(statement+";")
                     driver.run(statement+";")
-        #Drugs
+        #Drugs  
         elif "drugs" == i:
             drugsDataImportCode = cy.IMPORT_DRUG_DATA
             for statement in drugsDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:

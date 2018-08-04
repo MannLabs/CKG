@@ -30,7 +30,7 @@ graph = [#"ontologies",
          #"transcripts", 
          #"proteins", 
          #"ppi", 
-         "diseases", 
+         #"diseases", 
          "drugs", 
          'mentions',
          "internal",
@@ -73,7 +73,7 @@ pathway_resources = ["PathwayCommons"]
 metabolite_resources = ["hmdb"]
 
 #Internal Databases entities
-internalEntities = [("Protein","Disease"), ("Protein", "Tissue"), ("Protein","Cellular_compartment")]
+internalEntities = [("Protein","Disease"), ("Protein", "Tissue"), ("Protein","Cellular_component")]
 
 #Mentions entities
 mentionEntities = ["Disease", "Tissue", "Protein", "Cellular_component", "Chemical", "Metabolite"]

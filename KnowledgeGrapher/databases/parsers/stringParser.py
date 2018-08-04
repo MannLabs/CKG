@@ -23,15 +23,21 @@ def parser(importDirectory, download = True, db="STRING"):
         evidences = ["experimental", "prediction", "database","textmining", "score"]
         relationship = "COMPILED_INTERACTS_WITH"
         url = iconfig.STITCH_url
-        outputfile = os.path.join(importDirectory, "STITCH_associated_with.csv")
+        outputfile = os.path.join(importDirectory, "stitch_associated_with.csv")
 
         drugsource = dbconfig.sources["Drug"]
         drugmapping_url = iconfig.STITCH_mapping_url
         drugmapping = mp.getSTRINGMapping(drugmapping_url, source = drugsource, download = False, db = db)
+        
+        drugsource = dbconfig.sources["Drug"]
+        directory = os.path.join(dbconfig.databasesDir, drugsource)
+        mappingFile = os.path.join(directory, "mapping.tsv")
+        mp.updateMappingFileWithSTRING(mappingFile, drugmapping, db = "STITCH")
+
     elif db == "STRING":
         evidences = ["Neighborhood in the Genome", "Gene fusions", "Co-ocurrence across genomes","Co-expression", "Experimental/biochemical data", "Association in curated databases", "Text-mining"]
         relationship = "COMPILED_TARGETS"
-        outputfile = os.path.join(importDirectory, "STRING_interacts_with.csv")
+        outputfile = os.path.join(importDirectory, "string_interacts_with.csv")
         url = iconfig.STRING_url
     directory = os.path.join(dbconfig.databasesDir, db)
     utils.checkDirectory(directory)
@@ -87,10 +93,10 @@ def parseActions(importDirectory, proteinMapping, drugMapping = None, download =
 
     if db == "STRING":
         url = iconfig.STRING_actions_url
-        outputfile = os.path.join(importDirectory, "STRING_protein_acts_on_protein.csv")
+        outputfile = os.path.join(importDirectory, "string_protein_acts_on_protein.csv")
     elif db == "STITCH":
         url = iconfig.STITCH_actions_url
-        outputfile = os.path.join(importDirectory, "STITCH_drug_acts_on_protein.csv")
+        outputfile = os.path.join(importDirectory, "stitch_drug_acts_on_protein.csv")
     
     directory = os.path.join(dbconfig.databasesDir, db)
     utils.checkDirectory(directory)

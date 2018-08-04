@@ -117,7 +117,7 @@ def build_drug_entity(drugs):
     entities = set()
     attributes = iconfig.DrugBank_attributes
     properties = iconfig.DrugBank_exp_prop
-    allAttr = attributes + [p.replace(' ','_') for p in properties]
+    allAttr = attributes + [p.replace(' ','_').replace('-','_').replace('(','').replace(')','') for p in properties]
     for did in drugs:
         entity = []
         entity.append(did)
@@ -132,7 +132,7 @@ def build_drug_entity(drugs):
                             else:
                                 entity.append('')
                     else:
-                        lattr = ";".join(drugs[did][attr])
+                        lattr = "|".join(drugs[did][attr])
                         entity.append(lattr)
                 else:
                     entity.append(drugs[did][attr])
