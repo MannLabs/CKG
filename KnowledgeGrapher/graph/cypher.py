@@ -96,7 +96,7 @@ CREATE_PUBLICATIONS = '''
                     USING PERIODIC COMMIT 10000
                     LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/Publications.csv" AS line
                     MERGE (p:Publication{id:line.ID})
-                    ON CREATE SET p.linkout=line.linkout,p.journal=line.journal_title,p.PMC_id=line.pmcid,p.ISSN=line.issn,p.DOI=line.doi,p.page=line.page,p.volume=line.volume,p.year=line.year,p.issue=line.issue;
+                    ON CREATE SET p.linkout=line.linkout,p.journal=line.journal_title,p.PMC_id=line.pmcid,p.file_location=line.file_location;
                     '''
                     
 IMPORT_MENTIONS =   '''
@@ -226,17 +226,17 @@ IMPORT_KNOWN_VARIANT_DATA = '''
                             MERGE (k:Known_variant {id:line.ID})
                             ON CREATE SET k.alternative_names=line.alternative_names;
                             USING PERIODIC COMMIT 10000
-                            LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/known_variant_found_in_chromosome.csv" AS line
+                            LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/uniprot_chromosome_known_variant_found_in_chromosome.csv" AS line
                             MATCH (k:Known_variant {id:line.START_ID})
                             MATCH (c:Chromosome {id:line.END_ID}) 
                             MERGE (k)-[:VARIANT_FOUND_IN_CHROMOSOME]->(c);
                             USING PERIODIC COMMIT 10000
-                            LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/known_variant_found_in_gene.csv" AS line
+                            LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/uniprot_gene_known_variant_found_in_gene.csv" AS line
                             MATCH (k:Known_variant {id:line.START_ID})
                             MATCH (g:Gene {id:line.END_ID}) 
                             MERGE (k)-[:VARIANT_FOUND_IN_GENE]->(g);
                             USING PERIODIC COMMIT 10000
-                            LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/known_variant_found_in_protein.csv" AS line
+                            LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/uniprot_protein_known_variant_found_in_protein.csv" AS line
                             MATCH (k:Known_variant {id:line.START_ID})
                             MATCH (p:Protein {id:line.END_ID}) 
                             MERGE (k)-[:VARIANT_FOUND_IN_PROTEIN]->(p);

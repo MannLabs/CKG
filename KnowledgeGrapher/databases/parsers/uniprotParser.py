@@ -123,14 +123,16 @@ def parseUniProtVariants(download = False):
                 mutIdent = re.sub('NC_\d+\.', 'chr', data[9])
                 altName.append(mutIdent)
                 if len(data[9].split('.')) >1:
-                    chromosome = 'chr'+data[9].split('.')[1].split(':')[0]
+                    chromosome = data[9].split('.')[1].split(':')[0]
                 else:
-                    chromosome = 'chr'+data[9]
-
+                    chromosome = data[9]
                 entities.add((ident, "Known_variant", ",".join(altName)))
-                relationships[('Chromosome','known_variant_found_in_chromosome')].add((ident, chromosome, "VARIANT_FOUND_IN_CHROMOSOME","UniProt"))
-                relationships[('Gene','known_variant_found_in_gene')].add((ident, gene, "VARIANT_FOUND_IN_GENE", "UniProt"))
-                relationships[('Protein','known_variant_found_in_protein')].add((ident, protein, "VARIANT_FOUND_IN_PROTEIN", "UniProt"))
+                if chromosome != '-':
+                    relationships[('Chromosome','known_variant_found_in_chromosome')].add((ident, chromosome, "VARIANT_FOUND_IN_CHROMOSOME","UniProt"))
+                if gene != "":
+                    relationships[('Gene','known_variant_found_in_gene')].add((ident, gene, "VARIANT_FOUND_IN_GENE", "UniProt"))
+                if protein !="":
+                    relationships[('Protein','known_variant_found_in_protein')].add((ident, protein, "VARIANT_FOUND_IN_PROTEIN", "UniProt"))
 
     return entities, relationships
 
