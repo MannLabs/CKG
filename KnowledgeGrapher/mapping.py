@@ -2,6 +2,7 @@ from KnowledgeGrapher.ontologies import ontologies_config as oconfig
 from KnowledgeGrapher.databases import databases_config as dbconfig
 from KnowledgeGrapher import utils
 import os.path
+import time
 from collections import defaultdict
 import re
 import gzip
@@ -22,9 +23,11 @@ def getMappingFromOntology(ontology, source = None):
 
 def getMappingFromDatabase(mappingFile):
     mapping = {}
+    while not os.path.isfile(mappingFile):
+        time.sleep(5)
     with open(mappingFile, 'r') as mf:
         for line in mf:
-            data = line.rstrip("\r\n")
+            data = line.rstrip("\r\n").split("\t")
             ident = data[0]
             alias = data[1]
             mapping[alias] = ident

@@ -154,4 +154,4 @@ def build_DrugBank_dictionary(drugs):
                 out.write(did+"\t"+name.lower()+"\n")
             if "synonyms" in drugs[did]:
                 for synonym in drugs[did]["synonyms"]:
-                    out.write(did+"\t"+synonym.lower()+"\n")
+                    out.write(did+"\t"+synonym.lower()+"\n")    

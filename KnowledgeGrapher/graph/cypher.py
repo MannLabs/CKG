@@ -190,11 +190,6 @@ IMPORT_PATHWAY_DATA = '''
                         MATCH (p:Protein{id:line.START_ID})
                         MATCH (a:Pathway{id:line.END_ID}) 
                         MERGE (p)-[:ANNOTATED_IN_PATHWAY{evidence:line.evidence,linkout:line.linkout,source:line.source}]->(a);
-                        USING PERIODIC COMMIT 10000 
-                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/SOURCE_has_parent.csv" AS line
-                        MATCH (p1:Pathway{id:line.START_ID})
-                        MATCH (p2:Pathway{id:line.END_ID}) 
-                        MERGE (p1)-[:HAS_PARENT]->(p2);
                         '''
 IMPORT_METABOLITE_DATA = '''
                         CREATE CONSTRAINT ON (m:Metabolite) ASSERT m.id IS UNIQUE; 

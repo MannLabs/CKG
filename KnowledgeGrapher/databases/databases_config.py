@@ -3,23 +3,23 @@ databasesDir = "/Users/albertosantos/Development/Clinical_Proteomics_Department/
 databasesImportDir = "databases"
 #Databases
 databases = [
-            #"Internal",
-            #"HGNC", 
-            #"RefSeq", 
-            #"UniProt", 
-            #"IntAct", 
-            #"DisGEnet", 
-            #'DrugBank',             
-            #"STRING", 
+            'DrugBank',             
+            "Internal",
+            "HGNC", 
+            "RefSeq", 
+            "UniProt", 
+            "DisGEnet", 
             "STITCH", 
-            #"Mentions",
+            "STRING", 
+            "IntAct", 
+            "Mentions",
+            "HMDB",
+            "PathwayCommons",
+            'GWASCatalog',
             "DGIdb", 
             "OncoKB",
             "CancerGenomeInterpreter", 
-            "SIDER",
-            "HMDB",
-            "PathwayCommons",
-            'GWASCatalog'
+            "SIDER"
             ]
 
 sources = {

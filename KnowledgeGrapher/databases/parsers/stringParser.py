@@ -29,11 +29,6 @@ def parser(importDirectory, download = True, db="STRING"):
         drugmapping_url = iconfig.STITCH_mapping_url
         drugmapping = mp.getSTRINGMapping(drugmapping_url, source = drugsource, download = False, db = db)
         
-        drugsource = dbconfig.sources["Drug"]
-        directory = os.path.join(dbconfig.databasesDir, drugsource)
-        mappingFile = os.path.join(directory, "mapping.tsv")
-        mp.updateMappingFileWithSTRING(mappingFile, drugmapping, db = "STITCH")
-
     elif db == "STRING":
         evidences = ["Neighborhood in the Genome", "Gene fusions", "Co-ocurrence across genomes","Co-expression", "Experimental/biochemical data", "Association in curated databases", "Text-mining"]
         relationship = "COMPILED_TARGETS"
