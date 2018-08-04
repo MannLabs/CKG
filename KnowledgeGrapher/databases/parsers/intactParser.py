@@ -10,6 +10,7 @@ import re
 #########################
 def parser(download = False):
     intact_dictionary = defaultdict()
+    stored = set()
     relationships = set()
     header = iconfig.header
     outputfileName = "INTACT_interacts_with.csv"
@@ -63,5 +64,7 @@ def parser(download = False):
                 else:
                     intact_dictionary[(intA,intB)]= {'methods': set([method]),'sources':set([source]),'publications':set([publications]), 'itype':set([itype]), 'score':score}
     for (intA, intB) in intact_dictionary:
-        relationships.add((intA,intB,"CURATED_INTERACTS_WITH",intact_dictionary[(intA, intB)]['score'], ",".join(intact_dictionary[(intA, intB)]['itype']), ",".join(intact_dictionary[(intA, intB)]['methods']), ",".join(intact_dictionary[(intA, intB)]['sources']), ",".join(intact_dictionary[(intA, intB)]['publications'])))
+        if (intA, intB, intact_dictionary[(intA,intB)]["score"]) not in stored:
+            relationships.add((intA,intB,"CURATED_INTERACTS_WITH",intact_dictionary[(intA, intB)]['score'], ",".join(intact_dictionary[(intA, intB)]['itype']), ",".join(intact_dictionary[(intA, intB)]['methods']), ",".join(intact_dictionary[(intA, intB)]['sources']), ",".join(intact_dictionary[(intA, intB)]['publications'])))
+            stored.add((intA, intB, intact_dictionary[(intA,intB)]["score"]))
     return (relationships, header, outputfileName)

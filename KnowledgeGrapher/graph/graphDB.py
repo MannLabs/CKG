@@ -78,8 +78,18 @@ def createDB(imports=None):
         #PPIs
         elif "ppi" == i:
             ppiDataImportCode = cy.IMPORT_CURATED_PPI_DATA
-            for resource in config.PPI_resources:
+            for resource in config.curated_PPI_resources:
                 for statement in ppiDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.upper()).split(';')[0:-1]:
+                    print(statement+";")
+                    driver.run(statement+";")
+            ppiDataImportCode = cy.IMPORT_COMPILED_PPI_DATA
+            for resource in config.compiled_PPI_resources:
+                for statement in ppiDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.upper()).split(';')[0:-1]:
+                    print(statement+";")
+                    driver.run(statement+";")
+            ppiDataImportCode = cy.IMPORT_PPI_ACTION
+            for resource in config.PPI_action_resources:
+                for statement in ppiDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                     print(statement+";")
                     driver.run(statement+";")
         #Diseases
@@ -91,8 +101,22 @@ def createDB(imports=None):
                     driver.run(statement+";")
         #Drugs
         elif "drugs" == i:
+            drugsDataImportCode = cy.IMPORT_DRUG_DATA
+            for statement in drugsDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
+                print(statement+";")
+                driver.run(statement+";")
             drugsDataImportCode = cy.IMPORT_CURATED_DRUG_DATA
-            for resource in config.drug_resources:
+            for resource in config.curated_drug_resources:
+                for statement in drugsDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
+                    print(statement+";")
+                    driver.run(statement+";")
+            drugsDataImportCode = cy.IMPORT_COMPILED_DRUG_DATA
+            for resource in config.compiled_drug_resources:
+                for statement in drugsDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
+                    print(statement+";")
+                    driver.run(statement+";")
+            drugsDataImportCode = cy.IMPORT_DRUG_ACTS_ON
+            for resource in config.drug_action_resources:
                 for statement in drugsDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                     print(statement+";")
                     driver.run(statement+";")

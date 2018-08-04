@@ -24,12 +24,12 @@ statsFile = "stats.hdf"
 statsCols = ["date", "time", "dataset", "filename", "file_size", "Imported_number", "Import_type", "name"]
 
 #Full Graph
-graph = ["ontologies", 
-         "chromosomes", 
-         "genes", 
-         "transcripts", 
-         "proteins", 
-         "ppi", 
+graph = [#"ontologies", 
+         #"chromosomes", 
+         #"genes", 
+         #"transcripts", 
+         #"proteins", 
+         #"ppi", 
          "diseases", 
          "drugs", 
          'mentions',
@@ -48,17 +48,33 @@ graph = ["ontologies",
 #Imports 
 ontology_entities = ["Disease","Tissue","Biological_process", "Molecular_function", "Cellular_component", "Modification", "Clinical_variable", "Phenotype", "Experiment"]
 #Database resources
-PPI_resources = ["IntAct", "STRING"]
-disease_resources = [("Protein","DisGEnet"),("Clinically_relevant_variant","CGI"),("Clinically_relevant_variant","OncoKB")]
-drug_resources = ["DGIdb","CGI","OncoKB"]
+#Protein-protein interactions
+curated_PPI_resources = ["IntAct"]
+compiled_PPI_resources = ["STRING"]
+PPI_action_resources = ["STRING"]
+
+#Disease associations
+disease_resources = [("Protein","DisGEnet")]
+
+
+#Drug associations, indications and actions
+curated_drug_resources = ["DGIdb","CGI","OncoKB"]
+compiled_drug_resources = ["STITCH"]
+drug_action_resources = ["STITCH"]
 side_effects_resources = ["SIDER"]
+
+#Variants
 clinical_variant_resources = ["CGI","OncoKB"]
+
+#Pathways
 pathway_resources = ["PathwayCommons"]
+
+#Metabolites
 metabolite_resources = ["hmdb"]
 
 #Internal Databases entities
 internalEntities = [("Protein","Disease"), ("Protein", "Tissue"), ("Protein","Cellular_compartment")]
 
 #Mentions entities
-mentionEntities = ["Disease", "Tissue", "Protein", "Cellular_compartment", "Chemical", "Metabolite"]
+mentionEntities = ["Disease", "Tissue", "Protein", "Cellular_component", "Chemical", "Metabolite"]
 publicationEntities = ["GWAS_study"]

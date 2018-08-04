@@ -49,7 +49,7 @@ def parseInternalDatabasePairs(qtype, mapping, download = True):
 
             if id1 in mapping:
                 for ident in mapping[id1]:
-                    relationships.add((ident, id2, "ASSOCIATED_WITH_INTEGRATED", source, score))
+                    relationships.add((ident, id2, "ASSOCIATED_WITH_INTEGRATED", source, "compiled"))
             else:
                 continue
                 

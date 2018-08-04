@@ -14,6 +14,7 @@ import re
 def parser(importDirectory, download = True, db="STRING"):
     mapping_url = iconfig.STRING_mapping_url
     mapping = mp.getSTRINGMapping(mapping_url, download = False)
+    stored = set()
     relationship = None
     cutoff = iconfig.STRING_cutoff
     header = iconfig.header
@@ -28,7 +29,7 @@ def parser(importDirectory, download = True, db="STRING"):
         drugmapping_url = iconfig.STITCH_mapping_url
         drugmapping = mp.getSTRINGMapping(drugmapping_url, source = drugsource, download = False, db = db)
     elif db == "STRING":
-        evidences = ["experimental", "prediction", "database","textmining", "score"]
+        evidences = ["Neighborhood in the Genome", "Gene fusions", "Co-ocurrence across genomes","Co-expression", "Experimental/biochemical data", "Association in curated databases", "Text-mining"]
         relationship = "COMPILED_TARGETS"
         outputfile = os.path.join(importDirectory, "STRING_interacts_with.csv")
         url = iconfig.STRING_url
@@ -58,14 +59,20 @@ def parser(importDirectory, download = True, db="STRING"):
                 if intA in mapping and intB in mapping and float(fscores[-1])>=cutoff:
                     for aliasA in mapping[intA]:
                         for aliasB in mapping[intB]:
-                            row = (aliasA, aliasB, relationship, "association", db, ",".join(evidences), ",".join(fscores[0:-1]), fscores[-1])
-                            writer.writerow(row)
+                            if (aliasA,aliasB) not in stored:
+                                row = (aliasA, aliasB, relationship, "association", db, ",".join(evidences), ",".join(fscores[0:-1]), fscores[-1])
+                                stored.add((aliasA,aliasB))
+                                stored.add((aliasB,aliasB))
+                                writer.writerow(row)
             elif db == "STITCH":
                 if intA in drugmapping and intB in mapping and float(fscores[-1])>=cutoff:
                     for aliasA in drugmapping[intA]:
                         for aliasB in mapping[intB]:
-                            row = (aliasA, aliasB, relationship, "association", db, ",".join(evidences), ",".join(fscores[0:-1]), fscores[-1])
-                            writer.writerow(row)
+                            if (aliasA, aliasB) not in stored:
+                                row = (aliasA, aliasB, relationship, "association", db, ",".join(evidences), ",".join(fscores[0:-1]), fscores[-1])
+                                stored.add((aliasA,aliasB))
+                                stored.add((aliasB,aliasB))
+                                writer.writerow(row)
     associations.close()
 
     return mapping, drugmapping
