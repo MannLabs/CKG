@@ -156,19 +156,14 @@ IMPORT_PPI_ACTION = '''
 IMPORT_DRUG_SIDE_EFFECTS =   '''
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_has_side_effect.csv" AS line
-                        MATCH (d1:Drug {id:line.START_ID})
-                        MATCH (d2:Disease {id:line.END_ID})
-                        MERGE (d1)-[:HAS_SIDE_EFFECT{source:line.source,original_side_effect_code:line.original_side_effect}]->(d2);
+                        MATCH (d:Drug {id:line.START_ID})
+                        MATCH (p:Phenotype {id:line.END_ID})
+                        MERGE (d)-[:HAS_SIDE_EFFECT{source:line.source,original_side_effect_code:line.original_side_effect}]->(p);
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_is_indicated_for.csv" AS line
                         MATCH (d:Drug {id:line.START_ID})
                         MATCH (p:Phenotype {id:line.END_ID})
-                        MERGE (d)-[:IS_INDICATED_FOR{source:line.source,original_side_effect_code:line.original_side_effect;evidence:line.evidence}]->(p);
-                        USING PERIODIC COMMIT 10000
-                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_is_indicated_for.csv" AS line
-                        MATCH (d:Drug {id:line.START_ID})
-                        MATCH (p:Phenotype {id:line.END_ID})
-                        MERGE (d)-[:IS_INDICATED_FOR{source:line.source,original_side_effect_code:line.original_side_effect;evidence:line.evidence}]->(p);
+                        MERGE (d)-[:IS_INDICATED_FOR{source:line.source,original_side_effect_code:line.original_side_effect,evidence:line.evidence}]->(p);
                         '''
 
 IMPORT_DRUG_ACTS_ON =   '''
@@ -186,10 +181,10 @@ IMPORT_PATHWAY_DATA = '''
                         MERGE (p:Pathway{id:line.ID})
                         ON CREATE SET p.name=line.name,p.source=line.source;
                         USING PERIODIC COMMIT 10000
-                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_annotated_in_pathway.csv" AS line
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_protein_associated_with_pathway.csv" AS line
                         MATCH (p:Protein{id:line.START_ID})
                         MATCH (a:Pathway{id:line.END_ID}) 
-                        MERGE (p)-[:ANNOTATED_IN_PATHWAY{evidence:line.evidence,linkout:line.linkout,source:line.source}]->(a);
+                        MERGE (p)-[:ANNOTATED_IN_PATHWAY{linkout:line.linkout,source:line.source}]->(a);
                         '''
 IMPORT_METABOLITE_DATA = '''
                         CREATE CONSTRAINT ON (m:Metabolite) ASSERT m.id IS UNIQUE; 
@@ -201,7 +196,7 @@ IMPORT_METABOLITE_DATA = '''
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_annotated_in_pathway.csv" AS line
                         MATCH (m:Metabolite{id:line.START_ID})
                         MATCH (p:Pathway{id:line.END_ID}) 
-                        MERGE (m)-[:ANNOTATED_IN_PATHWAY{evidence:line.evidence,linkout:line.linkout,source:line.source}]->(p);
+                        MERGE (m)-[:ANNOTATED_IN_PATHWAY{source:line.source}]->(p);
                         USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/SOURCE_associated_with_protein.csv" AS line
                         MATCH (m:Metabolite{id:line.START_ID})
@@ -284,7 +279,7 @@ IMPORT_DATASETS = {"clinical":'''USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_proteins.csv" AS line
                         MATCH (s:Analytical_sample {id:line.START_ID}) 
                         MATCH (p:Protein{id:line.END_ID}) 
-                        MERGE (s)-[:HAS_QUANTIFIED_PROTEIN{value:line.value,intensity:line.intensity,qvalue:line.Q-value,score:line.Score,proteinGroup:line.id}]->(p);
+                        MERGE (s)-[:HAS_QUANTIFIED_PROTEIN{value:line.value,intensity:line.Intensity,qvalue:line.Qvalue,score:line.Score,proteinGroup:line.id}]->(p);
                         CREATE CONSTRAINT ON (p:Peptide) ASSERT p.id IS UNIQUE;
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_peptides.csv" AS line

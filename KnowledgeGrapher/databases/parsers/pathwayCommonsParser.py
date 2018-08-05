@@ -36,7 +36,7 @@ def parser(download = True):
         
         entities.add((code, "Pathway", name, name, source, linkout))
         for protein in proteins:
-            relationships.add((protein, code, "ANNOTATED_IN_PATHWAY", "", linkout, "PathwayCommons: "+source))
+            relationships.add((protein, code, "ANNOTATED_IN_PATHWAY", linkout, "PathwayCommons: "+source))
 
     associations.close()
     return (entities, relationships, entities_header, relationships_header)

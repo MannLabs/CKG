@@ -70,7 +70,7 @@ def extractAttributes(data, attributes):
                 auxAttr_reg = auxAttr_reg.join(data.filter(regex = r))
         else:
             auxAttr_col = auxAttr_col.join(data[attributes[ctype]])
-            cCols = [c.replace(' ','_') for c in attributes[ctype]]
+            cCols = [c.replace(' ','_').replace('-','') for c in attributes[ctype]]
 
     return (auxAttr_col,cCols), (auxAttr_reg,regexCols)
 
