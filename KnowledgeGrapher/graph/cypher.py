@@ -96,7 +96,7 @@ CREATE_PUBLICATIONS = '''
                     USING PERIODIC COMMIT 10000
                     LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/Publications.csv" AS line
                     MERGE (p:Publication{id:line.ID})
-                    ON CREATE SET p.linkout=line.linkout,p.journal=line.journal_title,p.PMC_id=line.pmcid,p.file_location=line.file_location;
+                    ON CREATE SET p.linkout=line.linkout,p.journal=line.journal_title,p.PMC_id=line.pmcid,p.year=toInt(line.year),p.volume=line.volume,p.issue=line.issue,p.page=line.page,p.DOI=line.doi;
                     '''
                     
 IMPORT_MENTIONS =   '''
@@ -255,10 +255,10 @@ IMPORT_CLINICALLY_RELEVANT_VARIANT_DATA = '''
                                         MATCH (c:Clinically_relevant_variant {id:line.END_ID}) 
                                         MERGE (k)-[:VARIANT_IS_CLINICALLY_RELEVANT{source:line.source}]->(c);
                                         USING PERIODIC COMMIT 10000
-                                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_targets_known_variant.csv" AS line
+                                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_targets_clinically_relevant_variant.csv" AS line
                                         MATCH (d:Drug {id:line.START_ID})
                                         MATCH (k:Clinically_relevant_variant {id:line.END_ID})
-                                        MERGE (d)-[:TARGETS_CLINICALLY_RELEVANT_VARIANT{association:line.association, evidence:line.evidence, tumor:line.tumor, type:line.type, source:line.source}]->(k)
+                                        MERGE (d)-[:TARGETS_CLINICALLY_RELEVANT_VARIANT{association:line.association, evidence:line.evidence, tumor:line.tumor, type:line.type, source:line.source}]->(k);
                                         USING PERIODIC COMMIT 10000
                                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_associated_with.csv" AS line
                                         MATCH (k:Clinically_relevant_variant {id:line.START_ID})
