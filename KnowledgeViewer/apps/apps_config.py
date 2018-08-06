@@ -35,7 +35,7 @@ wesPage= {"overview":[
 
 ### Project Page configuration
 pages = {"projectPage":{
-                "overview": projectPage,
+                "project": projectPage,
                 "proteomics": proteomicsPage,
                 "wes": wesPage
                 }
