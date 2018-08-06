@@ -8,7 +8,7 @@ from plotly.graph_objs import *
 import networkx as nx
 from utils import hex2rgb, getNumberText
 
-def getBarPlotFigure(data, identifier, title, subplot = False):
+def getBarPlotFigure(data, identifier, title, x_title, y_title, group= True, subplot = False):
     '''This function plots a simple barplot
     --> input:
         - data: is a Pandas DataFrame with three columns: "name" of the bars, 'x' values and 'y' values to plot
@@ -19,11 +19,26 @@ def getBarPlotFigure(data, identifier, title, subplot = False):
     '''
     figure = {}
     figure["data"] = []
+    if group:
+        for g in data["group"].unique():
+            trace = go.Bar(
+                        x = data.loc[data["group"] == g,'x'], # assign x as the dataframe column 'x'
+                        y = data.loc[data["group"] == g, 'y'],
+                        name = g
+                        )
+            figure["data"].append(trace)
+    else:
+        figure["data"].append(
+                      go.Bar(
+                            x=data['x'], # assign x as the dataframe column 'x'
+                            y=data['y']
+                        )
+                    )
     figure["layout"] = {"title":title,
                         "height":500,
                         "width":500}
-    for name in data.name.unique():
-        figure["data"].append({'x': np.unique(data['x'].values), 'y':data.loc[data['name'] == name,'y'].values , 'type': 'bar', 'name': name})
+    #for name in data.name.unique():
+    #    figure["data"].append({'x': np.unique(data['x'].values), 'y':data.loc[data['name'] == name,'y'].values , 'type': 'bar', 'name': name})
     
     if subplot:
         return (identifier, figure)

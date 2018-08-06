@@ -1,7 +1,7 @@
 from KnowledgeConnector import graph_controler
 from KnowledgeViewer.queries import *
 from KnowledgeViewer.plots import basicFigures as figure
-from KnowledgeViewer.analyses import basicAnalyses as analyses
+from KnowledgeViewer.analyses import basicAnalysis as analyses
 
 def getDBresults(query, driver, replace=[]):
     for r,by in replace:
@@ -23,8 +23,9 @@ def getPlot(name, data, identifier, title, args = {}):
         if "subset" in args:
             subset = args["subset"]
         plot = figure.getBasicTable(data, identifier, title, colors=colors, subset=subset, plot_attr=attr)
-    elif name == "barPlot":
-        if "x" in data.columns() and "y" in data.columns() and "name" in data.columns():
+    elif name == "basicBarPlot":
+        print(data.columns)
+        if "x" in data.columns and "y" in data.columns and "name" in data.columns:
             x_title = "x"
             y_title = "y"
             if "x_title" in args:
@@ -33,7 +34,7 @@ def getPlot(name, data, identifier, title, args = {}):
                 y_title = args["y_title"]
             plot = figure.getBarPlotFigure(data, identifier, x_title, y_title, title)
     elif name == "scatterPlot":
-        if "x" in data.columns() and "y" in data.columns() and "name" in data.columns():
+        if "x" in data.columns and "y" in data.columns and "name" in data.columns:
             x_title = "x"
             y_title = "y"
             if "x_title" in args:
@@ -49,22 +50,25 @@ def getAnalysisResults(data):
 
 def view(title, section_query, analysis_type, plot_name, args):
     result = None
+    plot = None
     driver = graph_controler.getGraphDatabaseConnectionConfiguration()
-    if title == "project":
+    if title in ["project","proteomics"]:
         replace = []
         queries = project_cypher.queries
         replacement = "PROJECTID"
         if "id" in args:
             replace.append((replacement, args["id"]))
+            print("Here",section_query)
+            query = None
             if section_query.upper() in queries:
                 plot_title, query = queries[section_query.upper()]
-            data = getDBresults(query, driver, replace)
-            result = data
-            if not data.empty:
-                if analysis_type is not None:
-                    result = getAnalysisResult(result)
-            if not result.empty:
-                plot = getPlot(plot_name, result, "project_"+section_query, plot_title, args)
+                data = getDBresults(query, driver, replace)
+                result = data
+                if not data.empty:
+                    if analysis_type is not None:
+                        result = getAnalysisResult(result)
+                if not result.empty:
+                    plot = getPlot(plot_name, result, "project_"+section_query, plot_title, args)
     elif title == "import":
         pass
 

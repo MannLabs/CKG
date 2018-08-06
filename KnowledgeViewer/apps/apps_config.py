@@ -11,22 +11,22 @@ projectPage = {"overview":[
                             ]
                 }
 proteomicsPage= {"overview":[
-                            ("number_proteins_analytical_sample", None, ["basicBarPlot"], {}),
+                            ("number_proteins_analytical_sample", None, ["basicBarPlot"], {"x_title":"Analytical sample", "y_title":"number of proteins"}),
                             ("number_pepetides_anlytical_sample", None, ["basicBarPlot"], {}),
                             ("number_modified_proteins_analytical_sample", None, ["basicBarPlot"], {})
                             ],
-                "stratification":[
-                                ("identified_proteins_sample_group", "pca", ["scatterPlot"], {})
-                                ],
-                    "correlation":[
-                                ("correlation_analysis", ["complexHeatmapPlot", "3dNetwork"])
-                                ],
-                    "regulation":[
-                                ("differential_regulation", ["volcanoPlot", "basicTable", "ppiNetwork"])
-                                ],
-                    "targets":[
-                                ("target_analysis_proteins", ["basicTable", "3dNetwork"])
-                                ]
+                #"stratification":[
+                #                ("identified_proteins_sample_group", "pca", ["scatterPlot"], {})
+                #                ],
+                #    "correlation":[
+                #                ("correlation_analysis", ["complexHeatmapPlot", "3dNetwork"])
+                #                ],
+                #    "regulation":[
+                #                ("differential_regulation", ["volcanoPlot", "basicTable", "ppiNetwork"])
+                #                ],
+                #    "targets":[
+                #                ("target_analysis_proteins", ["basicTable", "3dNetwork"])
+                #                ]
                     }
 wesPage= {"overview":[
                         ("number_somatic_mutations_by_type_analytical_sample",["basicBarPlot", "basicTable"]),
@@ -40,7 +40,7 @@ wesPage= {"overview":[
 ### Project Page configuration
 pages = {"projectPage":{
                 "project": projectPage,
-                #"proteomics": proteomicsPage,
+                "proteomics": proteomicsPage,
                 #"wes": wesPage
                 }
             }
