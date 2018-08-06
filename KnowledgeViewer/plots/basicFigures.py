@@ -30,7 +30,7 @@ def getBarPlotFigure(data, identifier, title, subplot = False):
         
     return dcc.Graph(id= identifier, figure = figure)
 
-def getScatterPlotFigure(data, identifier, x, y, x_title, y_title, title, subplot = False):
+def getScatterPlotFigure(data, identifier, x_title, y_title, title, subplot = False):
     '''This function plots a simple Scatterplot
     --> input:
         - data: is a Pandas DataFrame with four columns: "name", x values and y values (provided as variables) to plot
@@ -51,8 +51,8 @@ def getScatterPlotFigure(data, identifier, x, y, x_title, y_title, title, subplo
                                 width= 500
                                 )
     for name in data.name.unique():
-        figure["data"].append(go.Scatter(x = data.loc[data["name"] == name, x], 
-                                        y = data.loc[data['name'] == name, y], 
+        figure["data"].append(go.Scatter(x = data.loc[data["name"] == name, "x"], 
+                                        y = data.loc[data['name'] == name, "y"], 
                                         text = name, 
                                         mode = 'markers', 
                                         opacity=0.7,
@@ -259,8 +259,9 @@ def get3DNetworkFigure(data, sourceCol, targetCol, node_properties, identifier, 
     return dcc.Graph(id = identifier, figure = figure)
 
 
-def get2DPCAFigure(data, groups, components, identifier, title, subplot = False):
+def get2DPCAFigure(data, components, identifier, title, subplot = False):
     traces = []
+    groups = data["groups"].unique()
 
     for name in groups:
         trace = Scatter(
@@ -352,8 +353,8 @@ def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subse
                     fill = dict(color= colors[1]),
                     align = ['left'] * 5))
     layout =  dict(
-        width= 200 if 'width' not in plot_attr else plot_attr['width'],
-        height= 200 if 'height' not in plot_attr else plot_attr['height'],
+        width= 300 if 'width' not in plot_attr else plot_attr['width'],
+        height= 300 if 'height' not in plot_attr else plot_attr['height'],
         title = title,
         font = dict(
             size = 12 if 'font' not in plot_attr else plot_attr['font'],

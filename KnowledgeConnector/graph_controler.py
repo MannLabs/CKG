@@ -1,6 +1,7 @@
 import sys
 import py2neo
-import config_graph as config
+import pandas as pd
+from KnowledgeConnector import graph_config as config
 
 
 def getGraphDatabaseConnectionConfiguration():
@@ -32,6 +33,7 @@ def removeRelationshipDB(entity1, entity2, relationship):
     print("Existing entries after deletion: %d" % sendQuery(driver, countst).data()[0]['count'])
 
 def sendQuery(driver, query):
+    print(query)
     try:
         result = driver.run(query)
     except py2neo.database.ClientError as err:
@@ -42,3 +44,9 @@ def sendQuery(driver, query):
         print("Unexpected error:", sys.exc_info()[0])
 
     return result
+
+def getCursorData(driver, query):
+    result = sendQuery(driver, query)
+    df = pd.DataFrame(result.data())
+    
+    return df

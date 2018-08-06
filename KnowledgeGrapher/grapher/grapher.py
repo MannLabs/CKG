@@ -196,7 +196,7 @@ def partialUpdateDB(dataset):
 
 def populateDB():
     imports = config.graph
-    driver = getGraphDatabaseConnectionConfiguration()
+    driver = graph_controler.getGraphDatabaseConnectionConfiguration()
     updateDB(imports)
     print(datetime.now() - START_TIME)
     archiveImportDirectory(archive_type="full")
