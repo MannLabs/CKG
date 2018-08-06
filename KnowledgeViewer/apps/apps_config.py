@@ -4,7 +4,8 @@ logo = '../static/img/logo.png'
 
 footer = '<div id="PageFooter"><p> The Clinical Knowledge Graph has been implemented by <a href="mailto:alberto.santos@cpr.ku.dk">Alberto Santos</a>, <a>Annelaura B. Nielsen</a> and <a href="mailto:rita.colaco@cpr.ku.dk">Ana R. Colaço</a></p></br> <p>This tool is used by the Clinical Proteomics Department, Prof. Matthias Mann, at <a href="http://www.cpr.ku.dk">Novo Nordisk Foundation Center for Protein Reseach</a></p></div>'
 
-
+projectPage = {"overview":[("project_overview", "basicTable")]
+              }
 proteomicsPage= {"overview":[
                                 ("number_proteins_analytical_sample",["basicBarPlot"]),
                                 ("number_pepetides_anlytical_sample", ["basicBarPlot"]),
@@ -33,10 +34,8 @@ wesPage= {"overview":[
 
 
 ### Project Page configuration
-pages = {"projectPage":
-                {"overview":[
-                            ("project_overview", )
-                            ],
+pages = {"projectPage":{
+                "overview": projectPage,
                 "proteomics": proteomicsPage,
                 "wes": wesPage
                 }

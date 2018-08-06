@@ -5,6 +5,7 @@ from plots import basicFigures
 import pandas as pd
 import dash_auth
 from apps import basicApp
+from KnowledgeViewer.queries import project_queries
 
 class ProjectApp(basicApp.BasicApp):
     def __init__(self, projectId, title, subtitle, description, layout = [], logo = None, footer = None):
@@ -20,7 +21,8 @@ class ProjectApp(basicApp.BasicApp):
 
         for key in projectPageConfig:
             print(key,projectPageConfig[key])
-            
+        
+        
         
         data = pd.DataFrame([("a", "1", 2), ("b", "1", 3), ("a","2",12), ("b","2",2)], columns = ["name", "x", "y"])
         figure = basicFigures.getBarPlotFigure(data, identifier = "myPlot", title= "Oh what a figure")

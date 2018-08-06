@@ -100,7 +100,7 @@ def getComplexHeatmapFigure(data, identifier, title, subplot = False):
         dendro_side['data'][i]['xaxis'] = 'x2'
 
     # Add Side Dendrogram Data to Figure
-    figure['data'].extend(dendro_side['data'])
+    figure['data'] + (dendro_side['data'],)
 
     dendro_leaves = dendro_side['layout']['yaxis']['ticktext']
     dendro_leaves = list(map(int, dendro_leaves))
@@ -114,7 +114,7 @@ def getComplexHeatmapFigure(data, identifier, title, subplot = False):
             x = dendro_leaves,
             y = dendro_leaves,
             z = heat_data,
-            colorscale = 'YIGnBu'
+            colorscale = 'YlGnBu'
         )
     ])
 
@@ -122,7 +122,7 @@ def getComplexHeatmapFigure(data, identifier, title, subplot = False):
     heatmap[0]['y'] = dendro_side['layout']['yaxis']['tickvals']
 
     # Add Heatmap Data to Figure
-    figure['data'].extend(Data(heatmap))
+    figure['data'] + (Data(heatmap),)
 
     # Edit Layout
     figure['layout'].update({'width':800, 'height':800,
@@ -207,7 +207,7 @@ def get3DNetworkFigure(data, sourceCol, targetCol, node_properties, identifier, 
                y=Yed,
                z=Zed,
                mode='lines',
-               line=Line(color='rgb(125,125,125)', width=2),
+               line=scatter3d.Line(color='rgb(125,125,125)', width=2),
                hoverinfo='none'
                )
     trace2=Scatter3d(x=Xn,
@@ -215,11 +215,11 @@ def get3DNetworkFigure(data, sourceCol, targetCol, node_properties, identifier, 
                z=Zn,
                mode='markers',
                name='proteins',
-               marker=Marker(symbol='dot',
+               marker=scatter3d.Marker(symbol='circle',
                              size=sizes,
                              color=colors,
                              colorscale='Viridis',
-                             line=Line(color='rgb(50,50,50)', width=5.5)
+                             line=scatter3d.marker.Line(color='rgb(50,50,50)', width=5.5)
                              ),
                text=labels,
                hoverinfo='text'
@@ -268,17 +268,17 @@ def get2DPCAFigure(data, groups, components, identifier, title, subplot = False)
             y=Y_sklearn[y==name,components[1]],
             mode='markers',
             name=name,
-            marker=Marker(
+            marker=scatter.Marker(
                 size=12,
-                line=Line(
+                line=scatter.Line(
                     color='rgba(217, 217, 217, 0.14)',
                     width=0.5),
                 opacity=0.8))
         traces.append(trace)
 
     d = Data(traces)
-    layout = Layout(xaxis=XAxis(title='PC'+str(components[0]), showline=False),
-                    yaxis=YAxis(title='PC'+str(components[1]), showline=False))
+    layout = Layout(xaxis=layout.XAxis(title='PC'+str(components[0]), showline=False),
+                    yaxis=layout.YAxis(title='PC'+str(components[1]), showline=False))
     figure = Figure(data=d, layout=layout)
 
     if subplot:

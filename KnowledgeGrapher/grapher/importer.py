@@ -11,7 +11,7 @@ import os.path
 from datetime import datetime
 import pandas as pd
 from joblib import Parallel, delayed
-import config
+import grapher_config as aonfig
 from KnowledgeGrapher.ontologies import ontologieshandler as oh, ontologies_config as oconfig
 from KnowledgeGrapher.databases import databaseshandler as dh, databases_config as dbconfig
 from KnowledgeGrapher.experiments import experimentshandler as eh, experiments_config as econfig
