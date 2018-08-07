@@ -11,13 +11,13 @@ projectPage = {"overview":[
                             ]
                 }
 proteomicsPage= {"overview":[
+                            ("number_peptides_analytical_sample", None, ["basicBarPlot"], {"x_title":"Analytical sample", "y_title":"number of peptides"}),
                             ("number_proteins_analytical_sample", None, ["basicBarPlot"], {"x_title":"Analytical sample", "y_title":"number of proteins"}),
-                            ("number_pepetides_anlytical_sample", None, ["basicBarPlot"], {}),
-                            ("number_modified_proteins_analytical_sample", None, ["basicBarPlot"], {})
+                            ("number_modified_proteins_analytical_sample", None, ["basicBarPlot"], {"x_title":"Analytical sample", "y_title":"number of modified proteins"})
                             ],
-                #"stratification":[
-                #                ("identified_proteins_sample_group", "pca", ["scatterPlot"], {})
-                #                ],
+                "stratification":[
+                                ("identified_proteins_sample_group", "pca", ["scatterPlot"], {"imputation":True,"imputation_method":"distribution"})
+                                ],
                 #    "correlation":[
                 #                ("correlation_analysis", ["complexHeatmapPlot", "3dNetwork"])
                 #                ],

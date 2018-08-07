@@ -273,13 +273,13 @@ IMPORT_DATASETS = {"clinical":'''USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_clinical.csv" AS line 
                         MATCH (s:Analytical_sample{id:line.START_ID})
                         MATCH (c:Clinical_variable{id:line.END_ID}) 
-                        MERGE (s)-[:HAS_QUANTIFIED_CLINICAL{value:line.value}]->(c);
+                        MERGE (s)-[:HAS_QUANTIFIED_CLINICAL{value:toFloat(line.value)}]->(c);
                         ''',
                     "proteomics":'''USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_proteins.csv" AS line
                         MATCH (s:Analytical_sample {id:line.START_ID}) 
                         MATCH (p:Protein{id:line.END_ID}) 
-                        MERGE (s)-[:HAS_QUANTIFIED_PROTEIN{value:line.value,intensity:line.Intensity,qvalue:line.Qvalue,score:line.Score,proteinGroup:line.id}]->(p);
+                        MERGE (s)-[:HAS_QUANTIFIED_PROTEIN{value:toFloat(line.value),intensity:toFloat(line.Intensity),qvalue:toFloat(line.Qvalue),score:toFloat(line.Score),proteinGroup:line.id}]->(p);
                         CREATE CONSTRAINT ON (p:Peptide) ASSERT p.id IS UNIQUE;
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_peptides.csv" AS line
@@ -294,7 +294,7 @@ IMPORT_DATASETS = {"clinical":'''USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_subject_peptide.csv" AS line 
                         MATCH (s:Analytical_sample {id:line.START_ID})
                         MATCH (p:Peptide {id:line.END_ID}) 
-                        MERGE (s)-[:HAS_QUANTIFIED_PEPTIDE{value:line.value, score: line.Score, proteinGroupId:line.Protein_group_IDs}]->(p);
+                        MERGE (s)-[:HAS_QUANTIFIED_PEPTIDE{value:toFloat(line.value), score:toFloat(line.Score), proteinGroupId:line.Protein_group_IDs}]->(p);
                         USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_protein_modification.csv" AS line 
                         MATCH (p:Protein {id:line.START_ID})
@@ -319,7 +319,7 @@ IMPORT_DATASETS = {"clinical":'''USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_modifiedprotein_subject.csv" AS line
                         MATCH (s:Analytical_sample{id:line.START_ID})
                         MATCH (mp:Modified_protein{id:line.END_ID}) 
-                        MERGE (s)-[:HAS_QUANTIFIED_PROTEINMODIFICATION{value:line.value,sequenceWindow:line.Sequence_window,score:line.Score,deltaScore:line.Delta_score,scoreLocalization:line.Score_for_localization,localizationProb:line.Localization_prob}]->(mp);
+                        MERGE (s)-[:HAS_QUANTIFIED_PROTEINMODIFICATION{value:toFloat(line.value),sequenceWindow:line.Sequence_window,score:line.Score,deltaScore:line.Delta_score,scoreLocalization:line.Score_for_localization,localizationProb:line.Localization_prob}]->(mp);
                         ''',
                     "wes":'''
                         CREATE CONSTRAINT ON (s:Somatic_mutation) ASSERT s.id IS UNIQUE; 

@@ -32,7 +32,7 @@ def getPlot(name, data, identifier, title, args = {}):
                 x_title = args["x_title"]
             if "y_title" in args:
                 y_title = args["y_title"]
-            plot = figure.getBarPlotFigure(data, identifier, x_title, y_title, title)
+            plot = figure.getBarPlotFigure(data, identifier, title, x_title, y_title)
     elif name == "scatterPlot":
         if "x" in data.columns and "y" in data.columns and "name" in data.columns:
             x_title = "x"
@@ -45,8 +45,24 @@ def getPlot(name, data, identifier, title, args = {}):
 
     return plot
 
-def getAnalysisResults(data):
-    pass
+def getAnalysisResults(qtype, data, args):
+    if qtype == "proteomics":
+        imputation = True
+        method = "distribution"
+        missing_method = 'percentage'
+        missing_max = 0.3
+        if "imputation" in args:
+            imputation = args["imputation"]
+        if "method" in args:
+            method = args["method"]
+        if "missing_method" in args:
+            missing_method = args["missing_method"]
+        if "missing_max" in args:
+            missing_max = args["missing_max"]
+        print("Before", data.shape)
+        data = analyses.get_measurements_ready(data, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max)
+        print("After", data.shape)
+        
 
 def view(title, section_query, analysis_type, plot_name, args):
     result = None
@@ -66,7 +82,7 @@ def view(title, section_query, analysis_type, plot_name, args):
                 result = data
                 if not data.empty:
                     if analysis_type is not None:
-                        result = getAnalysisResult(result)
+                        result = getAnalysisResults(title, result, args)
                 if not result.empty:
                     plot = getPlot(plot_name, result, "project_"+section_query, plot_title, args)
     elif title == "import":

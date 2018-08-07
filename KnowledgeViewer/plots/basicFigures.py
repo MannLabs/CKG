@@ -34,12 +34,13 @@ def getBarPlotFigure(data, identifier, title, x_title, y_title, group= True, sub
                             y=data['y']
                         )
                     )
-    figure["layout"] = {"title":title,
-                        "height":500,
-                        "width":500}
-    #for name in data.name.unique():
-    #    figure["data"].append({'x': np.unique(data['x'].values), 'y':data.loc[data['name'] == name,'y'].values , 'type': 'bar', 'name': name})
-    
+    figure["layout"] = go.Layout(
+                            title = title,
+                            xaxis = {"title":x_title},
+                            yaxis = {"title":y_title},
+                            height = 500,
+                            width = 900
+                        )
     if subplot:
         return (identifier, figure)
         
@@ -81,7 +82,28 @@ def getScatterPlotFigure(data, identifier, x_title, y_title, title, subplot = Fa
 
     return dcc.Graph(id= identifier, figure = figure)
 
+def plot_2D_scatter(x, y, text='', title='', xlab='', ylab='', hoverinfo='text', color='black', colorscale='Blues', size=8, showscale=False, symmetric_x=False, symmetric_y=False, pad=0.5, hline=False, vline=False, return_trace=False):
+    range_x = [-max(abs(x))-pad, max(abs(x))+pad]if symmetric_x else []
+    range_y = [-max(abs(y))-pad, max(abs(y))+pad]if symmetric_y else []
+    trace = Scattergl(x=x, y=y, mode='markers', text=text, hoverinfo=hoverinfo, marker={'color': color, 'colorscale': colorscale, 'showscale': showscale, 'size': size})
+    if return_trace:
+        return trace
+    else:
+        layout = Layout(title=title, xaxis={'title': xlab, 'range': range_x}, yaxis={'title': ylab, 'range': range_y}, hovermode='closest')
+        fig = Figure(data=[trace], layout=layout)
+    
+    return fig
 
+def plotVolcano(results):
+    plot_2D_scatter(
+        x=results['x'],
+        y=results['y'],
+        text=results['text'],
+        color=results['color'],
+        symmetric_x=True,
+        xlab='log2FC',
+        ylab='-log10value',
+    )
 def getHeatmapFigure(data, identifier, title, subplot = False):
     '''This function plots a simple Heatmap
     --> input:
