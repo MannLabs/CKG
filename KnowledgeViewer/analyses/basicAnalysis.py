@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
+import umap
 from sklearn import preprocessing
 import statsmodels.stats.multitest as multi
 from scipy import stats
@@ -115,30 +116,78 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
 
 
 def runPCA(data, components = 2):
+    result = None
     df = data.copy()
-    df = df.drop(['sample'], axis=1) 
+    df = df.drop(['sample'], axis=1)
+    df = df.set_index('group')
     X = df.values
-    y = df.group
-    print(df.head())
+    y = df.index
     pca = PCA(n_components=components)
     pca.fit(X)
     X = pca.transform(X)
     var_exp = pca.explained_variance_ratio_
-    pcaResult = pd.DataFrame(X, index = y)
+    args = {"x_title":"PC1"+" ({0:.2f})".format(var_exp[0]),"y_title":"PC2"+" ({0:.2f})".format(var_exp[1])}
+    if components == 2:
+        result = pd.DataFrame(X, index = y, columns = ["x","y"])
+        result = result.reset_index()
+        result.columns = ["name", "x", "y"]
+    if components > 2:
+        args.update({"z_title":"PC3"+str(var_exp[2])})
+        result = pd.DataFrame(X, index = y)
+        result = result.reset_index()
+        cols = []
+        if len(components)>3:
+            cols = result.columns[4:]
+        result.columns = ["name", "x", "y", "z"] + cols
 
-    return pcaResult, var_exp
+    return result, args
 
-def tsne_peptide_features2(data):
-    x_data = data.iloc[:, data.columns != 'Pro-hormone precursor'].as_matrix()
-    tsne = TSNE(n_components=3, verbose=2, perplexity=40, n_iter=1000, init='pca')
-    tsne_results = tsne.fit_transform(x_data)
+def runTSNE(data, components=2, perplexity=40, n_iter=1000, init='pca'):
+    result = None
+    df = data.copy()
+    df = df.drop(['sample'], axis=1)
+    df = df.set_index('group')
+    X = df.values
+    y = df.index
     
-    df_tsne = data.copy()
-    df_tsne['x-tsne'] = tsne_results[:,0]
-    df_tsne['y-tsne'] = tsne_results[:,1]
-    df_tsne['z-tsne'] = tsne_results[:,2]
+    tsne = TSNE(n_components=components, verbose=2, perplexity=perplexity, n_iter=n_iter, init=init)
+    X = tsne.fit_transform(X)
+    args = {"x_title":"C1","y_title":"C2"}
+    if components == 2:
+        result = pd.DataFrame(X, index = y, columns = ["x","y"])
+        result = result.reset_index()
+        result.columns = ["name", "x", "y"]
+    if components > 2:
+        args.update({"z_title":"C3"})
+        result = pd.DataFrame(X, index = y)
+        result = result.reset_index()
+        cols = []
+        if len(components)>4:
+            cols = result.columns[4:]
+        result.columns = ["name", "x", "y", "z"] + cols
+
+    return result, args
     
-    return df_tsne
+def runUMAP(data, n_neighbors=10, min_dist=0.3, metric='cosine'):
+    result = None
+    df = data.copy()
+    df = df.drop(['sample'], axis=1)
+    df = df.set_index('group')
+    X = df.values
+    y = df.index
+
+    X = umap.UMAP(n_neighbors=10, min_dist=0.3, metric= metric).fit_transform(X)
+    args = {"x_title":"C1","y_title":"C2"}
+    result = pd.DataFrame(X, index = y)
+    result = result.reset_index()
+    print(result.head())
+    cols = []
+    if len(result.columns)>3:
+            cols = result.columns[3:]
+    result.columns = ["name", "x", "y"] + cols
+
+    return result, args
+
 
 def calculate_ttest(df, condition1, condition2):
     group1 = df[condition1].dropna()

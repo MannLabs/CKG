@@ -46,7 +46,7 @@ def getBarPlotFigure(data, identifier, title, x_title, y_title, group= True, sub
         
     return dcc.Graph(id= identifier, figure = figure)
 
-def getScatterPlotFigure(data, identifier, x_title, y_title, title, subplot = False):
+def getScatterPlotFigure(data, identifier, title, x_title, y_title, subplot = False):
     '''This function plots a simple Scatterplot
     --> input:
         - data: is a Pandas DataFrame with four columns: "name", x values and y values (provided as variables) to plot

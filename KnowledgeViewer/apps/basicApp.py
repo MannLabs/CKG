@@ -48,6 +48,9 @@ class BasicApp:
     def addToLayout(self, section):
         self.layout.append(section)
 
+    def extendLayout(self, sections):
+        self.layout.extend(sections)
+
     #Getters
     def getTitle(self):
         return self.title

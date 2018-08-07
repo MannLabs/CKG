@@ -31,11 +31,11 @@ class ProjectApp(basicApp.BasicApp):
             print(projectPageConfig[key])
             for section in projectPageConfig[key]:
                 print(section)
-                for section_query,analysis_type,plot_names,args in projectPageConfig[key][section]:
+                for section_query,analysis_types,plot_names,args in projectPageConfig[key][section]:
                     args["id"] = self.getProjectId()
                     for plot_name in plot_names:
-                        plot = viewer.view(key, section_query, analysis_type, plot_name, args)
-                        self.addToLayout(plot)
+                        plots = viewer.view(key, section_query, analysis_types, plot_name, args)
+                        self.extendLayout(plots)
         
         
         

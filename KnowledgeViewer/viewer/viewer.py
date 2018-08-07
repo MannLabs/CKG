@@ -41,11 +41,12 @@ def getPlot(name, data, identifier, title, args = {}):
                 x_title = args["x_title"]
             if "y_title" in args:
                 y_title = args["y_title"]
-            plot = figure.getScatterPlotFigure(data, identifier, x_title, y_title, title)
+            plot = figure.getScatterPlotFigure(data, identifier, title, x_title, y_title)
 
     return plot
 
-def getAnalysisResults(qtype, data, analysis_type, args):
+
+def preprocessData(data, qtype, args):
     if qtype == "proteomics":
         imputation = True
         method = "distribution"
@@ -61,16 +62,47 @@ def getAnalysisResults(qtype, data, analysis_type, args):
         if "missing_max" in args:
             missing_max = args["missing_max"]
         data = analyses.get_measurements_ready(data, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max)
+
+    return data
+
+def getAnalysisResults(data, analysis_type, args):
+    result = None
     if analysis_type == "pca":
         components = 2
         if "components" in args:
             components = args["components"]
-        pcaData = analyses.runPCA(data, components)
-        
+        result, args = analyses.runPCA(data, components)
+    elif analysis_type == "tsne":
+        components = 2
+        perplexity = 40
+        n_iter = 1000
+        init='pca'
+        if "components" in args:
+            components = args["components"]
+        if "perplexity" in args:
+            perplexity = args["perplexity"]
+        if "n_iter" in args:
+            n_iter = args["n_iter"]
+        if "init" in args:
+            init = args["init"]
+        result, args = analyses.runTSNE(data, components=components, perplexity=perplexity, n_iter=n_iter, init=init)
+    elif analysis_type == "umap":
+        n_neighbors=10
+        min_dist=0.3
+        metric='cosine'
+        if "n_neighbors" in args:
+            n_neighbors = args["n_neighbors"]
+        if "min_dist" in args:
+            min_dist = args["min_dist"]
+        if "metric" in args:
+            metric = args["metric"]
+        result, args = analyses.runUMAP(data, n_neighbors=n_neighbors, min_dist=min_dist, metric=metric)
+    return result, args
 
-def view(title, section_query, analysis_type, plot_name, args):
+def view(title, section_query, analysis_types, plot_name, args):
     result = None
-    plot = None
+    plots = []
+    print(analysis_types)
     driver = graph_controler.getGraphDatabaseConnectionConfiguration()
     if title in ["project","proteomics"]:
         replace = []
@@ -85,14 +117,22 @@ def view(title, section_query, analysis_type, plot_name, args):
                 data = getDBresults(query, driver, replace)
                 result = data
                 if not data.empty:
-                    if analysis_type is not None:
-                        result = getAnalysisResults(title, result, analysis_type, args)
-                if not result.empty:
-                    plot = getPlot(plot_name, result, "project_"+section_query, plot_title, args)
+                    if len(analysis_types) >= 1:
+                        data = preprocessData(data, title, args)
+                        for analysis_type in analysis_types:
+                            print(analysis_type)
+                            result, new_args = getAnalysisResults(data, analysis_type, args)
+                            if not result.empty:
+                                print("plotting")
+                                plot = getPlot(plot_name, result, "project_"+section_query+"_"+analysis_type, analysis_type.capitalize(), new_args)
+                                plots.append(plot)
+                    else:
+                        plot = getPlot(plot_name, result, "project_"+section_query, plot_title, args)
+                        plots.append(plot)
     elif title == "import":
         pass
 
-    return plot
+    return plots
     
 
     
