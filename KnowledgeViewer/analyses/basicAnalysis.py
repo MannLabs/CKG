@@ -9,13 +9,17 @@ import math
 from predictive_imputer import predictive_imputer
 
 def extract_number_missing(df, conditions, missing_max):
-    df_tmp = format_groups(df, conditions)
-    groups = pd.DataFrame(True, index = df_tmp.index, columns = conditions)
-    for cond in conditions:
-        groups[cond] = df_tmp[cond].notnull().sum(axis = 1) >= missing_max
-    groups = groups[groups.any(axis=1)]
+    if conditions is None:
+        groups = data.loc[:, data.notnull().sum(axis = 1) >= missing_max]
+    else:
+        groups = data.copy()
+        groups = groups.drop(["sample"], axis = 1)
+        groups = data.set_index("group").notnull().groupby(level=0).sum(axis = 1)
+        groups = groups[groups>=missing_max]
     
-    return list(groups.index)
+    groups = groups.dropna(axis=1)
+
+    return list(groups.columns)
 
 def extract_percentage_missing(data, conditions, missing_max):
     if conditions is None:
@@ -24,13 +28,11 @@ def extract_percentage_missing(data, conditions, missing_max):
         groups = data.copy()
         groups = groups.drop(["sample"], axis = 1)
         groups = data.set_index("group").isnull().groupby(level=0).mean()
-        print(groups.head())
         groups = groups[groups<missing_max]
-        print(groups.head())
-        groups = groups.dropna(axis=1)
-        print(groups.head)
+    
+    groups = groups.dropna(axis=1)
         
-    return groups.columns
+    return list(groups.columns)
 
 def imputation_KNN(data):
     df = data.copy()
@@ -108,20 +110,16 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
             df = imputation_normal_distribution(df, shift = 1.8, nstd = 0.3)
         else:
             sys.exit()
-    df = df.T
-    df.index.name = "samples"
 
     return df
 
-def get_measurement_for_high_dimensional_vis(data):
-    data = data.set_index("groups")
-
-    return data
 
 def runPCA(data, components = 2):
-    X = data.values
-    y = data.index
-    
+    df = data.copy()
+    df = df.drop(['sample'], axis=1) 
+    X = df.values
+    y = df.group
+    print(df.head())
     pca = PCA(n_components=components)
     pca.fit(X)
     X = pca.transform(X)

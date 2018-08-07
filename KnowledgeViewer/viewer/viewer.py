@@ -45,12 +45,13 @@ def getPlot(name, data, identifier, title, args = {}):
 
     return plot
 
-def getAnalysisResults(qtype, data, args):
+def getAnalysisResults(qtype, data, analysis_type, args):
     if qtype == "proteomics":
         imputation = True
         method = "distribution"
         missing_method = 'percentage'
         missing_max = 0.3
+        
         if "imputation" in args:
             imputation = args["imputation"]
         if "method" in args:
@@ -59,9 +60,12 @@ def getAnalysisResults(qtype, data, args):
             missing_method = args["missing_method"]
         if "missing_max" in args:
             missing_max = args["missing_max"]
-        print("Before", data.shape)
         data = analyses.get_measurements_ready(data, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max)
-        print("After", data.shape)
+    if analysis_type == "pca":
+        components = 2
+        if "components" in args:
+            components = args["components"]
+        pcaData = analyses.runPCA(data, components)
         
 
 def view(title, section_query, analysis_type, plot_name, args):
@@ -82,7 +86,7 @@ def view(title, section_query, analysis_type, plot_name, args):
                 result = data
                 if not data.empty:
                     if analysis_type is not None:
-                        result = getAnalysisResults(title, result, args)
+                        result = getAnalysisResults(title, result, analysis_type, args)
                 if not result.empty:
                     plot = getPlot(plot_name, result, "project_"+section_query, plot_title, args)
     elif title == "import":
