@@ -92,6 +92,7 @@ def remove_group(data):
 
 def get_measurements_ready(data, imputation = True, method = 'distribution', missing_method = 'percentage', missing_max = 0.3):
     df = data.copy()
+    print(df.head())
     conditions = df.group.unique()
     df = df.set_index(['group','sample'])
     df = df.pivot_table(values='LFQ_intensity', index=df.index, columns='protein', aggfunc='first')
@@ -207,30 +208,31 @@ def calculate_fold_change(df, condition1, condition2):
 
     return fold_change
 
-def ttest(df, grouping, condition1, condition2, alpha = 0.05):
-    df = df.reset_index().set_index('Samples')
-    df['group'] = df.index.map(grouping.get)
-    df_tmp = df.reset_index().set_index(['group', 'Samples']).T
-    df_tmp = df_tmp[[condition1, condition2]]
-    columns = ['sequence', 't-statistics', 'pvalue', '-Log pvalue']
-    scores = df_tmp.apply(func = calculate_ttest, axis = 1, result_type='expand', args =(condition1, condition2))
+def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample", "name"]):
+    df = data.copy()
+    df = df.set_index('group')
+    df = df.drop(drop_cols, axis = 1)
+    df = df.loc[[condition1, condition2],:].T
+    columns = ['identifier', 't-statistics', 'pvalue', '-Log pvalue']
+    scores = df.apply(func = calculate_ttest, axis = 1, result_type='expand', args =(condition1, condition2))
     scores.columns = columns
-    scores = scores.set_index("sequence")
+    scores = scores.set_index("identifier")
     scores = scores.dropna(how="all")
     
     #Fold change
-    scores["log2FC"] = df_tmp.apply(func = calculate_fold_change, axis = 1, args =(condition1, condition2))
+    scores["log2FC"] = df.apply(func = calculate_fold_change, axis = 1, args =(condition1, condition2))
     
     #Cohen's d
-    scores["cohen_d"] = df_tmp.apply(func = cohen_d, axis = 1, args =(condition1, condition2, 1))
+    scores["cohen_d"] = df.apply(func = cohen_d, axis = 1, args =(condition1, condition2, 1))
     
     #Hedge's g
-    scores["hedges_g"] = df_tmp.apply(func = hedges_g, axis = 1, args =(condition1, condition2, 1))
+    scores["hedges_g"] = df.apply(func = hedges_g, axis = 1, args =(condition1, condition2, 1))
 
     #FDR correction
     reject, padj = multi.fdrcorrection(scores["pvalue"], alpha=alpha, method = 'indep')
     scores['padj'] = padj
     scores['reject'] = reject
+    scores = scores.reset_index()
     
     return scores
 

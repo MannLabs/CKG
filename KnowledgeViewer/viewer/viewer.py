@@ -1,3 +1,4 @@
+import itertools
 from KnowledgeConnector import graph_controler
 from KnowledgeViewer.queries import *
 from KnowledgeViewer.plots import basicFigures as figure
@@ -42,9 +43,19 @@ def getPlot(name, data, identifier, title, args = {}):
             if "y_title" in args:
                 y_title = args["y_title"]
             plot = figure.getScatterPlotFigure(data, identifier, title, x_title, y_title)
-
+    elif name == "volcanoPlot":
+        plot = []
+        alpha = 0.05
+        lfc = 1.0
+        if "alpha" in args:
+            alpha = args["alpha"]
+        if "lfc" in args:
+            lfc = args["lfc"]
+        for pair in data:
+            signature = data[pair]
+            p = figure.runVolcano(identifier, signature, lfc=lfc, alpha=alpha, title=title+"_"+pair[0]+"_vs_"+pair[1])
+            plot.append(p)
     return plot
-
 
 def preprocessData(data, qtype, args):
     if qtype == "proteomics":
@@ -97,6 +108,14 @@ def getAnalysisResults(data, analysis_type, args):
         if "metric" in args:
             metric = args["metric"]
         result, args = analyses.runUMAP(data, n_neighbors=n_neighbors, min_dist=min_dist, metric=metric)
+    elif analysis_type == 'ttest':
+        result = {}
+        alpha = 0.05
+        if "alpha" in args:
+            alpha = args["alpha"]
+        for pair in itertools.combinations(data.group.unique(),2):
+            ttest_result = analyses.ttest(data, pair[0], pair[1], alpha = 0.05)
+            result[pair] = ttest_result
     return result, args
 
 def view(title, section_query, analysis_types, plot_name, args):
@@ -118,20 +137,23 @@ def view(title, section_query, analysis_types, plot_name, args):
                 result = data
                 if not data.empty:
                     if len(analysis_types) >= 1:
-                        data = preprocessData(data, title, args)
+                        processed_data = preprocessData(data, title, args)
                         for analysis_type in analysis_types:
                             print(analysis_type)
-                            result, new_args = getAnalysisResults(data, analysis_type, args)
-                            if not result.empty:
+                            result, new_args = getAnalysisResults(processed_data, analysis_type, args)
+                            if result is not None:
                                 print("plotting")
                                 plot = getPlot(plot_name, result, "project_"+section_query+"_"+analysis_type, analysis_type.capitalize(), new_args)
-                                plots.append(plot)
+                                if type(plot) == list:
+                                    plots.extend(plot)
+                                else:
+                                    plots.append(plot)
                     else:
                         plot = getPlot(plot_name, result, "project_"+section_query, plot_title, args)
                         plots.append(plot)
     elif title == "import":
         pass
-
+    
     return plots
     
 

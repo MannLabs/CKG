@@ -82,20 +82,19 @@ def getScatterPlotFigure(data, identifier, title, x_title, y_title, subplot = Fa
 
     return dcc.Graph(id= identifier, figure = figure)
 
-def plot_2D_scatter(x, y, text='', title='', xlab='', ylab='', hoverinfo='text', color='black', colorscale='Blues', size=8, showscale=False, symmetric_x=False, symmetric_y=False, pad=0.5, hline=False, vline=False, return_trace=False):
-    range_x = [-max(abs(x))-pad, max(abs(x))+pad]if symmetric_x else []
-    range_y = [-max(abs(y))-pad, max(abs(y))+pad]if symmetric_y else []
+def plot_2D_scatter(x, y, text='', title='', xlab='', ylab='', hoverinfo='text', color='black', colorscale='Blues', size=8, showscale=False, symmetric_x=False, symmetric_y=False, pad=0.5, hline=False, vline=False):
+    figure = {"data":[],"layout":None}
+    range_x = [-max(abs(x))-pad, max(abs(x))+pad]#if symmetric_x else []
+    range_y = [-max(abs(y))-pad, max(abs(y))+pad]#if symmetric_y else []
     trace = Scattergl(x=x, y=y, mode='markers', text=text, hoverinfo=hoverinfo, marker={'color': color, 'colorscale': colorscale, 'showscale': showscale, 'size': size})
-    if return_trace:
-        return trace
-    else:
-        layout = Layout(title=title, xaxis={'title': xlab, 'range': range_x}, yaxis={'title': ylab, 'range': range_y}, hovermode='closest')
-        fig = Figure(data=[trace], layout=layout)
+    figure["data"].append(trace)
+    figure["layout"] = go.Layout(title=title, xaxis={'title': xlab, 'range': range_x}, yaxis={'title': ylab, 'range': range_y}, hovermode='closest')
     
-    return fig
+    return figure
 
-def plotVolcano(results):
-    plot_2D_scatter(
+    
+def plotVolcano(results, title):
+    figure = plot_2D_scatter(
         x=results['x'],
         y=results['y'],
         text=results['text'],
@@ -103,7 +102,41 @@ def plotVolcano(results):
         symmetric_x=True,
         xlab='log2FC',
         ylab='-log10value',
+        title = title
     )
+
+    return figure
+
+def runVolcano(identifier, signature, lfc = 1, alpha = 0.05, title = ''):
+    # Loop through signature
+    color = []
+    text = []
+    for index, rowData in signature.iterrows():
+        # Text
+        text.append('<b>'+str(rowData['identifier'])+": "+str(index)+'<br>log2FC = '+str(round(rowData['log2FC'], ndigits=2))+'<br>p = '+'{:.2e}'.format(rowData['pvalue'])+'<br>FDR = '+'{:.2e}'.format(rowData['padj']))
+        
+        # Color
+        if rowData['padj'] < 0.05:
+            if rowData['log2FC'] < -lfc:
+                color.append('#2b83ba')
+            elif rowData['log2FC'] > lfc:
+                color.append('#d7191c')
+            else:
+                color.append('black')
+        else:
+            if rowData['log2FC'] < -lfc:
+                color.append("#abdda4")
+            elif rowData['log2FC'] > lfc:
+                color.append('#fdae61')
+            else:
+                color.append('black')
+                
+    # Return 
+    volcano_plot_results = {'x': signature['log2FC'].values, 'y': signature['-Log pvalue'].values, 'text':text, 'color': color}
+    figure = plotVolcano(volcano_plot_results, title)
+
+    return  dcc.Graph(id= identifier, figure = figure)
+
 def getHeatmapFigure(data, identifier, title, subplot = False):
     '''This function plots a simple Heatmap
     --> input:
