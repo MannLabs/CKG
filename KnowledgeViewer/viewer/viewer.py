@@ -53,7 +53,7 @@ def getPlot(name, data, identifier, title, args = {}):
             lfc = args["lfc"]
         for pair in data:
             signature = data[pair]
-            p = figure.runVolcano(identifier, signature, lfc=lfc, alpha=alpha, title=title+"_"+pair[0]+"_vs_"+pair[1])
+            p = figure.runVolcano(identifier+"_"+pair[0]+"_vs_"+pair[1], signature, lfc=lfc, alpha=alpha, title=title+" "+pair[0]+" vs "+pair[1])
             plot.append(p)
     return plot
 

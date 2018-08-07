@@ -191,8 +191,8 @@ def runUMAP(data, n_neighbors=10, min_dist=0.3, metric='cosine'):
 
 
 def calculate_ttest(df, condition1, condition2):
-    group1 = df[condition1].dropna()
-    group2 = df[condition2].dropna()
+    group1 = df[condition1]
+    group2 = df[condition2]
     t, pvalue = stats.ttest_ind(group1, group2, nan_policy='omit')
     log = -math.log(pvalue, 10)
         
