@@ -117,7 +117,7 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
 
 
 def runPCA(data, components = 2):
-    result = None
+    result = {}
     df = data.copy()
     df = df.drop(['sample'], axis=1)
     df = df.set_index('group')
@@ -129,22 +129,22 @@ def runPCA(data, components = 2):
     var_exp = pca.explained_variance_ratio_
     args = {"x_title":"PC1"+" ({0:.2f})".format(var_exp[0]),"y_title":"PC2"+" ({0:.2f})".format(var_exp[1])}
     if components == 2:
-        result = pd.DataFrame(X, index = y, columns = ["x","y"])
-        result = result.reset_index()
-        result.columns = ["name", "x", "y"]
+        resultDf = pd.DataFrame(X, index = y, columns = ["x","y"])
+        resultDf = resultDf.reset_index()
+        resultDf.columns = ["name", "x", "y"]
     if components > 2:
         args.update({"z_title":"PC3"+str(var_exp[2])})
-        result = pd.DataFrame(X, index = y)
-        result = result.reset_index()
+        resultDf = pd.DataFrame(X, index = y)
+        resultDf = resultDf.reset_index()
         cols = []
         if len(components)>3:
-            cols = result.columns[4:]
-        result.columns = ["name", "x", "y", "z"] + cols
-
+            cols = resultDf.columns[4:]
+        resultDf.columns = ["name", "x", "y", "z"] + cols
+    result['pca'] = resultDf
     return result, args
 
 def runTSNE(data, components=2, perplexity=40, n_iter=1000, init='pca'):
-    result = None
+    result = {}
     df = data.copy()
     df = df.drop(['sample'], axis=1)
     df = df.set_index('group')
@@ -155,22 +155,22 @@ def runTSNE(data, components=2, perplexity=40, n_iter=1000, init='pca'):
     X = tsne.fit_transform(X)
     args = {"x_title":"C1","y_title":"C2"}
     if components == 2:
-        result = pd.DataFrame(X, index = y, columns = ["x","y"])
-        result = result.reset_index()
-        result.columns = ["name", "x", "y"]
+        resultDf = pd.DataFrame(X, index = y, columns = ["x","y"])
+        resultDf = resultDf.reset_index()
+        resultDf.columns = ["name", "x", "y"]
     if components > 2:
         args.update({"z_title":"C3"})
-        result = pd.DataFrame(X, index = y)
-        result = result.reset_index()
+        resultDf = pd.DataFrame(X, index = y)
+        resultDf = resultDf.reset_index()
         cols = []
         if len(components)>4:
-            cols = result.columns[4:]
-        result.columns = ["name", "x", "y", "z"] + cols
-
+            cols = resultDf.columns[4:]
+        resultDf.columns = ["name", "x", "y", "z"] + cols
+    result['tsne'] = resultDf
     return result, args
     
 def runUMAP(data, n_neighbors=10, min_dist=0.3, metric='cosine'):
-    result = None
+    result = {}
     df = data.copy()
     df = df.drop(['sample'], axis=1)
     df = df.set_index('group')
@@ -179,14 +179,13 @@ def runUMAP(data, n_neighbors=10, min_dist=0.3, metric='cosine'):
 
     X = umap.UMAP(n_neighbors=10, min_dist=0.3, metric= metric).fit_transform(X)
     args = {"x_title":"C1","y_title":"C2"}
-    result = pd.DataFrame(X, index = y)
-    result = result.reset_index()
-    print(result.head())
+    resultDf = pd.DataFrame(X, index = y)
+    resultDf = result.reset_index()
     cols = []
-    if len(result.columns)>3:
-            cols = result.columns[3:]
-    result.columns = ["name", "x", "y"] + cols
-
+    if len(resultDf.columns)>3:
+            cols = resultDf.columns[3:]
+    resultDf.columns = ["name", "x", "y"] + cols
+    result['umap'] = resultDf
     return result, args
 
 
@@ -264,7 +263,7 @@ def oneway_anova(df, grouping):
     df_anova = df_anova.reset_index().set_index(['group', 'Samples']).T
     df_anova = df_anova.unstack().reset_index().rename(columns={"level_2":"Protein ID"})
     df_anova.rename(columns={df_anova.columns[3]: 'value'}, inplace=True)
-    columns = ['protein', 't-statistics', 'pvalue', '-Log pvalue']
+    columns = ['identifier', 't-statistics', 'pvalue', '-Log pvalue']
     scores = []
     for protein_entry in df_anova.groupby('Protein ID'):
         protein = protein_entry[0]
@@ -304,7 +303,6 @@ def cohen_d(df, condition1, condition2, ddof = 0):
         meang2 = np.nanmean(group2)
         sdg1 = np.nanstd(group1, ddof = ddof)
         sdg2 = np.nanstd(group2, ddof = ddof)
-
         d = (meang1 - meang2) / np.sqrt(((ng1-1)* sdg1 ** 2 + (ng2-1)* sdg2 ** 2) / dof)
     
     return d
@@ -331,7 +329,7 @@ def hedges_g(df, condition1, condition2, ddof = 0):
     else:
         meang1 = np.nanmean(group1) 
         meang2 = np.nanmean(group2)
-        sdpooled = np.nanstd(group1+group2, ddof = ddof)
+        sdpooled = np.nanstd(np.concatenate([group1, group2]), ddof = ddof)
 
         #Correct bias small sample size
         if ng1+ng2 < 50:

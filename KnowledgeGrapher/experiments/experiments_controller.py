@@ -1,5 +1,5 @@
 from KnowledgeGrapher.experiments import experiments_config as config
-from KnowledgeGrapher.ontologies import ontologieshandler as oh
+from KnowledgeGrapher.ontologies import ontologies_controller as oh
 from KnowledgeGrapher import utils
 
 import sys

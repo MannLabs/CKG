@@ -1,5 +1,5 @@
 import itertools
-from KnowledgeConnector import graph_controler
+from KnowledgeConnector import graph_controller
 from KnowledgeViewer.queries import *
 from KnowledgeViewer.plots import basicFigures as figure
 from KnowledgeViewer.analyses import basicAnalysis as analyses
@@ -7,12 +7,11 @@ from KnowledgeViewer.analyses import basicAnalysis as analyses
 def getDBresults(query, driver, replace=[]):
     for r,by in replace:
         query = query.replace(r,by)
-    results = graph_controler.getCursorData(driver, query)
-    print(results)
+    results = graph_controller.getCursorData(driver, query)
     return results
 
 def getPlot(name, data, identifier, title, args = {}):
-    plot = None
+    plot = [] 
     if name == "basicTable":
         colors = ('#C2D4FF','#F5F8FF')
         attr =  {'width':800, 'height':300, 'font':12}
@@ -23,28 +22,30 @@ def getPlot(name, data, identifier, title, args = {}):
             attr = args["attr"]
         if "subset" in args:
             subset = args["subset"]
-        plot = figure.getBasicTable(data, identifier, title, colors=colors, subset=subset, plot_attr=attr)
+        for id in data:
+            print("basicTable", id)
+            plot.append(figure.getBasicTable(data[id], identifier, title, colors=colors, subset=subset, plot_attr=attr))
     elif name == "basicBarPlot":
-        print(data.columns)
-        if "x" in data.columns and "y" in data.columns and "name" in data.columns:
-            x_title = "x"
-            y_title = "y"
-            if "x_title" in args:
-                x_title = args["x_title"]
-            if "y_title" in args:
-                y_title = args["y_title"]
-            plot = figure.getBarPlotFigure(data, identifier, title, x_title, y_title)
+        x_title = "x"
+        y_title = "y"
+        if "x_title" in args:
+            x_title = args["x_title"]
+        if "y_title" in args:
+            y_title = args["y_title"]
+        for id in data:            
+            print("basicBarPlot", id)
+            plot.append(figure.getBarPlotFigure(data[id], identifier, title, x_title, y_title))
     elif name == "scatterPlot":
-        if "x" in data.columns and "y" in data.columns and "name" in data.columns:
-            x_title = "x"
-            y_title = "y"
-            if "x_title" in args:
-                x_title = args["x_title"]
-            if "y_title" in args:
-                y_title = args["y_title"]
-            plot = figure.getScatterPlotFigure(data, identifier, title, x_title, y_title)
+        x_title = "x"
+        y_title = "y"
+        if "x_title" in args:
+            x_title = args["x_title"]
+        if "y_title" in args:
+            y_title = args["y_title"]
+        for id in data:
+            print("scatterPlot", id)
+            plot.append(figure.getScatterPlotFigure(data[id], identifier, title, x_title, y_title))
     elif name == "volcanoPlot":
-        plot = []
         alpha = 0.05
         lfc = 1.0
         if "alpha" in args:
@@ -53,6 +54,7 @@ def getPlot(name, data, identifier, title, args = {}):
             lfc = args["lfc"]
         for pair in data:
             signature = data[pair]
+            print("Volcano", pair)
             p = figure.runVolcano(identifier+"_"+pair[0]+"_vs_"+pair[1], signature, lfc=lfc, alpha=alpha, title=title+" "+pair[0]+" vs "+pair[1])
             plot.append(p)
     return plot
@@ -77,7 +79,7 @@ def preprocessData(data, qtype, args):
     return data
 
 def getAnalysisResults(data, analysis_type, args):
-    result = None
+    result = {}
     if analysis_type == "pca":
         components = 2
         if "components" in args:
@@ -98,7 +100,7 @@ def getAnalysisResults(data, analysis_type, args):
             init = args["init"]
         result, args = analyses.runTSNE(data, components=components, perplexity=perplexity, n_iter=n_iter, init=init)
     elif analysis_type == "umap":
-        n_neighbors=10
+        n_neighbors=10 
         min_dist=0.3
         metric='cosine'
         if "n_neighbors" in args:
@@ -107,7 +109,8 @@ def getAnalysisResults(data, analysis_type, args):
             min_dist = args["min_dist"]
         if "metric" in args:
             metric = args["metric"]
-        result, args = analyses.runUMAP(data, n_neighbors=n_neighbors, min_dist=min_dist, metric=metric)
+        if n_neighbors < data.shape[0]:
+            result, args = analyses.runUMAP(data, n_neighbors=n_neighbors, min_dist=min_dist, metric=metric)
     elif analysis_type == 'ttest':
         result = {}
         alpha = 0.05
@@ -118,11 +121,10 @@ def getAnalysisResults(data, analysis_type, args):
             result[pair] = ttest_result
     return result, args
 
-def view(title, section_query, analysis_types, plot_name, args):
+def view(title, section_query, analysis_types, plot_names, args):
     result = None
     plots = []
-    print(analysis_types)
-    driver = graph_controler.getGraphDatabaseConnectionConfiguration()
+    driver = graph_controller.getGraphDatabaseConnectionConfiguration()
     if title in ["project","proteomics"]:
         replace = []
         queries = project_cypher.queries
@@ -141,16 +143,25 @@ def view(title, section_query, analysis_types, plot_name, args):
                         for analysis_type in analysis_types:
                             print(analysis_type)
                             result, new_args = getAnalysisResults(processed_data, analysis_type, args)
-                            if result is not None:
+                            if len(result)>0:
                                 print("plotting")
-                                plot = getPlot(plot_name, result, "project_"+section_query+"_"+analysis_type, analysis_type.capitalize(), new_args)
-                                if type(plot) == list:
-                                    plots.extend(plot)
-                                else:
-                                    plots.append(plot)
+                                for plot_name in plot_names:
+                                    print(plot_name)
+                                    plot = getPlot(plot_name, result, "project_"+section_query+"_"+analysis_type+"_"+plot_name, analysis_type.capitalize(), new_args)
+                                    print(plot)
+                                    if type(plot) == list:
+                                        print("IN")
+                                        plots.extend(plot)
+                                    else:
+                                        plots.append(plot)
                     else:
-                        plot = getPlot(plot_name, result, "project_"+section_query, plot_title, args)
-                        plots.append(plot)
+                        if not isinstance(result, dict):
+                            dictresult = {}
+                            dictresult['single_result'] = result
+                            result = dictresult
+                        for plot_name in plot_names:
+                            plot = getPlot(plot_name, result, "project_"+section_query+"_"+plot_name, plot_title, args)
+                            plots.append(plot)
     elif title == "import":
         pass
     

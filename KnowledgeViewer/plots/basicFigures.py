@@ -415,7 +415,7 @@ def getSankeyPlot(data, sourceCol, targetCol, weightCol, edgeColorCol, node_colo
 def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':800, 'height':800, 'font':12}, subplot = False):
     if subset is not None:
         data = data[subset]
-
+    print(data)
     data_trace = go.Table(header=dict(values=data.columns,
                     fill = dict(color = colors[0]),
                     align = ['left'] * 5),

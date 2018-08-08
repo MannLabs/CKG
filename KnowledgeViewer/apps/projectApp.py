@@ -33,9 +33,9 @@ class ProjectApp(basicApp.BasicApp):
                 print(section)
                 for section_query,analysis_types,plot_names,args in projectPageConfig[key][section]:
                     args["id"] = self.getProjectId()
-                    for plot_name in plot_names:
-                        plots = viewer.view(key, section_query, analysis_types, plot_name, args)
-                        self.extendLayout(plots)
+                    plots = viewer.view(key, section_query, analysis_types, plot_names, args)
+                    print("saving")
+                    self.extendLayout(plots)
         
         
         

@@ -10,17 +10,17 @@ projectPage = {"overview":[
                             ("number_analytical_samples", [], ["basicTable"], {})
                             ]
                 }
-proteomicsPage= {#"overview":[
-                 #           ("number_peptides_analytical_sample", [], ["basicBarPlot"], {"x_title":"Analytical sample", "y_title":"number of peptides"}),
-                 #           ("number_proteins_analytical_sample", [], ["basicBarPlot"], {"x_title":"Analytical sample", "y_title":"number of proteins"}),
-                 #           ("number_modified_proteins_analytical_sample", [], ["basicBarPlot"], {"x_title":"Analytical sample", "y_title":"number of modified proteins"})
-                 #           ],
-                #"stratification":[
-                #                ("identified_proteins_sample_group", 
-                #               ["pca", "tsne", "umap"], 
-                #                ["scatterPlot"], 
-                #                {"imputation":True, "imputation_method":"distribution", "x_title":"PC1", "y_title":"PC2", "components":2, "perplexity":40, "n_iter":1000, "init":'pca'})
-                #                ],
+proteomicsPage= {"overview":[
+                            ("number_peptides_analytical_sample", [], ["basicBarPlot"], {"x_title":"Analytical sample", "y_title":"number of peptides"}),
+                            ("number_proteins_analytical_sample", [], ["basicBarPlot"], {"x_title":"Analytical sample", "y_title":"number of proteins"}),
+                            ("number_modified_proteins_analytical_sample", [], ["basicBarPlot"], {"x_title":"Analytical sample", "y_title":"number of modified proteins"})
+                            ],
+                "stratification":[
+                                ("identified_proteins_sample_group", 
+                               ["pca", "tsne", "umap"], 
+                                ["scatterPlot"], 
+                                {"imputation":True, "imputation_method":"distribution", "x_title":"PC1", "y_title":"PC2", "components":2, "perplexity":40, "n_iter":1000, "init":'pca'})
+                                ],
                 #    "correlation":[
                 #                ("correlation_analysis", ["complexHeatmapPlot", "3dNetwork"])
                 #                ],
