@@ -24,8 +24,9 @@ def getPlot(name, data, identifier, title, args = {}):
             subset = args["subset"]
         for id in data:
             if isinstance(id, tuple):
-                id = id[0]+"_vs_"+id[1]
-            plot.append(figure.getBasicTable(data[id], identifier+"_"+id, title, colors=colors, subset=subset, plot_attr=attr))
+                identifier = identifier+"_"+id[0]+"_vs_"+id[1]
+                title = title + id[0]+" vs "+id[1]
+            plot.append(figure.getBasicTable(data[id], identifier, title, colors=colors, subset=subset, plot_attr=attr))
     elif name == "basicBarPlot":
         x_title = "x"
         y_title = "y"
@@ -35,8 +36,9 @@ def getPlot(name, data, identifier, title, args = {}):
             y_title = args["y_title"]
         for id in data:     
             if isinstance(id, tuple):
-                id = id[0]+"_vs_"+id[1]
-            plot.append(figure.getBarPlotFigure(data[id], identifier+"_"+id, title, x_title, y_title))
+                identifier = identifier+"_"+id[0]+"_vs_"+id[1]
+                title = title + id[0]+" vs "+id[1]
+            plot.append(figure.getBarPlotFigure(data[id], identifier, title, x_title, y_title))
     elif name == "scatterPlot":
         x_title = "x"
         y_title = "y"
@@ -46,8 +48,9 @@ def getPlot(name, data, identifier, title, args = {}):
             y_title = args["y_title"]
         for id in data:
             if isinstance(id, tuple):
-                id = id[0]+"_vs_"+id[1]
-            plot.append(figure.getScatterPlotFigure(data[id], identifier+"_"+id, title, x_title, y_title))
+                identifier = identifier+"_"+id[0]+"_vs_"+id[1]
+                title = title + id[0]+" vs "+id[1]
+            plot.append(figure.getScatterPlotFigure(data[id], identifier, title, x_title, y_title))
     elif name == "volcanoPlot":
         alpha = 0.05
         lfc = 1.0
@@ -153,8 +156,6 @@ def view(title, section_query, analysis_types, plot_names, args):
                             dictresult = {}
                             dictresult['single_result'] = result
                             result = dictresult
-                            print(type(result))
-                            print(type(result["single_result"]))
                         for plot_name in plot_names:
                             plot = getPlot(plot_name, result, "project_"+section_query+"_"+plot_name, plot_title, args)
                             plots.extend(plot)
