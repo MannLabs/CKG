@@ -180,7 +180,7 @@ def runUMAP(data, n_neighbors=10, min_dist=0.3, metric='cosine'):
     X = umap.UMAP(n_neighbors=10, min_dist=0.3, metric= metric).fit_transform(X)
     args = {"x_title":"C1","y_title":"C2"}
     resultDf = pd.DataFrame(X, index = y)
-    resultDf = result.reset_index()
+    resultDf = resultDf.reset_index()
     cols = []
     if len(resultDf.columns)>3:
             cols = resultDf.columns[3:]

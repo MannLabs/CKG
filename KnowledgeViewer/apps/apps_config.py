@@ -21,13 +21,13 @@ proteomicsPage= {"overview":[
                                 ["scatterPlot"], 
                                 {"imputation":True, "imputation_method":"distribution", "x_title":"PC1", "y_title":"PC2", "components":2, "perplexity":40, "n_iter":1000, "init":'pca'})
                                 ],
-                #    "correlation":[
+                #"correlation":[
                 #                ("correlation_analysis", ["complexHeatmapPlot", "3dNetwork"])
-                #                ],
-                    "regulation":[
+                #               ],
+                 "regulation":[
                                 ("identified_proteins_sample_group_with_gene",
                                 ["ttest"], 
-                                ["volcanoPlot"],
+                                ["volcanoPlot", "basicTable"],
                                 {"imputation":True, "imputation_method":"distribution", "alpha":0.05, "drop_cols":["sample","gene_name"], "name":"name"})
                                 ],
                 #    "targets":[

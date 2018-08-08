@@ -23,8 +23,9 @@ def getPlot(name, data, identifier, title, args = {}):
         if "subset" in args:
             subset = args["subset"]
         for id in data:
-            print("basicTable", id)
-            plot.append(figure.getBasicTable(data[id], identifier, title, colors=colors, subset=subset, plot_attr=attr))
+            if isinstance(id, tuple):
+                id = id[0]+"_vs_"+id[1]
+            plot.append(figure.getBasicTable(data[id], identifier+"_"+id, title, colors=colors, subset=subset, plot_attr=attr))
     elif name == "basicBarPlot":
         x_title = "x"
         y_title = "y"
@@ -32,9 +33,10 @@ def getPlot(name, data, identifier, title, args = {}):
             x_title = args["x_title"]
         if "y_title" in args:
             y_title = args["y_title"]
-        for id in data:            
-            print("basicBarPlot", id)
-            plot.append(figure.getBarPlotFigure(data[id], identifier, title, x_title, y_title))
+        for id in data:     
+            if isinstance(id, tuple):
+                id = id[0]+"_vs_"+id[1]
+            plot.append(figure.getBarPlotFigure(data[id], identifier+"_"+id, title, x_title, y_title))
     elif name == "scatterPlot":
         x_title = "x"
         y_title = "y"
@@ -43,8 +45,9 @@ def getPlot(name, data, identifier, title, args = {}):
         if "y_title" in args:
             y_title = args["y_title"]
         for id in data:
-            print("scatterPlot", id)
-            plot.append(figure.getScatterPlotFigure(data[id], identifier, title, x_title, y_title))
+            if isinstance(id, tuple):
+                id = id[0]+"_vs_"+id[1]
+            plot.append(figure.getScatterPlotFigure(data[id], identifier+"_"+id, title, x_title, y_title))
     elif name == "volcanoPlot":
         alpha = 0.05
         lfc = 1.0
@@ -54,7 +57,6 @@ def getPlot(name, data, identifier, title, args = {}):
             lfc = args["lfc"]
         for pair in data:
             signature = data[pair]
-            print("Volcano", pair)
             p = figure.runVolcano(identifier+"_"+pair[0]+"_vs_"+pair[1], signature, lfc=lfc, alpha=alpha, title=title+" "+pair[0]+" vs "+pair[1])
             plot.append(p)
     return plot
@@ -131,7 +133,6 @@ def view(title, section_query, analysis_types, plot_names, args):
         replacement = "PROJECTID"
         if "id" in args:
             replace.append((replacement, args["id"]))
-            print("Here",section_query)
             query = None
             if section_query.upper() in queries:
                 plot_title, query = queries[section_query.upper()]
@@ -144,24 +145,19 @@ def view(title, section_query, analysis_types, plot_names, args):
                             print(analysis_type)
                             result, new_args = getAnalysisResults(processed_data, analysis_type, args)
                             if len(result)>0:
-                                print("plotting")
                                 for plot_name in plot_names:
-                                    print(plot_name)
                                     plot = getPlot(plot_name, result, "project_"+section_query+"_"+analysis_type+"_"+plot_name, analysis_type.capitalize(), new_args)
-                                    print(plot)
-                                    if type(plot) == list:
-                                        print("IN")
-                                        plots.extend(plot)
-                                    else:
-                                        plots.append(plot)
+                                    plots.extend(plot)
                     else:
                         if not isinstance(result, dict):
                             dictresult = {}
                             dictresult['single_result'] = result
                             result = dictresult
+                            print(type(result))
+                            print(type(result["single_result"]))
                         for plot_name in plot_names:
                             plot = getPlot(plot_name, result, "project_"+section_query+"_"+plot_name, plot_title, args)
-                            plots.append(plot)
+                            plots.extend(plot)
     elif title == "import":
         pass
     
