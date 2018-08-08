@@ -18,7 +18,7 @@ def extract_number_missing(df, conditions, missing_max):
         groups = data.set_index("group").notnull().groupby(level=0).sum(axis = 1)
         groups = groups[groups>=missing_max]
     
-    groups = groups.dropna(axis=1)
+    groups = groups.dropna(how='all', axis=1)
 
     return list(groups.columns)
 
@@ -28,10 +28,11 @@ def extract_percentage_missing(data, conditions, missing_max):
     else:
         groups = data.copy()
         groups = groups.drop(["sample"], axis = 1)
-        groups = data.set_index("group").isnull().groupby(level=0).mean()
-        groups = groups[groups<missing_max]
+        groups = data.set_index("group")
+        groups = groups.isnull().groupby(level=0).mean()
+        groups = groups[groups<=missing_max]
     
-    groups = groups.dropna(axis=1)
+    groups = groups.dropna(how='all', axis=1)
         
     return list(groups.columns)
 
@@ -92,7 +93,6 @@ def remove_group(data):
 
 def get_measurements_ready(data, imputation = True, method = 'distribution', missing_method = 'percentage', missing_max = 0.3):
     df = data.copy()
-    print(df.head())
     conditions = df.group.unique()
     df = df.set_index(['group','sample'])
     df = df.pivot_table(values='LFQ_intensity', index=df.index, columns='identifier', aggfunc='first')

@@ -38,7 +38,7 @@ def getBarPlotFigure(data, identifier, title, x_title, y_title, group= True, sub
                             title = title,
                             xaxis = {"title":x_title},
                             yaxis = {"title":y_title},
-                            height = 500,
+                            height = 800,
                             width = 900
                         )
     if subplot:
@@ -412,10 +412,9 @@ def getSankeyPlot(data, sourceCol, targetCol, weightCol, edgeColorCol, node_colo
     
     return dcc.Graph(id = identifier, figure = figure)
 
-def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':800, 'height':800, 'font':12}, subplot = False):
+def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':800, 'height':1500, 'font':12}, subplot = False):
     if subset is not None:
         data = data[subset]
-    print(data)
     data_trace = go.Table(header=dict(values=data.columns,
                     fill = dict(color = colors[0]),
                     align = ['left'] * 5),
