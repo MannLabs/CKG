@@ -95,7 +95,7 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
     print(df.head())
     conditions = df.group.unique()
     df = df.set_index(['group','sample'])
-    df = df.pivot_table(values='LFQ_intensity', index=df.index, columns='protein', aggfunc='first')
+    df = df.pivot_table(values='LFQ_intensity', index=df.index, columns='identifier', aggfunc='first')
     df = df.reset_index()
     df[['group', 'sample']] = df["index"].apply(pd.Series)
     df = df.drop(["index"], axis=1)
@@ -193,14 +193,34 @@ def runUMAP(data, n_neighbors=10, min_dist=0.3, metric='cosine'):
 def calculate_ttest(df, condition1, condition2):
     group1 = df[condition1]
     group2 = df[condition2]
+    
+    if isinstance(group1, np.float64):
+        group1 = np.array(group1)
+    else:
+        group1 = group1.values
+    if isinstance(group2, np.float64):
+        group2 = np.array(group2)
+    else:
+        group2 = group2.values
+    
     t, pvalue = stats.ttest_ind(group1, group2, nan_policy='omit')
     log = -math.log(pvalue, 10)
         
     return (df.name, t, pvalue, log)
 
 def calculate_fold_change(df, condition1, condition2):
-    group1 = df[condition1].tolist()
-    group2 = df[condition2].tolist()
+    group1 = df[condition1]
+    group2 = df[condition2]
+
+    if isinstance(group1, np.float64):
+        group1 = np.array(group1)
+    else:
+        group1 = group1.values
+    if isinstance(group2, np.float64):
+        group2 = np.array(group2)
+    else:
+        group2 = group2.values
+
     if np.isnan(group1).all() or np.isnan(group2).all():
         fold_change = np.nan
     else:
@@ -262,10 +282,20 @@ def oneway_anova(df, grouping):
     return scores
 
 def cohen_d(df, condition1, condition2, ddof = 0):
-    group1 = df[condition1].tolist()
-    group2 = df[condition2].tolist()
-    ng1 = len(group1)
-    ng2 = len(group2)
+    group1 = df[condition1]
+    group2 = df[condition2]
+
+    if isinstance(group1, np.float64):
+        group1 = np.array(group1)
+    else:
+        group1 = group1.values
+    if isinstance(group2, np.float64):
+        group2 = np.array(group2)
+    else:
+        group2 = group2.values
+
+    ng1 = group1.size
+    ng2 = group2.size
     dof = ng1 + ng2 - 2
     if np.isnan(group1).all() or np.isnan(group2).all():
         d = np.nan
@@ -280,10 +310,21 @@ def cohen_d(df, condition1, condition2, ddof = 0):
     return d
 
 def hedges_g(df, condition1, condition2, ddof = 0):
-    group1 = df[condition1].tolist()
-    group2 = df[condition2].tolist()
-    ng1 = len(group1)
-    ng2 = len(group2)
+    group1 = df[condition1]
+    group2 = df[condition2]
+    
+    if isinstance(group1, np.float64):
+        group1 = np.array(group1)
+    else:
+        group1 = group1.values
+    if isinstance(group2, np.float64):
+        group2 = np.array(group2)
+    else:
+        group2 = group2.values
+
+
+    ng1 = group1.size
+    ng2 = group2.size
     dof = ng1 + ng2 - 2
     if np.isnan(group1).all() or np.isnan(group2).all():
         g = np.nan

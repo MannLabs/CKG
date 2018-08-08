@@ -14,6 +14,6 @@ queries = {
     "IDENTIFIED_PROTEINS_SAMPLE_GROUP":("Identified proteins per group", 
             '''MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) WHERE project.id="PROJECTID" RETURN a.id AS sample, protein.id AS protein, a.group AS group, toFloat(r.value) as LFQ_intensity;'''),
     "IDENTIFIED_PROTEINS_SAMPLE_GROUP_WITH_GENE":("Identified proteins per group", 
-            '''MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) WHERE project.id="PROJECTID" RETURN a.id AS sample, protein.id AS protein, a.group AS group, toFloat(r.value) as LFQ_intensity, protein.name AS name;''')
+            '''MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) WHERE project.id="PROJECTID" RETURN a.id AS sample, protein.id AS identifier, a.group AS group, toFloat(r.value) as LFQ_intensity, protein.name AS name;''')
 
 }
