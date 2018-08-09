@@ -330,6 +330,57 @@ def oneway_anova(df, grouping):
     
     return scores
 
+def runFisher(group1, group2, alternative='two-sided'):
+    '''         annotated   not-annotated
+        group1      a               b   
+        group2      c               d
+        ------------------------------------
+
+        group1 = [a, b]
+        group2 = [c, d]
+
+        odds, pvalue = stats.fisher_exact([[a, b], [c, d]])
+    '''
+    odds, pvalue = stats.fisher_exact([group1, group2], alternative)
+
+    return (odds, pvalue)
+
+def runEnrichment(data, foreground, background, method='fisher'):
+    result = pd.DataFrame()
+    df = data.copy()
+    grouping = df['group'].value_counts().to_dict()
+    terms = []
+    ids = []
+    pvalues = []
+    if foreground in grouping and background in grouping:
+        foreground_pop = grouping[foreground]
+        background_pop = grouping[background]
+        countsdf = df.groupby(['annotation','group']).agg(['count'])[('identifier','count')].reset_index().set_index('annotation')
+        countsdf.columns = ['group', 'count']
+        for annotation in countsdf.index:
+            counts = countsdf[annotation]
+            num_foreground = counts.loc[counts['group'] == foreground,'count'].values
+            num_background = counts.loc[counts['group'] == background,'count'].values
+            if len(num_foreground) == 1:
+                num_foreground = num_foreground[0]
+            else:
+                num_foreground = 0
+            if len(num_background) == 1:
+                num_background = num_background[0]
+            else:
+                num_background = 0
+            if method == 'fisher':
+                odds, pvalue = runFisher([num_foreground, foreground_pop-num_foreground],[num_background, background_pop-num_background])
+            terms.append(annotation)
+            pvalues.append(pvalue)
+            ids.append(df.loc[(df['annotation']==annotation) & (df['group'] == foregorund), "identifier"].tolist())
+
+    if len(pvalues) > 1:
+        rejected,padj = apply_pvalue_fdrcorrection(pvalues, alpha=0.05, method='indep')
+        result = pd.DataFrame({'terms':terms, 'identifiers':ids, 'padj':padj, 'rejected':rejected})
+        result = result[result.rejected]
+    return result
+    
 def calculate_fold_change(df, condition1, condition2):
     group1 = df[condition1]
     group2 = df[condition2]

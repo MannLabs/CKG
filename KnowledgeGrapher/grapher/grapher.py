@@ -212,6 +212,6 @@ def archiveImportDirectory(archive_type="full"):
     utils.compress_directory(folder_to_backup, dest_folder, file_name)
 
 if __name__ == "__main__":
-    #populateDB()
-    partialUpdateDB(dataset="experiment")
+    populateDB()
+    #partialUpdateDB(dataset="experiment")
 
