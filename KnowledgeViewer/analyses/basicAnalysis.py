@@ -1,6 +1,8 @@
 import pandas as pd
+import itertools
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
+import statsmodels.stats.multitest as multitest
 import umap
 from sklearn import preprocessing
 import statsmodels.stats.multitest as multi
@@ -47,6 +49,7 @@ def imputation_KNN(data):
     df.update(dfm)
     
     return df
+
 
 def imputation_normal_distribution(data, shift = 1.8, nstd = 0.3):
     data_imputed = data.copy()
@@ -114,7 +117,6 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
             sys.exit()
 
     return df
-
 
 def runPCA(data, components = 2):
     result = {}
@@ -188,6 +190,70 @@ def runUMAP(data, n_neighbors=10, min_dist=0.3, metric='cosine'):
     result['umap'] = resultDf
     return result, args
 
+def calculate_correlations(x, y, method='pearson'):
+    if method == "pearson":
+        coefficient, pvalue = stats.pearsonr(x, y)
+    elif method == "spearman":
+        coefficient, pvalue = stats.spearmanr(x, y)
+
+    return (coefficient, pvalue)
+
+def apply_pvalue_fdrcorrection(pvalues, alpha=0.05, method='indep'):
+    rejected, padj = multitest.fdrcorrection(pvalues, alpha, method)
+
+    return (rejected, padj)
+
+def apply_pvalue_twostage_fdrcorrection(pvalues, alpha=0.05, method='bh'):
+    rejected, padj, num_hyp, alpha_stages = multitest.fdrcorrection_twostage(pvalues, alpha, method)
+
+    return (rejected, padj)
+
+def runCorrelation(data, alpha=0.05, method='pearson', correction=('fdr', 'indep')):
+    calculated = set()
+    df = data.copy()
+    df = df.dropna()._get_numeric_data()
+    dfcols = pd.DataFrame(columns=df.columns)
+    pvalues = []
+    correlations = []
+    for c1, c2 in itertools.combinations(df.columns, 2):
+        if (c1, c2) not in calculated and c1 != c2:
+            correlation, pvalue = calculate_correlations(df[c1], df[c2], method)
+            pvalues.append(pvalue)
+            correlations.append((c1,c2,correlation))
+            calculated.update({(c1, c2), (c2, c1)})
+    
+    if correction[0] == 'fdr':
+        rejected, padj = apply_pvalue_fdrcorrection(pvalues, alpha=alpha, method=correction[1])
+    elif correction[0] == '2fdr':
+        rejected, padj = apply_pvalue_twostage_fdrcorrection(pvalues, alpha=alpha, method=correction[1])
+    
+    cor = pd.DataFrame(correlations, columns=["node1", "node2", "weight"])
+    cor["padj"] = padj
+    cor["rejected"] = rejected
+    print("Correlation", cor.shape)
+    cor = cor[cor.rejected]
+    print("Correlation", cor.shape)
+    cor = cor[abs(cor.weight) > 0.5]
+    print("Correlation", cor.shape)
+    return cor
+    
+def calculate_paired_ttest(df, condition1, condition2):
+    group1 = df[condition1]
+    group2 = df[condition2]
+    
+    if isinstance(group1, np.float64):
+        group1 = np.array(group1)
+    else:
+        group1 = group1.values
+    if isinstance(group2, np.float64):
+        group2 = np.array(group2)
+    else:
+        group2 = group2.values
+    
+    t, pvalue = stats.ttest_rel(group1, group2, nan_policy='omit')
+    log = -math.log(pvalue, 10)
+        
+    return (df.name, t, pvalue, log)
 
 def calculate_ttest(df, condition1, condition2):
     group1 = df[condition1]
@@ -206,26 +272,6 @@ def calculate_ttest(df, condition1, condition2):
     log = -math.log(pvalue, 10)
         
     return (df.name, t, pvalue, log)
-
-def calculate_fold_change(df, condition1, condition2):
-    group1 = df[condition1]
-    group2 = df[condition2]
-
-    if isinstance(group1, np.float64):
-        group1 = np.array(group1)
-    else:
-        group1 = group1.values
-    if isinstance(group2, np.float64):
-        group2 = np.array(group2)
-    else:
-        group2 = group2.values
-
-    if np.isnan(group1).all() or np.isnan(group2).all():
-        fold_change = np.nan
-    else:
-        fold_change = np.nanmedian(group1) - np.nanmedian(group2)
-
-    return fold_change
 
 def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample", "name"]):
     df = data.copy()
@@ -252,7 +298,10 @@ def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample", "name
     scores['padj'] = padj
     scores['reject'] = reject
     scores = scores.reset_index()
-    
+    print("ttest", scores.shape)
+    scores = scores[scores.rejected]
+    print("ttest", scores.shape)
+
     return scores
 
 def oneway_anova(df, grouping):
@@ -277,8 +326,29 @@ def oneway_anova(df, grouping):
     #FDR correction
     reject, qvalue = multi.fdrcorrection(scores['pvalue'], alpha=0.05, method='indep')
     scores['qvalue'] = qvalue
-
+    scores = scores[scores.rejected]
+    
     return scores
+
+def calculate_fold_change(df, condition1, condition2):
+    group1 = df[condition1]
+    group2 = df[condition2]
+
+    if isinstance(group1, np.float64):
+        group1 = np.array(group1)
+    else:
+        group1 = group1.values
+    if isinstance(group2, np.float64):
+        group2 = np.array(group2)
+    else:
+        group2 = group2.values
+
+    if np.isnan(group1).all() or np.isnan(group2).all():
+        fold_change = np.nan
+    else:
+        fold_change = np.nanmedian(group1) - np.nanmedian(group2)
+
+    return fold_change
 
 def cohen_d(df, condition1, condition2, ddof = 0):
     group1 = df[condition1]

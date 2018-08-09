@@ -38,7 +38,7 @@ def getBarPlotFigure(data, identifier, title, x_title, y_title, group= True, sub
                             title = title,
                             xaxis = {"title":x_title},
                             yaxis = {"title":y_title},
-                            height = 800,
+                            height = 400,
                             width = 900
                         )
     if subplot:
@@ -278,7 +278,7 @@ def get3DNetworkFigure(data, sourceCol, targetCol, node_properties, identifier, 
                z=Zed,
                mode='lines',
                line=scatter3d.Line(color='rgb(125,125,125)', width=2),
-               hoverinfo='none'
+               hoverinfo='text'
                )
     trace2=Scatter3d(x=Xn,
                y=Yn,
@@ -289,7 +289,7 @@ def get3DNetworkFigure(data, sourceCol, targetCol, node_properties, identifier, 
                              size=sizes,
                              color=colors,
                              colorscale='Viridis',
-                             line=scatter3d.marker.Line(color='rgb(50,50,50)', width=5.5)
+                             line=scatter3d.marker.Line(color='rgb(0,50,50)', width=5.5)
                              ),
                text=labels,
                hoverinfo='text'
@@ -305,8 +305,8 @@ def get3DNetworkFigure(data, sourceCol, targetCol, node_properties, identifier, 
 
     layout = Layout(
          title=title + "(3D visualization)",
-         width=800,
-         height=800,
+         width=1300,
+         height=1500,
          showlegend=True,
          scene=Scene(
          xaxis=XAxis(axis),
@@ -340,7 +340,7 @@ def get2DPCAFigure(data, components, identifier, title, subplot = False):
             mode='markers',
             name=name,
             marker=scatter.Marker(
-                size=12,
+                size=18,
                 line=scatter.Line(
                     color='rgba(217, 217, 217, 0.14)',
                     width=0.5),
@@ -417,13 +417,11 @@ def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subse
         data = data[subset]
     data_trace = go.Table(header=dict(values=data.columns,
                     fill = dict(color = colors[0]),
-                    align = ['left'] * 5),
+                    align = ['left','center']),
                     cells=dict(values=[data[c] for c in data.columns],
                     fill = dict(color= colors[1]),
-                    align = ['left'] * 5))
+                    align = ['left','center']))
     layout =  dict(
-        width= 300 if 'width' not in plot_attr else plot_attr['width'],
-        height= 300 if 'height' not in plot_attr else plot_attr['height'],
         title = title,
         font = dict(
             size = 12 if 'font' not in plot_attr else plot_attr['font'],

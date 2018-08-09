@@ -446,14 +446,16 @@ def loadProteomicsDataset(uri, configuration):
     # P01911
     # Q29830
     # Q9MXZ4
-    s = data[proteinCol].str.split(';').apply(pd.Series, 1).stack().reset_index(level=1, drop=True)
-    del data[proteinCol]
-    pdf = s.to_frame(proteinCol)
+    #s = data[proteinCol].str.split(';').apply(pd.Series, 1).stack().reset_index(level=1, drop=True)
+    #del data[proteinCol]
+    #pdf = s.to_frame(proteinCol)
+    data[proteinCol] = data[proteinCol].str.split(';').apply(pd.Series,1)[0]    
     if "multipositions" in configuration:
-        s2 = data[configuration["multipositions"]].str.split(';').apply(pd.Series, 1).stack().reset_index(level=1, drop=True)
-        del data[configuration["multipositions"]]
-        pdf = pd.concat([s,s2], axis=1, keys=[proteinCol,configuration["multipositions"]])
-    data = data.join(pdf)
+        #s2 = data[configuration["multipositions"]].str.split(';').apply(pd.Series, 1).stack().reset_index(level=1, drop=True)
+        #del data[configuration["multipositions"]]
+        #pdf = pd.concat([s,s2], axis=1, keys=[proteinCol,configuration["multipositions"]])
+        data[configuration["multipositions"]] =  data[configuration["multipositions"]].str.split(';').apply(pd.Series,1)[0]
+    #data = data.join(pdf)
     #proteins = data[proteinCol].str.split(';').apply(pd.Series,1)[0]
     #data[proteinCol] = proteins
     data = data.set_index(indexCol)

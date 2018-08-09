@@ -25,8 +25,10 @@ def getPlot(name, data, identifier, title, args = {}):
         for id in data:
             if isinstance(id, tuple):
                 identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                title = title + id[0]+" vs "+id[1]
-            plot.append(figure.getBasicTable(data[id], identifier, title, colors=colors, subset=subset, plot_attr=attr))
+                figure_title = title + id[0]+" vs "+id[1]
+            else:
+                figure_title = title
+            plot.append(figure.getBasicTable(data[id], identifier, figure_title, colors=colors, subset=subset, plot_attr=attr))
     elif name == "basicBarPlot":
         x_title = "x"
         y_title = "y"
@@ -37,8 +39,10 @@ def getPlot(name, data, identifier, title, args = {}):
         for id in data:     
             if isinstance(id, tuple):
                 identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                title = title + id[0]+" vs "+id[1]
-            plot.append(figure.getBarPlotFigure(data[id], identifier, title, x_title, y_title))
+                figure_title = title + id[0]+" vs "+id[1]
+            else:
+                figure_title = title
+            plot.append(figure.getBarPlotFigure(data[id], identifier, figure_title, x_title, y_title))
     elif name == "scatterPlot":
         x_title = "x"
         y_title = "y"
@@ -49,8 +53,10 @@ def getPlot(name, data, identifier, title, args = {}):
         for id in data:
             if isinstance(id, tuple):
                 identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                title = title + id[0]+" vs "+id[1]
-            plot.append(figure.getScatterPlotFigure(data[id], identifier, title, x_title, y_title))
+                figure_title = title + id[0]+" vs "+id[1]
+            else:
+                figure_title = title
+            plot.append(figure.getScatterPlotFigure(data[id], identifier, figure_title, x_title, y_title))
     elif name == "volcanoPlot":
         alpha = 0.05
         lfc = 1.0
@@ -62,6 +68,20 @@ def getPlot(name, data, identifier, title, args = {}):
             signature = data[pair]
             p = figure.runVolcano(identifier+"_"+pair[0]+"_vs_"+pair[1], signature, lfc=lfc, alpha=alpha, title=title+" "+pair[0]+" vs "+pair[1])
             plot.append(p)
+    elif name == '3Dnetwork':
+        source = 'source'
+        target = 'target'
+        if "source" in args:
+            source = args["source"]
+        if "target" in args:
+            target = args["target"]
+        for id in data:
+            if isinstance(id, tuple):
+                identifier = identifier+"_"+id[0]+"_vs_"+id[1]
+                figure_title = title + id[0]+" vs "+id[1]
+            else:
+                figure_title = title
+            plot.append(figure.get3DNetworkFigure(data[id], sourceCol=source, targetCol=target, node_properties={}, identifier=identifier, title=figure_title))
     return plot
 
 def preprocessData(data, qtype, args):
@@ -124,6 +144,19 @@ def getAnalysisResults(data, analysis_type, args):
         for pair in itertools.combinations(data.group.unique(),2):
             ttest_result = analyses.ttest(data, pair[0], pair[1], alpha = 0.05)
             result[pair] = ttest_result
+    elif analysis_type == "correlation":
+        result = {}
+        alpha = 0.05
+        method = 'pearson'
+        correction = ('fdr', 'indep')
+        if "alpha" in args:
+            alpha = args["args"]
+        if "method" in args:
+            method = args["method"]
+        if "correction" in args:
+            correction = args["correction"]
+        result[analysis_type] = analyses.runCorrelation(data, alpha=alpha, method=method, correction=correction)
+    
     return result, args
 
 def view(title, section_query, analysis_types, plot_names, args):
@@ -136,6 +169,8 @@ def view(title, section_query, analysis_types, plot_names, args):
         replacement = "PROJECTID"
         if "id" in args:
             replace.append((replacement, args["id"]))
+            if "replace" in args:
+                replace.extend(args["replace"])
             query = None
             if section_query.upper() in queries:
                 plot_title, query = queries[section_query.upper()]
