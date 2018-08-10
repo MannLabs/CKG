@@ -27,12 +27,12 @@ proteomicsPage= {"overview":[
                                 ["volcanoPlot", "basicTable"],
                                 {"imputation":True, "imputation_method":"distribution", "alpha":0.05, "drop_cols":["sample","gene_name"], "name":"name"})
                              ],
-                "correlation":[
-                                ("identified_proteins_sample_group", 
-                                ["correlation"], 
-                                ["3Dnetwork", "basicTable"],
-                                {"source":"node1", "target":"node2"})
-                               ],
+                #"correlation":[
+                 #               ("identified_proteins_sample_group", 
+                 #               ["correlation"], 
+                 #               ["3Dnetwork", "basicTable"],
+                 #               {"source":"node1", "target":"node2"})
+                 #              ],
                 "action":[
                            ("drug_acts_on_proteins", 
                            [],

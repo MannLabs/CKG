@@ -100,7 +100,7 @@ def preprocessData(data, qtype, args):
         if "missing_max" in args:
             missing_max = args["missing_max"]
         data = analyses.get_measurements_ready(data, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max)
-
+    data.to_csv("~/Downloads/data_with_imputation.csv", sep=",", header=True, doublequote=False)
     return data
 
 def getAnalysisResults(data, analysis_type, args):

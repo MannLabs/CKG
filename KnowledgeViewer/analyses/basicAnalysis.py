@@ -5,7 +5,6 @@ from sklearn.manifold import TSNE
 import statsmodels.stats.multitest as multitest
 import umap
 from sklearn import preprocessing
-import statsmodels.stats.multitest as multi
 from scipy import stats
 import numpy as np
 import math
@@ -18,7 +17,7 @@ def extract_number_missing(df, conditions, missing_max):
         groups = data.copy()
         groups = groups.drop(["sample"], axis = 1)
         groups = data.set_index("group").notnull().groupby(level=0).sum(axis = 1)
-        groups = groups[groups>=missing_max]
+        groups = groups[groups>missing_max]
     
     groups = groups.dropna(how='all', axis=1)
 
@@ -32,7 +31,7 @@ def extract_percentage_missing(data, conditions, missing_max):
         groups = groups.drop(["sample"], axis = 1)
         groups = data.set_index("group")
         groups = groups.isnull().groupby(level=0).mean()
-        groups = groups[groups<=missing_max]
+        groups = groups[groups<missing_max]
     
     groups = groups.dropna(how='all', axis=1)
         
@@ -49,7 +48,6 @@ def imputation_KNN(data):
     df.update(dfm)
     
     return df
-
 
 def imputation_normal_distribution(data, shift = 1.8, nstd = 0.3):
     data_imputed = data.copy()
@@ -103,6 +101,8 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
     df[['group', 'sample']] = df["index"].apply(pd.Series)
     df = df.drop(["index"], axis=1)
     aux = ['group', 'sample']
+    df.to_csv("~/Downloads/data_without_imputation.csv", sep=",", header=True, doublequote=False)
+
     if missing_method == 'at_least_x_per_group':
         aux.extend(extract_number_missing(df, conditions, missing_max))
     elif missing_method == 'percentage':
@@ -153,7 +153,7 @@ def runTSNE(data, components=2, perplexity=40, n_iter=1000, init='pca'):
     X = df.values
     y = df.index
     
-    tsne = TSNE(n_components=components, verbose=2, perplexity=perplexity, n_iter=n_iter, init=init)
+    tsne = TSNE(n_components=components, verbose=0, perplexity=perplexity, n_iter=n_iter, init=init)
     X = tsne.fit_transform(X)
     args = {"x_title":"C1","y_title":"C2"}
     if components == 2:
@@ -258,7 +258,6 @@ def calculate_paired_ttest(df, condition1, condition2):
 def calculate_ttest(df, condition1, condition2):
     group1 = df[condition1]
     group2 = df[condition2]
-    
     if isinstance(group1, np.float64):
         group1 = np.array(group1)
     else:
@@ -268,18 +267,24 @@ def calculate_ttest(df, condition1, condition2):
     else:
         group2 = group2.values
     
-    t, pvalue = stats.ttest_ind(group1, group2, nan_policy='omit')
+    t, pvalue = stats.ttest_ind(group1.tolist(), group2.tolist(), nan_policy='omit')
     log = -math.log(pvalue, 10)
         
     return (df.name, t, pvalue, log)
 
-def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample", "name"]):
+def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample", "name"], paired = False):
     df = data.copy()
     df = df.set_index('group')
     df = df.drop(drop_cols, axis = 1)
     df = df.loc[[condition1, condition2],:].T
     columns = ['identifier', 't-statistics', 'pvalue', '-Log pvalue']
-    scores = df.apply(func = calculate_ttest, axis = 1, result_type='expand', args =(condition1, condition2))
+    print(df.shape)
+    print(df.head())
+    print(df.loc["O60341",:])
+    if paired:
+        scores = df.apply(func = calculate_paired_ttest, axis = 1, result_type='expand', args =(condition1, condition2))
+    else:
+        scores = df.apply(func = calculate_ttest, axis = 1, result_type='expand', args =(condition1, condition2))
     scores.columns = columns
     scores = scores.set_index("identifier")
     scores = scores.dropna(how="all")
@@ -292,15 +297,11 @@ def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample", "name
     
     #Hedge's g
     scores["hedges_g"] = df.apply(func = hedges_g, axis = 1, args =(condition1, condition2, 1))
-
     #FDR correction
-    reject, padj = multi.fdrcorrection(scores["pvalue"], alpha=alpha, method = 'indep')
+    rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'indep')
     scores['padj'] = padj
-    scores['reject'] = reject
+    scores['rejected'] = rejected
     scores = scores.reset_index()
-    print("ttest", scores.shape)
-    scores = scores[scores.rejected]
-    print("ttest", scores.shape)
 
     return scores
 
@@ -324,8 +325,9 @@ def oneway_anova(df, grouping):
     scores.columns = columns
     
     #FDR correction
-    reject, qvalue = multi.fdrcorrection(scores['pvalue'], alpha=0.05, method='indep')
+    rejected, qvalue = apply_pvalue_fdrcorrection(scores['pvalue'], alpha=0.05, method='indep')
     scores['qvalue'] = qvalue
+    scores['rejected'] = rejected
     scores = scores[scores.rejected]
     
     return scores

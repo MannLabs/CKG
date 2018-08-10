@@ -69,5 +69,5 @@ metabolite_resources = ["hmdb"]
 internalEntities = [("Protein","Disease"), ("Protein", "Tissue"), ("Protein","Cellular_component")]
 
 #Mentions entities
-mentionEntities = ["Disease", "Tissue", "Protein", "Cellular_component", "Chemical", "Metabolite"]
+mentionEntities = ["Disease", "Tissue", "Protein", "Metabolite"]
 publicationEntities = ["GWAS_study"]
