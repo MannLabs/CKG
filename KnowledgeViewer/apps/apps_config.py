@@ -19,13 +19,13 @@ proteomicsPage= {"overview":[
                                 ("identified_proteins_sample_group", 
                                ["pca", "tsne", "umap"], 
                                 ["scatterPlot"], 
-                                {"imputation":True, "imputation_method":"distribution", "x_title":"PC1", "y_title":"PC2", "components":2, "perplexity":40, "n_iter":1000, "init":'pca'})
+                                {"imputation":True, "imputation_method":"group_median", "x_title":"PC1", "y_title":"PC2", "components":2, "perplexity":40, "n_iter":1000, "init":'pca'})
                                 ],
                  "regulation":[
                                 ("identified_proteins_sample_group_with_gene",
                                 ["ttest"], 
                                 ["volcanoPlot", "basicTable"],
-                                {"imputation":True, "imputation_method":"distribution", "alpha":0.05, "drop_cols":["sample","gene_name"], "name":"name"})
+                                {"imputation":True, "imputation_method":"group_median", "alpha":0.05, "drop_cols":["sample","gene_name"], "name":"name"})
                              ],
                 #"correlation":[
                  #               ("identified_proteins_sample_group", 

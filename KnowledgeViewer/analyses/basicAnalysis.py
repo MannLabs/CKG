@@ -34,8 +34,18 @@ def extract_percentage_missing(data, conditions, missing_max):
         groups = groups[groups<missing_max]
     
     groups = groups.dropna(how='all', axis=1)
-        
+      
     return list(groups.columns)
+
+def imputation_median_by_group(data):
+    print("IN")
+    df = data.copy()
+    for i in data_imputed.loc[:, data_imputed.isnull().any()]:
+        for g in df.group.unique:
+            df.loc[i] = df[df.group == g].fillna(df[df.group == g].median())
+            print(g)
+    return df
+
 
 def imputation_KNN(data):
     df = data.copy()
@@ -50,6 +60,7 @@ def imputation_KNN(data):
     return df
 
 def imputation_normal_distribution(data, shift = 1.8, nstd = 0.3):
+    np.random.seed(1)
     data_imputed = data.copy()
     for i in data_imputed.loc[:, data_imputed.isnull().any()]:
         missing = data_imputed[i].isnull()
@@ -57,6 +68,11 @@ def imputation_normal_distribution(data, shift = 1.8, nstd = 0.3):
         mean = data_imputed[i].mean()
         sigma = std*nstd
         mu = mean - (std*shift)
+        if i == "O60341":
+            print("std", std)
+            print("mean", mean)
+            print("sigma", sigma)
+            print("mu", mu)
         data_imputed.loc[missing, i] = np.random.normal(mu, sigma, size=len(data_imputed[missing]))
     return data_imputed
 
@@ -107,12 +123,15 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
         aux.extend(extract_number_missing(df, conditions, missing_max))
     elif missing_method == 'percentage':
         aux.extend(extract_percentage_missing(df, conditions, missing_max))  
+        
     df = df[aux]
     if imputation:
         if method == "KNN":
             df = imputation_KNN(df)
         elif method == "distribution":
             df = imputation_normal_distribution(df, shift = 1.8, nstd = 0.3)
+        elif method == 'group_median':
+            df = imputation_median_by_group(df)
         else:
             sys.exit()
 
@@ -226,7 +245,6 @@ def runCorrelation(data, alpha=0.05, method='pearson', correction=('fdr', 'indep
         rejected, padj = apply_pvalue_fdrcorrection(pvalues, alpha=alpha, method=correction[1])
     elif correction[0] == '2fdr':
         rejected, padj = apply_pvalue_twostage_fdrcorrection(pvalues, alpha=alpha, method=correction[1])
-    
     cor = pd.DataFrame(correlations, columns=["node1", "node2", "weight"])
     cor["padj"] = padj
     cor["rejected"] = rejected
@@ -266,8 +284,12 @@ def calculate_ttest(df, condition1, condition2):
         group2 = np.array(group2)
     else:
         group2 = group2.values
-    
-    t, pvalue = stats.ttest_ind(group1.tolist(), group2.tolist(), nan_policy='omit')
+  
+    t, pvalue = stats.ttest_ind(group1, group2, nan_policy='omit')
+    if df.name == "O60341":
+        print("group1", group1)
+        print("group2", group2)
+        print(t, pvalue)
     log = -math.log(pvalue, 10)
         
     return (df.name, t, pvalue, log)
@@ -280,7 +302,6 @@ def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample", "name
     columns = ['identifier', 't-statistics', 'pvalue', '-Log pvalue']
     print(df.shape)
     print(df.head())
-    print(df.loc["O60341",:])
     if paired:
         scores = df.apply(func = calculate_paired_ttest, axis = 1, result_type='expand', args =(condition1, condition2))
     else:

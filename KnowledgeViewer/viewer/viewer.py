@@ -93,12 +93,13 @@ def preprocessData(data, qtype, args):
         
         if "imputation" in args:
             imputation = args["imputation"]
-        if "method" in args:
-            method = args["method"]
+        if "imputation_method" in args:
+            method = args["imputation_method"]
         if "missing_method" in args:
             missing_method = args["missing_method"]
         if "missing_max" in args:
             missing_max = args["missing_max"]
+        print(missing_max)
         data = analyses.get_measurements_ready(data, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max)
     data.to_csv("~/Downloads/data_with_imputation.csv", sep=",", header=True, doublequote=False)
     return data
