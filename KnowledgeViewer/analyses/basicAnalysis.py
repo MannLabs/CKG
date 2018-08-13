@@ -37,16 +37,7 @@ def extract_percentage_missing(data, conditions, missing_max):
       
     return list(groups.columns)
 
-def imputation_median_by_group(data):
-    df = data.copy()
-    for i in data_imputed.loc[:, data_imputed.isnull().any()]:
-        for g in df.group.unique:
-            df.loc[i] = df[df.group == g].fillna(df[df.group == g].median())
-            print(g)
-    return df
-
-
-def imputation_KNN(data):
+def imputation_KNN(data, alone = True):
     df = data.copy()
     for g in df.group.unique():
         missDf = df.loc[df.group==g, df.loc[df.group==g,:].isnull().any()]
@@ -57,10 +48,12 @@ def imputation_KNN(data):
         missingdata_df = missDf.columns.tolist()
         dfm = pd.DataFrame(X_trans, index =list(missDf.index), columns = missingdata_df)
         df.update(dfm)
+    if alone:
+        df = df.dropna()
     return df
 
 def imputation_mixed_norm_KNN(data):
-    df = imputation_KNN(data)
+    df = imputation_KNN(data, alone = False)
     df = imputation_normal_distribution(df, shift = 1.8, nstd = 0.3)
     
     return df
