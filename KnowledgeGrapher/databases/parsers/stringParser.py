@@ -85,7 +85,7 @@ def parseActions(importDirectory, proteinMapping, drugMapping = None, download =
     bool_dict = {'t':True, 'T':True, 'True':True, 'TRUE': True, 'f':False, 'F':False, 'False': False, 'FALSE':False}
     header = iconfig.header_actions
     relationship = "COMPILED_ACTS_ON"
-
+    stored = set()
     if db == "STRING":
         url = iconfig.STRING_actions_url
         outputfile = os.path.join(importDirectory, "string_protein_acts_on_protein.csv")
@@ -125,6 +125,9 @@ def parseActions(importDirectory, proteinMapping, drugMapping = None, download =
 
                 for aliasA in aliasesA:
                     for aliasB in proteinMapping[intB]:
-                        row = (aliasA, aliasB, relationship, action, directionality, score, db)
-                        writer.writerow(row)
+                        if (aliasA, aliasB, action) not in stored:
+                            row = (aliasA, aliasB, relationship, action, directionality, score, db)
+                            writer.writerow(row)
+                            stored.add((aliasA, aliasB, action))
+                            stored.add((aliasB, aliasA, action))
     associations.close()

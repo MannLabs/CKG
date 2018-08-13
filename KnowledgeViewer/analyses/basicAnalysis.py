@@ -17,7 +17,7 @@ def extract_number_missing(df, conditions, missing_max):
         groups = data.copy()
         groups = groups.drop(["sample"], axis = 1)
         groups = data.set_index("group").notnull().groupby(level=0).sum(axis = 1)
-        groups = groups[groups>missing_max]
+        groups = groups[groups>=missing_max]
     
     groups = groups.dropna(how='all', axis=1)
 
@@ -25,20 +25,19 @@ def extract_number_missing(df, conditions, missing_max):
 
 def extract_percentage_missing(data, conditions, missing_max):
     if conditions is None:
-        groups = data.loc[:, data.isnull().mean() <= missing_max].index
+        groups = data.loc[:, data.isnull().mean() <= missing_max].columns
     else:
         groups = data.copy()
         groups = groups.drop(["sample"], axis = 1)
         groups = data.set_index("group")
         groups = groups.isnull().groupby(level=0).mean()
-        groups = groups[groups<missing_max]
+        groups = groups[groups<=missing_max]
     
     groups = groups.dropna(how='all', axis=1)
       
     return list(groups.columns)
 
 def imputation_median_by_group(data):
-    print("IN")
     df = data.copy()
     for i in data_imputed.loc[:, data_imputed.isnull().any()]:
         for g in df.group.unique:
@@ -49,13 +48,20 @@ def imputation_median_by_group(data):
 
 def imputation_KNN(data):
     df = data.copy()
-    X = np.array(df.loc[:,df.isnull().any()].values, dtype=np.float64)
-    imp = predictive_imputer.PredictiveImputer(f_model="KNN")
-    X_trans = imp.fit(X).transform(X.copy())
+    for g in df.group.unique():
+        missDf = df.loc[df.group==g, df.loc[df.group==g,:].isnull().any()]
+        missDf = missDf.loc[:, missDf.notnull().mean() >= 0.5]
+        X = np.array(missDf.values, dtype=np.float64)
+        imp = predictive_imputer.PredictiveImputer(f_model="KNN")
+        X_trans = imp.fit(X).transform(X.copy())
+        missingdata_df = missDf.columns.tolist()
+        dfm = pd.DataFrame(X_trans, index =list(missDf.index), columns = missingdata_df)
+        df.update(dfm)
+    return df
 
-    missingdata_df = df.columns[df.isnull().any()].tolist()
-    dfm = pd.DataFrame(X_trans, index =list(df.index), columns = missingdata_df)
-    df.update(dfm)
+def imputation_mixed_norm_KNN(data):
+    df = imputation_KNN(data)
+    df = imputation_normal_distribution(df, shift = 1.8, nstd = 0.3)
     
     return df
 
@@ -132,6 +138,8 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
             df = imputation_normal_distribution(df, shift = 1.8, nstd = 0.3)
         elif method == 'group_median':
             df = imputation_median_by_group(df)
+        elif method == 'Mixed':
+            df = imputation_mixed_norm_KNN(df)
         else:
             sys.exit()
 

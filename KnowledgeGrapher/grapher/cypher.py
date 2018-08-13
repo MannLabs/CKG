@@ -374,6 +374,16 @@ CREATE_SUBJECTS = '''CREATE CONSTRAINT ON (s:Subject) ASSERT s.id IS UNIQUE;
                     MATCH (p:Project {id:line.START_ID})
                     MATCH (s:Subject {id:line.END_ID}) 
                     MERGE (p)-[:HAS_ENROLLED]->(s);
+                    USING PERIODIC COMMIT 10000
+                    LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_disease.csv" AS line 
+                    MATCH (s:Subject {id:line.START_ID})
+                    MATCH (d:Disease {id:line.END_ID}) 
+                    MERGE (s)-[:HAS_Disease]->(d);
+                    USING PERIODIC COMMIT 10000
+                    LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_clinical.csv" AS line 
+                    MATCH (s:Subject {id:line.START_ID})
+                    MATCH (c:Clinical_variable {id:line.END_ID}) 
+                    MERGE (s)-[:HAS_QUANTIFIED_CLINICAL{value:line.value}]->(c);
                     '''
 
 CREATE_BIOSAMPLES = '''CREATE CONSTRAINT ON (s:Biological_sample) ASSERT s.id IS UNIQUE; 
@@ -392,7 +402,7 @@ CREATE_ANALYTICALSAMPLES = '''CREATE INDEX ON :Analytical_sample(group);
                     USING PERIODIC COMMIT 10000
                     LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_analytical_samples.csv" AS line
                     MERGE (s:Analytical_sample {id:line.ID})
-                    ON CREATE SET s.collection_date=line.collection_date,s.conservation_conditions=line.conservation_conditions,s.storage=line.storage,s.status=line.status,s.quantity=line.quantity,s.quantity_units=line.quantity_units,s.group=line.group;
+                    ON CREATE SET s.collection_date=line.collection_date,s.conservation_conditions=line.conservation_conditions,s.storage=line.storage,s.status=line.status,s.quantity=line.quantity,s.quantity_units=line.quantity_units,s.group=line.group,s.secondary_group=line.secondary_group;
                     USING PERIODIC COMMIT 10000
                     LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_biosample_analytical.csv" AS line
                     MATCH (s1:Biological_sample {id:line.START_ID})
