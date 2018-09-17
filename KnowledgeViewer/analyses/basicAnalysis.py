@@ -1,4 +1,5 @@
 import pandas as pd
+from swifter import swiftapply
 import itertools
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
@@ -113,7 +114,7 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
     df = df.set_index(['group','sample'])
     df = df.pivot_table(values='LFQ_intensity', index=df.index, columns='identifier', aggfunc='first')
     df = df.reset_index()
-    df[['group', 'sample']] = df["index"].apply(pd.Series)
+    df[['group', 'sample']] = df["index"].swiftapply(pd.Series)
     df = df.drop(["index"], axis=1)
     aux = ['group', 'sample']
     df.to_csv("~/Downloads/data_without_imputation.csv", sep=",", header=True, doublequote=False)
@@ -228,6 +229,30 @@ def apply_pvalue_twostage_fdrcorrection(pvalues, alpha=0.05, method='bh'):
 
     return (rejected, padj)
 
+def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, permutations=250):
+    i = permutations
+    df_index = list(df.index)
+    columns = ['identifier', 't-statistics', 'pvalue', '-Log pvalue']
+    rand_pvalues = pd.DataFrame(columns=columns)
+    while i>0:
+        df_random = df.sample(frac=1).reset_index(drop=True)
+        if df_random.index != df.index:
+            rand_scores = df.apply(func=calculate_annova, axis=0, result_type='expand')
+            rand_scores.columns = columns
+            rand_scores = rand_scores.set_index("identifier")
+            rand_scores = scores.dropna(how="all")
+            rand_scores = rand_scores['pvalue']
+            rand_pvalues = pd.merge(rand_pvalues, rand_scores, on='identifier')
+
+    count = observed_pvalues.apply(func=get_counts_permutation_fdr, axis=0, result_type='expand', args=(rand_pvalues, observed_pvalues))
+    count.columns = ['padj']
+    count['rejected'] = count < alpha
+    
+    return count
+
+def get_counts_permutation_fdr(value, a, b, n):
+    return (a < value).sum()/(b < value).sum * 1/n
+
 def runCorrelation(data, alpha=0.05, method='pearson', correction=('fdr', 'indep')):
     calculated = set()
     df = data.copy()
@@ -287,13 +312,35 @@ def calculate_ttest(df, condition1, condition2):
         group2 = group2.values
   
     t, pvalue = stats.ttest_ind(group1, group2, nan_policy='omit')
-    if df.name == "O60341":
-        print("group1", group1)
-        print("group2", group2)
-        print(t, pvalue)
     log = -math.log(pvalue, 10)
         
     return (df.name, t, pvalue, log)
+
+def calculate_annova(df):
+    col = df.columns[0]
+    group_values = df.groupby('group').apply(list).tolist()
+    t, pvalue = stats.f_oneway(*samples_o)
+    log = -math.log(pvalue,10)
+
+    return (col, t, pvalue, log)
+
+def anova(data, alpha=0.5, drop_cols=["sample", "name"], permutations = 250):
+    columns = ['identifier', 't-statistics', 'pvalue', '-Log pvalue']
+    df = data.copy()
+    df = df.set_index('group')
+    df = df.drop(drop_cols, axis=1)
+    scores = df.apply(func = calculate_annova, axis=0,result_type='expand')
+    scores.columns = columns
+    scores = scores.set_index("identifier")
+    scores = scores.dropna(how="all")
+    
+    #FDR correction
+    observed_pvalues = scores.pvalue
+    count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=alpha, permutations=250)
+    scores = scores.join(count)
+    scores = scores.reset_index()
+    
+    return scores
 
 def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample", "name"], paired = False):
     df = data.copy()
@@ -301,8 +348,6 @@ def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample", "name
     df = df.drop(drop_cols, axis = 1)
     df = df.loc[[condition1, condition2],:].T
     columns = ['identifier', 't-statistics', 'pvalue', '-Log pvalue']
-    print(df.shape)
-    print(df.head())
     if paired:
         scores = df.apply(func = calculate_paired_ttest, axis = 1, result_type='expand', args =(condition1, condition2))
     else:
