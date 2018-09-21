@@ -8,7 +8,7 @@ import re
 #########################
 #   OncoKB database     #
 #########################
-def parser(download = False):
+def parser(download = True):
     url_actionable = iconfig.OncoKB_actionable_url
     url_annotated = iconfig.OncoKB_annotated_url
     entities_header = iconfig.entities_header

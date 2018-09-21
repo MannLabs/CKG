@@ -202,5 +202,5 @@ def getStatsName():
 
 
 if __name__ == "__main__":
-    #fullImport()
-    experimentsImport(projects=["P0000002"], n_jobs=1)
+    fullImport()
+    #experimentsImport(projects=["P0000002"], n_jobs=1)

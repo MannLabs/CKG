@@ -1,5 +1,4 @@
 import pandas as pd
-from swifter import swiftapply
 import itertools
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
@@ -68,11 +67,6 @@ def imputation_normal_distribution(data, shift = 1.8, nstd = 0.3):
         mean = data_imputed[i].mean()
         sigma = std*nstd
         mu = mean - (std*shift)
-        if i == "O60341":
-            print("std", std)
-            print("mean", mean)
-            print("sigma", sigma)
-            print("mu", mu)
         data_imputed.loc[missing, i] = np.random.normal(mu, sigma, size=len(data_imputed[missing]))
     return data_imputed
 
@@ -114,7 +108,7 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
     df = df.set_index(['group','sample'])
     df = df.pivot_table(values='LFQ_intensity', index=df.index, columns='identifier', aggfunc='first')
     df = df.reset_index()
-    df[['group', 'sample']] = df["index"].swiftapply(pd.Series)
+    df[['group', 'sample']] = df["index"].apply(pd.Series)
     df = df.drop(["index"], axis=1)
     aux = ['group', 'sample']
     df.to_csv("~/Downloads/data_without_imputation.csv", sep=",", header=True, doublequote=False)
@@ -132,7 +126,7 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
             df = imputation_normal_distribution(df, shift = 1.8, nstd = 0.3)
         elif method == 'group_median':
             df = imputation_median_by_group(df)
-        elif method == 'Mixed':
+        elif method == 'mixed':
             df = imputation_mixed_norm_KNN(df)
         else:
             sys.exit()
@@ -229,21 +223,27 @@ def apply_pvalue_twostage_fdrcorrection(pvalues, alpha=0.05, method='bh'):
 
     return (rejected, padj)
 
-def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, permutations=250):
+def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, permutations=50):
     i = permutations
     df_index = list(df.index)
-    columns = ['identifier', 't-statistics', 'pvalue', '-Log pvalue']
-    rand_pvalues = pd.DataFrame(columns=columns)
+    columns = ['identifier']
+    rand_pvalues = None
     while i>0:
         df_random = df.sample(frac=1).reset_index(drop=True)
-        if df_random.index != df.index:
-            rand_scores = df.apply(func=calculate_annova, axis=0, result_type='expand')
+        columns = ['identifier', 't-statistics', 'pvalue_'+str(i), '-Log pvalue']
+        if list(df_random.index) != df_index:
+            rand_scores = df.apply(func=calculate_annova, axis=0, result_type='expand').T
             rand_scores.columns = columns
             rand_scores = rand_scores.set_index("identifier")
-            rand_scores = scores.dropna(how="all")
-            rand_scores = rand_scores['pvalue']
-            rand_pvalues = pd.merge(rand_pvalues, rand_scores, on='identifier')
+            rand_scores = rand_scores.dropna(how="all")
+            rand_scores = rand_scores['pvalue_'+str(i)]
+            if rand_pvalues is None:
+                rand_pvalues = rand_scores
+            else:
+                rand_pvalues = rand_pvalues.join(rand_scores)
+            i -= 1
 
+    print(rand_pvalues)
     count = observed_pvalues.apply(func=get_counts_permutation_fdr, axis=0, result_type='expand', args=(rand_pvalues, observed_pvalues))
     count.columns = ['padj']
     count['rejected'] = count < alpha
@@ -260,6 +260,7 @@ def runCorrelation(data, alpha=0.05, method='pearson', correction=('fdr', 'indep
     dfcols = pd.DataFrame(columns=df.columns)
     pvalues = []
     correlations = []
+    #Parallel(n_jobs=n_jobs)(delayed(calculate_correlations)(df[c1], df[c2], method) for c1, c2 in itertools.combinations(df.columns, 2))
     for c1, c2 in itertools.combinations(df.columns, 2):
         if (c1, c2) not in calculated and c1 != c2:
             correlation, pvalue = calculate_correlations(df[c1], df[c2], method)
@@ -317,19 +318,19 @@ def calculate_ttest(df, condition1, condition2):
     return (df.name, t, pvalue, log)
 
 def calculate_annova(df):
-    col = df.columns[0]
+    col = df.name
     group_values = df.groupby('group').apply(list).tolist()
-    t, pvalue = stats.f_oneway(*samples_o)
+    t, pvalue = stats.f_oneway(*group_values)
     log = -math.log(pvalue,10)
 
     return (col, t, pvalue, log)
 
-def anova(data, alpha=0.5, drop_cols=["sample", "name"], permutations = 250):
+def anova(data, alpha=0.5, drop_cols=["sample", "name"], permutations = 50):
     columns = ['identifier', 't-statistics', 'pvalue', '-Log pvalue']
     df = data.copy()
     df = df.set_index('group')
     df = df.drop(drop_cols, axis=1)
-    scores = df.apply(func = calculate_annova, axis=0,result_type='expand')
+    scores = df.apply(func = calculate_annova, axis=0,result_type='expand').T
     scores.columns = columns
     scores = scores.set_index("identifier")
     scores = scores.dropna(how="all")
@@ -370,33 +371,6 @@ def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample", "name
     scores['rejected'] = rejected
     scores = scores.reset_index()
 
-    return scores
-
-def oneway_anova(df, grouping):
-    df_anova = data_imputed.copy()
-    df_anova['group'] = df_anova.index.map(grouping.get)
-    group_list = [str(x) for x in input().split()]
-    df_anova = df_anova[df_anova['group'].isin(group_list)]
-    df_anova = df_anova.reset_index().set_index(['group', 'Samples']).T
-    df_anova = df_anova.unstack().reset_index().rename(columns={"level_2":"Protein ID"})
-    df_anova.rename(columns={df_anova.columns[3]: 'value'}, inplace=True)
-    columns = ['identifier', 't-statistics', 'pvalue', '-Log pvalue']
-    scores = []
-    for protein_entry in df_anova.groupby('Protein ID'):
-        protein = protein_entry[0]
-        samples = [group[1] for group in protein_entry[1].groupby('group')['value']]
-        t_val, p_val = stats.f_oneway(*samples)
-        log = -math.log(p_val, 10)
-        scores.append((protein, t_val, p_val, log))
-    scores = pd.DataFrame(scores)
-    scores.columns = columns
-    
-    #FDR correction
-    rejected, qvalue = apply_pvalue_fdrcorrection(scores['pvalue'], alpha=0.05, method='indep')
-    scores['qvalue'] = qvalue
-    scores['rejected'] = rejected
-    scores = scores[scores.rejected]
-    
     return scores
 
 def runFisher(group1, group2, alternative='two-sided'):

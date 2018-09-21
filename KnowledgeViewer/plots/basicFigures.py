@@ -6,7 +6,7 @@ import plotly.figure_factory as FF
 from scipy.spatial.distance import pdist, squareform
 from plotly.graph_objs import *
 import networkx as nx
-from utils import hex2rgb, getNumberText
+from KnowledgeViewer.utils import hex2rgb, getNumberText
 
 def getBarPlotFigure(data, identifier, title, x_title, y_title, group= True, subplot = False):
     '''This function plots a simple barplot

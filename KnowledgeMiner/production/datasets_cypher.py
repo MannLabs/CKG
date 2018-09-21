@@ -1,4 +1,4 @@
-proteomics = [
+queries = {"proteomics" : {
             "NUMBER_OF_PROTEINS":
                 '''MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
                     WHERE project.id="PROJECTID" 
@@ -15,4 +15,5 @@ proteomics = [
                 '''MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
                     WHERE project.id="PROJECTID" 
                     RETURN a.id AS sample, protein.id AS identifier, a.group AS group, toFloat(r.value) as LFQ_intensity, protein.name AS name;'''
-                ]
+                }
+            }

@@ -8,7 +8,7 @@ import re
 #########################
 #          IntAct       # 
 #########################
-def parser(download = False):
+def parser(download = True):
     intact_dictionary = defaultdict()
     stored = set()
     relationships = set()

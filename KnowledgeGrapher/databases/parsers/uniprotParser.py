@@ -91,7 +91,7 @@ def addUniProtTexts(textsFile, proteins):
             if protein in proteins:
                 proteins[protein].update({"description":function})
 
-def parseUniProtVariants(download = False):
+def parseUniProtVariants(download = True):
     data = defaultdict()
     url = iconfig.uniprot_variant_file
     entities = set()
@@ -137,7 +137,7 @@ def parseUniProtVariants(download = False):
     return entities, relationships
 
 
-def parseUniProtUniquePeptides(download=False):
+def parseUniProtUniquePeptides(download=True):
     url = iconfig.uniprot_unique_peptides_file
     entities = set()
     directory = os.path.join(dbconfig.databasesDir,"UniProt")

@@ -1,4 +1,4 @@
-proteomics = {"report":
+configuration = {"proteomics":
                 {"overview":[ #section
                             ("number of peptides", #section_query
                             [], #analysis_types
@@ -17,13 +17,13 @@ proteomics = {"report":
                                 ("preprocessed", 
                                ["pca", "tsne", "umap"], 
                                 ["scatterPlot"], 
-                                {"imputation":True, "imputation_method":"Mixed", "x_title":"PC1", "y_title":"PC2", "components":2, "perplexity":40, "n_iter":1000, "init":'pca'})
+                                {"imputation":True, "imputation_method":"mixed", "x_title":"PC1", "y_title":"PC2", "components":2, "perplexity":40, "n_iter":1000, "init":'pca'})
                                 ],
                  "regulation":[
                                 ("preprocessed",
-                                ["ttest"], 
+                                ["ttest", "anova"], 
                                 ["volcanoPlot", "basicTable"],
-                                {"imputation":True, "imputation_method":"Mixed", "alpha":0.05, "drop_cols":["sample","gene_name"], "name":"name"})
+                                {"imputation":True, "imputation_method":"mixed", "alpha":0.05, "drop_cols":["sample","gene_name"], "name":"name"})
                              ],
                 "correlation":[
                                 ("preprocessed", 
