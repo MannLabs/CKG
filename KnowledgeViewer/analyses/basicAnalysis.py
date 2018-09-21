@@ -229,7 +229,7 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, per
     columns = ['identifier']
     rand_pvalues = None
     while i>0:
-        df_random = df.sample(frac=1).reset_index(drop=True)
+        df_random = df.sample(frac=1).reset_index(drop=False)
         columns = ['identifier', 't-statistics', 'pvalue_'+str(i), '-Log pvalue']
         if list(df_random.index) != df_index:
             rand_scores = df.apply(func=calculate_annova, axis=0, result_type='expand').T
@@ -238,7 +238,7 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, per
             rand_scores = rand_scores.dropna(how="all")
             rand_scores = rand_scores['pvalue_'+str(i)]
             if rand_pvalues is None:
-                rand_pvalues = rand_scores
+                rand_pvalues = rand_scores.to_frame()
             else:
                 rand_pvalues = rand_pvalues.join(rand_scores)
             i -= 1
