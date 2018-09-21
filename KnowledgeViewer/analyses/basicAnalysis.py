@@ -8,6 +8,7 @@ from sklearn import preprocessing
 from scipy import stats
 import numpy as np
 import math
+from random import shuffle
 from predictive_imputer import predictive_imputer
 
 def extract_number_missing(df, conditions, missing_max):
@@ -229,10 +230,13 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, per
     columns = ['identifier']
     rand_pvalues = None
     while i>0:
-        df_random = df.sample(frac=1).reset_index(drop=False).set_index('group')
-        print(df_random)
+        shuffle(df_index)
+        df_random = df.reset_index(drop=True)
+        df_random.index = df_index
+        df_random.index.name = 'group'
+        print(df_index)
         columns = ['identifier', 't-statistics', 'pvalue_'+str(i), '-Log pvalue']
-        if list(df_random.index) != df_index:
+        if list(df_random.index) != list(df.index):
             rand_scores = df_random.apply(func=calculate_annova, axis=0, result_type='expand').T
             rand_scores.columns = columns
             rand_scores = rand_scores.set_index("identifier")
@@ -245,7 +249,7 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, per
             i -= 1
 
     print(rand_pvalues)
-    count = observed_pvalues.apply(func=get_counts_permutation_fdr, result_type='expand', args=(rand_pvalues, observed_pvalues))
+    count = observed_pvalues.to_frame().apply(func=get_counts_permutation_fdr, axis=0, result_type='expand', args=(rand_pvalues, observed_pvalues,permutations))
     count.columns = ['padj']
     count['rejected'] = count < alpha
     
