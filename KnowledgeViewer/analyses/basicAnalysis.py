@@ -229,10 +229,11 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, per
     columns = ['identifier']
     rand_pvalues = None
     while i>0:
-        df_random = df.sample(frac=1).reset_index(drop=False)
+        df_random = df.sample(frac=1).reset_index(drop=False).set_index('group')
+        print(df_random)
         columns = ['identifier', 't-statistics', 'pvalue_'+str(i), '-Log pvalue']
         if list(df_random.index) != df_index:
-            rand_scores = df.apply(func=calculate_annova, axis=0, result_type='expand').T
+            rand_scores = df_random.apply(func=calculate_annova, axis=0, result_type='expand').T
             rand_scores.columns = columns
             rand_scores = rand_scores.set_index("identifier")
             rand_scores = rand_scores.dropna(how="all")
@@ -244,7 +245,7 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, per
             i -= 1
 
     print(rand_pvalues)
-    count = observed_pvalues.apply(func=get_counts_permutation_fdr, axis=0, result_type='expand', args=(rand_pvalues, observed_pvalues))
+    count = observed_pvalues.apply(func=get_counts_permutation_fdr, result_type='expand', args=(rand_pvalues, observed_pvalues))
     count.columns = ['padj']
     count['rejected'] = count < alpha
     
