@@ -9,6 +9,7 @@ if __name__ == "__main__":
                                     "imports/databases",
                                     "imports/experiments",
                                     "imports/ontologies",
+                                    "imports/stats",
                                     "ontologies"
                                     ]
                                 }
