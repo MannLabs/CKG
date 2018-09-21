@@ -1,5 +1,5 @@
 ########################
-dataDirectory = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/data"
+dataDirectory = "../../../data"
 #Import directory
 importDirectory = dataDirectory + "/imports"
 #Archive directory

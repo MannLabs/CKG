@@ -1,25 +1,25 @@
 #Database directory
-databasesDir = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/data/databases/"
+databasesDir = "../../../data/databases/"
 databasesImportDir = "databases"
 #Databases
 databases = [
-            #'DrugBank',             
-            #"Internal",
-            #"HGNC", 
-            #"RefSeq", 
-            #"UniProt", 
-            #"DisGEnet", 
-            #"STITCH", 
-            #"STRING", 
-            #"IntAct", 
-            #"Mentions",
-            #"HMDB",
-            #"PathwayCommons",
-            #'GWASCatalog',
+            'DrugBank',             
+            "Internal",
+            "HGNC", 
+            "RefSeq", 
+            "UniProt", 
+            "DisGEnet", 
+            "STITCH", 
+            "STRING", 
+            "IntAct", 
+            "Mentions",
+            "HMDB",
+            "PathwayCommons",
+            'GWASCatalog',
             "DGIdb", 
             "OncoKB",
             "CancerGenomeInterpreter", 
-            #"SIDER"
+            "SIDER"
             ]
 
 sources = {

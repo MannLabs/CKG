@@ -1,5 +1,5 @@
 #Ontologies directory
-ontologiesDirectory = "/Users/albertosantos/Development/Clinical_Proteomics_Department/ClinicalKnowledgeGraph(CKG)/data/ontologies/"
+ontologiesDirectory = "../../../data/ontologies/"
 ontologiesImportDir = "ontologies"
 
 ontologies = {"Disease": "DO", 
