@@ -12,6 +12,7 @@ from datetime import datetime
 import pandas as pd
 from joblib import Parallel, delayed
 import grapher_config as config
+form KnowledgeConnector import graph_config as gconfig
 from KnowledgeGrapher.ontologies import ontologies_controller as oh, ontologies_config as oconfig
 from KnowledgeGrapher.databases import databases_controller as dh, databases_config as dbconfig
 from KnowledgeGrapher.experiments import experiments_controller as eh, experiments_config as econfig
@@ -195,7 +196,7 @@ def getStatsName():
     Returns:
         statsName (string): key used to store in the stats object.
     """
-    version = config.version
+    version = gconfig.version
     statsName = 'stats_'+ str(version).replace('.', '_')
 
     return statsName
