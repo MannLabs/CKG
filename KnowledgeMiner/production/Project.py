@@ -176,7 +176,7 @@ class AnalysisResult:
             if "alpha" in args:
                 alpha = args["alpha"]
             anova_result = analyses.anova(self.getData(), alpha = 0.05)
-            result = anova_result
+            result[self.getAnalysisType()] = anova_result
         elif self.getAnalysisType()  == "correlation":
             alpha = 0.05
             method = 'pearson'

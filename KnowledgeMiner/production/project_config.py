@@ -21,8 +21,8 @@ configuration = {"proteomics":
                                 ],
                  "regulation":[
                                 ("preprocessed",
-                                ["ttest", "anova"], 
-                                ["volcanoPlot", "basicTable"],
+                                ["anova"], 
+                                ["basicTable"],
                                 {"imputation":True, "imputation_method":"mixed", "alpha":0.05, "drop_cols":["sample","gene_name"], "name":"name"})
                              ],
                 "correlation":[

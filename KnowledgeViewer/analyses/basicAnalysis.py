@@ -3,6 +3,7 @@ import itertools
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 import statsmodels.stats.multitest as multitest
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
 import umap
 from sklearn import preprocessing
 from scipy import stats
@@ -234,7 +235,6 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, per
         df_random = df.reset_index(drop=True)
         df_random.index = df_index
         df_random.index.name = 'group'
-        print(df_index)
         columns = ['identifier', 't-statistics', 'pvalue_'+str(i), '-Log pvalue']
         if list(df_random.index) != list(df.index):
             rand_scores = df_random.apply(func=calculate_annova, axis=0, result_type='expand').T
@@ -248,15 +248,19 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, per
                 rand_pvalues = rand_pvalues.join(rand_scores)
             i -= 1
 
-    print(rand_pvalues)
-    count = observed_pvalues.to_frame().apply(func=get_counts_permutation_fdr, axis=0, result_type='expand', args=(rand_pvalues, observed_pvalues,permutations))
-    count.columns = ['padj']
-    count['rejected'] = count < alpha
+    count = observed_pvalues.to_frame().apply(func=get_counts_permutation_fdr, result_type='expand', axis=1, args=(rand_pvalues, observed_pvalues, permutations, alpha))
+    count.columns = ['identifier','padj', 'rejected']
+    count = count.set_index('identifier')
     
     return count
 
-def get_counts_permutation_fdr(value, a, b, n):
-    return (a < value).sum()/(b < value).sum * 1/n
+def get_counts_permutation_fdr(value, random, observed, n, alpha):
+    a = (random <= value.values[0]).sum().sum()
+    b = (observed <= value.values[0]).sum()
+    qvalue = 1
+    if b != 0:
+        qvalue = (a/b * 1/n)
+    return (value.name, qvalue, qvalue <= alpha)
 
 def runCorrelation(data, alpha=0.05, method='pearson', correction=('fdr', 'indep')):
     calculated = set()
@@ -322,6 +326,15 @@ def calculate_ttest(df, condition1, condition2):
         
     return (df.name, t, pvalue, log)
 
+def calculate_THSD(df):
+    col = df.name
+    result = pairwise_tukeyhsd(df, list(df.index))
+    df_results = pd.DataFrame(data=result._results_table.data[1:], columns=result._results_table.data[0])
+    df_results.columns = ['group1', 'group2', 'log2FC', 'lower', 'upper', 'rejected'] 
+    df_results['identifier'] = col
+    df_results = df_results.set_index('identifier')
+    return df_results
+
 def calculate_annova(df):
     col = df.name
     group_values = df.groupby('group').apply(list).tolist()
@@ -330,7 +343,7 @@ def calculate_annova(df):
 
     return (col, t, pvalue, log)
 
-def anova(data, alpha=0.5, drop_cols=["sample", "name"], permutations = 50):
+def anova(data, alpha=0.5, drop_cols=["sample", "name"], permutations=50):
     columns = ['identifier', 't-statistics', 'pvalue', '-Log pvalue']
     df = data.copy()
     df = df.set_index('group')
@@ -342,13 +355,23 @@ def anova(data, alpha=0.5, drop_cols=["sample", "name"], permutations = 50):
     
     #FDR correction
     observed_pvalues = scores.pvalue
-    count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=alpha, permutations=250)
-    scores = scores.join(count)
-    scores = scores.reset_index()
-    
-    return scores
+    count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=alpha, permutations=permutations)
+    scores= scores.join(count)
 
-def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample", "name"], paired = False):
+    sigdf = df[list(scores[scores.rejected].index)]
+    res = None
+    for col in sigdf.columns:
+        pairthsd = calculate_THSD(sigdf[col])
+        if res is None:
+            res = pairthsd
+        else:
+            res = pd.concat([res,pairthsd], axis=0)
+    res = res.join(scores[['t-statistics', 'pvalue', '-Log pvalue', 'padj']])
+    res = res.reset_index()
+    
+    return res
+
+def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample", "name"], paired=False, permutations=50):
     df = data.copy()
     df = df.set_index('group')
     df = df.drop(drop_cols, axis = 1)
@@ -371,9 +394,14 @@ def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample", "name
     #Hedge's g
     scores["hedges_g"] = df.apply(func = hedges_g, axis = 1, args =(condition1, condition2, 1))
     #FDR correction
-    rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'indep')
-    scores['padj'] = padj
-    scores['rejected'] = rejected
+    if permutations > 0:
+        observed_pvalues = scores.pvalue
+        count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=alpha, permutations=permutations)
+        scores= scores.join(count)
+    else:
+        rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'indep')
+        scores['padj'] = padj
+        scores['rejected'] = rejected
     scores = scores.reset_index()
 
     return scores
