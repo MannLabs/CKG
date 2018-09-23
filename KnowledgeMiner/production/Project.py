@@ -4,14 +4,15 @@ from KnowledgeConnector import graph_controller
 import KnowledgeViewer.analyses.basicAnalysis as analyses
 from KnowledgeViewer.plots import basicFigures as figure
 import itertools
+from plotly.offline import iplot
 
 class Project:
-    def __init__(self,identifier, project_type, datasets = [], report = {}):
+    def __init__(self,identifier, project_type, datasets = {}, report = {}):
         self.identifier = identifier
         self.project_type = project_type
         self.datasets = datasets
         self.report = {}
-        if len(datasets) == 0:
+        if len(self.datasets) == 0:
             self.buildProject()
             self.generateReport()
 
@@ -23,6 +24,11 @@ class Project:
 
     def getDatasets(self):
         return self.datasets
+
+    def getDataset(self, dataset):
+        if dataset in self.datasets:
+            return self.datasets[dataset]
+        return None
 
     def getReport(self):
         return self.report
@@ -39,8 +45,8 @@ class Project:
     def setReport(self, report):
         self.report = report
 
-    def addDataset(self, dataset):
-        self.datasets.append(dataset)
+    def updateDataset(self, dataset):
+        self.datasets.update(dataset)
 
     def updateReport(self, new):
         self.report.update(new)
@@ -49,21 +55,38 @@ class Project:
         for dataset_type in config.configuration:
             if dataset_type == "proteomics":
                 proteomicsDataset = ProteomicsDataset(self.getIdentifier(), config.configuration[dataset_type])
-                self.addDataset(proteomicsDataset)
-
-                
+                self.updateDataset({dataset_type:proteomicsDataset})
+           
     def generateReport(self):
-        for dataset in self.getDatasets():
-                report = dataset.generateReport()
-                self.updateReport({dataset.getType():report})
+        if len(self.report) == 0:
+            for dataset_type in self.getDatasets():
+                dataset = self.getDataset(dataset_type)
+                if dataset is not None:
+                    report = dataset.generateReport()
+                    self.updateReport({dataset.getType():report})
     
-    def showReport(self):
-        for dataset_type in self.getReport():
-            print(dataset_type)
-            print(self.getReport()[dataset_type].getPlots())
+    def emptyReport(self):
+        self.report = {}
+
+    def generateDatasetReport(self, dataset):
+        if dataset_type in self.datasets:
+            dataset = self.getDataset(dataset_type)
+            if dataset is not None:
+                        report = dataset.generateReport()
+                        self.updateReport({dataset.getType():report})
+
+    def showReport(self, environment):
+        for data_type in self.getReport():
+            plots = self.getReport()[data_type].getPlots()
+            for plot_type in plots:
+                for plot in plots[plot_type]:
+                    if environment == "notebook":
+                        iplot(plot.figure)
+                    else:
+                        return plot
 
 class Report:
-    def __init__(self,identifier, plots = []):
+    def __init__(self,identifier, plots = {}):
         self.identifier = identifier
         self.plots = plots
 
@@ -73,20 +96,23 @@ class Report:
     def getPlots(self):
         return self.plots
 
+    def getPlot(self, plot):
+        if plot in self.plots:
+            return self.plots[plot]
+        return None
+
     def setIdentifier(self, identifier):
         self.identifier = identifier
 
     def setPlots(self, plots):
         self.plots = plots
 
-    def addPlot(self, plot):
-        self.plots.append(plot)
+    def updatePlots(self, plot):
+        self.plots.update(plot)
 
-    def extendPlots(self, plots):
-        self.plots.extend(plots)
 
 class AnalysisResult:
-    def __init__(self, identifier, analysis_type, args, data, result = None):
+    def __init__(self, identifier, analysis_type, args, data, result=None):
         self.identifier = identifier
         self.analysis_type = analysis_type
         self.args = args
@@ -270,11 +296,12 @@ class AnalysisResult:
         
 
 class Dataset:
-    def __init__(self, identifier, dtype, configuration, data):
+    def __init__(self, identifier, dtype, configuration, data, analyses):
         self.identifier = identifier
         self.type = dtype
         self.configuration = configuration
         self.data = data
+        self.analyses = analyses
         if len(data) == 0:
             self.data = self.queryData()
 
@@ -287,13 +314,24 @@ class Dataset:
     def getData(self):
         return self.data
 
-    def getDataset(self):
-        if "dataset" in self.data:
-            return self.data["dataset"]
+    def getDataset(self, dataset):
+        if dataset in self.data:
+            return self.data[dataset]
         return None
+
+    def getAnalyses(self):
+        return self.analyses
     
+    def getAnalysis(self, analysis):
+        if analysis in self.analyses:
+            return self.analyses[analysis]
+        return None
+
     def updateData(self, new):
         self.data.update(new)
+
+    def updateAnalyses(self, new):
+        self.analyses.update(new)
     
     def getConfiguration(self):
         return self.configuration
@@ -306,6 +344,12 @@ class Dataset:
 
     def setConfiguration(self, configuration):
         self.configuration  = configuration
+
+    def setData(self, data):
+        self.data = data
+
+    def setAnalyses(self, analyses):
+        self.analyses = analyses
 
     def queryData(self):
         data = {}
@@ -331,22 +375,29 @@ class Dataset:
                     if len(analysis_types) >= 1:
                         for analysis_type in analysis_types:
                             result = AnalysisResult(self.getIdentifier(), analysis_type, args, data)
+                            self.updateAnalyses(result.getResult())
+                            if key == "regulation":
+                                reg_data = result.getResult()[analysis_type]
+                                if not reg_data.empty:
+                                    sig_data = data[list(set(reg_data.loc[reg_data.rejected, "identifier"]))]
+                                    self.updateData({"regulation":sig_data})
                             for plot_name in plot_names:
                                 plots = result.getPlot(plot_name, section_query+"_"+analysis_type+"_"+plot_name, analysis_type.capitalize())
-                                report.extendPlots(plots)
+                                report.updatePlots({(analysis_type,plot_name):plots})
                     else:
                         if result is None:
                             dictresult = {}
-                            dictresult['single_result'] = data
-                            result = AnalysisResult(self.getIdentifier(),'single_result', {}, data, result = dictresult)
+                            dictresult["_".join(section_query.split(' '))] = data
+                            result = AnalysisResult(self.getIdentifier(),"_".join(section_query.split(' ')), {}, data, result = dictresult)
+                            self.updateAnalyses(result.getResult())
                         for plot_name in plot_names:
-                            plots = result.getPlot(plot_name, section_query+"_"+plot_name, section_query.capitalize())
-                            report.extendPlots(plots)
+                            plots = result.getPlot(plot_name, "_".join(section_query.split(' '))+"_"+plot_name, section_query.capitalize())
+                            report.updatePlots({("_".join(section_query.split(' ')),plot_name):plots})
         return report
 
 class ProteomicsDataset(Dataset):
-    def __init__(self, identifier, configuration, data={}):
-        Dataset.__init__(self, identifier, "proteomics", configuration, data)
+    def __init__(self, identifier, configuration, data={}, analyses={}):
+        Dataset.__init__(self, identifier, "proteomics", configuration, data, analyses)
         self.preprocessDataset()
         
     def preprocessDataset(self):
@@ -354,7 +405,7 @@ class ProteomicsDataset(Dataset):
     
     def preprocessing(self):
         processed_data = None
-        data = self.getDataset()
+        data = self.getDataset("dataset")
         if data is not None:
             imputation = True
             method = "mixed"
