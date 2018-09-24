@@ -28,7 +28,7 @@ configuration = {"proteomics":
                 "correlation":[
                                 ("regulation", 
                                 ["correlation"], 
-                                ["3Dnetwork", "basicTable"],
+                                ["3Dnetwork", "heatmap", "basicTable"],
                                 {"source":"node1", "target":"node2"})
                                ],
                 

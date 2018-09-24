@@ -293,6 +293,14 @@ class AnalysisResult:
                 else:
                     figure_title = title
                 plot.append(figure.get3DNetworkFigure(data[id], sourceCol=source, targetCol=target, node_properties={}, identifier=identifier, title=figure_title))
+        elif name == "heatmap":
+            for id in data:
+                if isinstance(id, tuple):
+                    identifier = identifier+"_"+id[0]+"_vs_"+id[1]
+                    figure_title = title + id[0]+" vs "+id[1]
+                else:
+                    figure_title = title
+            plot.append(figure.getComplexHeatmapFigure(data[id], identifier=identifier, title=figure_title))
 
         return plot
         

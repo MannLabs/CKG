@@ -6,7 +6,7 @@ from app import app
 from apps import initialApp, projectApp
 
 
-app.layout = html.Div([
+app.layout = html.Div([ 
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')
 ])
@@ -20,7 +20,7 @@ def display_page(pathname):
             return initialApp.layout
         elif pathname.startswith('/apps/project'):
             projectId = pathname.split('/')[-1]
-            project = projectApp.ProjectApp(projectId, "Project: "+projectId, "", "", layout = [], logo = None, footer = None)
+            project = projectApp.ProjectApp(projectId, projectId, "", "", layout = [], logo = None, footer = None)
 
             return project.getLayout()
         else:

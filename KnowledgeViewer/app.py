@@ -24,8 +24,7 @@ app.index_string = template
 app.config.suppress_callback_exceptions = True
 # Dash CSS
 external_css = ["https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css",
-                "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css",
-                "https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css"]
+                "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"]
 
 for css in external_css:
     app.css.append_css({"external_url": css})

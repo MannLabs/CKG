@@ -24,8 +24,7 @@ def getBarPlotFigure(data, identifier, title, x_title, y_title, group= True, sub
             trace = go.Bar(
                         x = data.loc[data["group"] == g,'x'], # assign x as the dataframe column 'x'
                         y = data.loc[data["group"] == g, 'y'],
-                        name = g
-                        )
+                        name = g)
             figure["data"].append(trace)
     else:
         figure["data"].append(
@@ -63,8 +62,8 @@ def getScatterPlotFigure(data, identifier, title, x_title, y_title, subplot = Fa
                                 margin={'l': 40, 'b': 40, 't': 30, 'r': 10},
                                 legend={'x': 0, 'y': 1},
                                 hovermode='closest',
-                                height=500,
-                                width= 500
+                                height=900,
+                                width= 900
                                 )
     for name in data.name.unique():
         figure["data"].append(go.Scatter(x = data.loc[data["name"] == name, "x"], 
@@ -161,26 +160,34 @@ def getHeatmapFigure(data, identifier, title, subplot = False):
 
     return dcc.Graph(id = identifier, figure = figure)
 
-def getComplexHeatmapFigure(data, identifier, title, subplot = False):
-    figure = FF.create_dendrogram(data.values, orientation='bottom', labels=list(data.columns))
+def getComplexHeatmapFigure(data, identifier, title, format = 'edgelist', subplot = False):
+    df = data.copy()
+    print(df.head())
+    if format == "edgelist":
+        df = df.set_index('node1')
+        df = df.pivot_table(values='weight', index=df.index, columns='node2', aggfunc='first')
+        df = df.fillna(0)
+
+    figure = FF.create_dendrogram(df.values, orientation='bottom', labels=list(df.columns))
     for i in range(len(figure['data'])):
         figure['data'][i]['yaxis'] = 'y2'
-    dendro_side = FF.create_dendrogram(data.values, orientation='right')
+    
+    dendro_side = FF.create_dendrogram(df.values, orientation='right')
     for i in range(len(dendro_side['data'])):
         dendro_side['data'][i]['xaxis'] = 'x2'
 
     # Add Side Dendrogram Data to Figure
-    figure['data'] + (dendro_side['data'],)
-
+    figure['data'] + dendro_side['data']
+    
     dendro_leaves = dendro_side['layout']['yaxis']['ticktext']
     dendro_leaves = list(map(int, dendro_leaves))
-    data_dist = pdist(data.values)
+    data_dist = pdist(df.values)
     heat_data = squareform(data_dist)
     heat_data = heat_data[dendro_leaves,:]
     heat_data = heat_data[:,dendro_leaves]
 
     heatmap = Data([
-        Heatmap(
+        go.Heatmap(
             x = dendro_leaves,
             y = dendro_leaves,
             z = heat_data,
@@ -192,10 +199,10 @@ def getComplexHeatmapFigure(data, identifier, title, subplot = False):
     heatmap[0]['y'] = dendro_side['layout']['yaxis']['tickvals']
 
     # Add Heatmap Data to Figure
-    figure['data'] + (Data(heatmap),)
+    figure['data'] + heatmap
 
     # Edit Layout
-    figure['layout'].update({'width':800, 'height':800,
+    figure['layout'].update({'width':1500, 'height':1500,
                              'showlegend':False, 'hovermode': 'closest',
                              })
     # Edit xaxis

@@ -87,6 +87,10 @@ class BasicApp:
 
     #Functionality
     def addBasicLayout(self):
+        self.layout.append(html.Link(
+            rel='stylesheet',
+            href='/assests/brPBPO.css'
+        ))
         if self.getTitle() is not None:
             self.layout.append(self.getHTMLTitle())
         if self.getSubtitle() is not None:
