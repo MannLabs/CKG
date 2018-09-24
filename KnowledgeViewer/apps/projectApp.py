@@ -7,6 +7,8 @@ import dash_auth
 from apps import basicApp
 from KnowledgeViewer.queries import project_cypher
 from KnowledgeViewer.viewer import viewer
+from KnowledgeViewer import project
+
 
 class ProjectApp(basicApp.BasicApp):
     def __init__(self, projectId, title, subtitle, description, layout = [], logo = None, footer = None):
@@ -23,14 +25,8 @@ class ProjectApp(basicApp.BasicApp):
 
     def buildPage(self):
         self.addBasicLayout()
-
-        projectPageConfig = self.getPageConfiguration()        
-
-        for key in projectPageConfig:
-            for section in projectPageConfig[key]:
-                for section_query,analysis_types,plot_names,args in projectPageConfig[key][section]:
-                    args["id"] = self.getProjectId()
-                    plots = viewer.view(key, section_query, analysis_types, plot_names, args)
-                    self.extendLayout(plots)
+        p = project.Project(self.getProjectId(), 'multi-omics')
+        plots = p.showReport("app")
+        self.extendLayout(plots)
         
         

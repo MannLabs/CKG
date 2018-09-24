@@ -19,8 +19,8 @@ class BasicApp:
         self.subtitle = subtitle
         self.description = description
         self.pageType = pageType
-        self.logo = logo if logo is not None else config.logo
-        self.footer = footer if footer is not None else config.footer
+        self.logo = logo
+        self.footer = footer 
         self.layout = layout
     
     #Setters

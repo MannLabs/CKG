@@ -1,5 +1,4 @@
-import project_config as config
-import datasets_cypher as cypher
+from KnowledgeViewer import project_config as config, datasets_cypher as cypher
 from KnowledgeConnector import graph_controller
 import KnowledgeViewer.analyses.basicAnalysis as analyses
 from KnowledgeViewer.plots import basicFigures as figure
@@ -76,6 +75,7 @@ class Project:
                         self.updateReport({dataset.getType():report})
 
     def showReport(self, environment):
+        app_plots = []
         for data_type in self.getReport():
             plots = self.getReport()[data_type].getPlots()
             for plot_type in plots:
@@ -83,7 +83,9 @@ class Project:
                     if environment == "notebook":
                         iplot(plot.figure)
                     else:
-                        return plot
+                        app_plots.append(plot)
+
+        return app_plots
 
 class Report:
     def __init__(self,identifier, plots = {}):
