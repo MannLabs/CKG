@@ -26,7 +26,7 @@ def parser(download = True):
     directory = os.path.join(dbconfig.databasesDir,"OncoKB")
     utils.checkDirectory(directory)
     acfileName = os.path.join(directory,url_actionable.split('/')[-1])
-    anfileName = os.path.join(directory,url_annotated.split('/')[-1])
+    anfileName = os.path.join(directory,url_annotation.split('/')[-1])
     if download:
         utils.downloadDB(url_actionable, directory)
         utils.downloadDB(url_annotation, directory)
@@ -38,7 +38,7 @@ def parser(download = True):
             if first:
                 first = False
                 continue
-            data = line.rstrip("\r\n").split("\t")
+            data = line.decode('utf-8').rstrip("\r\n").split("\t")
             gene = data[3]
             variant = data[4]
             oncogenicity = data[5]
@@ -52,7 +52,7 @@ def parser(download = True):
             if first:
                 first = False
                 continue
-            data = line.rstrip("\r\n").split("\t")
+            data = line.decode('utf-8').rstrip("\r\n").split("\t")
             isoform = data[1]
             gene = data[3]
             variant = data[4]
