@@ -39,7 +39,7 @@ def parser(importDirectory, download = True, db="STRING"):
     fileName = os.path.join(directory, url.split('/')[-1])
 
     if download:
-        utils.downloadDB(url, db)
+        utils.downloadDB(url, directory)
     
     f = os.path.join(directory, fileName)
     associations = gzip.open(f, 'r')
@@ -97,7 +97,7 @@ def parseActions(importDirectory, proteinMapping, drugMapping = None, download =
     utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
-        utils.downloadDB(url, db)
+        utils.downloadDB(url, directory)
     
     f = os.path.join(directory, fileName)
     associations = gzip.open(f, 'r')

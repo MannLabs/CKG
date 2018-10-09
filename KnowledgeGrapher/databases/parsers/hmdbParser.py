@@ -31,7 +31,7 @@ def extract_metabolites(download = True):
     utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
-        utils.downloadDB(url, "HMDB")
+        utils.downloadDB(url, directory)
     fields = iconfig.HMDB_fields
     parentFields = iconfig.HMDB_parentFields
     structuredFields = iconfig.HMDB_structures

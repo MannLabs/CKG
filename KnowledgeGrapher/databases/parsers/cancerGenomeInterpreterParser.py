@@ -31,7 +31,7 @@ def parser(download = True):
     zipFile = os.path.join(directory, url.split('/')[-1])
 
     if download:
-        utils.downloadDB(url, "CancerGenomeInterpreter")
+        utils.downloadDB(url, directory)
     with zipfile.ZipFile(zipFile) as z:
         if fileName in z.namelist():
             with z.open(fileName, 'r') as associations:

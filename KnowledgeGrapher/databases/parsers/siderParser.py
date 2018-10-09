@@ -23,7 +23,7 @@ def parser(download = True):
     utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
-        utils.downloadDB(url, "SIDER")
+        utils.downloadDB(url, directory)
     associations = gzip.open(fileName, 'r')
     for line in associations:
         data = line.decode('utf-8').rstrip("\r\n").split("\t")
@@ -48,7 +48,7 @@ def parserIndications(drugMapping, phenotypeMapping, download = True):
     utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
-        utils.downloadDB(url, "SIDER")
+        utils.downloadDB(url, directory)
     associations = gzip.open(fileName, 'r')
     for line in associations:
         data = line.decode('utf-8').rstrip("\r\n").split("\t")

@@ -100,7 +100,7 @@ def parseUniProtVariants(download = True):
     utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
-        utils.downloadDB(url, "UniProt")
+        utils.downloadDB(url, directory)
     with gzip.open(fileName, 'r') as f:
         din = False
         i = 0
@@ -144,7 +144,7 @@ def parseUniProtUniquePeptides(download=True):
     checkDirectory
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
-        utils.downloadDB(url, "UniProt")
+        utils.downloadDB(url, directory)
 
     with open(fileName, 'r') as f:
         for line in f:

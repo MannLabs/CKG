@@ -19,7 +19,7 @@ def parser(download = True):
     taxid = 9606
     
     if download:
-        utils.downloadDB(url, "RefSeq")
+        utils.downloadDB(url, directory)
 
     df = gzip.open(fileName, 'r')
     first = True

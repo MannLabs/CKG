@@ -21,7 +21,7 @@ def parser(download = True):
     utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
-        utils.downloadDB(url, "Intact")
+        utils.downloadDB(url, directory)
 
     with open(fileName, 'r') as idf:
         first = True

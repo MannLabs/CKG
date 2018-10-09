@@ -19,7 +19,7 @@ def parser(download = True):
     
 
     if download:
-        utils.downloadDB(url, "PathwayCommons")
+        utils.downloadDB(url, directory)
     f = os.path.join(directory, fileName)
     associations = gzip.open(f, 'r')
     for line in associations:

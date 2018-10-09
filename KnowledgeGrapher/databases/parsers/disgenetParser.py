@@ -20,7 +20,7 @@ def parser(download = True):
 
     if download:
         for f in files:
-            utils.downloadDB(url+files[f], "disgenet")
+            utils.downloadDB(url+files[f], directory)
 
     proteinMapping = readDisGeNetProteinMapping() 
     diseaseMapping, diseaseSynonyms = readDisGeNetDiseaseMapping()

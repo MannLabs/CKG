@@ -22,7 +22,7 @@ def parser(download = True):
     utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
-        utils.downloadDB(url, "DGIdb")
+        utils.downloadDB(url, directory)
     with open(fileName, 'r') as associations:
         first = True
         for line in associations:

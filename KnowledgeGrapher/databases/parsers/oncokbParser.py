@@ -28,8 +28,8 @@ def parser(download = True):
     acfileName = os.path.join(directory,url_actionable.split('/')[-1])
     anfileName = os.path.join(directory,url_annotated.split('/')[-1])
     if download:
-        utils.downloadDB(url_actionable, "OncoKB")
-        utils.downloadDB(url_annotation, "OncoKB")
+        utils.downloadDB(url_actionable, directory)
+        utils.downloadDB(url_annotation, directory)
 
     regex = r"\w\d+(\w|\*|\.)"
     with open(anfileName, 'r') as variants:
