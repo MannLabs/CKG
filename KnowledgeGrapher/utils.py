@@ -24,10 +24,10 @@ def downloadDB(databaseURL, extraFolder =""):
     try:
         requestedFile = urllib.request.URLopener()
         requestedFile.retrieve(databaseURL, os.path.join(directory, fileName))
-    except urllib.HTTPError:
-        pass
-    except urllib.URLError:
-        pass
+    except urllib.error.HTTPError:
+        print("The site could not be reached", databaseURL)
+    except urllib.error.URLError:
+        print("The url provided is incorrect", databaseURL)
     except TimeoutError:
         pass
     except OSError:
