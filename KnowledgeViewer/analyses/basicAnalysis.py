@@ -376,10 +376,11 @@ def anova(data, alpha=0.5, drop_cols=["sample", "name"], permutations=50):
         else:
             res = pd.concat([res,pairthsd], axis=0)
     if res is not None:
-        res = res.join(scores[['t-statistics', 'pvalue', '-Log pvalue', 'padj']])
-        res = res.reset_index()
+        res = res.join(scores[['t-statistics', 'pvalue', '-Log pvalue', 'padj']].astype('float'))
     else:
         res = scores
+    
+    res = res.reset_index()
     
     return res
 
@@ -410,17 +411,17 @@ def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample", "name
         max_perm = get_max_permutations(df)
         if max_perm < permutations:
             permutations = max_perm
-        print(max_perm)
         observed_pvalues = scores.pvalue
         count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=alpha, permutations=permutations)
-        print(count)
         scores= scores.join(count)
     else:
         rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'indep')
         scores['padj'] = padj
         scores['rejected'] = rejected
     scores = scores.reset_index()
-
+    aux = scores.loc[scores.rejected,:]
+    print(aux.shape)
+    print(aux.loc[aux.identifier == "Q15063",:])
     return scores
 
 def runFisher(group1, group2, alternative='two-sided'):

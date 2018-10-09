@@ -26,9 +26,9 @@ configuration = {"proteomics":
                                 {"imputation":True, "imputation_method":"mixed", "alpha":0.05, "drop_cols":["sample","gene_name"], "name":"name"})
                              ],
                 "correlation":[
-                                ("regulation", 
+                                ("preprocessed", 
                                 ["correlation"], 
-                                ["3Dnetwork", "heatmap", "basicTable"],
+                                ["3Dnetwork", "basicTable"],
                                 {"source":"node1", "target":"node2"})
                                ],
                 

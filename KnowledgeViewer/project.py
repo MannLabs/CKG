@@ -389,7 +389,9 @@ class Dataset:
                             if key == "regulation":
                                 reg_data = result.getResult()[analysis_type]
                                 if not reg_data.empty:
-                                    sig_data = data[list(set(reg_data.loc[reg_data.rejected, "identifier"]))]
+                                    print("all", reg_data.head())
+                                    sig_data = data[list(set(reg_data.loc[reg_data.rejected,"identifier"]))]
+                                    print(sig_data.shape)
                                     self.updateData({"regulation":sig_data})
                             for plot_name in plot_names:
                                 plots = result.getPlot(plot_name, section_query+"_"+analysis_type+"_"+plot_name, analysis_type.capitalize())

@@ -272,11 +272,10 @@ def get3DNetworkFigure(data, sourceCol, targetCol, node_properties, identifier, 
         Yed+=[pos[edge[0]][1],pos[edge[1]][1], None] 
         Zed+=[pos[edge[0]][2],pos[edge[1]][2], None]
 
-    labels=[]
+    labels= list(graph.nodes())
     colors = []
     sizes = []
     for node in node_properties:
-        labels.append(node)
         colors.append(node_properties[node]["color"])
         sizes.append(node_properties[node]["size"])
     
@@ -284,7 +283,8 @@ def get3DNetworkFigure(data, sourceCol, targetCol, node_properties, identifier, 
                y=Yed,
                z=Zed,
                mode='lines',
-               line=scatter3d.Line(color='rgb(125,125,125)', width=2),
+               opacity = 0.5,
+               line=scatter3d.Line(color='rgb(155,155,155)', width=1),
                hoverinfo='text'
                )
     trace2=Scatter3d(x=Xn,
@@ -296,7 +296,7 @@ def get3DNetworkFigure(data, sourceCol, targetCol, node_properties, identifier, 
                              size=sizes,
                              color=colors,
                              colorscale='Viridis',
-                             line=scatter3d.marker.Line(color='rgb(0,50,50)', width=5.5)
+                             line=scatter3d.marker.Line(color='rgb(0,50,50)', width=15.5)
                              ),
                text=labels,
                hoverinfo='text'
@@ -312,7 +312,7 @@ def get3DNetworkFigure(data, sourceCol, targetCol, node_properties, identifier, 
 
     layout = Layout(
          title=title + "(3D visualization)",
-         width=1300,
+         width=1500,
          height=1500,
          showlegend=True,
          scene=Scene(
@@ -419,13 +419,13 @@ def getSankeyPlot(data, sourceCol, targetCol, weightCol, edgeColorCol, node_colo
     
     return dcc.Graph(id = identifier, figure = figure)
 
-def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':800, 'height':1500, 'font':12}, subplot = False):
+def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':1500, 'font':12}, subplot = False):
     if subset is not None:
         data = data[subset]
     data_trace = go.Table(header=dict(values=data.columns,
                     fill = dict(color = colors[0]),
                     align = ['left','center']),
-                    cells=dict(values=[data[c] for c in data.columns],
+                    cells=dict(values=["%.2f" % data[c] if isinstance(data[c],float) else data[c] for c in data.columns],
                     fill = dict(color= colors[1]),
                     align = ['left','center']))
     layout =  dict(

@@ -15,7 +15,10 @@ from KnowledgeGrapher.databases import databases_config as dbconfig
 
 
 def downloadDB(databaseURL, extraFolder =""):
-    directory = os.path.join(dbconfig.databasesDir,extraFolder)
+    if extraFolder == "":
+        directory = dbconfig.databasesDir
+    else:
+        directory = extraFolder
     fileName = databaseURL.split('/')[-1]    
     urllib.request.URLopener.version = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36 SE 2.X MetaSr 1.0'
     try:
@@ -87,7 +90,6 @@ def listDirectoryFolders(directory):
     from os import listdir
     from os.path import isdir, join
     dircontent = [f for f in listdir(directory) if isdir(join(directory, f)) and not f.startswith('.')]
-
     return dircontent
 
 def checkDirectory(directory):

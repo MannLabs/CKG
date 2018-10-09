@@ -77,6 +77,7 @@ def experimentsImport(projects=None, n_jobs=1):
     experimentsImportDirectory = econfig.experimentsImportDirectory
     utils.checkDirectory(experimentsImportDirectory)
     experimentsDirectory = econfig.experimentsDir
+    print("Experiments:",experimentsDirectory)
     if projects is None:
         projects = utils.listDirectoryFolders(experimentsDirectory)
     Parallel(n_jobs=n_jobs)(delayed(experimentImport)(experimentsImportDirectory, experimentsDirectory, project) for project in projects)
@@ -114,7 +115,7 @@ def fullImport():
     print(datetime.now() - START_TIME)
     databasesImport(importDirectory, n_jobs=4)
     print(datetime.now() - START_TIME)
-    experimentsImport(importDirectory, n_jobs=4)
+    experimentsImport(n_jobs=4)
     print(datetime.now() - START_TIME)
 
 def generateStatsDataFrame(stats):
