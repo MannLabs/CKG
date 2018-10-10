@@ -32,13 +32,13 @@ def parser(download = True):
         utils.downloadDB(url_annotation, directory)
 
     regex = r"\w\d+(\w|\*|\.)"
-    with open(anfileName, 'r') as variants:
+    with open(anfileName, 'r', errors='replace') as variants:
         first = True
         for line in variants:
             if first:
                 first = False
                 continue
-            data = line.decode('utf-8').rstrip("\r\n").split("\t")
+            data = line.rstrip("\r\n").split("\t")
             gene = data[3]
             variant = data[4]
             oncogenicity = data[5]
@@ -46,13 +46,13 @@ def parser(download = True):
             entities.add((variant,"Clinically_relevant_variant", "", "", "", "", "", effect, oncogenicity))
             relationships["variant_found_in_gene"].add((variant, gene, "VARIANT_FOUND_IN_GENE"))
 
-    with open(acfileName, 'r') as associations:
+    with open(acfileName, 'r', errors='replace') as associations:
         first = True
         for line in associations:
             if first:
                 first = False
                 continue
-            data = line.decode('utf-8').rstrip("\r\n").split("\t")
+            data = line.rstrip("\r\n").split("\t")
             isoform = data[1]
             gene = data[3]
             variant = data[4]
