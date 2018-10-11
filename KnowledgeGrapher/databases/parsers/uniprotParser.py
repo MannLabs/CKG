@@ -45,6 +45,12 @@ def parser():
     variants_outputfile = "Known_variant.csv"
     variants_header = iconfig.variants_header
     result["Known_variant"] = (variants, variants_relationships, variants_header, relationships_header)
+    
+    #Gene ontology annotation
+    go_annotations = parseUniProtAnnotations()
+    go_annotations_header = iconfig.go_header
+    result["go"] = (None, go_annotations, None, go_annotations_header)
+
     return result
 
 
@@ -91,7 +97,7 @@ def addUniProtTexts(textsFile, proteins):
             if protein in proteins:
                 proteins[protein].update({"description":function})
 
-def parseUniProtVariants(download = True):
+def parseUniProtVariants(download = False):
     data = defaultdict()
     url = iconfig.uniprot_variant_file
     entities = set()
@@ -136,8 +142,32 @@ def parseUniProtVariants(download = True):
 
     return entities, relationships
 
+def parseUniProtAnnotations(download=False):
+    roots = {'F':'Molecular_function', 'C':'Cellular_component', 'P':'Biological_process'}
+    url = iconfig.uniprot_go_annotations
+    relationships = defaultdict(set)
+    directory = os.path.join(dbconfig.databasesDir,"UniProt")
+    utils.checkDirectory(directory)
+    fileName = os.path.join(directory, url.split('/')[-1])
+    if download:
+        utils.downloadDB(url, directory)
+    with gzip.open(fileName, 'r') as f:
+        for line in f:
+            line = line.decode('utf-8')
+            if line.startswith('!'):
+                continue
+            data = line.rstrip("\r\n").split("\t")
+            identifier = data[1]
+            go = data[4]
+            evidence = data[6]
+            root = data[8]
+            if root in roots:
+                root = roots[root]
+                relationships[(root,'Protein_'+root+'_associated_with')].add((identifier, go, "ASSOCIATED_WITH", evidence, 5, "UniProt"))
 
-def parseUniProtUniquePeptides(download=True):
+    return relationships
+
+def parseUniProtUniquePeptides(download=False):
     url = iconfig.uniprot_unique_peptides_file
     entities = set()
     directory = os.path.join(dbconfig.databasesDir,"UniProt")

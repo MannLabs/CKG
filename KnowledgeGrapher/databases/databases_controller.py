@@ -66,9 +66,10 @@ def parseDatabase(importDirectory,database):
         result = uniprotParser.parser()
         for dataset in result:
             entities, relationships, entities_header, relationship_header = result[dataset]
-            outputfile = os.path.join(importDirectory, dataset+".csv")
-            write_entities(entities, entities_header, outputfile)
-            stats.add(utils.buildStats(len(entities), "entity", dataset, database, outputfile))
+            if entities is not None:
+                outputfile = os.path.join(importDirectory, dataset+".csv")
+                write_entities(entities, entities_header, outputfile)
+                stats.add(utils.buildStats(len(entities), "entity", dataset, database, outputfile))
             for entity, rel in relationships:
                 outputfile = os.path.join(importDirectory, "uniprot_"+entity.lower()+"_"+rel.lower()+".csv")
                 write_relationships(relationships[(entity,rel)], relationship_header, outputfile)

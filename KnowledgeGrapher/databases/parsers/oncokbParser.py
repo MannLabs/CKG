@@ -50,6 +50,7 @@ def parser(download = True):
         first = True
         for line in associations:
             if first:
+                print(line)
                 first = False
                 continue
             data = line.rstrip("\r\n").split("\t")
@@ -58,24 +59,26 @@ def parser(download = True):
             variant = data[4]
             disease = data[5]
             level = data[6]
-            drugs = data[7].split(', ')
+            drugs = data[8].split(', ')
             pubmed_ids = data[8].split(',')
             if level in levels:
                 level = levels[level]
             for drug in drugs:
-                if drug.lower() in drugmapping:
-                    drug = drugmapping[drug.lower()]
-                else:
-                    continue
-                if disease.lower() in mapping:
-                    disease = mapping[disease.lower()]
-                else:
-                    pass
-                    #print disease
-                relationships["targets_clinically_relevant_variant"].add((drug, variant, "TARGETS_KNOWN_VARIANT", level[0], level[1], disease, "curated", "OncoKB"))
+                for d in drug.split(' + '):
+                    if d.lower() in drugmapping:
+                        drug = drugmapping[d.lower()]
+                        relationships["targets_clinically_relevant_variant"].add((drug, variant, "TARGETS_KNOWN_VARIANT", level[0], level[1], disease, "curated", "OncoKB"))
+                        relationships["targets"].add((drug, gene, "CURATED_TARGETS", "curated", "OncoKB"))
+                    else:
+                        print(drug)
+
+            if disease.lower() in mapping:
+                disease = mapping[disease.lower()]
                 relationships["associated_with"].add((variant, disease, "ASSOCIATED_WITH", "curated","curated", "OncoKB", len(pubmed_ids)))   
-                relationships["targets"].add((drug, gene, "CURATED_TARGETS", "curated", "OncoKB"))
-                relationships["known_variant_is_clinically_relevant"].add((variant, variant, "KNOWN_VARIANT_IS_CLINICALLY_RELEVANT", "OncoKB"))
+            else:
+                pass
+                #print disease
+            relationships["known_variant_is_clinically_relevant"].add((variant, variant, "KNOWN_VARIANT_IS_CLINICALLY_RELEVANT", "OncoKB"))
         relationships["variant_found_in_chromosome"].add(("","",""))
 
 
