@@ -50,6 +50,12 @@ def updateDB(driver, imports=None):
             for statement in proteinDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
                 print(statement+";")
                 graph_controller.sendQuery(driver, statement+';')
+        #Protein annotations
+        elif "annotations" == i:
+            proteinAnnotationsImportCode = cy.IMPORT_PROTEIN_ANNOTATIONS
+            for statement in proteinAnnotationsImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
+                print(statement+";")
+                graph_controller.sendQuery(driver, statement+';')
         #PPIs
         elif "ppi" == i:
             ppiDataImportCode = cy.IMPORT_CURATED_PPI_DATA

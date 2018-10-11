@@ -37,11 +37,22 @@ IMPORT_PROTEIN_DATA = '''CREATE INDEX ON :Protein(accession);
                         MATCH (p:Protein {id:line.START_ID})
                         MATCH (t:Transcript {id:line.END_ID})
                         MERGE (t)-[:TRANSLATED_INTO]->(p);
-                        USING PERIODIC COMMIT 10000
-                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/uniprot_ENTITY_associated_with.csv" AS line
+                        '''
+IMPORT_PROTEIN_ANNOTATIONS = '''USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/uniprot_cellular_component_associated_with.csv" AS line
                         MATCH (p:Protein {id:line.START_ID})
-                        MATCH (e:ENTITY {id:line.END_ID})
-                        MERGE (p)-[:ASSOCIATED_WITH{score:line.score,source:line.source,evidence_type:line.evidence_type}]->(e);
+                        MATCH (c:Cellular_component {id:line.END_ID})
+                        MERGE (p)-[:ASSOCIATED_WITH{score:line.score,source:line.source,evidence_type:line.evidence_type}]->(c);
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/uniprot_molecular_function_associated_with.csv" AS line
+                        MATCH (p:Protein {id:line.START_ID})
+                        MATCH (f:Molecular_function {id:line.END_ID})
+                        MERGE (p)-[:ASSOCIATED_WITH{score:line.score,source:line.source,evidence_type:line.evidence_type}]->(f);
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/uniprot_biological_process_associated_with.csv" AS line
+                        MATCH (p:Protein {id:line.START_ID})
+                        MATCH (b:Biological_process {id:line.END_ID})
+                        MERGE (p)-[:ASSOCIATED_WITH{score:line.score,source:line.source,evidence_type:line.evidence_type}]->(b);
                         '''
 
 IMPORT_GENE_DATA = '''CREATE CONSTRAINT ON (g:Gene) ASSERT g.id IS UNIQUE; 
