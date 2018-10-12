@@ -174,7 +174,11 @@ def parseDatabase(importDirectory,database):
             write_relationships(relationships[relationship], relationships_header, outputfile)
             stats.add(utils.buildStats(len(relationships[relationship]), "relationships", relationship, database, outputfile))
     elif database.lower() == "phosphositeplus":
-        pspParser.parser()
+        headers, relationships = pspParser.parser()
+        for entity,relationship in relationships:
+            outputfile = os.path.join(importDirectory, "psp_"+entity+"_"+relationship+".csv")
+            write_relationships(relationships[(entity,relationship)], headers[entity], outputfile)
+            stats.add(utils.buildStats(len(relationships[(entity,relationship)]), "relationships", relationship, database, outputfile))
     return stats
     
 

@@ -55,6 +55,23 @@ IMPORT_PROTEIN_ANNOTATIONS = '''USING PERIODIC COMMIT 10000
                         MERGE (p)-[:ASSOCIATED_WITH{score:line.score,source:line.source,evidence_type:line.evidence_type}]->(b);
                         '''
 
+IMPORT_MODIFIED_PROTEIN_ANNOTATIONS = '''USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_disease_associated_with.csv" AS line
+                        MATCH (m:Modified_protein {id:line.START_ID})
+                        MATCH (d:Disease {id:line.END_ID})
+                        MERGE (m)-[:ASSOCIATED_WITH{score:line.score,source:line.source,evidence_type:line.evidence_type,publications:SPLIT(line.publications,'; ')}]->(d);
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_biological_process_associated_with.csv" AS line
+                        MATCH (m:Modified_protein {id:line.START_ID})
+                        MATCH (b:Biological_process {id:line.END_ID})
+                        MERGE (m)-[:ASSOCIATED_WITH{score:line.score,source:line.source,evidence_type:line.evidence_type,publications:SPLIT(line.publications,'; '),action:line.action}]->(b);
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_modified_protein_is_substrate_of.csv" AS line
+                        MATCH (m:Modified_protein {id:line.START_ID})
+                        MATCH (p:Protein {id:line.END_ID})
+                        MERGE (m)-[:IS_SUBSTRATE_OF{score:line.score,source:line.source,evidence_type:line.evidence_type}]->(p);
+                        '''
+
 IMPORT_GENE_DATA = '''CREATE CONSTRAINT ON (g:Gene) ASSERT g.id IS UNIQUE; 
                         CREATE CONSTRAINT ON (g:Gene) ASSERT g.name IS UNIQUE; 
                         USING PERIODIC COMMIT 10000
