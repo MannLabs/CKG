@@ -12,4 +12,5 @@ __all__ = ["cancerGenomeInterpreterParser",
             "hgncParser",
             "internalDBsParser",
             "refseqParser",
-            "uniprotParser"]
+            "uniprotParser",
+            "pspParser"]

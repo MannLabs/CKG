@@ -223,7 +223,7 @@ def extractProteinModificationSubjectRelationships(data, configuration):
     cols.extend(positionCols)
     aux = data.copy()
     aux = aux.reset_index()
-    aux["END_ID"] = aux[proteinCol].map(str) + "_" + aux[positionCols[0]].map(str) + aux[positionCols[1]].map(str)
+    aux["END_ID"] = aux[proteinCol].map(str) + "_" + aux[positionCols[1]].map(str) + aux[positionCols[0]].map(str) + '-' +configuration["mod_acronym"]
     aux = aux.set_index("END_ID")
     newIndexdf = aux.copy()
     aux = aux.drop(cols, axis=1)
@@ -258,7 +258,7 @@ def extractProteinProteinModificationRelationships(data, configuration):
     cols.extend(positionCols)
     aux = data.copy().reset_index()
     aux = aux[cols]
-    aux["START_ID"] =  aux[proteinCol].map(str) + "_" + aux[positionCols[0]].map(str) + aux[positionCols[1]].map(str)
+    aux["START_ID"] =  aux[proteinCol].map(str) + "_" + aux[positionCols[1]].map(str) + aux[positionCols[0]].map(str)+'-'+configuration["mod_acronym"]
     aux = aux.drop(positionCols, axis=1)
     aux = aux.set_index("START_ID")
     aux = aux.reset_index()
@@ -276,7 +276,7 @@ def extractProteinModifications(data, configuration):
     cols.extend(positionCols)
     aux = data.copy().reset_index()
     aux = aux[cols] 
-    aux["ID"] = aux[proteinCol].map(str) + "_" + aux[positionCols[0]].map(str) + aux[positionCols[1]].map(str)
+    aux["ID"] =  aux[proteinCol].map(str) + "_" + aux[positionCols[1]].map(str) + aux[positionCols[0]].map(str)+'-'+configuration["mod_acronym"]
     aux = aux.set_index("ID")
     aux = aux.reset_index()
     aux[sequenceCol] = aux[sequenceCol].str.replace('_', '-')
@@ -293,7 +293,7 @@ def extractProteinModificationsModification(data, configuration):
     cols.extend(positionCols)
     aux = data.copy().reset_index()
     aux = aux[cols] 
-    aux["START_ID"] = aux[proteinCol].map(str) + "_" + aux[positionCols[0]].map(str) + aux[positionCols[1]].map(str)
+    aux["START_ID"] =  aux[proteinCol].map(str) + "_" + aux[positionCols[1]].map(str) + aux[positionCols[0]].map(str)+'-'+configuration["mod_acronym"]
     aux["END_ID"] = modID
     aux = aux[["START_ID","END_ID"]]
     

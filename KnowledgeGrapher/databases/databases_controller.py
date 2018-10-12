@@ -173,7 +173,8 @@ def parseDatabase(importDirectory,database):
             outputfile = os.path.join(importDirectory, "GWAS_study_"+relationship+".csv")
             write_relationships(relationships[relationship], relationships_header, outputfile)
             stats.add(utils.buildStats(len(relationships[relationship]), "relationships", relationship, database, outputfile))
-
+    elif database.lower() == "phosphositeplus":
+        pspParser.parser()
     return stats
     
 

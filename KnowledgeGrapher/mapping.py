@@ -17,7 +17,7 @@ def getMappingFromOntology(ontology, source = None):
         for line in f:
             data = line.rstrip("\r\n").split("\t")
             if data[1] == source or source is None:
-                mapping[data[2]] = data[0]
+                mapping[data[2].lower()] = data[0]
 
     return mapping
 
@@ -109,17 +109,24 @@ def buildMappingFromOBO(oboFile, ontology):
         for line in f:
             if line.startswith("id:"):
                 ident = ":".join(line.rstrip("\r\n").split(":")[1:])
-            if line.startswith("xref:"):
+            elif line.startswith("name:"):
+                name = "".join(line.rstrip("\r\n").split(':')[1:])
+                identifiers[ident.strip()].append(("NAME", name.lstrip()))
+            elif line.startswith("xref:"):
                 source_ref = line.rstrip("\r\n").split(":")[1:]
                 if len(source_ref) == 2:
                     identifiers[ident.strip()].append((source_ref[0].strip(), source_ref[1]))
-            if line.startswith("synonym:"):
+            elif line.startswith("synonym:"):
                 synonym_type = "".join(line.rstrip("\r\n").split(":")[1:])
                 matches = re.search(re_synonyms, synonym_type)
                 if matches:
-                     identifiers[ident.strip()].append(("SYN",matches.group(1)))
+                     identifiers[ident.strip()].append(("SYN",matches.group(1).lstrip()))
     with open(outputFile, 'w') as out:
         for ident in identifiers:
             for source, ref in identifiers[ident]:
                 out.write(ident+"\t"+source+"\t"+ref+"\n")
 
+
+if __name__ == "__main__":
+    pass
+    #buildMappingFromOBO(oboFile = '../../data/ontologies/DO/do.obo', ontology='DO')
