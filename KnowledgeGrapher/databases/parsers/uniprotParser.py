@@ -6,16 +6,16 @@ from collections import defaultdict
 from KnowledgeGrapher import utils
 import pandas as pd
 import re
+import time
 
 #########################
 #       UniProt         # 
 #########################
-def parser():
-    result = {"Protein":None, "Known_variant":None}
-    uniprot_id_file = iconfig.uniprot_id_file
-    uniprot_texts_file = iconfig.uniprot_text_file
+def parser(download=True):
+    result = {"Protein":None, "Known_variant":None, "Peptide":None}
+    uniprot_texts_file = iconfig.uniprot_text_file    
     relationships_header = iconfig.relationships_header
-    proteins, proteins_relationships = parseUniProtDatabase(uniprot_id_file)
+    proteins, proteins_relationships = parseUniProtDatabase(download=download)
     addUniProtTexts(uniprot_texts_file, proteins)
     proteins_outputfileName = "Protein.csv"
     proteins_header = iconfig.proteins_header
@@ -40,6 +40,12 @@ def parser():
 
     result["Protein"] = (protein_entities, proteins_relationships, proteins_header, relationships_header)
     
+    #Peptides
+    peptides, peptides_relationships = parseUniProtPeptides()
+    peptides_outputfile = "Peptides.csv"
+    peptides_header = iconfig.peptides_header
+    result["Peptide"] = (peptides, peptides_relationships, peptides_header, relationships_header)
+
     #Variants
     variants, variants_relationships = parseUniProtVariants()
     variants_outputfile = "Known_variant.csv"
@@ -54,17 +60,24 @@ def parser():
     return result
 
 
-def parseUniProtDatabase(dataFile):
+def parseUniProtDatabase(download=True):
     proteins = {}
     relationships = defaultdict(set)
+
+    url = iconfig.uniprot_id_url
+    directory = os.path.join(dbconfig.databasesDir,"UniProt")
+    utils.checkDirectory(directory)
+    file_name = os.path.join(directory, url.split('/')[-1])
+    if download:
+        utils.downloadDB(url, directory)
 
     fields = iconfig.uniprot_ids
     synonymFields = iconfig.uniprot_synonyms
     protein_relationships = iconfig.uniprot_protein_relationships
     identifier = None
-    with open(dataFile, 'r') as uf:
+    with gzip.open(file_name, 'r') as uf:
         for line in uf:
-            data = line.rstrip("\r\n").split("\t")
+            data = line.decode('utf-8').rstrip("\r\n").split("\t")
             iid = data[0]
             field = data[1]
             alias = data[2]
@@ -167,19 +180,34 @@ def parseUniProtAnnotations(download=False):
 
     return relationships
 
-def parseUniProtUniquePeptides(download=False):
-    url = iconfig.uniprot_unique_peptides_file
+def parseUniProtPeptides(download=True):
+    file_urls = iconfig.uniprot_peptides_files
     entities = set()
+    relationships = defaultdict(set)
     directory = os.path.join(dbconfig.databasesDir,"UniProt")
-    checkDirectory
-    fileName = os.path.join(directory, url.split('/')[-1])
-    if download:
-        utils.downloadDB(url, directory)
-
-    with open(fileName, 'r') as f:
-        for line in f:
-            data = line.rstrip("\r\n").split("\t")
-
-
+    utils.checkDirectory(directory)
+    for url in file_urls:
+        fileName = os.path.join(directory, url.split('/')[-1])
+        if download:
+            utils.downloadDB(url, directory)
+        first = True
+        with open(fileName, 'r') as f:
+            for line in f:
+                if first:
+                    first = False
+                    continue
+    
+                data = line.rstrip("\r\n").split("\t")
+                peptide = data[0]
+                groups = data[3].split(';')
+                is_unique = True
+                if len(groups) > 1:
+                    is_unique = False
+                entities.add((peptide, "Peptide", "tryptic peptide", is_unique))
+                for accs in groups:
+                    for protein in accs.split(','):
+                        relationships[("Peptide", 'belongs_to_protein')].add((peptide, protein, "BELONGS_TO_PROTEIN", "UniProt"))
+    return entities, relationships
+    
 if __name__ == "__main__":
     pass

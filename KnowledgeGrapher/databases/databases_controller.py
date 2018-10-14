@@ -179,6 +179,15 @@ def parseDatabase(importDirectory,database):
             outputfile = os.path.join(importDirectory, "psp_"+entity+"_"+relationship+".csv")
             write_relationships(relationships[(entity,relationship)], headers[entity], outputfile)
             stats.add(utils.buildStats(len(relationships[(entity,relationship)]), "relationships", relationship, database, outputfile))
+    elif database.lower() == "corum":
+        entities, relationships, entities_header, relationships_headers = corumParser.parser()
+        entity_outputfile = os.path.join(importDirectory, "Complex.csv")
+        write_entities(entities, entities_header, entity_outputfile)
+        stats.add(utils.buildStats(len(entities), "entity", "Complex", database, entity_outputfile))
+        for entity, relationship in relationships:
+            corum_outputfile = os.path.join(importDirectory, database+"_"+entity+"_"+relationship+".csv")
+            write_relationships(relationships[(entity,relationship)], relationships_headers[entity], corum_outputfile)
+            stats.add(utils.buildStats(len(relationships[(entity,relationship)]), "relationships", relationship, database, corum_outputfile))
     return stats
     
 

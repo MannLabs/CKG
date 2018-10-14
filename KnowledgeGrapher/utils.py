@@ -1,5 +1,4 @@
 import urllib3
-import urllib
 import json
 import urllib
 from Bio import Entrez
@@ -20,16 +19,21 @@ def downloadDB(databaseURL, extraFolder =""):
     else:
         directory = extraFolder
     fileName = databaseURL.split('/')[-1]    
-    urllib.request.URLopener.version = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36 SE 2.X MetaSr 1.0'
+    #urllib.request.URLopener.version = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36 SE 2.X MetaSr 1.0'
     try:
-        requestedFile = urllib.request.URLopener()
-        requestedFile.retrieve(databaseURL, os.path.join(directory, fileName))
-    except urllib.error.HTTPError:
+        http = urllib3.PoolManager()
+        response = http.request("GET", databaseURL)
+        mode = 'w'
+        if fileName.endswith('.gz') or fileName.endswith('.zip'):
+            mode = 'wb'
+        with open(os.path.join(directory, fileName), mode) as out:
+            out.write(response.data)
+    except urllib3.exceptions.HTTPError:
         print("The site could not be reached", databaseURL)
-    except urllib.error.URLError:
-        print("The url provided is incorrect", databaseURL)
-    except TimeoutError:
-        pass
+    except urllib3.exceptions.InvalidHeader:
+        print("Invalid HTTP header provided", databaseURL)
+    except urllib3.exceptions.ConnectTimeoutError:
+        print("Connection timeout requesting URL", databaseURL)
     except OSError:
         pass
     except Exception:
@@ -41,10 +45,21 @@ def searchPubmed(searchFields, sortby = 'relevance', num ="10", resultsFormat = 
         query = " [MeSH Terms] AND ".join(searchFields)
     else:
         query = searchFields[0] +" [MeSH Terms] AND"
-
-    response = urllib3.urlopen(urllib.quote_plus(pubmedQueryUrl.replace('TERMS',query).replace('NUM', num)))
-    jsonResponse = response.read()
-    resultDict = json.loads(jsonResponse)
+    try:
+        url = pubmedQueryUrl.replace('TERMS',query).replace('NUM', num)
+        response = urllib3.urlopen(urllib.quote_plus(url))
+        jsonResponse = response.read()
+        resultDict = json.loads(jsonResponse)
+    except urllib3.exceptions.HTTPError:
+        print("The site could not be reached", url)
+    except urllib3.exceptions.InvalidHeader:
+        print("Invalid HTTP header provided", url)
+    except urllib3.exceptions.ConnectTimeoutError:
+        print("Connection timeout requesting URL", url)
+    except OSError:
+        pass
+    except Exception:
+        pass
 
     result = []
     if 'esearchresult' in resultDict:

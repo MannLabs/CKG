@@ -27,6 +27,16 @@ IMPORT_PROTEIN_DATA = '''CREATE INDEX ON :Protein(accession);
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/Protein.csv" AS line
                         MERGE (p:Protein {id:line.ID}) 
                         ON CREATE SET p.accession=line.accession,p.name=line.name,p.description=line.description,p.taxid=line.taxid,p.synonyms=SPLIT(line.synonyms,',');
+                        CREATE CONSTRAINT ON (p:Peptide) ASSERT p.id IS UNIQUE;
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/Peptide.csv" AS line
+                        MERGE (p:Peptide{id:line.ID}) 
+                        ON CREATE SET p.type=line.type,p.unique=line.unique;
+                        USING PERIODIC COMMIT 10000 
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/uniprot_peptide_belongs_to_protein.csv" AS line 
+                        MATCH (p1:Peptide {id:line.START_ID})
+                        MATCH (p2:Protein {id:line.END_ID}) 
+                        MERGE (p1)-[:BELONGS_TO_PROTEIN{source:line.source}]->(p2);
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/uniprot_gene_translated_into.csv" AS line
                         MATCH (p:Protein {id:line.START_ID})
@@ -313,11 +323,6 @@ IMPORT_DATASETS = {"clinical":'''USING PERIODIC COMMIT 10000
                         MATCH (s:Analytical_sample {id:line.START_ID}) 
                         MATCH (p:Protein{id:line.END_ID}) 
                         MERGE (s)-[:HAS_QUANTIFIED_PROTEIN{value:toFloat(line.value),intensity:toFloat(line.Intensity),qvalue:toFloat(line.Qvalue),score:toFloat(line.Score),proteinGroup:line.id}]->(p);
-                        CREATE CONSTRAINT ON (p:Peptide) ASSERT p.id IS UNIQUE;
-                        USING PERIODIC COMMIT 10000
-                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_peptides.csv" AS line
-                        MERGE (p:Peptide{id:line.ID}) 
-                        ON CREATE SET p.type=line.type,p.count=line.count;
                         USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_peptide_protein.csv" AS line 
                         MATCH (p1:Peptide {id:line.START_ID})
