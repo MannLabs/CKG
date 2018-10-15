@@ -35,10 +35,9 @@ def extract_percentage_missing(data, conditions, missing_max):
         groups = data.set_index("group")
         groups = groups.isnull().groupby(level=0).mean()
         groups = groups[groups<=missing_max]
-    
-    groups = groups.dropna(how='all', axis=1)
+        groups = groups.dropna(how='all', axis=1).columns
       
-    return list(groups.columns)
+    return list(groups)
 
 def imputation_KNN(data, alone = True):
     df = data.copy()

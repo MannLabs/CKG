@@ -111,9 +111,9 @@ def fullImport():
     importDirectory = config.importDirectory
     utils.checkDirectory(importDirectory)
     setupStats()
-    #ontologiesImport(importDirectory)
+    ontologiesImport(importDirectory)
     print(datetime.now() - START_TIME)
-    #databasesImport(importDirectory, n_jobs=4)
+    databasesImport(importDirectory, n_jobs=4)
     print(datetime.now() - START_TIME)
     experimentsImport(n_jobs=4)
     print(datetime.now() - START_TIME)
