@@ -46,10 +46,10 @@ def parser(download=True):
                     entities.add((identifier, name, "9606", synonyms, "CORUM"))
                     for subunit in subunits:
                         #START_ID END_ID type cell_lines evidences publication source
-                        relationships[("Protein", "IS_SUBUNIT_OF")].add((subunit, identifier, "IS_SUBUNIT_OF", cell_lines, evidences, pubmedid, "CORUM"))
+                        relationships[("Protein", "is_subunit_of")].add((subunit, identifier, "IS_SUBUNIT_OF", cell_lines, evidences, pubmedid, "CORUM"))
                     for process in processes:
                         #START_ID END_ID type evidence_type score source
-                        relationships["Biological_process", "ASSOCIATED_WITH"].add((identifier, process, "ASSOCIATED_WITH", "CURATED", 5, "CORUM"))
+                        relationships["Biological_process", "associated_with"].add((identifier, process, "ASSOCIATED_WITH", "CURATED", 5, "CORUM"))
 
     return entities, relationships, entities_header, relationships_headers
     

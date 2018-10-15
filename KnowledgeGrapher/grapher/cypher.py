@@ -72,6 +72,16 @@ IMPORT_COMPLEXES = '''CREATE INDEX ON :Complex(name);
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/Complex.csv" AS line
                         MERGE (c:Complex {id:line.ID}) 
                         ON CREATE SET c.name=line.name,c.organism=line.organism,c.source=line.source,c.synonyms=SPLIT(line.synonyms,';');
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_protein_is_subunit_of.csv" AS line
+                        MATCH (p:Protein {id:line.START_ID})
+                        MATCH (c:Complex {id:line.END_ID})
+                        MERGE (p)-[:IS_SUBUNIT_OF{cell_lines:SPLIT(line.cell_lines,';'),evidences:SPLIT(line.evidences,';'),publication:line.publication,source:line.source}]->(c);
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_biological_process_associated_with.csv" AS line
+                        MATCH (c:Complex {id:line.START_ID})
+                        MATCH (b:Biological_process {id:line.END_ID})
+                        MERGE (c)-[:ASSOCIATED_WITH{evidence_type:line.evidence_type,score:line.score,source:line.source}]->(b);
                     '''
 
 IMPORT_MODIFIED_PROTEIN_ANNOTATIONS = '''USING PERIODIC COMMIT 10000

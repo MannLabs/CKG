@@ -185,7 +185,7 @@ def parseDatabase(importDirectory,database):
         write_entities(entities, entities_header, entity_outputfile)
         stats.add(utils.buildStats(len(entities), "entity", "Complex", database, entity_outputfile))
         for entity, relationship in relationships:
-            corum_outputfile = os.path.join(importDirectory, database+"_"+entity+"_"+relationship+".csv")
+            corum_outputfile = os.path.join(importDirectory, database+"_"+entity.lower()+"_"+relationship.lower()+".csv")
             write_relationships(relationships[(entity,relationship)], relationships_headers[entity], corum_outputfile)
             stats.add(utils.buildStats(len(relationships[(entity,relationship)]), "relationships", relationship, database, corum_outputfile))
     return stats

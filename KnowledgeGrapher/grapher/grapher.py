@@ -56,6 +56,13 @@ def updateDB(driver, imports=None):
             for statement in proteinAnnotationsImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
                 print(statement+";")
                 graph_controller.sendQuery(driver, statement+';')
+        #Protein complexes
+        elif "complexes" == i:
+            complexDataImportCode = cy.IMPORT_COMPLEX_DATA
+            for resource in config.complexes_resources:
+                for statement in complexDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
+                    print(statement+";")
+                    graph_controller.sendQuery(driver, statement+';')
         #PPIs
         elif "ppi" == i:
             ppiDataImportCode = cy.IMPORT_CURATED_PPI_DATA

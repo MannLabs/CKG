@@ -176,7 +176,7 @@ def parseUniProtAnnotations(download=False):
             root = data[8]
             if root in roots:
                 root = roots[root]
-                relationships[(root,'Protein_'+root+'_associated_with')].add((identifier, go, "ASSOCIATED_WITH", evidence, 5, "UniProt"))
+                relationships[(root,'associated_with')].add((identifier, go, "ASSOCIATED_WITH", evidence, 5, "UniProt"))
 
     return relationships
 
