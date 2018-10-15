@@ -24,7 +24,7 @@ def downloadDB(databaseURL, extraFolder =""):
         http = urllib3.PoolManager()
         response = http.request("GET", databaseURL)
         mode = 'w'
-        if fileName.endswith('.gz') or fileName.endswith('.zip'):
+        if fileName.endswith('.gz') or fileName.endswith('.zip') or fileName.endswith('.tar'):
             mode = 'wb'
         with open(os.path.join(directory, fileName), mode) as out:
             out.write(response.data)

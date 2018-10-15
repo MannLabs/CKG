@@ -65,6 +65,15 @@ IMPORT_PROTEIN_ANNOTATIONS = '''USING PERIODIC COMMIT 10000
                         MERGE (p)-[:ASSOCIATED_WITH{score:line.score,source:line.source,evidence_type:line.evidence_type}]->(b);
                         '''
 
+IMPORT_COMPLEXES = '''CREATE INDEX ON :Complex(name); 
+                        CREATE CONSTRAINT ON (c:Complex) ASSERT c.id IS UNIQUE; 
+                        CREATE CONSTRAINT ON (c:Complex) ASSERT c.name IS UNIQUE; 
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/Complex.csv" AS line
+                        MERGE (c:Complex {id:line.ID}) 
+                        ON CREATE SET c.name=line.name,c.organism=line.organism,c.source=line.source,c.synonyms=SPLIT(line.synonyms,';');
+                    '''
+
 IMPORT_MODIFIED_PROTEIN_ANNOTATIONS = '''USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_disease_associated_with.csv" AS line
                         MATCH (m:Modified_protein {id:line.START_ID})
