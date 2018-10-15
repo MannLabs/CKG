@@ -38,7 +38,6 @@ def parseInternalDatabasePairs(qtype, mapping, download=True):
     directory = os.path.join(dbconfig.databasesDir, "InternalDatabases")
     utils.checkDirectory(directory)
     if download:
-        print(url.replace("FILE", ifile))
         utils.downloadDB(url.replace("FILE", ifile), os.path.join(directory,"integration"))
     ifile = os.path.join(directory,os.path.join("integration",ifile))
     with open(ifile, 'r') as idbf:
@@ -81,7 +80,7 @@ def parsePMClist(download = True):
     
     return entities, header
 
-def parseInternalDatabaseMentions(qtype, importDirectory, download = True):
+def parseInternalDatabaseMentions(qtype, importDirectory, download=True):
     url = iconfig.internal_db_url
     string_url = iconfig.string_url
     stitch_url = iconfig.stitch_url

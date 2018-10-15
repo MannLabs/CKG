@@ -133,8 +133,6 @@ def parseProteomicsDataset(projectId, configuration, dataDir):
     for ftype in configuration:
         if ftype == "directory":
             continue
-        print(ftype)
-        print(configuration)
         datasetConfig = configuration[ftype]
         dfile = datasetConfig['file']
         filepath = os.path.join(dataDir, dfile)
@@ -297,7 +295,7 @@ def extractProteinModificationsModification(data, configuration):
     aux = aux[cols] 
     aux["START_ID"] =  aux[proteinCol].map(str) + "_" + aux[positionCols[1]].map(str) + aux[positionCols[0]].map(str)+'-'+configuration["mod_acronym"]
     aux["END_ID"] = modID
-    aux = aux[["START_ID", "END_ID", "HAS_MODIFICATION"]]
+    aux = aux[["START_ID", "END_ID"]]
     
     return aux
 
