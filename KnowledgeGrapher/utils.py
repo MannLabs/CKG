@@ -1,5 +1,6 @@
 import certifi
 import urllib3
+from ftplib import FTP
 import json
 import urllib
 from Bio import Entrez
@@ -22,20 +23,34 @@ def downloadDB(databaseURL, extraFolder =""):
     fileName = databaseURL.split('/')[-1]    
     #urllib.request.URLopener.version = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36 SE 2.X MetaSr 1.0'
     try:
-        http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
-        response = http.request("GET", databaseURL)
         mode = 'wb'
-        with open(os.path.join(directory, fileName), mode) as out:
-            out.write(response.data)
+        if databaseURL.startswith('ftp:'):
+            domain = databaseURL.split('/')[2]
+            ftp_file = '/'.join(databaseURL.split('/')[3:])
+            with FTP(domain) as ftp:
+                ftp.login(user='', passwd = '')
+                ftp.retrbinary("RETR " + ftp_file ,  open(os.path.join(directory, fileName), mode).write)
+        else:
+            http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
+            response = http.request("GET", databaseURL)
+            with open(os.path.join(directory, fileName), mode) as out:
+                out.write(response.data)
     except urllib3.exceptions.HTTPError:
         print("The site could not be reached", databaseURL)
     except urllib3.exceptions.InvalidHeader:
         print("Invalid HTTP header provided", databaseURL)
     except urllib3.exceptions.ConnectTimeoutError:
         print("Connection timeout requesting URL", databaseURL)
-    except OSError:
-        pass
-    except Exception:
+    except urllib3.exceptions.ConnectionError:
+        print("Protocol error when downloading ", databaseURL)
+    except urllib3.exceptions.DecodeError:
+        print("Decoder error when downloading ", databaseURL)
+    except urllib3.exceptions.SecurityWarning:
+        print("Security warning when downloading ", databaseURL)
+    except urllib3.exceptions.ProtocolError:
+        print("Protocol error when downloading", databaseURL)
+    except Exception as e:
+        print("Something went wrong", str(e))
         pass
 
 def searchPubmed(searchFields, sortby = 'relevance', num ="10", resultsFormat = 'json'):

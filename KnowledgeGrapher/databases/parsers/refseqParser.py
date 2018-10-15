@@ -8,7 +8,7 @@ from KnowledgeGrapher import utils
 #########################
 #          RefSeq       # 
 #########################
-def parser(download = True):
+def parser(download=True):
     url = iconfig.refseq_url
     entities = defaultdict(set)
     relationships = defaultdict(set)
