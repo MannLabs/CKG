@@ -16,10 +16,12 @@ from joblib import Parallel, delayed
 #########################
 def write_relationships(relationships, header, outputfile):
     df = pd.DataFrame(list(relationships))
-    df.columns = header 
-    df.to_csv(path_or_buf=outputfile, 
+    if not df.empty:
+        df.columns = header 
+        df.to_csv(path_or_buf=outputfile, 
                 header=True, index=False, quotechar='"', 
                 line_terminator='\n', escapechar='\\')
+    
 
 def write_entities(entities, header, outputfile):
     with open(outputfile, 'w') as csvfile:
@@ -174,10 +176,16 @@ def parseDatabase(importDirectory,database):
             write_relationships(relationships[relationship], relationships_header, outputfile)
             stats.add(utils.buildStats(len(relationships[relationship]), "relationships", relationship, database, outputfile))
     elif database.lower() == "phosphositeplus":
-        headers, relationships = pspParser.parser()
+        entities, relationships, entities_header, relationships_headers = pspParser.parser()
+        entity_outputfile = os.path.join(importDirectory, "Modified_protein.csv")
+        write_entities(entities, entities_header, entity_outputfile)
+        stats.add(utils.buildStats(len(entities), "entity", "Modified_protein", database, entity_outputfile))
         for entity,relationship in relationships:
-            outputfile = os.path.join(importDirectory, "psp_"+entity+"_"+relationship+".csv")
-            write_relationships(relationships[(entity,relationship)], headers[entity], outputfile)
+            rel_header = ["START_ID", "END_ID", "TYPE"]
+            if entity in relationships_headers:
+                rel_header = relationships_headers[entity]
+            outputfile = os.path.join(importDirectory, "psp_"+entity.lower()+"_"+relationship.lower()+".csv")
+            write_relationships(relationships[(entity,relationship)], rel_header, outputfile)
             stats.add(utils.buildStats(len(relationships[(entity,relationship)]), "relationships", relationship, database, outputfile))
     elif database.lower() == "corum":
         entities, relationships, entities_header, relationships_headers = corumParser.parser()

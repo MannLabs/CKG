@@ -37,6 +37,12 @@ PTMdict = {"columns": ["Proteins",
             "sequenceCol": "Sequence window",
             "geneCol":"Gene names",
             "log": "log10"}
+ox = {"modId":"MOD:00256", "mod_acronym":"ox", "file":"Oxidation (M)Sites.txt"}
+ox.update(PTMdict)
+gly = {"modId":"MOD:00767", "mod_acronym":"gly", "file":"GlycationSites.txt"}
+gly.update(PTMdict)
+p = {"modId":"MOD:01456", "mod_acronym":"p", "file":"Phosphosites (STY).txt"}
+p.update(PTMdict)
 dataTypes = {"clinical":{"directory":clinicalDirectory,
                             "file":"clinicalData.xlsx"},
             "proteomics":{"directory": proteomicsDirectory,
@@ -95,16 +101,9 @@ dataTypes = {"clinical":{"directory":clinicalDirectory,
                                         "type": "tryptic peptide",
                                         "log": "log10",
                                         "file":"peptides.txt"},
-                            "Oxydation(M)":{"modId":"MOD:00256",
-                                        "mod_acronym":"ox",
-                                        "file":"Oxidation (M)Sites.txt"}.update(PTMdict),
-                            "Glycation":{"modId":"MOD:00767",
-                                        "mod_acronym":"gly",
-                                        "file":"GlycationSites.txt"}.update(PTMdict),
-                                "Phosphorylation":{
-                                        "modId":"MOD:01456",
-                                        "mod_acronym":"p",
-                                        "file":"Phosphosites (STY).txt"}.update(PTMdict)
+                            "Oxydation(M)":ox,
+                            "Glycation":gly,
+                                "Phosphorylation":p
                             },
             "wes":{"directory": genomicsDirectory,
                         "columns" : ["Chr", "Start", "Ref", "Alt", 

@@ -48,6 +48,23 @@ IMPORT_PROTEIN_DATA = '''CREATE INDEX ON :Protein(accession);
                         MATCH (t:Transcript {id:line.END_ID})
                         MERGE (t)-[:TRANSLATED_INTO]->(p);
                         '''
+IMPORT_MODIFIED_PROTEINS = '''
+                        CREATE CONSTRAINT ON (m:Modified_protein) ASSERT m.id IS UNIQUE;
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/Modified_protein.csv" AS line
+                        MERGE (m:Modified_protein {id:line.ID})
+                        ON CREATE SET m.protein=line.protein,m.position=line.position,m.residue=line.residue,m.sequence_window=line.sequence_window;
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/psp_modified_protein_has_modification.csv" AS line
+                        MATCH (mp:Modified_protein {id:line.START_ID})
+                        MATCH (p:Modification {id:line.END_ID}) 
+                        MERGE (mp)-[:HAS_MODIFICATION]->(p);
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/psp_protein_has_modified_site.csv" AS line 
+                        MATCH (mp:Modified_protein {id:line.START_ID})
+                        MATCH (p:Protein {id:line.END_ID}) 
+                        MERGE (mp)-[:HAS_MODIFIED_SITE]->(p);
+                        '''
 IMPORT_PROTEIN_ANNOTATIONS = '''USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/uniprot_cellular_component_associated_with.csv" AS line
                         MATCH (p:Protein {id:line.START_ID})
@@ -95,7 +112,7 @@ IMPORT_MODIFIED_PROTEIN_ANNOTATIONS = '''USING PERIODIC COMMIT 10000
                         MATCH (b:Biological_process {id:line.END_ID})
                         MERGE (m)-[:ASSOCIATED_WITH{score:line.score,source:line.source,evidence_type:line.evidence_type,publications:SPLIT(line.publications,'; '),action:line.action}]->(b);
                         USING PERIODIC COMMIT 10000
-                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_modified_protein_is_substrate_of.csv" AS line
+                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_substrate_is_substrate_of.csv" AS line
                         MATCH (m:Modified_protein {id:line.START_ID})
                         MATCH (p:Protein {id:line.END_ID})
                         MERGE (m)-[:IS_SUBSTRATE_OF{score:line.score,source:line.source,evidence_type:line.evidence_type}]->(p);
@@ -343,40 +360,30 @@ IMPORT_DATASETS = {"clinical":'''USING PERIODIC COMMIT 10000
                         MATCH (p:Protein{id:line.END_ID}) 
                         MERGE (s)-[:HAS_QUANTIFIED_PROTEIN{value:toFloat(line.value),intensity:toFloat(line.Intensity),qvalue:toFloat(line.Qvalue),score:toFloat(line.Score),proteinGroup:line.id}]->(p);
                         USING PERIODIC COMMIT 10000 
-                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_peptide_protein.csv" AS line 
-                        MATCH (p1:Peptide {id:line.START_ID})
-                        MATCH (p2:Protein {id:line.END_ID}) 
-                        MERGE (p1)-[:BELONGS_TO_PROTEIN]->(p2);
-                        USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_subject_peptide.csv" AS line 
                         MATCH (s:Analytical_sample {id:line.START_ID})
                         MATCH (p:Peptide {id:line.END_ID}) 
                         MERGE (s)-[:HAS_QUANTIFIED_PEPTIDE{value:toFloat(line.value), score:toFloat(line.Score), proteinGroupId:line.Protein_group_IDs}]->(p);
-                        USING PERIODIC COMMIT 10000 
-                        LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_protein_modification.csv" AS line 
-                        MATCH (p:Protein {id:line.START_ID})
-                        MATCH (m:Postranslational_modification {id:line.END_ID}) 
-                        MERGE (p)-[:HAS_MODIFICATION{position:line.position,residue:line.residue}]->(m);
                         CREATE CONSTRAINT ON (m:Modified_protein) ASSERT m.id IS UNIQUE;
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_modifiedprotein.csv" AS line
                         MERGE (m:Modified_protein {id:line.ID}) 
-                        ON CREATE SET m.protein=line.protein,m.position=line.position,m.residue=line.residue;
+                        ON CREATE SET m.protein=line.protein,m.position=line.position,m.residue=line.residue,m.sequence_window=line.sequence_window;
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_modifiedprotein_modification.csv" AS line
                         MATCH (mp:Modified_protein {id:line.START_ID})
-                        MATCH (p:Postranslational_modification {id:line.END_ID}) 
-                        MERGE (mp)-[:MODIFIED_WITH]->(p);
+                        MATCH (p:Modification {id:line.END_ID}) 
+                        MERGE (mp)-[:HAS_MODIFICATION]->(p);
                         USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_modifiedprotein_protein.csv" AS line 
                         MATCH (mp:Modified_protein {id:line.START_ID})
                         MATCH (p:Protein {id:line.END_ID}) 
-                        MERGE (mp)-[:BELONGS_TO_PROTEIN]->(p);
+                        MERGE (mp)-[:HAS_MODIFIED_SITE]->(p);
                         USING PERIODIC COMMIT 10000 
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/PROJECTID_modifiedprotein_subject.csv" AS line
                         MATCH (s:Analytical_sample{id:line.START_ID})
                         MATCH (mp:Modified_protein{id:line.END_ID}) 
-                        MERGE (s)-[:HAS_QUANTIFIED_PROTEINMODIFICATION{value:toFloat(line.value),sequenceWindow:line.Sequence_window,score:line.Score,deltaScore:line.Delta_score,scoreLocalization:line.Score_for_localization,localizationProb:line.Localization_prob}]->(mp);
+                        MERGE (s)-[:HAS_QUANTIFIED_MODIFIED_PROTEIN{value:toFloat(line.value),sequenceWindow:line.Sequence_window,score:line.Score,deltaScore:line.Delta_score,scoreLocalization:line.Score_for_localization,localizationProb:line.Localization_prob}]->(mp);
                         ''',
                     "wes":'''
                         CREATE CONSTRAINT ON (s:Somatic_mutation) ASSERT s.id IS UNIQUE; 

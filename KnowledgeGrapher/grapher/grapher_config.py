@@ -23,6 +23,7 @@ graph = ["ontologies",
          "transcripts", 
          "proteins",
          "annotations",
+         "modified_proteins"
          "complexes",
          "ppi", 
          "diseases", 
@@ -43,6 +44,8 @@ graph = ["ontologies",
 #Imports 
 ontology_entities = ["Disease","Tissue","Biological_process", "Molecular_function", "Cellular_component", "Modification", "Clinical_variable", "Phenotype", "Experiment"]
 #Database resources
+#Modified proteins
+modified_proteins_resources = ["psp"]
 #Protein complexes
 complexes_resources = ["CORUM"]
 #Protein-protein interactions

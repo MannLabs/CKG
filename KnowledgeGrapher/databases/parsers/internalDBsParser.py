@@ -9,7 +9,7 @@ import pandas as pd
 #   Internal Databases (JensenLab.org)      # 
 #############################################
 
-def parser(download = True):
+def parser(download=True):
     result = {}
     string_url = iconfig.string_url
     string_mapping = mp.getSTRINGMapping(string_url, download=False)
@@ -22,7 +22,7 @@ def parser(download = True):
     
     return result
 
-def parserMentions(importDirectory,download = True):
+def parserMentions(importDirectory,download=True):
     entities, header = parsePMClist()
     outputfileName = "Publications.csv"
     for qtype in iconfig.internal_db_mentions_types:
@@ -30,7 +30,7 @@ def parserMentions(importDirectory,download = True):
 
     return (entities, header, outputfileName)
 
-def parseInternalDatabasePairs(qtype, mapping, download = True):
+def parseInternalDatabasePairs(qtype, mapping, download=True):
     url = iconfig.internal_db_url
     ifile = iconfig.internal_db_files[qtype]
     source = iconfig.internal_db_sources[qtype]
@@ -38,6 +38,7 @@ def parseInternalDatabasePairs(qtype, mapping, download = True):
     directory = os.path.join(dbconfig.databasesDir, "InternalDatabases")
     utils.checkDirectory(directory)
     if download:
+        print(url.replace("FILE", ifile))
         utils.downloadDB(url.replace("FILE", ifile), os.path.join(directory,"integration"))
     ifile = os.path.join(directory,os.path.join("integration",ifile))
     with open(ifile, 'r') as idbf:

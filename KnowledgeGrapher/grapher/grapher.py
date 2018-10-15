@@ -1,4 +1,4 @@
-from os.path import join
+import os
 import sys
 from datetime import datetime
 from KnowledgeConnector import graph_controller
@@ -13,12 +13,12 @@ def updateDB(driver, imports=None):
         imports = config.graph
     
     for i in imports:
-        importDir = config.databasesDirectory
+        importDir = os.path.join(os.getcwd(),config.databasesDirectory)
         #Get the cypher queries to build the graph
         #Ontologies
         if "ontologies" == i:
             entities = config.ontology_entities
-            importDir = config.ontologiesDirectory
+            importDir = os.path.join(os.getcwd(), config.ontologiesDirectory)
             ontologyDataImportCode = cy.IMPORT_ONTOLOGY_DATA
             for entity in entities:
                 cypherCode = ontologyDataImportCode.replace("ENTITY", entity).replace("IMPORTDIR", importDir).split(';')[0:-1]
@@ -61,6 +61,13 @@ def updateDB(driver, imports=None):
             complexDataImportCode = cy.IMPORT_COMPLEX_DATA
             for resource in config.complexes_resources:
                 for statement in complexDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
+                    print(statement+";")
+                    graph_controller.sendQuery(driver, statement+';')
+        #Modified proteins
+        elif "modified_proteins" == i:
+            modified_proteinsImportCode = cy.IMPORT_MODIFIED_PROTEINS
+            for resource in config.modified_proteins_resources:
+                for statement in modified_proteinsImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                     print(statement+";")
                     graph_controller.sendQuery(driver, statement+';')
         #PPIs
@@ -188,7 +195,7 @@ def updateDB(driver, imports=None):
                         graph_controller.sendQuery(driver, statement+';')
         #Datasets
         elif "experiment" == i:
-            importDir = config.experimentsDirectory
+            importDir = os.path.join(os.getcwd(),config.experimentsDirectory)
             datasetsCode = cy.IMPORT_DATASETS
             projects = utils.listDirectoryFolders(importDir)
             for project in projects:

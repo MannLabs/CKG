@@ -133,6 +133,8 @@ def parseProteomicsDataset(projectId, configuration, dataDir):
     for ftype in configuration:
         if ftype == "directory":
             continue
+        print(ftype)
+        print(configuration)
         datasetConfig = configuration[ftype]
         dfile = datasetConfig['file']
         filepath = os.path.join(dataDir, dfile)
@@ -244,7 +246,7 @@ def extractProteinModificationSubjectRelationships(data, configuration):
         columns.extend(cCols)
     
 
-    aux['TYPE'] = "HAS_QUANTIFIED_PROTEINMODIFICATION"
+    aux['TYPE'] = "HAS_QUANTIFIED_MODIFIED_PROTEIN"
     columns.append("TYPE")
     aux.columns = columns
     aux = aux[['START_ID', 'END_ID', 'TYPE', "value"] + regexCols + cCols]
@@ -263,7 +265,7 @@ def extractProteinProteinModificationRelationships(data, configuration):
     aux = aux.set_index("START_ID")
     aux = aux.reset_index()
     aux.columns = ["START_ID", "END_ID"]
-    aux['TYPE'] = "BELONGS_TO_PROTEIN"
+    aux['TYPE'] = "HAS_MODIFIED_SITE"
     aux = aux[['START_ID', 'END_ID', 'TYPE']]
     
     return aux
@@ -280,7 +282,7 @@ def extractProteinModifications(data, configuration):
     aux = aux.set_index("ID")
     aux = aux.reset_index()
     aux[sequenceCol] = aux[sequenceCol].str.replace('_', '-')
-    aux.columns = ["ID", "protein", "sequence_window", "position", "Amino acid"]
+    aux.columns = ["ID", "protein", "sequence_window", "position", "residue"]
     
     return aux
 
@@ -295,7 +297,7 @@ def extractProteinModificationsModification(data, configuration):
     aux = aux[cols] 
     aux["START_ID"] =  aux[proteinCol].map(str) + "_" + aux[positionCols[1]].map(str) + aux[positionCols[0]].map(str)+'-'+configuration["mod_acronym"]
     aux["END_ID"] = modID
-    aux = aux[["START_ID","END_ID"]]
+    aux = aux[["START_ID", "END_ID", "HAS_MODIFICATION"]]
     
     return aux
 
@@ -529,8 +531,8 @@ def generateDatasetImports(projectId, dataType):
                             dataRows = extractPeptides(data[dtype], configuration[dtype])
                             generateGraphFiles(dataRows, dtype, projectId)
                         else:
-                            dataRows = extractModificationProteinRelationships(data[dtype], configuration[dtype])
-                            generateGraphFiles(dataRows,"protein_modification", projectId, ot = 'a')
+                            #dataRows = extractModificationProteinRelationships(data[dtype], configuration[dtype])
+                            #generateGraphFiles(dataRows,"protein_modification", projectId, ot = 'a')
                             dataRows = extractProteinModificationSubjectRelationships(data[dtype], configuration[dtype])                
                             generateGraphFiles(dataRows, "modifiedprotein_subject", projectId, ot = 'a')
                             dataRows = extractProteinProteinModificationRelationships(data[dtype], configuration[dtype])

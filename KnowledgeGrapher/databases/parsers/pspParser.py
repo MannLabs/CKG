@@ -16,8 +16,16 @@ def parser():
     utils.checkDirectory(directory)
     modifications = iconfig.modifications
     annotation_files = iconfig.annotation_files
-    headers = iconfig.headers
+    entities_header = iconfig.entities_header
+    relationships_headers = iconfig.rel_headers
+    entities = set()
     relationships = defaultdict()
+    for site_file in iconfig.site_files:
+        file_name = os.path.join(directory, site_file)
+        with gzip.open(file_name, 'r') as f:
+            sites, site_relationships = parseSites(f, modifications)
+            entities.update(sites)
+            relationships.update(site_relationships)
     for entity, relationship_type in annotation_files:
         file_name = os.path.join(directory, annotation_files[(entity,relationship_type)])
         with gzip.open(file_name, 'r') as f:
@@ -27,10 +35,37 @@ def parser():
             elif entity == "biological_process":
                 mapping = mp.getMappingFromOntology(ontology = "Gene_ontology", source = None)
                 relationships[(entity,relationship_type)] = parseRegulationAnnotations(f, modifications, mapping)
-            elif entity == "modified_protein":
+            elif entity == "substrate":
                 relationships[(entity,relationship_type)] = parseKinaseSubstrates(f, modifications)
-    return headers, relationships
     
+    return entities, relationships, entities_header, relationships_headers
+    
+def parseSites(fhandler, modifications):
+    entities = set()
+    relationships = defaultdict(set)
+    i = 0
+    for line in fhandler:
+        if i < 4:
+            i += 1
+            continue
+        data = line.decode("utf-8").rstrip("\r\n").split("\t")
+        protein = data[2]
+        residue_mod = data[4].split('-')
+        modified_protein_id = protein+'_'+data[4]
+        organism = data[6]
+        seq_window = data[9]
+        if len(residue_mod) > 1:
+            modification = modifications[residue_mod[1]]
+            position = residue_mod[0][0]
+            residue = ''.join(residue_mod[0][1:])
+            if organism == "human":
+                #"sequence_window", "position", "Amino acid"
+                entities.add((modified_protein_id, "Modified_protein", protein, seq_window, position, residue))
+                relationships[("Protein", "has_modified_site")].add((protein, modified_protein_id, "HAS_MODIFIED_SITE"))
+                relationships[("Modified_protein", "has_modification")].add((modified_protein_id, modification, "HAS_MODIFICATION"))
+    
+    return entities, relationships
+
 def parseKinaseSubstrates(fhandler, modifications):
     relationships = set()
     i = 0

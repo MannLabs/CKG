@@ -1,3 +1,4 @@
+import certifi
 import urllib3
 import json
 import urllib
@@ -21,11 +22,9 @@ def downloadDB(databaseURL, extraFolder =""):
     fileName = databaseURL.split('/')[-1]    
     #urllib.request.URLopener.version = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36 SE 2.X MetaSr 1.0'
     try:
-        http = urllib3.PoolManager()
+        http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
         response = http.request("GET", databaseURL)
-        mode = 'w'
-        if fileName.endswith('.gz') or fileName.endswith('.zip') or fileName.endswith('.tar'):
-            mode = 'wb'
+        mode = 'wb'
         with open(os.path.join(directory, fileName), mode) as out:
             out.write(response.data)
     except urllib3.exceptions.HTTPError:

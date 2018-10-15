@@ -15,11 +15,20 @@ modifications = {"ac":"MOD:00394",
                  "gly":"MOD:00767"}
 
 annotation_files = {("disease", "associated_with"):"Disease-associated_sites.gz",
-         ("modified_protein", "is_substrate_of"):"Kinase_Substrate_Dataset.gz",
+         ("substrate", "is_substrate_of"):"Kinase_Substrate_Dataset.gz",
          ("biological_process", "associated_with"):"Regulatory_sites.gz"}
 
+site_files = ["Acetylation_site_dataset.gz",
+              "Methylation_site_dataset.gz",
+              "Phosphorylation_site_dataset.gz",
+              "Sumoylation_site_dataset.gz",
+              "Ubiquitination_site_dataset.gz",
+              "O-GalNAc_site_dataset.gz",
+              "O-GlcNAc_site_dataset.gz"
+              ]
 
-headers = {"disease":['START_ID', 'END_ID', 'TYPE', 'evidence_type','score','source', 'publications'],
-         "modified_protein":['START_ID', 'END_ID', 'TYPE', 'evidence_type','score','source'],
+entities_header = ["ID", "type", "protein", "sequence_window", "position", "residue"]
+rel_headers = {"disease":['START_ID', 'END_ID', 'TYPE', 'evidence_type','score','source', 'publications'],
+         "substrate":['START_ID', 'END_ID', 'TYPE', 'evidence_type','score','source'],
          "biological_process":['START_ID', 'END_ID', 'TYPE', 'evidence_type','score','source', 'publications', 'action']}
 
