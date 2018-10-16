@@ -15,7 +15,7 @@ from KnowledgeGrapher.ontologies import ontologies_config as oconfig
 from KnowledgeGrapher.databases import databases_config as dbconfig
 
 
-def downloadDB(databaseURL, extraFolder =""):
+def downloadDB(databaseURL, extraFolder ="", user="", password=""):
     if extraFolder == "":
         directory = dbconfig.databasesDir
     else:
@@ -28,7 +28,7 @@ def downloadDB(databaseURL, extraFolder =""):
             domain = databaseURL.split('/')[2]
             ftp_file = '/'.join(databaseURL.split('/')[3:])
             with FTP(domain) as ftp:
-                ftp.login(user='', passwd = '')
+                ftp.login(user=user, passwd = password)
                 ftp.retrbinary("RETR " + ftp_file ,  open(os.path.join(directory, fileName), mode).write)
         else:
             http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
