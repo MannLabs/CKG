@@ -50,7 +50,6 @@ def parser(download = True):
         first = True
         for line in associations:
             if first:
-                print(line)
                 first = False
                 continue
             data = line.rstrip("\r\n").split("\t")
@@ -70,7 +69,8 @@ def parser(download = True):
                         relationships["targets_clinically_relevant_variant"].add((drug, variant, "TARGETS_KNOWN_VARIANT", level[0], level[1], disease, "curated", "OncoKB"))
                         relationships["targets"].add((drug, gene, "CURATED_TARGETS", "curated", "OncoKB"))
                     else:
-                        print(drug)
+                        pass
+                        #print(drug)
 
             if disease.lower() in mapping:
                 disease = mapping[disease.lower()]

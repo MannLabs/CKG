@@ -69,7 +69,9 @@ def imputation_normal_distribution(data, shift = 1.8, nstd = 0.3):
         mean = data_imputed[i].mean()
         sigma = std*nstd
         mu = mean - (std*shift)
-        data_imputed.loc[missing, i] = np.random.normal(mu, sigma, size=len(data_imputed[missing]))
+        value = np.random.normal(mu, sigma, size=len(data_imputed[missing]))
+        value[value<0] = 0.0
+        data_imputed.loc[missing, i] = value
     return data_imputed
 
 

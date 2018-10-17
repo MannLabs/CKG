@@ -3,25 +3,25 @@ databasesDir = "../../../data/databases/"
 databasesImportDir = "databases"
 #Databases
 databases = [
-            'DrugBank',             
-            "Internal",
-            "HGNC", 
-            "RefSeq", 
-            "UniProt", 
-            "DisGEnet", 
-            "STITCH", 
-            "STRING", 
-            "IntAct", 
-            "Mentions",
-            "HMDB",
-            "PathwayCommons",
-            'GWASCatalog',
-            "DGIdb", 
+            #'DrugBank',             
+            #"Internal",
+            #"HGNC", 
+            #"RefSeq", 
+            #"UniProt", 
+            #"DisGEnet", 
+            #"STITCH", 
+            #"STRING", 
+            #"IntAct", 
+            #"Mentions",
+            #"HMDB",
+            #"PathwayCommons",
+            #'GWASCatalog',
+            #"DGIdb", 
             "OncoKB",
-            "CancerGenomeInterpreter", 
-            "SIDER",
-            "PhosphoSitePlus",
-            'CORUM'
+            #"CancerGenomeInterpreter", 
+            #"SIDER",
+            #"PhosphoSitePlus",
+            #'CORUM'
             ]
 
 sources = {

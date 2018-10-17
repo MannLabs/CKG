@@ -126,7 +126,7 @@ def parseDatabase(importDirectory,database):
         write_entities(entities, entities_header, outputfile)
         stats.add(utils.buildStats(len(entities), "entity", "Clinically_relevant_variant", database, outputfile))
         for relationship in relationships:
-            oncokb_outputfile = os.path.join(importDirectory, "Clinically_relevant_variant_oncokb_"+relationship+".csv")
+            oncokb_outputfile = os.path.join(importDirectory, "oncokb_"+relationship+".csv")
             if relationship in relationships_headers:
                 header = relationships_headers[relationship]
             else:

@@ -155,7 +155,7 @@ def parseUniProtVariants(download = False):
 
     return entities, relationships
 
-def parseUniProtAnnotations(download=False):
+def parseUniProtAnnotations(download=True):
     roots = {'F':'Molecular_function', 'C':'Cellular_component', 'P':'Biological_process'}
     url = iconfig.uniprot_go_annotations
     relationships = defaultdict(set)
