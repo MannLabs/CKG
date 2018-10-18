@@ -5,12 +5,12 @@ from KnowledgeConnector import graph_controller, graph_config
 import grapher_config as config
 import cypher as cy
 from KnowledgeGrapher import utils
-import ckgErrors
+import ckgError
 import logging
 import logging.config
 
-logging.config.dictConfig(graph_config.log)
-logger = logging.getLogger(__name__)
+log_config = graph_config.log
+logger = utils.setup_logging(log_config)
 
 START_TIME = datetime.now()
 
@@ -30,156 +30,156 @@ def updateDB(driver, imports=None):
                 for entity in entities:
                     cypherCode = ontologyDataImportCode.replace("ENTITY", entity).replace("IMPORTDIR", importDir).split(';')[0:-1]
                     for statement in cypherCode:
-                        print(statement)
+                        #print(statement)
                         graph_controller.sendQuery(driver, statement+';')
             #Databases
             #Chromosomes
             elif "chromosomes" == i:
                 chromosomeDataImportCode = cy.IMPORT_CHROMOSOME_DATA
                 for statement in chromosomeDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
-                    print(statement+";")
+                    #print(statement+";")
                     graph_controller.sendQuery(driver, statement+';')
             #Genes
             elif "genes" == i:
                 geneDataImportCode = cy.IMPORT_GENE_DATA
                 for statement in geneDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
-                    print(statement+";")
+                    #print(statement+";")
                     graph_controller.sendQuery(driver, statement+';')
             #Transcripts
             elif "transcripts" == i:
                 transcriptDataImportCode = cy.IMPORT_TRANSCRIPT_DATA
                 for statement in transcriptDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
-                    print(statement+";")
+                    #print(statement+";")
                     graph_controller.sendQuery(driver, statement+';')
             #Proteins
             elif "proteins" == i:
                 proteinDataImportCode = cy.IMPORT_PROTEIN_DATA
                 for statement in proteinDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
-                    print(statement+";")
+                    #print(statement+";")
                     graph_controller.sendQuery(driver, statement+';')
             #Protein annotations
             elif "annotations" == i:
                 proteinAnnotationsImportCode = cy.IMPORT_PROTEIN_ANNOTATIONS
                 for statement in proteinAnnotationsImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
-                    print(statement+";")
+                    #print(statement+";")
                     graph_controller.sendQuery(driver, statement+';')
             #Protein complexes
             elif "complexes" == i:
                 complexDataImportCode = cy.IMPORT_COMPLEX_DATA
                 for resource in config.complexes_resources:
                     for statement in complexDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        print(statement+";")
+                        #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
             #Modified proteins
             elif "modified_proteins" == i:
                 modified_proteinsImportCode = cy.IMPORT_MODIFIED_PROTEINS
                 for resource in config.modified_proteins_resources:
                     for statement in modified_proteinsImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        print(statement+";")
+                        #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
             #PPIs
             elif "ppi" == i:
                 ppiDataImportCode = cy.IMPORT_CURATED_PPI_DATA
                 for resource in config.curated_PPI_resources:
                     for statement in ppiDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        print(statement+";")
+                        #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
                 ppiDataImportCode = cy.IMPORT_COMPILED_PPI_DATA
                 for resource in config.compiled_PPI_resources:
                     for statement in ppiDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        print(statement+";")
+                        #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
                 ppiDataImportCode = cy.IMPORT_PPI_ACTION
                 for resource in config.PPI_action_resources:
                     for statement in ppiDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        print(statement+";")
+                        #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
             #Diseases
             elif "diseases" == i:
                 diseaseDataImportCode = cy.IMPORT_DISEASE_DATA
                 for entity, resource in config.disease_resources:
                     for statement in diseaseDataImportCode.replace("IMPORTDIR", importDir).replace("ENTITY", entity).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        print(statement+";")
+                        #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
             #Drugs  
             elif "drugs" == i:
                 drugsDataImportCode = cy.IMPORT_DRUG_DATA
                 for statement in drugsDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
-                    print(statement+";")
+                    #print(statement+";")
                     graph_controller.sendQuery(driver, statement+';')
                 drugsDataImportCode = cy.IMPORT_CURATED_DRUG_DATA
                 for resource in config.curated_drug_resources:
                     for statement in drugsDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        print(statement+";")
+                        #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
                 drugsDataImportCode = cy.IMPORT_COMPILED_DRUG_DATA
                 for resource in config.compiled_drug_resources:
                     for statement in drugsDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        print(statement+";")
+                        #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
                 drugsDataImportCode = cy.IMPORT_DRUG_ACTS_ON
                 for resource in config.drug_action_resources:
                     for statement in drugsDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        print(statement+";")
+                        #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
             #Side effects
             elif "side effects" == i:
                 sideEffectsDataImportCode = cy.IMPORT_DRUG_SIDE_EFFECTS
                 for resource in config.side_effects_resources:
                     for statement in sideEffectsDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        print(statement+";")
+                        #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
             #Pathway
             elif 'pathway' == i:
                 pathwayImportCode = cy.IMPORT_PATHWAY_DATA
                 for source in config.pathway_resources:
                     for statement in pathwayImportCode.replace("IMPORTDIR", importDir).replace("SOURCE", source.lower()).split(';')[0:-1]:
-                        print(statement+';')
+                        #print(statement+';')
                         graph_controller.sendQuery(driver, statement+';')
             #Metabolite
             elif 'metabolite' == i:
                 metaboliteImportCode = cy.IMPORT_METABOLITE_DATA
                 for source in config.metabolite_resources:
                     for statement in metaboliteImportCode.replace("IMPORTDIR", importDir).replace("SOURCE", source.lower()).split(';')[0:-1]:
-                        print(statement+';')
+                        #print(statement+';')
                         graph_controller.sendQuery(driver, statement+';')
             #GWAS
             elif "gwas" == i:
                 code = cy.IMPORT_GWAS
                 for statement in code.replace("IMPORTDIR", importDir).split(';')[0:-1]:
-                    print(statement+';')
+                    #print(statement+';')
                     graph_controller.sendQuery(driver, statement+';')
             #Known variants
             elif "known_variants" == i:
                 variantsImportCode = cy.IMPORT_KNOWN_VARIANT_DATA
                 for statement in variantsImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
-                    print(statement+";")
+                    #print(statement+";")
                     graph_controller.sendQuery(driver, statement+';')
             #Clinically_relevant_variants
             elif "clinical variants" == i:
                 variantsImportCode = cy.IMPORT_CLINICALLY_RELEVANT_VARIANT_DATA
                 for source in config.clinical_variant_resources:
                     for statement in variantsImportCode.replace("IMPORTDIR", importDir).replace("SOURCE", source.lower()).split(';')[0:-1]:
-                        print(statement+";")
+                        #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
             #Internal
             elif "internal" == i:
                 internalDataImportCode = cy.IMPORT_INTERNAL_DATA
                 for (entity1, entity2) in config.internalEntities:
                     for statement in internalDataImportCode.replace("IMPORTDIR", importDir).replace("ENTITY1", entity1).replace("ENTITY2", entity2).split(';')[0:-1]:
-                        print(statement+";")
+                        #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
             #Mentions
             elif "mentions" == i:
                 publicationsImportCode = cy.CREATE_PUBLICATIONS
                 for statement in publicationsImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
-                    print(statement+";")
+                    #print(statement+";")
                     graph_controller.sendQuery(driver, statement+';')
 
                 mentionsImportCode = cy.IMPORT_MENTIONS
                 for entity in config.mentionEntities:
                     for statement in mentionsImportCode.replace("IMPORTDIR", importDir).replace("ENTITY", entity).split(';')[0:-1]:
-                        print(statement+";")
+                        #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
 
              #Published in
@@ -187,18 +187,18 @@ def updateDB(driver, imports=None):
                 publicationImportCode = cy.IMPORT_PUBLISHED_IN
                 for entity in config.publicationEntities:
                     for statement in publicationImportCode.replace("IMPORTDIR", importDir).replace("ENTITY", entity).split(';')[0:-1]:
-                        print(statement+";")
+                        #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
             #Projects
             elif "project" == i:
-                importDir = config.experimentsDirectory
+                importDir = os.path.join(os.getcwd(),config.experimentsDirectory)
                 projects = utils.listDirectoryFolders(importDir)
                 projectCode = cy.IMPORT_PROJECT
                 for project in projects:
-                    projectDir = join(importDir, project)
+                    projectDir = os.path.join(importDir, project)
                     for code in projectCode:
                         for statement in code.replace("IMPORTDIR", projectDir).replace('PROJECTID', project).split(';')[0:-1]:
-                            print(statement+';')
+                            #print(statement+';')
                             graph_controller.sendQuery(driver, statement+';')
             #Datasets
             elif "experiment" == i:
@@ -206,13 +206,13 @@ def updateDB(driver, imports=None):
                 datasetsCode = cy.IMPORT_DATASETS
                 projects = utils.listDirectoryFolders(importDir)
                 for project in projects:
-                    projectDir = join(importDir, project)
+                    projectDir = os.path.join(importDir, project)
                     datasetTypes = utils.listDirectoryFolders(projectDir)
                     for dtype in datasetTypes:
-                        datasetDir = join(projectDir, dtype)
+                        datasetDir = os.path.join(projectDir, dtype)
                         code = datasetsCode[dtype]
                         for statement in code.replace("IMPORTDIR", datasetDir).replace('PROJECTID', project).split(';')[0:-1]:
-                            print(statement+';')
+                            #print(statement+';')
                             graph_controller.sendQuery(driver, statement+';')
         except ckgError.Error as err:
             logger.error("{}> {}".format(i,err))
@@ -225,6 +225,7 @@ def partialUpdateDB(dataset):
 def populateDB():
     imports = config.graph
     driver = graph_controller.getGraphDatabaseConnectionConfiguration()
+    print(datetime.now() - START_TIME)
     updateDB(driver, imports)
     print(datetime.now() - START_TIME)
     archiveImportDirectory(archive_type="full")

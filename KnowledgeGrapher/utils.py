@@ -11,9 +11,21 @@ import pprint
 import obonet
 import datetime
 import tarfile
+import logging
+import logging.config
 from KnowledgeGrapher.ontologies import ontologies_config as oconfig
 from KnowledgeGrapher.databases import databases_config as dbconfig
 
+def setup_logging(path='log.config', key=None):
+    """Setup logging configuration"""
+    if os.path.exists(path):
+        with open(path, 'rt') as f:
+            config = json.load(f)
+        logging.config.dictConfig(config)
+    else:
+        logging.basicConfig(level=logging.DEBUG)
+    logger = logging.getLogger(key)
+    return logger
 
 def downloadDB(databaseURL, extraFolder ="", user="", password=""):
     if extraFolder == "":
