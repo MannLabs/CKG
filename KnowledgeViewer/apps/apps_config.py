@@ -1,4 +1,4 @@
-
+importsPage = {"stats_file":"../../../data/imports/stats/stats.hdf"}
 
 logo = '../static/img/logo.png'
 
