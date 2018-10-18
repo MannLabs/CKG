@@ -2,7 +2,7 @@ import sys
 import py2neo
 import pandas as pd
 from KnowledgeConnector import graph_config as config
-
+import ckgError
 
 def getGraphDatabaseConnectionConfiguration():
     host = config.dbURL
@@ -18,15 +18,15 @@ def connectToDB(host="localhost", port=7687, user="neo4j", password="password"):
     try:
         driver = py2neo.Graph(host=host, port=port, user=user, password=password)
     except py2neo.database.DatabaseError as err:
-        print("Error: Database failed to service the request. {}".format(err))
+        raise ckgError.DatabaseError("Error: Database failed to service the request. {}".format(err))
     except py2neo.database.ClientError as err:
-        print("Error: The client sent a bad request. {}".format(err))
+        raise ckgError.ClientError("Error: The client sent a bad request. {}".format(err))
     except py2neo.GraphError as err:
-        print("Error: {}".format(err))
+        raise ckgError.GraphError("Error: {}".format(err))
     except py2neo.database.TransientError as err:
-        print("Error: Database cannot service the request right now. {}".format(err))
+        raise ckgError.TransientError("Error: Database cannot service the request right now. {}".format(err))
     except:
-        print("Unexpected error:", sys.exc_info()[0])
+        raise ckgError.Error("Unexpected error:", sys.exc_info()[0])
 
     return driver
 
@@ -49,15 +49,15 @@ def sendQuery(driver, query):
     try:
         result = driver.run(query)
     except py2neo.database.DatabaseError as err:
-        print("Error: Database failed to service the request. {}".format(err))
+        raise ckgError.DatabaseError("Error: Database failed to service the request. {}".format(err))
     except py2neo.database.ClientError as err:
-        print("Error: The client sent a bad request. {}".format(err))
+        raise ckgError.ClientError("Error: The client sent a bad request. {}".format(err))
     except py2neo.GraphError as err:
-        print("Error: {}".format(err))
+        raise ckgError.GraphError("Error: {}".format(err))
     except py2neo.database.TransientError as err:
-        print("Error: Database cannot service the request right now. {}".format(err))
+        raise ckgError.TransientError("Error: Database cannot service the request right now. {}".format(err))
     except:
-        print("Unexpected error:", sys.exc_info()[0])
+        raise ckgError.Error("Unexpected error:", sys.exc_info()[0])
 
     return result
 
