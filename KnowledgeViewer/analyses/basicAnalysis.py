@@ -69,8 +69,10 @@ def imputation_normal_distribution(data, shift = 1.8, nstd = 0.3):
         mean = data_imputed[i].mean()
         sigma = std*nstd
         mu = mean - (std*shift)
-        value = np.random.normal(mu, sigma, size=len(data_imputed[missing]))
-        value[value<0] = 0.0
+        value = 0.0
+        if not math.isnan(std) and not math.isnan(mean) and not math.isnan(sigma) and not math.isnan(mu):
+            value = np.random.normal(mu, sigma, size=len(data_imputed[missing]))
+            value[value<0] = 0.0
         data_imputed.loc[missing, i] = value
     return data_imputed
 
