@@ -55,11 +55,11 @@ def parser(download = True):
             data = line.rstrip("\r\n").split("\t")
             isoform = data[1]
             gene = data[3]
-            variant = data[4]
-            disease = data[5]
-            level = data[6]
+            variant = data[5]
+            disease = data[6]
+            level = data[7]
             drugs = data[8].split(', ')
-            pubmed_ids = data[8].split(',')
+            pubmed_ids = data[9].split(',')
             if level in levels:
                 level = levels[level]
             for drug in drugs:
@@ -71,7 +71,6 @@ def parser(download = True):
                     else:
                         pass
                         #print(drug)
-
             if disease.lower() in mapping:
                 disease = mapping[disease.lower()]
                 relationships["associated_with"].add((variant, disease, "ASSOCIATED_WITH", "curated","curated", "OncoKB", len(pubmed_ids)))   

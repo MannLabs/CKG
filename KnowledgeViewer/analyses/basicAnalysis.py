@@ -361,13 +361,18 @@ def anova(data, alpha=0.5, drop_cols=["sample", "name"], permutations=50):
     scores = scores.dropna(how="all")
     
     #FDR correction
-    max_perm = get_max_permutations(df)
-    if max_perm < permutations:
-        permutations = max_perm
-    observed_pvalues = scores.pvalue
-    count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=alpha, permutations=permutations)
-    scores= scores.join(count)
-
+    if permutations > 0:
+        max_perm = get_max_permutations(df)
+        if max_perm < permutations:
+            permutations = max_perm
+        observed_pvalues = scores.pvalue
+        count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=alpha, permutations=permutations)
+        scores= scores.join(count)
+    else:
+        rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'indep')
+        scores['padj'] = padj
+        scores['rejected'] = rejected
+    
     sigdf = df[list(scores[scores.rejected].index)]
     res = None
     for col in sigdf.columns:

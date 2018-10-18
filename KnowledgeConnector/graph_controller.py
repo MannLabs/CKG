@@ -33,7 +33,7 @@ def removeRelationshipDB(entity1, entity2, relationship):
     print("Existing entries after deletion: %d" % sendQuery(driver, countst).data()[0]['count'])
 
 def sendQuery(driver, query):
-    print(query)
+    #print(query)
     try:
         result = driver.run(query)
     except py2neo.database.ClientError as err:

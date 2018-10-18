@@ -69,17 +69,17 @@ IMPORT_PROTEIN_ANNOTATIONS = '''USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/uniprot_cellular_component_associated_with.csv" AS line
                         MATCH (p:Protein {id:line.START_ID})
                         MATCH (c:Cellular_component {id:line.END_ID})
-                        MERGE (p)-[:ASSOCIATED_WITH{score:line.score,source:line.source,evidence_type:line.evidence_type}]->(c);
+                        MERGE (p)-[:ASSOCIATED_WITH{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type}]->(c);
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/uniprot_molecular_function_associated_with.csv" AS line
                         MATCH (p:Protein {id:line.START_ID})
                         MATCH (f:Molecular_function {id:line.END_ID})
-                        MERGE (p)-[:ASSOCIATED_WITH{score:line.score,source:line.source,evidence_type:line.evidence_type}]->(f);
+                        MERGE (p)-[:ASSOCIATED_WITH{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type}]->(f);
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/uniprot_biological_process_associated_with.csv" AS line
                         MATCH (p:Protein {id:line.START_ID})
                         MATCH (b:Biological_process {id:line.END_ID})
-                        MERGE (p)-[:ASSOCIATED_WITH{score:line.score,source:line.source,evidence_type:line.evidence_type}]->(b);
+                        MERGE (p)-[:ASSOCIATED_WITH{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type}]->(b);
                         '''
 
 IMPORT_COMPLEXES = '''CREATE INDEX ON :Complex(name); 
@@ -98,24 +98,24 @@ IMPORT_COMPLEXES = '''CREATE INDEX ON :Complex(name);
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_biological_process_associated_with.csv" AS line
                         MATCH (c:Complex {id:line.START_ID})
                         MATCH (b:Biological_process {id:line.END_ID})
-                        MERGE (c)-[:ASSOCIATED_WITH{evidence_type:line.evidence_type,score:line.score,source:line.source}]->(b);
+                        MERGE (c)-[:ASSOCIATED_WITH{evidence_type:line.evidence_type,score:toFloat(line.score),source:line.source}]->(b);
                     '''
 
 IMPORT_MODIFIED_PROTEIN_ANNOTATIONS = '''USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_disease_associated_with.csv" AS line
                         MATCH (m:Modified_protein {id:line.START_ID})
                         MATCH (d:Disease {id:line.END_ID})
-                        MERGE (m)-[:ASSOCIATED_WITH{score:line.score,source:line.source,evidence_type:line.evidence_type,publications:SPLIT(line.publications,'; ')}]->(d);
+                        MERGE (m)-[:ASSOCIATED_WITH{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type,publications:SPLIT(line.publications,'; ')}]->(d);
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_biological_process_associated_with.csv" AS line
                         MATCH (m:Modified_protein {id:line.START_ID})
                         MATCH (b:Biological_process {id:line.END_ID})
-                        MERGE (m)-[:ASSOCIATED_WITH{score:line.score,source:line.source,evidence_type:line.evidence_type,publications:SPLIT(line.publications,'; '),action:line.action}]->(b);
+                        MERGE (m)-[:ASSOCIATED_WITH{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type,publications:SPLIT(line.publications,'; '),action:line.action}]->(b);
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_substrate_is_substrate_of.csv" AS line
                         MATCH (m:Modified_protein {id:line.START_ID})
                         MATCH (p:Protein {id:line.END_ID})
-                        MERGE (m)-[:IS_SUBSTRATE_OF{score:line.score,source:line.source,evidence_type:line.evidence_type}]->(p);
+                        MERGE (m)-[:IS_SUBSTRATE_OF{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type}]->(p);
                         '''
 
 IMPORT_GENE_DATA = '''CREATE CONSTRAINT ON (g:Gene) ASSERT g.id IS UNIQUE; 
@@ -155,20 +155,20 @@ IMPORT_CURATED_PPI_DATA =   '''
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_interacts_with.csv" AS line
                         MATCH (p1:Protein {id:line.START_ID})
                         MATCH (p2:Protein {id:line.END_ID})
-                        MERGE (p1)-[:CURATED_INTERACTS_WITH{score:line.score,interaction_type:line.interaction_type,method:SPLIT(line.method,','),source:SPLIT(line.source,','),publications:SPLIT(line.publications,',')}]->(p2);'''
+                        MERGE (p1)-[:CURATED_INTERACTS_WITH{score:toFloat(line.score),interaction_type:line.interaction_type,method:SPLIT(line.method,','),source:SPLIT(line.source,','),publications:SPLIT(line.publications,',')}]->(p2);'''
 IMPORT_COMPILED_PPI_DATA =   '''
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_interacts_with.csv" AS line
                         MATCH (p1:Protein {id:line.START_ID})
                         MATCH (p2:Protein {id:line.END_ID})
-                        MERGE (p1)-[:COMPILED_INTERACTS_WITH{score:line.score,interaction_type:line.interaction_type,source:SPLIT(line.source,','),scores:SPLIT(line.scores,','),evidences:SPLIT(line.evidences,',')}]->(p2);'''
+                        MERGE (p1)-[:COMPILED_INTERACTS_WITH{score:toFloat(line.score),interaction_type:line.interaction_type,source:SPLIT(line.source,','),scores:SPLIT(line.scores,','),evidences:SPLIT(line.evidences,',')}]->(p2);'''
 
 IMPORT_INTERNAL_DATA =   '''
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/ENTITY1_ENTITY2_associated_with_integrated.csv" AS line
                         MATCH (p:ENTITY1 {id:line.START_ID})
                         MATCH (d:ENTITY2 {id:line.END_ID})
-                        MERGE (p)-[:ASSOCIATED_WITH{score:line.score,source:line.source,evidence_type:line.evidence_type}]->(d);
+                        MERGE (p)-[:ASSOCIATED_WITH{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type}]->(d);
                         '''
 CREATE_PUBLICATIONS = '''
                     CREATE CONSTRAINT ON (p:Publication) ASSERT p.id IS UNIQUE; 
@@ -199,7 +199,7 @@ IMPORT_DISEASE_DATA =   '''
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/ENTITY_RESOURCE_associated_with.csv" AS line
                         MATCH (e:ENTITY {id:line.START_ID})
                         MATCH (d:Disease {id:line.END_ID})
-                        MERGE (e)-[:ASSOCIATED_WITH{score:line.score,evidence_type:line.evidence_type,source:line.source}]->(d);
+                        MERGE (e)-[:ASSOCIATED_WITH{score:toFloat(line.score),evidence_type:line.evidence_type,source:line.source}]->(d);
                         '''
 
 IMPORT_DRUG_DATA = '''CREATE INDEX ON :Drug(name);
@@ -222,14 +222,14 @@ IMPORT_COMPILED_DRUG_DATA =   '''
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_associated_with.csv" AS line
                         MATCH (d:Drug {id:line.START_ID})
                         MATCH (g:Gene {id:line.END_ID})
-                        MERGE (d)-[:COMPILED_TARGETS{score:line.score, source:line.source,interaction_type:line.interaction_type,scores:SPLIT(line.evidences,','),evidences:SPLIT(line.evidences,',')}]->(g);'''
+                        MERGE (d)-[:COMPILED_TARGETS{score:toFloat(line.score), source:line.source,interaction_type:line.interaction_type,scores:SPLIT(line.evidences,','),evidences:SPLIT(line.evidences,',')}]->(g);'''
 
 IMPORT_PPI_ACTION = '''
                      USING PERIODIC COMMIT 10000
                      LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_protein_acts_on_protein.csv" AS line
                      MATCH (p1:Protein {id:line.START_ID})
                      MATCH (p2:Protein {id:line.END_ID})
-                     MERGE (p1)-[:ACTS_ON{source:line.source,action:line.action,score:line.score,directionality:line.directionality}]->(p2);
+                     MERGE (p1)-[:ACTS_ON{source:line.source,action:line.action,score:toFloat(line.score),directionality:line.directionality}]->(p2);
                     '''
 
 IMPORT_DRUG_SIDE_EFFECTS =   '''
@@ -250,7 +250,7 @@ IMPORT_DRUG_ACTS_ON =   '''
                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/RESOURCE_drug_acts_on_protein.csv" AS line
                         MATCH (d:Drug {id:line.START_ID})
                         MATCH (p:Protein {id:line.END_ID})
-                        MERGE (d)-[:ACTS_ON{source:line.source,action:line.action,score:line.score,directionality:line.directionality}]->(p);
+                        MERGE (d)-[:ACTS_ON{source:line.source,action:line.action,score:toFloat(line.score),directionality:line.directionality}]->(p);
                         '''
 
 IMPORT_PATHWAY_DATA = '''
@@ -337,7 +337,7 @@ IMPORT_CLINICALLY_RELEVANT_VARIANT_DATA = '''
                                         LOAD CSV WITH HEADERS FROM "file://IMPORTDIR/SOURCE_associated_with.csv" AS line
                                         MATCH (k:Clinically_relevant_variant {id:line.START_ID})
                                         MATCH (d:Disease {id:line.END_ID})
-                                        MERGE (k)-[:ASSOCIATED_WITH{score:line.score,evidence_type:line.evidence_type,source:line.source,number_publications:line.number_publications}]->(d);
+                                        MERGE (k)-[:ASSOCIATED_WITH{score:toFloat(line.score),evidence_type:line.evidence_type,source:line.source,number_publications:line.number_publications}]->(d);
                                         '''
 
 IMPORT_GWAS = '''
