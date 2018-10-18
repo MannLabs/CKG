@@ -23,6 +23,9 @@ def display_page(pathname):
             project = projectApp.ProjectApp(projectId, projectId, "", "", layout = [], logo = None, footer = None)
 
             return project.getLayout()
+        elif pathname.startswith('/apps/imports'):
+            imports = importsApp.ImportsApp("CKG database monitoring", "Statistics", "", layout = [], logo = None, footer = None)
+            return imports.getLayout()
         else:
             return '404'
 
