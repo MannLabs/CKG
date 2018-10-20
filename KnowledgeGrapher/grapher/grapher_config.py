@@ -23,7 +23,7 @@ graph = ["ontologies",
          "transcripts", 
          "proteins",
          "annotations",
-         "modified_proteins"
+         "modified_proteins",
          "complexes",
          "ppi", 
          "diseases", 

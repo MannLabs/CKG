@@ -11,10 +11,10 @@ internal_db_mentions_files = {"-26":"disease_textmining_mentions.tsv",
                     "-1": "chemical_textmining_mentions.tsv"}
 internal_db_types = {"-26":("Protein","Disease"),
                     "-25":("Protein","Tissue"),
-                    "-23":("Protein","Cellular_compartment")}
+                    "-23":("Protein","Cellular_component")}
 internal_db_mentions_types = {"-26":("Disease", "Publication"),
                             "-25":("Tissue", "Publication"),
-                            "-23":("Cellular_compartment", "Publication"), 
+                            "-23":("Cellular_component", "Publication"), 
                             "9606":("Protein","Publication"), 
                             "-1":("Chemical","Publication")}
 internal_db_mentions_filters = {"-25": ["BTO:0000000"],

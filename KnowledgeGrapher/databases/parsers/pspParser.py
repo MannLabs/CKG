@@ -19,22 +19,23 @@ def parser():
     entities_header = iconfig.entities_header
     relationships_headers = iconfig.rel_headers
     entities = set()
-    relationships = defaultdict()
+    relationships = defaultdict(set)
     for site_file in iconfig.site_files:
         file_name = os.path.join(directory, site_file)
         with gzip.open(file_name, 'r') as f:
             sites, site_relationships = parseSites(f, modifications)
             entities.update(sites)
-            relationships.update(site_relationships)
+            for r in site_relationships:
+                relationships[r].update(site_relationships[r])
     for entity, relationship_type in annotation_files:
         file_name = os.path.join(directory, annotation_files[(entity,relationship_type)])
         with gzip.open(file_name, 'r') as f:
             if entity == "disease":
                 mapping = mp.getMappingFromOntology(ontology = "Disease", source = None)
-                relationships[(entity,relationship_type)] = parseDiseaseAnnotations(f, modifications, mapping)
+                relationships[(entity,relationship_type)].update(parseDiseaseAnnotations(f, modifications, mapping))
             elif entity == "biological_process":
                 mapping = mp.getMappingFromOntology(ontology = "Gene_ontology", source = None)
-                relationships[(entity,relationship_type)] = parseRegulationAnnotations(f, modifications, mapping)
+                relationships[(entity,relationship_type)].update(parseRegulationAnnotations(f, modifications, mapping))
             elif entity == "substrate":
                 relationships[(entity,relationship_type)] = parseKinaseSubstrates(f, modifications)
     
@@ -102,7 +103,7 @@ def parseRegulationAnnotations(fhandler, modifications, mapping):
             for process in processes:
                 if process.lower() in mapping:
                     process_code = mapping[process.lower()]
-                    relationships.add((modified_protein_id,process_code,"ASSOCIATED_WITH", "CURATED", 5, "PhosphoSitePlus", pmid,""))
+                    relationships.add((modified_protein_id,process_code,"ASSOCIATED_WITH", "CURATED", 5, "PhosphoSitePlus", pmid,"unspecified"))
                 elif process.lower().split(',')[0] in mapping:
                     process_code = mapping[process.lower().split(',')[0]]
                     relationships.add((modified_protein_id,process_code,"ASSOCIATED_WITH", "CURATED", 5, "PhosphoSitePlus", pmid,process.lower().split(',')[1]))

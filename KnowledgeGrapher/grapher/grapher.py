@@ -19,6 +19,7 @@ def updateDB(driver, imports=None):
         imports = config.graph
     
     for i in imports:
+        print(i)
         try:
             importDir = os.path.join(os.getcwd(),config.databasesDirectory)
             #Get the cypher queries to build the graph
@@ -65,10 +66,9 @@ def updateDB(driver, imports=None):
                     graph_controller.sendQuery(driver, statement+';')
             #Protein complexes
             elif "complexes" == i:
-                complexDataImportCode = cy.IMPORT_COMPLEX_DATA
+                complexDataImportCode = cy.IMPORT_COMPLEXES
                 for resource in config.complexes_resources:
                     for statement in complexDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
             #Modified proteins
             elif "modified_proteins" == i:
@@ -76,6 +76,10 @@ def updateDB(driver, imports=None):
                 for resource in config.modified_proteins_resources:
                     for statement in modified_proteinsImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                         #print(statement+";")
+                        graph_controller.sendQuery(driver, statement+';')
+                modified_proteins_annotationsImportCode = cy.IMPORT_MODIFIED_PROTEIN_ANNOTATIONS
+                for resource in config.modified_proteins_resources:
+                    for statement in modified_proteins_annotationsImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                         graph_controller.sendQuery(driver, statement+';')
             #PPIs
             elif "ppi" == i:
@@ -215,7 +219,7 @@ def updateDB(driver, imports=None):
                             #print(statement+';')
                             graph_controller.sendQuery(driver, statement+';')
         except ckgError.Error as err:
-            logger.error("{}> {}".format(i,err))
+            logger.error("{}> {}.\nQuery:{}".format(i, err, statement))
 
 def partialUpdateDB(dataset):
     driver = graph_controller.getGraphDatabaseConnectionConfiguration()

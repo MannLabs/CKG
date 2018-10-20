@@ -57,13 +57,13 @@ IMPORT_MODIFIED_PROTEINS = '''
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/psp_modified_protein_has_modification.csv" AS line
                         MATCH (mp:Modified_protein {id:line.START_ID})
-                        MATCH (p:Modification {id:line.END_ID}) 
-                        MERGE (mp)-[:HAS_MODIFICATION]->(p);
+                        MATCH (m:Modification {id:line.END_ID}) 
+                        MERGE (mp)-[:HAS_MODIFICATION]->(m);
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/psp_protein_has_modified_site.csv" AS line 
-                        MATCH (mp:Modified_protein {id:line.START_ID})
-                        MATCH (p:Protein {id:line.END_ID}) 
-                        MERGE (mp)-[:HAS_MODIFIED_SITE]->(p);
+                        MATCH (p:Protein {id:line.START_ID})
+                        MATCH (mp:Modified_protein {id:line.END_ID}) 
+                        MERGE (p)-[:HAS_MODIFIED_SITE]->(mp);
                         '''
 IMPORT_PROTEIN_ANNOTATIONS = '''USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/uniprot_cellular_component_associated_with.csv" AS line
@@ -82,18 +82,17 @@ IMPORT_PROTEIN_ANNOTATIONS = '''USING PERIODIC COMMIT 10000
                         MERGE (p)-[:ASSOCIATED_WITH{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type}]->(b);
                         '''
 
-IMPORT_COMPLEXES = '''CREATE INDEX ON :Complex(name); 
-                        CREATE CONSTRAINT ON (c:Complex) ASSERT c.id IS UNIQUE; 
+IMPORT_COMPLEXES = '''CREATE CONSTRAINT ON (c:Complex) ASSERT c.id IS UNIQUE; 
                         CREATE CONSTRAINT ON (c:Complex) ASSERT c.name IS UNIQUE; 
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Complex.csv" AS line
                         MERGE (c:Complex {id:line.ID}) 
-                        ON CREATE SET c.name=line.name,c.organism=line.organism,c.source=line.source,c.synonyms=SPLIT(line.synonyms,';');
+                        ON CREATE SET c.name=line.name,c.organism=line.organism,c.source=line.source,c.synonyms=SPLIT(line.synonyms,',');
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_protein_is_subunit_of.csv" AS line
                         MATCH (p:Protein {id:line.START_ID})
                         MATCH (c:Complex {id:line.END_ID})
-                        MERGE (p)-[:IS_SUBUNIT_OF{cell_lines:SPLIT(line.cell_lines,';'),evidences:SPLIT(line.evidences,';'),publication:line.publication,source:line.source}]->(c);
+                        MERGE (p)-[:IS_SUBUNIT_OF{cell_lines:SPLIT(line.cell_lines,','),evidences:SPLIT(line.evidences,','),publication:line.publication,source:line.source}]->(c);
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_biological_process_associated_with.csv" AS line
                         MATCH (c:Complex {id:line.START_ID})
@@ -105,12 +104,12 @@ IMPORT_MODIFIED_PROTEIN_ANNOTATIONS = '''USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_disease_associated_with.csv" AS line
                         MATCH (m:Modified_protein {id:line.START_ID})
                         MATCH (d:Disease {id:line.END_ID})
-                        MERGE (m)-[:ASSOCIATED_WITH{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type,publications:SPLIT(line.publications,'; ')}]->(d);
+                        MERGE (m)-[:ASSOCIATED_WITH{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type,publications:line.publications}]->(d);
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_biological_process_associated_with.csv" AS line
                         MATCH (m:Modified_protein {id:line.START_ID})
                         MATCH (b:Biological_process {id:line.END_ID})
-                        MERGE (m)-[:ASSOCIATED_WITH{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type,publications:SPLIT(line.publications,'; '),action:line.action}]->(b);
+                        MERGE (m)-[:ASSOCIATED_WITH{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type,publications:line.publications,action:line.action}]->(b);
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_substrate_is_substrate_of.csv" AS line
                         MATCH (m:Modified_protein {id:line.START_ID})
@@ -442,7 +441,7 @@ CREATE_SUBJECTS = '''CREATE CONSTRAINT ON (s:Subject) ASSERT s.id IS UNIQUE;
                     LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/clinical/PROJECTID_disease.csv" AS line 
                     MATCH (s:Subject {id:line.START_ID})
                     MATCH (d:Disease {id:line.END_ID}) 
-                    MERGE (s)-[:HAS_Disease]->(d);
+                    MERGE (s)-[:HAS_DISEASE]->(d);
                     USING PERIODIC COMMIT 10000
                     LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/clinical/PROJECTID_clinical.csv" AS line 
                     MATCH (s:Subject {id:line.START_ID})

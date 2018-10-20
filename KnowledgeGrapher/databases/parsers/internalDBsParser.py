@@ -73,11 +73,12 @@ def parsePMClist(download = True):
     entities = entities[entities.iloc[:,0].notnull()]
     entities = entities.set_index(list(entities.columns)[0])
     entities['linkout'] = [plinkout.replace("PUBMEDID", str(int(pubmedid))) for pubmedid in list(entities.index)]
-    entities.index = entities.index.rename('ID')
+    entities.index.names = ['ID']
+    entities['TYPE'] = 'Publication'
     entities = entities.reset_index()
-    header = [c.replace(' ','_').lower() for c in list(entities.columns)]
+    header = [c.replace(' ','_').lower() if c not in ['ID', 'TYPE'] else c for c in list(entities.columns)]
     entities = list(entities.itertuples(index=False)) 
-    
+    entities = entities.replace('\\','')
     return entities, header
 
 def parseInternalDatabaseMentions(qtype, importDirectory, download=True):
@@ -99,7 +100,7 @@ def parseInternalDatabaseMentions(qtype, importDirectory, download=True):
     if download:
         utils.downloadDB(url.replace("FILE", ifile), os.path.join(directory,"textmining"))
     ifile = os.path.join(directory,os.path.join("textmining",ifile))
-    with open(outputfile,'a') as f:
+    with open(outputfile,'w') as f:
         f.write("START_ID,END_ID,TYPE\n")
         with open(ifile, 'r') as idbf:
             for line in idbf:

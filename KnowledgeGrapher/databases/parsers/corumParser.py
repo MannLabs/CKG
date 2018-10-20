@@ -23,6 +23,7 @@ def parser(download=True):
     fileName = '.'.join(database_url.split('/')[-1].split('.')[0:2])
     if download:
         utils.downloadDB(database_url, directory)
+    names = set()
     first = True
     with zipfile.ZipFile(zipped_fileName) as z:
         with z.open(fileName) as f:
@@ -34,19 +35,21 @@ def parser(download=True):
                 identifier = data[0]
                 name = data[1]
                 organism = data[2]
-                synonyms = data[3] if data[3] != "None" else ""
-                cell_lines = data[4]
+                synonyms = data[3].split(';') if data[3] != "None" else [""]
+                cell_lines = data[4].join(';')
                 subunits = data[5].split(';')
-                evidences = data[7]
+                evidences = data[7].split(';')
                 processes = data[8].split(';')
                 pubmedid = data[14]
                 
                 if organism == "Human":
                     #ID name organism synonyms source
-                    entities.add((identifier, name, "9606", synonyms, "CORUM"))
+                    if name not in names:
+                        entities.add((identifier, name, "9606", ",".join(synonyms), "CORUM"))
+                        names.add(name)
                     for subunit in subunits:
                         #START_ID END_ID type cell_lines evidences publication source
-                        relationships[("Protein", "is_subunit_of")].add((subunit, identifier, "IS_SUBUNIT_OF", cell_lines, evidences, pubmedid, "CORUM"))
+                        relationships[("Protein", "is_subunit_of")].add((subunit, identifier, "IS_SUBUNIT_OF", ",".join(cell_lines), ",".join(evidences), pubmedid, "CORUM"))
                     for process in processes:
                         #START_ID END_ID type evidence_type score source
                         relationships["Biological_process", "associated_with"].add((identifier, process, "ASSOCIATED_WITH", "CURATED", 5, "CORUM"))
