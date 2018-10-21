@@ -55,7 +55,7 @@ def parseInternalDatabasePairs(qtype, mapping, download=True):
                 
     return relationships
 
-def parsePMClist(download = True):
+def parsePMClist(download=False):
     url = iconfig.PMC_db_url
     plinkout = iconfig.pubmed_linkout
     entities = set()
@@ -77,8 +77,9 @@ def parsePMClist(download = True):
     entities['TYPE'] = 'Publication'
     entities = entities.reset_index()
     header = [c.replace(' ','_').lower() if c not in ['ID', 'TYPE'] else c for c in list(entities.columns)]
+    entities = entities.replace('\\\\','', regex=True)
     entities = list(entities.itertuples(index=False)) 
-    entities = entities.replace('\\','')
+    
     return entities, header
 
 def parseInternalDatabaseMentions(qtype, importDirectory, download=True):
