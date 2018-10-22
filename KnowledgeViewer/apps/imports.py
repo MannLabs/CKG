@@ -3,7 +3,7 @@ import plotly.plotly as py
 from IPython.display import display
 import plotly.graph_objs as go
 from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
-import plotly.io as pio
+from plotly import tools
 
 #Data manipulation imports
 import pandas as pd

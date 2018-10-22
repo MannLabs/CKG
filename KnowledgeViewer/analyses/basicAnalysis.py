@@ -41,8 +41,9 @@ def extract_percentage_missing(data, conditions, missing_max):
 
 def imputation_KNN(data, alone = True):
     df = data.copy()
+    value_cols = [c for c in df.columns if c not in ['sample', 'group']]
     for g in df.group.unique():
-        missDf = df.loc[df.group==g,:]
+        missDf = df.loc[df.group==g, value_cols]
         missDf = missDf.loc[:, missDf.notnull().mean() >= 0.5]
         X = np.array(missDf.values, dtype=np.float64)
         imp = predictive_imputer.PredictiveImputer(f_model="KNN")
@@ -52,6 +53,7 @@ def imputation_KNN(data, alone = True):
         df.update(dfm)
     if alone:
         df = df.dropna()
+    
     return df
 
 def imputation_mixed_norm_KNN(data):

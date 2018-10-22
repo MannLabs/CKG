@@ -27,6 +27,8 @@ class ProjectApp(basicApp.BasicApp):
         self.addBasicLayout()
         p = project.Project(self.getProjectId(), 'multi-omics')
         plots = p.showReport("app")
+        print(type(plots))
+        print(plots)
         self.extendLayout(plots)
         
         

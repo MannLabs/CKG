@@ -18,7 +18,7 @@ queries = {
                     WHERE project.id="PROJECTID" 
                     RETURN a.id AS name, a.id AS x, a.group AS group,COUNT(DISTINCT(peptide.id)) AS y;'''),
     "NUMBER_MODIFIED_PROTEINS_ANALYTICAL_SAMPLE":("Number of Modified Proteins", 
-            '''MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEINMODIFICATION]->(modifiedprotein:Modified_protein) 
+            '''MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_MODIFIED_PROTEIN]->(modifiedprotein:Modified_protein) 
                     WHERE project.id="PROJECTID" 
                     RETURN a.id AS name, a.id AS x,a.group AS group,COUNT(DISTINCT(modifiedprotein.id)) AS y;'''),
     "IDENTIFIED_PROTEINS":("Identified proteins per group", 

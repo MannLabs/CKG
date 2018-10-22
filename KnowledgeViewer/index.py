@@ -3,7 +3,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 
 from app import app
-from apps import initialApp, projectApp
+from apps import initialApp, projectApp, importsApp
 
 
 app.layout = html.Div([ 

@@ -20,11 +20,12 @@ class ImportsApp(basicApp.BasicApp):
     def buildPage(self):
         self.addBasicLayout()
         conf = self.getPageConfiguration()
-        statsfile = conf['stats_file']
-        stats_df = imports.get_stats_data(stats_ile)
+        stats_file = conf['stats_file']
+        stats_df = imports.get_stats_data(stats_file)
         plots = []
         plots.append(imports.plot_total_number_imported(stats_df, '', 'Date', 'Number of imports'))
         plots.append(imports.plot_total_numbers_per_date(stats_df, '', 'Date', 'Number of imports'))
         plots.append(imports.plot_databases_numbers_per_date(stats_df, '', '', '', dropdown=True, dropdown_options='dates'))
         plots.append(imports.plot_import_numbers_per_database(stats_df, '', '', '', subplot_titles = ('Entities imports', 'Entities file size','Relationships imports', 'Relationships file size'), colors=True, colors_1='entities', colors_2='relationships', dropdown=True, dropdown_options='all'))
+        print(plots)
         self.extendLayout(plots)

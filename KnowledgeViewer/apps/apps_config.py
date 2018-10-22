@@ -1,4 +1,4 @@
-importsPage = {"stats_file":"../../../data/imports/stats/stats.hdf"}
+stats_file = "../../data/imports/stats/stats.hdf"
 
 logo = '../static/img/logo.png'
 
@@ -54,7 +54,8 @@ pages = {"projectPage":{
                 "project": projectPage,
                 "proteomics": proteomicsPage,
                 #"wes": wesPage
-                }
+                },
+            "importsPage":{"stats_file":stats_file}
             }
 ## Overview 
 ## Project Name
