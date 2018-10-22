@@ -122,7 +122,7 @@ def parseClinicalDataset(projectId, configuration, dataDir):
     data = None
     if os.path.isfile(filepath):
         data = readDataset(filepath)
-        data['subject id'] = data['subject id'].astype('int64')
+        data['subject id'] = data['subject id']#.astype('int64')
         data = data.set_index('subject id')
     
     return data
@@ -166,17 +166,36 @@ def parseWESDataset(projectId, configuration, dataDir):
 ###############################
 ########### Clinical Variables Datasets ############
 def extractSubjectClinicalVariablesRelationships(data):
-    cols = list(data.columns)
-    if "group" in data.columns:
-        cols.remove("group")
-        data = data[cols]
-    data = data.stack()
-    data = data.reset_index()
-    data.columns = ['START_ID', 'END_ID', "value"]
-    data['TYPE'] = "HAS_QUANTIFIED_CLINICAL"
-    data = data[['START_ID', 'END_ID','TYPE', 'value']]
+    df = data.copy()
+    intervention = None
+    if "intervention" in df.columns:
+        intervention = df["intervention"].to_frame()
+        intervention = intervention.reset_index()
+        intervention.columns = ['START_ID', 'END_ID']
+    df = df.drop(["external id", "biological_sample id", "analytical_sample id"], axis=1)
+    df = df.select_dtypes(exclude='float')
+    df = df.stack()
+    df = df.reset_index()
+    df.columns = ['START_ID', 'END_ID', "value"]
+    if intervention is not None:
+        df = df.append(intervention, sort=True)
+    df['TYPE'] = "HAS_CLINICAL_STATE"
+    df = df[['START_ID', 'END_ID','TYPE', 'value']]
 
-    return data
+    return df
+
+def extractBiologicalSampleClinicalVariablesRelationships(data):
+    df = data.copy()
+    if "biological_sample id" in df.columns:
+        df = df.set_index("biological_sample id")
+        df = df.select_dtypes(include='float')
+        df = df.stack()
+        df = df.reset_index()
+        df.columns = ['START_ID', 'END_ID', "value"]
+        df['TYPE'] = "HAS_QUANTIFIED_CLINICAL"
+        df = df[['START_ID', 'END_ID','TYPE', 'value']]
+
+    return df
 
 def extractSubjectGroupRelationships(data):
     cols = list(data.columns)
@@ -189,17 +208,46 @@ def extractSubjectGroupRelationships(data):
     else:
         return None
 
+def extractTimepoints(data):
+    cols = list(data.columns)
+    if "timepoint" in cols:
+        data = data["timepoint"].to_frame()
+        data['type'] = "Timepoint"
+        data['units'] = 'days'
+        data = data.set_index("timepoint")
+        data = data.reset_index()
+        data.columns = ['ID', 'type', "units"]
+        return data
+    else:
+        return pd.DataFrame(columns=['ID', 'type', "units"])
+
+def extractBiologicalSampleTimepointRelationships(data):
+    cols = list(data.columns)
+    if "biological_sample id" in cols and "timepoint" in cols and "intervention" in cols:
+        data = data[["biological_sample id","timepoint","intervention"]]
+        data = data.set_index("biological_sample id")
+        data = data.reset_index()
+        data.columns = ['START_ID', 'END_ID', "intervention"]
+        data['TYPE'] = "SAMPLED_AT_TIMEPOINT"
+        return data
+    else:
+        return pd.DataFrame(columns=['START_ID', 'END_ID', "intervention", "TYPE"])
+
 def extractSubjectDiseaseRelationships(data):
     cols = list(data.columns)
     if "disease" in data.columns:
         data = data["disease"].to_frame()
+        expanded = data.disease.str.split(';',expand=True)
+        if expanded.shape[1] > 1:
+            data = (data.disease.str.split(';',expand=True)[0]).append(data.disease.str.split(';',expand=True)[1].dropna())
         data = data.reset_index()
         data.columns = ['START_ID', 'END_ID']
         data['TYPE'] = "HAS_DISEASE"
         data = data.dropna()
+        data = data.drop_duplicates(keep='first')
         return data
     else:
-        return None
+        return pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE'])
 
 ########### Proteomics Datasets ############
 ############## ProteinModification entity ####################
@@ -498,7 +546,6 @@ def loadWESDataset(uri, configuration):
 #          Generate graph files        # 
 ########################################
 def generateDatasetImports(projectId, dataType):
-    print(dataType)
     if dataType in config.dataTypes:
         if "directory" in config.dataTypes[dataType]:
             dataDir = config.dataTypes[dataType]["directory"].replace("PROJECTID", projectId)
@@ -507,13 +554,23 @@ def generateDatasetImports(projectId, dataType):
                 data = parseClinicalDataset(projectId, configuration, dataDir)
                 if data is not None:
                     dataRows = extractSubjectClinicalVariablesRelationships(data)
-                    generateGraphFiles(dataRows,'clinical', projectId, d = dataType)
+                    if dataRows is not None:
+                        generateGraphFiles(dataRows,'clinical_state', projectId, d = dataType)
+                    dataRows = extractBiologicalSampleClinicalVariablesRelationships(data)
+                    if dataRows is not None:
+                        generateGraphFiles(dataRows,'clinical_quant', projectId, d = dataType)
                     dataRows = extractSubjectGroupRelationships(data)
                     if dataRows is not None:
                         generateGraphFiles(dataRows,'groups', projectId, d = dataType)
                     dataRows = extractSubjectDiseaseRelationships(data)
                     if dataRows is not None:
                         generateGraphFiles(dataRows,'disease', projectId, d = dataType)
+                    dataRows = extractTimepoints(data)
+                    if dataRows is not None:
+                        generateGraphFiles(dataRows, 'timepoint', projectId, d = dataType)
+                    dataRows = extractBiologicalSampleTimepointRelationships(data)
+                    if dataRows is not None:
+                        generateGraphFiles(dataRows,'biological_sample_timepoint', projectId, d = dataType)
             elif dataType == "proteomics":
                 data = parseProteomicsDataset(projectId, configuration, dataDir)
                 if data is not None:

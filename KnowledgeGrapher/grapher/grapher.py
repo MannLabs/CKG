@@ -221,10 +221,10 @@ def updateDB(driver, imports=None):
         except ckgError.Error as err:
             logger.error("{}> {}.\nQuery:{}".format(i, err, statement))
 
-def partialUpdateDB(dataset):
+def partialUpdateDB(datasets):
     driver = graph_controller.getGraphDatabaseConnectionConfiguration()
-    updateDB(driver, imports=[dataset])
-    archiveImportDirectory(archive_type="partial")
+    updateDB(driver, imports=datasets)
+    #archiveImportDirectory(archive_type="partial")
 
 def populateDB():
     imports = config.graph
@@ -245,6 +245,6 @@ def archiveImportDirectory(archive_type="full"):
     utils.compress_directory(folder_to_backup, dest_folder, file_name)
 
 if __name__ == "__main__":
-    populateDB()
-    #partialUpdateDB(dataset="experiment")
+    #populateDB()
+    partialUpdateDB(datasets=["project","experiment"])
 

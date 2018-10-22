@@ -77,7 +77,6 @@ def experimentsImport(projects=None, n_jobs=1):
     experimentsImportDirectory = econfig.experimentsImportDirectory
     utils.checkDirectory(experimentsImportDirectory)
     experimentsDirectory = econfig.experimentsDir
-    print("Experiments:",experimentsDirectory)
     if projects is None:
         projects = utils.listDirectoryFolders(experimentsDirectory)
     Parallel(n_jobs=n_jobs)(delayed(experimentImport)(experimentsImportDirectory, experimentsDirectory, project) for project in projects)
