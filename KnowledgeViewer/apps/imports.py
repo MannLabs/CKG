@@ -1,3 +1,9 @@
+from KnowledgeViewer.plots import basicFigures as figure
+#Dash
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+
 #Plotly imports
 import plotly.plotly as py
 from IPython.display import display
@@ -11,6 +17,7 @@ import numpy as np
 from operator import itemgetter
 from itertools import chain
 from collections import defaultdict
+from natsort import natsorted, ns
 
 
 def get_stats_data(filename):
@@ -29,14 +36,17 @@ def get_databases_entities_relationships(stats_file, options='all'):
     d_dat = defaultdict(list)
     for k, v in dat: d_dat[k].append(v)
     d_dat = {k:tuple(v) for k, v in d_dat.items()}
+    d_dat = dict(natsorted(d_dat.items()))
 
     d_ent = defaultdict(list)
     for k, v in ent: d_ent[v].append(k)
     d_ent = {k:tuple(v) for k, v in d_ent.items()}
+    d_ent = dict(natsorted(d_ent.items()))
 
     d_rel = defaultdict(list)
     for k, v in rel: d_rel[v].append(k)
     d_rel = {k:tuple(v) for k, v in d_rel.items()}
+    d_rel = dict(natsorted(d_rel.items()))
 
     for i in stats_file['dataset'].unique():
         if i not in d_ent.keys(): d_ent[i] = ''
@@ -45,6 +55,7 @@ def get_databases_entities_relationships(stats_file, options='all'):
     d_dbs_filename = defaultdict(list)
     for k,v in chain(d_ent.items(), d_rel.items()): d_dbs_filename[k].append(v)
     d_dbs_filename = {k:tuple(v) for k, v in d_dbs_filename.items()}
+    d_dbs_filename = dict(natsorted(d_dbs_filename.items()))
 
     if options == 'entities': return d_ent
     if options == 'relationships': return d_rel
@@ -75,14 +86,14 @@ def get_dropdown_menu(fig, options_dict, entities_dict=None, number_traces=2):
             temp_dict = dict(label = str(i),
                              method = 'update',
                              args = [{'visible': visible},
-                                     {'title': i}])
+                                     {'title': 'Date: '+i}])
             list_updatemenus.append(temp_dict)
 
             updatemenus = list([dict(active = -1,
                                  buttons = list_updatemenus,
                                  direction='down',
                                  pad={'r':10, 't':10},
-                                 showactive=True,x=-0.3,xanchor='left',y=1.25,yanchor='top'),])
+                                 showactive=True,x=-0.3,xanchor='left',y=1.15,yanchor='top'),])
 
     else:
         list_updatemenus = []
@@ -105,14 +116,14 @@ def get_dropdown_menu(fig, options_dict, entities_dict=None, number_traces=2):
             temp_dict = dict(label = str(i),
                              method = 'update',
                              args = [{'visible': visible},
-                                     {'title': i}])
+                                     {'title': 'Database: '+i}])
             list_updatemenus.append(temp_dict)
 
             updatemenus = list([dict(active = -1,
                                  buttons = list_updatemenus,
                                  direction='down',
                                  pad={'r':10, 't':10},
-                                 showactive=True,x=-0.3,xanchor='left',y=1.25,yanchor='top'),])
+                                 showactive=True,x=-0.3,xanchor='left',y=1.15,yanchor='top'),])
 
     return updatemenus
 
@@ -142,7 +153,7 @@ def get_totals_per_date(stats_file, import_types=False):
     return df
 
 def get_imports_per_database_date(stats_file):
-    cols = ['date', 'database', 'entities', 'relationships', 'total']
+    cols = ['date', 'database', 'entity', 'relationships', 'total']
     counts = []
     for i in stats_file['date'].unique():
         for j in stats_file['dataset'].unique():
@@ -162,72 +173,68 @@ def get_imports_per_database_date(stats_file):
 
     return df
 
-def plot_lines(data):
-    traces = [go.Scatter(x=data.index, y=data[col], name = col, mode='markers+lines') for col in data.columns]
-    return traces
 
-def plot_markers(data):
-    traces = [go.Scatter(x = data.index, y = data[col], name = col, mode = 'markers', marker = dict(size = data[col].values/(10^10000),
-                                                                                            sizemode = 'area')) for col in data.columns]
-    return traces
-
-def plot_bars(data, horizontal=False):
-    traces = [go.Bar(x = data.index, y = data[col], orientation = 'v', name = col) for col in data.columns]
-
-    if horizontal==True:
-        traces = [go.Bar(x = data[col], y = data.index, orientation = 'h', name = col) for col in data.columns]
-
-    return traces
-
-def plot_total_number_imported(stats_file, plot_title, x_title, y_title):
+def plot_total_number_imported(stats_file, plot_title):
     data = get_totals_per_date(stats_file, import_types=False)
-    traces = plot_lines(data)
+    traces = figure.getPlotTraces(data, type = 'lines')
 
     if type(traces[0]) == list:
         traces = list(chain.from_iterable(traces))
     else: pass
 
-    layout = go.Layout(title = plot_title, xaxis = {'title':x_title}, yaxis = {'title':y_title})
+    layout = go.Layout(title='', yaxis={'title':'Imported entities/relationships'}, height=500,
+    annotations=[dict(text='<b>{}<b>'.format(plot_title), font = dict(family='Arial', size = 18),
+    showarrow=False, xref = 'paper', x=-0.06, xanchor='left', yref = 'paper', y=1.2, yanchor='top')])
+
     fig = go.Figure(data=traces, layout=layout)
 
-    return fig
+    return dcc.Graph(id = 'total imports', figure = fig)
 
-def plot_total_numbers_per_date(stats_file, plot_title, x_title, y_title):
+
+def plot_total_numbers_per_date(stats_file, plot_title):
     data = get_totals_per_date(stats_file, import_types=True)
-    traces = plot_markers(data)
+    traces = figure.getPlotTraces(data, type = 'scaled markers', div_factor=float(10^10000))
 
     if type(traces[0]) == list:
         traces = list(chain.from_iterable(traces))
     else: pass
 
-    layout = go.Layout(title = plot_title, xaxis = {'title':x_title}, yaxis = {'title':y_title})
+    layout = go.Layout(title='', xaxis={'showgrid':True}, yaxis={'title':'Imported entities/relationships'}, height=500, margin=go.Margin(b=100, pad=4),
+    annotations=[dict(text='<b>{}<b>'.format(plot_title), font=dict(family='Arial', size = 18),
+    showarrow=False, xref='paper', x=-0.06, xanchor='left', yref='paper', y=1.2, yanchor='top')])
+
     fig = go.Figure(data=traces, layout=layout)
 
-    return fig
+    return dcc.Graph(id = 'entities-relationships per date', figure = fig)
 
-def plot_databases_numbers_per_date(stats_file, plot_title, x_title, y_title, dropdown=False, dropdown_options='dates'):
+
+def plot_databases_numbers_per_date(stats_file, plot_title, dropdown=False, dropdown_options='dates'):
     dropdown_options = get_databases_entities_relationships(stats_file, options=dropdown_options)
     data = get_imports_per_database_date(stats_file)
 
     traces = []
     for i in dropdown_options.keys():
         df = data.xs(i, level='date')
-        traces.append(plot_bars(df, horizontal=True))
+        traces.append(figure.getPlotTraces(df, type = 'bars', horizontal=True))
 
     if type(traces[0]) == list:
         traces = list(chain.from_iterable(traces))
     else: pass
 
-    layout = go.Layout(title = plot_title, xaxis = {'title':x_title}, yaxis = {'title':y_title})
+    layout = go.Layout(title = '', xaxis = {'title':'Imported entities/relationships'}, height=600, margin=go.Margin(b=100, pad=6),
+    annotations=[dict(text='<b>{}<b>'.format(plot_title), font = dict(family='Arial', size = 18),
+    showarrow=False, xref = 'paper', x=-0.31, xanchor='left', yref = 'paper', y=1.23, yanchor='top')])
+
     fig = go.Figure(data=traces, layout=layout)
 
     if dropdown:
         updatemenus = get_dropdown_menu(fig, dropdown_options, entities_dict=None, number_traces=2)
         fig.layout.update(go.Layout(updatemenus = updatemenus))
 
-    return fig
+    return dcc.Graph(id = 'databases total imports', figure = fig)
 
-def plot_import_numbers_per_database(stats_file, plot_title, x_title, y_title, subplot_titles = ('',''), colors=True, colors_1='entities', colors_2='relationships', dropdown=False, dropdown_options='all'):
+
+def plot_import_numbers_per_database(stats_file, plot_title, subplot_titles = ('',''), colors=True, colors_1='entities', colors_2='relationships', dropdown=False, dropdown_options='all'):
 
     ent = get_databases_entities_relationships(stats_file, options=colors_1)
     rel = get_databases_entities_relationships(stats_file, options=colors_2)
@@ -254,7 +261,7 @@ def plot_import_numbers_per_database(stats_file, plot_title, x_title, y_title, s
                                         y=df.loc[mask, 'file_size'],
                                         mode='markers+lines',
                                         marker = dict(color = ent_colors[entity]),
-                                        name=entity.split('.')[0], legendgroup='entities', showlegend=False),1,2)
+                                        name=entity.split('.')[0], legendgroup='entities', showlegend=False),2,1)
 
         for database in dropdown_options.keys():
             df = stats_file[(stats_file['dataset'] == database) & (stats_file['Import_type'] == 'relationships')]
@@ -265,7 +272,7 @@ def plot_import_numbers_per_database(stats_file, plot_title, x_title, y_title, s
                                         y=df.loc[mask, 'Imported_number'],
                                         mode='markers+lines',
                                         marker = dict(color = rel_colors[relationship]),
-                                        name=relationship.split('.')[0], legendgroup='relationships'),2,1)
+                                        name=relationship.split('.')[0], legendgroup='relationships'),1,2)
                 fig.append_trace(go.Scatter(visible = False,
                                         x=df.loc[mask, 'date'],
                                         y=df.loc[mask, 'file_size'],
@@ -274,10 +281,12 @@ def plot_import_numbers_per_database(stats_file, plot_title, x_title, y_title, s
                                         name=relationship.split('.')[0], legendgroup='relationships', showlegend=False),2,2)
 
 
-    fig.layout.update(go.Layout(title=plot_title, xaxis={'title':x_title}, yaxis={'title':y_title}, legend={'orientation':'v'}))
+    fig.layout.update(go.Layout(title='', legend={'orientation':'v'}, height=600,
+    annotations=[dict(text='<b>{}<b>'.format(plot_title), font = dict(family='Arial', size = 18),
+    showarrow=False, xref = 'paper', x=-0.31, xanchor='left', yref = 'paper', y=1.23, yanchor='top')]))
 
     if dropdown:
         updatemenus = get_dropdown_menu(fig, dropdown_options, entities_dict=ent)
         fig.layout.update(go.Layout(updatemenus = updatemenus))
 
-    return fig
+    return dcc.Graph(id = 'imports-breakdown per database', figure = fig)

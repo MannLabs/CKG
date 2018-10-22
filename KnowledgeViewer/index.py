@@ -6,9 +6,9 @@ from app import app
 from apps import initialApp, projectApp, importsApp
 
 
-app.layout = html.Div([ 
+app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
-    html.Div(id='page-content')
+    html.Div(id='page-content', style={'padding-top':50})
 ])
 
 
@@ -24,11 +24,11 @@ def display_page(pathname):
 
             return project.getLayout()
         elif pathname.startswith('/apps/imports'):
-            imports = importsApp.ImportsApp("CKG database monitoring", "Statistics", "", layout = [], logo = None, footer = None)
+            imports = importsApp.ImportsApp("CKG imports monitoring", "Statistics", "", layout = [], logo = None, footer = None)
             return imports.getLayout()
         else:
             return '404'
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=True, port=8889)
