@@ -92,8 +92,8 @@ def get_dropdown_menu(fig, options_dict, entities_dict=None, number_traces=2):
             updatemenus = list([dict(active = -1,
                                  buttons = list_updatemenus,
                                  direction='down',
-                                 pad={'r':10, 't':10},
-                                 showactive=True,x=-0.3,xanchor='left',y=1.15,yanchor='top'),])
+                                 #pad={'r':10, 't':10},
+                                 showactive=True,x=-0.17,xanchor='left',y=1.1,yanchor='top'),])
 
     else:
         list_updatemenus = []
@@ -122,8 +122,8 @@ def get_dropdown_menu(fig, options_dict, entities_dict=None, number_traces=2):
             updatemenus = list([dict(active = -1,
                                  buttons = list_updatemenus,
                                  direction='down',
-                                 pad={'r':10, 't':10},
-                                 showactive=True,x=-0.3,xanchor='left',y=1.15,yanchor='top'),])
+                                 #pad={'r':10, 't':10},
+                                 showactive=True,x=-0.07,xanchor='left',y=1.2,yanchor='top'),])
 
     return updatemenus
 
@@ -182,9 +182,9 @@ def plot_total_number_imported(stats_file, plot_title):
         traces = list(chain.from_iterable(traces))
     else: pass
 
-    layout = go.Layout(title='', yaxis={'title':'Imported entities/relationships'}, height=500,
+    layout = go.Layout(title='', yaxis={'title':'Imported entities/relationships'}, height=500, margin=go.layout.Margin(l=80,r=40,t=80,b=100),
     annotations=[dict(text='<b>{}<b>'.format(plot_title), font = dict(family='Arial', size = 18),
-    showarrow=False, xref = 'paper', x=-0.06, xanchor='left', yref = 'paper', y=1.2, yanchor='top')])
+    showarrow=False, xref = 'paper', x=-0.06, xanchor='left', yref = 'paper', y=1.15, yanchor='top')])
 
     fig = go.Figure(data=traces, layout=layout)
 
@@ -199,9 +199,9 @@ def plot_total_numbers_per_date(stats_file, plot_title):
         traces = list(chain.from_iterable(traces))
     else: pass
 
-    layout = go.Layout(title='', xaxis={'showgrid':True}, yaxis={'title':'Imported entities/relationships'}, height=500, margin=go.Margin(b=100, pad=4),
+    layout = go.Layout(title='', xaxis={'showgrid':True}, yaxis={'title':'Imported entities/relationships'}, height=500, margin=go.layout.Margin(l=80,r=40,t=80,b=100),
     annotations=[dict(text='<b>{}<b>'.format(plot_title), font=dict(family='Arial', size = 18),
-    showarrow=False, xref='paper', x=-0.06, xanchor='left', yref='paper', y=1.2, yanchor='top')])
+    showarrow=False, xref='paper', x=-0.06, xanchor='left', yref='paper', y=1.15, yanchor='top')])
 
     fig = go.Figure(data=traces, layout=layout)
 
@@ -221,9 +221,9 @@ def plot_databases_numbers_per_date(stats_file, plot_title, dropdown=False, drop
         traces = list(chain.from_iterable(traces))
     else: pass
 
-    layout = go.Layout(title = '', xaxis = {'title':'Imported entities/relationships'}, height=600, margin=go.Margin(b=100, pad=6),
+    layout = go.Layout(title = '', xaxis = {'title':'Imported entities/relationships'}, height=600, margin=go.layout.Margin(l=170,r=40,t=80,b=100),
     annotations=[dict(text='<b>{}<b>'.format(plot_title), font = dict(family='Arial', size = 18),
-    showarrow=False, xref = 'paper', x=-0.31, xanchor='left', yref = 'paper', y=1.23, yanchor='top')])
+    showarrow=False, xref = 'paper', x=-0.17, xanchor='left', yref = 'paper', y=1.2, yanchor='top')])
 
     fig = go.Figure(data=traces, layout=layout)
 
@@ -240,7 +240,7 @@ def plot_import_numbers_per_database(stats_file, plot_title, subplot_titles = ('
     rel = get_databases_entities_relationships(stats_file, options=colors_2)
     dropdown_options = get_databases_entities_relationships(stats_file, options=dropdown_options)
 
-    fig = tools.make_subplots(2, 2, subplot_titles = subplot_titles)
+    fig = tools.make_subplots(2,2)
 
     if colors:
         ent_colors = set_colors(ent)
@@ -281,9 +281,18 @@ def plot_import_numbers_per_database(stats_file, plot_title, subplot_titles = ('
                                         name=relationship.split('.')[0], legendgroup='relationships', showlegend=False),2,2)
 
 
-    fig.layout.update(go.Layout(title='', legend={'orientation':'v'}, height=600,
-    annotations=[dict(text='<b>{}<b>'.format(plot_title), font = dict(family='Arial', size = 18),
-    showarrow=False, xref = 'paper', x=-0.31, xanchor='left', yref = 'paper', y=1.23, yanchor='top')]))
+    fig.layout.update(go.Layout(legend={'orientation':'v'}, height=600, margin=go.layout.Margin(l=40,r=20,t=170,b=20)))
+
+    annotations = []
+    annotations.append(dict(text='<b>{}<b>'.format(plot_title), font = dict(family='Arial', size = 18),
+    showarrow=False, xref = 'paper', x=-0.07, xanchor='left', yref = 'paper', y=1.3, yanchor='top'))
+    annotations.append({'font':{'size': 14},'showarrow':False,'text':subplot_titles[0],'x':0.23,'xanchor':'center','xref':'paper','y':1.0,'yanchor':'bottom','yref':'paper'})
+    annotations.append({'font':{'size': 14},'showarrow':False,'text':subplot_titles[1],'x':0.78,'xanchor':'center','xref':'paper','y':1.0,'yanchor':'bottom','yref':'paper'})
+    annotations.append({'font':{'size': 14},'showarrow':False,'text':subplot_titles[2],'x':0.23,'xanchor':'center','xref':'paper','y':0.44,'yanchor':'bottom','yref':'paper'})
+    annotations.append({'font':{'size': 14},'showarrow':False,'text':subplot_titles[3],'x':0.78,'xanchor':'center','xref':'paper','y':0.44,'yanchor':'bottom','yref':'paper'})
+
+    fig.layout['annotations'] = annotations
+
 
     if dropdown:
         updatemenus = get_dropdown_menu(fig, dropdown_options, entities_dict=ent)
