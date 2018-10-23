@@ -12,11 +12,16 @@ from datetime import datetime
 import pandas as pd
 from joblib import Parallel, delayed
 import grapher_config as config
-import KnowledgeConnector.graph_config as gconfig
+import KnowledgeConnector.graph_config as graph_config
 from KnowledgeGrapher.ontologies import ontologies_controller as oh, ontologies_config as oconfig
 from KnowledgeGrapher.databases import databases_controller as dh, databases_config as dbconfig
 from KnowledgeGrapher.experiments import experiments_controller as eh, experiments_config as econfig
 from KnowledgeGrapher import utils
+import logging
+import logging.config
+
+log_config = graph_config.log
+logger = utils.setup_logging(log_config, key="importer")
 
 START_TIME = datetime.now()
 
@@ -107,15 +112,32 @@ def fullImport():
     experiments. The first step is to check if the stats object exists
     and create it otherwise. Calls setupStats.
     """
-    importDirectory = config.importDirectory
-    utils.checkDirectory(importDirectory)
-    setupStats()
-    ontologiesImport(importDirectory)
-    print(datetime.now() - START_TIME)
-    databasesImport(importDirectory, n_jobs=4)
-    print(datetime.now() - START_TIME)
-    experimentsImport(n_jobs=4)
-    print(datetime.now() - START_TIME)
+    try:
+        importDirectory = config.importDirectory
+        utils.checkDirectory(importDirectory)
+        setupStats()
+        ontologiesImport(importDirectory)
+        print(datetime.now() - START_TIME)
+        databasesImport(importDirectory, n_jobs=4)
+        print(datetime.now() - START_TIME)
+        experimentsImport(n_jobs=4)
+        print(datetime.now() - START_TIME)
+    except EOFError as err:
+        logger.error("{} > {}.".format("full import >", err))
+    except IOError as err:
+        logger.error("{} > {}.".format("full import >", err))
+    except IndexError as err:
+        logger.error("{} > {}.".format("full import >", err))
+    except KeyError as err:
+        logger.error("{} > {}.".format("full import >", err))
+    except MemoryError as err:
+        logger.error("{} > {}.".format("full import >", err))
+    except OSError as err:
+        logger.error("{} > {}.".format("full import >", err))
+    except FileNotFoundError as err:
+        logger.error("{} > {}.".format("full import >", err))
+    except Exception as err:
+        logger.error("{} > {}.".format("full import >", err))
 
 def generateStatsDataFrame(stats):
     """
@@ -127,6 +149,7 @@ def generateStatsDataFrame(stats):
         statsDf: pandas dataframe with the collected statistics
     """
     statsDf = pd.DataFrame.from_records(list(stats), columns=config.statsCols)
+    
     return statsDf
 
 def setupStats():
@@ -138,10 +161,13 @@ def setupStats():
     statsFile = os.path.join(statsDirectory, config.statsFile)
     statsCols = config.statsCols
     statsName = getStatsName()
-    if not os.path.exists(statsDirectory) or not os.path.isfile(statsFile):
-        if not os.path.exists(statsDirectory):
-            os.makedirs(statsDirectory)
-        createEmptyStats(statsCols, statsFile, statsName)
+    try:
+        if not os.path.exists(statsDirectory) or not os.path.isfile(statsFile):
+            if not os.path.exists(statsDirectory):
+                os.makedirs(statsDirectory)
+            createEmptyStats(statsCols, statsFile, statsName)
+    except Exception as err:
+        logger.error("{} > {}.".format("Setting up Stats file >", err))
 
 def createEmptyStats(statsCols, statsFile, statsName):
     """
@@ -152,10 +178,13 @@ def createEmptyStats(statsCols, statsFile, statsName):
         statsFile (string): path where the object should be stored
         statsName (string): name if the file containing the stats object
     """
-    statsDf = pd.DataFrame(columns=statsCols)
-    hdf = pd.HDFStore(statsFile)
-    hdf.put(statsName, statsDf, format='table', data_columns=True, min_itemsize=2000)
-    hdf.close()
+    try:
+        statsDf = pd.DataFrame(columns=statsCols)
+        hdf = pd.HDFStore(statsFile)
+        hdf.put(statsName, statsDf, format='table', data_columns=True, min_itemsize=2000)
+        hdf.close()
+    except Exception as err:
+        logger.error("{} > {}.".format("Writing Stats file >", err))
 
 def loadStats(statsFile):
     """
@@ -167,10 +196,15 @@ def loadStats(statsFile):
                                 stats can be accessed using a key
                                 (i.e stats_ version)
     """
-    hdf = None
-    if os.path.isfile(statsFile):
-        hdf = pd.HDFStore(statsFile)
+    try:
+        hdf = None
+        if os.path.isfile(statsFile):
+            hdf = pd.HDFStore(statsFile)
+    except Exception as err:
+        logger.error("{} > {}.".format("Loading Stats file >", err))
+
     return hdf
+
 def writeStats(statsDf, statsName=None):
     """
     Appends the new collected statistics to the existing stats object.
@@ -180,13 +214,16 @@ def writeStats(statsDf, statsName=None):
         statsName (string): If the statistics should be stored with a
                             specific name
     """
-    statsDirectory = config.statsDirectory
-    statsFile = os.path.join(statsDirectory, config.statsFile)
-    if statsName is None:
-        statsName = getStatsName()
-    hdf = loadStats(statsFile)
-    hdf.append(statsName, statsDf, min_itemsize=2000)
-    hdf.close()
+    try:
+        statsDirectory = config.statsDirectory
+        statsFile = os.path.join(statsDirectory, config.statsFile)
+        if statsName is None:
+            statsName = getStatsName()
+        hdf = loadStats(statsFile)
+        hdf.append(statsName, statsDf, min_itemsize=2000)
+        hdf.close()
+    except Exception as err:
+        logger.error("{} > {}.".format("Writing Stats file >", err))
 
 def getStatsName():
     """
@@ -195,7 +232,7 @@ def getStatsName():
     Returns:
         statsName (string): key used to store in the stats object.
     """
-    version = gconfig.version
+    version = graph_config.version
     statsName = 'stats_'+ str(version).replace('.', '_')
 
     return statsName

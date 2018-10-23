@@ -10,7 +10,7 @@ import logging
 import logging.config
 
 log_config = graph_config.log
-logger = utils.setup_logging(log_config)
+logger = utils.setup_logging(log_config, key="grapher")
 
 START_TIME = datetime.now()
 
@@ -19,7 +19,6 @@ def updateDB(driver, imports=None):
         imports = config.graph
     
     for i in imports:
-        print(i)
         try:
             importDir = os.path.join(os.getcwd(),config.databasesDirectory)
             #Get the cypher queries to build the graph
@@ -219,7 +218,7 @@ def updateDB(driver, imports=None):
                             #print(statement+';')
                             graph_controller.sendQuery(driver, statement+';')
         except ckgError.Error as err:
-            logger.error("{}> {}.\nQuery:{}".format(i, err, statement))
+            logger.error("{} > {}.\n Query:{}".format(i, err, statement))
 
 def partialUpdateDB(datasets):
     driver = graph_controller.getGraphDatabaseConnectionConfiguration()

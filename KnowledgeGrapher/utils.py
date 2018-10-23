@@ -1,6 +1,6 @@
 import certifi
 import urllib3
-from ftplib import FTP
+import ftplib
 import json
 import urllib
 from Bio import Entrez
@@ -39,7 +39,7 @@ def downloadDB(databaseURL, extraFolder ="", user="", password=""):
         if databaseURL.startswith('ftp:'):
             domain = databaseURL.split('/')[2]
             ftp_file = '/'.join(databaseURL.split('/')[3:])
-            with FTP(domain) as ftp:
+            with ftplib.FTP(domain) as ftp:
                 ftp.login(user=user, passwd = password)
                 ftp.retrbinary("RETR " + ftp_file ,  open(os.path.join(directory, fileName), mode).write)
         else:
@@ -47,23 +47,30 @@ def downloadDB(databaseURL, extraFolder ="", user="", password=""):
             response = http.request("GET", databaseURL)
             with open(os.path.join(directory, fileName), mode) as out:
                 out.write(response.data)
-    except urllib3.exceptions.HTTPError:
-        print("The site could not be reached", databaseURL)
+    except urllib3.exceptions.HTTPError as err:
+        raise urllib3.exceptions.HTTPError("The site could not be reached. {}.\nURL:{}".format(err,databaseURL))
     except urllib3.exceptions.InvalidHeader:
-        print("Invalid HTTP header provided", databaseURL)
+        raise urllib3.exceptions.InvalidHeader("Invalid HTTP header provided. {}.\nURL:{}".format(err,databaseURL))
     except urllib3.exceptions.ConnectTimeoutError:
-        print("Connection timeout requesting URL", databaseURL)
+        raise urllib3.exceptions.ConnectTimeoutError("Connection timeout requesting URL. {}.\nURL:{}".format(err,databaseURL))
     except urllib3.exceptions.ConnectionError:
-        print("Protocol error when downloading ", databaseURL)
+        raise urllib3.exceptions.ConnectionError("Protocol error when downloading. {}.\nURL:{}".format(err,databaseURL))
     except urllib3.exceptions.DecodeError:
-        print("Decoder error when downloading ", databaseURL)
+        raise urllib3.exceptions.DecodeError("Decoder error when downloading. {}.\nURL:{}".format(err,databaseURL))
     except urllib3.exceptions.SecurityWarning:
-        print("Security warning when downloading ", databaseURL)
+        raise urllib3.exceptions.SecurityWarning("Security warning when downloading. {}.\nURL:{}".format(err,databaseURL))
     except urllib3.exceptions.ProtocolError:
-        print("Protocol error when downloading", databaseURL)
-    except Exception as e:
-        print("Something went wrong", str(e))
-        pass
+        raise urllib3.exceptions.ProtocolError("Protocol error when downloading. {}.\nURL:{}".format(err,databaseURL))
+    except ftplib.error_reply as err:
+        raise ftplib.error_reply("Exception raised when an unexpected reply is received from the server. {}.\nURL:{}".format(err,databaseURL))
+    except ftplib.error_temp as err:
+        raise ftplib.error_temp("Exception raised when an error code signifying a temporary error. {}.\nURL:{}".format(err,databaseURL))
+    except ftplib.error_perm as err:
+        raise ftplib.error_perm("Exception raised when an error code signifying a permanent error. {}.\nURL:{}".format(err,databaseURL))
+    except ftplib.error_proto:
+        raise ftplib.error_proto("Exception raised when a reply is received from the server that does not fit the response specifications of the File Transfer Protocol. {}.\nURL:{}".format(err,databaseURL))
+    except Exception as err:
+        raise Exception("Something went wrong. {}.\nURL:{}".format(err,databaseURL))
 
 def searchPubmed(searchFields, sortby = 'relevance', num ="10", resultsFormat = 'json'):
     pubmedQueryUrl = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=TERM&retmode=json&retmax=NUM'
@@ -76,16 +83,22 @@ def searchPubmed(searchFields, sortby = 'relevance', num ="10", resultsFormat = 
         response = urllib3.urlopen(urllib.quote_plus(url))
         jsonResponse = response.read()
         resultDict = json.loads(jsonResponse)
-    except urllib3.exceptions.HTTPError:
-        print("The site could not be reached", url)
+    except urllib3.exceptions.HTTPError as err:
+        raise urllib3.exceptions.HTTPError("The site could not be reached. {}.\nURL:{}".format(err,databaseURL))
     except urllib3.exceptions.InvalidHeader:
-        print("Invalid HTTP header provided", url)
+        raise urllib3.exceptions.InvalidHeader("Invalid HTTP header provided. {}.\nURL:{}".format(err,databaseURL))
     except urllib3.exceptions.ConnectTimeoutError:
-        print("Connection timeout requesting URL", url)
-    except OSError:
-        pass
-    except Exception:
-        pass
+        raise urllib3.exceptions.ConnectTimeoutError("Connection timeout requesting URL. {}.\nURL:{}".format(err,databaseURL))
+    except urllib3.exceptions.ConnectionError:
+        raise urllib3.exceptions.ConnectionError("Protocol error when downloading. {}.\nURL:{}".format(err,databaseURL))
+    except urllib3.exceptions.DecodeError:
+        raise urllib3.exceptions.DecodeError("Decoder error when downloading. {}.\nURL:{}".format(err,databaseURL))
+    except urllib3.exceptions.SecurityWarning:
+        raise urllib3.exceptions.SecurityWarning("Security warning when downloading. {}.\nURL:{}".format(err,databaseURL))
+    except urllib3.exceptions.ProtocolError:
+        raise urllib3.exceptions.ProtocolError("Protocol error when downloading. {}.\nURL:{}".format(err,databaseURL))
+    except Exception as err:
+        raise Exception("Something went wrong. {}.\nURL:{}".format(err,databaseURL))
 
     result = []
     if 'esearchresult' in resultDict:
