@@ -55,7 +55,7 @@ def parseInternalDatabasePairs(qtype, mapping, download=True):
                 
     return relationships
 
-def parsePMClist(download=False):
+def parsePMClist(download=True):
     url = iconfig.PMC_db_url
     plinkout = iconfig.pubmed_linkout
     entities = set()

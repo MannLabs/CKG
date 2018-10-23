@@ -196,6 +196,15 @@ def parseDatabase(importDirectory,database):
             corum_outputfile = os.path.join(importDirectory, database+"_"+entity.lower()+"_"+relationship.lower()+".csv")
             write_relationships(relationships[(entity,relationship)], relationships_headers[entity], corum_outputfile)
             stats.add(utils.buildStats(len(relationships[(entity,relationship)]), "relationships", relationship, database, corum_outputfile))
+    elif database.lower() == "foodb":
+        entities, relationships, entities_header, relationships_headers = foodbParser.parser()
+        entity_outputfile = os.path.join(importDirectory, "Food.csv")
+        write_entities(entities, entities_header, entity_outputfile)
+        stats.add(utils.buildStats(len(entities), "entity", "Food", database, entity_outputfile))
+        for entity, relationship in relationships:
+            foodb_outputfile = os.path.join(importDirectory, database+"_"+entity.lower()+"_"+relationship.lower()+".csv")
+            write_relationships(relationships[(entity,relationship)], relationships_headers[entity], foodb_outputfile)
+            stats.add(utils.buildStats(len(relationships[(entity,relationship)]), "relationships", relationship, database, foodb_outputfile))
     return stats
     
 
