@@ -146,6 +146,13 @@ def updateDB(driver, imports=None):
                     for statement in metaboliteImportCode.replace("IMPORTDIR", importDir).replace("SOURCE", source.lower()).split(';')[0:-1]:
                         #print(statement+';')
                         graph_controller.sendQuery(driver, statement+';')
+            #Food
+            elif 'food' == i:
+                foodImportCode = cy.IMPORT_FOOD_DATA
+                for source in config.food_resources:
+                    for statement in foodImportCode.replace("IMPORTDIR", importDir).replace("SOURCE", source.lower()).split(';')[0:-1]:
+                        print(statement+';')
+                        graph_controller.sendQuery(driver, statement+';')
             #GWAS
             elif "gwas" == i:
                 code = cy.IMPORT_GWAS

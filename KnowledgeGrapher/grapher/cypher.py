@@ -292,6 +292,19 @@ IMPORT_METABOLITE_DATA = '''
                         MERGE (m)-[:ASSOCIATED_WITH]->(t);
                         '''
 
+IMPORT_FOOD_DATA =  ''' 
+                        CREATE CONSTRAINT ON (f:Food) ASSERT f.id IS UNIQUE; 
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Food.csv" AS line
+                        MERGE (f:Food{id:line.ID})
+                        ON CREATE SET f.name=line.name,f.scientific_name=line.scientific_name,f.description=line.description,f.group=line.group,f.subgroup=line.subgroup,f.source=line.source;
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/SOURCE_food_has_content.csv" AS line
+                        MATCH (f:Food{id:line.START_ID})
+                        MATCH (m:Metabolite{id:line.END_ID}) 
+                        MERGE (f)-[:HAS_CONTENT{minimum:line.min,maximum:line.max,average:line.average,units:line.units,source:line.source}]->(m);
+                        '''
+
 IMPORT_KNOWN_VARIANT_DATA = '''
                             CREATE CONSTRAINT ON (k:Known_variant) ASSERT k.id IS UNIQUE; 
                             USING PERIODIC COMMIT 10000

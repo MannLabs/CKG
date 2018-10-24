@@ -35,6 +35,7 @@ graph = ["ontologies",
          "side effects",
          'pathway',
          'metabolite',
+         'food',
          "gwas",
          "published",
          "project",
@@ -71,6 +72,9 @@ pathway_resources = ["PathwayCommons"]
 
 #Metabolites
 metabolite_resources = ["hmdb"]
+
+#Food
+food_resources = ['FooDB']
 
 #Internal Databases entities
 internalEntities = [("Protein","Disease"), ("Protein", "Tissue"), ("Protein","Cellular_component")]

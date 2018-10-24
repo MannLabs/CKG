@@ -38,10 +38,10 @@ def parser(download=True):
                 food = parseFood(f)
             elif file_name == "compounds.csv":
                 compounds = parseCompounds(f)
-    for food, compound in contents:
-        if compound in compounds:
-            compound_code = compounds[compound]
-            relationships[("food", "has_content")].add((food, compound_code, "HAS_CONTENT") + contents[(food, compound)])
+    for food_id, compound_id in contents:
+        if compound_id in compounds:
+            compound_code = compounds[compound_id].replace("HMDB","HMDB00")
+            relationships[("food", "has_content")].add((food_id, compound_code, "HAS_CONTENT") + contents[(food_id, compound_id)])
     
     return food, relationships, entities_header, relationships_headers
 
@@ -53,38 +53,45 @@ def parseContents(fhandler):
             first = False
             continue
         data = line.rstrip("\r\n").split(",")
-        compound_id = data[0]
-        food_id = data[3]
-        min_cont = data[11]
-        max_cont = data[12]
-        units = data[13]
-        average = data[23]
-        
-        contents[(food_id, compound_id)] = (min_cont, max_cont, units, average, "FooDB")
-
+        if len(data) == 24:
+            compound_id = data[0]
+            food_id = int(data[3])
+            min_cont = float(data[11]) if data[11] != 'NULL' else 0 
+            max_cont = float(data[12]) if data[12] != 'NULL' else 0
+            units = data[13].replace('"', '')
+            average = float(data[23]) if data[23] != 'NULL' else 0
+            
+            contents[(food_id, compound_id)] = (min_cont, max_cont, average, units, "FooDB")
     return contents
 
 
 def parseFood(fhandler):
     food = set()
-    df = pd.read_csv(fhandler, sep=',', header=None, error_bad_lines=False,low_memory=False)
+    df = pd.read_csv(fhandler, sep=',', header=None, error_bad_lines=False, low_memory=False)
+    first = True
     for index, row in df.iterrows():
-        food_id = row[0]
+        if first:
+            first = False
+            continue
+        food_id = int(row[0])
         name= row[1]
         sci_name = row[2]
         description = row[3]
         group = row[11]
         subgroup = row[12]
         food.add((food_id, name, sci_name, description, group, subgroup, "FooDB"))
-
     return food
 
 
 def parseCompounds(fhandler):
     compounds = {}
     first = True
-    df = pd.read_csv(fhandler, sep=',', header=None, error_bad_lines=False,low_memory=False)
+    df = pd.read_csv(fhandler, sep=',', header=None, error_bad_lines=False, low_memory=False)
+    first = True
     for index, row in df.iterrows():
+        if first:
+            first = False
+            continue
         compound_id = row[0]
         mapped_code = row[44]
         if str(mapped_code) != 'nan':
