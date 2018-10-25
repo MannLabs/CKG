@@ -12,7 +12,7 @@ from datetime import datetime
 import pandas as pd
 from joblib import Parallel, delayed
 import grapher_config as config
-import KnowledgeConnector.graph_config as graph_config
+import ckg_config as graph_config
 from KnowledgeGrapher.ontologies import ontologies_controller as oh, ontologies_config as oconfig
 from KnowledgeGrapher.databases import databases_controller as dh, databases_config as dbconfig
 from KnowledgeGrapher.experiments import experiments_controller as eh, experiments_config as econfig
@@ -25,7 +25,7 @@ logger = utils.setup_logging(log_config, key="importer")
 
 START_TIME = datetime.now()
 
-def ontologiesImport(importDirectory, ontologies=None):
+def ontologiesImport(importDirectory, ontologies=None, import_type="partial"):
     """
     Generates all the entities and relationships
     from the provided ontologies. If the ontologies list is
@@ -37,15 +37,16 @@ def ontologiesImport(importDirectory, ontologies=None):
         importDirectory (string): path of the import directory where
                                 files will be created
         ontologies (list): A list of ontology names to be imported
+        import_type: type of import (full or partial)
     """
     #Ontologies
     ontologiesImportDirectory = os.path.join(importDirectory, oconfig.ontologiesImportDir)
     utils.checkDirectory(ontologiesImportDirectory)
     stats = oh.generateGraphFiles(ontologiesImportDirectory, ontologies)
     statsDf = generateStatsDataFrame(stats)
-    writeStats(statsDf)
+    writeStats(statsDf, import_type)
 
-def databasesImport(importDirectory, databases=None, n_jobs=1):
+def databasesImport(importDirectory, databases=None, n_jobs=1, import_type="partial"):
     """
     Generates all the entities and relationships
     from the provided databases. If the databases list is
@@ -59,15 +60,16 @@ def databasesImport(importDirectory, databases=None, n_jobs=1):
         databases (list): A list of database names to be imported
         n_jobs (int): Number of jobs to run in parallel. 1 by default
                     when updating one database
+        import_type: type of import (full or partial)
     """
     #Databases
     databasesImportDirectory = os.path.join(importDirectory, dbconfig.databasesImportDir)
     utils.checkDirectory(databasesImportDirectory)
     stats = dh.generateGraphFiles(databasesImportDirectory, databases, n_jobs)
     statsDf = generateStatsDataFrame(stats)
-    writeStats(statsDf)
+    writeStats(statsDf, import_type)
 
-def experimentsImport(projects=None, n_jobs=1):
+def experimentsImport(projects=None, n_jobs=1, import_type="partial"):
     """
     Generates all the entities and relationships
     from the specified Projects. If the projects list is
@@ -77,6 +79,7 @@ def experimentsImport(projects=None, n_jobs=1):
         projects (list): A list of project identifiers to be imported
         n_jobs (int): Number of jobs to run in parallel. 1 by default
                     when updating one project
+        import_type: type of import (full or partial)
     """
     #Experiments
     experimentsImportDirectory = econfig.experimentsImportDirectory
@@ -115,29 +118,32 @@ def fullImport():
     try:
         importDirectory = config.importDirectory
         utils.checkDirectory(importDirectory)
-        setupStats()
-        ontologiesImport(importDirectory)
-        print(datetime.now() - START_TIME)
-        databasesImport(importDirectory, n_jobs=4)
-        print(datetime.now() - START_TIME)
-        experimentsImport(n_jobs=4)
-        print(datetime.now() - START_TIME)
+        setupStats(import_type='full')
+        logger.info("Full import: importing all Ontologies")
+        ontologiesImport(importDirectory, import_type='full')
+        logger.info("Full import: Ontologies import took {}".format(datetime.now() - START_TIME))
+        logger.info("Full import: importing all Databases")
+        databasesImport(importDirectory, n_jobs=4, import_type='full')
+        logger.info("Full import: Databases import took {}".format(datetime.now() - START_TIME))
+        logger.info("Full import: importing all Experiments")
+        experimentsImport(n_jobs=4, import_type='full')
+        logger.info("Full import: Experiments import took {}".format(datetime.now() - START_TIME))
     except EOFError as err:
-        logger.error("{} > {}.".format("full import >", err))
+        logger.error("Full import > {}.".format(err))
     except IOError as err:
-        logger.error("{} > {}.".format("full import >", err))
+        logger.error("Full import > {}.".format(err))
     except IndexError as err:
-        logger.error("{} > {}.".format("full import >", err))
+        logger.error("Full import > {}.".format(err)) 
     except KeyError as err:
-        logger.error("{} > {}.".format("full import >", err))
+        logger.error("Full import > {}.".format(err))
     except MemoryError as err:
-        logger.error("{} > {}.".format("full import >", err))
+        logger.error("Full import > {}.".format(err))
     except OSError as err:
-        logger.error("{} > {}.".format("full import >", err))
+        logger.error("Full import > {}.".format(err))
     except FileNotFoundError as err:
-        logger.error("{} > {}.".format("full import >", err))
+        logger.error("Full import > {}.".format(err))
     except Exception as err:
-        logger.error("{} > {}.".format("full import >", err))
+        logger.error("Full import > {}.".format(err))
 
 def generateStatsDataFrame(stats):
     """
@@ -152,7 +158,7 @@ def generateStatsDataFrame(stats):
     
     return statsDf
 
-def setupStats():
+def setupStats(import_type):
     """
     Creates a stats object that will collect all the statistics collected from
     each import.
@@ -160,14 +166,14 @@ def setupStats():
     statsDirectory = config.statsDirectory
     statsFile = os.path.join(statsDirectory, config.statsFile)
     statsCols = config.statsCols
-    statsName = getStatsName()
+    statsName = getStatsName(import_type)
     try:
         if not os.path.exists(statsDirectory) or not os.path.isfile(statsFile):
             if not os.path.exists(statsDirectory):
                 os.makedirs(statsDirectory)
             createEmptyStats(statsCols, statsFile, statsName)
     except Exception as err:
-        logger.error("{} > {}.".format("Setting up Stats file >", err))
+        logger.error("Setting up Stats object {} in file:{} > {}.".format(statsName, statsFile, err))
 
 def createEmptyStats(statsCols, statsFile, statsName):
     """
@@ -184,7 +190,7 @@ def createEmptyStats(statsCols, statsFile, statsName):
         hdf.put(statsName, statsDf, format='table', data_columns=True, min_itemsize=2000)
         hdf.close()
     except Exception as err:
-        logger.error("{} > {}.".format("Writing Stats file >", err))
+        logger.error("Creating empty Stats object {} in file:{} > {}.".format(statsName, statsFile, err))
 
 def loadStats(statsFile):
     """
@@ -201,11 +207,11 @@ def loadStats(statsFile):
         if os.path.isfile(statsFile):
             hdf = pd.HDFStore(statsFile)
     except Exception as err:
-        logger.error("{} > {}.".format("Loading Stats file >", err))
+        logger.error("Loading Stats object {} in file:{} > {}.".format(stats_name, statsFile, err))
 
     return hdf
 
-def writeStats(statsDf, statsName=None):
+def writeStats(statsDf, import_type, stats_name=None):
     """
     Appends the new collected statistics to the existing stats object.
     Args:
@@ -214,18 +220,18 @@ def writeStats(statsDf, statsName=None):
         statsName (string): If the statistics should be stored with a
                             specific name
     """
-    try:
-        statsDirectory = config.statsDirectory
-        statsFile = os.path.join(statsDirectory, config.statsFile)
-        if statsName is None:
-            statsName = getStatsName()
-        hdf = loadStats(statsFile)
-        hdf.append(statsName, statsDf, min_itemsize=2000)
+    stats_directory = config.statsDirectory
+    stats_file = os.path.join(stats_directory, config.statsFile)
+    try: 
+        if stats_name is None:
+            stats_name = getStatsName(import_type)
+        hdf = loadStats(stats_file)
+        hdf.append(stats_name, statsDf, min_itemsize=2000)
         hdf.close()
     except Exception as err:
-        logger.error("{} > {}.".format("Writing Stats file >", err))
+        logger.error("Writing Stats object {} in file:{} > {}.".format(stats_name, stats_file, err))
 
-def getStatsName():
+def getStatsName(import_type):
     """
     Generates the stats object name where to store the importing
     statistics from the CKG version, which is defined in the configuration.
@@ -233,7 +239,7 @@ def getStatsName():
         statsName (string): key used to store in the stats object.
     """
     version = graph_config.version
-    statsName = 'stats_'+ str(version).replace('.', '_')
+    statsName = import_type+'_stats_'+ str(version).replace('.', '_')
 
     return statsName
 

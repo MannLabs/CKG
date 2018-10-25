@@ -22,7 +22,8 @@ databases = [
             "SIDER",
             "PhosphoSitePlus",
             'CORUM',
-            "FooDB"
+            "FooDB",
+            "Exposome Explorer"
             ]
 
 sources = {

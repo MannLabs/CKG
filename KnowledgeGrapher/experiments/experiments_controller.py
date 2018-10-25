@@ -8,7 +8,12 @@ import os.path
 import pandas as pd
 import numpy as np
 from collections import defaultdict
+import ckg_config as graph_config
+import logging
+import logging.config
 
+log_config = graph_config.log
+logger = utils.setup_logging(log_config, key="experiments_controller")
 
 #########################
 # General functionality # 
@@ -546,81 +551,90 @@ def loadWESDataset(uri, configuration):
 #          Generate graph files        # 
 ########################################
 def generateDatasetImports(projectId, dataType):
-    if dataType in config.dataTypes:
-        if "directory" in config.dataTypes[dataType]:
-            dataDir = config.dataTypes[dataType]["directory"].replace("PROJECTID", projectId)
-            configuration = config.dataTypes[dataType]
-            if dataType == "clinical":
-                data = parseClinicalDataset(projectId, configuration, dataDir)
-                if data is not None:
-                    dataRows = extractSubjectClinicalVariablesRelationships(data)
-                    if dataRows is not None:
-                        generateGraphFiles(dataRows,'clinical_state', projectId, d = dataType)
-                    dataRows = extractBiologicalSampleClinicalVariablesRelationships(data)
-                    if dataRows is not None:
-                        generateGraphFiles(dataRows,'clinical_quant', projectId, d = dataType)
-                    dataRows = extractSubjectGroupRelationships(data)
-                    if dataRows is not None:
-                        generateGraphFiles(dataRows,'groups', projectId, d = dataType)
-                    dataRows = extractSubjectDiseaseRelationships(data)
-                    if dataRows is not None:
-                        generateGraphFiles(dataRows,'disease', projectId, d = dataType)
-                    dataRows = extractTimepoints(data)
-                    if dataRows is not None:
-                        generateGraphFiles(dataRows, 'timepoint', projectId, d = dataType)
-                    dataRows = extractBiologicalSampleTimepointRelationships(data)
-                    if dataRows is not None:
-                        generateGraphFiles(dataRows,'biological_sample_timepoint', projectId, d = dataType)
-            elif dataType == "proteomics":
-                data = parseProteomicsDataset(projectId, configuration, dataDir)
-                if data is not None:
-                    for dtype in data:
-                        if dtype == "proteins":
-                            dataRows = extractProteinSubjectRelationships(data[dtype], configuration[dtype])
-                            generateGraphFiles(dataRows,dtype, projectId)
-                        elif dtype == "peptides":
-                            dataRows = extractPeptideSubjectRelationships(data[dtype], configuration[dtype]) 
-                            generateGraphFiles(dataRows, "subject_peptide", projectId)
-                            dataRows = extractPeptideProteinRelationships(data[dtype], configuration[dtype])
-                            generateGraphFiles(dataRows,"peptide_protein", projectId)
-                            dataRows = extractPeptides(data[dtype], configuration[dtype])
-                            generateGraphFiles(dataRows, dtype, projectId)
-                        else:
-                            #dataRows = extractModificationProteinRelationships(data[dtype], configuration[dtype])
-                            #generateGraphFiles(dataRows,"protein_modification", projectId, ot = 'a')
-                            dataRows = extractProteinModificationSubjectRelationships(data[dtype], configuration[dtype])                
-                            generateGraphFiles(dataRows, "modifiedprotein_subject", projectId, ot = 'a')
-                            dataRows = extractProteinProteinModificationRelationships(data[dtype], configuration[dtype])
-                            generateGraphFiles(dataRows, "modifiedprotein_protein", projectId, ot = 'a')
-                            dataRows = extractProteinModifications(data[dtype], configuration[dtype])
-                            generateGraphFiles(dataRows, "modifiedprotein", projectId, ot = 'a')
-                            dataRows = extractProteinModificationsModification(data[dtype], configuration[dtype])
-                            generateGraphFiles(dataRows, "modifiedprotein_modification", projectId, ot = 'a')
-            elif dataType == "wes":
-                data = parseWESDataset(projectId, configuration, dataDir)
-                if data is not None:
-                    somatic_mutations = pd.DataFrame()
-                    for sample in data:
-                        entities, variantRows, sampleRows, geneRows, chrRows = extractWESRelationships(data[sample], configuration)
-                        generateGraphFiles(variantRows, "somatic_mutation_known_variant", projectId, d = dataType)
-                        generateGraphFiles(sampleRows, "somatic_mutation_sample", projectId, d = dataType)
-                        generateGraphFiles(geneRows, "somatic_mutation_gene", projectId, d = dataType)
-                        generateGraphFiles(chrRows, "somatic_mutation_chromosome", projectId, d = dataType)
-                        if somatic_mutations.empty:
-                            somatic_mutations = entities
-                        else:
-                            new = set(entities.index).difference(set(somatic_mutations.index))
-                            somatic_mutations = somatic_mutations.append(entities.loc[new,:], ignore_index=False)
-                    somatic_mutations = somatic_mutations.reset_index()
-                    generateGraphFiles(somatic_mutations, "somatic_mutation", projectId, d= dataType, ot = 'w')
-            
-def generateGraphFiles(data, dataType, projectId, ot = 'w', d = 'proteomics'):
+    stats = set()
+    try:
+        if dataType in config.dataTypes:
+            if "directory" in config.dataTypes[dataType]:
+                dataDir = config.dataTypes[dataType]["directory"].replace("PROJECTID", projectId)
+                configuration = config.dataTypes[dataType]
+                if dataType == "clinical":
+                    data = parseClinicalDataset(projectId, configuration, dataDir)
+                    if data is not None:
+                        dataRows = extractSubjectClinicalVariablesRelationships(data)
+                        if dataRows is not None:
+                            generateGraphFiles(dataRows,'clinical_state', projectId, stats, d = dataType)
+                        dataRows = extractBiologicalSampleClinicalVariablesRelationships(data)
+                        if dataRows is not None:
+                            generateGraphFiles(dataRows,'clinical_quant', projectId, stats, d = dataType)
+                        dataRows = extractSubjectGroupRelationships(data)
+                        if dataRows is not None:
+                            generateGraphFiles(dataRows,'groups', projectId, stats, d = dataType)
+                        dataRows = extractSubjectDiseaseRelationships(data)
+                        if dataRows is not None:
+                            generateGraphFiles(dataRows,'disease', projectId, stats, d = dataType)
+                        dataRows = extractTimepoints(data)
+                        if dataRows is not None:
+                            generateGraphFiles(dataRows, 'timepoint', projectId, stats, d = dataType)
+                        dataRows = extractBiologicalSampleTimepointRelationships(data)
+                        if dataRows is not None:
+                            generateGraphFiles(dataRows,'biological_sample_timepoint', projectId, stats, d = dataType)
+                elif dataType == "proteomics":
+                    data = parseProteomicsDataset(projectId, configuration, dataDir)
+                    if data is not None:
+                        for dtype in data:
+                            if dtype == "proteins":
+                                dataRows = extractProteinSubjectRelationships(data[dtype], configuration[dtype])
+                                generateGraphFiles(dataRows,dtype, projectId, stats)
+                            elif dtype == "peptides":
+                                dataRows = extractPeptideSubjectRelationships(data[dtype], configuration[dtype]) 
+                                generateGraphFiles(dataRows, "subject_peptide", projectId, stats)
+                                dataRows = extractPeptideProteinRelationships(data[dtype], configuration[dtype])
+                                generateGraphFiles(dataRows,"peptide_protein", projectId, stats)
+                                dataRows = extractPeptides(data[dtype], configuration[dtype])
+                                generateGraphFiles(dataRows, dtype, projectId, stats)
+                            else:
+                                #dataRows = extractModificationProteinRelationships(data[dtype], configuration[dtype])
+                                #generateGraphFiles(dataRows,"protein_modification", projectId, ot = 'a')
+                                dataRows = extractProteinModificationSubjectRelationships(data[dtype], configuration[dtype])                
+                                generateGraphFiles(dataRows, "modifiedprotein_subject", projectId, stats, ot = 'a')
+                                dataRows = extractProteinProteinModificationRelationships(data[dtype], configuration[dtype])
+                                generateGraphFiles(dataRows, "modifiedprotein_protein", projectId, stats, ot = 'a')
+                                dataRows = extractProteinModifications(data[dtype], configuration[dtype])
+                                generateGraphFiles(dataRows, "modifiedprotein", projectId, stats, ot = 'a')
+                                dataRows = extractProteinModificationsModification(data[dtype], configuration[dtype])
+                                generateGraphFiles(dataRows, "modifiedprotein_modification", projectId, stats, ot = 'a')
+                elif dataType == "wes":
+                    data = parseWESDataset(projectId, configuration, dataDir)
+                    if data is not None:
+                        somatic_mutations = pd.DataFrame()
+                        for sample in data:
+                            entities, variantRows, sampleRows, geneRows, chrRows = extractWESRelationships(data[sample], configuration)
+                            generateGraphFiles(variantRows, "somatic_mutation_known_variant", projectId, stats, d = dataType)
+                            generateGraphFiles(sampleRows, "somatic_mutation_sample", projectId, stats, d = dataType)
+                            generateGraphFiles(geneRows, "somatic_mutation_gene", projectId, stats, d = dataType)
+                            generateGraphFiles(chrRows, "somatic_mutation_chromosome", projectId, stats, d = dataType)
+                            if somatic_mutations.empty:
+                                somatic_mutations = entities
+                            else:
+                                new = set(entities.index).difference(set(somatic_mutations.index))
+                                somatic_mutations = somatic_mutations.append(entities.loc[new,:], ignore_index=False)
+                        somatic_mutations = somatic_mutations.reset_index()
+                        generateGraphFiles(somatic_mutations, "somatic_mutation", projectId, stats, d= dataType, ot = 'w')
+    except Exception as err:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        logger.error("Experiment {}: {} file: {}, line: {}".format(projectId, sys.exc_info(), fname, exc_tb.tb_lineno))
+        raise Exception("Error when importing experiment {}.\n {}".format(projectId, err))
+        
+def generateGraphFiles(data, dataType, projectId, stats, ot = 'w', d = 'proteomics'):
     importDir = os.path.join(config.experimentsImportDirectory, os.path.join(projectId,d))
     outputfile = os.path.join(importDir, projectId+"_"+dataType.lower()+".csv")
     with open(outputfile, ot) as f:  
         data.to_csv(path_or_buf = f, 
             header=True, index=False, quotechar='"', 
             line_terminator='\n', escapechar='\\')
+    logger.info("Experiment {} - Number of {} relationships: {}".format(projectId, dataType, data.shape[0]))
+    stats.add(utils.buildStats(data.shape[0], "relationships", dataType, "Experiment", outputfile))
 
 if __name__ == "__main__":
     pass

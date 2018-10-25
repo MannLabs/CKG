@@ -2,7 +2,6 @@ import sys
 import py2neo
 import pandas as pd
 from KnowledgeConnector import graph_config as config
-import ckgError
 
 def getGraphDatabaseConnectionConfiguration():
     host = config.dbURL
@@ -18,15 +17,18 @@ def connectToDB(host="localhost", port=7687, user="neo4j", password="password"):
     try:
         driver = py2neo.Graph(host=host, port=port, user=user, password=password)
     except py2neo.database.DatabaseError as err:
-        raise ckgError.DatabaseError("Database failed to service the request. {}".format(err))
+        raise py2neo.database.DatabaseError("Database failed to service the request. {}".format(err))
     except py2neo.database.ClientError as err:
-        raise ckgError.ClientError("The client sent a bad request. {}".format(err))
+        raise py2neo.ClientError("The client sent a bad request. {}".format(err))
     except py2neo.GraphError as err:
-        raise ckgError.GraphError("{}".format(err))
+        raise py2neo.GraphError("{}".format(err))
     except py2neo.database.TransientError as err:
-        raise ckgError.TransientError("Database cannot service the request right now. {}".format(err))
-    except:
-        raise ckgError.Error("Unexpected error:", sys.exc_info()[0])
+        raise py2neo.TransientError("Database cannot service the request right now. {}".format(err))
+    except Exception as err:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        sys_error = "{}, file: {},line: {}".format(sys.exc_info(), fname, exec_tb.tb_lineno)
+        raise Exception("Unexpected error:{}.\n{}".format(err, sys_err))
 
     return driver
 
@@ -49,15 +51,18 @@ def sendQuery(driver, query):
     try:
         result = driver.run(query)
     except py2neo.database.DatabaseError as err:
-        raise ckgError.DatabaseError("Database failed to service the request. {}".format(err))
+        raise py2neo.database.DatabaseError("Database failed to service the request. {}".format(err))
     except py2neo.database.ClientError as err:
-        raise ckgError.ClientError("The client sent a bad request. {}".format(err))
+        raise py2neo.ClientError("The client sent a bad request. {}".format(err))
     except py2neo.GraphError as err:
-        raise ckgError.GraphError("{}".format(err))
+        raise py2neo.GraphError("{}".format(err))
     except py2neo.database.TransientError as err:
-        raise ckgError.TransientError("Database cannot service the request right now. {}".format(err))
-    except:
-        raise ckgError.Error("Unexpected error: {}".format(sys.exc_info()[0]))
+        raise py2neo.TransientError("Database cannot service the request right now. {}".format(err))
+    except Exception as err:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        sys_error = "{}, file: {},line: {}".format(sys.exc_info(), fname, exec_tb.tb_lineno)
+        raise Exception("Unexpected error:{}.\n{}".format(err, sys_err))
 
     return result
 

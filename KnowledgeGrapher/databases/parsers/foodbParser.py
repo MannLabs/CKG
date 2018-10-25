@@ -35,14 +35,18 @@ def parser(download=True):
             if file_name == "contents.csv":
                 contents = parseContents(f)
             elif file_name == "foods.csv":
-                food = parseFood(f)
+                food, mapping = parseFood(f)
             elif file_name == "compounds.csv":
                 compounds = parseCompounds(f)
     for food_id, compound_id in contents:
         if compound_id in compounds:
             compound_code = compounds[compound_id].replace("HMDB","HMDB00")
             relationships[("food", "has_content")].add((food_id, compound_code, "HAS_CONTENT") + contents[(food_id, compound_id)])
-    
+    with open(os.path.join(directory, "mapping.tsv"), 'w') as out:
+        for food_id in mapping:
+            for alias in mapping[food_id]:
+                out.write(str(food_id)+"\t"+str(alias)+"\n")
+
     return food, relationships, entities_header, relationships_headers
 
 def parseContents(fhandler):
@@ -60,13 +64,13 @@ def parseContents(fhandler):
             max_cont = float(data[12]) if data[12] != 'NULL' else 0
             units = data[13].replace('"', '')
             average = float(data[23]) if data[23] != 'NULL' else 0
-            
             contents[(food_id, compound_id)] = (min_cont, max_cont, average, units, "FooDB")
     return contents
 
 
 def parseFood(fhandler):
     food = set()
+    mapping = defaultdict(set)
     df = pd.read_csv(fhandler, sep=',', header=None, error_bad_lines=False, low_memory=False)
     first = True
     for index, row in df.iterrows():
@@ -80,7 +84,10 @@ def parseFood(fhandler):
         group = row[11]
         subgroup = row[12]
         food.add((food_id, name, sci_name, description, group, subgroup, "FooDB"))
-    return food
+        mapping[food_id].add(name)
+        mapping[food_id].add(sci_name)
+
+    return food, mapping
 
 
 def parseCompounds(fhandler):
@@ -96,7 +103,6 @@ def parseCompounds(fhandler):
         mapped_code = row[44]
         if str(mapped_code) != 'nan':
             compounds[compound_id] = mapped_code
-
     return compounds
             
 if __name__ == "__main__":

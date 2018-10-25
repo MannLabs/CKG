@@ -1,11 +1,11 @@
 import os
 import sys
 from datetime import datetime
-from KnowledgeConnector import graph_controller, graph_config
+from KnowledgeConnector import graph_controller, 
+from ckg_config as graph_config
 import grapher_config as config
 import cypher as cy
 from KnowledgeGrapher import utils
-import ckgError
 import logging
 import logging.config
 
@@ -224,7 +224,7 @@ def updateDB(driver, imports=None):
                         for statement in code.replace("IMPORTDIR", datasetDir).replace('PROJECTID', project).split(';')[0:-1]:
                             #print(statement+';')
                             graph_controller.sendQuery(driver, statement+';')
-        except ckgError.Error as err:
+        except Exception as err:
             logger.error("{} > {}.\n Query:{}".format(i, err, statement))
 
 def partialUpdateDB(datasets):
