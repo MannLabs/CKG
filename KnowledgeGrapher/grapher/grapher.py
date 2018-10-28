@@ -44,6 +44,7 @@ def updateDB(driver, imports=None):
         imports = config.graph
     
     for i in imports:
+        logger.info("Loading {} into the database".format(i))
         try:
             importDir = os.path.join(os.getcwd(),config.databasesDirectory)
             #Get the cypher queries to build the graph
@@ -57,6 +58,7 @@ def updateDB(driver, imports=None):
                     for statement in cypherCode:
                         #print(statement)
                         graph_controller.sendQuery(driver, statement+';')
+                        logger.info("{} - Creating {}\n cypher query: {}".format(i, entity, statement))
             #Databases
             #Chromosomes
             elif "chromosomes" == i:
@@ -64,36 +66,42 @@ def updateDB(driver, imports=None):
                 for statement in chromosomeDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
                     #print(statement+";")
                     graph_controller.sendQuery(driver, statement+';')
+                    logger.info("{} - cypher query: {}".format(i, statement))
             #Genes
             elif "genes" == i:
                 geneDataImportCode = cy.IMPORT_GENE_DATA
                 for statement in geneDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
                     #print(statement+";")
                     graph_controller.sendQuery(driver, statement+';')
+                    logger.info("{} - cypher query: {}".format(i, statement))
             #Transcripts
             elif "transcripts" == i:
                 transcriptDataImportCode = cy.IMPORT_TRANSCRIPT_DATA
                 for statement in transcriptDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
                     #print(statement+";")
                     graph_controller.sendQuery(driver, statement+';')
+                    logger.info("{} - cypher query: {}".format(i, statement))
             #Proteins
             elif "proteins" == i:
                 proteinDataImportCode = cy.IMPORT_PROTEIN_DATA
                 for statement in proteinDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
                     #print(statement+";")
                     graph_controller.sendQuery(driver, statement+';')
+                    logger.info("{} - cypher query: {}".format(i, statement))
             #Protein annotations
             elif "annotations" == i:
                 proteinAnnotationsImportCode = cy.IMPORT_PROTEIN_ANNOTATIONS
                 for statement in proteinAnnotationsImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
                     #print(statement+";")
                     graph_controller.sendQuery(driver, statement+';')
+                    logger.info("{} - cypher query: {}".format(i, statement))
             #Protein complexes
             elif "complexes" == i:
                 complexDataImportCode = cy.IMPORT_COMPLEXES
                 for resource in config.complexes_resources:
                     for statement in complexDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                         graph_controller.sendQuery(driver, statement+';')
+                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
             #Modified proteins
             elif "modified_proteins" == i:
                 modified_proteinsImportCode = cy.IMPORT_MODIFIED_PROTEINS
@@ -101,16 +109,19 @@ def updateDB(driver, imports=None):
                     for statement in modified_proteinsImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                         #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
+                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
                 modified_proteins_annotationsImportCode = cy.IMPORT_MODIFIED_PROTEIN_ANNOTATIONS
                 for resource in config.modified_proteins_resources:
                     for statement in modified_proteins_annotationsImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                         graph_controller.sendQuery(driver, statement+';')
+                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
             #Pathology expression
             elif "pathology_expression" == i:
                 pathology_expression_DataImportCode = cy.IMPORT_PATHOLOGY_EXPRESSION
                 for resource in config.pathology_expression_resources:
                     for statement in pathology_expression_DataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                         graph_controller.sendQuery(driver, statement+';')
+                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
             #PPIs
             elif "ppi" == i:
                 ppiDataImportCode = cy.IMPORT_CURATED_PPI_DATA
@@ -118,16 +129,19 @@ def updateDB(driver, imports=None):
                     for statement in ppiDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                         #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
+                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
                 ppiDataImportCode = cy.IMPORT_COMPILED_PPI_DATA
                 for resource in config.compiled_PPI_resources:
                     for statement in ppiDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                         #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
+                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
                 ppiDataImportCode = cy.IMPORT_PPI_ACTION
                 for resource in config.PPI_action_resources:
                     for statement in ppiDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                         #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
+                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
             #Diseases
             elif "diseases" == i:
                 diseaseDataImportCode = cy.IMPORT_DISEASE_DATA
@@ -135,27 +149,32 @@ def updateDB(driver, imports=None):
                     for statement in diseaseDataImportCode.replace("IMPORTDIR", importDir).replace("ENTITY", entity).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                         #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
+                        logger.info("{} - Resource: {}\nEntity: {}\ncypher query: {}".format(i, resource, entity, statement))
             #Drugs  
             elif "drugs" == i:
                 drugsDataImportCode = cy.IMPORT_DRUG_DATA
                 for statement in drugsDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
                     #print(statement+";")
                     graph_controller.sendQuery(driver, statement+';')
+                    logger.info("{} - cypher query: {}".format(i, statement))
                 drugsDataImportCode = cy.IMPORT_CURATED_DRUG_DATA
                 for resource in config.curated_drug_resources:
                     for statement in drugsDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                         #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
+                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
                 drugsDataImportCode = cy.IMPORT_COMPILED_DRUG_DATA
                 for resource in config.compiled_drug_resources:
                     for statement in drugsDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                         #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
+                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
                 drugsDataImportCode = cy.IMPORT_DRUG_ACTS_ON
                 for resource in config.drug_action_resources:
                     for statement in drugsDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                         #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
+                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
             #Side effects
             elif "side effects" == i:
                 sideEffectsDataImportCode = cy.IMPORT_DRUG_SIDE_EFFECTS
@@ -163,6 +182,7 @@ def updateDB(driver, imports=None):
                     for statement in sideEffectsDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                         #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
+                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
             #Pathway
             elif 'pathway' == i:
                 pathwayImportCode = cy.IMPORT_PATHWAY_DATA
@@ -173,36 +193,41 @@ def updateDB(driver, imports=None):
             #Metabolite
             elif 'metabolite' == i:
                 metaboliteImportCode = cy.IMPORT_METABOLITE_DATA
-                for source in config.metabolite_resources:
-                    for statement in metaboliteImportCode.replace("IMPORTDIR", importDir).replace("SOURCE", source.lower()).split(';')[0:-1]:
+                for resource in config.metabolite_resources:
+                    for statement in metaboliteImportCode.replace("IMPORTDIR", importDir).replace("SOURCE", resource.lower()).split(';')[0:-1]:
                         #print(statement+';')
                         graph_controller.sendQuery(driver, statement+';')
+                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
             #Food
             elif 'food' == i:
                 foodImportCode = cy.IMPORT_FOOD_DATA
-                for source in config.food_resources:
-                    for statement in foodImportCode.replace("IMPORTDIR", importDir).replace("SOURCE", source.lower()).split(';')[0:-1]:
+                for resource in config.food_resources:
+                    for statement in foodImportCode.replace("IMPORTDIR", importDir).replace("SOURCE", resource.lower()).split(';')[0:-1]:
                         print(statement+';')
                         graph_controller.sendQuery(driver, statement+';')
+                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
             #GWAS
             elif "gwas" == i:
                 code = cy.IMPORT_GWAS
                 for statement in code.replace("IMPORTDIR", importDir).split(';')[0:-1]:
                     #print(statement+';')
                     graph_controller.sendQuery(driver, statement+';')
+                    logger.info("{} - cypher query: {}".format(i, statement))
             #Known variants
             elif "known_variants" == i:
                 variantsImportCode = cy.IMPORT_KNOWN_VARIANT_DATA
                 for statement in variantsImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
                     #print(statement+";")
                     graph_controller.sendQuery(driver, statement+';')
+                    logger.info("{} - cypher query: {}".format(i, statement))
             #Clinically_relevant_variants
             elif "clinical variants" == i:
                 variantsImportCode = cy.IMPORT_CLINICALLY_RELEVANT_VARIANT_DATA
-                for source in config.clinical_variant_resources:
-                    for statement in variantsImportCode.replace("IMPORTDIR", importDir).replace("SOURCE", source.lower()).split(';')[0:-1]:
+                for resource in config.clinical_variant_resources:
+                    for statement in variantsImportCode.replace("IMPORTDIR", importDir).replace("SOURCE", resource.lower()).split(';')[0:-1]:
                         #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
+                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
             #Internal
             elif "internal" == i:
                 internalDataImportCode = cy.IMPORT_INTERNAL_DATA
@@ -210,19 +235,21 @@ def updateDB(driver, imports=None):
                     for statement in internalDataImportCode.replace("IMPORTDIR", importDir).replace("ENTITY1", entity1).replace("ENTITY2", entity2).split(';')[0:-1]:
                         #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
+                        logger.info("{} - Entity1: {}, Entity2: {}\ncypher query: {}".format(i, entity1, entity2, statement))
             #Mentions
             elif "mentions" == i:
                 publicationsImportCode = cy.CREATE_PUBLICATIONS
                 for statement in publicationsImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
                     #print(statement+";")
                     graph_controller.sendQuery(driver, statement+';')
+                    logger.info("{} - cypher query: {}".format(i, statement))
 
                 mentionsImportCode = cy.IMPORT_MENTIONS
                 for entity in config.mentionEntities:
                     for statement in mentionsImportCode.replace("IMPORTDIR", importDir).replace("ENTITY", entity).split(';')[0:-1]:
                         #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
-
+                        logger.info("{} - cypher query: {}".format(i, statement))
              #Published in
             elif "published" == i:
                 publicationImportCode = cy.IMPORT_PUBLISHED_IN
@@ -230,6 +257,7 @@ def updateDB(driver, imports=None):
                     for statement in publicationImportCode.replace("IMPORTDIR", importDir).replace("ENTITY", entity).split(';')[0:-1]:
                         #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
+                        logger.info("{} - Entity: {}\ncypher query: {}".format(i, entity, statement))
             #Projects
             elif "project" == i:
                 importDir = os.path.join(os.getcwd(),config.experimentsDirectory)
@@ -241,6 +269,7 @@ def updateDB(driver, imports=None):
                         for statement in code.replace("IMPORTDIR", projectDir).replace('PROJECTID', project).split(';')[0:-1]:
                             #print(statement+';')
                             graph_controller.sendQuery(driver, statement+';')
+                            logger.info("{} - Project: {}\nCode: {}\ncypher query: {}".format(i, project, code, statement))
             #Datasets
             elif "experiment" == i:
                 importDir = os.path.join(os.getcwd(),config.experimentsDirectory)
@@ -255,6 +284,7 @@ def updateDB(driver, imports=None):
                         for statement in code.replace("IMPORTDIR", datasetDir).replace('PROJECTID', project).split(';')[0:-1]:
                             #print(statement+';')
                             graph_controller.sendQuery(driver, statement+';')
+                            logger.info("{} - Project: {}\nData type: {}\ncypher query: {}".format(i, project, dtype, statement))
         except Exception as err:
             logger.error("{} > {}.\n Query:{}".format(i, err, statement))
 
