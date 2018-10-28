@@ -68,6 +68,7 @@ def parseUniProtDatabase(download=True):
     directory = os.path.join(dbconfig.databasesDir,"UniProt")
     utils.checkDirectory(directory)
     file_name = os.path.join(directory, url.split('/')[-1])
+    mapping_file = os.path.join(directory, 'mapping.tsv')
     if download:
         utils.downloadDB(url, directory)
 
@@ -75,27 +76,30 @@ def parseUniProtDatabase(download=True):
     synonymFields = iconfig.uniprot_synonyms
     protein_relationships = iconfig.uniprot_protein_relationships
     identifier = None
-    with gzip.open(file_name, 'r') as uf:
-        for line in uf:
-            data = line.decode('utf-8').rstrip("\r\n").split("\t")
-            iid = data[0]
-            field = data[1]
-            alias = data[2]
-            
-            if iid not in proteins:
-                if identifier is not None:
-                    prot_info["synonyms"] = synonyms
-                    proteins[identifier] = prot_info
-                identifier = iid
-                proteins[identifier] = {}
-                prot_info = {}
-                synonyms = []
-            if field in fields:
-                if field in synonymFields:
-                    prot_info[field] = alias
-                    synonyms.append(alias)
-                if field in protein_relationships:
-                    relationships[protein_relationships[field]].add((iid, alias, protein_relationships[field][1], "UniProt"))
+    with open(mapping_file, 'w') as mf:
+        with gzip.open(file_name, 'r') as uf:
+            for line in uf:
+                data = line.decode('utf-8').rstrip("\r\n").split("\t")
+                iid = data[0]
+                field = data[1]
+                alias = data[2]
+
+                mf.write(iid+"\t"+alias+"\n")
+                
+                if iid not in proteins:
+                    if identifier is not None:
+                        prot_info["synonyms"] = synonyms
+                        proteins[identifier] = prot_info
+                    identifier = iid
+                    proteins[identifier] = {}
+                    prot_info = {}
+                    synonyms = []
+                if field in fields:
+                    if field in synonymFields:
+                        prot_info[field] = alias
+                        synonyms.append(alias)
+                    if field in protein_relationships:
+                        relationships[protein_relationships[field]].add((iid, alias, protein_relationships[field][1], "UniProt"))
     
     return proteins, relationships
 

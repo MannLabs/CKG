@@ -16,4 +16,5 @@ __all__ = ["cancerGenomeInterpreterParser",
            "pspParser",
            "corumParser",
            "foodbParser",
-		   "exposomeParser"]
+		   "exposomeParser",
+		   "hpaParser"]

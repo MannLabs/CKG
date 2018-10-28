@@ -15,10 +15,7 @@ def parser(download = True):
     relationships_headers = iconfig.relationships_headers
     mapping = mp.getMappingFromOntology(ontology = "Disease", source = None)
 
-    drugsource = dbconfig.sources["Drug"]
-    directory = os.path.join(dbconfig.databasesDir, drugsource)
-    mappingFile = os.path.join(directory, "mapping.tsv")
-    drugmapping = mp.getMappingFromDatabase(mappingFile)
+    drugmapping = mp.getMappingForEntity("Drug")
 
     levels = iconfig.OncoKB_levels
     entities = set()

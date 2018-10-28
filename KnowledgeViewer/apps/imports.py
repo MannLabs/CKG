@@ -20,8 +20,8 @@ from collections import defaultdict
 from natsort import natsorted, ns
 
 
-def get_stats_data(filename):
-    df = pd.read_hdf(filename)
+def get_stats_data(filename, key='partial'):
+    df = pd.read_hdf(filename, key=key)
     df[['Imported_number', 'file_size']] = df[['Imported_number', 'file_size']].apply(pd.to_numeric)
     df['datetime'] = pd.to_datetime(df['date'] + ' ' + df['time'])
     return df
@@ -221,7 +221,7 @@ def plot_databases_numbers_per_date(stats_file, plot_title, dropdown=False, drop
         traces = list(chain.from_iterable(traces))
     else: pass
 
-    layout = go.Layout(title = '', xaxis = {'title':'Imported entities/relationships'}, height=600, margin=go.layout.Margin(l=170,r=40,t=80,b=100),
+    layout = go.Layout(title = '', xaxis = {'type':'log','title':'Imported entities/relationships'}, height=600, margin=go.layout.Margin(l=170,r=40,t=80,b=100),
     annotations=[dict(text='<b>{}<b>'.format(plot_title), font = dict(family='Arial', size = 18),
     showarrow=False, xref = 'paper', x=-0.17, xanchor='left', yref = 'paper', y=1.2, yanchor='top')])
 

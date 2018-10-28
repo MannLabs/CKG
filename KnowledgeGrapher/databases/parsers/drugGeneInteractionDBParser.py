@@ -11,11 +11,7 @@ def parser(download = True):
     url = iconfig.DGIdb_url
     header = iconfig.header
     outputfileName = iconfig.outputfileName
-
-    drugsource = dbconfig.sources["Drug"]
-    directory = os.path.join(dbconfig.databasesDir, drugsource)
-    mappingFile = os.path.join(directory, "mapping.tsv")
-    drugmapping = mp.getMappingFromDatabase(mappingFile)
+    drugmapping = mp.getMappingForEntity("Drug")
 
     relationships = set()
     directory = os.path.join(dbconfig.databasesDir,"DGIdb")

@@ -58,12 +58,12 @@ IMPORT_MODIFIED_PROTEINS = '''
                         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/psp_modified_protein_has_modification.csv" AS line
                         MATCH (mp:Modified_protein {id:line.START_ID})
                         MATCH (m:Modification {id:line.END_ID}) 
-                        MERGE (mp)-[:HAS_MODIFICATION]->(m);
+                        MERGE (mp)-[:HAS_MODIFICATION{source:line.source}]->(m);
                         USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/psp_protein_has_modified_site.csv" AS line 
                         MATCH (p:Protein {id:line.START_ID})
                         MATCH (mp:Modified_protein {id:line.END_ID}) 
-                        MERGE (p)-[:HAS_MODIFIED_SITE]->(mp);
+                        MERGE (p)-[:HAS_MODIFIED_SITE{source:line.source}]->(mp);
                         '''
 IMPORT_PROTEIN_ANNOTATIONS = '''USING PERIODIC COMMIT 10000
                         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/uniprot_cellular_component_associated_with.csv" AS line
@@ -80,6 +80,13 @@ IMPORT_PROTEIN_ANNOTATIONS = '''USING PERIODIC COMMIT 10000
                         MATCH (p:Protein {id:line.START_ID})
                         MATCH (b:Biological_process {id:line.END_ID})
                         MERGE (p)-[:ASSOCIATED_WITH{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type}]->(b);
+                        '''
+
+IMPORT_PATHOLOGY_EXPRESSION = '''USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_protein_detected_in_pathology_sample.csv" AS line
+                        MATCH (p:Protein {id:line.START_ID})
+                        MATCH (d:Disease {id:line.END_ID})
+                        MERGE (p)-[:DETECTED_IN_PATHOLOGY_SAMPLE{expression_high:line.expression_high,expression_medium:line.expression_medium,expression_low:line.expression_low,not_detected:line.not_detected,positive_prognosis_logrank_pvalue:line.positive_prognosis_logrank_pvalue,negative_prognosis_logrank_pvalue:line.negative_prognosis_logrank_pvalue,linkout:line.linkout,source:line.source}]->(d);
                         '''
 
 IMPORT_COMPLEXES = '''CREATE CONSTRAINT ON (c:Complex) ASSERT c.id IS UNIQUE; 

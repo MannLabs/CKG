@@ -218,7 +218,7 @@ def parseDatabase(importDirectory,database):
             logger.info("Database {} - Number of {} entities: {}".format(database, "Modified_protein", len(entities)))
             stats.add(utils.buildStats(len(entities), "entity", "Modified_protein", database, entity_outputfile))
             for entity,relationship in relationships:
-                rel_header = ["START_ID", "END_ID", "TYPE"]
+                rel_header = ["START_ID", "END_ID", "TYPE", "source"]
                 if entity in relationships_headers:
                     rel_header = relationships_headers[entity]
                 outputfile = os.path.join(importDirectory, "psp_"+entity.lower()+"_"+relationship.lower()+".csv")
@@ -254,10 +254,17 @@ def parseDatabase(importDirectory,database):
                 write_relationships(relationships[(entity,relationship)], header[entity], ee_outputfile)
                 logger.info("Database {} - Number of {} relationships: {}".format(database, relationship, len(relationships[(entity,relationship)])))
                 stats.add(utils.buildStats(len(relationships[(entity,relationship)]), "relationships", relationship, database, ee_outputfile))
+        elif database.lower() == "hpa":
+            relationships, headers = hpaParser.parser()
+            for entity, relationship in relationships:
+                hpa_outputfile = os.path.join(importDirectory, database.lower()+"_"+entity.lower()+"_"+relationship.lower()+".csv")
+                write_relationships(relationships[(entity,relationship)], headers[relationship], hpa_outputfile)
+                logger.info("Database {} - Number of {} relationships: {}".format(database, relationship, len(relationships[(entity,relationship)])))
+                stats.add(utils.buildStats(len(relationships[(entity,relationship)]), "relationships", relationship, database, hpa_outputfile))
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        logger.error("Database {}: {}, file: {},line: {}".format(database, sys.exc_info(), fname, exec_tb.tb_lineno))
+        logger.error("Database {}: {}, file: {},line: {}".format(database, sys.exc_info(), fname, exc_tb.tb_lineno))
         raise Exception("Error when importing database {}.\n {}".format(database, err))
     return stats
     

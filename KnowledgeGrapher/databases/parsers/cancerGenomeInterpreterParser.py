@@ -17,11 +17,7 @@ def parser(download = True):
     entities_header = iconfig.entities_header
     relationships_headers = iconfig.relationships_headers
     mapping = mp.getMappingFromOntology(ontology = "Disease", source = None)
-    
-    drugsource = dbconfig.sources["Drug"]
-    directory = os.path.join(dbconfig.databasesDir, drugsource)
-    mappingFile = os.path.join(directory, "mapping.tsv")
-    drugmapping = mp.getMappingFromDatabase(mappingFile)
+    drugmapping = mp.getMappingForEntity("Drug")
     
     fileName = iconfig.cancerBiomarkers_variant_file
     relationships = defaultdict(set)

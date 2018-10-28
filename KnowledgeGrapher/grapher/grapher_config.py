@@ -17,29 +17,30 @@ statsFile = "stats.hdf"
 statsCols = ["date", "time", "dataset", "filename", "file_size", "Imported_number", "Import_type", "name"]
 
 #Full Graph
-graph = ["ontologies", 
-         "chromosomes", 
-         "genes", 
-         "transcripts", 
-         "proteins",
-         "annotations",
-         "modified_proteins",
-         "complexes",
-         "ppi", 
-         "diseases", 
-         "known_variants",
-         "clinical variants",
-         "drugs", 
-         'mentions',
-         "internal",
-         "side effects",
-         'pathway',
-         'metabolite',
-         'food',
-         "gwas",
-         "published",
-         "project",
-         "experiment"
+graph = [#"ontologies", 
+         #"chromosomes", 
+         #"genes", 
+         #"transcripts", 
+         #"proteins",
+         #"annotations",
+         #"modified_proteins",
+         #"complexes",
+         #"ppi", 
+         #"diseases", 
+         #"known_variants",
+         #"clinical variants",
+         #"drugs",
+         "pathology_expression",
+         #'mentions',
+         #"internal",
+         #"side effects",
+         #'pathway',
+         #'metabolite',
+         #'food',
+         #"gwas",
+         #"published",
+         #"project",
+         #"experiment"
          ]
 
 #Imports 
@@ -57,6 +58,8 @@ PPI_action_resources = ["STRING"]
 #Disease associations
 disease_resources = [("Protein","DisGEnet")]
 
+#Pathology Expression
+pathology_expression_resources = ["HPA"]
 
 #Drug associations, indications and actions
 curated_drug_resources = ["DGIdb","CGI","OncoKB"]

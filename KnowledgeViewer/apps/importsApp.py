@@ -9,6 +9,7 @@ from apps import imports
 from KnowledgeViewer.queries import project_cypher
 from KnowledgeViewer.viewer import viewer
 from KnowledgeViewer import project
+import ckg_config
 
 
 class ImportsApp(basicApp.BasicApp):
@@ -21,7 +22,8 @@ class ImportsApp(basicApp.BasicApp):
         self.addBasicLayout()
         conf = self.getPageConfiguration()
         stats_file = conf['stats_file']
-        stats_df = imports.get_stats_data(stats_file)
+        stats_key =  'full_stats_'+ str(ckg_config.version).replace('.','_')
+        stats_df = imports.get_stats_data(stats_file, key=stats_key)
         plots = []
         plots.append(imports.plot_total_number_imported(stats_df, 'Number of imported entities and relationships'))
         plots.append(imports.plot_total_numbers_per_date(stats_df, 'Imported entities vs relationships'))
