@@ -129,6 +129,28 @@ def parseDatabase(importDirectory,database):
             write_relationships(relationships, relationships_header, pathway_outputfile)
             logger.info("Database {} - Number of {} relationships: {}".format(database, "protein_associated_with_pathway", len(relationships)))
             stats.add(utils.buildStats(len(relationships), "relationships", "protein_associated_with_pathway", database, pathway_outputfile))
+        elif database.lower() == "reactome":
+            #Reactome
+            entities, relationships, entities_header, relationships_header = reactomeParser.parser()
+            entity_outputfile = os.path.join(importDirectory, database.lower()+"_Pathway.csv")
+            write_entities(entities, entities_header, entity_outputfile)
+            stats.add(utils.buildStats(len(entities), "entity", "Pathway", database, entity_outputfile))
+            for entity,relationship in relationships:
+                reactome_outputfile = os.path.join(importDirectory, database+"_"+entity.lower()+"_"+relationship.lower()+".csv")
+                write_relationships(relationships[(entity, relationship)], relationships_header[entity], reactome_outputfile)
+                logger.info("Database {} - Number of {} {} relationships: {}".format(database, entity, relationship, len(relationships[(entity,relationship)])))
+                stats.add(utils.buildStats(len(relationships[(entity,relationship)]), "relationships", relationship, database, reactome_outputfile))
+        elif database.lower() == "smpdb":
+            #SMPDB
+            entities, relationships, entities_header, relationships_header = smpdbParser.parser()
+            entity_outputfile = os.path.join(importDirectory, database.lower()+"_Pathway.csv")
+            write_entities(entities, entities_header, entity_outputfile)
+            stats.add(utils.buildStats(len(entities), "entity", "Pathway", database, entity_outputfile))
+            for entity,relationship in relationships:
+                smpdb_outputfile = os.path.join(importDirectory, database+"_"+entity.lower()+"_"+relationship.lower()+".csv")
+                write_relationships(relationships[(entity, relationship)], relationships_header[entity], smpdb_outputfile)
+                logger.info("Database {} - Number of {} {} relationships: {}".format(database, entity, relationship, len(relationships[(entity,relationship)])))
+                stats.add(utils.buildStats(len(relationships[(entity,relationship)]), "relationships", relationship, database, smpdb_outputfile))
         elif database.lower() == "dgidb":
             relationships, header, outputfileName = drugGeneInteractionDBParser.parser()
             outputfile = os.path.join(importDirectory, outputfileName)           

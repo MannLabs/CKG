@@ -31,9 +31,10 @@ def getMappingForEntity(entity):
         with open(mapping_file, 'r') as mf:
             for line in mf:
                 data = line.rstrip("\r\n").split("\t")
-                ident = data[0]
-                alias = data[1]
-                mapping[alias] = ident
+                if len(data) > 1:
+                    ident = data[0]
+                    alias = data[1]
+                    mapping[alias] = ident
 
     return mapping
 

@@ -262,14 +262,24 @@ IMPORT_DRUG_ACTS_ON =   '''
 IMPORT_PATHWAY_DATA = '''
                         CREATE CONSTRAINT ON (p:Pathway) ASSERT p.id IS UNIQUE; 
                         USING PERIODIC COMMIT 10000
-                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Pathway.csv" AS line
+                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_Pathway.csv" AS line
                         MERGE (p:Pathway{id:line.ID})
-                        ON CREATE SET p.name=line.name,p.source=line.source;
+                        ON CREATE SET p.name=line.name,p.description=line.description,p.organism=line.organism,p.linkout=line.linkout,p.source=line.source;
                         USING PERIODIC COMMIT 10000
-                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/SOURCE_protein_associated_with_pathway.csv" AS line
+                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_protein_annotated_to_pathway.csv" AS line
                         MATCH (p:Protein{id:line.START_ID})
                         MATCH (a:Pathway{id:line.END_ID}) 
-                        MERGE (p)-[:ANNOTATED_IN_PATHWAY{linkout:line.linkout,source:line.source}]->(a);
+                        MERGE (p)-[:ANNOTATED_IN_PATHWAY{evidence:line.evidence,organism:line.organism,cellular_component:line.cellular_component,source:line.source}]->(a);
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_metabolite_annotated_to_pathway.csv" AS line
+                        MATCH (m:Metabolite{id:line.START_ID})
+                        MATCH (a:Pathway{id:line.END_ID}) 
+                        MERGE (m)-[:ANNOTATED_IN_PATHWAY{evidence:line.evidence,organism:line.organism,cellular_component:line.cellular_component,source:line.source}]->(a);
+                        USING PERIODIC COMMIT 10000
+                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_drug_annotated_to_pathway.csv" AS line
+                        MATCH (d:Drug{id:line.START_ID})
+                        MATCH (a:Pathway{id:line.END_ID}) 
+                        MERGE (d)-[:ANNOTATED_IN_PATHWAY{evidence:line.evidence,organism:line.organism,cellular_component:line.cellular_component,source:line.source}]->(a);
                         '''
 IMPORT_METABOLITE_DATA = '''
                         CREATE CONSTRAINT ON (m:Metabolite) ASSERT m.id IS UNIQUE; 
@@ -277,23 +287,18 @@ IMPORT_METABOLITE_DATA = '''
                         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Metabolite.csv" AS line
                         MERGE (m:Metabolite{id:line.ID})
                         ON CREATE SET m.name=line.name,m.synonyms=line.synonyms,m.description=line.description,m.direct_parent=line.direct_parent,m.kingdom=line.kingdom,m.class=line.class,m.super_class=line.super_class,m.sub_class=line.sub_class,m.chemical_formula=line.chemical_formula,m.average_molecular_weight=line.average_molecular_weight,m.monoisotopic_molecular_weight=line.monoisotopic_molecular_weight,m.chebi_id=line.chebi_id,m.pubchem_compound_id=line.pubchem_compound_id,m.food_id=line.food_id;
-                        USING PERIODIC COMMIT 10000
-                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/SOURCE_annotated_in_pathway.csv" AS line
-                        MATCH (m:Metabolite{id:line.START_ID})
-                        MATCH (p:Pathway{id:line.END_ID}) 
-                        MERGE (m)-[:ANNOTATED_IN_PATHWAY{source:line.source}]->(p);
                         USING PERIODIC COMMIT 10000 
-                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/SOURCE_associated_with_protein.csv" AS line
+                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_associated_with_protein.csv" AS line
                         MATCH (m:Metabolite{id:line.START_ID})
                         MATCH (p:Protein{id:line.END_ID}) 
                         MERGE (m)-[:ASSOCIATED_WITH]->(p);
                         USING PERIODIC COMMIT 10000 
-                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/SOURCE_associated_with_disease.csv" AS line
+                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_associated_with_disease.csv" AS line
                         MATCH (m:Metabolite{id:line.START_ID})
                         MATCH (d:Disease{id:line.END_ID}) 
                         MERGE (m)-[:ASSOCIATED_WITH]->(d);
                         USING PERIODIC COMMIT 10000 
-                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/SOURCE_associated_with_tissue.csv" AS line
+                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_associated_with_tissue.csv" AS line
                         MATCH (m:Metabolite{id:line.START_ID})
                         MATCH (t:Tissue{id:line.END_ID}) 
                         MERGE (m)-[:ASSOCIATED_WITH]->(t);
@@ -306,7 +311,7 @@ IMPORT_FOOD_DATA =  '''
                         MERGE (f:Food{id:line.ID})
                         ON CREATE SET f.name=line.name,f.scientific_name=line.scientific_name,f.description=line.description,f.group=line.group,f.subgroup=line.subgroup,f.source=line.source;
                         USING PERIODIC COMMIT 10000
-                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/SOURCE_food_has_content.csv" AS line
+                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_food_has_content.csv" AS line
                         MATCH (f:Food{id:line.START_ID})
                         MATCH (m:Metabolite{id:line.END_ID}) 
                         MERGE (f)-[:HAS_CONTENT{minimum:line.min,maximum:line.max,average:line.average,units:line.units,source:line.source}]->(m);
@@ -339,21 +344,21 @@ IMPORT_KNOWN_VARIANT_DATA = '''
 IMPORT_CLINICALLY_RELEVANT_VARIANT_DATA = '''
                                         CREATE CONSTRAINT ON (k:Clinically_relevant_variant) ASSERT k.id IS UNIQUE; 
                                         USING PERIODIC COMMIT 10000
-                                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/SOURCE_Clinically_relevant_variant.csv" AS line
+                                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_Clinically_relevant_variant.csv" AS line
                                         MERGE (k:Clinically_relevant_variant {id:line.ID})
                                         ON CREATE SET k.alternative_names=line.alternative_names,k.chromosome=line.chromosome,k.position=toInt(line.position),k.reference=line.reference,k.alternative=line.alternative,k.effect=line.effect,k.oncogeneicity=line.oncogeneicity;
                                         USING PERIODIC COMMIT 10000
-                                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/SOURCE_known_variant_is_clinically_relevant.csv" AS line
+                                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_known_variant_is_clinically_relevant.csv" AS line
                                         MATCH (k:Known_variant {id:line.START_ID})
                                         MATCH (c:Clinically_relevant_variant {id:line.END_ID}) 
                                         MERGE (k)-[:VARIANT_IS_CLINICALLY_RELEVANT{source:line.source}]->(c);
                                         USING PERIODIC COMMIT 10000
-                                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/SOURCE_targets_clinically_relevant_variant.csv" AS line
+                                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_targets_clinically_relevant_variant.csv" AS line
                                         MATCH (d:Drug {id:line.START_ID})
                                         MATCH (k:Clinically_relevant_variant {id:line.END_ID})
                                         MERGE (d)-[:TARGETS_CLINICALLY_RELEVANT_VARIANT{association:line.association, evidence:line.evidence, tumor:line.tumor, type:line.type, source:line.source}]->(k);
                                         USING PERIODIC COMMIT 10000
-                                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/SOURCE_associated_with.csv" AS line
+                                        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_associated_with.csv" AS line
                                         MATCH (k:Clinically_relevant_variant {id:line.START_ID})
                                         MATCH (d:Disease {id:line.END_ID})
                                         MERGE (k)-[:ASSOCIATED_WITH{score:line.score,evidence_type:line.evidence_type,source:line.source,number_publications:line.number_publications}]->(d);

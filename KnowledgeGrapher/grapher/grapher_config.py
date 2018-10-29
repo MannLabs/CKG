@@ -30,14 +30,14 @@ graph = [#"ontologies",
          #"known_variants",
          #"clinical variants",
          #"drugs",
-         "pathology_expression",
+         #"pathology_expression",
          #'mentions',
          #"internal",
          #"side effects",
-         #'pathway',
          #'metabolite',
          #'food',
          #"gwas",
+         'pathway',
          #"published",
          #"project",
          #"experiment"
@@ -71,7 +71,7 @@ side_effects_resources = ["SIDER"]
 clinical_variant_resources = ["CGI","OncoKB"]
 
 #Pathways
-pathway_resources = ["PathwayCommons"]
+pathway_resources = ["Reactome", "SMPDB"]
 
 #Metabolites
 metabolite_resources = ["hmdb"]

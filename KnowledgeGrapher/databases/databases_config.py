@@ -24,7 +24,9 @@ databases = [
             #"CORUM",
             #"FooDB",
             #"Exposome Explorer",
-            "HPA"
+            #"HPA",
+            "Reactome",
+            "SMPDB"
             ]
 
 sources = {
@@ -32,5 +34,6 @@ sources = {
             "Metabolite":"HMDB",
             "Protein":"UniProt",
             "Gene":"HGNC",
-            "Food":"FooDB"
+            "Food":"FooDB",
+            "Pathway":"Reactome"
             }

@@ -186,15 +186,15 @@ def updateDB(driver, imports=None):
             #Pathway
             elif 'pathway' == i:
                 pathwayImportCode = cy.IMPORT_PATHWAY_DATA
-                for source in config.pathway_resources:
-                    for statement in pathwayImportCode.replace("IMPORTDIR", importDir).replace("SOURCE", source.lower()).split(';')[0:-1]:
+                for resource in config.pathway_resources:
+                    for statement in pathwayImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                         #print(statement+';')
                         graph_controller.sendQuery(driver, statement+';')
             #Metabolite
             elif 'metabolite' == i:
                 metaboliteImportCode = cy.IMPORT_METABOLITE_DATA
                 for resource in config.metabolite_resources:
-                    for statement in metaboliteImportCode.replace("IMPORTDIR", importDir).replace("SOURCE", resource.lower()).split(';')[0:-1]:
+                    for statement in metaboliteImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                         #print(statement+';')
                         graph_controller.sendQuery(driver, statement+';')
                         logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
@@ -202,7 +202,7 @@ def updateDB(driver, imports=None):
             elif 'food' == i:
                 foodImportCode = cy.IMPORT_FOOD_DATA
                 for resource in config.food_resources:
-                    for statement in foodImportCode.replace("IMPORTDIR", importDir).replace("SOURCE", resource.lower()).split(';')[0:-1]:
+                    for statement in foodImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                         print(statement+';')
                         graph_controller.sendQuery(driver, statement+';')
                         logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
@@ -224,7 +224,7 @@ def updateDB(driver, imports=None):
             elif "clinical variants" == i:
                 variantsImportCode = cy.IMPORT_CLINICALLY_RELEVANT_VARIANT_DATA
                 for resource in config.clinical_variant_resources:
-                    for statement in variantsImportCode.replace("IMPORTDIR", importDir).replace("SOURCE", resource.lower()).split(';')[0:-1]:
+                    for statement in variantsImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                         #print(statement+";")
                         graph_controller.sendQuery(driver, statement+';')
                         logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
@@ -298,11 +298,12 @@ def fullUpdate():
     """
     imports = config.graph
     driver = graph_controller.getGraphDatabaseConnectionConfiguration()
-    print(datetime.now() - START_TIME)
+    logger.info("Full update of the database - Updating: {}".format(",".join(imports)))
     updateDB(driver, imports)
-    print(datetime.now() - START_TIME)
+    logger.info("Full update of the database - Update took: {}".format(datetime.now() - START_TIME))
+    logger.info("Full update of the database - Archiving imports folder")
     archiveImportDirectory(archive_type="full")
-    print(datetime.now() - START_TIME)
+    logger.info("Full update of the database - Archiving took: {}".format(datetime.now() - START_TIME))
 
 def partialUpdate(imports):
     """
@@ -315,11 +316,12 @@ def partialUpdate(imports):
         imports (list): list of entities to update
     """
     driver = graph_controller.getGraphDatabaseConnectionConfiguration()
-    print(datetime.now() - START_TIME)
+    logger.info("Partial update of the database - Updating: {}".format(",".join(imports)))
     updateDB(driver, imports)
-    print(datetime.now() - START_TIME)
+    logger.info("Partial update of the database - Update took: {}".format(datetime.now() - START_TIME))
+    logger.info("Partial update of the database - Archiving imports folder")
     archiveImportDirectory(archive_type="partial")
-    print(datetime.now() - START_TIME)
+    logger.info("Partial update of the database - Archiving {} took: {}".format(",".join(imports), datetime.now() - START_TIME))
     
 def archiveImportDirectory(archive_type="full"):
     """
@@ -335,8 +337,9 @@ def archiveImportDirectory(archive_type="full"):
     folder_to_backup = config.importDirectory
     date, time = utils.getCurrentTime()
     file_name = "{}_{}_{}".format(archive_type, date.replace('-', ''), time.replace(':', ''))
-
+    logger.info("Archiving {} to file: {}".format(folder_to_backup, file_name))
     utils.compress_directory(folder_to_backup, dest_folder, file_name)
+    logger.info("New backup created: {}".format(file_name))
 
 if __name__ == "__main__":
     fullUpdate()

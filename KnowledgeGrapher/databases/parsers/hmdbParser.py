@@ -78,6 +78,8 @@ def build_metabolite_entity(metabolites):
                 entity.append('')
         entities.add(tuple(entity))
     
+    build_HMDB_dictionary(metabolites)
+    
     return entities, attributes
     
 def build_relationships_from_HMDB(metabolites, mapping):
@@ -104,7 +106,7 @@ def build_relationships_from_HMDB(metabolites, mapping):
 
 def build_HMDB_dictionary(metabolites):
     directory = os.path.join(dbconfig.databasesDir,"HMDB")
-    filename = iconfig.HMDB_dictionary_file
+    filename = "mapping.tsv"
     outputfile = os.path.join(directory, filename)
     
     with open(outputfile, 'w') as out:
@@ -115,4 +117,7 @@ def build_HMDB_dictionary(metabolites):
             if "synonyms" in metabolites[metid]:
                 for synonym in metabolites[metid]["synonyms"]:
                     out.write(metid+"\t"+synonym.lower()+"\n")
+            if "chebi_id" in metabolites[metid]:
+                chebi_id = metabolites[metid]["chebi_id"]
+                out.write(metid+"\t"+chebi_id+"\n")
 
