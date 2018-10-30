@@ -190,6 +190,7 @@ def updateDB(driver, imports=None):
                     for statement in pathwayImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
                         #print(statement+';')
                         graph_controller.sendQuery(driver, statement+';')
+                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
             #Metabolite
             elif 'metabolite' == i:
                 metaboliteImportCode = cy.IMPORT_METABOLITE_DATA
@@ -203,7 +204,7 @@ def updateDB(driver, imports=None):
                 foodImportCode = cy.IMPORT_FOOD_DATA
                 for resource in config.food_resources:
                     for statement in foodImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        print(statement+';')
+                        #print(statement+';')
                         graph_controller.sendQuery(driver, statement+';')
                         logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
             #GWAS

@@ -23,12 +23,10 @@ logger = utils.setup_logging(log_config, key="database_controller")
 #########################
 def write_relationships(relationships, header, outputfile):
     try:
-        df = pd.DataFrame(list(relationships))
-        if not df.empty:
-            df.columns = header 
-            df.to_csv(path_or_buf=outputfile, 
-                    header=True, index=False, quotechar='"', 
-                    line_terminator='\n', escapechar='\\')
+        df = pd.DataFrame(list(relationships), columns=header)
+        df.to_csv(path_or_buf=outputfile, 
+                header=True, index=False, quotechar='"', 
+                line_terminator='\n', escapechar='\\')
     except Exception as err:
         raise csv.Error("Error writing relationships to file: {}.\n {}".format(outputfile, err))
 
