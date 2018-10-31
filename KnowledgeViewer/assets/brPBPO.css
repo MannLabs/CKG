@@ -1,4 +1,4 @@
-._dash-loading-callback {
+#project ._dash-loading-callback {
   border: 36px solid #a3a3a3;
   border-radius: 50%;
   border-top: 36px solid #f03b20;
@@ -9,8 +9,7 @@
   display: inline-block;
   position: fixed;
   top: 50%;
-  left: 50%;
-  right: 50%;
+  left: 45%;
   opacity: 100;
   content:"Loading...";
   background-colour: #ffffff;

@@ -368,7 +368,7 @@ def extractPeptideSubjectRelationships(data, configuration):
     data = data[~data.index.duplicated(keep='first')]
     aux =  data.filter(regex = configuration["valueCol"])
     attributes = configuration["attributes"]
-    aux.columns = [c.split(" ")[-1] for c in aux.columns]
+    aux.columns = [c.split(" ")[1] for c in aux.columns]
     aux = aux.stack()
     aux = aux.reset_index()
     aux.columns = ["c"+str(i) for i in range(len(aux.columns))]
@@ -404,7 +404,7 @@ def extractPeptideProteinRelationships(data, configuration):
 def extractProteinSubjectRelationships(data, configuration):
     aux =  data.filter(regex = configuration["valueCol"])
     attributes = configuration["attributes"]  
-    aux.columns = [c.split(" ")[-1] for c in aux.columns]
+    aux.columns = [c.split(" ")[1] for c in aux.columns]
     aux = aux.stack()
     aux = aux.reset_index()
     aux.columns = ["c"+str(i) for i in range(len(aux.columns))]

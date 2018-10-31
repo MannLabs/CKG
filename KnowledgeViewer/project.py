@@ -6,12 +6,15 @@ import itertools
 from plotly.offline import iplot
 
 class Project:
-    def __init__(self,identifier, project_type, datasets = {}, report = {}):
+    def __init__(self,identifier, project_type, datasets = None, report = None):
         self.identifier = identifier
         self.project_type = project_type
         self.datasets = datasets
         self.report = {}
-        if len(self.datasets) == 0:
+        print(self.datasets)
+        if self.datasets is None:
+            self.datasets = {}
+            print("IN")
             self.buildProject()
             self.generateReport()
 
@@ -295,12 +298,13 @@ class AnalysisResult:
                 plot.append(figure.get3DNetworkFigure(data[id], sourceCol=source, targetCol=target, node_properties={}, identifier=identifier, title=figure_title))
         elif name == "heatmap":
             for id in data:
-                if isinstance(id, tuple):
-                    identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                    figure_title = title + id[0]+" vs "+id[1]
-                else:
-                    figure_title = title
-            plot.append(figure.getComplexHeatmapFigure(data[id], identifier=identifier, title=figure_title))
+                if not data[id].empty:
+                    if isinstance(id, tuple):
+                        identifier = identifier+"_"+id[0]+"_vs_"+id[1]
+                        figure_title = title + id[0]+" vs "+id[1]
+                    else:
+                        figure_title = title
+                    plot.append(figure.getComplexHeatmapFigure(data[id], identifier=identifier, title=figure_title))
 
         return plot
         
@@ -389,10 +393,8 @@ class Dataset:
                             if key == "regulation":
                                 reg_data = result.getResult()[analysis_type]
                                 if not reg_data.empty:
-                                    print("all", reg_data.head())
                                     sig_data = data[list(set(reg_data.loc[reg_data.rejected,"identifier"]))]
-                                    print(sig_data.shape)
-                                    self.updateData({"regulation":sig_data})
+                                    self.updateData({"regulated":sig_data})
                             for plot_name in plot_names:
                                 plots = result.getPlot(plot_name, section_query+"_"+analysis_type+"_"+plot_name, analysis_type.capitalize())
                                 report.updatePlots({(analysis_type,plot_name):plots})

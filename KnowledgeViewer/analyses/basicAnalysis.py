@@ -4,14 +4,14 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 import statsmodels.stats.multitest as multitest
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
-from scipy.special import factorial
+from scipy.special import factorial, betainc
 import umap
 from sklearn import preprocessing
 from scipy import stats
 import numpy as np
 import math
 from random import shuffle
-from predictive_imputer import predictive_imputer
+from fancyimpute import KNN
 
 def extract_number_missing(df, conditions, missing_max):
     if conditions is None:
@@ -46,8 +46,7 @@ def imputation_KNN(data, alone = True):
         missDf = df.loc[df.group==g, value_cols]
         missDf = missDf.loc[:, missDf.notnull().mean() >= 0.5]
         X = np.array(missDf.values, dtype=np.float64)
-        imp = predictive_imputer.PredictiveImputer(f_model="KNN")
-        X_trans = imp.fit(X).transform(X.copy())
+        X_trans = KNN(k=3).fit_transform(X)
         missingdata_df = missDf.columns.tolist()
         dfm = pd.DataFrame(X_trans, index =list(missDf.index), columns = missingdata_df)
         df.update(dfm)
@@ -266,34 +265,55 @@ def get_counts_permutation_fdr(value, random, observed, n, alpha):
         qvalue = (a/b * 1/n)
     return (qvalue, qvalue <= alpha)
 
+def convertToEdgeList(data, cols):
+    data.index.name = None
+    edge_list = data.stack().reset_index()
+    edge_list.columns = cols
+
+    return edge_list
+
 def runCorrelation(data, alpha=0.05, method='pearson', correction=('fdr', 'indep')):
     calculated = set()
     df = data.copy()
     df = df.dropna()._get_numeric_data()
-    dfcols = pd.DataFrame(columns=df.columns)
-    pvalues = []
-    correlations = []
-    #Parallel(n_jobs=n_jobs)(delayed(calculate_correlations)(df[c1], df[c2], method) for c1, c2 in itertools.combinations(df.columns, 2))
-    for c1, c2 in itertools.combinations(df.columns, 2):
-        if (c1, c2) not in calculated and c1 != c2:
-            correlation, pvalue = calculate_correlations(df[c1], df[c2], method)
-            pvalues.append(pvalue)
-            correlations.append((c1,c2,correlation))
-            calculated.update({(c1, c2), (c2, c1)})
     
+    r, p = runEfficientCorrelation(df, method=method)
+    rdf = pd.DataFrame(r, index=df.columns, columns=df.columns)
+    pdf = pd.DataFrame(p, index=df.columns, columns=df.columns)
+    rdf.values[[np.arange(len(rdf))]*2] = np.nan
+    pdf.values[[np.arange(len(pdf))]*2] = np.nan
+    correlation = convertToEdgeList(rdf, ["node1", "node2", "weight"])
+    pvalues = convertToEdgeList(pdf, ["node1", "node2", "pvalue"])
+     
     if correction[0] == 'fdr':
-        rejected, padj = apply_pvalue_fdrcorrection(pvalues, alpha=alpha, method=correction[1])
+        rejected, padj = apply_pvalue_fdrcorrection(pvalues["pvalue"].tolist(), alpha=alpha, method=correction[1])
     elif correction[0] == '2fdr':
-        rejected, padj = apply_pvalue_twostage_fdrcorrection(pvalues, alpha=alpha, method=correction[1])
-    cor = pd.DataFrame(correlations, columns=["node1", "node2", "weight"])
-    cor["padj"] = padj
-    cor["rejected"] = rejected
-    print("Correlation", cor.shape)
-    cor = cor[cor.rejected]
-    print("Correlation", cor.shape)
-    cor = cor[abs(cor.weight) > 0.5]
-    print("Correlation", cor.shape)
-    return cor
+        rejected, padj = apply_pvalue_twostage_fdrcorrection(pvalues["pvalue"].tolist(), alpha=alpha, method=correction[1])
+    
+    correlation["padj"] = padj
+    correlation["rejected"] = rejected
+    correlation = correlation[correlation.rejected]
+    
+    return correlation
+
+def runEfficientCorrelation(data, method='pearson'):
+    matrix = data.values
+    if method == 'pearson':
+        r = np.corrcoef(matrix, rowvar=False)
+    elif method == 'spearman':
+        r, p = spearmanr(matrix, axis=0)
+    
+    rf = r[np.triu_indices(r.shape[0], 1)]
+    df = matrix.shape[1] - 2
+    ts = rf * rf * (df / (1 - rf * rf))
+    pf = betainc(0.5 * df, 0.5, df / (df + ts))
+    p = np.zeros(shape=r.shape)
+    p[np.triu_indices(p.shape[0], 1)] = pf
+    p[np.tril_indices(p.shape[0], -1)] = pf
+    p[np.diag_indices(p.shape[0])] = np.ones(p.shape[0])
+
+    
+    return r, p
     
 def calculate_paired_ttest(df, condition1, condition2):
     group1 = df[condition1]
@@ -331,9 +351,13 @@ def calculate_ttest(df, condition1, condition2):
     return (df.name, t, pvalue, log)
 
 def calculate_THSD(df):
+    import matplotlib.pyplot as plt
     col = df.name
     result = pairwise_tukeyhsd(df, list(df.index))
     df_results = pd.DataFrame(data=result._results_table.data[1:], columns=result._results_table.data[0])
+    result.plot_simultaneous()    # Plot group confidence intervals
+    plt.vlines(x=49.57,ymin=-0.5,ymax=4.5, color="red")
+    print(result.summary())
     df_results.columns = ['group1', 'group2', 'log2FC', 'lower', 'upper', 'rejected'] 
     df_results['identifier'] = col
     df_results = df_results.set_index('identifier')
@@ -389,6 +413,7 @@ def anova(data, alpha=0.5, drop_cols=["sample", "name"], permutations=50):
         res = res.join(scores[['t-statistics', 'pvalue', '-Log pvalue', 'padj']].astype('float'))
     else:
         res = scores
+        res["log2FC"] = np.nan
     
     res = res.reset_index()
     

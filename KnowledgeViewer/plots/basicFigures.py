@@ -149,14 +149,14 @@ def runVolcano(identifier, signature, lfc = 1, alpha = 0.05, title = ''):
             elif rowData['log2FC'] > lfc:
                 color.append('#d7191c')
             else:
-                color.append('black')
+                color.append('grey')
         else:
             if rowData['log2FC'] < -lfc:
                 color.append("#abdda4")
             elif rowData['log2FC'] > lfc:
                 color.append('#fdae61')
             else:
-                color.append('black')
+                color.append('grey')
 
     # Return
     volcano_plot_results = {'x': signature['log2FC'].values, 'y': signature['-Log pvalue'].values, 'text':text, 'color': color}
@@ -164,7 +164,7 @@ def runVolcano(identifier, signature, lfc = 1, alpha = 0.05, title = ''):
 
     return  dcc.Graph(id= identifier, figure = figure)
 
-def getHeatmapFigure(data, identifier, title, subplot = False):
+def getHeatmapFigure(data, identifier, title, format='edgelist', subplot = False):
     '''This function plots a simple Heatmap
     --> input:
         - data: is a Pandas DataFrame with the shape of the heatmap where index corresponds to rows
@@ -174,91 +174,83 @@ def getHeatmapFigure(data, identifier, title, subplot = False):
     --> output:
         Heatmap figure within the <div id="_dash-app-content">
     '''
+    df = data.copy()
+    if format == "edgelist":
+        df = df.set_index('node1')
+        df = df.pivot_table(values='weight', index=df.index, columns='node2', aggfunc='first')
+        df = df.fillna(0)
     figure = {}
     figure["data"] = []
     figure["layout"] = {"title":title,
                         "height":500,
                         "width":700}
-    figure['data'].append(go.Heatmap(z=data.values.tolist(),
-                                    x = list(data.columns),
-                                    y = list(data.index)))
+    figure['data'].append(go.Heatmap(z=df.values.tolist(),
+                                    x = list(df.columns),
+                                    y = list(df.index)))
 
+    print(figure)
     if subplot:
         return (identifier, figure)
 
     return dcc.Graph(id = identifier, figure = figure)
 
-def getComplexHeatmapFigure(data, identifier, title, format = 'edgelist', subplot = False):
+def getComplexHeatmapFigure(data, identifier, title, dist=False, format='edgelist', subplot=False):
     df = data.copy()
-    print(df.head())
+    figure = {'data':[], 'layout':{}}
+
     if format == "edgelist":
         df = df.set_index('node1')
         df = df.pivot_table(values='weight', index=df.index, columns='node2', aggfunc='first')
         df = df.fillna(0)
-
-    figure = FF.create_dendrogram(df.values, orientation='bottom', labels=list(df.columns))
-    for i in range(len(figure['data'])):
-        figure['data'][i]['yaxis'] = 'y2'
+    
+    dendro_up = FF.create_dendrogram(df.values, orientation='bottom', labels=df.columns)
+    for i in range(len(dendro_up['data'])):
+        dendro_up['data'][i]['yaxis'] = 'y2'
 
     dendro_side = FF.create_dendrogram(df.values, orientation='right')
     for i in range(len(dendro_side['data'])):
         dendro_side['data'][i]['xaxis'] = 'x2'
 
-    # Add Side Dendrogram Data to Figure
-    figure['data'] + dendro_side['data']
+    figure['data'].extend(dendro_up['data'])
+    figure['data'].extend(dendro_side['data'])
 
+    if dist:
+        data_dist = pdist(df.values)
+        heat_data = squareform(data_dist)
+    else:
+        heat_data = df.values
+    
     dendro_leaves = dendro_side['layout']['yaxis']['ticktext']
     dendro_leaves = list(map(int, dendro_leaves))
-    data_dist = pdist(df.values)
-    heat_data = squareform(data_dist)
     heat_data = heat_data[dendro_leaves,:]
     heat_data = heat_data[:,dendro_leaves]
-
-    heatmap = Data([
+    
+    heatmap = [
         go.Heatmap(
             x = dendro_leaves,
             y = dendro_leaves,
             z = heat_data,
-            colorscale = 'YlGnBu'
+            colorscale = 'YlOrRd',
+            reversescale=True
         )
-    ])
+    ]
 
-    heatmap[0]['x'] = figure['layout']['xaxis']['tickvals']
+    heatmap[0]['x'] = dendro_up['layout']['xaxis']['tickvals']
     heatmap[0]['y'] = dendro_side['layout']['yaxis']['tickvals']
+    figure['data'].extend(heatmap)
 
-    # Add Heatmap Data to Figure
-    figure['data'] + heatmap
-
-    # Edit Layout
-    figure['layout'].update({'width':1500, 'height':1500,
+    figure['layout'] = dendro_up['layout']
+    
+    figure['layout'].update({'width':800, 'height':800,
                              'showlegend':False, 'hovermode': 'closest',
                              })
-    # Edit xaxis
     figure['layout']['xaxis'].update({'domain': [.15, 1],
                                       'mirror': False,
                                       'showgrid': False,
                                       'showline': False,
                                       'zeroline': False,
                                       'ticks':""})
-    # Edit xaxis2
     figure['layout'].update({'xaxis2': {'domain': [0, .15],
-                                       'mirror': False,
-                                   'showgrid': False,
-                                   'showline': False,
-                                   'zeroline': False,
-                                   'showticklabels': False,
-                                   'ticks':""}})
-
-    # Edit yaxis
-    figure['layout']['yaxis'].update({'domain': [0, .85],
-                                      'mirror': False,
-                                      'showgrid': False,
-                                      'showline': False,
-                                      'zeroline': False,
-                                      'showticklabels': False,
-                                      'ticks': ""})
-    # Edit yaxis2
-    figure['layout'].update({'yaxis2':{'domain':[.825, .975],
                                        'mirror': False,
                                        'showgrid': False,
                                        'showline': False,
@@ -266,8 +258,20 @@ def getComplexHeatmapFigure(data, identifier, title, format = 'edgelist', subplo
                                        'showticklabels': False,
                                        'ticks':""}})
 
-    if subplot:
-        return (identifier, figure)
+    figure['layout']['yaxis'].update({'domain': [0, .85],
+                                      'mirror': False,
+                                      'showgrid': False,
+                                      'showline': False,
+                                      'zeroline': False,
+                                      'showticklabels': False,
+                                      'ticks': ""})
+    figure['layout'].update({'yaxis2':{'domain':[.825, .975],
+                                       'mirror': False,
+                                       'showgrid': False,
+                                       'showline': False,
+                                       'zeroline': False,
+                                       'showticklabels': False,
+                                       'ticks':""}}) 
 
 
     return dcc.Graph(id = identifier, figure = figure)

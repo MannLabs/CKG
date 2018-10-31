@@ -53,7 +53,7 @@ dataTypes = {"clinical":{"directory":clinicalDirectory,
                                             "Score", 
                                             "id",
                                             "LFQ intensity \d+_AS\d+_?-?\d*",  #subject_replicate_timepoint
-                                            "Intensity \d+_AS\d+_?\d*",
+                                            "Intensity \d+_AS\d+_?-?\d*",
                                             "Reverse",
                                             "Potential contaminant",
                                             "Only identified by site"],
