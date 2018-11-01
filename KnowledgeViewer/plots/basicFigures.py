@@ -5,6 +5,7 @@ import plotly.graph_objs as go
 import plotly.figure_factory as FF
 from scipy.spatial.distance import pdist, squareform
 from plotly.graph_objs import *
+from kmapper import plotlyviz
 import networkx as nx
 from KnowledgeViewer.utils import hex2rgb, getNumberText
 
@@ -148,6 +149,10 @@ def runVolcano(identifier, signature, lfc = 1, alpha = 0.05, title = ''):
                 color.append('#2b83ba')
             elif rowData['log2FC'] > lfc:
                 color.append('#d7191c')
+            elif rowData['log2FC'] < -0.5:
+                color.append('#74a9cf')
+            elif rowData['log2FC'] > 0.5:
+                color.append('#fb6a4a')
             else:
                 color.append('grey')
         else:
@@ -188,7 +193,6 @@ def getHeatmapFigure(data, identifier, title, format='edgelist', subplot = False
                                     x = list(df.columns),
                                     y = list(df.index)))
 
-    print(figure)
     if subplot:
         return (identifier, figure)
 
@@ -273,7 +277,7 @@ def getComplexHeatmapFigure(data, identifier, title, dist=False, format='edgelis
                                        'showticklabels': False,
                                        'ticks':""}}) 
 
-
+    
     return dcc.Graph(id = identifier, figure = figure)
 
 def get3DNetworkFigure(data, sourceCol, targetCol, node_properties, identifier, title, subplot = False):
@@ -489,6 +493,13 @@ def getViolinPlot(data, variableCol, groupCol, colors, identifier, title, plot_a
 
     return dcc.Graph(id = identifier, figure = figure)
 
+def getMapperFigure(data, identifier, title, labels):
+    figure = plotlyviz.plotlyviz(data, title=title, color_function_name="Group",factor_size=7, edge_linewidth=2.5,
+                        node_linecolor="rgb(200,200,200)", width=800, height=800, bgcolor="rgba(240, 240, 240, 0.95)",
+                        left=50, bottom=35, summary_height=300, summary_width=00, summary_left=20, summary_right=20,
+                        hist_left=25, hist_right=25, member_textbox_width=800, custom_tooltips=labels)
+    return  dcc.Graph(id = identifier, figure=figure)
+
 def getDashboardLayout():
     layout = dict(
                 autosize=True,
@@ -544,3 +555,4 @@ def getDashboardPlots(figures, cols, distribution):
         divs.append(html.Div(row, className = 'row'))
 
     return html.Div(divs, className = className)
+

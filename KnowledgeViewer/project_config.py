@@ -31,6 +31,12 @@ configuration = {"proteomics":
                                 ["heatmap", "3Dnetwork", "basicTable"],
                                 {"source":"node1", "target":"node2"})
                                ],
+                "mapper":[
+                            ("regulated",
+                            ["mapper"],
+                            ["mapper"],
+                            [])
+                        ]
                 
                     }
             }

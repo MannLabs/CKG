@@ -6,12 +6,13 @@ import statsmodels.stats.multitest as multitest
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 from scipy.special import factorial, betainc
 import umap
-from sklearn import preprocessing
+from sklearn import preprocessing, ensemble, cluster
 from scipy import stats
 import numpy as np
 import math
 from random import shuffle
 from fancyimpute import KNN
+import kmapper as km
 
 def extract_number_missing(df, conditions, missing_max):
     if conditions is None:
@@ -351,12 +352,9 @@ def calculate_ttest(df, condition1, condition2):
     return (df.name, t, pvalue, log)
 
 def calculate_THSD(df):
-    import matplotlib.pyplot as plt
     col = df.name
     result = pairwise_tukeyhsd(df, list(df.index))
     df_results = pd.DataFrame(data=result._results_table.data[1:], columns=result._results_table.data[0])
-    result.plot_simultaneous()    # Plot group confidence intervals
-    plt.vlines(x=49.57,ymin=-0.5,ymax=4.5, color="red")
     print(result.summary())
     df_results.columns = ['group1', 'group2', 'log2FC', 'lower', 'upper', 'rejected'] 
     df_results['identifier'] = col
@@ -455,8 +453,6 @@ def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample", "name
         scores['rejected'] = rejected
     scores = scores.reset_index()
     aux = scores.loc[scores.rejected,:]
-    print(aux.shape)
-    print(aux.loc[aux.identifier == "Q15063",:])
     return scores
 
 def runFisher(group1, group2, alternative='two-sided'):
@@ -616,3 +612,29 @@ def runVolcano(signature, cutoff = 1, alpha = 0.05):
     # Return 
     volcano_plot_results = {'x': signature['log2FC'], 'y': signature['-Log pvalue'], 'text':text, 'color': color}
     return volcano_plot_results
+
+def runMapper(data):
+    X = data.values
+    labels ={i:data.index[i] for i in range(len(data.index))} 
+
+    model = ensemble.IsolationForest(random_state=1729)
+    model.fit(X)
+    lens1 = model.decision_function(X).reshape((X.shape[0], 1))
+    
+    # Create another 1-D lens with L2-norm
+    mapper = km.KeplerMapper(verbose=0)
+    lens2 = mapper.fit_transform(X, projection="l2norm")
+    
+    # Combine both lenses to get a 2-D [Isolation Forest, L^2-Norm] lens
+    lens = np.c_[lens1, lens2]
+    
+    # Define the simplicial complex
+    simplicial_complex = mapper.map(lens,
+                      X,
+                      nr_cubes=15,
+                      overlap_perc=0.7,
+                      clusterer=cluster.AgglomerativeClustering(n_clusters=3, linkage="complete", affinity="cosine"))
+    
+
+
+    return simplicial_complex, {"labels":labels}

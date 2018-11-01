@@ -1,4 +1,5 @@
 import sys
+import os
 import py2neo
 import pandas as pd
 from KnowledgeConnector import graph_config as config
@@ -27,8 +28,8 @@ def connectToDB(host="localhost", port=7687, user="neo4j", password="password"):
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        sys_error = "{}, file: {},line: {}".format(sys.exc_info(), fname, exec_tb.tb_lineno)
-        raise Exception("Unexpected error:{}.\n{}".format(err, sys_err))
+        sys_error = "{}, file: {},line: {}".format(sys.exc_info(), fname, exc_tb.tb_lineno)
+        raise Exception("Unexpected error:{}.\n{}".format(err, sys_error))
 
     return driver
 
@@ -61,8 +62,8 @@ def sendQuery(driver, query):
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        sys_error = "{}, file: {},line: {}".format(sys.exc_info(), fname, exec_tb.tb_lineno)
-        raise Exception("Unexpected error:{}.\n{}".format(err, sys_err))
+        sys_error = "{}, file: {},line: {}".format(sys.exc_info(), fname, exc_tb.tb_lineno)
+        raise Exception("Unexpected error:{}.\n{}".format(err, sys_error))
 
     return result
 

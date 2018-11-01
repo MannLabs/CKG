@@ -195,6 +195,9 @@ class AnalysisResult:
                 metric = args["metric"]
             if n_neighbors < self.getData().shape[0]:
                 result, args = analyses.runUMAP(self.getData(), n_neighbors=n_neighbors, min_dist=min_dist, metric=metric)
+        elif self.getAnalysisType()  == "mapper":
+            r, args = analyses.runMapper(self.getData())
+            result[self.getAnalysisType()] = r
         elif self.getAnalysisType()  == 'ttest':
             alpha = 0.05
             if "alpha" in args:
@@ -305,6 +308,14 @@ class AnalysisResult:
                     else:
                         figure_title = title
                     plot.append(figure.getComplexHeatmapFigure(data[id], identifier=identifier, title=figure_title))
+        elif name == "mapper":
+            for id in data:
+                if isinstance(id, tuple):
+                    identifier = identifier+"_"+id[0]+"_vs_"+id[1]
+                    figure_title = title + id[0]+" vs "+id[1]
+                else:
+                    figure_title = title
+                plot.append(figure.getMapperFigure(data[id], identifier, title=figure_title, labels=args["labels"]))
 
         return plot
         
@@ -394,6 +405,7 @@ class Dataset:
                                 reg_data = result.getResult()[analysis_type]
                                 if not reg_data.empty:
                                     sig_data = data[list(set(reg_data.loc[reg_data.rejected,"identifier"]))]
+                                    sig_data.index = data['group'].tolist()
                                     self.updateData({"regulated":sig_data})
                             for plot_name in plot_names:
                                 plots = result.getPlot(plot_name, section_query+"_"+analysis_type+"_"+plot_name, analysis_type.capitalize())
