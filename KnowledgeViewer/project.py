@@ -1,4 +1,5 @@
-from KnowledgeViewer import project_config as config, datasets_cypher as cypher
+from KnowledgeViewer import project_config as config
+from KnowledgeViewer.queries import datasets_cypher
 from KnowledgeConnector import graph_controller
 import KnowledgeViewer.analyses.basicAnalysis as analyses
 from KnowledgeViewer.plots import basicFigures as figure
@@ -404,9 +405,9 @@ class Dataset:
         replace = [("PROJECTID", self.getIdentifier())]
         if "replace" in self.getConfiguration():
             replace = self.getConfiguration()["replace"]
-        for query_name in cypher.queries[self.getType()]:
+        for query_name in datasets_cypher.queries[self.getType()]:
             title = query_name.lower().replace('_',' ')
-            query = cypher.queries[self.getType()][query_name]
+            query = datasets_cypher.queries[self.getType()][query_name]
             for r,by in replace:
                 query = query.replace(r,by)
             data[title] = graph_controller.getCursorData(driver, query)
