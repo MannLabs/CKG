@@ -2,15 +2,15 @@ configuration = {"proteomics":
                 {"overview":[ #section
                             ("number of peptides", #section_query
                             [], #analysis_types
-                            ["basicBarPlot"], #plot_type
+                            ["basicBarPlot", "basicTable"], #plot_type
                             {"x_title":"Analytical sample", "y_title":"number of peptides"}), #args
                             ("number of proteins",
                             [],
-                            ["basicBarPlot"],
+                            ["basicBarPlot", "basicTable"],
                             {"x_title":"Analytical sample", "y_title":"number of proteins"}),
                             ("number of modified proteins",
                             [],
-                            ["basicBarPlot"],
+                            ["basicBarPlot", "basicTable"],
                             {"x_title":"Analytical sample", "y_title":"number of modified proteins"})
                             ],
                 "stratification":[
@@ -35,8 +35,8 @@ configuration = {"proteomics":
                             ("regulated",
                             ["mapper"],
                             ["mapper"],
-                            [])
-                        ]
+                            {"n_cubes":15, "overlap":0.5, "n_clusters":3, "linkage":"complete", "affinity":"correlation"})
+                        ],
                 
                     }
             }

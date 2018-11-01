@@ -461,7 +461,7 @@ def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subse
     data_trace = go.Table(header=dict(values=data.columns,
                     fill = dict(color = colors[0]),
                     align = ['left','center']),
-                    cells=dict(values=["%.2f" % data[c] if isinstance(data[c],float) else data[c] for c in data.columns],
+                    cells=dict(values=[data[c].round(5) if data[c].dtype == np.float64 else data[c] for c in data.columns],
                     fill = dict(color= colors[1]),
                     align = ['left','center']))
     layout =  dict(
@@ -494,9 +494,20 @@ def getViolinPlot(data, variableCol, groupCol, colors, identifier, title, plot_a
     return dcc.Graph(id = identifier, figure = figure)
 
 def getMapperFigure(data, identifier, title, labels):
-    figure = plotlyviz.plotlyviz(data, title=title, color_function_name="Group",factor_size=7, edge_linewidth=2.5,
-                        node_linecolor="rgb(200,200,200)", width=800, height=800, bgcolor="rgba(240, 240, 240, 0.95)",
-                        left=50, bottom=35, summary_height=300, summary_width=00, summary_left=20, summary_right=20,
+    pl_brewer = [[0.0, '#67001f'],
+             [0.1, '#b2182b'],
+             [0.2, '#d6604d'],
+             [0.3, '#f4a582'],
+             [0.4, '#fddbc7'],
+             [0.5, '#000000'],
+             [0.6, '#d1e5f0'],
+             [0.7, '#92c5de'],
+             [0.8, '#4393c3'],
+             [0.9, '#2166ac'],
+             [1.0, '#053061']]
+    figure = plotlyviz.plotlyviz(data, title=title, colorscale=pl_brewer, color_function_name="Group",factor_size=7, edge_linewidth=2.5,
+                        node_linecolor="rgb(200,200,200)", width=1200, height=1200, bgcolor="rgba(240, 240, 240, 0.95)",
+                        left=50, bottom=50, summary_height=300, summary_width=400, summary_left=20, summary_right=20,
                         hist_left=25, hist_right=25, member_textbox_width=800, custom_tooltips=labels)
     return  dcc.Graph(id = identifier, figure=figure)
 

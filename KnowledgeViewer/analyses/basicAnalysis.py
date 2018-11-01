@@ -613,8 +613,8 @@ def runVolcano(signature, cutoff = 1, alpha = 0.05):
     volcano_plot_results = {'x': signature['log2FC'], 'y': signature['-Log pvalue'], 'text':text, 'color': color}
     return volcano_plot_results
 
-def runMapper(data):
-    X = data.values
+def runMapper(data, lenses=["l2norm"], n_cubes = 15, overlap=0.5, n_clusters=3, linkage="complete", affinity="correlation"):
+    X = data._get_numeric_data()
     labels ={i:data.index[i] for i in range(len(data.index))} 
 
     model = ensemble.IsolationForest(random_state=1729)
@@ -623,7 +623,7 @@ def runMapper(data):
     
     # Create another 1-D lens with L2-norm
     mapper = km.KeplerMapper(verbose=0)
-    lens2 = mapper.fit_transform(X, projection="l2norm")
+    lens2 = mapper.fit_transform(X, projection=lenses[0])
     
     # Combine both lenses to get a 2-D [Isolation Forest, L^2-Norm] lens
     lens = np.c_[lens1, lens2]
@@ -631,9 +631,9 @@ def runMapper(data):
     # Define the simplicial complex
     simplicial_complex = mapper.map(lens,
                       X,
-                      nr_cubes=15,
-                      overlap_perc=0.7,
-                      clusterer=cluster.AgglomerativeClustering(n_clusters=3, linkage="complete", affinity="cosine"))
+                      nr_cubes=n_cubes,
+                      overlap_perc=overlap,
+                      clusterer=cluster.AgglomerativeClustering(n_clusters=n_clusters, linkage=linkage, affinity=affinity))
     
 
 

@@ -196,7 +196,26 @@ class AnalysisResult:
             if n_neighbors < self.getData().shape[0]:
                 result, args = analyses.runUMAP(self.getData(), n_neighbors=n_neighbors, min_dist=min_dist, metric=metric)
         elif self.getAnalysisType()  == "mapper":
-            r, args = analyses.runMapper(self.getData())
+            n_cubes = 15
+            overlap = 0.5
+            n_clusters = 3
+            linkage = "complete"
+            affinity = "correlation"
+            labels = {}
+            if "labels" in args:
+                labels = args["labels"]
+            if "n_cubes" in args:
+                n_cubes = args["n_cubes"]
+            if "overlap" in args:
+                overlap = args["overlap"]
+            if "n_clusters" in args:
+                n_clusters = args["n_clusters"]
+            if "linkage" in args:
+                linkage = args["linkage"]
+            if "affinity" in args:
+                affinity = args["affinity"]
+            r, args = analyses.runMapper(self.getData(), n_cubes=n_cubes, overlap=overlap, 
+                                            n_clusters=n_clusters, linkage=linkage, affinity=affinity)
             result[self.getAnalysisType()] = r
         elif self.getAnalysisType()  == 'ttest':
             alpha = 0.05
@@ -310,6 +329,9 @@ class AnalysisResult:
                     plot.append(figure.getComplexHeatmapFigure(data[id], identifier=identifier, title=figure_title))
         elif name == "mapper":
             for id in data:
+                labels = {}
+                if "labels" in args:
+                    labels = args["labels"]
                 if isinstance(id, tuple):
                     identifier = identifier+"_"+id[0]+"_vs_"+id[1]
                     figure_title = title + id[0]+" vs "+id[1]
