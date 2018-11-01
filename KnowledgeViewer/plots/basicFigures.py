@@ -110,10 +110,12 @@ def getScatterPlotFigure(data, identifier, title, x_title, y_title, subplot = Fa
 
     return dcc.Graph(id= identifier, figure = figure)
 
-def plot_2D_scatter(x, y, text='', title='', xlab='', ylab='', hoverinfo='text', color='black', colorscale='Blues', size=8, showscale=False, symmetric_x=False, symmetric_y=False, pad=0.5, hline=False, vline=False):
+def plot_2D_scatter(x, y, text='', title='', xlab='', ylab='', hoverinfo='text', color='black', colorscale='Blues', size=8, showscale=False, symmetric_x=False, symmetric_y=False, pad=0.1, hline=False, vline=False, range_x=None, range_y=None):
     figure = {"data":[],"layout":None}
-    range_x = [-max(abs(x))-pad, max(abs(x))+pad]#if symmetric_x else []
-    range_y = [-max(abs(y))-pad, max(abs(y))+pad]#if symmetric_y else []
+    if range_x is None:
+        range_x = [-max(abs(x))-pad, max(abs(x))+pad]#if symmetric_x else []
+    if range_y is None:
+        range_y = [-max(abs(y))-pad, max(abs(y))+pad]#if symmetric_y else []
     trace = Scattergl(x=x, y=y, mode='markers', text=text, hoverinfo=hoverinfo, marker={'color': color, 'colorscale': colorscale, 'showscale': showscale, 'size': size})
     figure["data"].append(trace)
     figure["layout"] = go.Layout(title=title, xaxis={'title': xlab, 'range': range_x}, yaxis={'title': ylab, 'range': range_y}, hovermode='closest')
@@ -130,7 +132,8 @@ def plotVolcano(results, title):
         symmetric_x=True,
         xlab='log2FC',
         ylab='-log10value',
-        title = title
+        title = title,
+        range_y=[0,max(abs(results['y']))+2.5]
     )
 
     return figure

@@ -110,16 +110,15 @@ def remove_group(data):
     data.drop(['group'], axis=1)
     return data
 
-def get_measurements_ready(data, imputation = True, method = 'distribution', missing_method = 'percentage', missing_max = 0.3):
+def get_measurements_ready(data, imputation = True, method = 'distribution', missing_method = 'percentage', missing_max = 0.3, value_col='LFQ_intensity'):
     df = data.copy()
     conditions = df.group.unique()
     df = df.set_index(['group','sample'])
-    df = df.pivot_table(values='LFQ_intensity', index=df.index, columns='identifier', aggfunc='first')
+    df = df.pivot_table(values='value_col', index=df.index, columns='identifier', aggfunc='first')
     df = df.reset_index()
     df[['group', 'sample']] = df["index"].apply(pd.Series)
     df = df.drop(["index"], axis=1)
     aux = ['group', 'sample']
-    #df.to_csv("~/Downloads/data_without_imputation.csv", sep=",", header=True, doublequote=False)
 
     if missing_method == 'at_least_x_per_group':
         aux.extend(extract_number_missing(df, conditions, missing_max))
@@ -138,6 +137,7 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
             df = imputation_mixed_norm_KNN(df)
         else:
             sys.exit()
+    
     return df
 
 def runPCA(data, components = 2):
@@ -145,7 +145,7 @@ def runPCA(data, components = 2):
     df = data.copy()
     df = df.drop(['sample'], axis=1)
     df = df.set_index('group')
-    X = df.values
+    X = df._get_numeric_data()
     y = df.index
     pca = PCA(n_components=components)
     pca.fit(X)
@@ -172,7 +172,7 @@ def runTSNE(data, components=2, perplexity=40, n_iter=1000, init='pca'):
     df = data.copy()
     df = df.drop(['sample'], axis=1)
     df = df.set_index('group')
-    X = df.values
+    X = df._get_numeric_data()
     y = df.index
     
     tsne = TSNE(n_components=components, verbose=0, perplexity=perplexity, n_iter=n_iter, init=init)
@@ -198,7 +198,7 @@ def runUMAP(data, n_neighbors=10, min_dist=0.3, metric='cosine'):
     df = data.copy()
     df = df.drop(['sample'], axis=1)
     df = df.set_index('group')
-    X = df.values
+    X = df._get_numeric_data()
     y = df.index
 
     X = umap.UMAP(n_neighbors=10, min_dist=0.3, metric= metric).fit_transform(X)
@@ -294,6 +294,7 @@ def runCorrelation(data, alpha=0.05, method='pearson', correction=('fdr', 'indep
     correlation["padj"] = padj
     correlation["rejected"] = rejected
     correlation = correlation[correlation.rejected]
+    correlation["name"] = data["name"]
     
     return correlation
 

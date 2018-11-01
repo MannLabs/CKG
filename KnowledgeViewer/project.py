@@ -426,7 +426,10 @@ class Dataset:
                             if key == "regulation":
                                 reg_data = result.getResult()[analysis_type]
                                 if not reg_data.empty:
-                                    sig_data = data[list(set(reg_data.loc[reg_data.rejected,"identifier"]))]
+                                    print(reg_data.head())
+                                    sig_hits = list(set(reg_data.loc[reg_data.rejected,"identifier"]))
+                                    #sig_names = list(set(reg_data.loc[reg_data.rejected,"name"]))
+                                    sig_data = data[sig_hits]
                                     sig_data.index = data['group'].tolist()
                                     self.updateData({"regulated":sig_data})
                             for plot_name in plot_names:
@@ -449,7 +452,8 @@ class ProteomicsDataset(Dataset):
         self.preprocessDataset()
         
     def preprocessDataset(self):
-        self.updateData({"preprocessed":self.preprocessing()})
+        processed_data = self.preprocessing()
+        self.updateData({"preprocessed":processed_data})
     
     def preprocessing(self):
         processed_data = None
@@ -459,6 +463,7 @@ class ProteomicsDataset(Dataset):
             method = "mixed"
             missing_method = 'percentage'
             missing_max = 0.3
+            value_col = 'LFQ intensity'
             args = {}
             if "args" in self.getConfiguration():
                 args = self.getConfiguration()["args"] 
@@ -470,9 +475,11 @@ class ProteomicsDataset(Dataset):
                 missing_method = args["missing_method"]
             if "missing_max" in args:
                 missing_max = args["missing_max"]
+            if "value_col" in args:
+                value_col = args["value_col"]
             
             processed_data = analyses.get_measurements_ready(data, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max)
-        return processed_data
+        return processed_data, mapping
 
 class WESDataset(Dataset):
     def __init__(self, identifier, configuration, data={}):
