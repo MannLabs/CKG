@@ -15,7 +15,6 @@ class Project:
         print(self.datasets)
         if self.datasets is None:
             self.datasets = {}
-            print("IN")
             self.buildProject()
             self.generateReport()
 

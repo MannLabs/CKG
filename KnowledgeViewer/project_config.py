@@ -31,12 +31,12 @@ configuration = {"proteomics":
                                     ["heatmap", "3Dnetwork", "basicTable"],
                                     {"source":"node1", "target":"node2"})
                                    ],
-                    "mapper":[
-                                ("regulated",
-                                ["mapper"],
-                                ["mapper"],
-                                {"n_cubes":15, "overlap":0.5, "n_clusters":3, "linkage":"complete", "affinity":"correlation"})
-                            ],
+                    #"mapper":[
+                    #            ("regulated",
+                    #            ["mapper"],
+                    #            ["mapper"],
+                    #            {"n_cubes":15, "overlap":0.5, "n_clusters":3, "linkage":"complete", "affinity":"correlation"})
+                    #        ],
                     
                         }
             }

@@ -24,7 +24,6 @@ def extract_number_missing(df, conditions, missing_max):
         groups = groups[groups>=missing_max]
     
     groups = groups.dropna(how='all', axis=1)
-
     return list(groups.columns)
 
 def extract_percentage_missing(data, conditions, missing_max):
@@ -64,7 +63,9 @@ def imputation_mixed_norm_KNN(data):
 
 def imputation_normal_distribution(data, shift = 1.8, nstd = 0.3):
     np.random.seed(1)
-    data_imputed = data.copy().T
+    df = data.copy()
+    df = df.set_index(['sample','group'])
+    data_imputed = df.T
     for i in data_imputed.loc[:, data_imputed.isnull().any()]:
         missing = data_imputed[i].isnull()
         std = data_imputed[i].std()
@@ -119,14 +120,15 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
     df = df.reset_index()
     df[['group', 'sample']] = df["index"].apply(pd.Series)
     df = df.drop(["index"], axis=1)
+
     aux = ['group', 'sample']
 
     if missing_method == 'at_least_x_per_group':
         aux.extend(extract_number_missing(df, conditions, missing_max))
     elif missing_method == 'percentage':
         aux.extend(extract_percentage_missing(df, conditions, missing_max))  
-        
-    df = df[aux]
+    
+    df = df[list(set(aux))]
     if imputation:
         if method == "KNN":
             df = imputation_KNN(df)
@@ -139,6 +141,9 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
         else:
             sys.exit()
     
+    df = df.reset_index()
+    print(df.head())
+
     return df
 
 def runPCA(data, components = 2):
@@ -377,11 +382,12 @@ def get_max_permutations(df):
     
     return max_perm
 
-def anova(data, alpha=0.5, drop_cols=["sample", "name"], permutations=50):
+def anova(data, alpha=0.5, drop_cols=["sample"], permutations=50):
     columns = ['identifier', 't-statistics', 'pvalue', '-Log pvalue']
     df = data.copy()
     df = df.set_index('group')
     df = df.drop(drop_cols, axis=1)
+    print(df.head())
     scores = df.apply(func = calculate_annova, axis=0,result_type='expand').T
     scores.columns = columns
     scores = scores.set_index("identifier")
@@ -418,7 +424,7 @@ def anova(data, alpha=0.5, drop_cols=["sample", "name"], permutations=50):
     
     return res
 
-def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample", "name"], paired=False, permutations=50):
+def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample"], paired=False, permutations=50):
     df = data.copy()
     df = df.set_index('group')
     df = df.drop(drop_cols, axis = 1)
