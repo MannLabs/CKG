@@ -64,7 +64,7 @@ def imputation_mixed_norm_KNN(data):
 
 def imputation_normal_distribution(data, shift = 1.8, nstd = 0.3):
     np.random.seed(1)
-    data_imputed = data.copy()
+    data_imputed = data.copy().T
     for i in data_imputed.loc[:, data_imputed.isnull().any()]:
         missing = data_imputed[i].isnull()
         std = data_imputed[i].std()
@@ -76,7 +76,8 @@ def imputation_normal_distribution(data, shift = 1.8, nstd = 0.3):
             value = np.random.normal(mu, sigma, size=len(data_imputed[missing]))
             value[value<0] = 0.0
         data_imputed.loc[missing, i] = value
-    return data_imputed
+
+    return data_imputed.T
 
 
 def polish_median_normalization(data, max_iter = 10):
@@ -114,7 +115,7 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
     df = data.copy()
     conditions = df.group.unique()
     df = df.set_index(['group','sample'])
-    df = df.pivot_table(values='value_col', index=df.index, columns='identifier', aggfunc='first')
+    df = df.pivot_table(values=value_col, index=df.index, columns='identifier', aggfunc='first')
     df = df.reset_index()
     df[['group', 'sample']] = df["index"].apply(pd.Series)
     df = df.drop(["index"], axis=1)
@@ -294,7 +295,6 @@ def runCorrelation(data, alpha=0.05, method='pearson', correction=('fdr', 'indep
     correlation["padj"] = padj
     correlation["rejected"] = rejected
     correlation = correlation[correlation.rejected]
-    correlation["name"] = data["name"]
     
     return correlation
 

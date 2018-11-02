@@ -480,7 +480,7 @@ class ProteomicsDataset(Dataset):
                 value_col = args["value_col"]
             
             processed_data = analyses.get_measurements_ready(data, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max)
-        return processed_data, mapping
+        return processed_data
 
 class WESDataset(Dataset):
     def __init__(self, identifier, configuration, data={}):
