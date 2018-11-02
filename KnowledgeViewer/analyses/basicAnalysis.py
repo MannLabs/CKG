@@ -116,6 +116,7 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
     df = data.copy()
     conditions = df.group.unique()
     df = df.set_index(['group','sample'])
+    df['identifier'] = df['identifier'].map(str) +" - "+ df['name'].map(str)
     df = df.pivot_table(values=value_col, index=df.index, columns='identifier', aggfunc='first')
     df = df.reset_index()
     df[['group', 'sample']] = df["index"].apply(pd.Series)
@@ -361,7 +362,6 @@ def calculate_THSD(df):
     col = df.name
     result = pairwise_tukeyhsd(df, list(df.index))
     df_results = pd.DataFrame(data=result._results_table.data[1:], columns=result._results_table.data[0])
-    print(result.summary())
     df_results.columns = ['group1', 'group2', 'log2FC', 'lower', 'upper', 'rejected'] 
     df_results['identifier'] = col
     df_results = df_results.set_index('identifier')
