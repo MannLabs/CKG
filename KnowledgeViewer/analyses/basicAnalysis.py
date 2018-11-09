@@ -62,7 +62,7 @@ def imputation_mixed_norm_KNN(data):
     return df
 
 def imputation_normal_distribution(data, shift = 1.8, nstd = 0.3):
-    np.random.seed(1)
+    np.random.seed(112736)
     df = data.copy()
     df = df.set_index(['sample','group'])
     data_imputed = df.T
@@ -143,7 +143,6 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
             sys.exit()
     
     df = df.reset_index()
-    print(df.head())
 
     return df
 
@@ -237,7 +236,7 @@ def apply_pvalue_twostage_fdrcorrection(pvalues, alpha=0.05, method='bh'):
 
     return (rejected, padj)
 
-def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, permutations=50):
+def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, permutations=250):
     i = permutations
     df_index = list(df.index)
     columns = ['identifier']
@@ -387,7 +386,6 @@ def anova(data, alpha=0.5, drop_cols=["sample"], permutations=50):
     df = data.copy()
     df = df.set_index('group')
     df = df.drop(drop_cols, axis=1)
-    print(df.head())
     scores = df.apply(func = calculate_annova, axis=0,result_type='expand').T
     scores.columns = columns
     scores = scores.set_index("identifier")
@@ -401,6 +399,7 @@ def anova(data, alpha=0.5, drop_cols=["sample"], permutations=50):
         observed_pvalues = scores.pvalue
         count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=alpha, permutations=permutations)
         scores= scores.join(count)
+        aux = scores.loc[scores.rejected,:]
     else:
         rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'indep')
         scores['padj'] = padj
@@ -424,7 +423,7 @@ def anova(data, alpha=0.5, drop_cols=["sample"], permutations=50):
     
     return res
 
-def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample"], paired=False, permutations=50):
+def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample"], paired=False, permutations=0):
     df = data.copy()
     df = df.set_index('group')
     df = df.drop(drop_cols, axis = 1)

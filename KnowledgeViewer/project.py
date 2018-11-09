@@ -12,7 +12,6 @@ class Project:
         self.project_type = project_type
         self.datasets = datasets
         self.report = {}
-        print(self.datasets)
         if self.datasets is None:
             self.datasets = {}
             self.buildProject()
@@ -426,7 +425,6 @@ class Dataset:
                             if key == "regulation":
                                 reg_data = result.getResult()[analysis_type]
                                 if not reg_data.empty:
-                                    print(reg_data.head())
                                     sig_hits = list(set(reg_data.loc[reg_data.rejected,"identifier"]))
                                     #sig_names = list(set(reg_data.loc[reg_data.rejected,"name"]))
                                     sig_data = data[sig_hits]

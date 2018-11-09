@@ -81,7 +81,7 @@ def extractAttributes(data, attributes):
 
 def mergeRegexAttributes(data, attributes, index):
     if not attributes.empty:
-        attributes.columns = [c.split(" ")[-1] for c in attributes.columns]
+        attributes.columns = [c.split(" ")[1] for c in attributes.columns]
         attributes = attributes.stack()
         attributes = attributes.reset_index()
         attributes.columns = ["c"+str(i) for i in range(len(attributes.columns))]
@@ -403,8 +403,8 @@ def extractPeptideProteinRelationships(data, configuration):
 ################# Protein entity #########################
 def extractProteinSubjectRelationships(data, configuration):
     aux =  data.filter(regex = configuration["valueCol"])
-    attributes = configuration["attributes"]  
-    aux.columns = [c.split(" ")[1] for c in aux.columns]
+    attributes = configuration["attributes"]
+    aux.columns = [c.split(" ")[2] for c in aux.columns]
     aux = aux.stack()
     aux = aux.reset_index()
     aux.columns = ["c"+str(i) for i in range(len(aux.columns))]
@@ -417,12 +417,10 @@ def extractProteinSubjectRelationships(data, configuration):
     if not cAttributes.empty:
         aux = mergeColAttributes(aux, cAttributes, "c0")
         columns.extend(cCols)
-    
     aux['TYPE'] = "HAS_QUANTIFIED_PROTEIN"
     columns.append("TYPE")
     aux.columns = columns
     aux = aux[['START_ID', 'END_ID', 'TYPE', "value"] + regexCols + cCols]
-    
     return aux
 
 ############ Whole Exome Sequencing Datasets ##############

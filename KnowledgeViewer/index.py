@@ -20,7 +20,6 @@ def display_page(pathname):
             return initialApp.layout
         elif pathname.startswith('/apps/project'):
             projectId = pathname.split('/')[-1]
-            print(projectId)
             project = projectApp.ProjectApp(projectId, projectId, "", "", layout = [], logo = None, footer = None)
 
             return project.getLayout()
