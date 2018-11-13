@@ -167,7 +167,7 @@ def runPCA(data, components = 2):
         resultDf = pd.DataFrame(X, index = y)
         resultDf = resultDf.reset_index()
         cols = []
-        if len(components)>3:
+        if components>3:
             cols = resultDf.columns[4:]
         resultDf.columns = ["name", "x", "y", "z"] + cols
     result['pca'] = resultDf

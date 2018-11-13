@@ -10,7 +10,7 @@ modifications = {"ac":"MOD:00394",
                  "gl":"MOD:00448",
                  "sm":"MOD:01149",
                  "ub":"MOD:01148",
-                 "p":"MOD:01456",
+                 "p":"MOD:00696",
                  "ox":"MOD:00256",
                  "gly":"MOD:00767"}
 

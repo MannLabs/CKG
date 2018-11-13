@@ -41,7 +41,7 @@ ox = {"modId":"MOD:00256", "mod_acronym":"ox", "file":"Oxidation (M)Sites.txt"}
 ox.update(PTMdict)
 gly = {"modId":"MOD:00767", "mod_acronym":"gly", "file":"GlycationSites.txt"}
 gly.update(PTMdict)
-p = {"modId":"MOD:01456", "mod_acronym":"p", "file":"Phosphosites (STY).txt"}
+p = {"modId":"MOD:00696", "mod_acronym":"p", "file":"Phosphosites (STY).txt"}
 p.update(PTMdict)
 dataTypes = {"clinical":{"directory":clinicalDirectory,
                             "file":"clinicalData.xlsx"},

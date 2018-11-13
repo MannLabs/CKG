@@ -79,7 +79,7 @@ def parseKinaseSubstrates(fhandler, modifications):
         organism = data[3]
         substrate = data[6]
         residue_mod = data[9].split('-')
-        modified_protein_id = substrate+'_'+data[7]
+        modified_protein_id = substrate+'_'+data[9]+'-p'
         if organism == "human":
             relationships.add((modified_protein_id,kinase,"IS_SUBSTRATE_OF", "CURATED", 5, "PhosphoSitePlus"))
     return relationships
