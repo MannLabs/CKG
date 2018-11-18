@@ -283,7 +283,7 @@ def extractProteinModificationSubjectRelationships(data, configuration):
     aux = aux.set_index("END_ID")
     newIndexdf = aux.copy()
     aux = aux.drop(cols, axis=1)
-    aux =  aux.filter(regex = configuration["valueCol"])
+    aux =  aux.filter(regex = configuration["valueCol"].replace("\\\\","\\"))
     aux.columns = [c.split(" ")[1] for c in aux.columns]
     aux = aux.stack()
     aux = aux.reset_index()
@@ -369,7 +369,7 @@ def extractPeptides(data, configuration):
 
 def extractPeptideSubjectRelationships(data, configuration):
     data = data[~data.index.duplicated(keep='first')]
-    aux =  data.filter(regex = configuration["valueCol"])
+    aux =  data.filter(regex = configuration["valueCol"].replace("\\\\","\\"))
     attributes = configuration["attributes"]
     aux.columns = [c.split(" ")[1] for c in aux.columns]
     aux = aux.stack()
@@ -405,7 +405,7 @@ def extractPeptideProteinRelationships(data, configuration):
 
 ################# Protein entity #########################
 def extractProteinSubjectRelationships(data, configuration):
-    aux =  data.filter(regex = configuration["valueCol"])
+    aux =  data.filter(regex = configuration["valueCol"].replace("\\\\","\\"))
     attributes = configuration["attributes"]
     aux.columns = [c.split(" ")[2] for c in aux.columns]
     aux = aux.stack()
@@ -480,7 +480,7 @@ def loadProteomicsDataset(uri, configuration):
     aux = None
     #Get the columns from config and divide them into simple or regex columns
     columns = configuration["columns"]
-    regexCols = [c for c in columns if '+' in c]
+    regexCols = [c.replace("\\\\","\\") for c in columns if '+' in c]
     columns = set(columns).difference(regexCols)
     
     #Read the filters defined in config, i.e. reverse, contaminant, etc.
