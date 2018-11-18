@@ -1,10 +1,11 @@
 import os.path
 import sys
 import gzip
+import config.ckg_config as ckg_config
+import ckg_utils
 from graphdb_builder.databases import databases_config as dbconfig
-import config.ckg_config as graph_config
+from graphdb_builder import builder_utils
 from collections import defaultdict
-from graphdb_builder import utils
 import csv
 import pandas as pd
 import re
@@ -15,8 +16,13 @@ from joblib import Parallel, delayed
 import logging
 import logging.config
 
-log_config = graph_config.log
+log_config = ckg_config.log
 logger = utils.setup_logging(log_config, key="database_controller")
+
+try:
+    dbconfig = ckg_utils.get_configuration(ckg_config.databases_config_file)
+except Exception as err
+    logger.error("Reading configuration > {}.".format(err))
 
 #########################
 # General functionality # 
@@ -294,7 +300,7 @@ def parseDatabase(importDirectory,database):
 #########################
 def generateGraphFiles(importDirectory, databases = None, n_jobs = 4):
     if databases is None:
-        databases = dbconfig.databases
+        databases = dbconfig["databases"]
     stats = Parallel(n_jobs=n_jobs)(delayed(parseDatabase)(importDirectory,database) for database in databases)
     allstats = {val if type(sublist) == set else sublist for sublist in stats for val in sublist}
     return allstats

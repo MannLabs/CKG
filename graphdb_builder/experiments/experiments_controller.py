@@ -1,19 +1,22 @@
-from graphdb_builder.experiments import experiments_config as config
 from graphdb_builder.ontologies import ontologies_controller as oh
-from graphdb_builder import utils
-
+from graphdb_builder import builder_utils
 import sys
 import re
 import os.path
 import pandas as pd
 import numpy as np
 from collections import defaultdict
-import config.ckg_config as graph_config
+import config.ckg_config as ckg_config
 import logging
 import logging.config
 
-log_config = graph_config.log
-logger = utils.setup_logging(log_config, key="experiments_controller")
+log_config = ckg_config.log
+logger = builder_utils.setup_logging(log_config, key="experiments_controller")
+
+try:
+    config = ckg_utils.get_configuration(ckg_config.experiments_config_file)
+except Exception as err
+    logger.error("Reading configuration > {}.".format(err))
 
 #########################
 # General functionality # 
@@ -551,10 +554,10 @@ def loadWESDataset(uri, configuration):
 def generateDatasetImports(projectId, dataType):
     stats = set()
     try:
-        if dataType in config.dataTypes:
-            if "directory" in config.dataTypes[dataType]:
-                dataDir = config.dataTypes[dataType]["directory"].replace("PROJECTID", projectId)
-                configuration = config.dataTypes[dataType]
+        if dataType in config["dataTypes"]:
+            if "directory" in config["dataTypes"][dataType]:
+                dataDir = config["dataTypes"][dataType]["directory"].replace("PROJECTID", projectId)
+                configuration = config["dataTypes"][dataType]
                 if dataType == "clinical":
                     data = parseClinicalDataset(projectId, configuration, dataDir)
                     if data is not None:
@@ -625,7 +628,7 @@ def generateDatasetImports(projectId, dataType):
         raise Exception("Error when importing experiment {}.\n {}".format(projectId, err))
         
 def generateGraphFiles(data, dataType, projectId, stats, ot = 'w', d = 'proteomics'):
-    importDir = os.path.join(config.experimentsImportDirectory, os.path.join(projectId,d))
+    importDir = os.path.join(config["experimentsImportDirectory"], os.path.join(projectId,d))
     outputfile = os.path.join(importDir, projectId+"_"+dataType.lower()+".csv")
     with open(outputfile, ot) as f:  
         data.to_csv(path_or_buf = f, 

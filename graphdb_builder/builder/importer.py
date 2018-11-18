@@ -12,6 +12,7 @@ from datetime import datetime
 import pandas as pd
 from joblib import Parallel, delayed
 import config.ckg_config as ckg_config
+import ckg_utils
 from graphdb_builder.ontologies import ontologies_controller as oh
 from graphdb_builder.databases import databases_controller as dh
 from graphdb_builder.experiments import experiments_controller as eh

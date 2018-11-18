@@ -15,11 +15,11 @@
 import os
 import sys
 from datetime import datetime
-from graphdb_connector import connector
 import config.ckg_config as ckg_config
-import cypher as cy
-import utils as ckg_utils
+import ckg_utils
+from graphdb_connector import connector
 from graphdb_builder import builder_utils
+import cypher as cy
 import logging
 import logging.config
 

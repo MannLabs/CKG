@@ -1,5 +1,4 @@
 import urllib
-from graphdb_builder.ontologies import ontologies_config as config
 from graphdb_builder import mapping as mp, utils
 from graphdb_builder.ontologies.parsers import *
 import os.path
@@ -14,6 +13,11 @@ import logging.config
 
 log_config = graph_config.log
 logger = utils.setup_logging(log_config, key="ontologies_controller")
+
+try:
+    config = ckg_utils.get_configuration(ckg_config.ontologies_config_file)
+except Exception as err
+    logger.error("Reading configuration > {}.".format(err))
 
 #########################
 # General functionality # 
@@ -51,19 +55,19 @@ def trimSNOMEDTree(relationships, filters):
 # Calling the right parser # 
 ############################
 def parseOntology(ontology):
-    ontologyDirectory = config.ontologiesDirectory
+    ontologyDirectory = config["ontologiesDirectory"]
     ontologyFiles = []
-    if ontology in config.ontology_types:
-        otype = config.ontology_types[ontology]
-        if otype in config.files:
-            ofiles = config.files[otype]
+    if ontology in config["ontology_types"]:
+        otype = config["ontology_types"][ontology]
+        if otype in config["files"]:
+            ofiles = config["files"][otype]
             ###Check SNOMED-CT files exist
             for f in ofiles:
                 if os.path.isfile(os.path.join(ontologyDirectory, f)):
                     ontologyFiles.append(os.path.join(ontologyDirectory, f))
         filters = None
-        if otype in config.parser_filters:
-            filters = config.parser_filters[otype]
+        if otype in config["parser_filters"]:
+            filters = config["parser_filters"][otype]
     if ontology == "SNOMED-CT":
         ontologyData = snomedParser.parser(ontologyFiles, filters)
     if ontology == "ICD":
@@ -78,21 +82,21 @@ def parseOntology(ontology):
 #       Graph files     # 
 #########################
 def generateGraphFiles(importDirectory, ontologies=None):
-    entities = config.ontologies
+    entities = config["ontologies"]
     if ontologies is not None:
         for ontology in ontologies:
             entities = {ontology:ontologies[ontology]}
 
     stats = set()
     for entity in entities:
-        ontology = config.ontologies[entity]
-        if ontology in config.ontology_types:
-            ontologyType = config.ontology_types[ontology]
+        ontology = config["ontologies"][entity]
+        if ontology in config["ontology_types"]:
+            ontologyType = config["ontology_types"][ontology]
         try:
             terms, relationships, definitions = parseOntology(ontology)
             for namespace in terms:
-                if namespace in config.entities:
-                    name = config.entities[namespace]
+                if namespace in config["entities"]:
+                    name = config["entities"][namespace]
                 entity_outputfile = os.path.join(importDirectory, name+".csv")
                 with open(entity_outputfile, 'w') as csvfile:
                     writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
