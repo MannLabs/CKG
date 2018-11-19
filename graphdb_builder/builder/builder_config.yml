@@ -1,128 +1,128 @@
 ########################
-dataDirectory : ../../../data
+dataDirectory : '../../../data'
 #Import directory
-importDirectory : "{{dataDirectory}}/imports"
+importDirectory : '../../../data/imports'
 #Archive directory
-archiveDirectory : "{{dataDirectory}}/archive"
+archiveDirectory : '../../../data/archive'
 #Stats directory
-statsDirectory : "{{importDirectory}}/stats"
+statsDirectory : '../../../data/imports/stats'
 #experiments import directory
-experimentsDirectory : "{{importDirectory}}/experiments"
+experimentsDirectory : '../../../data/imports/experiments'
 #databases import diretory
-databasesDirectory : "{{importDirectory}}/databases"
+databasesDirectory : '../../../data/imports/databases'
 #ontologies import diretory
-ontologiesDirectory : "{{importDirectory}}/ontologies"
+ontologiesDirectory : '../../../data/imports/ontologies'
 
-statsFile : "stats.hdf"
+statsFile : 'stats.hdf'
 statsCols : 
-    -"date"
-    -"time"
-    -"dataset"
-    -"filename"
-    -"file_size"
-    -"Imported_number"
-    -"Import_type"
-    -"name"
+    - 'date'
+    - 'time'
+    - 'dataset'
+    - 'filename'
+    - 'file_size'
+    - 'Imported_number'
+    - 'Import_type'
+    - 'name'
 
 #Full Graph
-graph = 
-    "ontologies"
-    -"chromosomes"
-    -"genes"
-    -"transcripts"
-    -"proteins"
-    -"annotations"
-    -"modified_proteins"
-    -"complexes"
-    -"ppi"
-    -"diseases"
-    -"known_variants"
-    -"clinical variants"
-    -"drugs"
-    -"pathology_expression"
-    -'mentions'
-    -"internal"
-    -"side effects"
-    -'metabolite'
-    -'food'
-    -"gwas"
-    -'pathway'
-    -"published"
-    -"project"
-    -"experiment"
+graph : 
+    - 'ontologies'
+    - 'chromosomes'
+    - 'genes'
+    - 'transcripts'
+    - 'proteins'
+    - 'annotations'
+    - 'modified_proteins'
+    - 'complexes'
+    - 'ppi'
+    - 'diseases'
+    - 'known_variants'
+    - 'clinical variants'
+    - 'drugs'
+    - 'pathology_expression'
+    - 'mentions'
+    - 'internal'
+    - 'side effects'
+    - 'metabolite'
+    - 'food'
+    - 'gwas'
+    - 'pathway'
+    - 'published'
+    - 'project'
+    - 'experiment'
 
 #Imports 
 ontology_entities : 
-    -"Disease"
-    -"Tissue"
-    -"Biological_process"
-    -"Molecular_function"
-    -"Cellular_component"
-    -"Modification"
-    -"Clinical_variable"
-    -"Phenotype"
-    -"Experiment"
+    - 'Disease'
+    - 'Tissue'
+    - 'Biological_process'
+    - 'Molecular_function'
+    - 'Cellular_component'
+    - 'Modification'
+    - 'Clinical_variable'
+    - 'Phenotype'
+    - 'Experiment'
 #Database resources
 #Modified proteins
 modified_proteins_resources :
-    -"psp"
+    - 'psp'
 #Protein complexes
 complexes_resources :
-    -"CORUM"
+    - 'CORUM'
 #Protein-protein interactions
 curated_PPI_resources :
-    -"IntAct"
+    - 'IntAct'
 compiled_PPI_resources :
-    -"STRING"
+    - 'STRING'
 PPI_action_resources :
-    -"STRING"
+    - 'STRING'
 #Disease associations
 disease_resources : 
-    -["Protein","DisGEnet"]
+    - ['Protein','DisGEnet']
 #Pathology Expression
 pathology_expression_resources : 
-    -"HPA"
+    - 'HPA'
 #Drug associations, indications and actions
 curated_drug_resources :
-    -"DGIdb"
-    -"CGI"
-    -"OncoKB"
+    - 'DGIdb'
+    - 'CGI'
+    - 'OncoKB'
 compiled_drug_resources :
-    -"STITCH"
+    - 'STITCH'
 drug_action_resources :
-    -"STITCH"
+    - 'STITCH'
 side_effects_resources :
-    -"SIDER"
+    - 'SIDER'
 
 #Variants
 clinical_variant_resources :
-    -"CGI"
-    -"OncoKB"
+    - 'CGI'
+    - 'OncoKB'
 
 #Pathways
 pathway_resources :
-    -"Reactome"
-    -"SMPDB"
+    - 'Reactome'
+    - 'SMPDB'
 
 #Metabolites
 metabolite_resources :
-    -"hmdb"
+    - 'hmdb'
 
 #Food
 food_resources :
-    -'FooDB'
+    - 'FooDB'
 
 #Internal Databases entities
 internalEntities :
-    -["Protein","Disease"]
-    -["Protein", "Tissue"]
-    -["Protein","Cellular_component"]
+    - ['Protein','Disease']
+    - ['Protein', 'Tissue']
+    - ['Protein','Cellular_component']
 
 #Mentions entities
 mentionEntities : 
-    -"Disease"
-    -"Tissue"
-    -"Protein"
-    -"Metabolite"
+    - 'Disease'
+    - 'Tissue'
+    - 'Protein'
+    - 'Metabolite'
 publicationEntities :
-    -"GWAS_study"
+    - 'GWAS_study'

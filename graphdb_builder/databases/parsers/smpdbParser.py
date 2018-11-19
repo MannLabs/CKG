@@ -1,28 +1,27 @@
 import os.path
 import zipfile
 from collections import defaultdict
-from graphdb_builder.databases import databases_config as dbconfig
 from graphdb_builder.databases.config import smpdbConfig as iconfig
-from graphdb_builder import mapping as mp, utils
+from graphdb_builder import mapping as mp, builder_utils
 import pandas as pd
 
 #########################
 #     SMPDB database    #
 #########################
-def parser(download=True):
+def parser(databases_directory, download=True):
     urls = iconfig.smpdb_urls
     entities = set()
     relationships = defaultdict(set)
     entities_header = iconfig.pathway_header
     relationships_headers = iconfig.relationships_header
-    directory = os.path.join(dbconfig.databasesDir, "SMPDB")
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory, "SMPDB")
+    builder_utils.checkDirectory(directory)
     
     for dataset in urls:
         url = urls[dataset]
         file_name = url.split('/')[-1]
         if download:
-            utils.downloadDB(url, directory)
+            builder_utils.downloadDB(url, directory)
         zipped_file = os.path.join(directory, file_name)
         with zipfile.ZipFile(zipped_file) as rf:
             if dataset == "pathway":

@@ -1,5 +1,5 @@
 from collections import defaultdict
-from graphdb_builder import utils
+from graphdb_builder import builder_utils
 import re
 ##################
 # OBO ontologies # 
@@ -10,7 +10,7 @@ def parser(ontology, files):
     relationships = defaultdict(set)
     definitions = defaultdict()
     for f in files:
-        oboGraph = utils.convertOBOtoNet(f)
+        oboGraph = builder_utils.convertOBOtoNet(f)
         namespace = ontology
         for term,attr in oboGraph.nodes(data = True):
             if "namespace" in attr:

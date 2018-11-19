@@ -1,16 +1,14 @@
 import os.path
-from graphdb_builder.databases import databases_config as dbconfig
 from graphdb_builder.databases.config import cancerGenomeInterpreterConfig as iconfig
 from collections import defaultdict
 import zipfile
-from graphdb_builder import utils, mapping as mp
+from graphdb_builder import builder_utils, mapping as mp
 import re
-
 
 #######################################
 #   The Cancer Genome Interpreter     # 
 #######################################
-def parser(download = True):
+def parser(databases_directory, download = True):
     regex = r"chr(\d+)\:g\.(\d+)(\w)>(\w)"
     url = iconfig.cancerBiomarkers_url
     entities_header = iconfig.entities_header
@@ -21,12 +19,12 @@ def parser(download = True):
     fileName = iconfig.cancerBiomarkers_variant_file
     relationships = defaultdict(set)
     entities = set()
-    directory = os.path.join(dbconfig.databasesDir,"CancerGenomeInterpreter")
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory,"CancerGenomeInterpreter")
+    builder_utils.checkDirectory(directory)
     zipFile = os.path.join(directory, url.split('/')[-1])
 
     if download:
-        utils.downloadDB(url, directory)
+        builder_utils.downloadDB(url, directory)
     with zipfile.ZipFile(zipFile) as z:
         if fileName in z.namelist():
             with z.open(fileName, 'r') as associations:

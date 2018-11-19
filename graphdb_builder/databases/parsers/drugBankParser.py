@@ -1,18 +1,17 @@
 import os.path
-from graphdb_builder.databases import databases_config as dbconfig
 from graphdb_builder.databases.config import drugBankConfig as iconfig
 from collections import defaultdict
 from lxml import etree
 import zipfile
-from graphdb_builder import utils
+from graphdb_builder import builder_utils
 
 
 #########################
 #       Drug Bank       #
 #########################
-def parser():
-    drugs = extract_drugs()
-    build_DrugBank_dictionary(drugs)
+def parser(databases_directory):
+    drugs = extract_drugs(databases_directory)
+    build_DrugBank_dictionary(databases_directory, drugs)
     relationships = build_relationships_from_DrugBank(drugs)
     entities, attributes = build_drug_entity(drugs)
     entities_header = ['ID'] + attributes
@@ -20,18 +19,18 @@ def parser():
     
     return (entities, relationships, entities_header, relationships_headers)
 
-def extract_drugs():
+def extract_drugs(databases_directory):
     drugs = {}
     prefix = '{http://www.drugbank.ca}'
     relationships = set()
     url = iconfig.DrugBank_url
-    directory = os.path.join(dbconfig.databasesDir,"DrugBank")
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory,"DrugBank")
+    builder_utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     fields = iconfig.DrugBank_fields
     parentFields = iconfig.DrugBank_parentFields
     structuredFields = iconfig.DrugBank_structures
-    vocabulary = parseDrugBankVocabulary()
+    vocabulary = parseDrugBankVocabulary(databases_directory)
     i = 1
     with zipfile.ZipFile(fileName, 'r') as zipped:
         for f in zipped.namelist():
@@ -68,10 +67,10 @@ def extract_drugs():
 
     return drugs
 
-def parseDrugBankVocabulary():
+def parseDrugBankVocabulary(databases_directory):
     vocabulary = {}
     url = iconfig.DrugBank_vocabulary_url
-    directory = os.path.join(dbconfig.databasesDir,"DrugBank")
+    directory = os.path.join(databases_directory,"DrugBank")
     fileName = os.path.join(directory, url.split('/')[-1])
     with zipfile.ZipFile(fileName, 'r') as zipped:
         for f in zipped.namelist():
@@ -106,7 +105,7 @@ def build_relationships_from_DrugBank(drugs):
                         partners = [p for r,p in partners if r == "UniProtKB"]
                     for partner in partners:
                         rel = (did, partner, associations[ass][0], "DrugBank")
-                        relationships[ident].append(tuple(utils.flatten(rel)))
+                        relationships[ident].append(tuple(builder_utils.flatten(rel)))
                 else:
                     partner = drugs[did][ass]
                     relationships[ident].append((did, partner, associations[ass][0], "DrugBank"))
@@ -142,8 +141,8 @@ def build_drug_entity(drugs):
     
     return entities, allAttr
 
-def build_DrugBank_dictionary(drugs):
-    directory = os.path.join(dbconfig.databasesDir,"DrugBank")
+def build_DrugBank_dictionary(databases_directory, drugs):
+    directory = os.path.join(databases_directory,"DrugBank")
     filename = iconfig.DrugBank_dictionary_file
     outputfile = os.path.join(directory, filename)
     

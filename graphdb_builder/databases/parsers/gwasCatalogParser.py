@@ -1,24 +1,23 @@
 import os.path
-from graphdb_builder.databases import databases_config as dbconfig
 from graphdb_builder.databases.config import gwasCatalogConfig as iconfig
 from collections import defaultdict
-from graphdb_builder import utils
+from graphdb_builder import builder_utils
 
 
 #########################
 #   GWAS Catalog EBI    #
 #########################
-def parser(download= True, mapping = {}):
+def parser(databases_directory, download= True):
     url = iconfig.GWASCat_url
     entities_header = iconfig.entities_header
     relationships_header = iconfig.relationships_header
     entities = set()
     relationships = defaultdict(set)
-    directory = os.path.join(dbconfig.databasesDir,"GWAScatalog")
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory,"GWAScatalog")
+    builder_utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
-        utils.downloadDB(url, directory)
+        builder_utils.downloadDB(url, directory)
     with open(fileName, 'r') as catalog:
         for line in catalog:
             data = line.rstrip("\r\n").split("\t")

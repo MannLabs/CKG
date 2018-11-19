@@ -24,7 +24,7 @@ import logging
 import logging.config
 
 log_config = ckg_config.log
-logger = utils.setup_logging(log_config, key="grapher")
+logger = builder_utils.setup_logging(log_config, key="grapher")
 
 try:
     config = ckg_utils.get_configuration(ckg_config.builder_config_file)
@@ -267,7 +267,7 @@ def updateDB(driver, imports=None):
             #Projects
             elif "project" == i:
                 importDir = os.path.join(os.getcwd(),config["experimentsDirectory"])
-                projects = utils.listDirectoryFolders(importDir)
+                projects = builder_utils.listDirectoryFolders(importDir)
                 projectCode = cy.IMPORT_PROJECT
                 for project in projects:
                     projectDir = os.path.join(importDir, project)
@@ -280,10 +280,10 @@ def updateDB(driver, imports=None):
             elif "experiment" == i:
                 importDir = os.path.join(os.getcwd(),config["experimentsDirectory"])
                 datasetsCode = cy.IMPORT_DATASETS
-                projects = utils.listDirectoryFolders(importDir)
+                projects = builder_utils.listDirectoryFolders(importDir)
                 for project in projects:
                     projectDir = os.path.join(importDir, project)
-                    datasetTypes = utils.listDirectoryFolders(projectDir)
+                    datasetTypes = builder_utils.listDirectoryFolders(projectDir)
                     for dtype in datasetTypes:
                         datasetDir = os.path.join(projectDir, dtype)
                         code = datasetsCode[dtype]
@@ -339,12 +339,12 @@ def archiveImportDirectory(archive_type="full"):
         archive_type (string): whether it is a full update or a partial update
     """
     dest_folder = config["archiveDirectory"]
-    utils.checkDirectory(dest_folder)
+    builder_utils.checkDirectory(dest_folder)
     folder_to_backup = config["importDirectory"]
-    date, time = utils.getCurrentTime()
+    date, time = builder_utils.getCurrentTime()
     file_name = "{}_{}_{}".format(archive_type, date.replace('-', ''), time.replace(':', ''))
     logger.info("Archiving {} to file: {}".format(folder_to_backup, file_name))
-    utils.compress_directory(folder_to_backup, dest_folder, file_name)
+    builder_utils.compress_directory(folder_to_backup, dest_folder, file_name)
     logger.info("New backup created: {}".format(file_name))
 
 if __name__ == "__main__":

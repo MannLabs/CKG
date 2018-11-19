@@ -1,27 +1,26 @@
 import os.path
 import zipfile
-from graphdb_builder.databases import databases_config as dbconfig
 from graphdb_builder.databases.config import hpaConfig as iconfig
 from collections import defaultdict
-from graphdb_builder import mapping as mp, utils
+from graphdb_builder import mapping as mp, builder_utils
 import numpy as np
 import pandas as pd
 
 ##########################################
 #   Human Protein Atlas (pathology)      # 
 ##########################################
-def parser(download = True):
+def parser(databases_directory, download = True):
     url = iconfig.hpa_pathology_url
     disease_mapping = mp.getMappingFromOntology(ontology = "Disease", source = None)
     protein_mapping = mp.getMappingForEntity("Protein")
-    directory = os.path.join(dbconfig.databasesDir, "HPA")
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory, "HPA")
+    builder_utils.checkDirectory(directory)
     compressed_fileName = os.path.join(directory, url.split('/')[-1])
     file_name = '.'.join(url.split('/')[-1].split('.')[0:2])
     relationships_headers = iconfig.relationships_headers
 
     if download:
-        utils.downloadDB(url, directory)
+        builder_utils.downloadDB(url, directory)
     
     with zipfile.ZipFile(compressed_fileName) as z:
         if file_name == "pathology.tsv":

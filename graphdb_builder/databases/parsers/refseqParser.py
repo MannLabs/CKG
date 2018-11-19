@@ -1,25 +1,24 @@
 import os.path
 import gzip
-from graphdb_builder.databases import databases_config as dbconfig
 from graphdb_builder.databases.config import refseqConfig as iconfig
 from collections import defaultdict
-from graphdb_builder import utils
+from graphdb_builder import builder_utils
 
 #########################
 #          RefSeq       # 
 #########################
-def parser(download=True):
+def parser(databases_directory, download=True):
     url = iconfig.refseq_url
     entities = defaultdict(set)
     relationships = defaultdict(set)
-    directory = os.path.join(dbconfig.databasesDir,"RefSeq")
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory,"RefSeq")
+    builder_utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     headers = iconfig.headerEntities
     taxid = 9606
     
     if download:
-        utils.downloadDB(url, directory)
+        builder_utils.downloadDB(url, directory)
 
     df = gzip.open(fileName, 'r')
     first = True

@@ -35,3 +35,4 @@ sources :
     "Gene": "HGNC"
     "Food": "FooDB"
     "Pathway": "Reactome"
+    "Disease": "DO"

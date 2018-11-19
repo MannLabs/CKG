@@ -1,13 +1,12 @@
 import os.path
-from graphdb_builder.databases import databases_config as dbconfig
 from graphdb_builder.databases.config import oncokbConfig as iconfig
-from graphdb_builder import mapping as mp, utils
+from graphdb_builder import mapping as mp, builder_utils
 from collections import defaultdict
 import re
 #########################
 #   OncoKB database     #
 #########################
-def parser(download = True):
+def parser(databases_directory, download = True):
     url_actionable = iconfig.OncoKB_actionable_url
     url_annotation = iconfig.OncoKB_annotated_url
     entities_header = iconfig.entities_header
@@ -19,13 +18,13 @@ def parser(download = True):
     levels = iconfig.OncoKB_levels
     entities = set()
     relationships = defaultdict(set)
-    directory = os.path.join(dbconfig.databasesDir,"OncoKB")
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory,"OncoKB")
+    builder_utils.checkDirectory(directory)
     acfileName = os.path.join(directory,url_actionable.split('/')[-1])
     anfileName = os.path.join(directory,url_annotation.split('/')[-1])
     if download:
-        utils.downloadDB(url_actionable, directory)
-        utils.downloadDB(url_annotation, directory)
+        builder_utils.downloadDB(url_actionable, directory)
+        builder_utils.downloadDB(url_annotation, directory)
 
     regex = r"\w\d+(\w|\*|\.)"
     with open(anfileName, 'r', errors='replace') as variants:

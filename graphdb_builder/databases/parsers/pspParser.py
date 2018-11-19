@@ -1,8 +1,7 @@
 import os.path
 import gzip
-from graphdb_builder.databases import databases_config as dbconfig
 from graphdb_builder.databases.config import pspConfig as iconfig
-from graphdb_builder import mapping as mp, utils
+from graphdb_builder import mapping as mp, builder_utils
 from collections import defaultdict
 import pandas as pd
 import re
@@ -10,9 +9,9 @@ import re
 #############################
 #       PhosphoSitePlus     # 
 #############################
-def parser():
-    directory = os.path.join(dbconfig.databasesDir,"PhosphoSitePlus")
-    utils.checkDirectory(directory)
+def parser(databases_directory):
+    directory = os.path.join(databases_directory,"PhosphoSitePlus")
+    builder_utils.checkDirectory(directory)
     modifications = iconfig.modifications
     annotation_files = iconfig.annotation_files
     entities_header = iconfig.entities_header

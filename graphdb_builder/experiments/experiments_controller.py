@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 from collections import defaultdict
 import config.ckg_config as ckg_config
+import ckg_utils
 import logging
 import logging.config
 
@@ -15,7 +16,7 @@ logger = builder_utils.setup_logging(log_config, key="experiments_controller")
 
 try:
     config = ckg_utils.get_configuration(ckg_config.experiments_config_file)
-except Exception as err
+except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
 
 #########################

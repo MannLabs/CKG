@@ -1,5 +1,7 @@
 import urllib
-from graphdb_builder import mapping as mp, utils
+from graphdb_builder import mapping as mp, builder_utils
+import config.ckg_config as ckg_config
+import ckg_utils
 from graphdb_builder.ontologies.parsers import *
 import os.path
 from collections import defaultdict
@@ -12,11 +14,11 @@ import logging
 import logging.config
 
 log_config = graph_config.log
-logger = utils.setup_logging(log_config, key="ontologies_controller")
+logger = builder_utils.setup_logging(log_config, key="ontologies_controller")
 
 try:
     config = ckg_utils.get_configuration(ckg_config.ontologies_config_file)
-except Exception as err
+except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
 
 #########################
@@ -104,7 +106,7 @@ def generateGraphFiles(importDirectory, ontologies=None):
                     for term in terms[namespace]:
                         writer.writerow([term, entity, list(terms[namespace][term])[0], definitions[term], ontologyType, ",".join(terms[namespace][term])])
                 logger.info("Ontology {} - Number of {} entities: {}".format(ontology, name, len(terms[namespace])))
-                stats.add(utils.buildStats(len(terms[namespace]), "entity", name, ontology, entity_outputfile))
+                stats.add(builder_utils.buildStats(len(terms[namespace]), "entity", name, ontology, entity_outputfile))
                 if namespace in relationships:
                     relationships_outputfile = os.path.join(importDirectory, name+"_has_parent.csv")
                     relationshipsDf = pd.DataFrame(list(relationships[namespace]))
@@ -114,7 +116,7 @@ def generateGraphFiles(importDirectory, ontologies=None):
                                                 quoting=csv.QUOTE_ALL,
                                                 line_terminator='\n', escapechar='\\')
                     logger.info("Ontology {} - Number of {} relationships: {}".format(ontology, name+"_has_parent", len(relationships[namespace])))
-                    stats.add(utils.buildStats(len(relationships[namespace]), "relationships", name+"_has_parent", ontology, relationships_outputfile))
+                    stats.add(builder_utils.buildStats(len(relationships[namespace]), "relationships", name+"_has_parent", ontology, relationships_outputfile))
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]

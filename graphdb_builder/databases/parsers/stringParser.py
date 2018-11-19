@@ -1,16 +1,15 @@
 import os.path
 import gzip
-from graphdb_builder.databases import databases_config as dbconfig
 from graphdb_builder.databases.config import stringConfig as iconfig
 from collections import defaultdict
-from graphdb_builder import mapping as mp, utils
+from graphdb_builder import mapping as mp, builder_utils
 import csv
 import re
 
 #########################
 #   STRING like DBs     #
 #########################
-def parser(importDirectory, download = True, db="STRING"):
+def parser(databases_directory, importDirectory, drug_source = None, download = True, db="STRING"):
     mapping_url = iconfig.STRING_mapping_url
     mapping = mp.getSTRINGMapping(mapping_url, download = False)
     stored = set()
@@ -24,21 +23,20 @@ def parser(importDirectory, download = True, db="STRING"):
         url = iconfig.STITCH_url
         outputfile = os.path.join(importDirectory, "stitch_associated_with.csv")
 
-        drugsource = dbconfig.sources["Drug"]
         drugmapping_url = iconfig.STITCH_mapping_url
-        drugmapping = mp.getSTRINGMapping(drugmapping_url, source = drugsource, download = False, db = db)
+        drugmapping = mp.getSTRINGMapping(drugmapping_url, source = drug_source, download = False, db = db)
         
     elif db == "STRING":
         evidences = ["Neighborhood in the Genome", "Gene fusions", "Co-ocurrence across genomes","Co-expression", "Experimental/biochemical data", "Association in curated databases", "Text-mining"]
         relationship = "COMPILED_TARGETS"
         outputfile = os.path.join(importDirectory, "string_interacts_with.csv")
         url = iconfig.STRING_url
-    directory = os.path.join(dbconfig.databasesDir, db)
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory, db)
+    builder_utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
 
     if download:
-        utils.downloadDB(url, directory)
+        builder_utils.downloadDB(url, directory)
     
     f = os.path.join(directory, fileName)
     associations = gzip.open(f, 'r')
@@ -79,7 +77,7 @@ def parser(importDirectory, download = True, db="STRING"):
 
 
 
-def parseActions(importDirectory, proteinMapping, drugMapping = None, download = True, db="STRING"):
+def parseActions(databases_directory, importDirectory, proteinMapping, drugMapping = None, download = True, db="STRING"):
     url = None
     bool_dict = {'t':True, 'T':True, 'True':True, 'TRUE': True, 'f':False, 'F':False, 'False': False, 'FALSE':False}
     header = iconfig.header_actions
@@ -92,11 +90,11 @@ def parseActions(importDirectory, proteinMapping, drugMapping = None, download =
         url = iconfig.STITCH_actions_url
         outputfile = os.path.join(importDirectory, "stitch_drug_acts_on_protein.csv")
     
-    directory = os.path.join(dbconfig.databasesDir, db)
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory, db)
+    builder_utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
-        utils.downloadDB(url, directory)
+        builder_utils.downloadDB(url, directory)
     
     f = os.path.join(directory, fileName)
     associations = gzip.open(f, 'r')

@@ -20,15 +20,15 @@ from graphdb_builder import builder_utils
 import logging
 import logging.config
 
-log_config = graph_config.log
-logger = utils.setup_logging(log_config, key="importer")
+log_config = ckg_config.log
+logger = builder_utils.setup_logging(log_config, key="importer")
 
 try:
     config = ckg_utils.get_configuration(ckg_config.builder_config_file)
     oconfig = ckg_utils.get_configuration(ckg_config.ontologies_config_file)
     dbconfig = ckg_utils.get_configuration(ckg_config.databases_config_file)
     econfig = ckg_utils.get_configuration(ckg_config.experiments_config_file)
-except Exception as err
+except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
 
 START_TIME = datetime.now()
@@ -49,7 +49,7 @@ def ontologiesImport(importDirectory, ontologies=None, import_type="partial"):
     """
     #Ontologies
     ontologiesImportDirectory = os.path.join(importDirectory, oconfig["ontologiesImportDir"])
-    utils.checkDirectory(ontologiesImportDirectory)
+    builder_utils.checkDirectory(ontologiesImportDirectory)
     stats = oh.generateGraphFiles(ontologiesImportDirectory, ontologies)
     statsDf = generateStatsDataFrame(stats)
     writeStats(statsDf, import_type)
@@ -72,7 +72,7 @@ def databasesImport(importDirectory, databases=None, n_jobs=1, import_type="part
     """
     #Databases
     databasesImportDirectory = os.path.join(importDirectory, dbconfig["databasesImportDir"])
-    utils.checkDirectory(databasesImportDirectory)
+    builder_utils.checkDirectory(databasesImportDirectory)
     stats = dh.generateGraphFiles(databasesImportDirectory, databases, n_jobs)
     statsDf = generateStatsDataFrame(stats)
     writeStats(statsDf, import_type)
@@ -91,10 +91,10 @@ def experimentsImport(projects=None, n_jobs=1, import_type="partial"):
     """
     #Experiments
     experimentsImportDirectory = econfig["experimentsImportDirectory"]
-    utils.checkDirectory(experimentsImportDirectory)
+    builder_utils.checkDirectory(experimentsImportDirectory)
     experimentsDirectory = econfig["experimentsDir"]
     if projects is None:
-        projects = utils.listDirectoryFolders(experimentsDirectory)
+        projects = builder_utils.listDirectoryFolders(experimentsDirectory)
     Parallel(n_jobs=n_jobs)(delayed(experimentImport)(experimentsImportDirectory, experimentsDirectory, project) for project in projects)
 
 def experimentImport(importDirectory, experimentsDirectory, project):
@@ -109,12 +109,12 @@ def experimentImport(importDirectory, experimentsDirectory, project):
         project (string): Identifier of the project to be imported
     """
     projectPath = os.path.join(importDirectory, project)
-    utils.checkDirectory(projectPath)
+    builder_utils.checkDirectory(projectPath)
     projectDirectory = os.path.join(experimentsDirectory, project)
-    datasets = utils.listDirectoryFolders(projectDirectory)
+    datasets = builder_utils.listDirectoryFolders(projectDirectory)
     for dataset in datasets:
         datasetPath = os.path.join(projectPath, dataset)
-        utils.checkDirectory(datasetPath)
+        builder_utils.checkDirectory(datasetPath)
         eh.generateDatasetImports(project, dataset)
 
 def fullImport():
@@ -125,7 +125,7 @@ def fullImport():
     """
     try:
         importDirectory = config["importDirectory"]
-        utils.checkDirectory(importDirectory)
+        builder_utils.checkDirectory(importDirectory)
         setupStats(import_type='full')
         logger.info("Full import: importing all Ontologies")
         ontologiesImport(importDirectory, import_type='full')

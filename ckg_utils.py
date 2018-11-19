@@ -14,8 +14,7 @@ def get_configuration(configuration_file):
     if configuration_file.endswith("yml"):
         configuration = read_yaml(configuration_file)
     else:
-        raise Exception as err:
-            raise Exception("The format specified in the configuration file {} is not supported. {}".format(configuration_file, err))
+        raise Exception("The format specified in the configuration file {} is not supported. {}".format(configuration_file, err))
 
     return configuration
 
@@ -24,5 +23,4 @@ def get_configuration_variable(configuration_file, variable):
     if variable in configuration:
         return configuration[variable]
     else:
-        raise Exception as err:
-            raise Exception("The varible {} is not found in the configuration file {}. {}".format(variable, configuration_file, err))
+        raise Exception("The varible {} is not found in the configuration file {}. {}".format(variable, configuration_file, err))

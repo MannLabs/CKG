@@ -13,8 +13,13 @@ import datetime
 import tarfile
 import logging
 import logging.config
-from graphdb_builder.ontologies import ontologies_config as oconfig
-from graphdb_builder.databases import databases_config as dbconfig
+import config.ckg_config as ckg_config
+import ckg_utils
+
+try:
+    dbconfig = ckg_utils.get_configuration(ckg_config.databases_config_file)
+except Exception as err:
+    raise Exception("Reading configuration > {}.".format(err))
 
 def setup_logging(path='log.config', key=None):
     """Setup logging configuration"""
@@ -30,7 +35,7 @@ def setup_logging(path='log.config', key=None):
 
 def downloadDB(databaseURL, extraFolder ="", user="", password=""):
     if extraFolder == "":
-        directory = dbconfig.databasesDir
+        directory = dbconfig["databasesDir"]
     else:
         directory = extraFolder
     fileName = databaseURL.split('/')[-1]    

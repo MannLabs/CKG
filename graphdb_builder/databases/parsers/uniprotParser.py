@@ -1,9 +1,8 @@
 import os.path
 import gzip
-from graphdb_builder.databases import databases_config as dbconfig
 from graphdb_builder.databases.config import uniprotConfig as iconfig
 from collections import defaultdict
-from graphdb_builder import utils
+from graphdb_builder import builder_utils
 import pandas as pd
 import re
 import time
@@ -11,11 +10,11 @@ import time
 #########################
 #       UniProt         # 
 #########################
-def parser(download=True):
+def parser(databases_directory, download=True):
     result = {"Protein":None, "Known_variant":None, "Peptide":None}
     uniprot_texts_file = iconfig.uniprot_text_file    
     relationships_header = iconfig.relationships_header
-    proteins, proteins_relationships = parseUniProtDatabase(download=download)
+    proteins, proteins_relationships = parseUniProtDatabase(databases_directory, download=download)
     addUniProtTexts(uniprot_texts_file, proteins)
     proteins_outputfileName = "Protein.csv"
     proteins_header = iconfig.proteins_header
@@ -41,36 +40,36 @@ def parser(download=True):
     result["Protein"] = (protein_entities, proteins_relationships, proteins_header, relationships_header)
     
     #Peptides
-    peptides, peptides_relationships = parseUniProtPeptides()
+    peptides, peptides_relationships = parseUniProtPeptides(databases_directory, download)
     peptides_outputfile = "Peptides.csv"
     peptides_header = iconfig.peptides_header
     result["Peptide"] = (peptides, peptides_relationships, peptides_header, relationships_header)
 
     #Variants
-    variants, variants_relationships = parseUniProtVariants()
+    variants, variants_relationships = parseUniProtVariants(databases_directory, download)
     variants_outputfile = "Known_variant.csv"
     variants_header = iconfig.variants_header
     result["Known_variant"] = (variants, variants_relationships, variants_header, relationships_header)
     
     #Gene ontology annotation
-    go_annotations = parseUniProtAnnotations()
+    go_annotations = parseUniProtAnnotations(databases_directory, download)
     go_annotations_header = iconfig.go_header
     result["go"] = (None, go_annotations, None, go_annotations_header)
 
     return result
 
 
-def parseUniProtDatabase(download=True):
+def parseUniProtDatabase(databases_directory, download=True):
     proteins = {}
     relationships = defaultdict(set)
 
     url = iconfig.uniprot_id_url
-    directory = os.path.join(dbconfig.databasesDir,"UniProt")
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory,"UniProt")
+    builder_utils.checkDirectory(directory)
     file_name = os.path.join(directory, url.split('/')[-1])
     mapping_file = os.path.join(directory, 'mapping.tsv')
     if download:
-        utils.downloadDB(url, directory)
+        builder_utils.downloadDB(url, directory)
 
     fields = iconfig.uniprot_ids
     synonymFields = iconfig.uniprot_synonyms
@@ -114,16 +113,16 @@ def addUniProtTexts(textsFile, proteins):
             if protein in proteins:
                 proteins[protein].update({"description":function})
 
-def parseUniProtVariants(download = False):
+def parseUniProtVariants(databases_directory, download = False):
     data = defaultdict()
     url = iconfig.uniprot_variant_file
     entities = set()
     relationships = defaultdict(set)
-    directory = os.path.join(dbconfig.databasesDir,"UniProt")
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory,"UniProt")
+    builder_utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
-        utils.downloadDB(url, directory)
+        builder_utils.downloadDB(url, directory)
     with gzip.open(fileName, 'r') as f:
         din = False
         i = 0
@@ -159,15 +158,15 @@ def parseUniProtVariants(download = False):
 
     return entities, relationships
 
-def parseUniProtAnnotations(download=True):
+def parseUniProtAnnotations(databases_directory, download=True):
     roots = {'F':'Molecular_function', 'C':'Cellular_component', 'P':'Biological_process'}
     url = iconfig.uniprot_go_annotations
     relationships = defaultdict(set)
-    directory = os.path.join(dbconfig.databasesDir,"UniProt")
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory,"UniProt")
+    builder_utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
-        utils.downloadDB(url, directory)
+        builder_utils.downloadDB(url, directory)
     with gzip.open(fileName, 'r') as f:
         for line in f:
             line = line.decode('utf-8')
@@ -184,16 +183,16 @@ def parseUniProtAnnotations(download=True):
 
     return relationships
 
-def parseUniProtPeptides(download=True):
+def parseUniProtPeptides(databases_directory, download=True):
     file_urls = iconfig.uniprot_peptides_files
     entities = set()
     relationships = defaultdict(set)
-    directory = os.path.join(dbconfig.databasesDir,"UniProt")
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory,"UniProt")
+    builder_utils.checkDirectory(directory)
     for url in file_urls:
         fileName = os.path.join(directory, url.split('/')[-1])
         if download:
-            utils.downloadDB(url, directory)
+            builder_utils.downloadDB(url, directory)
         first = True
         with open(fileName, 'r') as f:
             for line in f:

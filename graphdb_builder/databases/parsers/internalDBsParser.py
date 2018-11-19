@@ -1,19 +1,18 @@
 import os.path
-from graphdb_builder.databases import databases_config as dbconfig
 from graphdb_builder.databases.config import internalDBsConfig as iconfig
-from graphdb_builder import mapping as mp, utils
+from graphdb_builder import mapping as mp, builder_utils
 import pandas as pd
 
 #############################################
 #   Internal Databases (JensenLab.org)      # 
 #############################################
 
-def parser(download=True):
+def parser(databases_directory, download=True):
     result = {}
     string_url = iconfig.string_url
-    string_mapping = mp.getSTRINGMapping(string_url, download=False)
+    string_mapping = mp.getSTRINGMapping(string_url, download=download)
     for qtype in iconfig.internal_db_types:
-        relationships = parseInternalDatabasePairs(qtype, string_mapping)
+        relationships = parseInternalDatabasePairs(databases_directory, qtype, string_mapping)
         entity1, entity2 = iconfig.internal_db_types[qtype]
         outputfileName =  entity1+"_"+entity2+"_associated_with_integrated.csv"
         header = iconfig.header
@@ -21,23 +20,23 @@ def parser(download=True):
     
     return result
 
-def parserMentions(importDirectory,download=True):
-    entities, header = parsePMClist()
+def parserMentions(databases_directory, importDirectory, download=True):
+    entities, header = parsePMClist(databases_directory, download)
     outputfileName = "Publications.csv"
     for qtype in iconfig.internal_db_mentions_types:
-        parseInternalDatabaseMentions(qtype, importDirectory)
+        parseInternalDatabaseMentions(databases_directory, qtype, importDirectory)
 
     return (entities, header, outputfileName)
 
-def parseInternalDatabasePairs(qtype, mapping, download=True):
+def parseInternalDatabasePairs(databases_directory, qtype, mapping, download=True):
     url = iconfig.internal_db_url
     ifile = iconfig.internal_db_files[qtype]
     source = iconfig.internal_db_sources[qtype]
     relationships = set()
-    directory = os.path.join(dbconfig.databasesDir, "InternalDatabases")
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory, "InternalDatabases")
+    builder_utils.checkDirectory(directory)
     if download:
-        utils.downloadDB(url.replace("FILE", ifile), os.path.join(directory,"integration"))
+        builder_utils.downloadDB(url.replace("FILE", ifile), os.path.join(directory,"integration"))
     ifile = os.path.join(directory,os.path.join("integration",ifile))
     with open(ifile, 'r') as idbf:
         for line in idbf:
@@ -54,18 +53,18 @@ def parseInternalDatabasePairs(qtype, mapping, download=True):
                 
     return relationships
 
-def parsePMClist(download=True):
+def parsePMClist(databases_directory, download=True):
     url = iconfig.PMC_db_url
     plinkout = iconfig.pubmed_linkout
     entities = set()
-    directory = os.path.join(dbconfig.databasesDir, "InternalDatabases")
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory, "InternalDatabases")
+    builder_utils.checkDirectory(directory)
     directory = os.path.join(directory,"textmining")
-    utils.checkDirectory(directory)
+    builder_utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     
     if download:
-        utils.downloadDB(url, directory)
+        builder_utils.downloadDB(url, directory)
 
     entities = pd.read_csv(fileName, sep = ',', dtype = str, compression = 'gzip', low_memory=False)
     entities = entities[iconfig.PMC_fields]
@@ -81,7 +80,7 @@ def parsePMClist(download=True):
     
     return entities, header
 
-def parseInternalDatabaseMentions(qtype, importDirectory, download=True):
+def parseInternalDatabaseMentions(databases_directory, qtype, importDirectory, download=True):
     url = iconfig.internal_db_url
     string_url = iconfig.string_url
     stitch_url = iconfig.stitch_url
@@ -96,9 +95,9 @@ def parseInternalDatabaseMentions(qtype, importDirectory, download=True):
     entity1, entity2 = iconfig.internal_db_mentions_types[qtype]
     outputfile = os.path.join(importDirectory, entity1+"_"+entity2+"_mentioned_in_publication.csv")
     relationships = pd.DataFrame()
-    directory = os.path.join(dbconfig.databasesDir, "InternalDatabases")
+    directory = os.path.join(databases_directory, "InternalDatabases")
     if download:
-        utils.downloadDB(url.replace("FILE", ifile), os.path.join(directory,"textmining"))
+        builder_utils.downloadDB(url.replace("FILE", ifile), os.path.join(directory,"textmining"))
     ifile = os.path.join(directory,os.path.join("textmining",ifile))
     with open(outputfile,'w') as f:
         f.write("START_ID,END_ID,TYPE\n")

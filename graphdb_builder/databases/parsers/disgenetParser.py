@@ -1,29 +1,27 @@
 import os.path
 import gzip
-from graphdb_builder.databases import databases_config as dbconfig
 from graphdb_builder.databases.config import disgenetConfig as iconfig
-from graphdb_builder.ontologies import ontologies_config as oconfig
 from collections import defaultdict
-from graphdb_builder import utils
+from graphdb_builder import builder_utils
 
 #########################
 #       DisGeNet        # 
 #########################
-def parser(download = True):
+def parser(databases_directory, download = True):
     relationships = defaultdict(set)
     files = iconfig.disgenet_files
     url = iconfig.disgenet_url
-    directory = os.path.join(dbconfig.databasesDir,"disgenet")
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory,"disgenet")
+    builder_utils.checkDirectory(directory)
     header = iconfig.disgenet_header
     outputfileName = iconfig.outputfileName
 
     if download:
         for f in files:
-            utils.downloadDB(url+files[f], directory)
+            builder_utils.downloadDB(url+files[f], directory)
 
-    proteinMapping = readDisGeNetProteinMapping() 
-    diseaseMapping, diseaseSynonyms = readDisGeNetDiseaseMapping()
+    proteinMapping = readDisGeNetProteinMapping(databases_directory) 
+    diseaseMapping, diseaseSynonyms = readDisGeNetDiseaseMapping(databases_directory)
     for f in files:
         first = True
         associations = gzip.open(os.path.join(directory,files[f]), 'r')
@@ -56,9 +54,9 @@ def parser(download = True):
         associations.close()
     return (relationships,header,outputfileName)
     
-def readDisGeNetProteinMapping():
+def readDisGeNetProteinMapping(databases_directory):
     files = iconfig.disgenet_mapping_files
-    directory = os.path.join(dbconfig.databasesDir,"disgenet")
+    directory = os.path.join(databases_directory,"disgenet")
     
     first = True
     mapping = defaultdict(set)
@@ -76,9 +74,9 @@ def readDisGeNetProteinMapping():
         f.close()
     return mapping
 
-def readDisGeNetDiseaseMapping():
+def readDisGeNetDiseaseMapping(databases_directory):
     files = iconfig.disgenet_mapping_files
-    directory =  os.path.join(dbconfig.databasesDir,"disgenet")
+    directory =  os.path.join(databases_directory,"disgenet")
     first = True
     mapping = defaultdict(set)
     synonyms = defaultdict(set)
@@ -93,7 +91,7 @@ def readDisGeNetDiseaseMapping():
             identifier = data[0]
             vocabulary = data[2]
             code = data[3]
-            if vocabulary == oconfig.ontologies["Disease"]:
+            if vocabulary == "DO":
                 mapping[identifier].add(code)
             else:
                 synonyms[identifier].add(code)

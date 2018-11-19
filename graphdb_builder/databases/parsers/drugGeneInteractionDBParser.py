@@ -1,23 +1,22 @@
 import os.path
-from graphdb_builder.databases import databases_config as dbconfig
 from graphdb_builder.databases.config import drugGeneInteractionDBConfig as iconfig
-from graphdb_builder import mapping as mp, utils
+from graphdb_builder import mapping as mp, builder_utils
 
 ############################################
 #   The Drug Gene Interaction Database     # 
 ############################################
-def parser(download = True):
+def parser(databases_directory, download = True):
     url = iconfig.DGIdb_url
     header = iconfig.header
     outputfileName = iconfig.outputfileName
     drugmapping = mp.getMappingForEntity("Drug")
 
     relationships = set()
-    directory = os.path.join(dbconfig.databasesDir,"DGIdb")
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory,"DGIdb")
+    builder_utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
-        utils.downloadDB(url, directory)
+        builder_utils.downloadDB(url, directory)
     with open(fileName, 'r') as associations:
         first = True
         for line in associations:

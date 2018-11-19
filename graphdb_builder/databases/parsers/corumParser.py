@@ -1,8 +1,7 @@
 import os.path
 import zipfile
-from graphdb_builder.databases import databases_config as dbconfig
 from graphdb_builder.databases.config import corumConfig as iconfig
-from graphdb_builder import mapping as mp, utils
+from graphdb_builder import mapping as mp, builder_utils
 from collections import defaultdict
 import pandas as pd
 import re
@@ -10,18 +9,18 @@ import re
 ###################
 #       CORUM     # 
 ###################
-def parser(download=True):
+def parser(databases_directory, download=True):
     entities = set()
     relationships = defaultdict(set)
-    directory = os.path.join(dbconfig.databasesDir,"CORUM")
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory,"CORUM")
+    builder_utils.checkDirectory(directory)
     database_url = iconfig.database_url    
     entities_header = iconfig.entities_header
     relationships_headers = iconfig.relationships_headers
     zipped_fileName = os.path.join(directory, database_url.split('/')[-1])
     fileName = '.'.join(database_url.split('/')[-1].split('.')[0:2])
     if download:
-        utils.downloadDB(database_url, directory)
+        builder_utils.downloadDB(database_url, directory)
     names = set()
     first = True
     with zipfile.ZipFile(zipped_fileName) as z:

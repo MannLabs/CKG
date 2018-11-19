@@ -1,14 +1,13 @@
 import os.path
-from graphdb_builder.databases import databases_config as dbconfig
 from graphdb_builder.databases.config import intactConfig as iconfig
 from collections import defaultdict
-from graphdb_builder import utils
+from graphdb_builder import builder_utils
 import re
 
 #########################
 #          IntAct       # 
 #########################
-def parser(download = True):
+def parser(databases_directory, download = True):
     intact_dictionary = defaultdict()
     stored = set()
     relationships = set()
@@ -17,11 +16,11 @@ def parser(download = True):
     regex = r"\((.*)\)"
     taxid_regex =  r"\:(\d+)"
     url = iconfig.intact_psimitab_url
-    directory = os.path.join(dbconfig.databasesDir,"Intact")
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory,"Intact")
+    builder_utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
-        utils.downloadDB(url, directory)
+        builder_utils.downloadDB(url, directory)
 
     with open(fileName, 'r') as idf:
         first = True
@@ -51,7 +50,7 @@ def parser(download = True):
             sourceMatch = re.search(regex, data[12])
             source = sourceMatch.group(1) if sourceMatch else "unknown"
             score = data[14].split(":")[1]
-            if utils.is_number(score):
+            if builder_utils.is_number(score):
                 score = float(score)
             else:
                 continue
