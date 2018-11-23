@@ -25,7 +25,8 @@ def parser(databases_directory):
             entities.update(sites)
             for r in site_relationships:
                 relationships[r].update(site_relationships[r])
-    for entity, relationship_type in annotation_files:
+    for er in annotation_files:
+        entity, relationship_type = er.split('-')
         file_name = os.path.join(directory, annotation_files[(entity,relationship_type)])
         with gzip.open(file_name, 'r') as f:
             if entity == "disease":

@@ -161,7 +161,7 @@ def parseProteomicsDataset(projectId, configuration, dataDir):
 ########### Genomics Datasets ############
 def parseWESDataset(projectId, configuration, dataDir):
     datasets = {}
-    files = utils.listDirectoryFiles(dataDir)
+    files = builder_utils.listDirectoryFiles(dataDir)
     for dfile in files:
         filepath = os.path.join(dataDir, dfile)
         if os.path.isfile(filepath):
@@ -636,7 +636,7 @@ def generateGraphFiles(data, dataType, projectId, stats, ot = 'w', d = 'proteomi
             header=True, index=False, quotechar='"', 
             line_terminator='\n', escapechar='\\')
     logger.info("Experiment {} - Number of {} relationships: {}".format(projectId, dataType, data.shape[0]))
-    stats.add(utils.buildStats(data.shape[0], "relationships", dataType, "Experiment", outputfile))
+    stats.add(builder_utils.buildStats(data.shape[0], "relationships", dataType, "Experiment", outputfile))
 
 if __name__ == "__main__":
     pass

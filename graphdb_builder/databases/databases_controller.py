@@ -113,7 +113,7 @@ def parseDatabase(importDirectory, database, download=True):
         elif database.lower() == "stitch":
             #STITCH
             proteinMapping, drugMapping = stringParser.parser(dbconfig["databasesDir"], importDirectory, drug_source=dbconfig["sources"]["Drug"], download=download, db="STITCH")
-            stringParser.parseActions(importDirectory, proteinMapping, drugMapping, download = download, db="STITCH")
+            stringParser.parseActions(dbconfig["databasesDir"], importDirectory, proteinMapping, drugMapping, download = download, db="STITCH")
         elif database.lower() == "disgenet":
             #DisGeNet
             relationships, header, outputfileName = disgenetParser.parser(dbconfig["databasesDir"], download)
@@ -166,7 +166,7 @@ def parseDatabase(importDirectory, database, download=True):
             write_relationships(relationships, header, outputfile)
             logger.info("Database {} - Number of {} relationships: {}".format(database, "has_side_effect", len(relationships)))
             stats.add(builder_utils.buildStats(len(relationships), "relationships", "has_side_effect", database, outputfile))
-            relationships, header, outputfileName = siderParser.parserIndications(drugMapping, phenotypeMapping, download = True)
+            relationships, header, outputfileName = siderParser.parserIndications(dbconfig["databasesDir"], drugMapping, phenotypeMapping, download = True)
             outputfile = os.path.join(importDirectory, outputfileName)
             write_relationships(relationships, header, outputfile)
             logger.info("Database {} - Number of {} relationships: {}".format(database, "indicated_for", len(relationships)))

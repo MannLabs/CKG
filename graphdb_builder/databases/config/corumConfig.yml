@@ -1,0 +1,25 @@
+###### CORUM Database ########
+database_url: 'http://mips.helmholtz-muenchen.de/corum/download/allComplexes.txt.zip'
+entities_header: 
+    - 'ID'
+    - 'name'
+    - 'organism'
+    - 'synonyms'
+    - 'source'
+relationships_headers: 
+    'Protein':
+        - 'START_ID'
+        - 'END_ID'
+        - 'TYPE'
+        - 'cell_lines'
+        - 'evidences'
+        - 'publication'
+        - 'source'
+    'Biological_process':
+        - 'START_ID'
+        - 'END_ID'
+        - 'TYPE'
+        - 'evidence_type'
+        - 'score'
+        - 'source'
+

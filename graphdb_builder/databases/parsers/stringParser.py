@@ -119,7 +119,6 @@ def parseActions(databases_directory, importDirectory, proteinMapping, drugMappi
                     aliasesA = drugMapping[intA]
                 elif intA in proteinMapping:
                     aliasesA = proteinMapping[intA]
-
                 for aliasA in aliasesA:
                     for aliasB in proteinMapping[intB]:
                         if (aliasA, aliasB, action) not in stored:

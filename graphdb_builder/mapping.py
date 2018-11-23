@@ -51,7 +51,7 @@ def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True, db = "ST
     fileName = os.path.join(directory, url.split('/')[-1])
 
     if download:
-        builder_utils.downloadDB(url, db)
+        builder_utils.downloadDB(url, directory)
     
     f = os.path.join(directory, fileName)
     mf = gzip.open(f, 'r')
