@@ -1,20 +1,21 @@
 import os.path
 import gzip
-from graphdb_builder.databases.config import pathwayCommonsConfig as iconfig
+import ckg_utils
 from graphdb_builder import builder_utils
 
 #########################
 #   PathwayCommons      # 
 #########################
 def parser(databases_directory, download = True):
-    url = iconfig.pathwayCommons_pathways_url
+    config = ckg_utils.get_configuration('../databases/config/pathwayCommonsConfig.yml')
+    url = config['pathwayCommons_pathways_url']
     entities = set()
     relationships = set()
     directory = os.path.join(databases_directory, "PathwayCommons")
     builder_utils.checkDirectory(directory)
     fileName = url.split('/')[-1]
-    entities_header = iconfig.pathways_header
-    relationships_header = iconfig.relationships_header
+    entities_header = config['pathways_header']
+    relationships_header = config['relationships_header']
     
 
     if download:

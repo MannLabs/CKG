@@ -1,8 +1,8 @@
 ###### Drug bank ########
-DrugBank_url: 'https://www.drugbank.ca/releases/5-1-1/downloads/drugbank_all_full_database.xml.zip' ## Manual download need to login
-DrugBank_vocabulary_url: 'https://www.drugbank.ca/releases/5-1-1/downloads/drugbank_all_drugbank_vocabulary.csv.zip'
-DrugBank_dictionary_file: 'mapping.tsv'
-relationships_headers: 
+'DrugBank_url': 'https://www.drugbank.ca/releases/5-1-1/downloads/drugbank_all_full_database.xml.zip' ## Manual download need to login
+'DrugBank_vocabulary_url': 'https://www.drugbank.ca/releases/5-1-1/downloads/drugbank_all_drugbank_vocabulary.csv.zip'
+'DrugBank_dictionary_file': 'mapping.tsv'
+'relationships_headers': 
     'drugbank_annotated_in_pathway':
         - 'START_ID'
         - 'END_ID'
@@ -20,7 +20,7 @@ relationships_headers:
         - 'interaction_type'
         - 'source'
 
-DrugBank_fields: 
+'DrugBank_fields': 
     - 'drugbank-id'
     - 'name'
     - 'description'
@@ -39,7 +39,7 @@ DrugBank_fields:
     - 'class'
     - 'subclass'
 
-DrugBank_parentFields: 
+'DrugBank_parentFields': 
     - 'groups'
     - 'prices'
     - 'pathways'
@@ -52,7 +52,7 @@ DrugBank_parentFields:
     - 'snp-effects'
     - 'snp-adverse-drug-reactions'
 
-DrugBank_structures: 
+'DrugBank_structures': 
     'general-references': 
         - 'pubmed-id'
     'drug-interactions':
@@ -79,7 +79,7 @@ DrugBank_structures:
         - 'rs-id'
         - 'desciption'
 
-DrugBank_attributes: 
+'DrugBank_attributes': 
     - 'name'
     - 'description'
     - 'indication'
@@ -96,7 +96,7 @@ DrugBank_attributes:
     - 'groups'
     - 'experimental-properties'# NEEDS TO BE THE LAST ATTRIBUTE
 
-DrugBank_exp_prop: 
+'DrugBank_exp_prop': 
     - 'Melting Point'
     - 'Hydrophobicity'
     - 'Isoelectric Point'
@@ -122,7 +122,7 @@ DrugBank_exp_prop:
     - 'pKa'
     - 'Boiling Point'
 
-DrugBank_associations: 
+'DrugBank_associations': 
     'pathways': 
         - 'ANNOTATED_IN_PATHWAY'
         - 'drugbank_annotated_in_pathway'

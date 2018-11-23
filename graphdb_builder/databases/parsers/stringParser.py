@@ -1,36 +1,37 @@
 import os.path
 import gzip
-from graphdb_builder.databases.config import stringConfig as iconfig
-from collections import defaultdict
-from graphdb_builder import mapping as mp, builder_utils
 import csv
 import re
+from collections import defaultdict
+import ckg_utils
+from graphdb_builder import mapping as mp, builder_utils
 
 #########################
 #   STRING like DBs     #
 #########################
 def parser(databases_directory, importDirectory, drug_source = None, download = True, db="STRING"):
-    mapping_url = iconfig.STRING_mapping_url
+    config = ckg_utils.get_configuration('../databases/config/stringConfig.yml')
+    mapping_url = config['STRING_mapping_url']
     mapping = mp.getSTRINGMapping(mapping_url, download = False)
     stored = set()
     relationship = None
-    cutoff = iconfig.STRING_cutoff
-    header = iconfig.header
+    cutoff = config['STRING_cutoff']
+    header = config['header']
     drugmapping = {}
     if db == "STITCH":
         evidences = ["experimental", "prediction", "database","textmining", "score"]
         relationship = "COMPILED_INTERACTS_WITH"
-        url = iconfig.STITCH_url
+        url = config['STITCH_url']
         outputfile = os.path.join(importDirectory, "stitch_associated_with.csv")
 
-        drugmapping_url = iconfig.STITCH_mapping_url
+        drugmapping_url = config['STITCH_mapping_url']
         drugmapping = mp.getSTRINGMapping(drugmapping_url, source = drug_source, download = False, db = db)
         
     elif db == "STRING":
         evidences = ["Neighborhood in the Genome", "Gene fusions", "Co-ocurrence across genomes","Co-expression", "Experimental/biochemical data", "Association in curated databases", "Text-mining"]
         relationship = "COMPILED_TARGETS"
         outputfile = os.path.join(importDirectory, "string_interacts_with.csv")
-        url = iconfig.STRING_url
+        url = config['STRING_url']
     directory = os.path.join(databases_directory, db)
     builder_utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
@@ -78,16 +79,17 @@ def parser(databases_directory, importDirectory, drug_source = None, download = 
 
 
 def parseActions(databases_directory, importDirectory, proteinMapping, drugMapping = None, download = True, db="STRING"):
+    config = ckg_utils.get_configuration('../databases/config/stringConfig.yml')
     url = None
     bool_dict = {'t':True, 'T':True, 'True':True, 'TRUE': True, 'f':False, 'F':False, 'False': False, 'FALSE':False}
-    header = iconfig.header_actions
+    header = config['header_actions']
     relationship = "COMPILED_ACTS_ON"
     stored = set()
     if db == "STRING":
-        url = iconfig.STRING_actions_url
+        url = config['STRING_actions_url']
         outputfile = os.path.join(importDirectory, "string_protein_acts_on_protein.csv")
     elif db == "STITCH":
-        url = iconfig.STITCH_actions_url
+        url = config['STITCH_actions_url']
         outputfile = os.path.join(importDirectory, "stitch_drug_acts_on_protein.csv")
     
     directory = os.path.join(databases_directory, db)

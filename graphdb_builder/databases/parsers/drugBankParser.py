@@ -1,36 +1,36 @@
 import os.path
-from graphdb_builder.databases.config import drugBankConfig as iconfig
+import ckg_utils
 from collections import defaultdict
 from lxml import etree
 import zipfile
 from graphdb_builder import builder_utils
 
-
 #########################
 #       Drug Bank       #
 #########################
 def parser(databases_directory):
-    drugs = extract_drugs(databases_directory)
-    build_DrugBank_dictionary(databases_directory, drugs)
-    relationships = build_relationships_from_DrugBank(drugs)
-    entities, attributes = build_drug_entity(drugs)
+    config = ckg_utils.get_configuration('../databases/config/drugBankConfig.yml')
+    drugs = extract_drugs(config, databases_directory)
+    build_DrugBank_dictionary(config, databases_directory, drugs)
+    relationships = build_relationships_from_DrugBank(config, drugs)
+    entities, attributes = build_drug_entity(config, drugs)
     entities_header = ['ID'] + attributes
-    relationships_headers = iconfig.relationships_headers
+    relationships_headers = config['relationships_headers']
     
     return (entities, relationships, entities_header, relationships_headers)
 
-def extract_drugs(databases_directory):
+def extract_drugs(config, databases_directory):
     drugs = {}
     prefix = '{http://www.drugbank.ca}'
     relationships = set()
-    url = iconfig.DrugBank_url
+    url = config['DrugBank_url']
     directory = os.path.join(databases_directory,"DrugBank")
     builder_utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
-    fields = iconfig.DrugBank_fields
-    parentFields = iconfig.DrugBank_parentFields
-    structuredFields = iconfig.DrugBank_structures
-    vocabulary = parseDrugBankVocabulary(databases_directory)
+    fields = config['DrugBank_fields']
+    parentFields = config['DrugBank_parentFields']
+    structuredFields = config['DrugBank_structures']
+    vocabulary = parseDrugBankVocabulary(config, databases_directory)
     i = 1
     with zipfile.ZipFile(fileName, 'r') as zipped:
         for f in zipped.namelist():
@@ -67,9 +67,9 @@ def extract_drugs(databases_directory):
 
     return drugs
 
-def parseDrugBankVocabulary(databases_directory):
+def parseDrugBankVocabulary(config, databases_directory):
     vocabulary = {}
-    url = iconfig.DrugBank_vocabulary_url
+    url = config['DrugBank_vocabulary_url']
     directory = os.path.join(databases_directory,"DrugBank")
     fileName = os.path.join(directory, url.split('/')[-1])
     with zipfile.ZipFile(fileName, 'r') as zipped:
@@ -85,9 +85,9 @@ def parseDrugBankVocabulary(databases_directory):
     return vocabulary
 
 
-def build_relationships_from_DrugBank(drugs):
+def build_relationships_from_DrugBank(config, drugs):
     relationships = defaultdict(list)
-    associations = iconfig.DrugBank_associations
+    associations = config['DrugBank_associations']
     for did in drugs:
         for ass in associations:
             ident = ass
@@ -112,10 +112,10 @@ def build_relationships_from_DrugBank(drugs):
     
     return relationships
 
-def build_drug_entity(drugs):
+def build_drug_entity(config, drugs):
     entities = set()
-    attributes = iconfig.DrugBank_attributes
-    properties = iconfig.DrugBank_exp_prop
+    attributes = config['DrugBank_attributes']
+    properties = config['DrugBank_exp_prop']
     allAttr = attributes + [p.replace(' ','_').replace('-','_').replace('(','').replace(')','') for p in properties]
     for did in drugs:
         entity = []
@@ -141,9 +141,9 @@ def build_drug_entity(drugs):
     
     return entities, allAttr
 
-def build_DrugBank_dictionary(databases_directory, drugs):
+def build_DrugBank_dictionary(config, databases_directory, drugs):
     directory = os.path.join(databases_directory,"DrugBank")
-    filename = iconfig.DrugBank_dictionary_file
+    filename = config['DrugBank_dictionary_file']
     outputfile = os.path.join(directory, filename)
     
     with open(outputfile, 'w') as out:

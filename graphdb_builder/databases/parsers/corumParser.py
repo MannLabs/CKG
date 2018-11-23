@@ -1,6 +1,6 @@
 import os.path
 import zipfile
-from graphdb_builder.databases.config import corumConfig as iconfig
+import ckg_utils
 from graphdb_builder import mapping as mp, builder_utils
 from collections import defaultdict
 import pandas as pd
@@ -14,9 +14,15 @@ def parser(databases_directory, download=True):
     relationships = defaultdict(set)
     directory = os.path.join(databases_directory,"CORUM")
     builder_utils.checkDirectory(directory)
-    database_url = iconfig.database_url    
-    entities_header = iconfig.entities_header
-    relationships_headers = iconfig.relationships_headers
+    
+    try:
+        config = ckg_utils.get_configuration('../databases/config/corumConfig.yml')
+    except Exception as err:
+        raise Exception("Reading configuration > {}.".format(err))
+
+    database_url = config.database_url    
+    entities_header = config.entities_header
+    relationships_headers = config.relationships_headers
     zipped_fileName = os.path.join(directory, database_url.split('/')[-1])
     fileName = '.'.join(database_url.split('/')[-1].split('.')[0:2])
     if download:

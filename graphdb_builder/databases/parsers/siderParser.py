@@ -1,19 +1,20 @@
 import os.path
 import gzip
-from graphdb_builder.databases.config import siderConfig as iconfig
-from graphdb_builder import mapping as mp, builder_utils
 import re
+import ckg_utils
+from graphdb_builder import mapping as mp, builder_utils
 
 #############################################
 #              SIDER database               # 
 #############################################
 def parser(databases_directory, drug_source, download=True):
-    url = iconfig.SIDER_url
-    header = iconfig.header
-    outputfileName = iconfig.outputfileName
+    config = ckg_utils.get_configuration('../databases/config/siderConfig.yml')
+    url = config['SIDER_url']
+    header = config['header']
+    outputfileName = config['outputfileName']
     
-    drugmapping = mp.getSTRINGMapping(iconfig.SIDER_mapping, source = drug_source, download = False, db = "STITCH")
-    phenotypemapping = mp.getMappingFromOntology(ontology="Phenotype", source = iconfig.SIDER_source)
+    drugmapping = mp.getSTRINGMapping(config['SIDER_mapping'], source = drug_source, download = False, db = "STITCH")
+    phenotypemapping = mp.getMappingFromOntology(ontology="Phenotype", source = config['SIDER_source'])
     
     relationships = set()
     directory = os.path.join(databases_directory,"SIDER")
@@ -36,9 +37,10 @@ def parser(databases_directory, drug_source, download=True):
 
 
 def parserIndications(databases_directory, drugMapping, phenotypeMapping, download=True):
-    url = iconfig.SIDER_indications
-    header = iconfig.indications_header
-    outputfileName = iconfig.indications_outputfileName
+    config = ckg_utils.get_configuration('../databases/config/siderConfig.yml')
+    url = config['SIDER_indications']
+    header = config['indications_header']
+    outputfileName = config['indications_outputfileName']
 
     relationships = set()
     directory = os.path.join(databases_directory,"SIDER")

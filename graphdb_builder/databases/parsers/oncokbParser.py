@@ -1,21 +1,23 @@
 import os.path
-from graphdb_builder.databases.config import oncokbConfig as iconfig
-from graphdb_builder import mapping as mp, builder_utils
-from collections import defaultdict
 import re
+from collections import defaultdict
+import ckg_utils
+from graphdb_builder import mapping as mp, builder_utils
+
 #########################
 #   OncoKB database     #
 #########################
 def parser(databases_directory, download = True):
-    url_actionable = iconfig.OncoKB_actionable_url
-    url_annotation = iconfig.OncoKB_annotated_url
-    entities_header = iconfig.entities_header
-    relationships_headers = iconfig.relationships_headers
+    config = ckg_utils.get_configuration('../databases/config/oncokbConfig.yml')
+    url_actionable = config['OncoKB_actionable_url']
+    url_annotation = config['OncoKB_annotated_url']
+    entities_header = config['entities_header']
+    relationships_headers = config['relationships_headers']
     mapping = mp.getMappingFromOntology(ontology = "Disease", source = None)
 
     drugmapping = mp.getMappingForEntity("Drug")
 
-    levels = iconfig.OncoKB_levels
+    levels = config['OncoKB_levels']
     entities = set()
     relationships = defaultdict(set)
     directory = os.path.join(databases_directory,"OncoKB")

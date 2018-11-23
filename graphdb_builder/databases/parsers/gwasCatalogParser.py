@@ -1,16 +1,16 @@
 import os.path
-from graphdb_builder.databases.config import gwasCatalogConfig as iconfig
 from collections import defaultdict
+import ckg_utils
 from graphdb_builder import builder_utils
-
 
 #########################
 #   GWAS Catalog EBI    #
 #########################
 def parser(databases_directory, download= True):
-    url = iconfig.GWASCat_url
-    entities_header = iconfig.entities_header
-    relationships_header = iconfig.relationships_header
+    config = ckg_utils.get_configuration('../databases/config/gwasCatalogConfig.yml')
+    url = config['GWASCat_url']
+    entities_header = config['entities_header']
+    relationships_header = config['relationships_header']
     entities = set()
     relationships = defaultdict(set)
     directory = os.path.join(databases_directory,"GWAScatalog")

@@ -1,8 +1,8 @@
 ###### SMPDB Database #######
 smpdb_urls: 
-    'pathway':'http://smpdb.ca/downloads/smpdb_pathways.csv.zip'
-    'protein':'http://smpdb.ca/downloads/smpdb_proteins.csv.zip'
-    'metabolite':'http://smpdb.ca/downloads/smpdb_metabolites.csv.zip'
+    'pathway': 'http://smpdb.ca/downloads/smpdb_pathways.csv.zip'
+    'protein': 'http://smpdb.ca/downloads/smpdb_proteins.csv.zip'
+    'metabolite': 'http://smpdb.ca/downloads/smpdb_metabolites.csv.zip'
 
 pathway_header: 
     - 'ID'

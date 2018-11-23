@@ -1,14 +1,17 @@
 import os.path
-from graphdb_builder.databases.config import drugGeneInteractionDBConfig as iconfig
+import ckg_utils
 from graphdb_builder import mapping as mp, builder_utils
 
 ############################################
 #   The Drug Gene Interaction Database     # 
 ############################################
 def parser(databases_directory, download = True):
-    url = iconfig.DGIdb_url
-    header = iconfig.header
-    outputfileName = iconfig.outputfileName
+    
+    config = ckg_utils.get_configuration('../databases/config/drugGeneInteractionDBConfig.yml')
+
+    url = config['DGIdb_url']
+    header = config['header']
+    outputfileName = config['outputfileName']
     drugmapping = mp.getMappingForEntity("Drug")
 
     relationships = set()

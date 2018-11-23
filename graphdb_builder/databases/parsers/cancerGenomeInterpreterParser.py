@@ -1,7 +1,7 @@
 import os.path
-from graphdb_builder.databases.config import cancerGenomeInterpreterConfig as iconfig
 from collections import defaultdict
 import zipfile
+import ckg_utils
 from graphdb_builder import builder_utils, mapping as mp
 import re
 
@@ -10,13 +10,15 @@ import re
 #######################################
 def parser(databases_directory, download = True):
     regex = r"chr(\d+)\:g\.(\d+)(\w)>(\w)"
-    url = iconfig.cancerBiomarkers_url
-    entities_header = iconfig.entities_header
-    relationships_headers = iconfig.relationships_headers
+    
+    config = ckg_utils.get_configuration('../databases/config/cancerGenomeInterpreterConfig.yml')
+    url = config['cancerBiomarkers_url']
+    entities_header = config['entities_header']
+    relationships_headers = config['relationships_headers']
     mapping = mp.getMappingFromOntology(ontology = "Disease", source = None)
     drugmapping = mp.getMappingForEntity("Drug")
     
-    fileName = iconfig.cancerBiomarkers_variant_file
+    fileName = config['cancerBiomarkers_variant_file']
     relationships = defaultdict(set)
     entities = set()
     directory = os.path.join(databases_directory,"CancerGenomeInterpreter")

@@ -1,6 +1,6 @@
 import os.path
 import zipfile
-from graphdb_builder.databases.config import exposomeConfig as iconfig
+import ckg_utils
 from graphdb_builder import mapping as mp, builder_utils
 from collections import defaultdict
 import pandas as pd
@@ -14,8 +14,9 @@ def parser(databases_directory, download=True):
     relationships = defaultdict(set)
     directory = os.path.join(databases_directory,"ExposomeExplorer")
     builder_utils.checkDirectory(directory)
-    database_urls = iconfig.database_urls 
-    relationships_header = iconfig.relationships_header
+    config = ckg_utils.get_configuration('../databases/config/exposomeConfig.yml')
+    database_urls = config['database_urls']
+    relationships_header = config['relationships_header']
     mapping = mp.getMappingForEntity("Food")
     correlations = {}
     for url in database_urls:

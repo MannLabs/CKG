@@ -1,7 +1,7 @@
 import os.path
 import tarfile
-from graphdb_builder.databases.config import foodbConfig as iconfig
 from collections import defaultdict
+import ckg_utils
 from graphdb_builder import builder_utils
 import pandas as pd
 import numpy as np
@@ -14,9 +14,12 @@ def parser(databases_directory, download=True):
     relationships = defaultdict(set)
     directory = os.path.join(databases_directory,"FooDB")
     builder_utils.checkDirectory(directory)
-    database_url = iconfig.database_url    
-    entities_header = iconfig.entities_header
-    relationships_headers = iconfig.relationships_headers
+    
+    config = ckg_utils.get_configuration('../databases/config/foodbConfig.yml')
+
+    database_url = config['database_url']
+    entities_header = config['entities_header']
+    relationships_headers = config['relationships_headers']
     tar_fileName = os.path.join(directory, database_url.split('/')[-1])
     tar_dir = database_url.split('/')[-1].split('.')[0]
     if download:
@@ -28,7 +31,7 @@ def parser(databases_directory, download=True):
     tf = tarfile.open(tar_fileName, 'r:gz')
     tf.extractall(path=directory)
     tf.close()
-    for file_name in iconfig.files:
+    for file_name in config['files']:
         path = os.path.join(directory,os.path.join(tar_dir, file_name))
         with open(path, 'r', encoding="utf-8", errors='replace') as f:
             if file_name == "contents.csv":

@@ -1,6 +1,6 @@
 import os.path
 import gzip
-from graphdb_builder.databases.config import disgenetConfig as iconfig
+import ckg_utils
 from collections import defaultdict
 from graphdb_builder import builder_utils
 
@@ -9,19 +9,22 @@ from graphdb_builder import builder_utils
 #########################
 def parser(databases_directory, download = True):
     relationships = defaultdict(set)
-    files = iconfig.disgenet_files
-    url = iconfig.disgenet_url
+    
+    config = ckg_utils.get_configuration('../databases/config/disgenetConfig.yml')
+
+    files = config['disgenet_files']
+    url = config['disgenet_url']
     directory = os.path.join(databases_directory,"disgenet")
     builder_utils.checkDirectory(directory)
-    header = iconfig.disgenet_header
-    outputfileName = iconfig.outputfileName
+    header = config['disgenet_header']
+    outputfileName = config['outputfileName']
 
     if download:
         for f in files:
             builder_utils.downloadDB(url+files[f], directory)
 
-    proteinMapping = readDisGeNetProteinMapping(databases_directory) 
-    diseaseMapping, diseaseSynonyms = readDisGeNetDiseaseMapping(databases_directory)
+    proteinMapping = readDisGeNetProteinMapping(config, databases_directory) 
+    diseaseMapping, diseaseSynonyms = readDisGeNetDiseaseMapping(config, databases_directory)
     for f in files:
         first = True
         associations = gzip.open(os.path.join(directory,files[f]), 'r')
@@ -54,8 +57,8 @@ def parser(databases_directory, download = True):
         associations.close()
     return (relationships,header,outputfileName)
     
-def readDisGeNetProteinMapping(databases_directory):
-    files = iconfig.disgenet_mapping_files
+def readDisGeNetProteinMapping(config, databases_directory):
+    files = config['disgenet_mapping_files']
     directory = os.path.join(databases_directory,"disgenet")
     
     first = True
@@ -74,8 +77,8 @@ def readDisGeNetProteinMapping(databases_directory):
         f.close()
     return mapping
 
-def readDisGeNetDiseaseMapping(databases_directory):
-    files = iconfig.disgenet_mapping_files
+def readDisGeNetDiseaseMapping(config, databases_directory):
+    files = config['disgenet_mapping_files']
     directory =  os.path.join(databases_directory,"disgenet")
     first = True
     mapping = defaultdict(set)

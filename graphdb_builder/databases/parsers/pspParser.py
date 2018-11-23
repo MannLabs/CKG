@@ -1,10 +1,10 @@
 import os.path
 import gzip
-from graphdb_builder.databases.config import pspConfig as iconfig
-from graphdb_builder import mapping as mp, builder_utils
-from collections import defaultdict
-import pandas as pd
 import re
+import pandas as pd
+from collections import defaultdict
+import ckg_utils
+from graphdb_builder import mapping as mp, builder_utils
 
 #############################
 #       PhosphoSitePlus     # 
@@ -12,13 +12,14 @@ import re
 def parser(databases_directory):
     directory = os.path.join(databases_directory,"PhosphoSitePlus")
     builder_utils.checkDirectory(directory)
-    modifications = iconfig.modifications
-    annotation_files = iconfig.annotation_files
-    entities_header = iconfig.entities_header
-    relationships_headers = iconfig.rel_headers
+    config = ckg_utils.get_configuration('../databases/config/pspConfig.yml')
+    modifications = config['modifications']
+    annotation_files = config['annotation_files']
+    entities_header = config['entities_header']
+    relationships_headers = config['rel_headers']
     entities = set()
     relationships = defaultdict(set)
-    for site_file in iconfig.site_files:
+    for site_file in config['site_files']:
         file_name = os.path.join(directory, site_file)
         with gzip.open(file_name, 'r') as f:
             sites, site_relationships = parseSites(f, modifications)

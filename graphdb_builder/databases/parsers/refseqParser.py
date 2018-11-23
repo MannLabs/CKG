@@ -1,20 +1,21 @@
 import os.path
 import gzip
-from graphdb_builder.databases.config import refseqConfig as iconfig
 from collections import defaultdict
+import ckg_utils
 from graphdb_builder import builder_utils
 
 #########################
 #          RefSeq       # 
 #########################
 def parser(databases_directory, download=True):
-    url = iconfig.refseq_url
+    config = ckg_utils.get_configuration('../databases/config/refseqConfig.yml')
+    url = config['refseq_url']
     entities = defaultdict(set)
     relationships = defaultdict(set)
     directory = os.path.join(databases_directory,"RefSeq")
     builder_utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
-    headers = iconfig.headerEntities
+    headers = config['headerEntities']
     taxid = 9606
     
     if download:

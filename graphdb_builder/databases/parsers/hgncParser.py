@@ -1,19 +1,20 @@
 import os.path
-from graphdb_builder.databases.config import hgncConfig as iconfig
+import ckg_utils
 from graphdb_builder import builder_utils
 
 #########################################
 #          HUGO Gene Nomenclature       # 
 #########################################
 def parser(databases_directory, download = True):
-    url = iconfig.hgnc_url
+    config = ckg_utils.get_configuration('../databases/config/hgncConfig.yml')
+    url = config['hgnc_url']
     entities = set()
     relationships = set()
     directory = os.path.join(databases_directory,"HGNC")
     builder_utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     taxid = 9606
-    entities_header = iconfig.header
+    entities_header = config['header']
     
     if download:
         builder_utils.downloadDB(url, directory)

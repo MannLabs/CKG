@@ -1,19 +1,20 @@
 import os.path
 import zipfile
-from collections import defaultdict
-from graphdb_builder.databases.config import smpdbConfig as iconfig
-from graphdb_builder import mapping as mp, builder_utils
 import pandas as pd
+from collections import defaultdict
+import ckg_utils
+from graphdb_builder import mapping as mp, builder_utils
 
 #########################
 #     SMPDB database    #
 #########################
 def parser(databases_directory, download=True):
-    urls = iconfig.smpdb_urls
+    config = ckg_utils.get_configuration('../databases/config/smpdbConfig.yml')
+    urls = config['smpdb_urls']
     entities = set()
     relationships = defaultdict(set)
-    entities_header = iconfig.pathway_header
-    relationships_headers = iconfig.relationships_header
+    entities_header = config['pathway_header']
+    relationships_headers = config['relationships_header']
     directory = os.path.join(databases_directory, "SMPDB")
     builder_utils.checkDirectory(directory)
     
@@ -25,7 +26,7 @@ def parser(databases_directory, download=True):
         zipped_file = os.path.join(directory, file_name)
         with zipfile.ZipFile(zipped_file) as rf:
             if dataset == "pathway":
-                entities = parsePathways(rf)
+                entities = parsePathways(config, rf)
             elif dataset == "protein":
                 relationships.update(parsePathwayProteinRelationships(rf))
             elif dataset == "metabolite":
@@ -33,9 +34,9 @@ def parser(databases_directory, download=True):
     
     return entities, relationships, entities_header, relationships_headers
         
-def parsePathways(fhandler):
+def parsePathways(config, fhandler):
     entities = set()
-    url = iconfig.linkout_url
+    url = config['linkout_url']
     organism = 9606
     for filename in fhandler.namelist():
         if not os.path.isdir(filename):

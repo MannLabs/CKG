@@ -1,7 +1,7 @@
 import os.path
-from graphdb_builder.databases.config import internalDBsConfig as iconfig
-from graphdb_builder import mapping as mp, builder_utils
 import pandas as pd
+import ckg_utils
+from graphdb_builder import mapping as mp, builder_utils
 
 #############################################
 #   Internal Databases (JensenLab.org)      # 
@@ -9,29 +9,31 @@ import pandas as pd
 
 def parser(databases_directory, download=True):
     result = {}
-    string_url = iconfig.string_url
+    config = ckg_utils.get_configuration('../databases/config/internalDBsConfig.yml')
+    string_url = config['string_url']
     string_mapping = mp.getSTRINGMapping(string_url, download=download)
-    for qtype in iconfig.internal_db_types:
-        relationships = parseInternalDatabasePairs(databases_directory, qtype, string_mapping)
-        entity1, entity2 = iconfig.internal_db_types[qtype]
+    for qtype in config['internal_db_types']:
+        relationships = parseInternalDatabasePairs(config, databases_directory, qtype, string_mapping)
+        entity1, entity2 = config['internal_db_types'][qtype]
         outputfileName =  entity1+"_"+entity2+"_associated_with_integrated.csv"
-        header = iconfig.header
+        header = config['header']
         result[qtype] = (relationships, header, outputfileName)
     
     return result
 
 def parserMentions(databases_directory, importDirectory, download=True):
-    entities, header = parsePMClist(databases_directory, download)
+    config = ckg_utils.get_configuration('../databases/config/internalDBsConfig.yml')
+    entities, header = parsePMClist(config, databases_directory, download)
     outputfileName = "Publications.csv"
-    for qtype in iconfig.internal_db_mentions_types:
-        parseInternalDatabaseMentions(databases_directory, qtype, importDirectory)
+    for qtype in config['internal_db_mentions_types']:
+        parseInternalDatabaseMentions(config, databases_directory, qtype, importDirectory)
 
     return (entities, header, outputfileName)
 
-def parseInternalDatabasePairs(databases_directory, qtype, mapping, download=True):
-    url = iconfig.internal_db_url
-    ifile = iconfig.internal_db_files[qtype]
-    source = iconfig.internal_db_sources[qtype]
+def parseInternalDatabasePairs(config, databases_directory, qtype, mapping, download=True):
+    url = config['internal_db_url']
+    ifile = config['internal_db_files'][qtype]
+    source = config['internal_db_sources'][qtype]
     relationships = set()
     directory = os.path.join(databases_directory, "InternalDatabases")
     builder_utils.checkDirectory(directory)
@@ -53,9 +55,9 @@ def parseInternalDatabasePairs(databases_directory, qtype, mapping, download=Tru
                 
     return relationships
 
-def parsePMClist(databases_directory, download=True):
-    url = iconfig.PMC_db_url
-    plinkout = iconfig.pubmed_linkout
+def parsePMClist(config, databases_directory, download=True):
+    url = config['PMC_db_url']
+    plinkout = config['pubmed_linkout']
     entities = set()
     directory = os.path.join(databases_directory, "InternalDatabases")
     builder_utils.checkDirectory(directory)
@@ -67,7 +69,7 @@ def parsePMClist(databases_directory, download=True):
         builder_utils.downloadDB(url, directory)
 
     entities = pd.read_csv(fileName, sep = ',', dtype = str, compression = 'gzip', low_memory=False)
-    entities = entities[iconfig.PMC_fields]
+    entities = entities[config['PMC_fields']]
     entities = entities[entities.iloc[:,0].notnull()]
     entities = entities.set_index(list(entities.columns)[0])
     entities['linkout'] = [plinkout.replace("PUBMEDID", str(int(pubmedid))) for pubmedid in list(entities.index)]
@@ -80,19 +82,19 @@ def parsePMClist(databases_directory, download=True):
     
     return entities, header
 
-def parseInternalDatabaseMentions(databases_directory, qtype, importDirectory, download=True):
-    url = iconfig.internal_db_url
-    string_url = iconfig.string_url
-    stitch_url = iconfig.stitch_url
-    ifile = iconfig.internal_db_mentions_files[qtype]
+def parseInternalDatabaseMentions(config, databases_directory, qtype, importDirectory, download=True):
+    url = config['internal_db_url']
+    string_url = config['string_url']
+    stitch_url = config['stitch_url']
+    ifile = config.internal_db_mentions_files[qtype]
     if qtype == "9606":
         mapping = mp.getSTRINGMapping(string_url, download=False)
     elif qtype == "-1":
-        mapping = mp.getSTRINGMapping(stitch_url, source = iconfig.internal_db_sources["Drug"], download = False, db = "STITCH")
+        mapping = mp.getSTRINGMapping(stitch_url, source = config['internal_db_sources']["Drug"], download = False, db = "STITCH")
     filters = []
-    if qtype in iconfig.internal_db_mentions_filters:
-        filters = iconfig.internal_db_mentions_filters[qtype]
-    entity1, entity2 = iconfig.internal_db_mentions_types[qtype]
+    if qtype in config['internal_db_mentions_filters']:
+        filters = config['internal_db_mentions_filters'][qtype]
+    entity1, entity2 = config['internal_db_mentions_types'][qtype]
     outputfile = os.path.join(importDirectory, entity1+"_"+entity2+"_mentioned_in_publication.csv")
     relationships = pd.DataFrame()
     directory = os.path.join(databases_directory, "InternalDatabases")
