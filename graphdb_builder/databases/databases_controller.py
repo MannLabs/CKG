@@ -15,7 +15,7 @@ from joblib import Parallel, delayed
 import logging
 import logging.config
 
-log_config = ckg_config.log
+log_config = ckg_config.graphdb_builder_log
 logger = builder_utils.setup_logging(log_config, key="database_controller")
 
 try:

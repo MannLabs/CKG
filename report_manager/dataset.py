@@ -73,7 +73,7 @@ class Dataset:
             replace = self.getConfiguration()["replace"]
         for query_name in datasets_cypher[self.getType()]:
             title = query_name.lower().replace('_',' ')
-            query = datasets_cypher[self.getType()][query_name]
+            query = datasets_cypher[self.getType()][query_name]['query']
             for r,by in replace:
                 query = query.replace(r,by)
             data[title] = connector.getCursorData(driver, query)

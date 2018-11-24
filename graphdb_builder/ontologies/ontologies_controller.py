@@ -13,7 +13,7 @@ import config.ckg_config as graph_config
 import logging
 import logging.config
 
-log_config = graph_config.log
+log_config = graph_config.graphdb_builder_log
 logger = builder_utils.setup_logging(log_config, key="ontologies_controller")
 
 try:

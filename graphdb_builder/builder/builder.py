@@ -22,7 +22,7 @@ from graphdb_builder import builder_utils
 import logging
 import logging.config
 
-log_config = ckg_config.log
+log_config = ckg_config.graphdb_builder_log
 logger = builder_utils.setup_logging(log_config, key="grapher")
 
 try:
