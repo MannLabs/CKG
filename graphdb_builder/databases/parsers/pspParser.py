@@ -28,7 +28,7 @@ def parser(databases_directory):
                 relationships[r].update(site_relationships[r])
     for er in annotation_files:
         entity, relationship_type = er.split('-')
-        file_name = os.path.join(directory, annotation_files[(entity,relationship_type)])
+        file_name = os.path.join(directory, annotation_files[er])
         with gzip.open(file_name, 'r') as f:
             if entity == "disease":
                 mapping = mp.getMappingFromOntology(ontology = "Disease", source = None)
