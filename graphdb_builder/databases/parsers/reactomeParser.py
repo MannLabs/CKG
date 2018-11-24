@@ -26,7 +26,6 @@ def parser(databases_directory, download=True):
             builder_utils.downloadDB(url, directory)
         f = os.path.join(directory, file_name)
         with open(f, 'r') as rf:
-            print(dataset)
             if dataset == "pathway":
                 entities = parsePathways(config, databases_directory, rf)
             elif dataset == "hierarchy":

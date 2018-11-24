@@ -18,7 +18,7 @@ databases :
     - "GWASCatalog"
     - "DGIdb" 
     - "OncoKB"
-    - "CancerGenomeInterpreter"
+    #- "CancerGenomeInterpreter"
     - "SIDER"
     - "PhosphoSitePlus"
     - "CORUM"

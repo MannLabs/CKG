@@ -13,6 +13,8 @@ databasesDirectory : '../../../data/imports/databases'
 #ontologies import diretory
 ontologiesDirectory : '../../../data/imports/ontologies'
 
+download: True
+
 statsFile : 'stats.hdf'
 statsCols : 
     - 'date'

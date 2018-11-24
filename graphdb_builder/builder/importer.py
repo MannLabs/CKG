@@ -54,7 +54,7 @@ def ontologiesImport(importDirectory, ontologies=None, import_type="partial"):
     statsDf = generateStatsDataFrame(stats)
     writeStats(statsDf, import_type)
 
-def databasesImport(importDirectory, databases=None, n_jobs=1, import_type="partial"):
+def databasesImport(importDirectory, databases=None, n_jobs=1, download=True, import_type="partial"):
     """
     Generates all the entities and relationships
     from the provided databases. If the databases list is
@@ -73,7 +73,7 @@ def databasesImport(importDirectory, databases=None, n_jobs=1, import_type="part
     #Databases
     databasesImportDirectory = os.path.join(importDirectory, dbconfig["databasesImportDir"])
     builder_utils.checkDirectory(databasesImportDirectory)
-    stats = dh.generateGraphFiles(databasesImportDirectory, databases, n_jobs)
+    stats = dh.generateGraphFiles(databasesImportDirectory, databases, download, n_jobs)
     statsDf = generateStatsDataFrame(stats)
     writeStats(statsDf, import_type)
 
@@ -124,6 +124,7 @@ def fullImport():
     and create it otherwise. Calls setupStats.
     """
     try:
+        download = config["download"]
         importDirectory = config["importDirectory"]
         builder_utils.checkDirectory(importDirectory)
         setupStats(import_type='full')
@@ -131,7 +132,7 @@ def fullImport():
         ontologiesImport(importDirectory, import_type='full')
         logger.info("Full import: Ontologies import took {}".format(datetime.now() - START_TIME))
         logger.info("Full import: importing all Databases")
-        databasesImport(importDirectory, n_jobs=4, import_type='full')
+        databasesImport(importDirectory, n_jobs=4, download=download, import_type='full')
         logger.info("Full import: Databases import took {}".format(datetime.now() - START_TIME))
         logger.info("Full import: importing all Experiments")
         experimentsImport(n_jobs=4, import_type='full')

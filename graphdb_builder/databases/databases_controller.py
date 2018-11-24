@@ -297,10 +297,10 @@ def parseDatabase(importDirectory, database, download=True):
 #########################
 #       Graph files     # 
 #########################
-def generateGraphFiles(importDirectory, databases = None, n_jobs = 4):
+def generateGraphFiles(importDirectory, databases=None, download=True, n_jobs = 4):
     if databases is None:
         databases = dbconfig["databases"]
-    stats = Parallel(n_jobs=n_jobs)(delayed(parseDatabase)(importDirectory,database) for database in databases)
+    stats = Parallel(n_jobs=n_jobs)(delayed(parseDatabase)(importDirectory,database, download) for database in databases)
     allstats = {val if type(sublist) == set else sublist for sublist in stats for val in sublist}
     return allstats
 
