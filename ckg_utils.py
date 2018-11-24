@@ -9,6 +9,15 @@ def read_yaml(yaml_file):
             raise yaml.YAMLError("The yaml file {} could not be parsed. {}".format(yaml_file, err))
     return content
 
+def get_queries(queries_file):
+    queries  = None
+    if queries_file.endswith("yml"):
+        queries = read_yaml(queries_file)
+    else:
+        raise Exception("The format specified in the queries file {} is not supported. {}".format(queries_file, err))
+
+    return queries
+
 def get_configuration(configuration_file):
     configuration  = None
     if configuration_file.endswith("yml"):

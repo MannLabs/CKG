@@ -15,6 +15,8 @@ ontologiesDirectory : '../../../data/imports/ontologies'
 
 download: True
 
+cypher_queries_file: 'cypher.yml'
+
 statsFile : 'stats.hdf'
 statsCols : 
     - 'date'
