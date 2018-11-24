@@ -86,7 +86,7 @@ def parseInternalDatabaseMentions(config, databases_directory, qtype, importDire
     url = config['internal_db_url']
     string_url = config['string_url']
     stitch_url = config['stitch_url']
-    ifile = config.internal_db_mentions_files[qtype]
+    ifile = config['internal_db_mentions_files'][qtype]
     if qtype == "9606":
         mapping = mp.getSTRINGMapping(string_url, download=False)
     elif qtype == "-1":
