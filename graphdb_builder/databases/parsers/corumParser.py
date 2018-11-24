@@ -20,9 +20,9 @@ def parser(databases_directory, download=True):
     except Exception as err:
         raise Exception("Reading configuration > {}.".format(err))
 
-    database_url = config.database_url    
-    entities_header = config.entities_header
-    relationships_headers = config.relationships_headers
+    database_url = config['database_url']
+    entities_header = config['entities_header']
+    relationships_headers = config['relationships_headers']
     zipped_fileName = os.path.join(directory, database_url.split('/')[-1])
     fileName = '.'.join(database_url.split('/')[-1].split('.')[0:2])
     if download:

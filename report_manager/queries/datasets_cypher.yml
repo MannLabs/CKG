@@ -2,11 +2,11 @@
     "NUMBER_OF_PROTEINS":
         'name': 'number of proteins'
         'description': 'Extracts the number of proteins identified in a given Project. Requires: Project.id'
-        'involves_nodes':
+        'involved_nodes':
             - 'Project'
             - 'Analytical_sample'
             - 'Protein'
-        'involves_rels':
+        'involved_rels':
             - 'HAS_QUANTIFIED_PROTEIN'
         'query': >
             MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
@@ -15,11 +15,11 @@
     "NUMBER_OF_PEPTIDES":
         'name': 'number of peptides'
         'description': 'Extracts the number of peptides identified in a given Project. Requires: Project.id'
-        'involves_nodes':
+        'involved_nodes':
             - 'Project'
             - 'Analytical_sample'
             - 'Peptide'
-        'involves_rels':
+        'involved_rels':
             - 'HAS_QUANTIFIED_PEPTIDE'
         'query': >
             MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PEPTIDE]->(peptide:Peptide) 
@@ -28,11 +28,11 @@
     "NUMBER_OF_MODIFIED_PROTEINS":
         'name': 'number of modified proteins'
         'description': 'Extracts the number of modified proteins identified in a given Project. Requires: Project.id'
-        'involves_nodes':
+        'involved_nodes':
             - 'Project'
             - 'Analytical_sample'
             - 'Modified_protein'
-        'involves_rels':
+        'involved_rels':
             - 'HAS_QUANTIFIED_MODIFIED_PROTEIN'
         'query': >
             MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_MODIFIED_PROTEIN]->(modifiedprotein:Modified_protein) 
@@ -41,11 +41,11 @@
     "DATASET":
         'name': 'get dataset from project'
         'description': 'Extracts the dataset matrix of quantified proteins in a given Project. Requires: Project.id'
-        'involves_nodes':
+        'involved_nodes':
             - 'Project'
             - 'Analytical_sample'
             - 'Protein'
-        'involves_rels':
+        'involved_rels':
             - 'HAS_QUANTIFIED_PROTEIN'
         'query': >
             MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
