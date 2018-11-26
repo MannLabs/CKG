@@ -1,8 +1,14 @@
+import os
 import ckg_utils
+import config.ckg_config as ckg_config
 from report_manager import analysisResult as ar, report as rp
 from report_manager.analyses import basicAnalysis
 from graphdb_connector import connector
+import logging
+import logging.config
 
+log_config = ckg_config.report_manager_log
+logger = ckg_utils.setup_logging(log_config, key="dataset")
 
 class Dataset:
     def __init__(self, identifier, dtype, configuration, data, analyses):
@@ -65,18 +71,20 @@ class Dataset:
         driver = connector.getGraphDatabaseConnectionConfiguration()
         replace = [("PROJECTID", self.getIdentifier())]
         try:
-            datasets_cypher = ckg_utils.get_queries('./queries/dataset_cypher.yml')
+            cwd = os.path.abspath(os.path.dirname(__file__))
+            queries_path = "queries/datasets_cypher.yml"
+            datasets_cypher = ckg_utils.get_queries(os.path.join(cwd, queries_path))
+            if "replace" in self.getConfiguration():
+                replace = self.getConfiguration()["replace"]
+            for query_name in datasets_cypher[self.getType()]:
+                title = query_name.lower().replace('_',' ')
+                query = datasets_cypher[self.getType()][query_name]['query']
+                for r,by in replace:
+                    query = query.replace(r,by)
+                data[title] = connector.getCursorData(driver, query)
         except Exception as err:
             logger.error("Reading queries > {}.".format(err))
-            
-        if "replace" in self.getConfiguration():
-            replace = self.getConfiguration()["replace"]
-        for query_name in datasets_cypher[self.getType()]:
-            title = query_name.lower().replace('_',' ')
-            query = datasets_cypher[self.getType()][query_name]['query']
-            for r,by in replace:
-                query = query.replace(r,by)
-            data[title] = connector.getCursorData(driver, query)
+        
         return data
 
     def generateReport(self):

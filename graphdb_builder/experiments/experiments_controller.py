@@ -178,9 +178,12 @@ def extractSubjectClinicalVariablesRelationships(data):
     df = data.copy()
     intervention = None
     if "intervention" in df.columns:
+        print("IN")
         intervention = df["intervention"].to_frame()
         intervention = intervention.reset_index()
         intervention.columns = ['START_ID', 'END_ID']
+        intervention['END_ID'] = intervention['END_ID'].astype('int64')
+        intervention['value'] = True
     df = df.drop(["external id", "biological_sample id", "analytical_sample id"], axis=1)
     df = df.select_dtypes(exclude='float')
     df = df.stack()
@@ -190,6 +193,7 @@ def extractSubjectClinicalVariablesRelationships(data):
         df = df.append(intervention, sort=True)
     df['TYPE'] = "HAS_CLINICAL_STATE"
     df = df[['START_ID', 'END_ID','TYPE', 'value']]
+    df = df.dropna()
 
     return df
 

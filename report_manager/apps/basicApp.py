@@ -1,5 +1,5 @@
 from apps import apps_config as config
-
+import dash_html_components as html
 
 class BasicApp:
     '''Defines what an App is in the report_manager.

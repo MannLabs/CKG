@@ -1,4 +1,7 @@
 import yaml
+import json
+import os
+import logging
 
 def read_yaml(yaml_file):
     content = None
@@ -33,3 +36,15 @@ def get_configuration_variable(configuration_file, variable):
         return configuration[variable]
     else:
         raise Exception("The varible {} is not found in the configuration file {}. {}".format(variable, configuration_file, err))
+
+def setup_logging(path='log.config', key=None):
+    """Setup logging configuration"""
+    if os.path.exists(path):
+        with open(path, 'rt') as f:
+            config = json.load(f)
+        logging.config.dictConfig(config)
+    else:
+        logging.basicConfig(level=logging.DEBUG)
+    logger = logging.getLogger(key)
+    
+    return logger
