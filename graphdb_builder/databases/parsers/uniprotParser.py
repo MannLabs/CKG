@@ -203,14 +203,13 @@ def parseUniProtPeptides(config, databases_directory, download=True):
     
                 data = line.rstrip("\r\n").split("\t")
                 peptide = data[0]
-                groups = data[3].split(';')
+                accs = data[5].split(",")
                 is_unique = True
-                if len(groups) > 1:
+                if len(accs) > 1:
                     is_unique = False
                 entities.add((peptide, "Peptide", "tryptic peptide", is_unique))
-                for accs in groups:
-                    for protein in accs.split(','):
-                        relationships[("Peptide", 'belongs_to_protein')].add((peptide, protein, "BELONGS_TO_PROTEIN", "UniProt"))
+                for protein in accs:
+                    relationships[("Peptide", 'belongs_to_protein')].add((peptide, protein, "BELONGS_TO_PROTEIN", "UniProt"))
     return entities, relationships
     
 if __name__ == "__main__":

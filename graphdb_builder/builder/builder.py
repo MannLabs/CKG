@@ -32,6 +32,13 @@ except Exception as err:
 
 START_TIME = datetime.now()
 
+def send_queries_to_database(driver, queries, requester):
+    for query in queries:
+        result = connector.send_query(driver, statement+";")
+        logger.info("{} - cypher query: {}".format(requester, statement))
+        
+    return result
+
 def updateDB(driver, imports=None):
     """
     Populates the graph database with information for each Database, Ontology or Experiment
@@ -55,6 +62,7 @@ def updateDB(driver, imports=None):
         logger.error("Reading queries file > {}.".format(err))
         
     for i in imports:
+        queries = []
         logger.info("Loading {} into the database".format(i))
         try:
             importDir = os.path.join(os.getcwd(),config["databasesDirectory"])
@@ -65,212 +73,125 @@ def updateDB(driver, imports=None):
                 importDir = os.path.join(os.getcwd(), config["ontologiesDirectory"])
                 ontologyDataImportCode = cypher_queries['IMPORT_ONTOLOGY_DATA']['query']
                 for entity in entities:
-                    cypherCode = ontologyDataImportCode.replace("ENTITY", entity).replace("IMPORTDIR", importDir).split(';')[0:-1]
-                    for statement in cypherCode:
-                        #print(statement)
-                        result = connector.sendQuery(driver, statement+';')
-                        print(result.data())
-                        logger.info("{} - Creating {}\n cypher query: {}".format(i, entity, statement))
+                    queries.extend(ontologyDataImportCode.replace("ENTITY", entity).replace("IMPORTDIR", importDir).split(';')[0:-1])
             #Databases
             #Chromosomes
             elif "chromosomes" == i:
                 chromosomeDataImportCode = cypher_queries['IMPORT_CHROMOSOME_DATA']['query']
-                for statement in chromosomeDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
-                    #print(statement+";")
-                    connector.sendQuery(driver, statement+';')
-                    logger.info("{} - cypher query: {}".format(i, statement))
+                queries = chromosomeDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]
             #Genes
             elif "genes" == i:
                 geneDataImportCode = cypher_queries['IMPORT_GENE_DATA']['query']
-                for statement in geneDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
-                    #print(statement+";")
-                    connector.sendQuery(driver, statement+';')
-                    logger.info("{} - cypher query: {}".format(i, statement))
+                queries = geneDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]
             #Transcripts
             elif "transcripts" == i:
                 transcriptDataImportCode = cypher_queries['IMPORT_TRANSCRIPT_DATA']['query']
-                for statement in transcriptDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
-                    #print(statement+";")
-                    connector.sendQuery(driver, statement+';')
-                    logger.info("{} - cypher query: {}".format(i, statement))
+                queries = transcriptDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]
             #Proteins
             elif "proteins" == i:
                 proteinDataImportCode = cypher_queries['IMPORT_PROTEIN_DATA']['query']
-                for statement in proteinDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
-                    #print(statement+";")
-                    connector.sendQuery(driver, statement+';')
-                    logger.info("{} - cypher query: {}".format(i, statement))
+                queries = proteinDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]
             #Protein annotations
             elif "annotations" == i:
                 proteinAnnotationsImportCode = cypher_queries['IMPORT_PROTEIN_ANNOTATIONS']['query']
-                for statement in proteinAnnotationsImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
-                    #print(statement+";")
-                    connector.sendQuery(driver, statement+';')
-                    logger.info("{} - cypher query: {}".format(i, statement))
+                queries = proteinAnnotationsImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]
             #Protein complexes
             elif "complexes" == i:
                 complexDataImportCode = cypher_queries['IMPORT_COMPLEXES']['query']
                 for resource in config["complexes_resources"]:
-                    for statement in complexDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        connector.sendQuery(driver, statement+';')
-                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
+                    queries.extend(complexDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
             #Modified proteins
             elif "modified_proteins" == i:
                 modified_proteinsImportCode = cypher_queries['IMPORT_MODIFIED_PROTEINS']['query']
                 for resource in config["modified_proteins_resources"]:
-                    for statement in modified_proteinsImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        #print(statement+";")
-                        connector.sendQuery(driver, statement+';')
-                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
+                    queries.extend(modified_proteinsImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
                 modified_proteins_annotationsImportCode = cypher_queries['IMPORT_MODIFIED_PROTEIN_ANNOTATIONS']['query']
                 for resource in config["modified_proteins_resources"]:
-                    for statement in modified_proteins_annotationsImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        connector.sendQuery(driver, statement+';')
-                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
+                    queries.extend(modified_proteins_annotationsImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
             #Pathology expression
             elif "pathology_expression" == i:
                 pathology_expression_DataImportCode = cypher_queries['IMPORT_PATHOLOGY_EXPRESSION']['query']
                 for resource in config["pathology_expression_resources"]:
-                    for statement in pathology_expression_DataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        connector.sendQuery(driver, statement+';')
-                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
+                    queries.extend(pathology_expression_DataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
             #PPIs
             elif "ppi" == i:
                 ppiDataImportCode = cypher_queries['IMPORT_CURATED_PPI_DATA']['query']
                 for resource in config["curated_PPI_resources"]:
-                    for statement in ppiDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        #print(statement+";")
-                        connector.sendQuery(driver, statement+';')
-                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
+                    queries.extend(ppiDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
                 ppiDataImportCode = cypher_queries['IMPORT_COMPILED_PPI_DATA']['query']
                 for resource in config["compiled_PPI_resources"]:
-                    for statement in ppiDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        #print(statement+";")
-                        connector.sendQuery(driver, statement+';')
-                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
+                    queries.extend(ppiDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
                 ppiDataImportCode = cypher_queries['IMPORT_PPI_ACTION']['query']
                 for resource in config["PPI_action_resources"]:
-                    for statement in ppiDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        #print(statement+";")
-                        connector.sendQuery(driver, statement+';')
-                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
+                    queries.extend(ppiDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
             #Diseases
             elif "diseases" == i:
                 diseaseDataImportCode = cypher_queries['IMPORT_DISEASE_DATA']['query']
                 for entity, resource in config["disease_resources"]:
-                    for statement in diseaseDataImportCode.replace("IMPORTDIR", importDir).replace("ENTITY", entity).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        #print(statement+";")
-                        connector.sendQuery(driver, statement+';')
-                        logger.info("{} - Resource: {}\nEntity: {}\ncypher query: {}".format(i, resource, entity, statement))
+                    queries.extend(diseaseDataImportCode.replace("IMPORTDIR", importDir).replace("ENTITY", entity).replace("RESOURCE", resource.lower()).split(';')[0:-1])
             #Drugs  
             elif "drugs" == i:
                 drugsDataImportCode = cypher_queries['IMPORT_DRUG_DATA']['query']
-                for statement in drugsDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
-                    #print(statement+";")
-                    connector.sendQuery(driver, statement+';')
-                    logger.info("{} - cypher query: {}".format(i, statement))
+                queries = drugsDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]
                 drugsDataImportCode = cypher_queries['IMPORT_CURATED_DRUG_DATA']['query']
                 for resource in config["curated_drug_resources"]:
-                    for statement in drugsDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        #print(statement+";")
-                        connector.sendQuery(driver, statement+';')
-                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
+                    queries.extend(drugsDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
                 drugsDataImportCode = cypher_queries['IMPORT_COMPILED_DRUG_DATA']['query']
                 for resource in config["compiled_drug_resources"]:
-                    for statement in drugsDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        #print(statement+";")
-                        connector.sendQuery(driver, statement+';')
-                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
+                    queries.extend(drugsDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
                 drugsDataImportCode = cypher_queries['IMPORT_DRUG_ACTS_ON']['query']
                 for resource in config["drug_action_resources"]:
-                    for statement in drugsDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        #print(statement+";")
-                        connector.sendQuery(driver, statement+';')
-                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
+                    queries.extend(drugsDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
             #Side effects
             elif "side effects" == i:
                 sideEffectsDataImportCode = cypher_queries['IMPORT_DRUG_SIDE_EFFECTS']['query']
                 for resource in config["side_effects_resources"]:
-                    for statement in sideEffectsDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        #print(statement+";")
-                        connector.sendQuery(driver, statement+';')
-                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
+                    queries.extend(sideEffectsDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
             #Pathway
             elif 'pathway' == i:
                 pathwayImportCode = cypher_queries['IMPORT_PATHWAY_DATA']['query']
                 for resource in config["pathway_resources"]:
-                    for statement in pathwayImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        #print(statement+';')
-                        connector.sendQuery(driver, statement+';')
-                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
+                    queries.extend(pathwayImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
             #Metabolite
             elif 'metabolite' == i:
                 metaboliteImportCode = cypher_queries['IMPORT_METABOLITE_DATA']['query']
                 for resource in config["metabolite_resources"]:
-                    for statement in metaboliteImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        #print(statement+';')
-                        connector.sendQuery(driver, statement+';')
-                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
+                    queries.extend(metaboliteImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
             #Food
             elif 'food' == i:
                 foodImportCode = cypher_queries['IMPORT_FOOD_DATA']['query']
                 for resource in config["food_resources"]:
-                    for statement in foodImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        #print(statement+';')
-                        connector.sendQuery(driver, statement+';')
-                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
+                    queries.extend(foodImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
             #GWAS
             elif "gwas" == i:
                 code = cypher_queries['IMPORT_GWAS']['query']
-                for statement in code.replace("IMPORTDIR", importDir).split(';')[0:-1]:
-                    #print(statement+';')
-                    connector.sendQuery(driver, statement+';')
-                    logger.info("{} - cypher query: {}".format(i, statement))
+                queries = code.replace("IMPORTDIR", importDir).split(';')[0:-1]
             #Known variants
             elif "known_variants" == i:
                 variantsImportCode = cypher_queries['IMPORT_KNOWN_VARIANT_DATA']['query']
-                for statement in variantsImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
-                    #print(statement+";")
-                    connector.sendQuery(driver, statement+';')
-                    logger.info("{} - cypher query: {}".format(i, statement))
+                queries = variantsImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]
             #Clinically_relevant_variants
             elif "clinical variants" == i:
                 variantsImportCode = cypher_queries['IMPORT_CLINICALLY_RELEVANT_VARIANT_DATA']['query']
                 for resource in config["clinical_variant_resources"]:
-                    for statement in variantsImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1]:
-                        #print(statement+";")
-                        connector.sendQuery(driver, statement+';')
-                        logger.info("{} - Resource: {}\ncypher query: {}".format(i, resource, statement))
+                    queries.extend(variantsImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
             #Internal
             elif "internal" == i:
                 internalDataImportCode = cypher_queries['IMPORT_INTERNAL_DATA']['query']
                 for (entity1, entity2) in config["internalEntities"]:
-                    for statement in internalDataImportCode.replace("IMPORTDIR", importDir).replace("ENTITY1", entity1).replace("ENTITY2", entity2).split(';')[0:-1]:
-                        #print(statement+";")
-                        connector.sendQuery(driver, statement+';')
-                        logger.info("{} - Entity1: {}, Entity2: {}\ncypher query: {}".format(i, entity1, entity2, statement))
+                    queries.extend(internalDataImportCode.replace("IMPORTDIR", importDir).replace("ENTITY1", entity1).replace("ENTITY2", entity2).split(';')[0:-1])
             #Mentions
             elif "mentions" == i:
                 publicationsImportCode = cypher_queries['CREATE_PUBLICATIONS']['query']
-                for statement in publicationsImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]:
-                    #print(statement+";")
-                    connector.sendQuery(driver, statement+';')
-                    logger.info("{} - cypher query: {}".format(i, statement))
-
+                queries = publicationsImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]
                 mentionsImportCode = cypher_queries['IMPORT_MENTIONS']['query']
                 for entity in config["mentionEntities"]:
-                    for statement in mentionsImportCode.replace("IMPORTDIR", importDir).replace("ENTITY", entity).split(';')[0:-1]:
-                        #print(statement+";")
-                        connector.sendQuery(driver, statement+';')
-                        logger.info("{} - cypher query: {}".format(i, statement))
+                    queries.extend(mentionsImportCode.replace("IMPORTDIR", importDir).replace("ENTITY", entity).split(';')[0:-1])
              #Published in
             elif "published" == i:
                 publicationImportCode = cypher_queries['IMPORT_PUBLISHED_IN']['query']
                 for entity in config["publicationEntities"]:
-                    for statement in publicationImportCode.replace("IMPORTDIR", importDir).replace("ENTITY", entity).split(';')[0:-1]:
-                        #print(statement+";")
-                        connector.sendQuery(driver, statement+';')
-                        logger.info("{} - Entity: {}\ncypher query: {}".format(i, entity, statement))
+                    queries.extend(publicationImportCode.replace("IMPORTDIR", importDir).replace("ENTITY", entity).split(';')[0:-1])
             #Projects
             elif "project" == i:
                 importDir = os.path.join(os.getcwd(),config["experimentsDirectory"])
@@ -280,10 +201,7 @@ def updateDB(driver, imports=None):
                     projectDir = os.path.join(importDir, project)
                     for project_section in project_cypher:
                         code = project_section['query']
-                        for statement in code.replace("IMPORTDIR", projectDir).replace('PROJECTID', project).split(';')[0:-1]:
-                            #print(statement+';')
-                            result = connector.sendQuery(driver, statement+';')
-                            logger.info("{} - Project: {}\nCode: {}\ncypher query: {}\n".format(i, project, code, statement))
+                        queries.extend(code.replace("IMPORTDIR", projectDir).replace('PROJECTID', project).split(';')[0:-1])
             #Datasets
             elif "experiment" == i:
                 importDir = os.path.join(os.getcwd(),config["experimentsDirectory"])
@@ -296,10 +214,10 @@ def updateDB(driver, imports=None):
                         datasetDir = os.path.join(projectDir, dtype)
                         dataset = datasets_cypher[dtype]
                         code = dataset['query']
-                        for statement in code.replace("IMPORTDIR", datasetDir).replace('PROJECTID', project).split(';')[0:-1]:
-                            #print(statement+';')
-                            connector.sendQuery(driver, statement+';')
-                            logger.info("{} - Project: {}\nData type: {}\ncypher query: {}".format(i, project, dtype, statement))
+                        queries.extend(code.replace("IMPORTDIR", datasetDir).replace('PROJECTID', project).split(';')[0:-1])
+            else:
+                logger.error("Non-existing dataset. The dataset you are trying to import does not exist: {}.".format(i))
+            result = send_queries_to_database(driver, queries, i)
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -360,5 +278,5 @@ def archiveImportDirectory(archive_type="full"):
 
 if __name__ == "__main__":
     fullUpdate()
-    #partialUpdate(imports=["project", "experiment"])
+    #partialUpdate(imports=["experiment"])
 
