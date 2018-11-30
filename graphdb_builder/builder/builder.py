@@ -24,19 +24,30 @@ import logging.config
 
 log_config = ckg_config.graphdb_builder_log
 logger = builder_utils.setup_logging(log_config, key="grapher")
+START_TIME = datetime.now()
 
 try:
     config = ckg_utils.get_configuration(ckg_config.builder_config_file)
 except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
 
-START_TIME = datetime.now()
-
-def send_queries_to_database(driver, queries, requester):
+def load_into_database(driver, queries, requester):
     for query in queries:
-        result = connector.send_query(driver, statement+";")
-        logger.info("{} - cypher query: {}".format(requester, statement))
-        
+        try:
+            result = connector.sendQuery(driver, query+";").data()
+            if len(result) > 0:
+                counts = result.pop()
+                if 0 in counts.values():
+                    logger.warning("{} - No data was inserted in query: {}.\n results: {}".format(requester, query, counts))
+
+                logger.info("{} - cypher query: {}.\n results: {}".format(requester, query, counts))
+            else:
+                logger.info("{} - cypher query: {}".format(requester, query))
+        except Exception as err:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            raise Exception("{}, file: {}, line: {}.\n Query: {}".format(err, fname, exc_tb.tb_lineno, query))        
+    
     return result
 
 def updateDB(driver, imports=None):
@@ -51,10 +62,8 @@ def updateDB(driver, imports=None):
                                 connection to the neo4j graph database
         imports (list): A list of entities to be loaded into the graph
     """
-    statement = ""
     if imports is None:
         imports = config["graph"]
-
 
     try:
         cypher_queries = ckg_utils.get_queries(config['cypher_queries_file'])
@@ -66,7 +75,6 @@ def updateDB(driver, imports=None):
         logger.info("Loading {} into the database".format(i))
         try:
             importDir = os.path.join(os.getcwd(),config["databasesDirectory"])
-            #Get the cypher queries to build the graph
             #Ontologies
             if "ontologies" == i:
                 entities = config["ontology_entities"]
@@ -217,11 +225,11 @@ def updateDB(driver, imports=None):
                         queries.extend(code.replace("IMPORTDIR", datasetDir).replace('PROJECTID', project).split(';')[0:-1])
             else:
                 logger.error("Non-existing dataset. The dataset you are trying to import does not exist: {}.".format(i))
-            result = send_queries_to_database(driver, queries, i)
+            load_into_database(driver, queries, i)
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            logger.error("Import: {}: {}, file: {}, line: {}.\n Query: {}".format(i, err, fname, exc_tb.tb_lineno, statement))
+            logger.error("Loading: {}: {}, file: {}, line: {}".format(i, err, fname, exc_tb.tb_lineno))
 
 def fullUpdate():
     """
@@ -277,6 +285,6 @@ def archiveImportDirectory(archive_type="full"):
     logger.info("New backup created: {}".format(file_name))
 
 if __name__ == "__main__":
-    fullUpdate()
-    #partialUpdate(imports=["experiment"])
+    #fullUpdate()
+    partialUpdate(imports=["proteins"])
 
