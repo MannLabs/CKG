@@ -38,7 +38,7 @@ internal_db_mentions_types:
         - 'Protein'
         - 'Publication'
     '-1':
-        - 'Chemical'
+        - 'Drug'
         - 'Publication'
 
 internal_db_mentions_filters: 

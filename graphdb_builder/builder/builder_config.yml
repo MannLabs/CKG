@@ -127,6 +127,6 @@ mentionEntities :
     - 'Disease'
     - 'Tissue'
     - 'Protein'
-    - 'Metabolite'
+    - 'Drug'
 publicationEntities :
     - 'GWAS_study'
