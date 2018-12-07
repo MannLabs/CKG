@@ -64,7 +64,7 @@ def parser(databases_directory, download = True):
                     if d.lower() in drugmapping:
                         drug = drugmapping[d.lower()]
                         relationships["targets_clinically_relevant_variant"].add((drug, variant, "TARGETS_KNOWN_VARIANT", level[0], level[1], disease, "curated", "OncoKB"))
-                        relationships["targets"].add((drug, gene, "CURATED_TARGETS", "curated", "OncoKB"))
+                        relationships["targets"].add((drug, gene, "CURATED_TARGETS", "NA", "NA", "NA", "curated", "OncoKB"))
                     else:
                         pass
                         #print(drug)

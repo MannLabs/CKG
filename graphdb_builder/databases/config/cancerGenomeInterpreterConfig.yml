@@ -21,7 +21,7 @@ relationships_headers:
         - 'END_ID'
         - 'TYPE'
         - 'evidence'
-        - 'association'
+        - 'response'
         - 'tumor'
         - 'type'
         - 'source'
@@ -29,6 +29,9 @@ relationships_headers:
         - 'START_ID'
         - 'END_ID'
         - 'TYPE'
+        - 'evidence'
+        - 'response'
+        - 'disease'
         - 'type'
         - 'source'
     'associated_with':

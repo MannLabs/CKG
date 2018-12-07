@@ -40,6 +40,6 @@ def parser(databases_directory, download = True):
             if gene != "":
                 if drug in drugmapping:
                     drug = drugmapping[drug]
-                    relationships.add((drug, gene, "TARGETS", interactionType, "DGIdb: "+source))
+                    relationships.add((drug, gene, "TARGETS", "NA", "NA", "NA", interactionType, "DGIdb: "+source))
 
     return (relationships, header, outputfileName)

@@ -325,7 +325,7 @@ IMPORT_CURATED_DRUG_DATA:
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_targets.csv" AS line
         MATCH (d:Drug {id:line.START_ID})
         MATCH (g:Gene {id:line.END_ID})
-        MERGE (d)-[r:CURATED_TARGETS{source:line.source,interaction_type:line.type,score:'curated'}]->(g)
+        MERGE (d)-[r:CURATED_TARGETS{source:line.source,interaction_type:line.type, evidence:line.evidence, response:line.response, disease:line.disease, score:line.type}]->(g)
         RETURN COUNT(r) AS drug_curated_targets_gene;
         
 IMPORT_COMPILED_DRUG_DATA:

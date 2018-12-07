@@ -4,6 +4,10 @@ header:
     - 'START_ID'
     - 'END_ID'
     - 'TYPE'
+    - 'evidence'
+    - 'response'
+    - 'disease'
     - 'type'
     - 'source'
 outputfileName: 'dgidb_targets.csv'
+
