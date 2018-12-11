@@ -35,8 +35,7 @@ def parser(databases_directory, download = True):
                     if first:
                         first = False
                         continue
-                    data = line.decode('utf-8').rstrip("\r\n").split("\t")
-                    alteration = data[0]
+                    data = line.decode('utf-8').rstrip("\r\n").split("\t") 
                     alterationType = data[1]
                     response = data[3]
                     drugs = data[10].split(';')
@@ -46,12 +45,13 @@ def parser(databases_directory, download = True):
                     tumors = data[16].split(';')
                     publications = data[17].split(';')
                     identifier = data[21]
+                    variant = data[22]
                     matches = re.match(regex, identifier)
+                    chromosome, position, reference, alternative = "NA"
+
                     if matches is not None:
                         chromosome, position, reference, alternative = list(matches.groups())
-                        alteration = alteration.split(':')[1]
-                    else:
-                        continue
+                        chromosome = "chr"+chromosome
 
                     for drug in drugs:
                         if drug.lower() in drugmapping:
@@ -62,15 +62,15 @@ def parser(databases_directory, download = True):
                             drug = drugmapping[" ".join(drug.split(" ")[1:]).lower()]
                         
                         relationships["targets"].add((drug, gene, "CURATED_TARGETS", evidence, response, tumor, "curated", "CGI"))
-                       
-                        for variant in alteration.split(','):
-                            entities.add((variant, "Clinically_relevant_variant", identifier, "chr"+chromosome, position, reference, alternative, "", ""))
+                        
+                        if variant !="":
+                            entities.add((variant, "Clinically_relevant_variant", identifier, chromosome, position, reference, alternative, "", ""))
+                            relationships["known_variant_is_clinically_relevant"].add((variant, variant, "KNOWN_VARIANT_IS_CLINICALLY_RELEVANT", "CGI"))
                             for tumor in tumors:                         
                                 if tumor.lower() in mapping:
                                     tumor = mapping[tumor.lower()]
                                 relationships["associated_with"].add((variant, tumor, "ASSOCIATED_WITH", "curated","curated", "CGI", len(publications)))
                                 relationships["targets_clinically_relevant_variant"].add((drug, variant, "TARGETS_CLINICALLY_RELEVANT_VARIANT", evidence, response, tumor, "curated", "CGI"))
-                            relationships["known_variant_is_clinically_relevant"].add((variant, variant, "KNOWN_VARIANT_IS_CLINICALLY_RELEVANT", "CGI"))
                             #relationships["clinically_relevant_variant_found_in_gene"].add((variant, gene, "CLINICALLY_RELEVANT_VARIANT_FOUND_IN_GENE"))
                             #relationships["clinically_relevant_variant_found_in_chromosome"].add((variant, chromosome, "CLINICALLY_RELEVANT_VARIANT_FOUND_IN_CHROMOSOME"))
 
