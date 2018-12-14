@@ -117,6 +117,7 @@ def addUniProtTexts(textsFile, proteins):
 def parseUniProtVariants(config, databases_directory, download = False):
     data = defaultdict()
     url = config['uniprot_variant_file']
+    aa = config['amino_acids']
     entities = set()
     relationships = defaultdict(set)
     directory = os.path.join(databases_directory,"UniProt")
@@ -139,23 +140,28 @@ def parseUniProtVariants(config, databases_directory, download = False):
             if len(data) > 9:
                 gene = data[0]
                 protein = data[1]
-                ident = re.sub('[a-z|\.]','', data[2])
-                altName = [data[3]]
-                altName.append(data[5])
-                consequence = data[4]
-                mutIdent = re.sub('NC_\d+\.', 'chr', data[9])
-                altName.append(mutIdent)
-                if len(data[9].split('.')) >1:
-                    chromosome = data[9].split('.')[1].split(':')[0]
-                else:
-                    chromosome = data[9]
-                entities.add((ident, "Known_variant", ",".join(altName)))
-                if chromosome != '-':
-                    relationships[('Chromosome','known_variant_found_in_chromosome')].add((ident, chromosome, "VARIANT_FOUND_IN_CHROMOSOME","UniProt"))
-                if gene != "":
-                    relationships[('Gene','known_variant_found_in_gene')].add((ident, gene, "VARIANT_FOUND_IN_GENE", "UniProt"))
-                if protein !="":
-                    relationships[('Protein','known_variant_found_in_protein')].add((ident, protein, "VARIANT_FOUND_IN_PROTEIN", "UniProt"))
+                pvariant = data[2]
+                ref = pvariant[0:3]
+                pos = pvariant[3:-3]
+                alt = pvariant[-3:]
+                if ref in aa and alt in aa:
+                    ident = aa[ref]+pos+aa[alt]
+                    altName = [data[3]]
+                    altName.append(data[5])
+                    consequence = data[4]
+                    mutIdent = re.sub('NC_\d+\.', 'chr', data[9])
+                    altName.append(mutIdent)
+                    if len(data[9].split('.')) >1:
+                        chromosome = data[9].split('.')[1].split(':')[0]
+                    else:
+                        chromosome = data[9]
+                    entities.add((ident, "Known_variant", ",".join(altName)))
+                    if chromosome != '-':
+                        relationships[('Chromosome','known_variant_found_in_chromosome')].add((ident, chromosome, "VARIANT_FOUND_IN_CHROMOSOME","UniProt"))
+                    if gene != "":
+                        relationships[('Gene','known_variant_found_in_gene')].add((ident, gene, "VARIANT_FOUND_IN_GENE", "UniProt"))
+                    if protein !="":
+                        relationships[('Protein','known_variant_found_in_protein')].add((ident, protein, "VARIANT_FOUND_IN_PROTEIN", "UniProt"))
 
     return entities, relationships
 
