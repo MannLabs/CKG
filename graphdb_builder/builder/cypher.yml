@@ -648,7 +648,7 @@ CREATE_PROJECT: &create_project
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID.csv" AS line
         MERGE (p:Project {id:line.ID}) 
-        ON CREATE SET p.name=line.name,p.description=line.description,p.acronym=line.acronym,p.responsible=line.responsible
+        ON CREATE SET p.name=line.name,p.description=line.description,p.acronym=line.acronym,p.responsible=line.responsible,p.type=line.type
         RETURN COUNT(p) AS PROJECTID_project;
         
 CREATE_SUBJECTS: &create_subject

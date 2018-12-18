@@ -4,7 +4,14 @@ from graphdb_connector import connector
 from plotly.offline import iplot
 
 class Project:
-    def __init__(self,identifier, project_type, datasets = None, report = None):
+    ''' A project class that defines an experimental project.
+        A project can be of different types, contain several datasets and reports.
+        To use:
+         >>> p = Project(identifier="P0000001", project_type="multi-omics", datasets=None, report=None)
+         >>> p.showReport(environment="noteboook")
+    '''
+
+    def __init__(self, identifier, datasets = None, report = None):
         self.identifier = identifier
         self.project_type = project_type
         self.datasets = datasets
@@ -14,34 +21,42 @@ class Project:
             self.buildProject()
             self.generateReport()
 
-    def getIdentifier(self):
+    @property
+    def identifier(self):
         return self.identifier
+    
+    @identifier.setter
+    def identifier(self, identifier):
+        self.identifier = identifier
 
-    def getProject_type(self):
+    @property
+    def project_type(self):
         return self.project_type
 
-    def getDatasets(self):
+    @project_type.setter
+    def project_type(self, project_type):
+        self.project_type = project_type
+    
+    @property
+    def datasets(self):
         return self.datasets
 
+    @datasets.setter
+    def datasets(self, datasets):
+        self.datasets = datasets
+
+    @property
+    def report(self):
+        return self.report
+
+    @report.setter
+    def report(self, report):
+        self.report = report
+    
     def getDataset(self, dataset):
         if dataset in self.datasets:
             return self.datasets[dataset]
         return None
-
-    def getReport(self):
-        return self.report
-
-    def setIdentifier(self, identifier):
-        self.identifier = identifier
-
-    def setProject_type(self, project_type):
-        self.project_type = project_type
-
-    def setDatasets(self, datasets):
-        self.datasets = datasets
-
-    def setReport(self, report):
-        self.report = report
 
     def updateDataset(self, dataset):
         self.datasets.update(dataset)
