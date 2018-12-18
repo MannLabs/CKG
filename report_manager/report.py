@@ -5,22 +5,26 @@ class Report:
         self.identifier = identifier
         self.plots = plots
 
-    def getIdenfitifer(self):
+    @property
+    def idenfitifer(self):
         return self.identifier
 
-    def getPlots(self):
+    @identifier.setter
+    def identifier(self, identifier):
+        self.identifier = identifier
+    
+    @property
+    def plots(self):
         return self.plots
+
+    @plots.setter
+    def plots(self, plots):
+        self.plots = plots
 
     def getPlot(self, plot):
         if plot in self.plots:
             return self.plots[plot]
         return None
-
-    def setIdentifier(self, identifier):
-        self.identifier = identifier
-
-    def setPlots(self, plots):
-        self.plots = plots
 
     def updatePlots(self, plot):
         self.plots.update(plot)
