@@ -18,7 +18,7 @@ class Dataset:
         self.data = data
         self.analyses = analyses
         if len(data) == 0:
-            self.data = self.queryData()
+            self.data = self.query_data()
     
     @property
     def identifier(self):
@@ -60,12 +60,12 @@ class Dataset:
     def configuration(self, configuration):
         self.configuration = configuration
     
-    def getDataset(self, dataset):
+    def get_dataset(self, dataset):
         if dataset in self.data:
             return self.data[dataset]
         return None
     
-    def getAnalysis(self, analysis):
+    def get_analysis(self, analysis):
         if analysis in self.analyses:
             return self.analyses[analysis]
         return None
@@ -76,19 +76,19 @@ class Dataset:
     def updateAnalyses(self, new):
         self.analyses.update(new)
 
-    def queryData(self):
+    def query_data(self):
         data = {}
         driver = connector.getGraphDatabaseConnectionConfiguration()
-        replace = [("PROJECTID", self.getIdentifier())]
+        replace = [("PROJECTID", self.identifier)]
         try:
             cwd = os.path.abspath(os.path.dirname(__file__))
             queries_path = "queries/datasets_cypher.yml"
             datasets_cypher = ckg_utils.get_queries(os.path.join(cwd, queries_path))
-            if "replace" in self.getConfiguration():
-                replace = self.getConfiguration()["replace"]
-            for query_name in datasets_cypher[self.getType()]:
+            if "replace" in self.configuration:
+                replace = self.configuration["replace"]
+            for query_name in datasets_cypher[self.dataset_type]:
                 title = query_name.lower().replace('_',' ')
-                query = datasets_cypher[self.getType()][query_name]['query']
+                query = datasets_cypher[self.dataset_type][query_name]['query']
                 for r,by in replace:
                     query = query.replace(r,by)
                 data[title] = connector.getCursorData(driver, query)
@@ -98,15 +98,15 @@ class Dataset:
         return data
 
     def generateReport(self):
-        report = rp.Report(self.getType().capitalize())
-        for key in self.getConfiguration():
-            for section_query,analysis_types,plot_names,args in self.getConfiguration()[key]:
-                if section_query in self.getData():
-                    data = self.getData()[section_query]
+        report = rp.Report(self.dataset_type.capitalize())
+        for key in self.configuration:
+            for section_query,analysis_types,plot_names,args in self.configuration[key]:
+                if section_query in self.data:
+                    data = self.data[section_query]
                     result = None 
                     if len(analysis_types) >= 1:
                         for analysis_type in analysis_types:
-                            result = ar.AnalysisResult(self.getIdentifier(), analysis_type, args, data)
+                            result = ar.AnalysisResult(self.identifier, analysis_type, args, data)
                             self.updateAnalyses(result.getResult())
                             if key == "regulation":
                                 reg_data = result.getResult()[analysis_type]
@@ -123,7 +123,7 @@ class Dataset:
                         if result is None:
                             dictresult = {}
                             dictresult["_".join(section_query.split(' '))] = data
-                            result = ar.AnalysisResult(self.getIdentifier(),"_".join(section_query.split(' ')), {}, data, result = dictresult)
+                            result = ar.AnalysisResult(self.identifier,"_".join(section_query.split(' ')), {}, data, result = dictresult)
                             self.updateAnalyses(result.getResult())
                         for plot_name in plot_names:
                             plots = result.getPlot(plot_name, "_".join(section_query.split(' '))+"_"+plot_name, section_query.capitalize())
@@ -141,7 +141,7 @@ class ProteomicsDataset(Dataset):
     
     def preprocessing(self):
         processed_data = None
-        data = self.getDataset("dataset")
+        data = self.get_dataset("dataset")
         if data is not None:
             imputation = True
             method = "mixed"
@@ -149,8 +149,8 @@ class ProteomicsDataset(Dataset):
             missing_max = 0.3
             value_col = 'LFQ intensity'
             args = {}
-            if "args" in self.getConfiguration():
-                args = self.getConfiguration()["args"] 
+            if "args" in self.configuration:
+                args = self.configuration["args"] 
             if "imputation" in args:
                 imputation = args["imputation"]
             if "imputation_method" in args:

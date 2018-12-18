@@ -1,0 +1,13 @@
+"attributes":
+    'name': 'project information'
+    'description': 'Gets all the attributes of a given Project. Requires: Project.id'
+    'involved_nodes':
+        - 'Project'
+    'involved_rels':
+    'query': >
+        MATCH (project:Project)
+        WITH project, size((project)-[]->()) AS number_subjects
+        WHERE project.id="PROJECTID" 
+        RETURN project.id AS identifier, project.name AS name, project.acronym AS acronym, 
+        project.type AS data_types, SPLIT(project.responsible, ';') AS responsible, project.description AS description, number_subjects, project.status AS status;
+
