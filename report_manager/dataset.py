@@ -13,29 +13,57 @@ logger = ckg_utils.setup_logging(log_config, key="dataset")
 class Dataset:
     def __init__(self, identifier, dtype, configuration, data, analyses):
         self.identifier = identifier
-        self.type = dtype
+        self.dataset_type = dtype
         self.configuration = configuration
         self.data = data
         self.analyses = analyses
         if len(data) == 0:
             self.data = self.queryData()
-
-    def getIdentifier(self):
+    
+    @property
+    def identifier(self):
         return self.identifier
 
-    def getType(self):
-        return self.type
+    @identifier.setter
+    def identifier(self, identifier):
+        self.identifier = identifier
 
-    def getData(self):
+    @property
+    def dataset_type(self):
+        return self.dataset_type
+
+    @dataset_type.setter
+    def dataset_type(self, dataset_type):
+        self.dataset_type = dataset_type
+
+    @property
+    def data(self):
         return self.data
 
+    @data.setter
+    def data(self, data):
+        self.data = data
+
+    @property
+    def analyses(self):
+        return self.analyses
+
+    @analyses.setter
+    def analyses(self, analyses):
+        self.analyses = analyses
+
+    @property
+    def configuration(self):
+        return self.configuration
+
+    @configuration.setter
+    def configuration(self, configuration):
+        self.configuration = configuration
+    
     def getDataset(self, dataset):
         if dataset in self.data:
             return self.data[dataset]
         return None
-
-    def getAnalyses(self):
-        return self.analyses
     
     def getAnalysis(self, analysis):
         if analysis in self.analyses:
@@ -47,24 +75,6 @@ class Dataset:
 
     def updateAnalyses(self, new):
         self.analyses.update(new)
-    
-    def getConfiguration(self):
-        return self.configuration
-
-    def setIdentifier(self, identifier):
-        self.identifier = identifier
-
-    def setType(self, dtype):
-        self.type = dtype
-
-    def setConfiguration(self, configuration):
-        self.configuration  = configuration
-
-    def setData(self, data):
-        self.data = data
-
-    def setAnalyses(self, analyses):
-        self.analyses = analyses
 
     def queryData(self):
         data = {}
