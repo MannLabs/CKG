@@ -136,6 +136,25 @@ class Project:
             if "number_subjects" in attributes:
                 self.num_subjects = attributes["number_subjects"]
 
+    def to_dict(self):
+        d = {"identifier" : self.identifier, 
+            "name" : self.name, 
+            "acronym" : self.acronym, 
+            "description" : self.description,
+            "data_types" : self.data_types, 
+            "responsible": self.responsible,
+            "status": self.status,
+            "number_subjects": self.number_subjects
+            }
+        
+        return d
+        
+    def to_json(self):
+        d = self.to_dict()
+        djson = dumps(d)
+        
+        return djson
+
     def query_data(self):
         data = {}
         driver = connector.getGraphDatabaseConnectionConfiguration()
@@ -155,33 +174,45 @@ class Project:
         
         return data
 
-    def buildProject(self):
+    def build_project(self):
         project_info = self.query_data()
         self.set_attributes(project_info)
         for data_type in self.data_types:
             if data_type == "proteomics":
                 proteomicsDataset = ProteomicsDataset(self.identifier, config.configuration[dataset_type])
-                self.updateDataset({dataset_type:proteomicsDataset})
+                self.update_dataset({dataset_type:proteomicsDataset})
            
-    def generateReport(self):
+    def generate_project_info_report(self):
+        report = rp.Report("project_info")
+        project_dict = self.to_dict()
+        identifier = "project_info"
+        title = "Project: {} information".format(self.name)
+        plot = [figure.getBasicTable(project_dict, identifier, title)]
+        report.updatePlots({("project_info","Project Information"): plot})
+        
+        return report
+    
+    def generate_report(self):
         if len(self.report) == 0:
+            project_report = self.generate_project_info_report()
+            self.update_report(report)
             for dataset_type in self.datasets:
                 dataset = self.get_dataset(dataset_type)
                 if dataset is not None:
                     report = dataset.generateReport()
-                    self.updateReport({dataset.project_type:report})
+                    self.update_report({dataset.project_type:report})
     
-    def emptyReport(self):
+    def empty_report(self):
         self.report = {}
 
-    def generateDatasetReport(self, dataset):
+    def generate_dataset_report(self, dataset):
         if dataset_type in self.datasets:
             dataset = self.get_dataset(dataset_type)
             if dataset is not None:
                         report = dataset.generateReport()
-                        self.updateReport({dataset.project_type:report})
+                        self.update_report({dataset.project_type:report})
 
-    def showReport(self, environment):
+    def show_report(self, environment):
         app_plots = []
         for data_type in self.report:
             plots = self.report[data_type].plots()

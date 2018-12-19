@@ -56,7 +56,7 @@ class Dataset:
     def configuration(self):
         return self.configuration
 
-    @configuration.setter
+    @configuration.setter   
     def configuration(self, configuration):
         self.configuration = configuration
     
