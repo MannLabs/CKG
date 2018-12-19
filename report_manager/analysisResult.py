@@ -5,53 +5,53 @@ import itertools
 
 class AnalysisResult:
     def __init__(self, identifier, analysis_type, args, data, result=None):
-        self.identifier = identifier
-        self.analysis_type = analysis_type
-        self.args = args
-        self.data = data
-        self.result = result
-        if self.result is None:
-            self.generateResult()
+        self._identifier = identifier
+        self._analysis_type = analysis_type
+        self._args = args
+        self._data = data
+        self._result = result
+        if self._result is None:
+            self.generate_result()
 
     @property
     def identifier(self):
-        return self.identifier
+        return self._identifier
 
     @identifier.setter
     def identifier(self, identifier):
-        self.identifier = identifier
+        self._identifier = identifier
 
     @property
     def analysis_type(self):
-        return self.analysis_type
+        return self._analysis_type
 
     @analysis_type.setter
     def identifier(self, analysis_type):
-        self.analysis_type = analysis_type
+        self._analysis_type = analysis_type
     
     @property
     def args(self):
-        return self.args
+        return self._args
 
     @args.setter
     def args(self, args):
-        self.args = args
+        self._args = args
 
     @property
     def data(self):
-        return self.data
+        return self._data
 
     @data.setter
     def data(self, data):
-        self.data = data
+        self._data = data
 
     @property
     def result(self):
-        return self.result
+        return self._result
 
     @result.setter
     def result(self, result):
-        self.result = result
+        self._result = result
 
 
     def generate_result(self):
@@ -142,7 +142,7 @@ class AnalysisResult:
          
         return result, args
 
-    def getPlot(self, name, identifier, title):
+    def get_plot(self, name, identifier, title):
         data = self.result
         args = self.args
         plot = [] 

@@ -1,0 +1,87 @@
+overview: #section
+    peptides:
+        data: number of peptides 
+        analyses: 
+            -
+        plots: 
+            - basicBarPlot
+            - basicTable
+        args: 
+            x_title: Analytical sample
+            y_title: number of peptides #args
+    proteins:
+        data: number of proteins
+        analyses:
+            -
+        plots: 
+            - basicBarPlot
+            - basicTable
+        args: 
+            x_title: Analytical sample
+            y_title: number of proteins
+    modifications:
+        data: number of modified proteins
+        analyses:
+            -
+        plots: 
+            - basicBarPlot
+            - basicTable
+        args: 
+            x_title: Analytical sample
+            y_title: number of modified proteins
+"data exploration":
+    stratification:
+        data: preprocessed
+        analyses: 
+            - pca 
+            - tsne
+            - umap
+        plots:
+            - scatterPlot
+        args: 
+            imputation: True
+            imputation_method: mixed
+            x_title: PC1
+            y_title: PC2
+            components: 2
+            perplexity: 40
+            n_iter: 1000
+            init: 'pca'
+    regulation:
+        data: preprocessed
+        analyses: 
+            - anova
+        plots: 
+            - basicTable
+            - volcanoPlot
+        args: 
+            imputation: True
+            imputation_method: mixed
+            alpha: 0.05
+            drop_cols: 
+                - sample
+                - gene_name
+            name: name
+    correlation:
+        data: regulated
+        analyses: 
+            - correlation
+        plots: 
+            - heatmap
+            - 3Dnetwork
+            - basicTable
+        args: 
+            source: node1
+            target: node2
+    #"topological data analysis":
+    #    data: regulated
+    #    analyses: 
+    #        - mapper
+    #    plots:
+    #        - mapper
+    #    args: 
+    #        n_cubes: 15
+    #        overlap: 0.5
+    #        n_clusters: 3
+    #        linkage: complete
+    #        affinity: correlation

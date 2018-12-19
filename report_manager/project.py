@@ -188,7 +188,7 @@ class Project:
         self.set_attributes(project_info)
         for data_type in self.data_types:
             if data_type == "proteomics":
-                proteomics_dataset = ProteomicsDataset(self.identifier, config.configuration[dataset_type])
+                proteomics_dataset = ProteomicsDataset(self.identifier)
                 self.update_dataset({dataset_type:proteomics_dataset})
            
     def generate_project_info_report(self):
