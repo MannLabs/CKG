@@ -10,7 +10,7 @@
             - 'HAS_QUANTIFIED_PROTEIN'
         'query': >
             MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
-            WHERE project.id="PROJECTID" 
+            WHERE project.id="PROJECTID" AND toBoolean(protein.is_razor)
             RETURN a.id AS name, a.id AS x,COUNT(DISTINCT(protein.id)) AS y, a.group AS group ORDER BY group;
     "NUMBER_OF_PEPTIDES":
         'name': 'number of peptides'

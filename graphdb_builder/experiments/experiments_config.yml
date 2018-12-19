@@ -13,6 +13,7 @@ ox : &var_ox
     'columns': 
         - 'Proteins'
         - 'Positions within proteins'
+        - 'id'
         - 'Amino acid'
         - 'Sequence window'
         - 'Score'
@@ -23,7 +24,7 @@ ox : &var_ox
         - 'Delta score'
         - 'Score for localization'
         - 'Localization prob'
-    'filters' : 
+    'filters': 
         - 'Reverse'
         - 'Potential contaminant'
     'attributes':
@@ -33,24 +34,26 @@ ox : &var_ox
             - 'Delta score'
             - 'Score for localization'
             - 'Localization prob'
-    'proteinCol' : 'Proteins'
-    'indexCol' : 'Proteins'
-    'valueCol' : 'Intensity'
+    'proteinCol': 'Proteins'
+    'indexCol': 'Proteins'
+    'groupCol': 'id'
+    'valueCol': 'Intensity'
     'multipositions': 'Positions within proteins'
     'positionCols': 
         - 'Positions within proteins'
         - 'Amino acid'
-    'sequenceCol' : 'Sequence window'
-    'geneCol' : 'Gene names'
-    'log' : 'log10'
-    'modId' : 'MOD:00256'
-    'mod_acronym' : 'ox'
-    'file' : 'Oxidation (M)Sites.txt'
+    'sequenceCol': 'Sequence window'
+    'geneCol': 'Gene names'
+    'log': 'log10'
+    'modId': 'MOD:00256'
+    'mod_acronym': 'ox'
+    'file': 'Oxidation (M)Sites.txt'
 
 gly : &var_gly
     'columns': 
         - 'Proteins'
         - 'Positions within proteins'
+        - 'id'
         - 'Amino acid'
         - 'Sequence window'
         - 'Score'
@@ -61,7 +64,7 @@ gly : &var_gly
         - 'Delta score'
         - 'Score for localization'
         - 'Localization prob'
-    'filters' : 
+    'filters': 
         - 'Reverse'
         - 'Potential contaminant'
     'attributes':
@@ -71,25 +74,27 @@ gly : &var_gly
             - 'Delta score'
             - 'Score for localization'
             - 'Localization prob'
-    'proteinCol' : 'Proteins'
-    'indexCol' : 'Proteins'
-    'valueCol' : 'Intensity'
+    'proteinCol': 'Proteins'
+    'indexCol': 'Proteins'
+    'groupCol': 'id'
+    'valueCol': 'Intensity'
     'multipositions': 'Positions within proteins'
     'positionCols': 
         - 'Positions within proteins'
         - 'Amino acid'
-    'sequenceCol' : 'Sequence window'
-    'geneCol' : 'Gene names'
-    'log' : 'log10'
-    'modId' : 'MOD:00767'
-    'mod_acronym' : 'gly'
-    'file' : 'GlycationSites.txt'
+    'sequenceCol': 'Sequence window'
+    'geneCol': 'Gene names'
+    'log': 'log10'
+    'modId': 'MOD:00767'
+    'mod_acronym': 'gly'
+    'file': 'GlycationSites.txt'
 
 p : &var_p
     'columns': 
         - 'Proteins'
         - 'Positions within proteins'
         - 'Amino acid'
+        - 'id'
         - 'Sequence window'
         - 'Score'
         - 'Intensity \d+\w?_AS\d+_?-?\d*'
@@ -99,7 +104,7 @@ p : &var_p
         - 'Delta score'
         - 'Score for localization'
         - 'Localization prob'
-    'filters' : 
+    'filters': 
         - 'Reverse'
         - 'Potential contaminant'
     'attributes':
@@ -109,30 +114,30 @@ p : &var_p
             - 'Delta score'
             - 'Score for localization'
             - 'Localization prob'
-    'proteinCol' : 'Proteins'
-    'indexCol' : 'Proteins'
-    'valueCol' : 'Intensity'
+    'proteinCol': 'Proteins'
+    'indexCol': 'Proteins'
+    'groupCol': 'id'
+    'valueCol': 'Intensity'
     'multipositions': 'Positions within proteins'
     'positionCols': 
         - 'Positions within proteins'
         - 'Amino acid'
-    'sequenceCol' : 'Sequence window'
-    'geneCol' : 'Gene names'
-    'log' : 'log10'
-    'modId' : 'MOD:00696'
-    'mod_acronym' : 'p'
-    'file' : 'Phosphosites (STY).txt'
+    'sequenceCol': 'Sequence window'
+    'geneCol': 'Gene names'
+    'log': 'log10'
+    'modId': 'MOD:00696'
+    'mod_acronym': 'p'
+    'file': 'Phosphosites (STY).txt'
 
 dataTypes :
     'clinical':
-        'directory' : *var_clinicalDirectory
-        'file' : 'clinicalData.xlsx'
+        'directory': *var_clinicalDirectory
+        'file': 'clinicalData.xlsx'
     'proteomics':
-        'directory' : *var_proteomicsDirectory
-        'proteins' :
-            'columns' :
+        'directory': *var_proteomicsDirectory
+        'proteins':
+            'columns':
                 - 'Majority protein IDs'
-                - 'Gene names'
                 - 'Q-value'
                 - 'Score'
                 - 'id'
@@ -141,18 +146,20 @@ dataTypes :
                 - 'Reverse'
                 - 'Potential contaminant'
                 - 'Only identified by site'
-            'filters' : 
+            'filters': 
                 - 'Reverse'
                 - 'Potential contaminant'
                 - 'Only identified by site'
-            'proteinCol' : 'Majority protein IDs'
-            'valueCol' : 'LFQ intensity'
-            'indexCol' : 'Majority protein IDs'
+            'proteinCol': 'Majority protein IDs'
+            'valueCol': 'LFQ intensity'
+            'groupCol': 'id'
+            'indexCol': 'Majority protein IDs'
             'attributes':
                 'cols':
                     - 'Q-value'
                     - 'Score'
                     - 'id'
+                    - 'is_razor'
                 'regex':
                     - 'Intensity'
             'log': 'log10'
@@ -168,6 +175,7 @@ dataTypes :
                 - 'Amino acid after'
                 - 'Experiment \d+\w?_AS\d+_?-?\d*'
                 - 'Proteins'
+                - 'id'
                 - 'Start position'
                 - 'End position'
                 - 'Score'
@@ -175,16 +183,17 @@ dataTypes :
                 - 'Intensity \d+\w?_AS\d+_?-?\d*'
                 - 'Reverse'
                 - 'Potential contaminant'
-            'filters' : 
+            'filters': 
                 - 'Reverse'
                 - 'Potential contaminant'
             'attributes':
                 'col':
                     - 'Score'
                     - 'Protein group IDs'
-            'proteinCol' : 'Proteins'
-            'valueCol' : 'Intensity'
-            'indexCol' : 'Sequence'
+            'proteinCol': 'Proteins'
+            'valueCol': 'Intensity'
+            'groupCol': 'id'
+            'indexCol': 'Sequence'
             'positionCols':
                 - 'Start position'
                 - 'End position'
@@ -196,7 +205,7 @@ dataTypes :
         'Phosphorylation': *var_p
     'wes':
         'directory': *var_genomicsDirectory
-        'columns' : 
+        'columns': 
             - 'Chr'
             - 'Start'
             - 'Ref'
@@ -232,13 +241,13 @@ dataTypes :
             - 'cosmic70'
             - 'ICGC_Id'
             - 'ICGC_Occurrence'
-        'position' : 'Start'
-        'id_fields' : 
+        'position': 'Start'
+        'id_fields': 
             - 'Chr'
             - 'Start'
             - 'Ref'
             - 'Alt'
-        'alt_names' : 'AAChange.refGene'
+        'alt_names': 'AAChange.refGene'
         'somatic_mutation_attributes':
             - 'chr'
             - 'position'
@@ -316,6 +325,6 @@ dataTypes :
             - 'annotated'
             - 'alternative_names'
             - 'ID'
-        'types' :
+        'types':
             'Somatic_mutation': 'KEEP'
             'Germline_mutation': 'REJECT'
