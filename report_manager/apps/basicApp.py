@@ -7,93 +7,96 @@ class BasicApp:
         Attributes: Title, subtitle, description, logo, footer
         Functionality: setters, getters'''
     
-    def __init__(self, title, subtitle, description, pageType, layout = [], logo = None, footer= None):
-        self.title = title
-        self.subtitle = subtitle
-        self.description = description
-        self.pageType = pageType
-        self.logo = logo
-        self.footer = footer 
-        self.layout = layout
+    def __init__(self, title, subtitle, description, page_type, layout = [], logo = None, footer= None):
+        self._title = title
+        self._subtitle = subtitle
+        self._description = description
+        self._page_type = page_type
+        self._logo = logo
+        self._footer = footer 
+        self._layout = layout
     
-    #Setters
-    def setTitle(self, title):
-        self.title = title
+    @property
+    def title(self):
+        return self._title
 
-    def setSubtitle(self, subtitle):
-        self.subtitle = subtitle
+    @title.setter
+    def title(self, title):
+        self._title = title
 
-    def setDescription(self, description):
-        self.description = description
+    @property
+    def subtitle(self):
+        return self._subtitle
 
-    def setPageType(self, pageType):
-        self.pageType = pageType
+    @subtitle.setter
+    def subtitle(self, subtitle):
+        self._subtitle = subtitle
 
-    def setLogo(self,logo):
-        self.logo = logo
+    @property
+    def description(self):
+        return self._description
 
-    def setFooter(self, footer):
-        self.footer = footer
+    @description.setter
+    def description(self, description):
+        self._description = description
+    
+    @property
+    def page_type(self):
+        return self._page_type
 
-    def setLayout(self, layout):
-        self.layout = layout
+    @page_type.setter
+    def page_type(self, page_type):
+        self._page_type = page_type
 
-    def addToLayout(self, section):
-        self.layout.append(section)
+    @property
+    def logo(self):
+        return self._logo
 
-    def extendLayout(self, sections):
-        self.layout.extend(sections)
+    @logo.setter
+    def logo(self, logo):
+        self._logo = logo
 
-    #Getters
-    def getTitle(self):
-        return self.title
+    @property
+    def footer(self):
+        return self._footer
 
-    def getHTMLTitle(self):
-        return html.H1(children= self.getTitle())
+    @footer.setter
+    def footer(self, footer):
+        self._footer = footer
 
-    def getSubtitle(self):
-        return self.subtitle
+    @property
+    def layout(self):
+        return self._layout
 
-    def getHTMLSubtitle(self):
-        return html.H2(children= self.getSubtitle())
+    @layout.setter
+    def layout(self, layout):
+        self._layout = layout
 
-    def getDescription(self):
-        return self.description
+    def get_HTML_title(self):
+        return html.H1(children= self.title)
 
-    def getPageType(self):
-        return self.pageType
+    def get_HTML_subtitle(self):
+        return html.H2(children= self.subtitle)
 
-    def getHTMLDescription(self):
-        return html.Div(children = self.getDescription())
-
-    def getFooter(self):
-        return self.footer
-
-    def getLogo(self):
-        return self.logo
-
-    def getLayout(self):
-        return self.layout
-
-    def getPageConfiguration(self):
-        return config.pages[self.getPageType()]
+    def get_HTML_description(self):
+        return html.Div(children = self.description)
 
     #Functionality
-    def addBasicLayout(self):
+    def add_basic_layout(self):
         self.layout.append(html.Link(
             rel='stylesheet',
             href='/assests/brPBPO.css'
         ))
-        if self.getTitle() is not None:
-            self.layout.append(self.getHTMLTitle())
-        if self.getSubtitle() is not None:
-            self.layout.append(self.getHTMLSubtitle())
-        if self.getDescription() is not None:
-            self.layout.append(self.getHTMLDescription())
-        if self.getLogo() is not None:
-            self.layout.append(self.getLogo())
-        if self.getFooter() is not None:
-            self.layout.append(self.getFooter())
+        if self.title is not None:
+            self.layout.append(self.get_HTML_title())
+        if self.subtitle is not None:
+            self.layout.append(self.get_HTML_subtitle())
+        if self.description is not None:
+            self.layout.append(self.get_HTML_description())
+        if self.logo is not None:
+            self.layout.append(self.logo)
+        if self.footer is not None:
+            self.layout.append(self.footer)
 
-    def buildPage(self):
-        self.addBasicLayout()
+    def build_page(self):
+        self.add_basic_layout()

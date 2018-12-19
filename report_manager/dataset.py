@@ -70,10 +70,10 @@ class Dataset:
             return self.analyses[analysis]
         return None
 
-    def updateData(self, new):
+    def update_data(self, new):
         self.data.update(new)
 
-    def updateAnalyses(self, new):
+    def update_analyses(self, new):
         self.analyses.update(new)
 
     def query_data(self):
@@ -97,7 +97,7 @@ class Dataset:
         
         return data
 
-    def generateReport(self):
+    def generate_report(self):
         report = rp.Report(self.dataset_type.capitalize())
         for key in self.configuration:
             for section_query,analysis_types,plot_names,args in self.configuration[key]:
@@ -107,7 +107,7 @@ class Dataset:
                     if len(analysis_types) >= 1:
                         for analysis_type in analysis_types:
                             result = ar.AnalysisResult(self.identifier, analysis_type, args, data)
-                            self.updateAnalyses(result.getResult())
+                            self.update_analyses(result.getResult())
                             if key == "regulation":
                                 reg_data = result.getResult()[analysis_type]
                                 if not reg_data.empty:
@@ -115,7 +115,7 @@ class Dataset:
                                     #sig_names = list(set(reg_data.loc[reg_data.rejected,"name"]))
                                     sig_data = data[sig_hits]
                                     sig_data.index = data['group'].tolist()
-                                    self.updateData({"regulated":sig_data})
+                                    self.update_data({"regulated":sig_data})
                             for plot_name in plot_names:
                                 plots = result.getPlot(plot_name, section_query+"_"+analysis_type+"_"+plot_name, analysis_type.capitalize())
                                 report.updatePlots({(analysis_type,plot_name):plots})
@@ -124,7 +124,7 @@ class Dataset:
                             dictresult = {}
                             dictresult["_".join(section_query.split(' '))] = data
                             result = ar.AnalysisResult(self.identifier,"_".join(section_query.split(' ')), {}, data, result = dictresult)
-                            self.updateAnalyses(result.getResult())
+                            self.update_analyses(result.getResult())
                         for plot_name in plot_names:
                             plots = result.getPlot(plot_name, "_".join(section_query.split(' '))+"_"+plot_name, section_query.capitalize())
                             report.updatePlots({("_".join(section_query.split(' ')),plot_name):plots})
@@ -133,9 +133,9 @@ class Dataset:
 class ProteomicsDataset(Dataset):
     def __init__(self, identifier, configuration, data={}, analyses={}):
         Dataset.__init__(self, identifier, "proteomics", configuration, data, analyses)
-        self.preprocessDataset()
+        self.preprocess_dataset()
         
-    def preprocessDataset(self):
+    def preprocess_dataset(self):
         processed_data = self.preprocessing()
         self.updateData({"preprocessed":processed_data})
     

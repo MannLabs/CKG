@@ -4,21 +4,23 @@ from report_manager import project
 
 class ProjectApp(basicApp.BasicApp):
     def __init__(self, projectId, title, subtitle, description, layout = [], logo = None, footer = None):
-        self.projectId = projectId
-        self.pageType = "projectPage"
-        basicApp.BasicApp.__init__(self, title, subtitle, description, self.pageType, layout, logo, footer)
-        self.buildPage()
+        self._project_id = projectId
+        self._page_type = "projectPage"
+        basicApp.BasicApp.__init__(self, title, subtitle, description, self.page_type, layout, logo, footer)
+        self.build_page()
+    
+    @property
+    def project_id(self):
+        return self._project_id
 
-    def setProjectId(self, projectId):
-        self.projectId = projectId
+    @project_id.setter
+    def project_id(self, project_id):
+        self._project_id = project_id
 
-    def getProjectId(self):
-        return self.projectId
-
-    def buildPage(self):
-        self.addBasicLayout()
-        p = project.Project(self.getProjectId(), 'multi-omics')
-        plots = p.showReport("app")
-        self.extendLayout(plots)
+    def build_page(self):
+        self.add_basic_layout()
+        p = project.Project(self.project_id)
+        plots = p.show_report("app")
+        self.extend_layout(plots)
         
         

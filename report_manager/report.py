@@ -6,7 +6,7 @@ class Report:
         self.plots = plots
 
     @property
-    def idenfitifer(self):
+    def identifier(self):
         return self.identifier
 
     @identifier.setter
@@ -21,10 +21,10 @@ class Report:
     def plots(self, plots):
         self.plots = plots
 
-    def getPlot(self, plot):
+    def get_plot(self, plot):
         if plot in self.plots:
             return self.plots[plot]
         return None
 
-    def updatePlots(self, plot):
+    def update_plots(self, plot):
         self.plots.update(plot)

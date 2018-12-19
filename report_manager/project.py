@@ -1,111 +1,120 @@
-from report_manager import project_config as config
-from report_manager.dataset import ProteomicsDataset
-from graphdb_connector import connector
 from plotly.offline import iplot
+from json import dumps
+import ckg_utils
+import config.ckg_config as ckg_config
+from report_manager.dataset import ProteomicsDataset
+from report_manager.plots import basicFigures as figure
+from report_manager import report as rp
+from graphdb_connector import connector
+import logging
+import logging.config
+
+log_config = ckg_config.report_manager_log
+logger = ckg_utils.setup_logging(log_config, key="project")
 
 class Project:
     ''' A project class that defines an experimental project.
         A project can be of different types, contain several datasets and reports.
         To use:
          >>> p = Project(identifier="P0000001", datasets=None, report=None)
-         >>> p.showReport(environment="noteboook")
+         >>> p.show_report(environment="notebook")
     '''
 
     def __init__(self, identifier, datasets = None, report = None):
-        self.identifier = identifier
-        self.datasets = datasets
-        self.report = report
-        self.name = None
-        self.acronym = None
-        self.data_types = None
-        self.responsible = None 
-        self.description = None 
-        self.status = None
-        self.num_subjects = None
-        if self.datasets is None:
-            self.datasets = {}
-            self.buildProject()
-            self.generateReport()
+        self._identifier = identifier
+        self._datasets = datasets
+        self._report = report
+        self._name = None
+        self._acronym = None
+        self._data_types = None
+        self._responsible = None 
+        self._description = None 
+        self._status = None
+        self._num_subjects = None
+        if self._datasets is None:
+            self._datasets = {}
+            self.build_project()
+            self.generate_report()
 
     @property
     def identifier(self):
-        return self.identifier
+        return self._identifier
     
     @identifier.setter
     def identifier(self, identifier):
-        self.identifier = identifier
+        self._identifier = identifier
 
     @property
     def name(self):
-        return self.name
+        return self._name
     
     @name.setter
     def name(self, name):
-        self.name = name
+        self._name = name
 
     @property
     def acronym(self):
-        return self.acronym
+        return self._acronym
     
     @acronym.setter
     def acronym(self, acronym):
-        self.acronym = acronym
+        self._acronym = acronym
 
     @property
     def data_types(self):
-        return self.data_types
+        return self._data_types
 
     @data_types.setter
     def data_types(self, data_types):
-        self.data_types = data_types
+        self._data_types = data_types
 
     @property
     def responsible(self):
-        return self.responsible
+        return self._responsible
     
     @responsible.setter
     def responsible(self, responsible):
-        self.responsible = responsible
+        self._responsible = responsible
 
     @property
     def description(self):
-        return self.description
+        return self._description
     
     @description.setter
     def description(self, description):
-        self.description = description
+        self._description = description
     
     @property
     def status(self):
-        return self.status
+        return self._status
     
     @status.setter
     def status(self, status):
-        self.status = status
+        self._status = status
 
     @property
     def num_subjects(self):
-        return self.num_subjects
+        return self._num_subjects
     
     @num_subjects.setter
     def num_subjects(self, num_subjects):
-        self.num_subjects = num_subjects
+        self._num_subjects = num_subjects
 
     @property
     def datasets(self):
-        return self.datasets
+        return self._datasets
 
     @datasets.setter
     def datasets(self, datasets):
-        self.datasets = datasets
+        self._datasets = datasets
 
     @property
     def report(self):
-        return self.report
+        return self._report
 
     @report.setter
     def report(self, report):
-        self.report = report
+        self._report = report
     
     def get_dataset(self, dataset):
         if dataset in self.datasets:
@@ -179,8 +188,8 @@ class Project:
         self.set_attributes(project_info)
         for data_type in self.data_types:
             if data_type == "proteomics":
-                proteomicsDataset = ProteomicsDataset(self.identifier, config.configuration[dataset_type])
-                self.update_dataset({dataset_type:proteomicsDataset})
+                proteomics_dataset = ProteomicsDataset(self.identifier, config.configuration[dataset_type])
+                self.update_dataset({dataset_type:proteomics_dataset})
            
     def generate_project_info_report(self):
         report = rp.Report("project_info")
@@ -188,7 +197,7 @@ class Project:
         identifier = "project_info"
         title = "Project: {} information".format(self.name)
         plot = [figure.getBasicTable(project_dict, identifier, title)]
-        report.updatePlots({("project_info","Project Information"): plot})
+        report.update_plots({("project_info","Project Information"): plot})
         
         return report
     
@@ -199,18 +208,17 @@ class Project:
             for dataset_type in self.datasets:
                 dataset = self.get_dataset(dataset_type)
                 if dataset is not None:
-                    report = dataset.generateReport()
+                    report = dataset.generate_report()
                     self.update_report({dataset.project_type:report})
     
     def empty_report(self):
         self.report = {}
 
     def generate_dataset_report(self, dataset):
-        if dataset_type in self.datasets:
-            dataset = self.get_dataset(dataset_type)
-            if dataset is not None:
-                        report = dataset.generateReport()
-                        self.update_report({dataset.project_type:report})
+        dataset = self.get_dataset(dataset_type)
+        if dataset is not None:
+            report = dataset.generate_report()
+            self.update_report({dataset.project_type:report})
 
     def show_report(self, environment):
         app_plots = []

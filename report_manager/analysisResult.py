@@ -13,50 +13,61 @@ class AnalysisResult:
         if self.result is None:
             self.generateResult()
 
-    def getIdentifier(self):
+    @property
+    def identifier(self):
         return self.identifier
 
-    def getAnalysisType(self):
-        return self.analysis_type
-
-    def getArguments(self):
-        return self.args
-
-    def getData(self):
-        return self.data
-
-    def getResult(self):
-        return self.result
-
-    def setIdentifier(self, identifier):
+    @identifier.setter
+    def identifier(self, identifier):
         self.identifier = identifier
 
-    def setAnalysisType(self, analysis_type):
-        self.analysis_type = analysis_type
+    @property
+    def analysis_type(self):
+        return self.analysis_type
 
-    def setArguments(self, args):
+    @analysis_type.setter
+    def identifier(self, analysis_type):
+        self.analysis_type = analysis_type
+    
+    @property
+    def args(self):
+        return self.args
+
+    @args.setter
+    def args(self, args):
         self.args = args
 
-    def setData(self, data):
+    @property
+    def data(self):
+        return self.data
+
+    @data.setter
+    def data(self, data):
         self.data = data
 
-    def setResult(self, result):
+    @property
+    def result(self):
+        return self.result
+
+    @result.setter
+    def result(self, result):
         self.result = result
 
-    def generateResult(self):
-        result, args = self.getAnalysisResult()
-        self.setResult(result)
-        self.setArguments(args)
 
-    def getAnalysisResult(self):
+    def generate_result(self):
+        result, args = self.get_analysis_result()
+        self.result = result
+        self.args = args
+
+    def get_analysis_result(self):
         result = {}
-        args = self.getArguments()
-        if self.getAnalysisType() == "pca":
+        args = self.args
+        if self.analysis_type == "pca":
             components = 2
             if "components" in args:
                 components = args["components"]
-            result, args = analyses.runPCA(self.getData(), components)
-        elif self.getAnalysisType()  == "tsne":
+            result, args = analyses.runPCA(self.data, components)
+        elif self.analysis_type  == "tsne":
             components = 2
             perplexity = 40
             n_iter = 1000
@@ -69,8 +80,8 @@ class AnalysisResult:
                 n_iter = args["n_iter"]
             if "init" in args:
                 init = args["init"]
-            result, args = analyses.runTSNE(self.getData(), components=components, perplexity=perplexity, n_iter=n_iter, init=init)
-        elif self.getAnalysisType()  == "umap":
+            result, args = analyses.runTSNE(self.data, components=components, perplexity=perplexity, n_iter=n_iter, init=init)
+        elif self.analysis_type  == "umap":
             n_neighbors=10 
             min_dist=0.3
             metric='cosine'
@@ -80,9 +91,9 @@ class AnalysisResult:
                 min_dist = args["min_dist"]
             if "metric" in args:
                 metric = args["metric"]
-            if n_neighbors < self.getData().shape[0]:
-                result, args = analyses.runUMAP(self.getData(), n_neighbors=n_neighbors, min_dist=min_dist, metric=metric)
-        elif self.getAnalysisType()  == "mapper":
+            if n_neighbors < self.data.shape[0]:
+                result, args = analyses.runUMAP(self.data, n_neighbors=n_neighbors, min_dist=min_dist, metric=metric)
+        elif self.analysis_type  == "mapper":
             n_cubes = 15
             overlap = 0.5
             n_clusters = 3
@@ -101,23 +112,23 @@ class AnalysisResult:
                 linkage = args["linkage"]
             if "affinity" in args:
                 affinity = args["affinity"]
-            r, args = analyses.runMapper(self.getData(), n_cubes=n_cubes, overlap=overlap, 
+            r, args = analyses.runMapper(self.data, n_cubes=n_cubes, overlap=overlap, 
                                             n_clusters=n_clusters, linkage=linkage, affinity=affinity)
-            result[self.getAnalysisType()] = r
-        elif self.getAnalysisType()  == 'ttest':
+            result[self.analysis_type] = r
+        elif self.analysis_type  == 'ttest':
             alpha = 0.05
             if "alpha" in args:
                 alpha = args["alpha"]
-            for pair in itertools.combinations(self.getData().group.unique(),2):
-                ttest_result = analyses.ttest(self.getData(), pair[0], pair[1], alpha = 0.05)
+            for pair in itertools.combinations(self.data.group.unique(),2):
+                ttest_result = analyses.ttest(self.data, pair[0], pair[1], alpha = 0.05)
                 result[pair] = ttest_result
-        elif self.getAnalysisType()  == 'anova':
+        elif self.analysis_type  == 'anova':
             alpha = 0.05
             if "alpha" in args:
                 alpha = args["alpha"]
-            anova_result = analyses.anova(self.getData(), alpha = 0.05)
-            result[self.getAnalysisType()] = anova_result
-        elif self.getAnalysisType()  == "correlation":
+            anova_result = analyses.anova(self.data, alpha = 0.05)
+            result[self.analysis_type] = anova_result
+        elif self.analysis_type  == "correlation":
             alpha = 0.05
             method = 'pearson'
             correction = ('fdr', 'indep')
@@ -127,12 +138,12 @@ class AnalysisResult:
                 method = args["method"]
             if "correction" in args:
                 correction = args["correction"]
-            result[self.getAnalysisType()] = analyses.runCorrelation(self.getData(), alpha=alpha, method=method, correction=correction)
+            result[self.analysis_type] = analyses.runCorrelation(self.data, alpha=alpha, method=method, correction=correction)
          
         return result, args
 
     def getPlot(self, name, identifier, title):
-        data = self.getResult()
+        data = self.result
         args = self.args
         plot = [] 
         if name == "basicTable":
