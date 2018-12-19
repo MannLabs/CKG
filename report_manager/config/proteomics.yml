@@ -1,8 +1,7 @@
 overview: #section
     peptides:
         data: number of peptides 
-        analyses: 
-            -
+        analyses: []            
         plots: 
             - basicBarPlot
             - basicTable
@@ -11,8 +10,7 @@ overview: #section
             y_title: number of peptides #args
     proteins:
         data: number of proteins
-        analyses:
-            -
+        analyses: []
         plots: 
             - basicBarPlot
             - basicTable
@@ -21,8 +19,7 @@ overview: #section
             y_title: number of proteins
     modifications:
         data: number of modified proteins
-        analyses:
-            -
+        analyses: []
         plots: 
             - basicBarPlot
             - basicTable

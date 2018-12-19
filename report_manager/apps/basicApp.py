@@ -72,6 +72,12 @@ class BasicApp:
     def layout(self, layout):
         self._layout = layout
 
+    def add_to_layout(self, section):
+        self.layout.append(section)
+
+    def extend_layout(self, sections):
+        self.layout.extend(sections)
+
     def get_HTML_title(self):
         return html.H1(children= self.title)
 

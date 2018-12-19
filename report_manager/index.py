@@ -22,7 +22,7 @@ def display_page(pathname):
             projectId = pathname.split('/')[-1]
             project = projectApp.ProjectApp(projectId, projectId, "", "", layout = [], logo = None, footer = None)
 
-            return project.getLayout()
+            return project.layout
         elif pathname.startswith('/apps/imports'):
             imports = importsApp.ImportsApp("CKG imports monitoring", "Statistics", "", layout = [], logo = None, footer = None)
             return imports.getLayout()

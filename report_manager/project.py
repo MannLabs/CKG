@@ -1,3 +1,5 @@
+import sys
+import os
 from plotly.offline import iplot
 from json import dumps
 import ckg_utils
@@ -20,7 +22,7 @@ class Project:
          >>> p.show_report(environment="notebook")
     '''
 
-    def __init__(self, identifier, datasets = None, report = None):
+    def __init__(self, identifier, datasets=None, report={}):
         self._identifier = identifier
         self._datasets = datasets
         self._report = report
@@ -179,7 +181,9 @@ class Project:
                     query = query.replace(r,by)
                 data[title] = connector.getCursorData(driver, query)
         except Exception as err:
-            logger.error("Reading queries > {}.".format(err))
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            logger.error("Reading queries from file {}: {}, file: {},line: {}".format(queries_path, sys.exc_info(), fname, exc_tb.tb_lineno))
         
         return data
 
@@ -189,7 +193,7 @@ class Project:
         for data_type in self.data_types:
             if data_type == "proteomics":
                 proteomics_dataset = ProteomicsDataset(self.identifier)
-                self.update_dataset({dataset_type:proteomics_dataset})
+                self.update_dataset({data_type:proteomics_dataset})
            
     def generate_project_info_report(self):
         report = rp.Report("project_info")
@@ -205,11 +209,11 @@ class Project:
         if len(self.report) == 0:
             project_report = self.generate_project_info_report()
             self.update_report(report)
-            for dataset_type in self.datasets:
+            for dataset_type in self.data_types:
                 dataset = self.get_dataset(dataset_type)
                 if dataset is not None:
                     report = dataset.generate_report()
-                    self.update_report({dataset.project_type:report})
+                    self.update_report({dataset.dataset_type:report})
     
     def empty_report(self):
         self.report = {}
@@ -218,12 +222,12 @@ class Project:
         dataset = self.get_dataset(dataset_type)
         if dataset is not None:
             report = dataset.generate_report()
-            self.update_report({dataset.project_type:report})
+            self.update_report({dataset.dataset_type:report})
 
     def show_report(self, environment):
         app_plots = []
         for data_type in self.report:
-            plots = self.report[data_type].plots()
+            plots = self.report[data_type].plots
             for plot_type in plots:
                 for plot in plots[plot_type]:
                     if environment == "notebook":

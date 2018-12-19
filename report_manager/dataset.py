@@ -1,4 +1,5 @@
 import os
+import sys
 import ckg_utils
 import config.ckg_config as ckg_config
 from report_manager import analysisResult as ar, report as rp
@@ -11,14 +12,12 @@ log_config = ckg_config.report_manager_log
 logger = ckg_utils.setup_logging(log_config, key="dataset")
 
 class Dataset:
-    def __init__(self, identifier, dtype, configuration, data, analyses):
+    def __init__(self, identifier, dtype, configuration=None, data={}, analyses={}):
         self._identifier = identifier
         self._dataset_type = dtype
         self._configuration = configuration
         self._data = data
         self._analyses = analyses
-        if len(data) == 0:
-            self._data = self.query_data()
     
     @property
     def identifier(self):
@@ -80,7 +79,7 @@ class Dataset:
         try:
             cwd = os.path.abspath(os.path.dirname(__file__))
             config_path = os.path.join("config/", configuration_file)
-            self.configuration = ckg_utils.get_configuration(os.path.join(cwd, queries_path))
+            self.configuration = ckg_utils.get_configuration(os.path.join(cwd, config_path))
         except Exception as err:
             logger.error("Error: {} reading configuration file: {}.".format(err, config_path))
 
@@ -101,7 +100,9 @@ class Dataset:
                     query = query.replace(r,by)
                 data[title] = connector.getCursorData(driver, query)
         except Exception as err:
-            logger.error("Reading queries > {}.".format(err))
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            logger.error("Reading queries from file {}: {}, file: {},line: {}".format(queries_path, sys.exc_info(), fname, exc_tb.tb_lineno))
         
         return data
     
@@ -110,9 +111,8 @@ class Dataset:
         analysis_types = None
         plot_types = None
         args = None
-        
         if "data" in configuration:
-            section_query = configuration["data"]
+            data_name = configuration["data"]
         if "analyses" in configuration:
             analysis_types = configuration["analyses"]
         if "plots" in configuration:
@@ -126,16 +126,16 @@ class Dataset:
         report = rp.Report(self.dataset_type.capitalize())
         for section in self.configuration:
             for subsection in self.configuration[section]:
-                data_name, analysis_types, plot_types, args = extract_configuration(self.configuration[section][subsection])
+                data_name, analysis_types, plot_types, args = self.extract_configuration(self.configuration[section][subsection])
                 if data_name in self.data:
                     data = self.data[data_name]
                     result = None 
                     if len(analysis_types) >= 1:
                         for analysis_type in analysis_types:
                             result = ar.AnalysisResult(self.identifier, analysis_type, args, data)
-                            self.update_analyses(result.get_result())
-                            if key == "regulation":
-                                reg_data = result.get_result()[analysis_type]
+                            self.update_analyses(result.result)
+                            if subsection == "regulation":
+                                reg_data = result.result[analysis_type]
                                 if not reg_data.empty:
                                     sig_hits = list(set(reg_data.loc[reg_data.rejected,"identifier"]))
                                     #sig_names = list(set(reg_data.loc[reg_data.rejected,"name"]))
@@ -143,29 +143,32 @@ class Dataset:
                                     sig_data.index = data['group'].tolist()
                                     self.update_data({"regulated":sig_data})
                             for plot_type in plot_types:
-                                plots = result.get_plot(plot_type, section_query+"_"+analysis_type+"_"+plot_name, analysis_type.capitalize())
+                                plots = result.get_plot(plot_type, subsection+"_"+analysis_type+"_"+plot_type, analysis_type.capitalize())
                                 report.update_plots({(analysis_type, plot_type):plots})
                     else:
                         if result is None:
                             dictresult = {}
-                            dictresult["_".join(section_query.split(' '))] = data
-                            result = ar.AnalysisResult(self.identifier,"_".join(section_query.split(' ')), {}, data, result = dictresult)
-                            self.update_analyses(result.getResult())
+                            dictresult["_".join(subsection.split(' '))] = data
+                            result = ar.AnalysisResult(self.identifier,"_".join(subsection.split(' ')), {}, data, result = dictresult)
+                            self.update_analyses(result.result)
                         for plot_type in plot_types:
-                            plots = result.get_plot(plot_type, "_".join(section_query.split(' '))+"_"+plot_type, section_query.capitalize())
-                            report.update_plots({("_".join(section_query.split(' ')), plot_type): plots})
+                            plots = result.get_plot(plot_type, "_".join(subsection.split(' '))+"_"+plot_type, subsection.capitalize())
+                            report.update_plots({("_".join(subsection.split(' ')), plot_type): plots})
         return report
 
 class ProteomicsDataset(Dataset):
     def __init__(self, identifier, data={}, analyses={}):
         config_file = "proteomics.yml"
         Dataset.__init__(self, identifier, "proteomics", data=data, analyses=analyses)
-        self.set_configuration_from_file(configuration_file)
+        self.set_configuration_from_file(config_file)
+        if len(data) == 0:
+            self._data = self.query_data()
+        
         self.preprocess_dataset()
         
     def preprocess_dataset(self):
         processed_data = self.preprocessing()
-        self.updateData({"preprocessed":processed_data})
+        self.update_data({"preprocessed":processed_data})
     
     def preprocessing(self):
         processed_data = None
