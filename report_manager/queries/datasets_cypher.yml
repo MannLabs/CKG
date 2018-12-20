@@ -10,7 +10,7 @@
             - 'HAS_QUANTIFIED_PROTEIN'
         'query': >
             MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
-            WHERE project.id="PROJECTID" AND toBoolean(protein.is_razor)
+            WHERE project.id="PROJECTID"
             RETURN a.id AS name, a.id AS x,COUNT(DISTINCT(protein.id)) AS y, a.group AS group ORDER BY group;
     "NUMBER_OF_PEPTIDES":
         'name': 'number of peptides'
@@ -35,9 +35,9 @@
         'involved_rels':
             - 'HAS_QUANTIFIED_MODIFIED_PROTEIN'
         'query': >
-            MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_MODIFIED_PROTEIN]->(modifiedprotein:Modified_protein) 
+            MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_MODIFIED_PROTEIN]->(modifiedprotein:Modified_protein)-[:HAS_MODIFICATION]->(modification:Modification) 
             WHERE project.id="PROJECTID" 
-            RETURN a.id AS name, a.id AS x,a.group AS group,COUNT(DISTINCT(modifiedprotein.id)) AS y ORDER BY group;
+            RETURN a.id AS name, a.id AS x,a.group AS group,COUNT(DISTINCT(modifiedprotein.id)) AS y,modification.name AS type ORDER BY group;
     "DATASET":
         'name': 'get dataset from project'
         'description': 'Extracts the dataset matrix of quantified proteins in a given Project. Requires: Project.id'

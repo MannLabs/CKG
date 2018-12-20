@@ -21,11 +21,12 @@ overview: #section
         data: number of modified proteins
         analyses: []
         plots: 
-            - basicBarPlot
+            - facetPlot
             - basicTable
         args: 
             x_title: Analytical sample
             y_title: number of modified proteins
+            plot_type: bar
 "data exploration":
     stratification:
         data: preprocessed

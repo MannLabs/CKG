@@ -145,96 +145,116 @@ class AnalysisResult:
     def get_plot(self, name, identifier, title):
         data = self.result
         args = self.args
-        plot = [] 
-        if name == "basicTable":
-            colors = ('#C2D4FF','#F5F8FF')
-            attr =  {'width':800, 'height':300, 'font':12}
-            subset = None
-            if "colors" in args:
-                colors = args["colors"]
-            if "attr" in args:
-                attr = args["attr"]
-            if "subset" in args:
-                subset = args["subset"]
-            for id in data:
-                if isinstance(id, tuple):
-                    identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                    figure_title = title + id[0]+" vs "+id[1]
-                else:
-                    figure_title = title
-                plot.append(figure.getBasicTable(data[id], identifier, figure_title, colors=colors, subset=subset, plot_attr=attr))
-        elif name == "basicBarPlot":
-            x_title = "x"
-            y_title = "y"
-            if "x_title" in args:
-                x_title = args["x_title"]
-            if "y_title" in args:
-                y_title = args["y_title"]
-            for id in data:     
-                if isinstance(id, tuple):
-                    identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                    figure_title = title + id[0]+" vs "+id[1]
-                else:
-                    figure_title = title
-                plot.append(figure.getBarPlotFigure(data[id], identifier, figure_title, x_title, y_title))
-        elif name == "scatterPlot":
-            x_title = "x"
-            y_title = "y"
-            if "x_title" in args:
-                x_title = args["x_title"]
-            if "y_title" in args:
-                y_title = args["y_title"]
-            for id in data:
-                if isinstance(id, tuple):
-                    identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                    figure_title = title + id[0]+" vs "+id[1]
-                else:
-                    figure_title = title
-                plot.append(figure.getScatterPlotFigure(data[id], identifier, figure_title, x_title, y_title))
-        elif name == "volcanoPlot":
-            alpha = 0.05
-            lfc = 1.0
-            if "alpha" in args:
-                alpha = args["alpha"]
-            if "lfc" in args:
-                lfc = args["lfc"]
-            for pair in data:
-                signature = data[pair]
-                p = figure.runVolcano(identifier+"_"+pair[0]+"_vs_"+pair[1], signature, lfc=lfc, alpha=alpha, title=title+" "+pair[0]+" vs "+pair[1])
-                plot.append(p)
-        elif name == '3Dnetwork':
-            source = 'source'
-            target = 'target'
-            if "source" in args:
-                source = args["source"]
-            if "target" in args:
-                target = args["target"]
-            for id in data:
-                if isinstance(id, tuple):
-                    identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                    figure_title = title + id[0]+" vs "+id[1]
-                else:
-                    figure_title = title
-                plot.append(figure.get3DNetworkFigure(data[id], sourceCol=source, targetCol=target, node_properties={}, identifier=identifier, title=figure_title))
-        elif name == "heatmap":
-            for id in data:
-                if not data[id].empty:
+        plot = []
+        print(identifier, title)
+        print(self.args)
+        if len(data) >=1:
+            if name == "basicTable":
+                colors = ('#C2D4FF','#F5F8FF')
+                attr =  {'width':800, 'height':300, 'font':12}
+                subset = None
+                if "colors" in args:
+                    colors = args["colors"]
+                if "attr" in args:
+                    attr = args["attr"]
+                if "subset" in args:
+                    subset = args["subset"]
+                for id in data:
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
                         figure_title = title + id[0]+" vs "+id[1]
                     else:
                         figure_title = title
-                    plot.append(figure.getComplexHeatmapFigure(data[id], identifier=identifier, title=figure_title))
-        elif name == "mapper":
-            for id in data:
-                labels = {}
-                if "labels" in args:
-                    labels = args["labels"]
-                if isinstance(id, tuple):
-                    identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                    figure_title = title + id[0]+" vs "+id[1]
-                else:
-                    figure_title = title
-                plot.append(figure.getMapperFigure(data[id], identifier, title=figure_title, labels=args["labels"]))
+                    plot.append(figure.getBasicTable(data[id], identifier, figure_title, colors=colors, subset=subset, plot_attr=attr))
+            elif name == "basicBarPlot":
+                x_title = "x"
+                y_title = "y"
+                if "x_title" in args:
+                    x_title = args["x_title"]
+                if "y_title" in args:
+                    y_title = args["y_title"]
+                for id in data:     
+                    if isinstance(id, tuple):
+                        identifier = identifier+"_"+id[0]+"_vs_"+id[1]
+                        figure_title = title + id[0]+" vs "+id[1]
+                    else:
+                        figure_title = title
+                    plot.append(figure.getBarPlotFigure(data[id], identifier, figure_title, x_title, y_title))
+            elif name == "facetPlot":
+                x_title = "x"
+                y_title = "y"
+                plot_type = "bar"
+                if "x_title" not in args:
+                    args["x_title"] = x_title
+                if "y_title" not in args:
+                    args["y_title"] = y_title
+                if "plot_type" not in args:
+                    args["plot_type"] = plot_type
+                for id in data:     
+                    if isinstance(id, tuple):
+                        identifier = identifier+"_"+id[0]+"_vs_"+id[1]
+                        figure_title = title + id[0]+" vs "+id[1]
+                    else:
+                        figure_title = title
+                    plot.append(figure.get_facet_grid_plot(data[id], identifier, figure_title, args))
+            elif name == "scatterPlot":
+                x_title = "x"
+                y_title = "y"
+                if "x_title" in args:
+                    x_title = args["x_title"]
+                if "y_title" in args:
+                    y_title = args["y_title"]
+                for id in data:
+                    if isinstance(id, tuple):
+                        identifier = identifier+"_"+id[0]+"_vs_"+id[1]
+                        figure_title = title + id[0]+" vs "+id[1]
+                    else:
+                        figure_title = title
+                    plot.append(figure.getScatterPlotFigure(data[id], identifier, figure_title, x_title, y_title))
+            elif name == "volcanoPlot":
+                alpha = 0.05
+                lfc = 1.0
+                if "alpha" in args:
+                    alpha = args["alpha"]
+                if "lfc" in args:
+                    lfc = args["lfc"]
+                for pair in data:
+                    signature = data[pair]
+                    p = figure.runVolcano(identifier+"_"+pair[0]+"_vs_"+pair[1], signature, lfc=lfc, alpha=alpha, title=title+" "+pair[0]+" vs "+pair[1])
+                    plot.append(p)
+            elif name == '3Dnetwork':
+                source = 'source'
+                target = 'target'
+                if "source" in args:
+                    source = args["source"]
+                if "target" in args:
+                    target = args["target"]
+                for id in data:
+                    if isinstance(id, tuple):
+                        identifier = identifier+"_"+id[0]+"_vs_"+id[1]
+                        figure_title = title + id[0]+" vs "+id[1]
+                    else:
+                        figure_title = title
+                    plot.append(figure.get3DNetworkFigure(data[id], sourceCol=source, targetCol=target, node_properties={}, identifier=identifier, title=figure_title))
+            elif name == "heatmap":
+                for id in data:
+                    if not data[id].empty:
+                        if isinstance(id, tuple):
+                            identifier = identifier+"_"+id[0]+"_vs_"+id[1]
+                            figure_title = title + id[0]+" vs "+id[1]
+                        else:
+                            figure_title = title
+                        plot.append(figure.getComplexHeatmapFigure(data[id], identifier=identifier, title=figure_title))
+            elif name == "mapper":
+                for id in data:
+                    labels = {}
+                    if "labels" in args:
+                        labels = args["labels"]
+                    if isinstance(id, tuple):
+                        identifier = identifier+"_"+id[0]+"_vs_"+id[1]
+                        figure_title = title + id[0]+" vs "+id[1]
+                    else:
+                        figure_title = title
+                    plot.append(figure.getMapperFigure(data[id], identifier, title=figure_title, labels=args["labels"]))
 
         return plot

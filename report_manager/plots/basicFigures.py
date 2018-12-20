@@ -74,6 +74,65 @@ def getBarPlotFigure(data, identifier, title, x_title, y_title, group= True, sub
 
     return dcc.Graph(id= identifier, figure = figure)
 
+##ToDo
+def get_facet_grid_plot(data, identifier, title, args):
+    figure = FF.create_facet_grid(data,
+                                x='x',
+                                y='y',
+                                facet_col='type',
+                                color_name='group',
+                                color_is_cat=True,
+                                trace_type=args['plot_type'],
+                                xaxis=args["x_title"],
+                                yaxis=args["y_title"],
+                                )
+    figure['layout']['title'] = title
+    figure['layout']['paper_bgcolor'] = None
+    figure['layout']['legend'] = None
+    figure['layout']['opacity'] = 1
+    
+    return dcc.Graph(id= identifier, figure = figure)
+
+##ToDo
+def scatterplot_matrix(data, identifier, title, grouping_var='group'):
+    classes=np.unique(data[grouping_var].values).tolist()
+    class_code={classes[k]: k for k in range(len(classes))}
+    color_vals=[class_code[cl] for cl in data[grouping_var]]
+    text=[data.loc[ k, grouping_var] for k in range(len(data))]
+
+    figure = {}
+    figure["data"] = []
+    dimensions = []
+    for col in data.columns:
+        dimensions.append(dict(label=col, values=data[col]))
+    
+    figure["data"].append(go.Splom(dimensions=dimensions,
+                    text=text,
+                    marker=dict(color=color_vals,
+                                size=7,
+                                showscale=False,
+                                line=dict(width=0.5,
+                                        color='rgb(230,230,230)'))
+                    ))
+
+    axis = dict(showline=True,
+                zeroline=False,
+                gridcolor='#fff',
+                ticklen=len(data.columns))
+    
+    figure["layout"] = go.Layout(title = title,
+                            xaxis = dict(axis),
+                            yaxis = dict(axis),
+                            dragmode='select',
+                            width=600,
+                            height=600,
+                            autosize=False,
+                            hovermode='closest',
+                            plot_bgcolor='rgba(240,240,240, 0.95)',
+                            )
+
+    return dcc.Graph(id=identifier, figure=figure)
+
 def getScatterPlotFigure(data, identifier, title, x_title, y_title, subplot = False):
     '''This function plots a simple Scatterplot
     --> input:

@@ -2,6 +2,7 @@ import sys
 import os
 from plotly.offline import iplot
 from json import dumps
+import pandas as pd
 import ckg_utils
 import config.ckg_config as ckg_config
 from report_manager.dataset import ProteomicsDataset
@@ -131,7 +132,7 @@ class Project:
 
     def set_attributes(self, project_info):
         if "attributes" in project_info:
-            attributes = project_info["attributes"]
+            attributes = project_info["attributes"].to_dict('r')[0]
             if "name" in attributes:
                 self.name = attributes["name"]
             if "acronym" in attributes:
@@ -139,7 +140,7 @@ class Project:
             if "description" in attributes:
                 self.description = attributes["description"]
             if "data_types" in attributes:
-                self.data_types = attributes["data_types"]
+                self.data_types = ["proteomics"]#attributes["data_types"]
             if "responsible" in attributes:
                 self.responsible = attributes["responsible"]
             if "status" in attributes:
@@ -155,11 +156,17 @@ class Project:
             "data_types" : self.data_types, 
             "responsible": self.responsible,
             "status": self.status,
-            "number_subjects": self.number_subjects
+            "number_subjects": self.num_subjects
             }
         
         return d
+    
+    def to_dataframe(self):
+        d = self.to_dict() 
+        df = pd.DataFrame.from_dict(d, orient='columns')
         
+        return df
+
     def to_json(self):
         d = self.to_dict()
         djson = dumps(d)
@@ -197,10 +204,10 @@ class Project:
            
     def generate_project_info_report(self):
         report = rp.Report("project_info")
-        project_dict = self.to_dict()
+        project_df = self.to_dataframe()
         identifier = "project_info"
         title = "Project: {} information".format(self.name)
-        plot = [figure.getBasicTable(project_dict, identifier, title)]
+        plot = [figure.getBasicTable(project_df, identifier, title)]
         report.update_plots({("project_info","Project Information"): plot})
         
         return report
@@ -208,7 +215,7 @@ class Project:
     def generate_report(self):
         if len(self.report) == 0:
             project_report = self.generate_project_info_report()
-            self.update_report(report)
+            self.update_report({"project_info":project_report})
             for dataset_type in self.data_types:
                 dataset = self.get_dataset(dataset_type)
                 if dataset is not None:

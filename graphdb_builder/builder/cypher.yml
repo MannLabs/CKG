@@ -80,7 +80,7 @@ IMPORT_PROTEIN_DATA:
 
 IMPORT_MODIFIED_PROTEINS: 
     'name': 'import modified proteins'
-    'description': 'Creates Modified_protein nodes and loads the relationships to Modification and Protein nodes'
+    'description': 'Creates Modified_protein nodes and loads the relationships to Modification, Protein and Peptide nodes'
     'query': >
         CREATE CONSTRAINT ON (m:Modified_protein) ASSERT m.id IS UNIQUE;
         USING PERIODIC COMMIT 10000
@@ -98,7 +98,7 @@ IMPORT_MODIFIED_PROTEINS:
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/psp_protein_has_modified_site.csv" AS line 
         MATCH (p:Protein {id:line.START_ID})
         MATCH (mp:Modified_protein {id:line.END_ID}) 
-        MERGE (p)-[r:HAS_MODIFIED_SITE{source:line.source}]->(mp)
+        MERGE (p)-[r:HAS_MODIFIED_SITE]->(mp)
         RETURN COUNT(r) AS protein_has_modified_site;
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/psp_peptide_has_modified_site.csv" AS line 
@@ -353,7 +353,7 @@ IMPORT_PPI_ACTION:
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_protein_acts_on_protein.csv" AS line
         MATCH (p1:Protein {id:line.START_ID})
         MATCH (p2:Protein {id:line.END_ID})
-        MERGE (p1)-[r:ACTS_ON{source:line.source,action:line.action,score:toFloat(line.score),directionality:line.directionality}]->(p2)
+        MERGE (p1)-[r:ACTS_ON{source:line.source,action:line.action,score:toFloat(line.score),directionality:toBoolean(line.directionality)}]->(p2)
         RETURN COUNT(r) AS protein_acts_on_protein;
         
 IMPORT_DRUG_SIDE_EFFECTS:
@@ -381,7 +381,7 @@ IMPORT_DRUG_ACTS_ON:
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_drug_acts_on_protein.csv" AS line
         MATCH (d:Drug {id:line.START_ID})
         MATCH (p:Protein {id:line.END_ID})
-        MERGE (d)-[r:ACTS_ON{source:line.source,action:line.action,score:toFloat(line.score),directionality:line.directionality}]->(p)
+        MERGE (d)-[r:ACTS_ON{source:line.source,action:line.action,score:toFloat(line.score),directionality:toBoolean(line.directionality)}]->(p)
         RETURN COUNT(r) AS drug_acts_on_protein;
         
 IMPORT_PATHWAY_DATA: 
@@ -571,7 +571,7 @@ IMPORT_DATASETS:
             LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_proteins.csv" AS line
             MATCH (s:Analytical_sample {id:line.START_ID}) 
             MATCH (p:Protein{id:line.END_ID}) 
-            MERGE (s)-[r:HAS_QUANTIFIED_PROTEIN{value:toFloat(line.value),intensity:toFloat(line.Intensity),qvalue:toFloat(line.Qvalue),score:toFloat(line.Score),proteinGroup:line.id}]->(p)
+            MERGE (s)-[r:HAS_QUANTIFIED_PROTEIN{value:toFloat(line.value),intensity:toFloat(line.Intensity),qvalue:toFloat(line.Qvalue),score:toFloat(line.Score),proteinGroup:line.id,is_razor=toBoolean(line.is_razor)}]->(p)
             RETURN COUNT(r) AS PROJECTID_analytical_sample_has_quantified_protein;
             USING PERIODIC COMMIT 10000 
             LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_subject_peptide.csv" AS line 
