@@ -320,11 +320,31 @@ def extractProteinProteinModificationRelationships(data, configuration):
     cols.extend(positionCols)
     aux = data.copy().reset_index()
     aux = aux[cols]
-    aux["START_ID"] =  aux[proteinCol].map(str) + "_" + aux[positionCols[1]].map(str) + aux[positionCols[0]].map(str)+'-'+configuration["mod_acronym"]
+    aux["END_ID"] =  aux[proteinCol].map(str) + "_" + aux[positionCols[1]].map(str) + aux[positionCols[0]].map(str)+'-'+configuration["mod_acronym"]
     aux = aux.drop(positionCols, axis=1)
-    aux = aux.set_index("START_ID")
+    aux = aux.set_index("END_ID")
     aux = aux.reset_index()
-    aux.columns = ["START_ID", "END_ID"]
+    aux.columns = ["END_ID", "START_ID"]
+    aux['TYPE'] = "HAS_MODIFIED_SITE"
+    aux = aux[['START_ID', 'END_ID', 'TYPE']]
+    aux = aux.drop_duplicates()
+
+    return aux
+
+def extractPeptideProteinModificationRelationships(data, configuration):
+    positionCols = configuration["positionCols"]
+    proteinCol = configuration["proteinCol"]
+    sequenceCol = configuration["sequenceCol"]
+    cols = [sequenceCol, proteinCol]
+    cols.extend(positionCols)
+    aux = data.copy().reset_index()
+    aux = aux[cols]
+    aux["END_ID"] =  aux[proteinCol].map(str) + "_" + aux[positionCols[1]].map(str) + aux[positionCols[0]].map(str)+'-'+configuration["mod_acronym"]
+    aux = aux.drop([proteinCol, positionCols], axis=1)
+    aux = aux.set_index("END_ID")
+    aux = aux.reset_index()
+    aux.columns = ["END_ID", "START_ID"]
+    aux["START_ID"] = aux["START_ID"].str.upper()
     aux['TYPE'] = "HAS_MODIFIED_SITE"
     aux = aux[['START_ID', 'END_ID', 'TYPE']]
     aux = aux.drop_duplicates()
@@ -343,7 +363,8 @@ def extractProteinModifications(data, configuration):
     aux = aux.set_index("ID")
     aux = aux.reset_index()
     aux[sequenceCol] = aux[sequenceCol].str.replace('_', '-')
-    aux.columns = ["ID", "protein", "sequence_window", "position", "residue"]
+    aux["source"] = "experimentally_identified"
+    aux.columns = ["ID", "protein", "sequence_window", "position", "residue", "source"]
     aux = aux.drop_duplicates()
         
     return aux
@@ -611,6 +632,8 @@ def generateDatasetImports(projectId, dataType):
                                 generateGraphFiles(dataRows, "modifiedprotein_subject", projectId, stats, ot = 'a')
                                 dataRows = extractProteinProteinModificationRelationships(data[dtype], configuration[dtype])
                                 generateGraphFiles(dataRows, "modifiedprotein_protein", projectId, stats, ot = 'a')
+                                dataRows = extractPeptideProteinModificationRelationships(data[dtype], configuration[dtype])
+                                generateGraphFiles(dataRows, "modifiedprotein_peptide", projectId, stats, ot = 'a')
                                 dataRows = extractProteinModifications(data[dtype], configuration[dtype])
                                 generateGraphFiles(dataRows, "modifiedprotein", projectId, stats, ot = 'a')
                                 dataRows = extractProteinModificationsModification(data[dtype], configuration[dtype])

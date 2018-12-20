@@ -61,7 +61,7 @@ def parseSites(fhandler, modifications):
             residue = ''.join(residue_mod[0][1:])
             if organism == "human":
                 #"sequence_window", "position", "Amino acid"
-                entities.add((modified_protein_id, "Modified_protein", protein, seq_window, position, residue))
+                entities.add((modified_protein_id, "Modified_protein", protein, seq_window, position, residue, "PhosphositePlus"))
                 relationships[("Protein", "has_modified_site")].add((protein, modified_protein_id, "HAS_MODIFIED_SITE", "PhosphositePlus"))
                 relationships[("Modified_protein", "has_modification")].add((modified_protein_id, modification, "HAS_MODIFICATION", "PhosphositePlus"))
     

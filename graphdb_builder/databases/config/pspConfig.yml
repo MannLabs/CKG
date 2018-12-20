@@ -36,6 +36,7 @@ entities_header:
     - 'sequence_window'
     - 'position'
     - 'residue'
+    - 'source'
 
 rel_headers: 
     'disease':

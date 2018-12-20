@@ -86,7 +86,7 @@ IMPORT_MODIFIED_PROTEINS:
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Modified_protein.csv" AS line
         MERGE (m:Modified_protein {id:line.ID})
-        ON CREATE SET m.protein=line.protein,m.position=line.position,m.residue=line.residue,m.sequence_window=line.sequence_window
+        ON CREATE SET m.protein=line.protein,m.position=line.position,m.residue=line.residue,m.sequence_window=line.sequence_window,m.source=line.source
         RETURN COUNT(m) AS modified_protein;
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/psp_modified_protein_has_modification.csv" AS line
@@ -577,7 +577,7 @@ IMPORT_DATASETS:
             USING PERIODIC COMMIT 10000
             LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_modifiedprotein.csv" AS line
             MERGE (m:Modified_protein {id:line.ID}) 
-            ON CREATE SET m.protein=line.protein,m.position=line.position,m.residue=line.residue,m.sequence_window=line.sequence_window
+            ON CREATE SET m.protein=line.protein,m.position=line.position,m.residue=line.residue,m.sequence_window=line.sequence_window,m.source=line.source
             RETURN COUNT(m) AS PROJECTID_modified_protein;
             USING PERIODIC COMMIT 10000
             LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_modifiedprotein_modification.csv" AS line
@@ -587,10 +587,16 @@ IMPORT_DATASETS:
             RETURN COUNT(r) AS PROJECTID_modified_protein_has_modification;
             USING PERIODIC COMMIT 10000 
             LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_modifiedprotein_protein.csv" AS line 
-            MATCH (mp:Modified_protein {id:line.START_ID})
-            MATCH (p:Protein {id:line.END_ID}) 
-            MERGE (mp)-[r:HAS_MODIFIED_SITE]->(p)
+            MATCH (p:Protein {id:line.START_ID})
+            MATCH (mp:Modified_protein {id:line.END_ID})
+            MERGE (p)-[r:HAS_MODIFIED_SITE]->(mp)
             RETURN COUNT(r) AS PROJECTID_protein_has_modified_site;
+            USING PERIODIC COMMIT 10000 
+            LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_modifiedprotein_peptide.csv" AS line 
+            MATCH (p:Peptide {id:line.START_ID})
+            MATCH (mp:Modified_protein {id:line.END_ID})
+            MERGE (p)-[r:HAS_MODIFIED_SITE]->(mp)
+            RETURN COUNT(r) AS PROJECTID_peptide_has_modified_site;
             USING PERIODIC COMMIT 10000 
             LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_modifiedprotein_subject.csv" AS line
             MATCH (s:Analytical_sample{id:line.START_ID})
