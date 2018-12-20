@@ -342,9 +342,9 @@ def get_3d_network(data, identifier, args):
             - Title of the plot
     '''
     edge_prop_columns = [c for c in data.columns if c not in [args['source'], args['target']]]
-    edge_properties = [str(d) for d in data[edge_prop_columns].to_dict(orient='index').values()]
+    edge_properties = [str(d) for d in data.to_dict(orient='index').values()]
     graph = nx.from_pandas_edgelist(data, args['source'], args['target'], edge_prop_columns)
-    pos=nx.fruchterman_reingold_layout(graph, dim=3)
+    pos=nx.spring_layout(graph, dim=3)
     edges = graph.edges()
     N = len(graph.nodes())
 
@@ -360,19 +360,40 @@ def get_3d_network(data, identifier, args):
         Yed+=[pos[edge[0]][1],pos[edge[1]][1], None]
         Zed+=[pos[edge[0]][2],pos[edge[1]][2], None]
 
-    labels= list(graph.nodes())
+    weight = np.abs(data[args['values']].tolist())
+    degrees = dict(graph.degree())
     colors = []
     sizes = []
-    for node in args['node_properties']:
-        colors.append(node_properties[node]["color"])
-        sizes.append(node_properties[node]["size"])
+    labels = []
+    annotations = []
+    for node in graph.nodes():
+        #colors.append(node_properties[node]["color"])
+        size = degrees[node]
+        if node in args["node_properties"]:
+            if "size" in args["node_properties"][node]:
+                size= args["node_properties"][node]["size"]
+        
+        label = "{} (degree:{})".format(node, size)
+        labels.append(label) 
+        annotations.append(dict(text=node, 
+                                x=pos[node][0], 
+                                y=pos[node][1],
+                                z=pos[node][2],
+                                ax=0, ay=-0.75, 
+                                font=dict(color= 'black', size=10),
+                                showarrow=False))
 
+        if size > 50:
+            size = 50
+        sizes.append(size)
+        
+        
     trace1=Scatter3d(x=Xed,
                y=Yed,
                z=Zed,
                mode='lines',
                opacity = 0.5,
-               line=scatter3d.Line(color='rgb(155,155,155)', width=1),
+               line=dict(color='rgb(155,155,155)', width=1),
                text=edge_properties,
                hoverinfo='text'
                )
@@ -383,9 +404,8 @@ def get_3d_network(data, identifier, args):
                name='proteins',
                marker=scatter3d.Marker(symbol='circle',
                              size=sizes,
-                             color=colors,
+                             #color=colors,
                              colorscale='Viridis',
-                             line=scatter3d.marker.Line(color='rgb(0,50,50)', width=15.5)
                              ),
                text=labels,
                hoverinfo='text'
@@ -405,15 +425,13 @@ def get_3d_network(data, identifier, args):
          height=1500,
          showlegend=True,
          scene=Scene(
-         xaxis=XAxis(axis),
-         yaxis=YAxis(axis),
-         zaxis=ZAxis(axis),
-        ),
-     margin=Margin(
-        t=100
-    ),
-    hovermode='closest',
-
+                    xaxis=XAxis(axis),
+                    yaxis=YAxis(axis),
+                    zaxis=ZAxis(axis),
+                    annotations= annotations,
+                    ),
+        margin=Margin(t=1),
+        hovermode='closest',
     )
 
     data=Data([trace1, trace2])
