@@ -143,16 +143,16 @@ class Dataset:
                                     sig_data.index = data['group'].tolist()
                                     self.update_data({"regulated":sig_data})
                             for plot_type in plot_types:
-                                plots = result.get_plot(plot_type, subsection+"_"+analysis_type+"_"+plot_type, analysis_type.capitalize())
+                                plots = result.get_plot(plot_type, subsection+"_"+analysis_type+"_"+plot_type)
                                 report.update_plots({(analysis_type, plot_type):plots})
                     else:
                         if result is None:
                             dictresult = {}
                             dictresult["_".join(subsection.split(' '))] = data
-                            result = ar.AnalysisResult(self.identifier,"_".join(subsection.split(' ')), {}, data, result = dictresult)
+                            result = ar.AnalysisResult(self.identifier,"_".join(subsection.split(' ')), args, data, result = dictresult)
                             self.update_analyses(result.result)
                         for plot_type in plot_types:
-                            plots = result.get_plot(plot_type, "_".join(subsection.split(' '))+"_"+plot_type, subsection.capitalize())
+                            plots = result.get_plot(plot_type, "_".join(subsection.split(' '))+"_"+plot_type)
                             report.update_plots({("_".join(subsection.split(' ')), plot_type): plots})
         return report
 

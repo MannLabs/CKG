@@ -3,39 +3,52 @@ overview: #section
         data: number of peptides 
         analyses: []            
         plots: 
-            - basicBarPlot
+            - barplot
             - basicTable
         args: 
+            x: x
+            y: y
+            group: group
             x_title: Analytical sample
-            y_title: number of peptides #args
+            y_title: number of peptides
+            title: 'Number of proteins identified per group'
     proteins:
         data: number of proteins
         analyses: []
         plots: 
-            - basicBarPlot
+            - barplot
             - basicTable
-        args: 
+        args:
+            x: x
+            y: y
+            group: group
             x_title: Analytical sample
             y_title: number of proteins
+            title: 'Number of peptide identified per group'
     modifications:
         data: number of modified proteins
         analyses: []
         plots: 
-            - facetPlot
+            - facetplot
             - basicTable
         args: 
+            x: x
+            y: y
+            group: group
+            class: type
             x_title: Analytical sample
             y_title: number of modified proteins
             plot_type: bar
+            title: 'Number of modified proteins identified per type'
 "data exploration":
     stratification:
         data: preprocessed
         analyses: 
             - pca 
-            - tsne
-            - umap
+            #- tsne
+            #- umap
         plots:
-            - scatterPlot
+            - scatterplot
         args: 
             imputation: True
             imputation_method: mixed
@@ -45,32 +58,39 @@ overview: #section
             perplexity: 40
             n_iter: 1000
             init: 'pca'
+            title: 'Sample stratification'
     regulation:
         data: preprocessed
         analyses: 
             - anova
         plots: 
             - basicTable
-            - volcanoPlot
+            - volcanoplot
         args: 
             imputation: True
             imputation_method: mixed
             alpha: 0.05
+            lfc: 1.0
+            colorscale: 'Blues'
+            showscale: False
+            marker_size: 10
             drop_cols: 
                 - sample
                 - gene_name
             name: name
+            title: 'Volcano plot'
     correlation:
         data: regulated
         analyses: 
             - correlation
         plots: 
             - heatmap
-            - 3Dnetwork
+            - network
             - basicTable
         args: 
             source: node1
             target: node2
+            title: 'Features correlation map'
     #"topological data analysis":
     #    data: regulated
     #    analyses: 

@@ -66,7 +66,8 @@ class AnalysisResult:
             components = 2
             if "components" in args:
                 components = args["components"]
-            result, args = analyses.runPCA(self.data, components)
+            result, nargs = analyses.runPCA(self.data, components)
+            args.update(nargs)
         elif self.analysis_type  == "tsne":
             components = 2
             perplexity = 40
@@ -80,7 +81,8 @@ class AnalysisResult:
                 n_iter = args["n_iter"]
             if "init" in args:
                 init = args["init"]
-            result, args = analyses.runTSNE(self.data, components=components, perplexity=perplexity, n_iter=n_iter, init=init)
+            result, nargs = analyses.runTSNE(self.data, components=components, perplexity=perplexity, n_iter=n_iter, init=init)
+            args.update(nargs)
         elif self.analysis_type  == "umap":
             n_neighbors=10 
             min_dist=0.3
@@ -92,7 +94,8 @@ class AnalysisResult:
             if "metric" in args:
                 metric = args["metric"]
             if n_neighbors < self.data.shape[0]:
-                result, args = analyses.runUMAP(self.data, n_neighbors=n_neighbors, min_dist=min_dist, metric=metric)
+                result, nargs = analyses.runUMAP(self.data, n_neighbors=n_neighbors, min_dist=min_dist, metric=metric)
+                args.update(nargs)
         elif self.analysis_type  == "mapper":
             n_cubes = 15
             overlap = 0.5
@@ -112,8 +115,8 @@ class AnalysisResult:
                 linkage = args["linkage"]
             if "affinity" in args:
                 affinity = args["affinity"]
-            r, args = analyses.runMapper(self.data, n_cubes=n_cubes, overlap=overlap, 
-                                            n_clusters=n_clusters, linkage=linkage, affinity=affinity)
+            r, nargs = analyses.runMapper(self.data, n_cubes=n_cubes, overlap=overlap, n_clusters=n_clusters, linkage=linkage, affinity=affinity)
+            args.update(nargs)
             result[self.analysis_type] = r
         elif self.analysis_type  == 'ttest':
             alpha = 0.05
@@ -142,12 +145,12 @@ class AnalysisResult:
          
         return result, args
 
-    def get_plot(self, name, identifier, title):
+    def get_plot(self, name, identifier):
         data = self.result
         args = self.args
         plot = []
-        print(identifier, title)
         print(self.args)
+        print(name)
         if len(data) >=1:
             if name == "basicTable":
                 colors = ('#C2D4FF','#F5F8FF')
@@ -162,11 +165,11 @@ class AnalysisResult:
                 for id in data:
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                        figure_title = title + id[0]+" vs "+id[1]
+                        figure_title = args["title"] + id[0]+" vs "+id[1]
                     else:
-                        figure_title = title
+                        figure_title = args["title"]
                     plot.append(figure.getBasicTable(data[id], identifier, figure_title, colors=colors, subset=subset, plot_attr=attr))
-            elif name == "basicBarPlot":
+            elif name == "barplot":
                 x_title = "x"
                 y_title = "y"
                 if "x_title" in args:
@@ -176,11 +179,12 @@ class AnalysisResult:
                 for id in data:     
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                        figure_title = title + id[0]+" vs "+id[1]
+                        figure_title = args['title'] + id[0]+" vs "+id[1]
                     else:
-                        figure_title = title
-                    plot.append(figure.getBarPlotFigure(data[id], identifier, figure_title, x_title, y_title))
-            elif name == "facetPlot":
+                        figure_title = args['title']
+                    args["title"] = figure_title
+                    plot.append(figure.get_barplot(data[id], identifier, args))
+            elif name == "facetplot":
                 x_title = "x"
                 y_title = "y"
                 plot_type = "bar"
@@ -193,11 +197,12 @@ class AnalysisResult:
                 for id in data:     
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                        figure_title = title + id[0]+" vs "+id[1]
+                        figure_title = args['title'] + id[0]+" vs "+id[1]
                     else:
-                        figure_title = title
-                    plot.append(figure.get_facet_grid_plot(data[id], identifier, figure_title, args))
-            elif name == "scatterPlot":
+                        figure_title = args['title']
+                    args['title'] = figure_title
+                    plot.append(figure.get_facet_grid_plot(data[id], identifier, args))
+            elif name == "scatterplot":
                 x_title = "x"
                 y_title = "y"
                 if "x_title" in args:
@@ -207,11 +212,12 @@ class AnalysisResult:
                 for id in data:
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                        figure_title = title + id[0]+" vs "+id[1]
+                        figure_title = args['title'] + id[0]+" vs "+id[1]
                     else:
-                        figure_title = title
-                    plot.append(figure.getScatterPlotFigure(data[id], identifier, figure_title, x_title, y_title))
-            elif name == "volcanoPlot":
+                        figure_title = args['title']
+                    args['title'] = figure_title
+                    plot.append(figure.get_scatterplot(data[id], identifier, args))
+            elif name == "volcanoplot":
                 alpha = 0.05
                 lfc = 1.0
                 if "alpha" in args:
@@ -220,9 +226,10 @@ class AnalysisResult:
                     lfc = args["lfc"]
                 for pair in data:
                     signature = data[pair]
-                    p = figure.runVolcano(identifier+"_"+pair[0]+"_vs_"+pair[1], signature, lfc=lfc, alpha=alpha, title=title+" "+pair[0]+" vs "+pair[1])
+                    args["title"] = args['title']+" "+pair[0]+" vs "+pair[1]
+                    p = figure.run_volcano(signature, identifier+"_"+pair[0]+"_vs_"+pair[1], args)
                     plot.append(p)
-            elif name == '3Dnetwork':
+            elif name == 'network':
                 source = 'source'
                 target = 'target'
                 if "source" in args:
@@ -232,10 +239,11 @@ class AnalysisResult:
                 for id in data:
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                        figure_title = title + id[0]+" vs "+id[1]
+                        figure_title = args["title"] + id[0]+" vs "+id[1]
                     else:
-                        figure_title = title
-                    plot.append(figure.get3DNetworkFigure(data[id], sourceCol=source, targetCol=target, node_properties={}, identifier=identifier, title=figure_title))
+                        figure_title = args["title"]
+                    args["title"] = figure_title
+                    plot.append(figure.get_3d_network(data[id], identifier, args))
             elif name == "heatmap":
                 for id in data:
                     if not data[id].empty:
