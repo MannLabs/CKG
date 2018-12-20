@@ -74,6 +74,8 @@ overview: #section
             colorscale: 'Blues'
             showscale: False
             marker_size: 10
+            x_title: log2FC
+            y_title: -log(pvalue)
             drop_cols: 
                 - sample
                 - gene_name
@@ -91,6 +93,10 @@ overview: #section
             source: node1
             target: node2
             title: 'Features correlation map'
+            format: edgelist
+            values: weight
+            dist: False
+            node_properties: {}
     #"topological data analysis":
     #    data: regulated
     #    analyses: 

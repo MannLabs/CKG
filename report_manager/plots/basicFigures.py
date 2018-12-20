@@ -181,7 +181,7 @@ def get_volcanoplot(results, args):
                     mode='markers', 
                     text=results['text'], 
                     hoverinfo='text', 
-                    marker={'color': 'black', 'colorscale': args["colorscale"], 'showscale': args['showscale'], 'size': args['marker_size']}
+                    marker={'color': results['color'], 'colorscale': args["colorscale"], 'showscale': args['showscale'], 'size': args['marker_size']}
                     )
 
     figure["data"].append(trace)
@@ -343,7 +343,7 @@ def get_3d_network(data, identifier, args):
     '''
     edge_prop_columns = [c for c in data.columns if c not in [args['source'], args['target']]]
     edge_properties = [str(d) for d in data[edge_prop_columns].to_dict(orient='index').values()]
-    graph = nx.from_pandas_edgelist(data, args['source'], args['target'], edge_properties)
+    graph = nx.from_pandas_edgelist(data, args['source'], args['target'], edge_prop_columns)
     pos=nx.fruchterman_reingold_layout(graph, dim=3)
     edges = graph.edges()
     N = len(graph.nodes())
