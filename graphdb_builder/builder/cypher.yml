@@ -100,6 +100,12 @@ IMPORT_MODIFIED_PROTEINS:
         MATCH (mp:Modified_protein {id:line.END_ID}) 
         MERGE (p)-[r:HAS_MODIFIED_SITE{source:line.source}]->(mp)
         RETURN COUNT(r) AS protein_has_modified_site;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/psp_peptide_has_modified_site.csv" AS line 
+        MATCH (p:Peptide {id:line.START_ID})
+        MATCH (mp:Modified_protein {id:line.END_ID})
+        MERGE (p)-[r:HAS_MODIFIED_SITE]->(mp)
+        RETURN COUNT(r) AS peptide_has_modified_site;
 
 IMPORT_PROTEIN_ANNOTATIONS: 
     'name': 'import protein annotations'

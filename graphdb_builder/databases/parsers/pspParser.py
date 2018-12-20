@@ -63,6 +63,7 @@ def parseSites(fhandler, modifications):
                 #"sequence_window", "position", "Amino acid"
                 entities.add((modified_protein_id, "Modified_protein", protein, seq_window, position, residue, "PhosphositePlus"))
                 relationships[("Protein", "has_modified_site")].add((protein, modified_protein_id, "HAS_MODIFIED_SITE", "PhosphositePlus"))
+                relationships[("Peptide", "has_modified_site")].add((seq_window.upper(), modified_protein_id, "HAS_MODIFIED_SITE", "PhosphositePlus"))
                 relationships[("Modified_protein", "has_modification")].add((modified_protein_id, modification, "HAS_MODIFICATION", "PhosphositePlus"))
     
     return entities, relationships
