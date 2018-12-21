@@ -142,6 +142,9 @@ class AnalysisResult:
             if "correction" in args:
                 correction = args["correction"]
             result[self.analysis_type] = analyses.runCorrelation(self.data, alpha=alpha, method=method, correction=correction)
+        elif self.analysis_type == "interaction":
+            result[self.analysis_type], nargs = analyses.get_interaction_network(self.data)
+            args.update(nargs)
          
         return result, args
 

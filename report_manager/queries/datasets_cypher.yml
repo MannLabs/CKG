@@ -8,6 +8,7 @@
             - 'Protein'
         'involved_rels':
             - 'HAS_QUANTIFIED_PROTEIN'
+        'query_type': 'pre'
         'query': >
             MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
             WHERE project.id="PROJECTID"
@@ -21,6 +22,7 @@
             - 'Peptide'
         'involved_rels':
             - 'HAS_QUANTIFIED_PEPTIDE'
+        'query_type': 'pre'
         'query': >
             MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PEPTIDE]->(peptide:Peptide) 
             WHERE project.id="PROJECTID" 
@@ -34,6 +36,7 @@
             - 'Modified_protein'
         'involved_rels':
             - 'HAS_QUANTIFIED_MODIFIED_PROTEIN'
+        'query_type': 'pre'
         'query': >
             MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_MODIFIED_PROTEIN]->(modifiedprotein:Modified_protein)-[:HAS_MODIFICATION]->(modification:Modification) 
             WHERE project.id="PROJECTID" 
@@ -47,7 +50,21 @@
             - 'Protein'
         'involved_rels':
             - 'HAS_QUANTIFIED_PROTEIN'
+        'query_type': 'pre'
         'query': >
-            MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
+            MATCH (project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
             WHERE project.id="PROJECTID" 
             RETURN a.id AS sample, protein.id AS identifier, a.group AS group, toFloat(r.value) as LFQ_intensity, protein.name AS name ORDER BY group;
+    "INTERACTION":
+        'name': 'get PPI network'
+        'description': 'Get all the protein-protein interactions for the relevant proteins'
+        'involved_nodes':
+            - 'Protein'
+        'involved_relationships':
+            - 'CURATED_INTERACTS_WITH'
+            - 'COMPILED_INTERACTS_WITH'
+        'query_type': 'post'
+        'query': >
+            MATCH (protein1:Protein)-[r:CURATED_INTERACTS_WITH|:COMPILED_INTERACTS_WITH|:ACTS_ON]->(protein2:Protein) 
+            WHERE ((protein1.id+"-"+protein1.name) IN [IDENTIFIERS]) AND ((protein2.id+"-"+protein2.name) IN [IDENTIFIERS]) AND (r.score>=0.4 OR toLower(toString(r.score))="curated")
+            RETURN protein1.id+"-"+protein1.name AS node1,protein2.id+"-"+protein2.name AS node2,r.score AS score,r.scores AS scores,r.source AS source,r.action AS action,r.interaction_type AS interaction_type

@@ -379,12 +379,14 @@ def get_3d_network(data, identifier, args):
                                 x=pos[node][0], 
                                 y=pos[node][1],
                                 z=pos[node][2],
-                                ax=0, ay=-0.75, 
+                                ax=0, ay=-0., 
                                 font=dict(color= 'black', size=10),
                                 showarrow=False))
 
         if size > 50:
             size = 50
+        if size < 3:
+            size = 5
         sizes.append(size)
         
         

@@ -12,13 +12,15 @@ log_config = ckg_config.report_manager_log
 logger = ckg_utils.setup_logging(log_config, key="dataset")
 
 class Dataset:
-    def __init__(self, identifier, dtype, configuration=None, data={}, analyses={}):
+    def __init__(self, identifier, dtype, configuration=None, data={}, analyses={}, analysis_queries={}, report=None):
         self._identifier = identifier
         self._dataset_type = dtype
         self._configuration = configuration
         self._data = data
         self._analyses = analyses
-    
+        self._analysis_queries = analysis_queries
+        self._report = report
+
     @property
     def identifier(self):
         return self._identifier
@@ -58,6 +60,25 @@ class Dataset:
     @configuration.setter   
     def configuration(self, configuration):
         self._configuration = configuration
+
+    @property
+    def analysis_queries(self):
+        return self._analysis_queries
+
+    @analysis_queries.setter
+    def analysis_queries(self, analysis_queries):
+        self._analysis_queries = analysis_queries
+
+    @property
+    def report(self):
+        return self._report
+
+    @report.setter
+    def report(self, report):
+        self._report = report
+
+    def update_analysis_queries(self, query):
+        self.analysis_queries.update(query)
     
     def get_dataset(self, dataset):
         if dataset in self.data:
@@ -85,7 +106,6 @@ class Dataset:
 
     def query_data(self):
         data = {}
-        driver = connector.getGraphDatabaseConnectionConfiguration()
         replace = [("PROJECTID", self.identifier)]
         try:
             cwd = os.path.abspath(os.path.dirname(__file__))
@@ -95,15 +115,25 @@ class Dataset:
                 replace = self.configuration["replace"]
             for query_name in datasets_cypher[self.dataset_type]:
                 title = query_name.lower().replace('_',' ')
+                query_type = datasets_cypher[self.dataset_type][query_name]['query_type']
                 query = datasets_cypher[self.dataset_type][query_name]['query']
-                for r,by in replace:
-                    query = query.replace(r,by)
-                data[title] = connector.getCursorData(driver, query)
+                if query_type == "pre":
+                    for r,by in replace:
+                        query = query.replace(r,by)
+                    data[title] = self.send_query(query)
+                else:
+                    self.update_analysis_queries({query_name.lower(): query})
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             logger.error("Reading queries from file {}: {}, file: {},line: {}".format(queries_path, sys.exc_info(), fname, exc_tb.tb_lineno))
         
+        return data
+
+    def send_query(self, query):
+        driver = connector.getGraphDatabaseConnectionConfiguration()
+        data = connector.getCursorData(driver, query)
+
         return data
     
     def extract_configuration(self, configuration):
@@ -129,6 +159,18 @@ class Dataset:
                 data_name, analysis_types, plot_types, args = self.extract_configuration(self.configuration[section][subsection])
                 if data_name in self.data:
                     data = self.data[data_name]
+                    if subsection in self.analysis_queries:
+                        query = self.analysis_queries[subsection]                    
+                        if "use" in args:
+                            for r_id in args["use"]:
+                                if r_id == "columns":
+                                    rep = ",".join(['"{}"'.format(i) for i in data.columns.tolist()])
+                                elif r_id == "index":
+                                    rep = ",".join(['"{}"'.format(i) for i in data.index.tolist()])
+                                elif r_id in data.columns:
+                                    rep = ",".join(['"{}"'.format(i) for i in data[r_id].tolist()])
+                                query = query.replace(args["use"][r_id].upper(),rep)
+                            data = self.send_query(query)
                     result = None 
                     if len(analysis_types) >= 1:
                         for analysis_type in analysis_types:
@@ -154,7 +196,8 @@ class Dataset:
                         for plot_type in plot_types:
                             plots = result.get_plot(plot_type, "_".join(subsection.split(' '))+"_"+plot_type)
                             report.update_plots({("_".join(subsection.split(' ')), plot_type): plots})
-        return report
+        
+        self.report = report
 
 class ProteomicsDataset(Dataset):
     def __init__(self, identifier, data={}, analyses={}):

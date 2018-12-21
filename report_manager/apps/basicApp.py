@@ -5,7 +5,7 @@ class BasicApp:
     '''Defines what an App is in the report_manager.
         Other Apps will inherit basic functionality from this class
         Attributes: Title, subtitle, description, logo, footer
-        Functionality: setters, getters'''
+    '''
     
     def __init__(self, title, subtitle, description, page_type, layout = [], logo = None, footer= None):
         self._title = title

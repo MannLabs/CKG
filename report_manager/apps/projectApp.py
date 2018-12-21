@@ -18,8 +18,9 @@ class ProjectApp(basicApp.BasicApp):
         self._project_id = project_id
 
     def build_page(self):
-        self.add_basic_layout()
         p = project.Project(self.project_id)
+        self.title = "Project: {}".format(p.name)
+        self.add_basic_layout()
         plots = p.show_report("app")
         self.extend_layout(plots)
         

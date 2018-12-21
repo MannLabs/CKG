@@ -16,7 +16,7 @@ header:
     - 'TYPE'
     - 'interaction_type'
     - 'source'
-    - 'evidences'
+    - 'evidence'
     - 'scores'
     - 'score'
 

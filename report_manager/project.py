@@ -219,8 +219,8 @@ class Project:
             for dataset_type in self.data_types:
                 dataset = self.get_dataset(dataset_type)
                 if dataset is not None:
-                    report = dataset.generate_report()
-                    self.update_report({dataset.dataset_type:report})
+                    dataset.generate_report()
+                    self.update_report({dataset.dataset_type:dataset.report})
     
     def empty_report(self):
         self.report = {}

@@ -97,6 +97,22 @@ overview: #section
             values: weight
             dist: False
             node_properties: {}
+    interaction:
+        data: regulated
+        analyses: []
+        plots:
+            - network
+            - basicTable
+        args:
+            use: 
+                columns: identifiers
+            source: node1
+            target: node2
+            title: 'Protein-Protein interaction network'
+            format: edgelist
+            values: score
+            dist: False
+            node_properties: {} 
     #"topological data analysis":
     #    data: regulated
     #    analyses: 
