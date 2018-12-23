@@ -1,6 +1,7 @@
 import yaml
 import json
 import os
+from os.path import isfile, join
 import logging
 
 def read_yaml(yaml_file):
@@ -48,3 +49,17 @@ def setup_logging(path='log.config', key=None):
     logger = logging.getLogger(key)
     
     return logger
+
+
+def listDirectoryFiles(directory):
+    onlyfiles = [f for f in os.listdir(directory) if isfile(join(directory, f)) and not f.startswith('.')]
+
+    return onlyfiles
+
+def listDirectoryFolders(directory):
+    dircontent = [f for f in os.listdir(directory) if isdir(join(directory, f)) and not f.startswith('.')]
+    return dircontent
+
+def checkDirectory(directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)

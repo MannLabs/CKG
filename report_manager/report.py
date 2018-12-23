@@ -1,4 +1,5 @@
-
+import os.path
+import plotly.io as pio
 
 class Report:
     def __init__(self,identifier, plots = {}):
@@ -28,3 +29,10 @@ class Report:
 
     def update_plots(self, plot):
         self.plots.update(plot)
+
+    def save_report(self, directory, plot_format='pdf'):
+        for plot_id in self.plots:
+            name = "_".join(plot_id)
+            for plot in self.plots[plot_id]:
+                figure = plot.figure
+                pio.write_image(figure, os.path.join(directory,name+"."+plot_format))

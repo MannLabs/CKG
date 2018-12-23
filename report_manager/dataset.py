@@ -1,5 +1,6 @@
 import os
 import sys
+import pandas as pd
 import ckg_utils
 import config.ckg_config as ckg_config
 from report_manager import analysisResult as ar, report as rp
@@ -198,6 +199,25 @@ class Dataset:
                             report.update_plots({("_".join(subsection.split(' ')), plot_type): plots})
         
         self.report = report
+        self.save_datset()
+
+    def get_dataset_data_directory(self):
+        ckg_utils.checkDirectory(directory)
+        id_directory = os.path.join(directory, self.identifier)
+        ckg_utils.checkDirectory(id_directory)
+        dataset_directory = os.path.join(id_directory, self.dataset_type)
+
+        return dataset_directory
+
+    def save_datset(self, directory="../../data/reports"):
+        dataset_directory = self.get_dataset_data_directory(directory)
+        store = pd.HDFStore(os.path.join(dataset_directory, self.dataset_type+".h5"))
+        for data in self.data:
+            store[data]=self.data[data]
+    
+    def save_dataset_report(self, directory):
+        self.save_datset(directory)
+        self.report.save_report(directory=directory)
 
 class ProteomicsDataset(Dataset):
     def __init__(self, identifier, data={}, analyses={}):

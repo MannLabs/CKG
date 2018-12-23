@@ -112,7 +112,23 @@ overview: #section
             format: edgelist
             values: score
             dist: False
-            node_properties: {} 
+            node_properties: {}
+    enrichment:
+        data: regulated
+        analyses: 
+            - enrichment
+        plots:
+            - basicTable
+        args:
+            use: 
+                columns: identifiers
+            source: node1
+            target: node2
+            title: 'Protein-Protein interaction network'
+            format: edgelist
+            values: score
+            dist: False
+            node_properties: {}
     #"topological data analysis":
     #    data: regulated
     #    analyses: 
