@@ -105,6 +105,15 @@ class Dataset:
         except Exception as err:
             logger.error("Error: {} reading configuration file: {}.".format(err, config_path))
 
+    def get_dataset_data_directory(self, directory="../../data/reports"):
+        ckg_utils.checkDirectory(directory)
+        id_directory = os.path.join(directory, self.identifier)
+        ckg_utils.checkDirectory(id_directory)
+        dataset_directory = os.path.join(id_directory, self.dataset_type)
+        ckg_utils.checkDirectory(dataset_directory)
+
+        return dataset_directory
+
     def query_data(self):
         data = {}
         replace = [("PROJECTID", self.identifier)]
@@ -160,64 +169,60 @@ class Dataset:
                 data_name, analysis_types, plot_types, args = self.extract_configuration(self.configuration[section][subsection])
                 if data_name in self.data:
                     data = self.data[data_name]
-                    if subsection in self.analysis_queries:
-                        query = self.analysis_queries[subsection]                    
-                        if "use" in args:
-                            for r_id in args["use"]:
-                                if r_id == "columns":
-                                    rep = ",".join(['"{}"'.format(i) for i in data.columns.tolist()])
-                                elif r_id == "index":
-                                    rep = ",".join(['"{}"'.format(i) for i in data.index.tolist()])
-                                elif r_id in data.columns:
-                                    rep = ",".join(['"{}"'.format(i) for i in data[r_id].tolist()])
-                                query = query.replace(args["use"][r_id].upper(),rep)
-                            data = self.send_query(query)
-                    result = None 
-                    if len(analysis_types) >= 1:
-                        for analysis_type in analysis_types:
-                            result = ar.AnalysisResult(self.identifier, analysis_type, args, data)
-                            self.update_analyses(result.result)
-                            if subsection == "regulation":
-                                reg_data = result.result[analysis_type]
-                                if not reg_data.empty:
-                                    sig_hits = list(set(reg_data.loc[reg_data.rejected,"identifier"]))
-                                    #sig_names = list(set(reg_data.loc[reg_data.rejected,"name"]))
-                                    sig_data = data[sig_hits]
-                                    sig_data.index = data['group'].tolist()
-                                    self.update_data({"regulated":sig_data})
+                    if not data.empty:
+                        if subsection in self.analysis_queries:
+                            query = self.analysis_queries[subsection]                    
+                            if "use" in args:
+                                for r_id in args["use"]:
+                                    if r_id == "columns":
+                                        rep = ",".join(['"{}"'.format(i) for i in data.columns.tolist()])
+                                    elif r_id == "index":
+                                        rep = ",".join(['"{}"'.format(i) for i in data.index.tolist()])
+                                    elif r_id in data.columns:
+                                        rep = ",".join(['"{}"'.format(i) for i in data[r_id].tolist()])
+                                    query = query.replace(args["use"][r_id].upper(),rep)
+                                data = self.send_query(query)
+                        result = None 
+                        if len(analysis_types) >= 1:
+                            for analysis_type in analysis_types:
+                                result = ar.AnalysisResult(self.identifier, analysis_type, args, data)
+                                self.update_analyses(result.result)
+                                if subsection == "regulation":
+                                    reg_data = result.result[analysis_type]
+                                    if not reg_data.empty:
+                                        sig_hits = list(set(reg_data.loc[reg_data.rejected,"identifier"]))
+                                        #sig_names = list(set(reg_data.loc[reg_data.rejected,"name"]))
+                                        sig_data = data[sig_hits]
+                                        sig_data.index = data['group'].tolist()
+                                        sig_data["sample"] = data["sample"].tolist()
+                                        self.update_data({"regulated":sig_data})
+                                for plot_type in plot_types:
+                                    plots = result.get_plot(plot_type, subsection+"_"+analysis_type+"_"+plot_type)
+                                    report.update_plots({(analysis_type, plot_type):plots})
+                        else:
+                            if result is None:
+                                dictresult = {}
+                                dictresult["_".join(subsection.split(' '))] = data
+                                result = ar.AnalysisResult(self.identifier,"_".join(subsection.split(' ')), args, data, result = dictresult)
+                                self.update_analyses(result.result)
                             for plot_type in plot_types:
-                                plots = result.get_plot(plot_type, subsection+"_"+analysis_type+"_"+plot_type)
-                                report.update_plots({(analysis_type, plot_type):plots})
-                    else:
-                        if result is None:
-                            dictresult = {}
-                            dictresult["_".join(subsection.split(' '))] = data
-                            result = ar.AnalysisResult(self.identifier,"_".join(subsection.split(' ')), args, data, result = dictresult)
-                            self.update_analyses(result.result)
-                        for plot_type in plot_types:
-                            plots = result.get_plot(plot_type, "_".join(subsection.split(' '))+"_"+plot_type)
-                            report.update_plots({("_".join(subsection.split(' ')), plot_type): plots})
+                                plots = result.get_plot(plot_type, "_".join(subsection.split(' '))+"_"+plot_type)
+                                report.update_plots({("_".join(subsection.split(' ')), plot_type): plots})
         
         self.report = report
         self.save_datset()
+        self.save_dataset_report()
 
-    def get_dataset_data_directory(self):
-        ckg_utils.checkDirectory(directory)
-        id_directory = os.path.join(directory, self.identifier)
-        ckg_utils.checkDirectory(id_directory)
-        dataset_directory = os.path.join(id_directory, self.dataset_type)
-
-        return dataset_directory
-
-    def save_datset(self, directory="../../data/reports"):
-        dataset_directory = self.get_dataset_data_directory(directory)
+    def save_datset(self):
+        dataset_directory = self.get_dataset_data_directory()
         store = pd.HDFStore(os.path.join(dataset_directory, self.dataset_type+".h5"))
         for data in self.data:
+            name = data.replace(" ", "_")
             store[data]=self.data[data]
     
-    def save_dataset_report(self, directory):
-        self.save_datset(directory)
-        self.report.save_report(directory=directory)
+    def save_dataset_report(self):
+        dataset_directory = self.get_dataset_data_directory()
+        self.report.save_report(directory=dataset_directory)
 
 class ProteomicsDataset(Dataset):
     def __init__(self, identifier, data={}, analyses={}):

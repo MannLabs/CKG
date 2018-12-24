@@ -1,5 +1,6 @@
 import os.path
 import plotly.io as pio
+import pandas as pd
 
 class Report:
     def __init__(self,identifier, plots = {}):
@@ -30,9 +31,19 @@ class Report:
     def update_plots(self, plot):
         self.plots.update(plot)
 
-    def save_report(self, directory, plot_format='pdf'):
+    def print_report(self, directory, plot_format='pdf'):
         for plot_id in self.plots:
             name = "_".join(plot_id)
             for plot in self.plots[plot_id]:
                 figure = plot.figure
                 pio.write_image(figure, os.path.join(directory,name+"."+plot_format))
+
+    def save_report(self, directory):
+        store = pd.HDFStore(os.path.join(directory, "report.h5"))
+        for plot_id in self.plots:
+            name = "_".join(plot_id)
+            i=0
+            for plot in self.plots[plot_id]:
+                print("plot",i)
+                store[name]=plot
+                i+=1

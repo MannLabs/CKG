@@ -143,7 +143,6 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
             sys.exit()
     
     df = df.reset_index()
-
     return df
 
 def runPCA(data, components = 2):
