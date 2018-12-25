@@ -218,7 +218,7 @@ class Dataset:
         store = pd.HDFStore(os.path.join(dataset_directory, self.dataset_type+".h5"))
         for data in self.data:
             name = data.replace(" ", "_")
-            store[data]=self.data[data]
+            store[name]=self.data[data]
     
     def save_dataset_report(self):
         dataset_directory = self.get_dataset_data_directory()
