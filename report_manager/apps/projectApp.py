@@ -1,5 +1,7 @@
 from apps import basicApp
 from report_manager import project
+import dash_html_components as html
+import dash_core_components as dcc
 
 
 class ProjectApp(basicApp.BasicApp):
@@ -22,6 +24,11 @@ class ProjectApp(basicApp.BasicApp):
         self.title = "Project: {}".format(p.name)
         self.add_basic_layout()
         plots = p.show_report("app")
-        self.extend_layout(plots)
+        tabs = []
+        for data_type in plots:
+            tab = dcc.Tab(label=data_type, children=[html.Div(plots[data_type])])
+            tabs.append(tab)
+        lc = dcc.Tabs(id="tabs", children=tabs)
+        self.layou = lc
         
         

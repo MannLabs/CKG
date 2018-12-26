@@ -1,5 +1,6 @@
 import sys
 import os
+from collections import defaultdict
 from plotly.offline import iplot
 from json import dumps
 import pandas as pd
@@ -232,7 +233,7 @@ class Project:
             self.update_report({dataset.dataset_type:report})
 
     def show_report(self, environment):
-        app_plots = []
+        app_plots = defaultdict(list)
         for data_type in self.report:
             plots = self.report[data_type].plots
             for plot_type in plots:
@@ -240,6 +241,6 @@ class Project:
                     if environment == "notebook":
                         iplot(plot.figure)
                     else:
-                        app_plots.append(plot)
+                        app_plots[data_type].append(plot)
 
         return app_plots        

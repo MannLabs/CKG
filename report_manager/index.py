@@ -7,7 +7,7 @@ from apps import initialApp, projectApp, importsApp
 
 
 app.layout = html.Div([
-    dcc.Location(id='url', refresh=False),
+    dcc.Location(id='url', refresh=True),
     html.Div(id='page-content', style={'padding-top':50})
 ])
 
