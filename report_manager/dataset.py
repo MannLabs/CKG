@@ -78,6 +78,9 @@ class Dataset:
     def report(self, report):
         self._report = report
 
+    def update_report(self, report):
+        self.report.update(report)
+
     def update_analysis_queries(self, query):
         self.analysis_queries.update(query)
     
@@ -217,12 +220,27 @@ class Dataset:
         dataset_directory = self.get_dataset_data_directory()
         store = pd.HDFStore(os.path.join(dataset_directory, self.dataset_type+".h5"))
         for data in self.data:
-            name = data.replace(" ", "_")
+            name = data.replace(" ", "-")
             store[name]=self.data[data]
     
     def save_dataset_report(self):
         dataset_directory = self.get_dataset_data_directory()
         self.report.save_report(directory=dataset_directory)
+
+    def load_dataset(self):
+        data = {}
+        dataset_directory = self.get_dataset_data_directory()
+        dataset_store = os.path.join(dataset_directory, self.dataset_type+".h5")
+        if os.path.isfile(dataset_store):
+            data = pd.read_hdf(dataset_store)
+            self.update_data = data
+        
+        return data
+
+    def load_dataset_report(self):
+        dataset_directory = self.get_dataset_data_directory()
+        report = self.report.load_report(directory=dataset_directory)
+        self.update_report(report)
 
 class ProteomicsDataset(Dataset):
     def __init__(self, identifier, data={}, analyses={}):
