@@ -242,5 +242,6 @@ class Project:
                         iplot(plot.figure)
                     else:
                         app_plots[data_type].append(plot)
-
+        for data_type in app_plots:
+            print(data_type, len(app_plots[data_type]))
         return app_plots        

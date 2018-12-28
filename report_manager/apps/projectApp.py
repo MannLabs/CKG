@@ -29,6 +29,6 @@ class ProjectApp(basicApp.BasicApp):
             tab = dcc.Tab(label=data_type, children=[html.Div(plots[data_type])])
             tabs.append(tab)
         lc = dcc.Tabs(id="tabs", children=tabs)
-        self.layou = lc
+        self.add_to_layout(lc)
         
         
