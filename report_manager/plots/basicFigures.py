@@ -334,13 +334,19 @@ def get_complex_heatmapplot(data, identifier, args):
 
 def get_network(data, identifier, args):
     data = data.rename(index=str, columns={args['values']: "width"})
+    data['width'] = data['width'] * 10
     edge_prop_columns = [c for c in data.columns if c not in [args['source'], args['target']]]
     edge_properties = [str(d) for d in data.to_dict(orient='index').values()]
-
     graph = nx.from_pandas_edgelist(data, args['source'], args['target'], edge_prop_columns)
+    betweenness = nx.betweenness_centrality(graph)
+    degrees = dict(graph.degree())
+    if args['node_size'] == 'betweenness':
+        nx.set_node_attributes(graph, betweenness, 'radius')
+    elif args['node_size'] == 'degree':
+        nx.set_node_attributes(graph, degrees, 'radius')
+
     jgraph = json_graph.node_link_data(graph)
 
-    print(jgraph)
     net = Network(id=identifier, data=jgraph, width=args['width'], height=args['height'], maxLinkWidth=args['maxLinkWidth'], maxRadius=args['maxRadius'])
 
     return net

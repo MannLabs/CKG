@@ -152,8 +152,6 @@ class AnalysisResult:
         data = self.result
         args = self.args
         plot = []
-        print(self.args)
-        print(name)
         if len(data) >=1:
             if name == "basicTable":
                 colors = ('#C2D4FF','#F5F8FF')
