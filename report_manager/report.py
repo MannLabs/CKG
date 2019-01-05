@@ -47,11 +47,17 @@ class Report:
                 name = "-".join(plot_id)
                 for plot in self.plots[plot_id]:
                     grp = f.create_group(name)
-                    figure_json = json.dumps(plot.figure, cls=plotly.utils.PlotlyJSONEncoder)
+                    if hasattr(plot, 'figure'):
+                        figure_json = json.dumps(plot.figure, cls=plotly.utils.PlotlyJSONEncoder)
+                    elif hasattr(plot, 'data'):
+                        figure_json = plot.data
+                    else:
+                        continue
                     fig_set = grp.create_dataset("figure", (1,), dtype=dt)
                     fig_set[:] = str(figure_json)
                     fig_set.attrs['identifier'] = plot.id
-
+    
+    #ToDo load Network data
     def read_report(self, directory):
         with h5.File(os.path.join(directory, "report.h5"), 'r') as f:
             for name in f:

@@ -1,6 +1,7 @@
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
+from dash_network import Network
 
 from app import app
 from apps import initialApp, projectApp, importsApp
@@ -21,7 +22,6 @@ def display_page(pathname):
         elif pathname.startswith('/apps/project'):
             projectId = pathname.split('/')[-1]
             project = projectApp.ProjectApp(projectId, projectId, "", "", layout = [], logo = None, footer = None)
-
             return project.layout
         elif pathname.startswith('/apps/imports'):
             imports = importsApp.ImportsApp("CKG imports monitoring", "Statistics", "", layout = [], logo = None, footer = None)

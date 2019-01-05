@@ -246,7 +246,7 @@ class AnalysisResult:
                     else:
                         figure_title = args["title"]
                     args["title"] = figure_title
-                    plot.append(figure.get_3d_network(data[id], identifier, args))
+                    plot.append(figure.get_network(data[id], identifier, args))
             elif name == "heatmap":
                 for id in data:
                     if not data[id].empty:

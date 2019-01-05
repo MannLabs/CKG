@@ -7,6 +7,8 @@ from scipy.spatial.distance import pdist, squareform
 from plotly.graph_objs import *
 from kmapper import plotlyviz
 import networkx as nx
+from networkx.readwrite import json_graph
+from dash_network import Network
 from report_manager.utils import hex2rgb, getNumberText
 
 
@@ -149,7 +151,6 @@ def get_scatterplot(data, identifier, args):
                                 legend={'x': 0, 'y': 1},
                                 hovermode='closest',
                                 height=900,
-                                width= 900
                                 )
     for name in data.name.unique():
         figure["data"].append(go.Scatter(x = data.loc[data["name"] == name, "x"],
@@ -246,7 +247,7 @@ def get_heatmapplot(data, identifier, args):
     figure['data'].append(go.Heatmap(z=df.values.tolist(),
                                     x = list(df.columns),
                                     y = list(df.index)))
-
+    
     return dcc.Graph(id = identifier, figure = figure)
 
 def get_complex_heatmapplot(data, identifier, args):
@@ -327,9 +328,22 @@ def get_complex_heatmapplot(data, identifier, args):
                                        'zeroline': False,
                                        'showticklabels': False,
                                        'ticks':""}}) 
-
     
-    return dcc.Graph(id = identifier, figure = figure)
+    
+    return dcc.Graph(id=identifier, figure=figure)
+
+def get_network(data, identifier, args):
+    data = data.rename(index=str, columns={args['values']: "width"})
+    edge_prop_columns = [c for c in data.columns if c not in [args['source'], args['target']]]
+    edge_properties = [str(d) for d in data.to_dict(orient='index').values()]
+
+    graph = nx.from_pandas_edgelist(data, args['source'], args['target'], edge_prop_columns)
+    jgraph = json_graph.node_link_data(graph)
+
+    print(jgraph)
+    net = Network(id=identifier, data=jgraph, width=args['width'], height=args['height'], maxLinkWidth=args['maxLinkWidth'], maxRadius=args['maxRadius'])
+
+    return net
 
 def get_3d_network(data, identifier, args):
     '''This function generates a 3D network in plotly
