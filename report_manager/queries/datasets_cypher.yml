@@ -68,3 +68,18 @@
             MATCH (protein1:Protein)-[r:CURATED_INTERACTS_WITH|:COMPILED_INTERACTS_WITH|:ACTS_ON]->(protein2:Protein) 
             WHERE ((protein1.id+"-"+protein1.name) IN [IDENTIFIERS]) AND ((protein2.id+"-"+protein2.name) IN [IDENTIFIERS]) AND (r.score>=0.4 OR toLower(toString(r.score))="curated")
             RETURN protein1.id+"-"+protein1.name AS node1,protein2.id+"-"+protein2.name AS node2,r.score AS score, r.source AS source,r.action AS action,r.interaction_type AS interaction_type
+"clinical":
+    "CLINICAL_VARIABLES":
+        'name': 'list of clinical variables'
+        'description': 'Extracts the list of clinical variables measured in a project. Requires: Project.id'
+        'involved_nodes':
+            - 'Project'
+            - 'Analytical_sample'
+            - 'Protein'
+        'involved_rels':
+            - 'HAS_QUANTIFIED_PROTEIN'
+        'query_type': 'pre'
+        'query': >
+            MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
+            WHERE project.id="PROJECTID"
+            RETURN a.id AS name, a.id AS x,COUNT(DISTINCT(protein.id)) AS y, a.group AS group ORDER BY group;

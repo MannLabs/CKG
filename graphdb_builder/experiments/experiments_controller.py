@@ -200,12 +200,13 @@ def extractBiologicalSampleClinicalVariablesRelationships(data):
     df = data.copy()
     if "biological_sample id" in df.columns:
         df = df.set_index("biological_sample id")
-        df = df.select_dtypes(include='float')
+        df = df._get_numeric_data()
         df = df.stack()
         df = df.reset_index()
         df.columns = ['START_ID', 'END_ID', "value"]
         df['TYPE'] = "HAS_QUANTIFIED_CLINICAL"
         df = df[['START_ID', 'END_ID','TYPE', 'value']]
+        df['END_ID'] = pd.to_numeric(df['END_ID'], errors='ignore')
 
     return df
 
