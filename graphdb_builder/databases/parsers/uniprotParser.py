@@ -114,7 +114,7 @@ def addUniProtTexts(textsFile, proteins):
             if protein in proteins:
                 proteins[protein].update({"description":function})
 
-def parseUniProtVariants(config, databases_directory, download = False):
+def parseUniProtVariants(config, databases_directory, download=True):
     data = defaultdict()
     url = config['uniprot_variant_file']
     aa = config['amino_acids']
@@ -141,8 +141,8 @@ def parseUniProtVariants(config, databases_directory, download = False):
                 gene = data[0]
                 protein = data[1]
                 pvariant = data[2]
-                ref = pvariant[0:3]
-                pos = pvariant[3:-3]
+                ref = pvariant[2:5]
+                pos = pvariant[5:-3]
                 alt = pvariant[-3:]
                 if ref in aa and alt in aa:
                     ident = aa[ref]+pos+aa[alt]
