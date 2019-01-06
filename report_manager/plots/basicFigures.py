@@ -334,7 +334,6 @@ def get_complex_heatmapplot(data, identifier, args):
 
 def get_network(data, identifier, args):
     data = data.rename(index=str, columns={args['values']: "width"})
-    data['width'] = data['width'] * 10
     edge_prop_columns = [c for c in data.columns if c not in [args['source'], args['target']]]
     edge_properties = [str(d) for d in data.to_dict(orient='index').values()]
     graph = nx.from_pandas_edgelist(data, args['source'], args['target'], edge_prop_columns)

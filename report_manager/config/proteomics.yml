@@ -99,9 +99,9 @@ overview: #section
             node_properties: {}
             width: 1600
             height: 1600
-            maxLinkWidth: 10
+            maxLinkWidth: 5
             maxRadius: 20
-            node_size: 'betweenness'
+            node_size: 'degree'
     interaction:
         data: regulated
         analyses: []
@@ -120,7 +120,7 @@ overview: #section
             node_properties: {}
             width: 1600
             height: 1600
-            maxLinkWidth: 10
+            maxLinkWidth: 5
             maxRadius: 20
             node_size: 'betweenness'
     enrichment:
