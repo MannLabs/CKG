@@ -5,7 +5,7 @@ import json
 import plotly.utils
 
 class Report:
-    def __init__(self,identifier, plots = {}):
+    def __init__(self, identifier, plots = {}):
         self._identifier = identifier
         self._plots = plots
 

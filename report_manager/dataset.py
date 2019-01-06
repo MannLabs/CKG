@@ -79,7 +79,7 @@ class Dataset:
         self._report = report
 
     def update_report(self, report):
-        self.report.update(report)
+        self._report.update(report)
 
     def update_analysis_queries(self, query):
         self.analysis_queries.update(query)
@@ -166,7 +166,8 @@ class Dataset:
         return data_name, analysis_types, plot_types, args
             
     def generate_report(self):
-        report = rp.Report(self.dataset_type.capitalize())
+        report = rp.Report(identifier=self.dataset_type.capitalize())
+        print("dataset report", report.identifier, report.plots)
         for section in self.configuration:
             for subsection in self.configuration[section]:
                 data_name, analysis_types, plot_types, args = self.extract_configuration(self.configuration[section][subsection])

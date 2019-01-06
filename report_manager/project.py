@@ -204,19 +204,19 @@ class Project:
                 self.update_dataset({data_type:proteomics_dataset})
            
     def generate_project_info_report(self):
-        report = rp.Report("project_info")
+        report = rp.Report(identifier="project_info")
         project_df = self.to_dataframe()
         identifier = "project_info"
         title = "Project: {} information".format(self.name)
         plot = [figure.getBasicTable(project_df, identifier, title)]
-        report.update_plots({("project_info","Project Information"): plot})
-        
+        report.plots = {("project_info","Project Information"): plot}
+
         return report
     
     def generate_report(self):
         if len(self.report) == 0:
             project_report = self.generate_project_info_report()
-            self.update_report({"project_info":project_report})
+            self.update_report({"Project information":project_report})
             for dataset_type in self.data_types:
                 dataset = self.get_dataset(dataset_type)
                 if dataset is not None:
@@ -235,12 +235,14 @@ class Project:
     def show_report(self, environment):
         app_plots = defaultdict(list)
         for data_type in self.report:
-            plots = self.report[data_type].plots
+            r = self.report[data_type]
+            plots = r.plots
+            identifier = r.identifier
             for plot_type in plots:
                 for plot in plots[plot_type]:
                     if environment == "notebook":
                         iplot(plot.figure)
                     else:
-                        app_plots[data_type].append(plot)
+                        app_plots[identifier].append(plot)
         
         return app_plots        
