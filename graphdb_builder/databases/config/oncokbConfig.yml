@@ -52,7 +52,8 @@ relationships_headers:
         - 'END_ID'
         - 'TYPE'
         - 'evidence'
-        - 'tumor'
+        - 'response'
+        - 'disease'
         - 'type'
         - 'source'
     'associated_with':
