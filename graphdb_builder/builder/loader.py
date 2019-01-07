@@ -285,6 +285,6 @@ def archiveImportDirectory(archive_type="full"):
     logger.info("New backup created: {}".format(file_name))
 
 if __name__ == "__main__":
-    #fullUpdate()
-    partialUpdate(imports=["mentions"])
+    fullUpdate()
+    #partialUpdate(imports=["mentions"])
 

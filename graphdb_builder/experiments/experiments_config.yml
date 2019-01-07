@@ -146,6 +146,7 @@ dataTypes :
                 - 'Reverse'
                 - 'Potential contaminant'
                 - 'Only identified by site'
+                - 'is_razor'
             'filters': 
                 - 'Reverse'
                 - 'Potential contaminant'

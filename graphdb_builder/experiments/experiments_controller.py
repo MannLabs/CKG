@@ -191,8 +191,8 @@ def extractSubjectClinicalVariablesRelationships(data):
         df = df.append(intervention, sort=True)
     df['TYPE'] = "HAS_CLINICAL_STATE"
     df = df[['START_ID', 'END_ID','TYPE', 'value']]
-    df['END_ID'] = pd.to_numeric(df['END_ID'], errors='ignore')
-    df = df[df['value'].apply(lambda x: isinstance(s, str))]
+    df['END_ID'] = df['END_ID'].apply(lambda x: int(x) if isinstance(x,float) else x)
+    df = df[df['value'].apply(lambda x: isinstance(x, str))]
     df = df.dropna()
 
     return df
@@ -207,7 +207,8 @@ def extractBiologicalSampleClinicalVariablesRelationships(data):
         df.columns = ['START_ID', 'END_ID', "value"]
         df['TYPE'] = "HAS_QUANTIFIED_CLINICAL"
         df = df[['START_ID', 'END_ID','TYPE', 'value']]
-        df['END_ID'] = pd.to_numeric(df['END_ID'], errors='ignore')
+        df['END_ID'] = df['END_ID'].apply(lambda x: int(x) if isinstance(x,float) else x)
+        df = df.dropna()
 
     return df
 
@@ -342,7 +343,7 @@ def extractPeptideProteinModificationRelationships(data, configuration):
     aux = data.copy().reset_index()
     aux = aux[cols]
     aux["END_ID"] =  aux[proteinCol].map(str) + "_" + aux[positionCols[1]].map(str) + aux[positionCols[0]].map(str)+'-'+configuration["mod_acronym"]
-    aux = aux.drop([proteinCol, positionCols], axis=1)
+    aux = aux.drop([proteinCol] + positionCols, axis=1)
     aux = aux.set_index("END_ID")
     aux = aux.reset_index()
     aux.columns = ["END_ID", "START_ID"]
@@ -433,8 +434,8 @@ def extractPeptideProteinRelationships(data, configuration):
     aux.columns = ["Sequence", "Protein", "Start", "End"]
     aux['TYPE'] = "BELONGS_TO_PROTEIN"
     aux['source'] = 'experimentally_identified'
-    aux.columns = ['START_ID', 'END_ID', "start", "end", 'TYPE']
-    aux = aux[['START_ID', 'END_ID', 'TYPE']]
+    aux.columns = ['START_ID', 'END_ID', "start", "end", 'TYPE', 'source']
+    aux = aux[['START_ID', 'END_ID', 'TYPE', 'source']]
     return aux
 
 ################# Protein entity #########################

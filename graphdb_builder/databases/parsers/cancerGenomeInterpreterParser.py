@@ -57,6 +57,7 @@ def parser(databases_directory, download = True):
                         chromosome, position, reference, alternative = cpra
 
                     if variant != "":
+                        variant = variant.split(':')[1]
                         entities.add((variant, "Clinically_relevant_variant", identifier, chromosome, position, reference, alternative, "", ""))
                         relationships["known_variant_is_clinically_relevant"].add((variant, variant, "KNOWN_VARIANT_IS_CLINICALLY_RELEVANT", "CGI"))
 

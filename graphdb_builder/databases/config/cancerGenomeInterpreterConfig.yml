@@ -22,7 +22,7 @@ relationships_headers:
         - 'TYPE'
         - 'evidence'
         - 'response'
-        - 'tumor'
+        - 'disease'
         - 'type'
         - 'source'
     'targets':

@@ -38,6 +38,19 @@ def getPlotTraces(data, type = 'lines', div_factor=float(10^10000), horizontal=F
     return traces
 
 
+def get_distplot(data, identifier, args):
+    
+    df = data.copy()
+    for c in df.columns:
+        df_var = df[c]
+        
+    # Group data together
+    hist_data = [x1, x2, x3, x4]
+    group_labels = ['Group 1', 'Group 2', 'Group 3', 'Group 4']
+    # Create distplot with custom bin_size
+    fig = ff.create_distplot(hist_data, group_labels, bin_size=.2)
+
+
 
 def get_barplot(data, identifier, args):
     '''This function plots a simple barplot

@@ -342,7 +342,7 @@ IMPORT_COMPILED_DRUG_DATA:
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_associated_with.csv" AS line
         MATCH (d:Drug {id:line.START_ID})
         MATCH (g:Gene {id:line.END_ID})
-        MERGE (d)-[r:COMPILED_TARGETS{score:toFloat(line.score), source:line.source,interaction_type:line.interaction_type,scores:SPLIT(line.evidences,','),evidences:SPLIT(line.evidences,',')}]->(g)
+        MERGE (d)-[r:COMPILED_TARGETS{score:toFloat(line.score), source:line.source,interaction_type:line.interaction_type,scores:SPLIT(line.scores,','),evidences:SPLIT(line.evidence,',')}]->(g)
         RETURN COUNT(r) AS drug_compiled_targets_gene;
 
 IMPORT_PPI_ACTION:
@@ -508,7 +508,7 @@ IMPORT_CLINICALLY_RELEVANT_VARIANT_DATA:
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_targets_clinically_relevant_variant.csv" AS line
         MATCH (d:Drug {id:line.START_ID})
         MATCH (k:Clinically_relevant_variant {id:line.END_ID})
-        MERGE (d)-[r:TARGETS_CLINICALLY_RELEVANT_VARIANT{association:line.association, evidence:line.evidence, tumor:line.tumor, type:line.type, source:line.source}]->(k)
+        MERGE (d)-[r:TARGETS_CLINICALLY_RELEVANT_VARIANT{evidence:line.evidence, disease:line.disease, type:line.type, source:line.source}]->(k)
         RETURN COUNT(r) AS drug_targets_clinically_relevant_variant;
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_associated_with.csv" AS line
