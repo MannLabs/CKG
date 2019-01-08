@@ -286,5 +286,5 @@ def archiveImportDirectory(archive_type="full"):
 
 if __name__ == "__main__":
     fullUpdate()
-    #partialUpdate(imports=["mentions"])
+    #partialUpdate(imports=["clinical variants"])
 
