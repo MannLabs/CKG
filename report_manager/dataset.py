@@ -283,6 +283,14 @@ class ProteomicsDataset(Dataset):
             processed_data = basicAnalysis.get_measurements_ready(data, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max)
         return processed_data
 
+class Clinical(Dataset):
+    def __init__(self, identifier, data={}, analyses={}):
+        config_file = "clinical.yml"
+        Dataset.__init__(self, identifier, "clinical", data=data, analyses=analyses)
+        self.set_configuration_from_file(config_file)
+        if len(data) == 0:
+            self._data = self.query_data()
+        
 class WESDataset(Dataset):
     def __init__(self, identifier, configuration, data={}):
         Dataset.__init__(identifier, "wes", configuration, data)

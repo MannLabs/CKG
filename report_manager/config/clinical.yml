@@ -1,0 +1,16 @@
+overview: #section
+    clinical variables:
+        data: clinical variables 
+        analyses: []
+        plots:
+            - basicTable
+        args: [] 
+    measurement matrix:
+        data: dataset
+        analyses: []
+        plots: 
+            - scatterplot_matrix
+            - basicTable
+        args:
+            group: group
+            title: 'Clinical variables measurements per group'

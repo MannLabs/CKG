@@ -266,5 +266,14 @@ class AnalysisResult:
                     else:
                         figure_title = title
                     plot.append(figure.getMapperFigure(data[id], identifier, title=figure_title, labels=args["labels"]))
+            elif name == "scatterplot_matrix":
+                for id in data:     
+                    if isinstance(id, tuple):
+                        identifier = identifier+"_"+id[0]+"_vs_"+id[1]
+                        figure_title = args['title'] + id[0]+" vs "+id[1]
+                    else:
+                        figure_title = args['title']
+                    args["title"] = figure_title
+                    plot.append(figure.get_scatterplot_matrix(data[id], identifier, args))
 
         return plot

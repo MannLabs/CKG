@@ -107,7 +107,7 @@ def get_facet_grid_plot(data, identifier, args):
     return dcc.Graph(id= identifier, figure = figure)
 
 ##ToDo
-def scatterplot_matrix(data, identifier, args):
+def get_scatterplot_matrix(data, identifier, args):
     classes=np.unique(data[args["group"]].values).tolist()
     class_code={classes[k]: k for k in range(len(classes))}
     color_vals=[class_code[cl] for cl in data[grouping_var]]
