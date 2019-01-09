@@ -191,9 +191,9 @@ def get_imports_per_database_date(stats_file):
     return df
 
 
-def plot_total_number_imported(data, plot_title):
-    df_full = get_totals_per_date(stats, key='full', import_types=False)
-    df_partial = get_totals_per_date(stats, key='partial', import_types=False)
+def plot_total_number_imported(stats_file, plot_title):
+    df_full = get_totals_per_date(stats_file, key='full', import_types=False)
+    df_partial = get_totals_per_date(stats_file, key='partial', import_types=False)
 
     traces_f = figure.getPlotTraces(df_full, key='full', type='lines')
     traces_p = figure.getPlotTraces(df_partial, key='partial', type='lines')
@@ -203,19 +203,19 @@ def plot_total_number_imported(data, plot_title):
         traces = list(chain.from_iterable(traces))
     else: pass
 
-    layout = go.Layout(title=plot_title,
-                       xaxis=dict(title=''),
-                       yaxis={'title':'Number of imports'},
-                       legend={'font':{'size':10}})
+    layout = go.Layout(title='', xaxis=dict(title=''), yaxis={'title':'Number of imports'},
+                       legend={'font':{'size':11}}, margin=go.layout.Margin(l=80,r=40,t=100,b=50),
+                       annotations=[dict(text='<b>{}<b>'.format(plot_title), font=dict(family='Arial', size = 18),
+                       showarrow=False, xref='paper', x=-0.06, xanchor='left', yref='paper', y=1.15, yanchor='top')])
 
     fig = go.Figure(data=traces, layout=layout)
 
     return dcc.Graph(id = 'total imports', figure = fig)
 
 
-def plot_total_numbers_per_date(data, plot_title):
-    df_full = get_totals_per_date(data, key='full', import_types=True)
-    df_partial = get_totals_per_date(data, key='partial', import_types=True)
+def plot_total_numbers_per_date(stats_file, plot_title):
+    df_full = get_totals_per_date(stats_file, key='full', import_types=True)
+    df_partial = get_totals_per_date(stats_file, key='partial', import_types=True)
 
     traces_f = figure.getPlotTraces(df_full, key='full', type='scaled markers', div_factor=float(10^40000))
     traces_p = figure.getPlotTraces(df_partial, key='partial', type='scaled markers', div_factor=float(10^40000))
@@ -226,9 +226,9 @@ def plot_total_numbers_per_date(data, plot_title):
     else: pass
 
     layout = go.Layout(title='', xaxis={'showgrid':True}, yaxis={'title':'Imported entities/relationships'},
-    legend={'font':{'size':10}}, height=500, margin=go.layout.Margin(l=80,r=40,t=80,b=100),
-    annotations=[dict(text='<b>{}<b>'.format(plot_title), font=dict(family='Arial', size = 18),
-    showarrow=False, xref='paper', x=-0.06, xanchor='left', yref='paper', y=1.15, yanchor='top')])
+                        legend={'font':{'size':11}}, height=550, margin=go.layout.Margin(l=80,r=40,t=100,b=100),
+                        annotations=[dict(text='<b>{}<b>'.format(plot_title), font=dict(family='Arial', size = 18),
+                        showarrow=False, xref='paper', x=-0.06, xanchor='left', yref='paper', y=1.15, yanchor='top')])
 
     fig = go.Figure(data=traces, layout=layout)
 
@@ -250,16 +250,16 @@ def plot_databases_numbers_per_date(stats_file, plot_title, key='full', dropdown
     traces = []
     for i in dropdown_options.keys():
         df = data.xs(i, level='date')
-        traces.append(getPlotTraces(df, key='', type = 'bars', horizontal=True))
+        traces.append(figure.getPlotTraces(df, key='', type = 'bars', horizontal=True))
 
     if type(traces[0]) == list:
         traces = list(chain.from_iterable(traces))
     else: pass
 
-    layout = go.Layout(title = '', xaxis = {'type':'log','title':'Imported entities/relationships'},
-    legend={'font':{'size':10}}, height=600, margin=go.layout.Margin(l=170,r=40,t=80,b=100),
-    annotations=[dict(text='<b>{}<b>'.format(plot_title), font = dict(family='Arial', size = 18),
-    showarrow=False, xref = 'paper', x=-0.17, xanchor='left', yref = 'paper', y=1.2, yanchor='top')])
+    layout = go.Layout(title = '', xaxis = {'showgrid':True, 'type':'log','title':'Imported entities/relationships'},
+                        legend={'font':{'size':11}}, height=600, margin=go.layout.Margin(l=40,r=40,t=80,b=100),
+                        annotations=[dict(text='<b>{}<b>'.format(plot_title), font = dict(family='Arial', size = 18),
+                        showarrow=False, xref = 'paper', x=-0.17, xanchor='left', yref = 'paper', y=1.2, yanchor='top')])
 
     fig = go.Figure(data=traces, layout=layout)
 
@@ -267,7 +267,7 @@ def plot_databases_numbers_per_date(stats_file, plot_title, key='full', dropdown
         updatemenus = get_dropdown_menu(fig, dropdown_options, entities_dict=None, number_traces=2)
         fig.layout.update(go.Layout(updatemenus = updatemenus))
 
-    return dcc.Graph(id = 'databases total imports', figure = fig)
+    return dcc.Graph(id = 'databases total imports {}'.format(key), figure = fig)
 
 
 def plot_import_numbers_per_database(stats_file, plot_title, key='full', subplot_titles = ('',''), colors=True, color1='entities', color2='relationships', dropdown=True, dropdown_options='databases'):
@@ -325,12 +325,12 @@ def plot_import_numbers_per_database(stats_file, plot_title, key='full', subplot
                                         name=relationship.split('.')[0],
                                         showlegend=False),2,2)
 
-    fig.layout.update(go.Layout(legend={'orientation':'v', 'font':{'size':10}},
-                                height=700, width=1000, margin=go.layout.Margin(l=20,r=20,t=150,b=60)))
+    fig.layout.update(go.Layout(legend={'orientation':'v', 'font':{'size':11}},
+                                height=700, margin=go.layout.Margin(l=20,r=20,t=150,b=60)))
 
     annotations = []
     annotations.append(dict(text='<b>{}<b>'.format(plot_title), font = dict(family='Arial', size = 18),
-    showarrow=False, xref = 'paper', x=-0.07, xanchor='left', yref = 'paper', y=1.3, yanchor='top'))
+                            showarrow=False, xref = 'paper', x=-0.07, xanchor='left', yref = 'paper', y=1.3, yanchor='top'))
     annotations.append({'font':{'size': 14},'showarrow':False,'text':subplot_titles[0],'x':0.23,'xanchor':'center','xref':'paper','y':1.0,'yanchor':'bottom','yref':'paper'})
     annotations.append({'font':{'size': 14},'showarrow':False,'text':subplot_titles[1],'x':0.78,'xanchor':'center','xref':'paper','y':1.0,'yanchor':'bottom','yref':'paper'})
     annotations.append({'font':{'size': 14},'showarrow':False,'text':subplot_titles[2],'x':0.23,'xanchor':'center','xref':'paper','y':0.44,'yanchor':'bottom','yref':'paper'})
@@ -342,4 +342,4 @@ def plot_import_numbers_per_database(stats_file, plot_title, key='full', subplot
         updatemenus = get_dropdown_menu(fig, dropdown_options, entities_dict=ent)
         fig.layout.update(go.Layout(updatemenus = updatemenus))
 
-    return dcc.Graph(id = 'imports-breakdown per database', figure = fig)
+    return dcc.Graph(id = 'imports-breakdown per database {}'.format(key), figure = fig)
