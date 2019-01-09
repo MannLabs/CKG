@@ -89,8 +89,11 @@ if __name__ == '__main__':
                 print("These entities will be loaded into the database: {}".format(", ".join(valid_entities)))
                 loader.partialUpdate(imports=valid_entities)
             else:
-                logger.error("The indicated entities (--load_entities) cannot be loaded into the database: {}".format(args.load_entities))
+                logger.error("The indicated entities (--load_entities) cannot be loaded: {}".format(args.load_entities))
                 print("The indicated entities (--load_entities) cannot be loaded into the database: {}".format(args.load_entities))
+        else:
+            logger.error("The indicated entities (--load_entities) cannot be loaded into the database: {}".format(args.load_entities))
+            print("The indicated entities (--load_entities) cannot be loaded into the database: {}".format(args.load_entities))
     else:
         print("Indicate the type of build you want to perform, either import (generate csv files to be loaded into the database), \
                                     load (load csv files into the database) or full (import and then load all the data into the database) \
