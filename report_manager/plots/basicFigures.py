@@ -12,7 +12,7 @@ from dash_network import Network
 from report_manager.utils import hex2rgb, getNumberText
 
 
-def getPlotTraces(data, type = 'lines', div_factor=float(10^10000), horizontal=False):
+def getPlotTraces(data, key='full', type = 'lines', div_factor=float(10^10000), horizontal=False):
     '''This function returns traces for different kinds of plots
     --> input:
         - data: is a Pandas DataFrame with one variable as data.index (i.e. 'x') and all others as columns (i.e. 'y')
@@ -23,15 +23,15 @@ def getPlotTraces(data, type = 'lines', div_factor=float(10^10000), horizontal=F
         List of traces
     '''
     if type == 'lines':
-        traces = [go.Scatter(x=data.index, y=data[col], name = col, mode='markers+lines') for col in data.columns]
+        traces = [go.Scatter(x=data.index, y=data[col], name = col+' '+key, mode='markers+lines') for col in data.columns]
 
     elif type == 'scaled markers':
-        traces = [go.Scatter(x = data.index, y = data[col], name = col, mode = 'markers', marker = dict(size = data[col].values/div_factor, sizemode = 'area')) for col in data.columns]
+        traces = [go.Scatter(x = data.index, y = data[col], name = col+' '+key, mode = 'markers', marker = dict(size = data[col].values/div_factor, sizemode = 'area')) for col in data.columns]
 
     elif type == 'bars':
-        traces = [go.Bar(x = data.index, y = data[col], orientation = 'v', name = col) for col in data.columns]
+        traces = [go.Bar(x = data.index, y = data[col], orientation = 'v', name = col+' '+key) for col in data.columns]
         if horizontal == True:
-            traces = [go.Bar(x = data[col], y = data.index, orientation = 'h', name = col) for col in data.columns]
+            traces = [go.Bar(x = data[col], y = data.index, orientation = 'h', name = col+' '+key) for col in data.columns]
 
     else: return 'Option not found'
 
@@ -39,11 +39,11 @@ def getPlotTraces(data, type = 'lines', div_factor=float(10^10000), horizontal=F
 
 
 def get_distplot(data, identifier, args):
-    
+
     df = data.copy()
     for c in df.columns:
         df_var = df[c]
-        
+
     # Group data together
     hist_data = [x1, x2, x3, x4]
     group_labels = ['Group 1', 'Group 2', 'Group 3', 'Group 4']
@@ -103,7 +103,7 @@ def get_facet_grid_plot(data, identifier, args):
     figure['layout']['title'] = args['title'].title()
     figure['layout']['paper_bgcolor'] = None
     figure['layout']['legend'] = None
-    
+
     return dcc.Graph(id= identifier, figure = figure)
 
 ##ToDo
@@ -118,7 +118,7 @@ def scatterplot_matrix(data, identifier, args):
     dimensions = []
     for col in data.columns:
         dimensions.append(dict(label=col, values=data[col]))
-    
+
     figure["data"].append(go.Splom(dimensions=dimensions,
                     text=text,
                     marker=dict(color=color_vals,
@@ -132,7 +132,7 @@ def scatterplot_matrix(data, identifier, args):
                 zeroline=False,
                 gridcolor='#fff',
                 ticklen=len(data.columns))
-    
+
     figure["layout"] = go.Layout(title = title,
                             xaxis = dict(axis),
                             yaxis = dict(axis),
@@ -176,9 +176,9 @@ def get_scatterplot(data, identifier, args):
                                             'line': {'width': 0.5, 'color': 'white'}
                                             },
                                         name=name))
-    
+
     return dcc.Graph(id= identifier, figure = figure)
-    
+
 def get_volcanoplot(results, args):
     figure = {"data":[],"layout":None}
     if "range_x" not in args:
@@ -189,12 +189,12 @@ def get_volcanoplot(results, args):
         range_y = [0,max(abs(results['y']))+2.5]
     else:
         range_y = args["range_y"]
-    
-    trace = Scattergl(x=results['x'], 
-                    y=results['y'], 
-                    mode='markers', 
-                    text=results['text'], 
-                    hoverinfo='text', 
+
+    trace = Scattergl(x=results['x'],
+                    y=results['y'],
+                    mode='markers',
+                    text=results['text'],
+                    hoverinfo='text',
                     marker={'color': results['color'], 'colorscale': args["colorscale"], 'showscale': args['showscale'], 'size': args['marker_size']}
                     )
 
@@ -260,7 +260,7 @@ def get_heatmapplot(data, identifier, args):
     figure['data'].append(go.Heatmap(z=df.values.tolist(),
                                     x = list(df.columns),
                                     y = list(df.index)))
-    
+
     return dcc.Graph(id = identifier, figure = figure)
 
 def get_complex_heatmapplot(data, identifier, args):
@@ -271,7 +271,7 @@ def get_complex_heatmapplot(data, identifier, args):
         df = df.set_index(args['source'])
         df = df.pivot_table(values=args['values'], index=df.index, columns=args['target'], aggfunc='first')
         df = df.fillna(0)
-    
+
     dendro_up = FF.create_dendrogram(df.values, orientation='bottom', labels=df.columns)
     for i in range(len(dendro_up['data'])):
         dendro_up['data'][i]['yaxis'] = 'y2'
@@ -288,12 +288,12 @@ def get_complex_heatmapplot(data, identifier, args):
         heat_data = squareform(data_dist)
     else:
         heat_data = df.values
-    
+
     dendro_leaves = dendro_side['layout']['yaxis']['ticktext']
     dendro_leaves = list(map(int, dendro_leaves))
     heat_data = heat_data[dendro_leaves,:]
     heat_data = heat_data[:,dendro_leaves]
-    
+
     heatmap = [
         go.Heatmap(
             x = dendro_leaves,
@@ -309,7 +309,7 @@ def get_complex_heatmapplot(data, identifier, args):
     figure['data'].extend(heatmap)
 
     figure['layout'] = dendro_up['layout']
-    
+
     figure['layout'].update({'width':800, 'height':800,
                              'showlegend':False, 'hovermode': 'closest',
                              })
@@ -340,9 +340,9 @@ def get_complex_heatmapplot(data, identifier, args):
                                        'showline': False,
                                        'zeroline': False,
                                        'showticklabels': False,
-                                       'ticks':""}}) 
-    
-    
+                                       'ticks':""}})
+
+
     return dcc.Graph(id=identifier, figure=figure)
 
 def get_network(data, identifier, args):
@@ -404,14 +404,14 @@ def get_3d_network(data, identifier, args):
         if node in args["node_properties"]:
             if "size" in args["node_properties"][node]:
                 size= args["node_properties"][node]["size"]
-        
+
         label = "{} (degree:{})".format(node, size)
-        labels.append(label) 
-        annotations.append(dict(text=node, 
-                                x=pos[node][0], 
+        labels.append(label)
+        annotations.append(dict(text=node,
+                                x=pos[node][0],
                                 y=pos[node][1],
                                 z=pos[node][2],
-                                ax=0, ay=-0., 
+                                ax=0, ay=-0.,
                                 font=dict(color= 'black', size=10),
                                 showarrow=False))
 
@@ -420,8 +420,8 @@ def get_3d_network(data, identifier, args):
         if size < 3:
             size = 5
         sizes.append(size)
-        
-        
+
+
     trace1=Scatter3d(x=Xed,
                y=Yed,
                z=Zed,
@@ -668,4 +668,3 @@ def getDashboardPlots(figures, cols, distribution):
         divs.append(html.Div(row, className = 'row'))
 
     return html.Div(divs, className = className)
-
