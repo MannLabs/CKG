@@ -110,8 +110,8 @@ def get_facet_grid_plot(data, identifier, args):
 def get_scatterplot_matrix(data, identifier, args):
     classes=np.unique(data[args["group"]].values).tolist()
     class_code={classes[k]: k for k in range(len(classes))}
-    color_vals=[class_code[cl] for cl in data[grouping_var]]
-    text=[data.loc[ k, grouping_var] for k in range(len(data))]
+    color_vals=[class_code[cl] for cl in data[args["group"]]]
+    text=[data.loc[ k, args["group"]] for k in range(len(data))]
 
     figure = {}
     figure["data"] = []
@@ -133,7 +133,7 @@ def get_scatterplot_matrix(data, identifier, args):
                 gridcolor='#fff',
                 ticklen=len(data.columns))
 
-    figure["layout"] = go.Layout(title = title,
+    figure["layout"] = go.Layout(title = args["title"],
                             xaxis = dict(axis),
                             yaxis = dict(axis),
                             dragmode='select',

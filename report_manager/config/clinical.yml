@@ -4,7 +4,8 @@ overview: #section
         analyses: []
         plots:
             - basicTable
-        args: [] 
+        args: 
+            title: 'List of clinical variables'
     measurement matrix:
         data: dataset
         analyses: []

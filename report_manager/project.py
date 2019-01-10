@@ -6,7 +6,7 @@ from json import dumps
 import pandas as pd
 import ckg_utils
 import config.ckg_config as ckg_config
-from report_manager.dataset import ProteomicsDataset
+from report_manager.dataset import ProteomicsDataset, ClinicalDataset
 from report_manager.plots import basicFigures as figure
 from report_manager import report as rp
 from graphdb_connector import connector
@@ -141,9 +141,9 @@ class Project:
             if "description" in attributes:
                 self.description = attributes["description"]
             if "data_types" in attributes:
-                self.data_types = ["proteomics"]#attributes["data_types"]
+                self.data_types = attributes["data_types"].split(',')
             if "responsible" in attributes:
-                self.responsible = attributes["responsible"]
+                self.responsible = attributes["responsible"].split(',')
             if "status" in attributes:
                 self.status = attributes["status"]
             if "number_subjects" in attributes:
@@ -164,7 +164,8 @@ class Project:
     
     def to_dataframe(self):
         d = self.to_dict() 
-        df = pd.DataFrame.from_dict(d, orient='columns')
+        df = pd.DataFrame.from_dict(d, orient='index')
+        df = df.transpose()
         
         return df
 
@@ -202,6 +203,9 @@ class Project:
             if data_type == "proteomics":
                 proteomics_dataset = ProteomicsDataset(self.identifier)
                 self.update_dataset({data_type:proteomics_dataset})
+            elif data_type == "clinical":
+                clinical_dataset = ClinicalDataset(self.identifier)
+                self.update_dataset({data_type:clinical_dataset})
            
     def generate_project_info_report(self):
         report = rp.Report(identifier="project_info")

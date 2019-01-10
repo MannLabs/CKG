@@ -210,6 +210,7 @@ class Dataset:
                                 result = ar.AnalysisResult(self.identifier,"_".join(subsection.split(' ')), args, data, result = dictresult)
                                 self.update_analyses(result.result)
                             for plot_type in plot_types:
+                                print(self.dataset_type)
                                 plots = result.get_plot(plot_type, "_".join(subsection.split(' '))+"_"+plot_type)
                                 report.update_plots({("_".join(subsection.split(' ')), plot_type): plots})
         
@@ -283,7 +284,7 @@ class ProteomicsDataset(Dataset):
             processed_data = basicAnalysis.get_measurements_ready(data, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max)
         return processed_data
 
-class Clinical(Dataset):
+class ClinicalDataset(Dataset):
     def __init__(self, identifier, data={}, analyses={}):
         config_file = "clinical.yml"
         Dataset.__init__(self, identifier, "clinical", data=data, analyses=analyses)

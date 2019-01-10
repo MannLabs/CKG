@@ -11,7 +11,7 @@ proteomics:
         query_type: pre
         query: >
             MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
-            WHERE project.id="PROJECTID"  AND r.is_razor
+            WHERE project.id="PROJECTID"  AND toBoolean(r.is_razor)
             RETURN a.id AS name, a.id AS x,COUNT(DISTINCT(protein.id)) AS y, a.group AS group ORDER BY group;
     NUMBER_OF_PEPTIDES:
         name: 'number of peptides'
@@ -22,7 +22,7 @@ proteomics:
             - Peptide
         involved_rels:
             - HAS_QUANTIFIED_PEPTIDE
-        query_type': pre
+        query_type: pre
         query: >
             MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PEPTIDE]->(peptide:Peptide) 
             WHERE project.id="PROJECTID" 
@@ -53,7 +53,7 @@ proteomics:
         query_type: pre
         query: >
             MATCH (project:Project)-[*3]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
-            WHERE project.id="PROJECTID" AND r.is_razor
+            WHERE project.id="PROJECTID" AND toBoolean(r.is_razor)
             RETURN a.id AS sample, protein.id AS identifier, a.group AS group, toFloat(r.value) as LFQ_intensity, protein.name AS name ORDER BY group;
     INTERACTION:
         name: 'get PPI network'

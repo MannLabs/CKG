@@ -154,6 +154,7 @@ class AnalysisResult:
         plot = []
         if len(data) >=1:
             if name == "basicTable":
+                print(args)
                 colors = ('#C2D4FF','#F5F8FF')
                 attr =  {'width':800, 'height':300, 'font':12}
                 subset = None
