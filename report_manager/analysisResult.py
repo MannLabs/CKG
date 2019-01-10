@@ -289,5 +289,14 @@ class AnalysisResult:
                         figure_title = args['title']
                     args["title"] = figure_title
                     plot.extend(figure.get_distplot(data[id], identifier, args))
+            elif name == "violinplot":
+                for id in data:
+                    if isinstance(id, tuple):
+                        identifier = identifier+"_"+id[0]+"_vs_"+id[1]
+                        figure_title = args['title'] + id[0]+" vs "+id[1]
+                    else:
+                        figure_title = args['title']
+                    args["title"] = figure_title
+                    plot.extend(figure.get_violinplot(data[id], identifier, args))
     
         return plot

@@ -596,21 +596,42 @@ def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subse
 
     return dcc.Graph(id = identifier, figure = figure)
 
-def getViolinPlot(data, variableCol, groupCol, colors, identifier, title, plot_attr={'width':600, 'height':600, 'colorScale': False}, subplot = False):
+def get_violinplot(data, identifier, args):
+    df = data.copy()
+    graphs = []
 
-    
-    figure = FF.create_violin(data,
-                    data_header=variableCol,
-                    group_header= groupCol,
-                    colors= colors,
-                    title = title,
-                    height=500 if 'height' not in plot_attr else plot_attr['height'],
-                    width=500 if 'width' not in plot_attr else plot_attr['width'],
-                    use_colorscale= False if 'colorScale' not in plot_attr else plot_attr['colorScale'])
-    if subplot:
-        return (identifier, figure)
+    for c in df.columns.unique():
+        if c != args['group']:
+            traces = create_violinplot(df, c, args['group'])
+            figure = {"data": traces,
+                    "layout":{
+                            "title": "Violinplot per group for variable: "+c,
+                            "yaxis": {
+                                "zeroline":False,
+                                }
+                        }
+                    }
+            graphs.append(dcc.Graph(id=identifier+"_"+c, figure=figure))
 
-    return dcc.Graph(id = identifier, figure = figure)
+    return graphs
+
+def create_violinplot(df, variable, group_col='group'):
+    traces = []
+    for group in np.unique(df[group_col].values):
+        violin = {"type": 'violin',
+                    "x": df[group_col][df[group_col] == group],
+                    "y": df[variable][df[group_col] == group],
+                    "name": group,
+                    "box": {
+                        "visible": True
+                    },
+                    "meanline": {
+                        "visible": True
+                    }
+                }
+        traces.append(violin)
+
+    return traces
 
 def getMapperFigure(data, identifier, title, labels):
     pl_brewer = [[0.0, '#67001f'],

@@ -11,6 +11,7 @@ overview: #section
         analyses: 
             - long_format
         plots: 
+            - violinplot
             - distplot
             - basicTable
         args:
