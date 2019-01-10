@@ -14,6 +14,21 @@ from random import shuffle
 from fancyimpute import KNN
 import kmapper as km
 
+def transform_into_long_format(data, index, columns, values, extra=[], use_index=False):
+    df = data.copy()
+    cols = [index,columns, values]
+    df = df.drop_duplicates()
+    if len(extra) > 0:
+        extra.append(index)
+        extra_cols = df[extra].set_index(index)
+    df = df[cols]
+    df = df.pivot(index=index, columns=columns, values=values)
+    df = df.join(extra_cols)
+    if not use_index:
+        df = df.reset_index(drop=True)
+
+    return df
+
 def extract_number_missing(df, conditions, missing_max):
     if conditions is None:
         groups = data.loc[:, data.notnull().sum(axis = 1) >= missing_max]

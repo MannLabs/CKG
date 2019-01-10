@@ -62,6 +62,10 @@ class AnalysisResult:
     def get_analysis_result(self):
         result = {}
         args = self.args
+        if self.analysis_type == "long_format":
+            r = analyses.transform_into_long_format(self.data, args['index'], args['x'], 
+                                                                args['y'], extra=[args['group']], use_index=args['use_index'])
+            result[self.analysis_type] = r
         if self.analysis_type == "pca":
             components = 2
             if "components" in args:

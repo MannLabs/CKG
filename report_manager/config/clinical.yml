@@ -8,7 +8,8 @@ overview: #section
             title: 'List of clinical variables'
     measurement matrix:
         data: dataset
-        analyses: []
+        analyses: 
+            - long_format
         plots: 
             - distplot
             - basicTable
@@ -17,6 +18,7 @@ overview: #section
             group: group
             x: clinical_variable
             y: value
+            use_index: False
             format: long
             x_title: clinical variables
             y_title: value

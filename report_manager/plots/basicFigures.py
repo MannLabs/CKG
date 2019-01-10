@@ -42,26 +42,18 @@ def getPlotTraces(data, key='full', type = 'lines', div_factor=float(10^10000), 
 def get_distplot(data, identifier, args):
     df = data.copy()
     graphs = []
-    if "format" in args:
-        if args["format"] == "long":
-            columns = [args['index'],args["x"], args["y"]]
-            df = df.drop_duplicates()
-            groups = df[[args['index'],args['group']]].set_index(args["index"])
-            df = df[columns]
-            df = df.pivot(index=args['index'], columns=args["x"], values=args["y"])
-            df = df.join(groups)
-            df = df.reset_index(drop=True)
-            df = df.set_index(args['group'])
-            df = df.transpose()
-            df = df.fillna(0.0)
-    row = 1
+
+    df = df.set_index(args['group'])
+    df = df.transpose()
+    df = df.dropna()
+    
     for i in df.index.unique():
         hist_data = []
         for c in df.columns.unique():
             hist_data.append(df.loc[i,c].values.tolist())
         group_labels = df.columns.unique().tolist()
         # Create distplot with custom bin_size
-        fig = FF.create_distplot(hist_data, group_labels, bin_size=.5)    
+        fig = FF.create_distplot(hist_data, group_labels, bin_size=.5, curve_type='normal')    
         fig['layout'].update(height=600, width=1000, title='Distribution plot '+i)
         graphs.append(dcc.Graph(id=identifier+"_"+i, figure=fig))
 
@@ -606,6 +598,7 @@ def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subse
 
 def getViolinPlot(data, variableCol, groupCol, colors, identifier, title, plot_attr={'width':600, 'height':600, 'colorScale': False}, subplot = False):
 
+    
     figure = FF.create_violin(data,
                     data_header=variableCol,
                     group_header= groupCol,
