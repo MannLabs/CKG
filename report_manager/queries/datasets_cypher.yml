@@ -106,9 +106,9 @@ clinical:
             - HAS_QUANTIFIED_CLINICAL
         query_type: pre
         query: >
-            MATCH p=(project:Project)-[:HAS_ENROLLED]->(subject:Subject)-[:HAS_DISEASE]-(disease:Disease)
-            WITH subject,disease
+            MATCH (project:Project)-[:HAS_ENROLLED]->(subject:Subject)<-[:BELONGS_TO_SUBJECT]-(bs:Biological_sample)-[r1:HAS_QUANTIFIED_CLINICAL]->(clinvar:Clinical_variable)
+            WITH subject, bs, clinvar, r1
             WHERE project.id="PROJECTID"
-            MATCH p2=(subject)<-[:BELONGS_TO_SUBJECT]-(bs:Biological_sample)-[r:HAS_QUANTIFIED_CLINICAL]->(clinvar:Clinical_variable)
-            RETURN subject.id AS subject, disease.id AS disease_id, disease.name AS group, clinvar.id AS clinvar_id, clinvar.name AS clinical_variable, r.value AS value ORDER BY subject
+            MATCH (bs)-[r2:SPLITTED_INTO]-(an:Analytical_sample)
+            RETURN subject.id AS subject, an.group AS group, clinvar.name AS clinical_variable, r1.value AS value ORDER BY subject
 

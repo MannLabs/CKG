@@ -3,6 +3,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 import plotly.figure_factory as FF
+from plotly import tools
 from scipy.spatial.distance import pdist, squareform
 from plotly.graph_objs import *
 from kmapper import plotlyviz
@@ -39,18 +40,32 @@ def getPlotTraces(data, key='full', type = 'lines', div_factor=float(10^10000), 
 
 
 def get_distplot(data, identifier, args):
-
     df = data.copy()
-    for c in df.columns:
-        df_var = df[c]
+    graphs = []
+    if "format" in args:
+        if args["format"] == "long":
+            columns = [args['index'],args["x"], args["y"]]
+            df = df.drop_duplicates()
+            groups = df[[args['index'],args['group']]].set_index(args["index"])
+            df = df[columns]
+            df = df.pivot(index=args['index'], columns=args["x"], values=args["y"])
+            df = df.join(groups)
+            df = df.reset_index(drop=True)
+            df = df.set_index(args['group'])
+            df = df.transpose()
+            df = df.fillna(0.0)
+    row = 1
+    for i in df.index.unique():
+        hist_data = []
+        for c in df.columns.unique():
+            hist_data.append(df.loc[i,c].values.tolist())
+        group_labels = df.columns.unique().tolist()
+        # Create distplot with custom bin_size
+        fig = FF.create_distplot(hist_data, group_labels, bin_size=.5)    
+        fig['layout'].update(height=600, width=1000, title='Distribution plot '+i)
+        graphs.append(dcc.Graph(id=identifier+"_"+i, figure=fig))
 
-    # Group data together
-    hist_data = [x1, x2, x3, x4]
-    group_labels = ['Group 1', 'Group 2', 'Group 3', 'Group 4']
-    # Create distplot with custom bin_size
-    fig = ff.create_distplot(hist_data, group_labels, bin_size=.2)
-
-
+    return graphs
 
 def get_barplot(data, identifier, args):
     '''This function plots a simple barplot
@@ -106,18 +121,27 @@ def get_facet_grid_plot(data, identifier, args):
 
     return dcc.Graph(id= identifier, figure = figure)
 
-##ToDo
 def get_scatterplot_matrix(data, identifier, args):
-    classes=np.unique(data[args["group"]].values).tolist()
+    df = data.copy()
+    if "format" in args:
+        if args["format"] == "long":
+            columns = [args["variables"], args["values"]]
+            df = data.copy()
+            groups = df[args["group"]]
+            df = df[columns]
+            df = df.pivot(columns=args["variables"], values=args["values"])
+            df['group'] = groups
+    classes=np.unique(df[args["group"]].values).tolist()
     class_code={classes[k]: k for k in range(len(classes))}
-    color_vals=[class_code[cl] for cl in data[args["group"]]]
-    text=[data.loc[ k, args["group"]] for k in range(len(data))]
+    color_vals=[class_code[cl] for cl in df[args["group"]]]
+    text=[data.loc[ k, args["group"]] for k in range(len(df))]
 
     figure = {}
     figure["data"] = []
     dimensions = []
-    for col in data.columns:
-        dimensions.append(dict(label=col, values=data[col]))
+    for col in df.columns:
+        if col != args["group"]:
+            dimensions.append(dict(label=col, values=df[col]))
 
     figure["data"].append(go.Splom(dimensions=dimensions,
                     text=text,
@@ -131,15 +155,15 @@ def get_scatterplot_matrix(data, identifier, args):
     axis = dict(showline=True,
                 zeroline=False,
                 gridcolor='#fff',
-                ticklen=len(data.columns))
+                ticklen=4)
 
     figure["layout"] = go.Layout(title = args["title"],
                             xaxis = dict(axis),
                             yaxis = dict(axis),
                             dragmode='select',
-                            width=600,
-                            height=600,
-                            autosize=False,
+                            width=1500,
+                            height=1500,
+                            autosize=True,
                             hovermode='closest',
                             plot_bgcolor='rgba(240,240,240, 0.95)',
                             )

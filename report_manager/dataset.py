@@ -167,7 +167,6 @@ class Dataset:
             
     def generate_report(self):
         report = rp.Report(identifier=self.dataset_type.capitalize())
-        print("dataset report", report.identifier, report.plots)
         for section in self.configuration:
             for subsection in self.configuration[section]:
                 data_name, analysis_types, plot_types, args = self.extract_configuration(self.configuration[section][subsection])
@@ -210,13 +209,12 @@ class Dataset:
                                 result = ar.AnalysisResult(self.identifier,"_".join(subsection.split(' ')), args, data, result = dictresult)
                                 self.update_analyses(result.result)
                             for plot_type in plot_types:
-                                print(self.dataset_type)
                                 plots = result.get_plot(plot_type, "_".join(subsection.split(' '))+"_"+plot_type)
                                 report.update_plots({("_".join(subsection.split(' ')), plot_type): plots})
         
         self.report = report
-        self.save_datset()
-        self.save_dataset_report()
+        #self.save_datset()
+        #self.save_dataset_report()
 
     def save_datset(self):
         dataset_directory = self.get_dataset_data_directory()

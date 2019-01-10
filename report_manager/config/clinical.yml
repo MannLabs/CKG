@@ -10,8 +10,14 @@ overview: #section
         data: dataset
         analyses: []
         plots: 
-            - scatterplot_matrix
+            - distplot
             - basicTable
         args:
+            index: subject
             group: group
+            x: clinical_variable
+            y: value
+            format: long
+            x_title: clinical variables
+            y_title: value
             title: 'Clinical variables measurements per group'
