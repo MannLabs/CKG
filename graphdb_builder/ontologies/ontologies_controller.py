@@ -12,6 +12,7 @@ import re
 import config.ckg_config as graph_config
 import logging
 import logging.config
+import sys
 
 log_config = graph_config.graphdb_builder_log
 logger = builder_utils.setup_logging(log_config, key="ontologies_controller")
@@ -22,7 +23,7 @@ except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
 
 #########################
-# General functionality # 
+# General functionality #
 #########################
 
 def entries_to_remove(entries, the_dict):
@@ -48,13 +49,13 @@ def trimSNOMEDTree(relationships, filters):
                     filteredRelationships.add((term,destinationID, "HAS_PARENT"))
         else:
             toRemove.add(term)
-    
+
     return filteredRelationships, toRemove
 
 
 
 ############################
-# Calling the right parser # 
+# Calling the right parser #
 ############################
 def parseOntology(ontology):
     ontologyDirectory = config["ontologiesDirectory"]
@@ -77,11 +78,11 @@ def parseOntology(ontology):
     if ontology in ["DO","BTO","PSI-MOD", "HPO", "GO","PSI-MS"]:
         ontologyData = oboParser.parser(ontology, ontologyFiles)
         mp.buildMappingFromOBO(ontologyFiles.pop(), ontology)
-   
+
     return ontologyData
-    
+
 #########################
-#       Graph files     # 
+#       Graph files     #
 #########################
 def generateGraphFiles(importDirectory, ontologies=None):
     entities = config["ontologies"]
@@ -111,7 +112,7 @@ def generateGraphFiles(importDirectory, ontologies=None):
                     relationships_outputfile = os.path.join(importDirectory, name+"_has_parent.csv")
                     relationshipsDf = pd.DataFrame(list(relationships[namespace]))
                     relationshipsDf.columns = ['START_ID', 'END_ID', 'TYPE']
-                    relationshipsDf.to_csv(path_or_buf=relationships_outputfile, 
+                    relationshipsDf.to_csv(path_or_buf=relationships_outputfile,
                                                 header=True, index=False, quotechar='"',
                                                 quoting=csv.QUOTE_ALL,
                                                 line_terminator='\n', escapechar='\\')
@@ -120,7 +121,7 @@ def generateGraphFiles(importDirectory, ontologies=None):
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            logger.error("Ontology {}: {}, file: {},line: {}".format(ontology, sys.exc_info(), fname, exec_tb.tb_lineno))
+            logger.error("Ontology {}: {}, file: {},line: {}".format(ontology, sys.exc_info(), fname, exc_tb.tb_lineno))
             raise Exception("Error when importing ontology {}.\n {}".format(ontology, err))
     return stats
 
