@@ -20,7 +20,7 @@ class ProjectApp(basicApp.BasicApp):
         self._project_id = project_id
 
     def build_page(self):
-        p = project.Project(self.project_id)
+        p = project.Project(self.project_id, datasets=None, report={})
         self.title = "Project: {}".format(p.name)
         self.add_basic_layout()
         plots = p.show_report("app")

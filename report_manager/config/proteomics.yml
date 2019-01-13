@@ -1,3 +1,6 @@
+args:
+    imputation: True
+    imputation_method: distribution    
 overview: #section
     peptides:
         data: number of peptides 
@@ -50,8 +53,6 @@ overview: #section
         plots:
             - scatterplot
         args: 
-            imputation: True
-            imputation_method: mixed
             x_title: PC1
             y_title: PC2
             components: 2
@@ -67,8 +68,6 @@ overview: #section
             - basicTable
             - volcanoplot
         args: 
-            imputation: True
-            imputation_method: mixed
             alpha: 0.05
             lfc: 1.0
             colorscale: 'Blues'

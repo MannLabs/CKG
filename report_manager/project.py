@@ -201,10 +201,10 @@ class Project:
         self.set_attributes(project_info)
         for data_type in self.data_types:
             if data_type == "proteomics":
-                proteomics_dataset = ProteomicsDataset(self.identifier)
+                proteomics_dataset = ProteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
                 self.update_dataset({data_type:proteomics_dataset})
             elif data_type == "clinical":
-                clinical_dataset = ClinicalDataset(self.identifier)
+                clinical_dataset = ClinicalDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
                 self.update_dataset({data_type:clinical_dataset})
            
     def generate_project_info_report(self):

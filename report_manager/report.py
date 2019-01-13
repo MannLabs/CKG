@@ -5,7 +5,7 @@ import json
 import plotly.utils
 
 class Report:
-    def __init__(self, identifier, plots = {}):
+    def __init__(self, identifier, plots={}):
         self._identifier = identifier
         self._plots = plots
 
@@ -26,26 +26,26 @@ class Report:
         self._plots = plots
 
     def get_plot(self, plot):
-        if plot in self.plots:
-            return self.plots[plot]
+        if plot in self._plots:
+            return self._plots[plot]
         return None
 
     def update_plots(self, plot):
-        self.plots.update(plot)
+        self._plots.update(plot)
 
     def print_report(self, directory, plot_format='pdf'):
-        for plot_id in self.plots:
+        for plot_id in self._plots:
             name = "_".join(plot_id)
-            for plot in self.plots[plot_id]:
+            for plot in self._plots[plot_id]:
                 figure = plot.figure
                 pio.write_image(figure, os.path.join(directory,name+"."+plot_format))
 
     def save_report(self, directory):
         dt = h5.special_dtype(vlen=str)
         with h5.File(os.path.join(directory, "report.h5"), "w") as f:
-            for plot_id in self.plots:
+            for plot_id in self._plots:
                 name = "-".join(plot_id)
-                for plot in self.plots[plot_id]:
+                for plot in self._plots[plot_id]:
                     grp = f.create_group(name)
                     if hasattr(plot, 'figure'):
                         figure_json = json.dumps(plot.figure, cls=plotly.utils.PlotlyJSONEncoder)

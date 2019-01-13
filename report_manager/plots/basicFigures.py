@@ -362,20 +362,22 @@ def get_complex_heatmapplot(data, identifier, args):
     return dcc.Graph(id=identifier, figure=figure)
 
 def get_network(data, identifier, args):
-    data = data.rename(index=str, columns={args['values']: "width"})
-    edge_prop_columns = [c for c in data.columns if c not in [args['source'], args['target']]]
-    edge_properties = [str(d) for d in data.to_dict(orient='index').values()]
-    graph = nx.from_pandas_edgelist(data, args['source'], args['target'], edge_prop_columns)
-    betweenness = nx.betweenness_centrality(graph)
-    degrees = dict(graph.degree())
-    if args['node_size'] == 'betweenness':
-        nx.set_node_attributes(graph, betweenness, 'radius')
-    elif args['node_size'] == 'degree':
-        nx.set_node_attributes(graph, degrees, 'radius')
+    net = None
+    if not data.empty:
+        data = data.rename(index=str, columns={args['values']: "width"})
+        edge_prop_columns = [c for c in data.columns if c not in [args['source'], args['target']]]
+        edge_properties = [str(d) for d in data.to_dict(orient='index').values()]
+        graph = nx.from_pandas_edgelist(data, args['source'], args['target'], edge_prop_columns)
+        betweenness = nx.betweenness_centrality(graph)
+        degrees = dict(graph.degree())
+        if args['node_size'] == 'betweenness':
+            nx.set_node_attributes(graph, betweenness, 'radius')
+        elif args['node_size'] == 'degree':
+            nx.set_node_attributes(graph, degrees, 'radius')
 
-    jgraph = json_graph.node_link_data(graph)
+        jgraph = json_graph.node_link_data(graph)
 
-    net = Network(id=identifier, data=jgraph, width=args['width'], height=args['height'], maxLinkWidth=args['maxLinkWidth'], maxRadius=args['maxRadius'])
+        net = Network(id=identifier, data=jgraph, width=args['width'], height=args['height'], maxLinkWidth=args['maxLinkWidth'], maxRadius=args['maxRadius'])
 
     return net
 
@@ -578,7 +580,7 @@ def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subse
         data = data[subset]
     data_trace = go.Table(header=dict(values=data.columns,
                     fill = dict(color = colors[0]),
-                    align = ['left','center']),
+                    align = ['center','center']),
                     cells=dict(values=[data[c].round(5) if data[c].dtype == np.float64 else data[c] for c in data.columns],
                     fill = dict(color= colors[1]),
                     align = ['left','center']))

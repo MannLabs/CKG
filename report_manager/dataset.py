@@ -166,8 +166,10 @@ class Dataset:
         return data_name, analysis_types, plot_types, args
             
     def generate_report(self):
-        report = rp.Report(identifier=self.dataset_type.capitalize())
+        self.report = rp.Report(identifier=self.dataset_type.capitalize(), plots={})
         for section in self.configuration:
+            if section == "args":
+                continue
             for subsection in self.configuration[section]:
                 data_name, analysis_types, plot_types, args = self.extract_configuration(self.configuration[section][subsection])
                 if data_name in self.data:
@@ -201,7 +203,7 @@ class Dataset:
                                         self.update_data({"regulated":sig_data})
                                 for plot_type in plot_types:
                                     plots = result.get_plot(plot_type, subsection+"_"+analysis_type+"_"+plot_type)
-                                    report.update_plots({(analysis_type, plot_type):plots})
+                                    self.report.update_plots({(analysis_type, plot_type):plots})
                         else:
                             if result is None:
                                 dictresult = {}
@@ -210,13 +212,12 @@ class Dataset:
                                 self.update_analyses(result.result)
                             for plot_type in plot_types:
                                 plots = result.get_plot(plot_type, "_".join(subsection.split(' '))+"_"+plot_type)
-                                report.update_plots({("_".join(subsection.split(' ')), plot_type): plots})
+                                self.report.update_plots({("_".join(subsection.split(' ')), plot_type): plots})
         
-        self.report = report
-        #self.save_datset()
+        self.save_dataset()
         #self.save_dataset_report()
 
-    def save_datset(self):
+    def save_dataset(self):
         dataset_directory = self.get_dataset_data_directory()
         store = pd.HDFStore(os.path.join(dataset_directory, self.dataset_type+".h5"))
         for data in self.data:
@@ -243,9 +244,9 @@ class Dataset:
         self.update_report(report)
 
 class ProteomicsDataset(Dataset):
-    def __init__(self, identifier, data={}, analyses={}):
+    def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
         config_file = "proteomics.yml"
-        Dataset.__init__(self, identifier, "proteomics", data=data, analyses=analyses)
+        Dataset.__init__(self, identifier, "proteomics", data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
         self.set_configuration_from_file(config_file)
         if len(data) == 0:
             self._data = self.query_data()
@@ -267,7 +268,7 @@ class ProteomicsDataset(Dataset):
             value_col = 'LFQ intensity'
             args = {}
             if "args" in self.configuration:
-                args = self.configuration["args"] 
+                args = self.configuration["args"]
             if "imputation" in args:
                 imputation = args["imputation"]
             if "imputation_method" in args:
@@ -283,9 +284,9 @@ class ProteomicsDataset(Dataset):
         return processed_data
 
 class ClinicalDataset(Dataset):
-    def __init__(self, identifier, data={}, analyses={}):
+    def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
         config_file = "clinical.yml"
-        Dataset.__init__(self, identifier, "clinical", data=data, analyses=analyses)
+        Dataset.__init__(self, identifier, "clinical", data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
         self.set_configuration_from_file(config_file)
         if len(data) == 0:
             self._data = self.query_data()
