@@ -1,6 +1,7 @@
 import os
 import sys
 import pandas as pd
+import h5py
 import ckg_utils
 import config.ckg_config as ckg_config
 from report_manager import analysisResult as ar, report as rp
@@ -233,10 +234,11 @@ class Dataset:
         dataset_directory = self.get_dataset_data_directory()
         dataset_store = os.path.join(dataset_directory, self.dataset_type+".h5")
         if os.path.isfile(dataset_store):
-            data = pd.read_hdf(dataset_store)
-            self.update_data = data
+            f = h5py.File(filename, 'r') 
+            for key in list(f.keys()):
+                data[key] = pd.read_hdf(filename, key)
         
-        return data
+        return data 
 
     def load_dataset_report(self):
         dataset_directory = self.get_dataset_data_directory()
