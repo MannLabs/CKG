@@ -201,7 +201,7 @@ class Dataset:
                                         sig_data = data[sig_hits]
                                         sig_data.index = data['group'].tolist()
                                         sig_data["sample"] = data["sample"].tolist()
-                                        self.update_data({"regulated":sig_data})
+                                        self.update_data({"regulated":sig_data, "regulation_table":reg_data.loc[reg_data.rejected,:]})
                                 for plot_type in plot_types:
                                     plots = result.get_plot(plot_type, subsection+"_"+analysis_type+"_"+plot_type)
                                     self.report.update_plots({(analysis_type, plot_type):plots})
@@ -223,7 +223,9 @@ class Dataset:
         store = pd.HDFStore(os.path.join(dataset_directory, self.dataset_type+".h5"))
         for data in self.data:
             name = data.replace(" ", "-")
-            store[name]=self.data[data]
+            store[name] = self.data[data]
+
+        store.close()
     
     def save_dataset_report(self):
         dataset_directory = self.get_dataset_data_directory()
