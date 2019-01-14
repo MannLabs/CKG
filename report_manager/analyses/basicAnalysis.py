@@ -14,6 +14,21 @@ from random import shuffle
 from fancyimpute import KNN
 import kmapper as km
 
+def transform_into_long_format(data, index, columns, values, extra=[], use_index=False):
+    df = data.copy()
+    cols = [index,columns, values]
+    df = df.drop_duplicates()
+    if len(extra) > 0:
+        extra.append(index)
+        extra_cols = df[extra].set_index(index)
+    df = df[cols]
+    df = df.pivot(index=index, columns=columns, values=values)
+    df = df.join(extra_cols)
+    if not use_index:
+        df = df.reset_index(drop=True)
+
+    return df
+
 def extract_number_missing(df, conditions, missing_max):
     if conditions is None:
         groups = data.loc[:, data.notnull().sum(axis = 1) >= missing_max]
@@ -116,7 +131,7 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
     df = data.copy()
     conditions = df.group.unique()
     df = df.set_index(['group','sample'])
-    df['identifier'] = df['identifier'].map(str) +" - "+ df['name'].map(str)
+    df['identifier'] = df['identifier'].map(str) +"-"+ df['name'].map(str)
     df = df.pivot_table(values=value_col, index=df.index, columns='identifier', aggfunc='first')
     df = df.reset_index()
     df[['group', 'sample']] = df["index"].apply(pd.Series)
@@ -143,7 +158,6 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
             sys.exit()
     
     df = df.reset_index()
-
     return df
 
 def runPCA(data, components = 2):
@@ -644,3 +658,4 @@ def runMapper(data, lenses=["l2norm"], n_cubes = 15, overlap=0.5, n_clusters=3, 
 
 
     return simplicial_complex, {"labels":labels}
+

@@ -1,17 +1,23 @@
-from graphdb_builder.ontologies import ontologies_config as oconfig
-from graphdb_builder.databases import databases_config as dbconfig
-from graphdb_builder import utils
+from graphdb_builder import builder_utils
+import config.ckg_config as ckg_config
+import ckg_utils
 import os.path
 import time
 from collections import defaultdict
 import re
 import gzip
 
+try:
+    oconfig = ckg_utils.get_configuration(ckg_config.ontologies_config_file)
+    dbconfig = ckg_utils.get_configuration(ckg_config.databases_config_file)
+except Exception as err:
+    raise Exception("Reading configuration > {}.".format(err))
+
 
 def getMappingFromOntology(ontology, source = None):
     mapping = {}
-    ont = oconfig.ontologies[ontology]
-    dirFile = os.path.join(oconfig.ontologiesDirectory,ont)
+    ont = oconfig["ontologies"][ontology]
+    dirFile = os.path.join(oconfig["ontologiesDirectory"],ont)
     dataFile = os.path.join(dirFile,"mapping.tsv")
     with open(dataFile, 'r') as f:
         for line in f:
@@ -23,8 +29,8 @@ def getMappingFromOntology(ontology, source = None):
 
 def getMappingForEntity(entity):
     mapping = {}
-    if entity in dbconfig.sources:
-        mapping_file = os.path.join(dbconfig.databasesDir, os.path.join(dbconfig.sources[entity],"mapping.tsv"))
+    if entity in dbconfig["sources"]:
+        mapping_file = os.path.join(dbconfig["databasesDir"], os.path.join(dbconfig["sources"][entity],"mapping.tsv"))
         mapping = {}
         while not os.path.isfile(mapping_file):
             time.sleep(5)
@@ -41,11 +47,11 @@ def getMappingForEntity(entity):
 def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True, db = "STRING"):
     mapping = defaultdict(set)
     
-    directory = os.path.join(dbconfig.databasesDir, db)
+    directory = os.path.join(dbconfig["databasesDir"], db)
     fileName = os.path.join(directory, url.split('/')[-1])
 
     if download:
-        utils.downloadDB(url, db)
+        builder_utils.downloadDB(url, directory)
     
     f = os.path.join(directory, fileName)
     mf = gzip.open(f, 'r')
@@ -72,11 +78,11 @@ def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True, db = "ST
     return mapping
 
 def updateMappingFileWithSTRING(mappingFile, mapping, db = "STRING"):
-    directory = os.path.join(dbconfig.databasesDir, db)
+    directory = os.path.join(dbconfig["databasesDir"], db)
     fileName = os.path.join(directory, url.split('/')[-1])
 
     if download:
-        utils.downloadDB(url, db)
+        builder_utils.downloadDB(url, db)
     
     f = os.path.join(directory, fileName)
     mf = gzip.open(f, 'r')
@@ -105,7 +111,7 @@ def updateMappingFileWithSTRING(mappingFile, mapping, db = "STRING"):
                         mf.write(ident+"\t"+alias)
 
 def buildMappingFromOBO(oboFile, ontology):
-    outputDir = os.path.join(oconfig.ontologiesDirectory, ontology)
+    outputDir = os.path.join(oconfig["ontologiesDirectory"], ontology)
     outputFile = os.path.join(outputDir, "mapping.tsv")
     identifiers = defaultdict(list)
     re_synonyms = r'\"(.+)\"'

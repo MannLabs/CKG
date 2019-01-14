@@ -1,33 +1,34 @@
 import os.path
 import gzip
-from graphdb_builder.databases import databases_config as dbconfig
-from graphdb_builder.databases.config import pspConfig as iconfig
-from graphdb_builder import mapping as mp, utils
-from collections import defaultdict
-import pandas as pd
 import re
+import pandas as pd
+from collections import defaultdict
+import ckg_utils
+from graphdb_builder import mapping as mp, builder_utils
 
 #############################
 #       PhosphoSitePlus     # 
 #############################
-def parser():
-    directory = os.path.join(dbconfig.databasesDir,"PhosphoSitePlus")
-    utils.checkDirectory(directory)
-    modifications = iconfig.modifications
-    annotation_files = iconfig.annotation_files
-    entities_header = iconfig.entities_header
-    relationships_headers = iconfig.rel_headers
+def parser(databases_directory):
+    directory = os.path.join(databases_directory,"PhosphoSitePlus")
+    builder_utils.checkDirectory(directory)
+    config = ckg_utils.get_configuration('../databases/config/pspConfig.yml')
+    modifications = config['modifications']
+    annotation_files = config['annotation_files']
+    entities_header = config['entities_header']
+    relationships_headers = config['rel_headers']
     entities = set()
     relationships = defaultdict(set)
-    for site_file in iconfig.site_files:
+    for site_file in config['site_files']:
         file_name = os.path.join(directory, site_file)
         with gzip.open(file_name, 'r') as f:
             sites, site_relationships = parseSites(f, modifications)
             entities.update(sites)
             for r in site_relationships:
                 relationships[r].update(site_relationships[r])
-    for entity, relationship_type in annotation_files:
-        file_name = os.path.join(directory, annotation_files[(entity,relationship_type)])
+    for er in annotation_files:
+        entity, relationship_type = er.split('-')
+        file_name = os.path.join(directory, annotation_files[er])
         with gzip.open(file_name, 'r') as f:
             if entity == "disease":
                 mapping = mp.getMappingFromOntology(ontology = "Disease", source = None)
@@ -60,8 +61,9 @@ def parseSites(fhandler, modifications):
             residue = ''.join(residue_mod[0][1:])
             if organism == "human":
                 #"sequence_window", "position", "Amino acid"
-                entities.add((modified_protein_id, "Modified_protein", protein, seq_window, position, residue))
+                entities.add((modified_protein_id, "Modified_protein", protein, seq_window, position, residue, "PhosphositePlus"))
                 relationships[("Protein", "has_modified_site")].add((protein, modified_protein_id, "HAS_MODIFIED_SITE", "PhosphositePlus"))
+                relationships[("Peptide", "has_modified_site")].add((seq_window.upper(), modified_protein_id, "HAS_MODIFIED_SITE", "PhosphositePlus"))
                 relationships[("Modified_protein", "has_modification")].add((modified_protein_id, modification, "HAS_MODIFICATION", "PhosphositePlus"))
     
     return entities, relationships

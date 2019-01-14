@@ -1,39 +1,38 @@
 import os.path
-from graphdb_builder.databases import databases_config as dbconfig
-from graphdb_builder.databases.config import hmdbConfig as iconfig
 from collections import defaultdict
 from lxml import etree
 import zipfile
-from graphdb_builder import mapping as mp, utils
-
+import ckg_utils
+from graphdb_builder import mapping as mp, builder_utils
 
 #################################
 #   Human Metabolome Database   # 
 #################################
-def parser(download = True):
-    metabolites = extract_metabolites(download)
-    mapping = mp.getMappingFromOntology(ontology = "Disease", source = iconfig.HMDB_DO_source)
+def parser(databases_directory, download = True):
+    config = ckg_utils.get_configuration('../databases/config/hmdbConfig.yml')
+    metabolites = extract_metabolites(config, databases_directory, download)
+    mapping = mp.getMappingFromOntology(ontology = "Disease", source = config['HMDB_DO_source'])
     mapping.update(mp.getMappingFromOntology(ontology = "Tissue", source = None))
-    entities, attributes =  build_metabolite_entity(metabolites)
-    relationships = build_relationships_from_HMDB(metabolites, mapping)
+    entities, attributes =  build_metabolite_entity(config, databases_directory, metabolites)
+    relationships = build_relationships_from_HMDB(config, metabolites, mapping)
     entities_header = ['ID'] + attributes
-    relationships_header = iconfig.relationships_header
+    relationships_header = config['relationships_header']
     
     return (entities, relationships, entities_header, relationships_header)
 
-def extract_metabolites(download = True):
+def extract_metabolites(config, databases_directory, download = True):
     metabolites = defaultdict()
     prefix = "{http://www.hmdb.ca}"
-    url = iconfig.HMDB_url
+    url = config['HMDB_url']
     relationships = set()
-    directory = os.path.join(dbconfig.databasesDir,"HMDB")
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory,"HMDB")
+    builder_utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
-        utils.downloadDB(url, directory)
-    fields = iconfig.HMDB_fields
-    parentFields = iconfig.HMDB_parentFields
-    structuredFields = iconfig.HMDB_structures
+        builder_utils.downloadDB(url, directory)
+    fields = config['HMDB_fields']
+    parentFields = config['HMDB_parentFields']
+    structuredFields = config['HMDB_structures']
     with zipfile.ZipFile(fileName, 'r') as zipped:
         for f in zipped.namelist():
             data = zipped.read(f) 
@@ -60,9 +59,9 @@ def extract_metabolites(download = True):
                     metabolites[values["accession"]] = values
     return metabolites
 
-def build_metabolite_entity(metabolites):
+def build_metabolite_entity(config, databases_directory, metabolites):
     entities = set()
-    attributes = iconfig.HMDB_attributes
+    attributes = config['HMDB_attributes']
     for metid in metabolites:
         entity = []
         entity.append(metid)
@@ -77,13 +76,13 @@ def build_metabolite_entity(metabolites):
                 entity.append('')
         entities.add(tuple(entity))
     
-    build_HMDB_dictionary(metabolites)
+    build_HMDB_dictionary(databases_directory, metabolites)
     
     return entities, attributes
     
-def build_relationships_from_HMDB(metabolites, mapping):
+def build_relationships_from_HMDB(config, metabolites, mapping):
     relationships = defaultdict(list)
-    associations = iconfig.HMDB_associations
+    associations = config['HMDB_associations']
     for metid in metabolites:
         for ass in associations:
             ident = ass
@@ -103,8 +102,8 @@ def build_relationships_from_HMDB(metabolites, mapping):
         
     return relationships
 
-def build_HMDB_dictionary(metabolites):
-    directory = os.path.join(dbconfig.databasesDir,"HMDB")
+def build_HMDB_dictionary(databases_directory, metabolites):
+    directory = os.path.join(databases_directory,"HMDB")
     filename = "mapping.tsv"
     outputfile = os.path.join(directory, filename)
     

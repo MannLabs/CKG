@@ -1,8 +1,7 @@
 import os.path
 import zipfile
-from graphdb_builder.databases import databases_config as dbconfig
-from graphdb_builder.databases.config import exposomeConfig as iconfig
-from graphdb_builder import mapping as mp, utils
+import ckg_utils
+from graphdb_builder import mapping as mp, builder_utils
 from collections import defaultdict
 import pandas as pd
 import re
@@ -10,20 +9,21 @@ import re
 ###############################
 #       Exposome Explorer     # 
 ###############################
-def parser(download=True):
+def parser(databases_directory, download=True):
     entities = set()
     relationships = defaultdict(set)
-    directory = os.path.join(dbconfig.databasesDir,"ExposomeExplorer")
-    utils.checkDirectory(directory)
-    database_urls = iconfig.database_urls 
-    relationships_header = iconfig.relationships_header
+    directory = os.path.join(databases_directory,"ExposomeExplorer")
+    builder_utils.checkDirectory(directory)
+    config = ckg_utils.get_configuration('../databases/config/exposomeConfig.yml')
+    database_urls = config['database_urls']
+    relationships_header = config['relationships_header']
     mapping = mp.getMappingForEntity("Food")
     correlations = {}
     for url in database_urls:
         zipped_fileName = os.path.join(directory, url.split('/')[-1])
         file_name = '.'.join(url.split('/')[-1].split('.')[0:2])
         if download:
-            utils.downloadDB(url, directory)
+            builder_utils.downloadDB(url, directory)
 
         with zipfile.ZipFile(zipped_fileName) as z:
             if file_name == "biomarkers.csv":

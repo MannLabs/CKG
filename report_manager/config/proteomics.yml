@@ -1,0 +1,152 @@
+args:
+    imputation: True
+    imputation_method: distribution    
+overview: #section
+    peptides:
+        data: number of peptides 
+        analyses: []            
+        plots: 
+            - barplot
+            - basicTable
+        args: 
+            x: x
+            y: y
+            group: group
+            x_title: Analytical sample
+            y_title: number of peptides
+            title: 'Number of proteins identified per group'
+    proteins:
+        data: number of proteins
+        analyses: []
+        plots: 
+            - barplot
+            - basicTable
+        args:
+            x: x
+            y: y
+            group: group
+            x_title: Analytical sample
+            y_title: number of proteins
+            title: 'Number of peptide identified per group'
+    modifications:
+        data: number of modified proteins
+        analyses: []
+        plots: 
+            - facetplot
+            - basicTable
+        args: 
+            x: x
+            y: y
+            group: group
+            class: type
+            x_title: Analytical sample
+            y_title: number of modified proteins
+            plot_type: bar
+            title: 'Number of modified proteins identified per type'
+"data exploration":
+    stratification:
+        data: preprocessed
+        analyses: 
+            - pca 
+            #- tsne
+            #-   umap
+        plots:
+            - scatterplot
+        args: 
+            x_title: PC1
+            y_title: PC2
+            components: 2
+            perplexity: 40
+            n_iter: 1000
+            init: 'pca'
+            title: 'Sample stratification'
+    regulation:
+        data: preprocessed
+        analyses: 
+            - anova
+        plots: 
+            - basicTable
+            - volcanoplot
+        args: 
+            alpha: 0.05
+            lfc: 1.0
+            colorscale: 'Blues'
+            showscale: False
+            marker_size: 10
+            x_title: log2FC
+            y_title: -log(pvalue)
+            drop_cols: 
+                - sample
+                - gene_name
+            name: name
+            title: 'Volcano plot'
+    correlation:
+        data: regulated
+        analyses: 
+            - correlation
+        plots: 
+            - heatmap
+            - network
+            - basicTable
+        args: 
+            source: node1
+            target: node2
+            title: 'Features correlation map'
+            format: edgelist
+            values: weight
+            dist: False
+            node_properties: {}
+            width: 1600
+            height: 1600
+            maxLinkWidth: 5
+            maxRadius: 20
+            node_size: 'degree'
+    interaction:
+        data: regulated
+        analyses: []
+        plots:
+            - network
+            - basicTable
+        args:
+            use: 
+                columns: identifiers
+            source: node1
+            target: node2
+            title: 'Protein-Protein interaction network'
+            format: edgelist
+            values: score
+            dist: False
+            node_properties: {}
+            width: 1600
+            height: 1600
+            maxLinkWidth: 5
+            maxRadius: 20
+            node_size: 'betweenness'
+    enrichment:
+        data: regulated
+        analyses: 
+            - enrichment
+        plots:
+            - basicTable
+        args:
+            use: 
+                columns: identifiers
+            source: node1
+            target: node2
+            title: 'Protein-Protein interaction network'
+            format: edgelist
+            values: score
+            dist: False
+            node_properties: {}
+    #"topological data analysis":
+    #    data: regulated
+    #    analyses: 
+    #        - mapper
+    #    plots:
+    #        - mapper
+    #    args: 
+    #        n_cubes: 15
+    #        overlap: 0.5
+    #        n_clusters: 3
+    #        linkage: complete
+    #        affinity: correlation

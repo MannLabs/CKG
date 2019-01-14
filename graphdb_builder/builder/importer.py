@@ -11,17 +11,25 @@ import os.path
 from datetime import datetime
 import pandas as pd
 from joblib import Parallel, delayed
-import builder_config as config
-import config.ckg_config as graph_config
-from graphdb_builder.ontologies import ontologies_controller as oh, ontologies_config as oconfig
-from graphdb_builder.databases import databases_controller as dh, databases_config as dbconfig
-from graphdb_builder.experiments import experiments_controller as eh, experiments_config as econfig
-from graphdb_builder import utils
+import config.ckg_config as ckg_config
+import ckg_utils
+from graphdb_builder.ontologies import ontologies_controller as oh
+from graphdb_builder.databases import databases_controller as dh
+from graphdb_builder.experiments import experiments_controller as eh
+from graphdb_builder import builder_utils
 import logging
 import logging.config
 
-log_config = graph_config.log
-logger = utils.setup_logging(log_config, key="importer")
+log_config = ckg_config.graphdb_builder_log
+logger = builder_utils.setup_logging(log_config, key="importer")
+
+try:
+    config = ckg_utils.get_configuration(ckg_config.builder_config_file)
+    oconfig = ckg_utils.get_configuration(ckg_config.ontologies_config_file)
+    dbconfig = ckg_utils.get_configuration(ckg_config.databases_config_file)
+    econfig = ckg_utils.get_configuration(ckg_config.experiments_config_file)
+except Exception as err:
+    logger.error("Reading configuration > {}.".format(err))
 
 START_TIME = datetime.now()
 
@@ -40,13 +48,13 @@ def ontologiesImport(importDirectory, ontologies=None, import_type="partial"):
         import_type: type of import (full or partial)
     """
     #Ontologies
-    ontologiesImportDirectory = os.path.join(importDirectory, oconfig.ontologiesImportDir)
-    utils.checkDirectory(ontologiesImportDirectory)
+    ontologiesImportDirectory = os.path.join(importDirectory, oconfig["ontologiesImportDir"])
+    builder_utils.checkDirectory(ontologiesImportDirectory)
     stats = oh.generateGraphFiles(ontologiesImportDirectory, ontologies)
     statsDf = generateStatsDataFrame(stats)
     writeStats(statsDf, import_type)
 
-def databasesImport(importDirectory, databases=None, n_jobs=1, import_type="partial"):
+def databasesImport(importDirectory, databases=None, n_jobs=1, download=True, import_type="partial"):
     """
     Generates all the entities and relationships
     from the provided databases. If the databases list is
@@ -63,9 +71,9 @@ def databasesImport(importDirectory, databases=None, n_jobs=1, import_type="part
         import_type: type of import (full or partial)
     """
     #Databases
-    databasesImportDirectory = os.path.join(importDirectory, dbconfig.databasesImportDir)
-    utils.checkDirectory(databasesImportDirectory)
-    stats = dh.generateGraphFiles(databasesImportDirectory, databases, n_jobs)
+    databasesImportDirectory = os.path.join(importDirectory, dbconfig["databasesImportDir"])
+    builder_utils.checkDirectory(databasesImportDirectory)
+    stats = dh.generateGraphFiles(databasesImportDirectory, databases, download, n_jobs)
     statsDf = generateStatsDataFrame(stats)
     writeStats(statsDf, import_type)
 
@@ -82,11 +90,11 @@ def experimentsImport(projects=None, n_jobs=1, import_type="partial"):
         import_type: type of import (full or partial)
     """
     #Experiments
-    experimentsImportDirectory = econfig.experimentsImportDirectory
-    utils.checkDirectory(experimentsImportDirectory)
-    experimentsDirectory = econfig.experimentsDir
+    experimentsImportDirectory = econfig["experimentsImportDirectory"]
+    builder_utils.checkDirectory(experimentsImportDirectory)
+    experimentsDirectory = econfig["experimentsDir"]
     if projects is None:
-        projects = utils.listDirectoryFolders(experimentsDirectory)
+        projects = builder_utils.listDirectoryFolders(experimentsDirectory)
     Parallel(n_jobs=n_jobs)(delayed(experimentImport)(experimentsImportDirectory, experimentsDirectory, project) for project in projects)
 
 def experimentImport(importDirectory, experimentsDirectory, project):
@@ -101,12 +109,12 @@ def experimentImport(importDirectory, experimentsDirectory, project):
         project (string): Identifier of the project to be imported
     """
     projectPath = os.path.join(importDirectory, project)
-    utils.checkDirectory(projectPath)
+    builder_utils.checkDirectory(projectPath)
     projectDirectory = os.path.join(experimentsDirectory, project)
-    datasets = utils.listDirectoryFolders(projectDirectory)
+    datasets = builder_utils.listDirectoryFolders(projectDirectory)
     for dataset in datasets:
         datasetPath = os.path.join(projectPath, dataset)
-        utils.checkDirectory(datasetPath)
+        builder_utils.checkDirectory(datasetPath)
         eh.generateDatasetImports(project, dataset)
 
 def fullImport():
@@ -116,14 +124,15 @@ def fullImport():
     and create it otherwise. Calls setupStats.
     """
     try:
-        importDirectory = config.importDirectory
-        utils.checkDirectory(importDirectory)
+        download = config["download"]
+        importDirectory = config["importDirectory"]
+        builder_utils.checkDirectory(importDirectory)
         setupStats(import_type='full')
         logger.info("Full import: importing all Ontologies")
         ontologiesImport(importDirectory, import_type='full')
         logger.info("Full import: Ontologies import took {}".format(datetime.now() - START_TIME))
         logger.info("Full import: importing all Databases")
-        databasesImport(importDirectory, n_jobs=4, import_type='full')
+        databasesImport(importDirectory, n_jobs=4, download=download, import_type='full')
         logger.info("Full import: Databases import took {}".format(datetime.now() - START_TIME))
         logger.info("Full import: importing all Experiments")
         experimentsImport(n_jobs=4, import_type='full')
@@ -154,7 +163,7 @@ def generateStatsDataFrame(stats):
     Returns:
         statsDf: pandas dataframe with the collected statistics
     """
-    statsDf = pd.DataFrame.from_records(list(stats), columns=config.statsCols)
+    statsDf = pd.DataFrame.from_records(list(stats), columns=config["statsCols"])
     
     return statsDf
 
@@ -163,9 +172,9 @@ def setupStats(import_type):
     Creates a stats object that will collect all the statistics collected from
     each import.
     """
-    statsDirectory = config.statsDirectory
-    statsFile = os.path.join(statsDirectory, config.statsFile)
-    statsCols = config.statsCols
+    statsDirectory = config["statsDirectory"]
+    statsFile = os.path.join(statsDirectory, config["statsFile"])
+    statsCols = config["statsCols"]
     statsName = getStatsName(import_type)
     try:
         if not os.path.exists(statsDirectory) or not os.path.isfile(statsFile):
@@ -220,8 +229,8 @@ def writeStats(statsDf, import_type, stats_name=None):
         statsName (string): If the statistics should be stored with a
                             specific name
     """
-    stats_directory = config.statsDirectory
-    stats_file = os.path.join(stats_directory, config.statsFile)
+    stats_directory = config["statsDirectory"]
+    stats_file = os.path.join(stats_directory, config["statsFile"])
     try: 
         if stats_name is None:
             stats_name = getStatsName(import_type)
@@ -238,7 +247,7 @@ def getStatsName(import_type):
     Returns:
         statsName (string): key used to store in the stats object.
     """
-    version = graph_config.version
+    version = ckg_config.version
     statsName = import_type+'_stats_'+ str(version).replace('.', '_')
 
     return statsName
@@ -246,4 +255,5 @@ def getStatsName(import_type):
 
 if __name__ == "__main__":
     fullImport()
-    #experimentsImport(projects=["P0000003"], n_jobs=1)
+    #databasesImport(importDirectory='../../../data/imports', databases=['CancerGenomeInterpreter'], n_jobs=1, download=False, import_type="partial")
+    #experimentsImport(projects=["P0000001", "P0000002", "P0000003", "P0000004"], n_jobs=1)

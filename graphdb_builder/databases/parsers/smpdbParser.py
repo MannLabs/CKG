@@ -1,32 +1,32 @@
 import os.path
 import zipfile
-from collections import defaultdict
-from graphdb_builder.databases import databases_config as dbconfig
-from graphdb_builder.databases.config import smpdbConfig as iconfig
-from graphdb_builder import mapping as mp, utils
 import pandas as pd
+from collections import defaultdict
+import ckg_utils
+from graphdb_builder import mapping as mp, builder_utils
 
 #########################
 #     SMPDB database    #
 #########################
-def parser(download=True):
-    urls = iconfig.smpdb_urls
+def parser(databases_directory, download=True):
+    config = ckg_utils.get_configuration('../databases/config/smpdbConfig.yml')
+    urls = config['smpdb_urls']
     entities = set()
     relationships = defaultdict(set)
-    entities_header = iconfig.pathway_header
-    relationships_headers = iconfig.relationships_header
-    directory = os.path.join(dbconfig.databasesDir, "SMPDB")
-    utils.checkDirectory(directory)
+    entities_header = config['pathway_header']
+    relationships_headers = config['relationships_header']
+    directory = os.path.join(databases_directory, "SMPDB")
+    builder_utils.checkDirectory(directory)
     
     for dataset in urls:
         url = urls[dataset]
         file_name = url.split('/')[-1]
         if download:
-            utils.downloadDB(url, directory)
+            builder_utils.downloadDB(url, directory)
         zipped_file = os.path.join(directory, file_name)
         with zipfile.ZipFile(zipped_file) as rf:
             if dataset == "pathway":
-                entities = parsePathways(rf)
+                entities = parsePathways(config, rf)
             elif dataset == "protein":
                 relationships.update(parsePathwayProteinRelationships(rf))
             elif dataset == "metabolite":
@@ -34,9 +34,9 @@ def parser(download=True):
     
     return entities, relationships, entities_header, relationships_headers
         
-def parsePathways(fhandler):
+def parsePathways(config, fhandler):
     entities = set()
-    url = iconfig.linkout_url
+    url = config['linkout_url']
     organism = 9606
     for filename in fhandler.namelist():
         if not os.path.isdir(filename):

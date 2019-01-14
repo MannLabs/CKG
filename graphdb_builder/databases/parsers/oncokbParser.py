@@ -1,31 +1,32 @@
 import os.path
-from graphdb_builder.databases import databases_config as dbconfig
-from graphdb_builder.databases.config import oncokbConfig as iconfig
-from graphdb_builder import mapping as mp, utils
-from collections import defaultdict
 import re
+from collections import defaultdict
+import ckg_utils
+from graphdb_builder import mapping as mp, builder_utils
+
 #########################
 #   OncoKB database     #
 #########################
-def parser(download = True):
-    url_actionable = iconfig.OncoKB_actionable_url
-    url_annotation = iconfig.OncoKB_annotated_url
-    entities_header = iconfig.entities_header
-    relationships_headers = iconfig.relationships_headers
+def parser(databases_directory, download = True):
+    config = ckg_utils.get_configuration('../databases/config/oncokbConfig.yml')
+    url_actionable = config['OncoKB_actionable_url']
+    url_annotation = config['OncoKB_annotated_url']
+    entities_header = config['entities_header']
+    relationships_headers = config['relationships_headers']
     mapping = mp.getMappingFromOntology(ontology = "Disease", source = None)
 
     drugmapping = mp.getMappingForEntity("Drug")
 
-    levels = iconfig.OncoKB_levels
+    levels = config['OncoKB_levels']
     entities = set()
     relationships = defaultdict(set)
-    directory = os.path.join(dbconfig.databasesDir,"OncoKB")
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory,"OncoKB")
+    builder_utils.checkDirectory(directory)
     acfileName = os.path.join(directory,url_actionable.split('/')[-1])
     anfileName = os.path.join(directory,url_annotation.split('/')[-1])
     if download:
-        utils.downloadDB(url_actionable, directory)
-        utils.downloadDB(url_annotation, directory)
+        builder_utils.downloadDB(url_actionable, directory)
+        builder_utils.downloadDB(url_annotation, directory)
 
     regex = r"\w\d+(\w|\*|\.)"
     with open(anfileName, 'r', errors='replace') as variants:
@@ -63,7 +64,7 @@ def parser(download = True):
                     if d.lower() in drugmapping:
                         drug = drugmapping[d.lower()]
                         relationships["targets_clinically_relevant_variant"].add((drug, variant, "TARGETS_KNOWN_VARIANT", level[0], level[1], disease, "curated", "OncoKB"))
-                        relationships["targets"].add((drug, gene, "CURATED_TARGETS", "curated", "OncoKB"))
+                        relationships["targets"].add((drug, gene, "CURATED_TARGETS", "curated", "NA", "NA", "curated", "OncoKB"))
                     else:
                         pass
                         #print(drug)

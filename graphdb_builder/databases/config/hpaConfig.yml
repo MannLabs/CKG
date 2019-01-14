@@ -1,0 +1,17 @@
+###### HPA Database #########
+hpa_pathology_url: 'https://www.proteinatlas.org/download/pathology.tsv.zip'
+relationships_headers: 
+    'detected_in_pathology_sample':
+        - 'START_ID'
+        - 'END_ID'
+        - 'TYPE'
+        - 'expression_high'
+        - 'expression_medium'
+        - 'expression_low'
+        - 'not_detected' 
+        - 'positive_prognosis_logrank_pvalue'
+        - 'negative_prognosis_logrank_pvalue' 
+        - 'linkout'
+        - 'source'
+linkout_url: 'https://www.proteinatlas.org/GENECODE-GENENAME/pathology/tissue/DISEASE'
+

@@ -1,0 +1,26 @@
+overview: #section
+    clinical variables:
+        data: clinical variables 
+        analyses: []
+        plots:
+            - basicTable
+        args: 
+            title: 'List of clinical variables'
+    measurement matrix:
+        data: dataset
+        analyses: 
+            - long_format
+        plots: 
+            - violinplot
+            - distplot
+            - basicTable
+        args:
+            index: subject
+            group: group
+            x: clinical_variable
+            y: value
+            use_index: False
+            format: long
+            x_title: clinical variables
+            y_title: value
+            title: 'Clinical variables measurements per group'

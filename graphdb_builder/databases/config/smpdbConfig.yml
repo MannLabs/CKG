@@ -1,0 +1,49 @@
+###### SMPDB Database #######
+smpdb_urls: 
+    'pathway': 'http://smpdb.ca/downloads/smpdb_pathways.csv.zip'
+    'protein': 'http://smpdb.ca/downloads/smpdb_proteins.csv.zip'
+    'metabolite': 'http://smpdb.ca/downloads/smpdb_metabolites.csv.zip'
+
+pathway_header: 
+    - 'ID'
+    - ':LABEL'
+    - 'name'
+    - 'description'
+    - 'organism'
+    - 'linkout'
+    - 'source'
+
+relationships_header: 
+    'pathway':
+        - 'START_ID'
+        - 'END_ID'
+        - 'TYPE'
+        - 'source'
+    'protein':
+        - 'START_ID'
+        - 'END_ID'
+        - 'TYPE'
+        - 'evidence'
+        - 'organism'
+        - 'cellular_component'
+        - 'source'
+    'metabolite':
+        - 'START_ID'
+        - 'END_ID'
+        - 'TYPE'
+        - 'evidence'
+        - 'organism'
+        - 'cellular_component'
+        - 'source'
+    'drug':
+        - 'START_ID'
+        - 'END_ID'
+        - 'TYPE'
+        - 'evidence'
+        - 'organism'
+        - 'cellular_component'
+        - 'source'
+
+linkout_url: 'http://smpdb.ca/view/PATHWAY'
+
+

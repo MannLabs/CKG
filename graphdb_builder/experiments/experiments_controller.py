@@ -1,19 +1,23 @@
-from graphdb_builder.experiments import experiments_config as config
 from graphdb_builder.ontologies import ontologies_controller as oh
-from graphdb_builder import utils
-
+from graphdb_builder import builder_utils
 import sys
 import re
 import os.path
 import pandas as pd
 import numpy as np
 from collections import defaultdict
-import config.ckg_config as graph_config
+import config.ckg_config as ckg_config
+import ckg_utils
 import logging
 import logging.config
 
-log_config = graph_config.log
-logger = utils.setup_logging(log_config, key="experiments_controller")
+log_config = ckg_config.graphdb_builder_log
+logger = builder_utils.setup_logging(log_config, key="experiments_controller")
+
+try:
+    config = ckg_utils.get_configuration(ckg_config.experiments_config_file)
+except Exception as err:
+    logger.error("Reading configuration > {}.".format(err))
 
 #########################
 # General functionality # 
@@ -157,7 +161,7 @@ def parseProteomicsDataset(projectId, configuration, dataDir):
 ########### Genomics Datasets ############
 def parseWESDataset(projectId, configuration, dataDir):
     datasets = {}
-    files = utils.listDirectoryFiles(dataDir)
+    files = builder_utils.listDirectoryFiles(dataDir)
     for dfile in files:
         filepath = os.path.join(dataDir, dfile)
         if os.path.isfile(filepath):
@@ -177,8 +181,9 @@ def extractSubjectClinicalVariablesRelationships(data):
         intervention = df["intervention"].to_frame()
         intervention = intervention.reset_index()
         intervention.columns = ['START_ID', 'END_ID']
+        intervention['END_ID'] = intervention['END_ID'].astype('int64')
+        intervention['value'] = True
     df = df.drop(["external id", "biological_sample id", "analytical_sample id"], axis=1)
-    df = df.select_dtypes(exclude='float')
     df = df.stack()
     df = df.reset_index()
     df.columns = ['START_ID', 'END_ID', "value"]
@@ -186,6 +191,9 @@ def extractSubjectClinicalVariablesRelationships(data):
         df = df.append(intervention, sort=True)
     df['TYPE'] = "HAS_CLINICAL_STATE"
     df = df[['START_ID', 'END_ID','TYPE', 'value']]
+    df['END_ID'] = df['END_ID'].apply(lambda x: int(x) if isinstance(x,float) else x)
+    df = df[df['value'].apply(lambda x: isinstance(x, str))]
+    df = df.dropna()
 
     return df
 
@@ -193,12 +201,14 @@ def extractBiologicalSampleClinicalVariablesRelationships(data):
     df = data.copy()
     if "biological_sample id" in df.columns:
         df = df.set_index("biological_sample id")
-        df = df.select_dtypes(include='float')
+        df = df._get_numeric_data()
         df = df.stack()
         df = df.reset_index()
         df.columns = ['START_ID', 'END_ID', "value"]
         df['TYPE'] = "HAS_QUANTIFIED_CLINICAL"
         df = df[['START_ID', 'END_ID','TYPE', 'value']]
+        df['END_ID'] = df['END_ID'].apply(lambda x: int(x) if isinstance(x,float) else x)
+        df = df.dropna()
 
     return df
 
@@ -266,6 +276,7 @@ def extractModificationProteinRelationships(data, configuration):
     aux['TYPE'] = "HAS_MODIFICATION"
     aux = aux[['START_ID', 'END_ID','TYPE', "position", "residue"]]
     aux['position'] = aux['position'].astype('int64')
+    aux = aux.drop_duplicates()
     
     return aux
 
@@ -280,7 +291,7 @@ def extractProteinModificationSubjectRelationships(data, configuration):
     aux = aux.set_index("END_ID")
     newIndexdf = aux.copy()
     aux = aux.drop(cols, axis=1)
-    aux =  aux.filter(regex = configuration["valueCol"])
+    aux =  aux.filter(regex = configuration["valueCol"].replace("\\\\","\\"))
     aux.columns = [c.split(" ")[1] for c in aux.columns]
     aux = aux.stack()
     aux = aux.reset_index()
@@ -301,6 +312,7 @@ def extractProteinModificationSubjectRelationships(data, configuration):
     columns.append("TYPE")
     aux.columns = columns
     aux = aux[['START_ID', 'END_ID', 'TYPE', "value"] + regexCols + cCols]
+    aux = aux.drop_duplicates()
     
     return aux
 
@@ -311,14 +323,35 @@ def extractProteinProteinModificationRelationships(data, configuration):
     cols.extend(positionCols)
     aux = data.copy().reset_index()
     aux = aux[cols]
-    aux["START_ID"] =  aux[proteinCol].map(str) + "_" + aux[positionCols[1]].map(str) + aux[positionCols[0]].map(str)+'-'+configuration["mod_acronym"]
+    aux["END_ID"] =  aux[proteinCol].map(str) + "_" + aux[positionCols[1]].map(str) + aux[positionCols[0]].map(str)+'-'+configuration["mod_acronym"]
     aux = aux.drop(positionCols, axis=1)
-    aux = aux.set_index("START_ID")
+    aux = aux.set_index("END_ID")
     aux = aux.reset_index()
-    aux.columns = ["START_ID", "END_ID"]
+    aux.columns = ["END_ID", "START_ID"]
     aux['TYPE'] = "HAS_MODIFIED_SITE"
     aux = aux[['START_ID', 'END_ID', 'TYPE']]
-    
+    aux = aux.drop_duplicates()
+
+    return aux
+
+def extractPeptideProteinModificationRelationships(data, configuration):
+    positionCols = configuration["positionCols"]
+    proteinCol = configuration["proteinCol"]
+    sequenceCol = configuration["sequenceCol"]
+    cols = [sequenceCol, proteinCol]
+    cols.extend(positionCols)
+    aux = data.copy().reset_index()
+    aux = aux[cols]
+    aux["END_ID"] =  aux[proteinCol].map(str) + "_" + aux[positionCols[1]].map(str) + aux[positionCols[0]].map(str)+'-'+configuration["mod_acronym"]
+    aux = aux.drop([proteinCol] + positionCols, axis=1)
+    aux = aux.set_index("END_ID")
+    aux = aux.reset_index()
+    aux.columns = ["END_ID", "START_ID"]
+    aux["START_ID"] = aux["START_ID"].str.upper()
+    aux['TYPE'] = "HAS_MODIFIED_SITE"
+    aux = aux[['START_ID', 'END_ID', 'TYPE']]
+    aux = aux.drop_duplicates()
+
     return aux
 
 def extractProteinModifications(data, configuration):
@@ -333,8 +366,10 @@ def extractProteinModifications(data, configuration):
     aux = aux.set_index("ID")
     aux = aux.reset_index()
     aux[sequenceCol] = aux[sequenceCol].str.replace('_', '-')
-    aux.columns = ["ID", "protein", "sequence_window", "position", "residue"]
-    
+    aux["source"] = "experimentally_identified"
+    aux.columns = ["ID", "protein", "sequence_window", "position", "residue", "source"]
+    aux = aux.drop_duplicates()
+        
     return aux
 
 def extractProteinModificationsModification(data, configuration):
@@ -361,12 +396,13 @@ def extractPeptides(data, configuration):
     aux = aux.reset_index()
     aux = aux.groupby(aux.columns.tolist()).size().reset_index().rename(columns={0:'count'})
     aux.columns = ["ID", "type", "count"]
-
+    aux = aux.drop_duplicates()
+    
     return aux
 
 def extractPeptideSubjectRelationships(data, configuration):
     data = data[~data.index.duplicated(keep='first')]
-    aux =  data.filter(regex = configuration["valueCol"])
+    aux =  data.filter(regex = configuration["valueCol"].replace("\\\\","\\"))
     attributes = configuration["attributes"]
     aux.columns = [c.split(" ")[1] for c in aux.columns]
     aux = aux.stack()
@@ -386,6 +422,7 @@ def extractPeptideSubjectRelationships(data, configuration):
     columns.append("TYPE")
     aux.columns = columns
     aux = aux[['START_ID', 'END_ID', 'TYPE', "value"] + regexCols + cCols]
+    aux = aux.drop_duplicates()
     
     return aux
 
@@ -396,13 +433,14 @@ def extractPeptideProteinRelationships(data, configuration):
     aux = aux.reset_index()
     aux.columns = ["Sequence", "Protein", "Start", "End"]
     aux['TYPE'] = "BELONGS_TO_PROTEIN"
-    aux.columns = ['START_ID', 'END_ID', "start", "end", 'TYPE']
-    aux = aux[['START_ID', 'END_ID', 'TYPE']]
+    aux['source'] = 'experimentally_identified'
+    aux.columns = ['START_ID', 'END_ID', "start", "end", 'TYPE', 'source']
+    aux = aux[['START_ID', 'END_ID', 'TYPE', 'source']]
     return aux
 
 ################# Protein entity #########################
 def extractProteinSubjectRelationships(data, configuration):
-    aux =  data.filter(regex = configuration["valueCol"])
+    aux =  data.filter(regex = configuration["valueCol"].replace("\\\\","\\"))
     attributes = configuration["attributes"]
     aux.columns = [c.split(" ")[2] for c in aux.columns]
     aux = aux.stack()
@@ -477,13 +515,14 @@ def loadProteomicsDataset(uri, configuration):
     aux = None
     #Get the columns from config and divide them into simple or regex columns
     columns = configuration["columns"]
-    regexCols = [c for c in columns if '+' in c]
+    regexCols = [c.replace("\\\\","\\") for c in columns if '+' in c]
     columns = set(columns).difference(regexCols)
     
     #Read the filters defined in config, i.e. reverse, contaminant, etc.
     filters = configuration["filters"]
     proteinCol = configuration["proteinCol"]
     indexCol = configuration["indexCol"]
+    groupCol = configuration["groupCol"]
     if "geneCol" in configuration:
         geneCol = configuration["geneCol"]
     
@@ -493,23 +532,7 @@ def loadProteomicsDataset(uri, configuration):
     #Apply filters
     data = data[data[filters].isnull().all(1)]
     data = data.drop(filters, axis=1)
-    #Select all protein form protein groups, i.e. P01911;Q29830;Q9MXZ4
-    # P01911
-    # Q29830
-    # Q9MXZ4
-    #s = data[proteinCol].str.split(';').apply(pd.Series, 1).stack().reset_index(level=1, drop=True)
-    #del data[proteinCol]
-    #pdf = s.to_frame(proteinCol)
-    data[proteinCol] = data[proteinCol].str.split(';').apply(pd.Series,1)[0]    
-    if "multipositions" in configuration:
-        #s2 = data[configuration["multipositions"]].str.split(';').apply(pd.Series, 1).stack().reset_index(level=1, drop=True)
-        #del data[configuration["multipositions"]]
-        #pdf = pd.concat([s,s2], axis=1, keys=[proteinCol,configuration["multipositions"]])
-        data[configuration["multipositions"]] =  data[configuration["multipositions"]].str.split(';').apply(pd.Series,1)[0]
-    #data = data.join(pdf)
-    #proteins = data[proteinCol].str.split(';').apply(pd.Series,1)[0]
-    #data[proteinCol] = proteins
-    data = data.set_index(indexCol)
+    data = expand_groups(data, configuration)
     columns = set(columns).difference(filters)
     columns.remove(indexCol)
 
@@ -519,7 +542,22 @@ def loadProteomicsDataset(uri, configuration):
         columns.update(set(filter(r.match, data.columns)))
     #Add simple and regex columns into a single DataFrame
     data = data[list(columns)]
+    
     return data, regexCols
+
+def expand_groups(data, configuration):
+    s = data[configuration["proteinCol"]].str.split(';').apply(pd.Series, 1).stack().reset_index(level=1, drop=True)
+    del data[configuration["proteinCol"]]
+    pdf = s.to_frame(configuration["proteinCol"])
+    if "multipositions" in configuration:
+        s2 = data[configuration["multipositions"]].str.split(';').apply(pd.Series, 1).stack().reset_index(level=1, drop=True)
+        del data[configuration["multipositions"]]
+        pdf = pd.concat([s,s2], axis=1, keys=[configuration["proteinCol"],configuration["multipositions"]])
+    data = data.join(pdf)
+    data["is_razor"] = ~ data[configuration["groupCol"]].duplicated()
+    data = data.set_index(configuration["indexCol"])
+    
+    return data
 
 ############ Whole Exome Sequencing #############
 def loadWESDataset(uri, configuration):
@@ -551,10 +589,10 @@ def loadWESDataset(uri, configuration):
 def generateDatasetImports(projectId, dataType):
     stats = set()
     try:
-        if dataType in config.dataTypes:
-            if "directory" in config.dataTypes[dataType]:
-                dataDir = config.dataTypes[dataType]["directory"].replace("PROJECTID", projectId)
-                configuration = config.dataTypes[dataType]
+        if dataType in config["dataTypes"]:
+            if "directory" in config["dataTypes"][dataType]:
+                dataDir = config["dataTypes"][dataType]["directory"].replace("PROJECTID", projectId)
+                configuration = config["dataTypes"][dataType]
                 if dataType == "clinical":
                     data = parseClinicalDataset(projectId, configuration, dataDir)
                     if data is not None:
@@ -597,6 +635,8 @@ def generateDatasetImports(projectId, dataType):
                                 generateGraphFiles(dataRows, "modifiedprotein_subject", projectId, stats, ot = 'a')
                                 dataRows = extractProteinProteinModificationRelationships(data[dtype], configuration[dtype])
                                 generateGraphFiles(dataRows, "modifiedprotein_protein", projectId, stats, ot = 'a')
+                                dataRows = extractPeptideProteinModificationRelationships(data[dtype], configuration[dtype])
+                                generateGraphFiles(dataRows, "modifiedprotein_peptide", projectId, stats, ot = 'a')
                                 dataRows = extractProteinModifications(data[dtype], configuration[dtype])
                                 generateGraphFiles(dataRows, "modifiedprotein", projectId, stats, ot = 'a')
                                 dataRows = extractProteinModificationsModification(data[dtype], configuration[dtype])
@@ -625,14 +665,14 @@ def generateDatasetImports(projectId, dataType):
         raise Exception("Error when importing experiment {}.\n {}".format(projectId, err))
         
 def generateGraphFiles(data, dataType, projectId, stats, ot = 'w', d = 'proteomics'):
-    importDir = os.path.join(config.experimentsImportDirectory, os.path.join(projectId,d))
+    importDir = os.path.join(config["experimentsImportDirectory"], os.path.join(projectId,d))
     outputfile = os.path.join(importDir, projectId+"_"+dataType.lower()+".csv")
     with open(outputfile, ot) as f:  
         data.to_csv(path_or_buf = f, 
             header=True, index=False, quotechar='"', 
             line_terminator='\n', escapechar='\\')
     logger.info("Experiment {} - Number of {} relationships: {}".format(projectId, dataType, data.shape[0]))
-    stats.add(utils.buildStats(data.shape[0], "relationships", dataType, "Experiment", outputfile))
+    stats.add(builder_utils.buildStats(data.shape[0], "relationships", dataType, "Experiment", outputfile))
 
 if __name__ == "__main__":
     pass

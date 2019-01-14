@@ -1,21 +1,21 @@
 import os.path
-from collections import defaultdict
-from graphdb_builder.databases import databases_config as dbconfig
-from graphdb_builder.databases.config import reactomeConfig as iconfig
-from graphdb_builder import mapping as mp, utils
 import re
+from collections import defaultdict
+import ckg_utils
+from graphdb_builder import mapping as mp, builder_utils
 
 #########################
 #   Reactome database   #
 #########################
-def parser(download=True):
-    urls = iconfig.reactome_urls
+def parser(databases_directory, download=True):
+    config = ckg_utils.get_configuration('../databases/config/reactomeConfig.yml')
+    urls = config['reactome_urls']
     entities = set()
     relationships = defaultdict(set)
-    entities_header = iconfig.pathway_header
-    relationships_headers = iconfig.relationships_header
-    directory = os.path.join(dbconfig.databasesDir, "Reactome")
-    utils.checkDirectory(directory)
+    entities_header = config['pathway_header']
+    relationships_headers = config['relationships_header']
+    directory = os.path.join(databases_directory, "Reactome")
+    builder_utils.checkDirectory(directory)
     metabolite_mapping = mp.getMappingForEntity("Metabolite")
     drug_mapping = mp.getMappingForEntity("Drug")
     
@@ -23,28 +23,27 @@ def parser(download=True):
         url = urls[dataset]
         file_name = url.split('/')[-1]
         if download:
-            utils.downloadDB(url, directory)
+            builder_utils.downloadDB(url, directory)
         f = os.path.join(directory, file_name)
         with open(f, 'r') as rf:
-            print(dataset)
             if dataset == "pathway":
-                entities = parsePathways(rf)
+                entities = parsePathways(config, databases_directory, rf)
             elif dataset == "hierarchy":
                 relationships[("pathway", "has_parent")] = parsePathwayHierarchy(rf)
             elif dataset == "protein":
-                relationships[(dataset, "annotated_to_pathway")] = parsePathwayRelationships(rf)
+                relationships[(dataset, "annotated_to_pathway")] = parsePathwayRelationships(config, rf)
             elif dataset == "metabolite":
-                relationships[(dataset, "annotated_to_pathway")] = parsePathwayRelationships(rf, metabolite_mapping)
+                relationships[(dataset, "annotated_to_pathway")] = parsePathwayRelationships(config, rf, metabolite_mapping)
             elif dataset == "drug":
                 relationships[(dataset, "annotated_to_pathway")] = set()
     
     return entities, relationships, entities_header, relationships_headers
         
-def parsePathways(fhandler):
+def parsePathways(config, databases_directory, fhandler):
     entities = set()
-    organisms = iconfig.organisms
-    url = iconfig.linkout_url
-    directory = os.path.join(dbconfig.databasesDir, "Reactome")
+    organisms = config['organisms']
+    url = config['linkout_url']
+    directory = os.path.join(databases_directory, "Reactome")
     mapping_file = os.path.join(directory, "mapping.tsv")
     with open(mapping_file, 'w') as mf:
         for line in fhandler:
@@ -71,10 +70,10 @@ def parsePathwayHierarchy(fhandler):
     return relationships
 
 
-def parsePathwayRelationships(fhandler, mapping=None):
+def parsePathwayRelationships(config, fhandler, mapping=None):
     relationships = set()
     regex = r"(.+)\s\[(.+)\]" 
-    organisms = iconfig.organisms
+    organisms = config['organisms']
     for line in fhandler:
         data = line.rstrip("\r\n").split("\t")
         identifier = data[0]

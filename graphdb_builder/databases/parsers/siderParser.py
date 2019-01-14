@@ -1,28 +1,27 @@
 import os.path
 import gzip
-from graphdb_builder.databases import databases_config as dbconfig
-from graphdb_builder.databases.config import siderConfig as iconfig
-from graphdb_builder import mapping as mp, utils
 import re
+import ckg_utils
+from graphdb_builder import mapping as mp, builder_utils
 
 #############################################
 #              SIDER database               # 
 #############################################
-def parser(download=True):
-    url = iconfig.SIDER_url
-    header = iconfig.header
-    outputfileName = iconfig.outputfileName
+def parser(databases_directory, drug_source, download=True):
+    config = ckg_utils.get_configuration('../databases/config/siderConfig.yml')
+    url = config['SIDER_url']
+    header = config['header']
+    outputfileName = config['outputfileName']
     
-    drugsource = dbconfig.sources["Drug"]
-    drugmapping = mp.getSTRINGMapping(iconfig.SIDER_mapping, source = drugsource, download = False, db = "STITCH")
-    phenotypemapping = mp.getMappingFromOntology(ontology="Phenotype", source = iconfig.SIDER_source)
+    drugmapping = mp.getSTRINGMapping(config['SIDER_mapping'], source = drug_source, download = False, db = "STITCH")
+    phenotypemapping = mp.getMappingFromOntology(ontology="Phenotype", source = config['SIDER_source'])
     
     relationships = set()
-    directory = os.path.join(dbconfig.databasesDir,"SIDER")
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory,"SIDER")
+    builder_utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
-        utils.downloadDB(url, directory)
+        builder_utils.downloadDB(url, directory)
     associations = gzip.open(fileName, 'r')
     for line in associations:
         data = line.decode('utf-8').rstrip("\r\n").split("\t")
@@ -37,17 +36,18 @@ def parser(download=True):
     return (relationships, header, outputfileName, drugmapping, phenotypemapping)
 
 
-def parserIndications(drugMapping, phenotypeMapping, download=True):
-    url = iconfig.SIDER_indications
-    header = iconfig.indications_header
-    outputfileName = iconfig.indications_outputfileName
+def parserIndications(databases_directory, drugMapping, phenotypeMapping, download=True):
+    config = ckg_utils.get_configuration('../databases/config/siderConfig.yml')
+    url = config['SIDER_indications']
+    header = config['indications_header']
+    outputfileName = config['indications_outputfileName']
 
     relationships = set()
-    directory = os.path.join(dbconfig.databasesDir,"SIDER")
-    utils.checkDirectory(directory)
+    directory = os.path.join(databases_directory,"SIDER")
+    builder_utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
-        utils.downloadDB(url, directory)
+        builder_utils.downloadDB(url, directory)
     associations = gzip.open(fileName, 'r')
     for line in associations:
         data = line.decode('utf-8').rstrip("\r\n").split("\t")
