@@ -33,7 +33,7 @@ except Exception as err:
 
 START_TIME = datetime.now()
 
-def ontologiesImport(importDirectory, ontologies=None, import_type="partial"):
+def ontologiesImport(importDirectory, ontologies=None, download=True, import_type="partial"):
     """
     Generates all the entities and relationships
     from the provided ontologies. If the ontologies list is
@@ -48,9 +48,9 @@ def ontologiesImport(importDirectory, ontologies=None, import_type="partial"):
         import_type: type of import (full or partial)
     """
     #Ontologies
-    ontologiesImportDirectory = os.path.join(importDirectory, oconfig["ontologiesImportDir"])
+    ontologiesImportDirectory = os.path.join(importDirectory, oconfig["ontologies_importDir"])
     builder_utils.checkDirectory(ontologiesImportDirectory)
-    stats = oh.generateGraphFiles(ontologiesImportDirectory, ontologies)
+    stats = oh.generate_graphFiles(ontologiesImportDirectory, ontologies, download)
     statsDf = generateStatsDataFrame(stats)
     writeStats(statsDf, import_type)
 
@@ -254,6 +254,7 @@ def getStatsName(import_type):
 
 
 if __name__ == "__main__":
-    fullImport()
+    #fullImport()
     #databasesImport(importDirectory='../../../data/imports', databases=['CancerGenomeInterpreter'], n_jobs=1, download=False, import_type="partial")
     #experimentsImport(projects=["P0000001", "P0000002", "P0000003", "P0000004"], n_jobs=1)
+    ontologiesImport(importDirectory='../../../data/imports')

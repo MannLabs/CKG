@@ -17,7 +17,7 @@ except Exception as err:
 def getMappingFromOntology(ontology, source = None):
     mapping = {}
     ont = oconfig["ontologies"][ontology]
-    dirFile = os.path.join(oconfig["ontologiesDirectory"],ont)
+    dirFile = os.path.join(oconfig["ontologies_directory"],ont)
     dataFile = os.path.join(dirFile,"mapping.tsv")
     with open(dataFile, 'r') as f:
         for line in f:
@@ -111,7 +111,7 @@ def updateMappingFileWithSTRING(mappingFile, mapping, db = "STRING"):
                         mf.write(ident+"\t"+alias)
 
 def buildMappingFromOBO(oboFile, ontology):
-    outputDir = os.path.join(oconfig["ontologiesDirectory"], ontology)
+    outputDir = os.path.join(oconfig["ontologies_directory"], ontology)
     outputFile = os.path.join(outputDir, "mapping.tsv")
     identifiers = defaultdict(list)
     re_synonyms = r'\"(.+)\"'

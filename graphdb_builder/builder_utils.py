@@ -33,12 +33,11 @@ def setup_logging(path='log.config', key=None):
     
     return logger
 
-def downloadDB(databaseURL, extraFolder ="", user="", password=""):
-    if extraFolder == "":
+def downloadDB(databaseURL, directory=None, file_name=None, user="", password=""):
+    if directory is None:
         directory = dbconfig["databasesDir"]
-    else:
-        directory = extraFolder
-    fileName = databaseURL.split('/')[-1]    
+    if file_name is None:
+        file_name = databaseURL.split('/')[-1]
     #urllib.request.URLopener.version = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36 SE 2.X MetaSr 1.0'
     try:
         mode = 'wb'
@@ -47,11 +46,11 @@ def downloadDB(databaseURL, extraFolder ="", user="", password=""):
             ftp_file = '/'.join(databaseURL.split('/')[3:])
             with ftplib.FTP(domain) as ftp:
                 ftp.login(user=user, passwd = password)
-                ftp.retrbinary("RETR " + ftp_file ,  open(os.path.join(directory, fileName), mode).write)
+                ftp.retrbinary("RETR " + ftp_file ,  open(os.path.join(directory, file_name), mode).write)
         else:
             http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
             response = http.request("GET", databaseURL)
-            with open(os.path.join(directory, fileName), mode) as out:
+            with open(os.path.join(directory, file_name), mode) as out:
                 out.write(response.data)
     except urllib3.exceptions.HTTPError as err:
         raise urllib3.exceptions.HTTPError("The site could not be reached. {}.\nURL:{}".format(err,databaseURL))

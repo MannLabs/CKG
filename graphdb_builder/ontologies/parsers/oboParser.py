@@ -9,8 +9,8 @@ def parser(ontology, files):
     terms = defaultdict(list)
     relationships = defaultdict(set)
     definitions = defaultdict()
-    for f in files:
-        oboGraph = builder_utils.convertOBOtoNet(f)
+    for obo_file in files:
+        oboGraph = builder_utils.convertOBOtoNet(obo_file)
         namespace = ontology
         for term,attr in oboGraph.nodes(data = True):
             if "namespace" in attr:

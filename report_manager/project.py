@@ -245,7 +245,10 @@ class Project:
             for plot_type in plots:
                 for plot in plots[plot_type]:
                     if environment == "notebook":
-                        iplot(plot.figure)
+                        if hasattr(plot, 'figure'):
+                            iplot(plot.figure)
+                        #else:
+                        #    iplot(plot)
                     else:
                         app_plots[identifier].append(plot)
         
