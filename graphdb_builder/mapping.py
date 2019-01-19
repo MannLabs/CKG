@@ -48,12 +48,12 @@ def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True, db = "ST
     mapping = defaultdict(set)
     
     directory = os.path.join(dbconfig["databasesDir"], db)
-    fileName = os.path.join(directory, url.split('/')[-1])
+    file_name = os.path.join(directory, url.split('/')[-1])
 
     if download:
         builder_utils.downloadDB(url, directory)
     
-    f = os.path.join(directory, fileName)
+    f = os.path.join(directory, file_name)
     mf = gzip.open(f, 'r')
     first = True
     for line in mf:
@@ -79,12 +79,12 @@ def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True, db = "ST
 
 def updateMappingFileWithSTRING(mappingFile, mapping, db = "STRING"):
     directory = os.path.join(dbconfig["databasesDir"], db)
-    fileName = os.path.join(directory, url.split('/')[-1])
+    file_name = os.path.join(directory, url.split('/')[-1])
 
     if download:
         builder_utils.downloadDB(url, db)
     
-    f = os.path.join(directory, fileName)
+    f = os.path.join(directory, file_name)
     mf = gzip.open(f, 'r')
     first = True
     with open(mappingFile, 'a') as mf:

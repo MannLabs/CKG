@@ -14,7 +14,7 @@ overview: #section
             group: group
             x_title: Analytical sample
             y_title: number of peptides
-            title: 'Number of proteins identified per group'
+            title: 'Number of peptides identified per group'
     proteins:
         data: number of proteins
         analyses: []
@@ -27,7 +27,7 @@ overview: #section
             group: group
             x_title: Analytical sample
             y_title: number of proteins
-            title: 'Number of peptide identified per group'
+            title: 'Number of proteins identified per group'
     modifications:
         data: number of modified proteins
         analyses: []

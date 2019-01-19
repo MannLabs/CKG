@@ -296,5 +296,9 @@ class ClinicalDataset(Dataset):
             self._data = self.query_data()
         
 class WESDataset(Dataset):
-    def __init__(self, identifier, configuration, data={}):
-        Dataset.__init__(identifier, "wes", configuration, data)
+    def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
+        config_file = "wes.yml"
+        Dataset.__init__(self, identifier, "wes", data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
+        self.set_configuration_from_file(config_file)
+        if len(data) == 0:
+            self._data = self.query_data()

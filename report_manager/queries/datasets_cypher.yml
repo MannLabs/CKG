@@ -96,7 +96,6 @@ clinical:
         involved_nodes:
             - Project
             - Subject
-            - Disease
             - Biological_sample
             - Clinical_variable
         involved_rels:
@@ -111,4 +110,32 @@ clinical:
             WHERE project.id="PROJECTID"
             MATCH (bs)-[r2:SPLITTED_INTO]-(an:Analytical_sample)
             RETURN subject.id AS subject, an.group AS group, clinvar.name AS clinical_variable, r1.value AS value ORDER BY subject
-
+wes:
+    NUMBER_SOMATIC_MUTATIONS:
+        name: 'number somatic mutations'
+        description: 'Provides the number of somatic variants called in a Project. Requires: Project.id'
+        involved_nodes:
+            - Project
+            - Analytical_sample
+            - Somatic_mutation
+        involved_rels:
+            - CONTAINS_MUTATION
+        query_type: pre
+        query: >
+            MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:CONTAINS_MUTATION]-> (s:Somatic_mutation)
+            WHERE project.id="PROJECTID"
+            RETURN a.id AS name, a.id AS x,COUNT(DISTINCT(s.id)) AS y, a.group AS group ORDER BY group;
+    SOMATIC_MUTATIONS:
+        name: 'somatic mutations'
+        description: 'Extracts the list of somatic variants called in a Project with all they attributes. Requires: Project.id'
+        involved_nodes:
+            - Project
+            - Analytical_sample
+            - Somatic_mutation
+        involved_rels:
+            - CONTAINS_MUTATION 
+        query_type: pre
+        query: >
+            MATCH p=(project:Project)-[*3]-(a:Analytical_sample)-[r:CONTAINS_MUTATION]-> (s:Somatic_mutation) 
+            WHERE project.id="PROJECTID" 
+            RETURN a.id AS analytical_sample, s.id AS somatic_mutation, s.somaticalternative_names AS alternative_names, s.function AS function, s.SNVid AS variant_id, s.region AS region, s.Xref AS external_reference, s.TFATHMM_score AS FATHMM_score, s.DLRT_score AS DLRT_score, s.MutationAssessor_score AS MutationAssessor_score, s.MutationTaster_score AS MutationTaster_score,s.PROVEAN_score AS PROVEAN_score,s.Polyphen2_HDIV_score AS Polyphen2_HDIV_score,s.Polyphen2_HVAR_score AS Polyphen2_HVAR_score,s.SIFT_score AS SIFT_score, s.VEST3_score AS VEST3_score

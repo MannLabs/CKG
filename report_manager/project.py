@@ -6,7 +6,7 @@ from json import dumps
 import pandas as pd
 import ckg_utils
 import config.ckg_config as ckg_config
-from report_manager.dataset import ProteomicsDataset, ClinicalDataset
+from report_manager.dataset import ProteomicsDataset, ClinicalDataset, WESDataset
 from report_manager.plots import basicFigures as figure
 from report_manager import report as rp
 from graphdb_connector import connector
@@ -206,11 +206,14 @@ class Project:
             elif data_type == "clinical":
                 clinical_dataset = ClinicalDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
                 self.update_dataset({data_type:clinical_dataset})
+            elif data_type == "wes":
+                wes_dataset = WESDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
+                self.update_dataset({data_type:wes_dataset})
            
     def generate_project_info_report(self):
         report = rp.Report(identifier="project_info")
         project_df = self.to_dataframe()
-        identifier = "project_info"
+        identifier = "Project info"
         title = "Project: {} information".format(self.name)
         plot = [figure.getBasicTable(project_df, identifier, title)]
         report.plots = {("project_info","Project Information"): plot}
