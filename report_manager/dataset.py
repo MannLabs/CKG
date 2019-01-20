@@ -302,3 +302,11 @@ class DNAseqDataset(Dataset):
         self.set_configuration_from_file(config_file)
         if len(data) == 0:
             self._data = self.query_data()
+
+class RNAseqDataset(Dataset):
+    def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
+        config_file = "RNAseq.yml"
+        Dataset.__init__(self, identifier, "RNAseq", data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
+        self.set_configuration_from_file(config_file)
+        if len(data) == 0:
+            self._data = self.query_data()
