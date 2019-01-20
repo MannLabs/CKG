@@ -3,7 +3,7 @@ overview: #section
         data: number of somatic mutations 
         analyses: []
         plots: 
-            - barplot
+            #- barplot
             - basicTable
         args: 
             x: x

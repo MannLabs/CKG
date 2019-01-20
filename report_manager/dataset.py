@@ -14,9 +14,9 @@ log_config = ckg_config.report_manager_log
 logger = ckg_utils.setup_logging(log_config, key="dataset")
 
 class Dataset:
-    def __init__(self, identifier, dtype, configuration=None, data={}, analyses={}, analysis_queries={}, report=None):
+    def __init__(self, identifier, dataset_type, configuration=None, data={}, analyses={}, analysis_queries={}, report=None):
         self._identifier = identifier
-        self._dataset_type = dtype
+        self._dataset_type = dataset_type
         self._configuration = configuration
         self._data = data
         self._analyses = analyses
@@ -295,10 +295,10 @@ class ClinicalDataset(Dataset):
         if len(data) == 0:
             self._data = self.query_data()
         
-class WESDataset(Dataset):
-    def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
-        config_file = "wes.yml"
-        Dataset.__init__(self, identifier, "wes", data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
+class DNAseqDataset(Dataset):
+    def __init__(self, identifier, dataset_type, data={}, analyses={}, analysis_queries={}, report=None):
+        config_file = "DNAseq.yml"
+        Dataset.__init__(self, identifier, dataset_type=dataset_type, data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
         self.set_configuration_from_file(config_file)
         if len(data) == 0:
             self._data = self.query_data()

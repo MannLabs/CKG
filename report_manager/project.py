@@ -201,14 +201,15 @@ class Project:
         self.set_attributes(project_info)
         for data_type in self.data_types:
             if data_type == "proteomics":
-                proteomics_dataset = ProteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
-                self.update_dataset({data_type:proteomics_dataset})
+                dataset = ProteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
+                self.update_dataset({data_type:dataset})
             elif data_type == "clinical":
-                clinical_dataset = ClinicalDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
-                self.update_dataset({data_type:clinical_dataset})
-            elif data_type == "wes":
-                wes_dataset = WESDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
+                dataset = ClinicalDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
+                self.update_dataset({data_type:dataset})
+            elif data_type == "wes" or data_type == "wgs":
+                dataset = DNAseqDataset(self.identifier, dataset_type=data_type, data={}, analyses={}, analysis_queries={}, report=None)
                 self.update_dataset({data_type:wes_dataset})
+                
            
     def generate_project_info_report(self):
         report = rp.Report(identifier="project_info")
@@ -216,7 +217,7 @@ class Project:
         identifier = "Project info"
         title = "Project: {} information".format(self.name)
         plot = [figure.getBasicTable(project_df, identifier, title)]
-        report.plots = {("project_info","Project Information"): plot}
+        report.plots = {("Project info","Project Information"): plot}
 
         return report
     
