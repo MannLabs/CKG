@@ -131,9 +131,18 @@ class AnalysisResult:
                 result[pair] = ttest_result
         elif self.analysis_type  == 'anova':
             alpha = 0.05
+            drop_cols = []
+            group = 'group'
+            permutations = 50
             if "alpha" in args:
                 alpha = args["alpha"]
-            anova_result = analyses.anova(self.data, alpha = 0.05)
+            if "drop_cols" in args:
+                drop_cols = args['drop_cols']
+            if "group" in args:
+                group = args["group"]
+            if "permutations" in args:
+                permutations = args["permutations"]
+            anova_result = analyses.anova(self.data, drop_cols=drop_cols, group=group, alpha=alpha, permutations=permutations)
             result[self.analysis_type] = anova_result
         elif self.analysis_type  == "correlation":
             alpha = 0.05

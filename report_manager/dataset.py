@@ -273,16 +273,16 @@ class ProteomicsDataset(Dataset):
             args = {}
             if "args" in self.configuration:
                 args = self.configuration["args"]
-            if "imputation" in args:
-                imputation = args["imputation"]
-            if "imputation_method" in args:
-                method = args["imputation_method"]
-            if "missing_method" in args:
-                missing_method = args["missing_method"]
-            if "missing_max" in args:
-                missing_max = args["missing_max"]
-            if "value_col" in args:
-                value_col = args["value_col"]
+                if "imputation" in args:
+                    imputation = args["imputation"]
+                if "imputation_method" in args:
+                    method = args["imputation_method"]
+                if "missing_method" in args:
+                    missing_method = args["missing_method"]
+                if "missing_max" in args:
+                    missing_max = args["missing_max"]
+                if "value_col" in args:
+                    value_col = args["value_col"]
             
             processed_data = basicAnalysis.get_measurements_ready(data, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max)
         return processed_data
@@ -294,6 +294,38 @@ class ClinicalDataset(Dataset):
         self.set_configuration_from_file(config_file)
         if len(data) == 0:
             self._data = self.query_data()
+
+        self.preprocess_dataset()
+
+    def preprocess_dataset(self):
+        processed_data = self.preprocessing()
+        self.update_data({"preprocessed":processed_data})
+    
+    def preprocessing(self):
+        processed_data = None
+        data = self.get_dataset("dataset")
+        if data is not None:
+            index = 'index'
+            columns = 'clinical_variable'
+            values = 'value'
+            extra = []
+            use_index = False
+            args = {}
+            if "args" in self.configuration:
+                args = self.configuration["args"]
+                if "index" in args:
+                    index = args["index"]
+                if "columns" in args:
+                    columns = args["columns"]
+                if "values" in args:
+                    values = args["values"]
+                if "extra" in args:
+                    extra = args["extra"]
+                if "use_index" in args:
+                    use_index = args["use_index"]
+            
+            processed_data = basicAnalysis.transform_into_long_format(data, index=index, columns=columns, values=values, extra=extra, use_index=use_index)
+        return processed_data
         
 class DNAseqDataset(Dataset):
     def __init__(self, identifier, dataset_type, data={}, analyses={}, analysis_queries={}, report=None):

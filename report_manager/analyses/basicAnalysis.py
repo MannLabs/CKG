@@ -399,6 +399,7 @@ def get_max_permutations(df, group='group'):
     return max_perm
 
 def anova(data, alpha=0.5, drop_cols=["sample"], group='group', permutations=50):
+    print(data.head())
     columns = ['identifier', 't-statistics', 'pvalue', '-Log pvalue']
     df = data.copy()
     df = df.set_index(group)

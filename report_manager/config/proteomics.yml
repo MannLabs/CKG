@@ -70,6 +70,7 @@ overview: #section
         args: 
             alpha: 0.05
             fc: 2.0
+            group: 'group'
             colorscale: 'Blues'
             showscale: False
             marker_size: 10
@@ -77,7 +78,6 @@ overview: #section
             y_title: -log(pvalue)
             drop_cols: 
                 - sample
-                - gene_name
             name: name
             title: 'Volcano plot'
     correlation:
