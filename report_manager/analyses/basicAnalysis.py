@@ -5,7 +5,7 @@ from sklearn.manifold import TSNE
 import statsmodels.stats.multitest as multitest
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 from scipy.special import factorial, betainc
-import umap
+import umap.umap_ as umap
 from sklearn import preprocessing, ensemble, cluster
 from scipy import stats
 import numpy as np
@@ -54,12 +54,12 @@ def extract_percentage_missing(data, conditions, missing_max):
       
     return list(groups)
 
-def imputation_KNN(data, alone = True):
+def imputation_KNN(data, cutoff=0.5, alone = True):
     df = data.copy()
     value_cols = [c for c in df.columns if c not in ['sample', 'group']]
     for g in df.group.unique():
         missDf = df.loc[df.group==g, value_cols]
-        missDf = missDf.loc[:, missDf.notnull().mean() >= 0.5]
+        missDf = missDf.loc[:, missDf.notnull().mean() >= cutoff]
         X = np.array(missDf.values, dtype=np.float64)
         X_trans = KNN(k=3).fit_transform(X)
         missingdata_df = missDf.columns.tolist()
@@ -71,7 +71,7 @@ def imputation_KNN(data, alone = True):
     return df
 
 def imputation_mixed_norm_KNN(data):
-    df = imputation_KNN(data, alone = False)
+    df = imputation_KNN(data, cutoff=0.6, alone = False)
     df = imputation_normal_distribution(df, shift = 1.8, nstd = 0.3)
     
     return df
@@ -161,6 +161,7 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
     return df
 
 def runPCA(data, components = 2):
+    np.random.seed(112736)
     result = {}
     df = data.copy()
     df = df.drop(['sample'], axis=1)
@@ -375,12 +376,14 @@ def calculate_THSD(df):
     col = df.name
     result = pairwise_tukeyhsd(df, list(df.index))
     df_results = pd.DataFrame(data=result._results_table.data[1:], columns=result._results_table.data[0])
-    df_results.columns = ['group1', 'group2', 'log2FC', 'lower', 'upper', 'rejected'] 
+    df_results.columns = ['group1', 'group2', 'logFC', 'lower', 'upper', 'rejected'] 
     df_results['identifier'] = col
     df_results = df_results.set_index('identifier')
+    df_results['FC'] = df_results['logFC'].apply(lambda x: np.power(10,np.abs(x)) * -1 if x < 0 else np.power(10,np.abs(x)))
+    
     return df_results
 
-def calculate_annova(df):
+def calculate_annova(df, group='group'):
     col = df.name
     group_values = df.groupby('group').apply(list).tolist()
     t, pvalue = stats.f_oneway(*group_values)
@@ -388,19 +391,19 @@ def calculate_annova(df):
 
     return (col, t, pvalue, log)
 
-def get_max_permutations(df):
+def get_max_permutations(df, group='group'):
     num_groups = len(list(df.index))
-    num_per_group = df.groupby('group').size().tolist() 
+    num_per_group = df.groupby(group).size().tolist() 
     max_perm = math.factorial(num_groups)/np.prod(factorial(np.array(num_per_group)))
     
     return max_perm
 
-def anova(data, alpha=0.5, drop_cols=["sample"], permutations=50):
+def anova(data, alpha=0.5, drop_cols=["sample"], group='group', permutations=50):
     columns = ['identifier', 't-statistics', 'pvalue', '-Log pvalue']
     df = data.copy()
-    df = df.set_index('group')
+    df = df.set_index(group)
     df = df.drop(drop_cols, axis=1)
-    scores = df.apply(func = calculate_annova, axis=0,result_type='expand').T
+    scores = df.apply(func = calculate_annova, axis=0,result_type='expand', group=group).T
     scores.columns = columns
     scores = scores.set_index("identifier")
     scores = scores.dropna(how="all")
@@ -419,10 +422,10 @@ def anova(data, alpha=0.5, drop_cols=["sample"], permutations=50):
         scores['padj'] = padj
         scores['rejected'] = rejected
     
-    sigdf = df[list(scores[scores.rejected].index)]
+    #sigdf = df[list(scores[scores.rejected].index)]
     res = None
-    for col in sigdf.columns:
-        pairthsd = calculate_THSD(sigdf[col])
+    for col in df.columns:
+        pairthsd = calculate_THSD(df[col])
         if res is None:
             res = pairthsd
         else:
@@ -431,13 +434,13 @@ def anova(data, alpha=0.5, drop_cols=["sample"], permutations=50):
         res = res.join(scores[['t-statistics', 'pvalue', '-Log pvalue', 'padj']].astype('float'))
     else:
         res = scores
-        res["log2FC"] = np.nan
+        res["logFC"] = np.nan
     
     res = res.reset_index()
     
     return res
 
-def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample"], paired=False, permutations=0):
+def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample"], paired=False, permutations=50):
     df = data.copy()
     df = df.set_index('group')
     df = df.drop(drop_cols, axis = 1)
@@ -452,7 +455,7 @@ def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample"], pair
     scores = scores.dropna(how="all")
     
     #Fold change
-    scores["log2FC"] = tdf.apply(func = calculate_fold_change, axis = 1, args =(condition1, condition2))
+    scores["logFC"] = tdf.apply(func = calculate_fold_change, axis = 1, args =(condition1, condition2))
     
     #Cohen's d
     scores["cohen_d"] = tdf.apply(func = cohen_d, axis = 1, args =(condition1, condition2, 1))
@@ -604,34 +607,6 @@ def hedges_g(df, condition1, condition2, ddof = 0):
             g = ((meang1 - meang2) / sdpooled)
         
     return g
-
-def runVolcano(signature, cutoff = 1, alpha = 0.05):
-    # Loop through signature
-    color = []
-    text = []
-    for index, rowData in signature.iterrows():
-        # Text
-        text.append('<b>'+str(rowData['Leading razor protein'])+": "+str(index)+'<br>Gene = '+str(rowData['Gene names'])+'<br>log2FC = '+str(round(rowData['log2FC'], ndigits=2))+'<br>p = '+'{:.2e}'.format(rowData['pvalue'])+'<br>FDR = '+'{:.2e}'.format(rowData['padj']))
-        
-        # Color
-        if rowData['padj'] < 0.05:
-            if rowData['log2FC'] < -cutoff:
-                color.append('#2b83ba')
-            elif rowData['log2FC'] > cutoff:
-                color.append('#d7191c')
-            else:
-                color.append('black')
-        else:
-            if rowData['log2FC'] < -cutoff:
-                color.append("#abdda4")
-            elif rowData['log2FC'] > cutoff:
-                color.append('#fdae61')
-            else:
-                color.append('black')
-                
-    # Return 
-    volcano_plot_results = {'x': signature['log2FC'], 'y': signature['-Log pvalue'], 'text':text, 'color': color}
-    return volcano_plot_results
 
 def runMapper(data, lenses=["l2norm"], n_cubes = 15, overlap=0.5, n_clusters=3, linkage="complete", affinity="correlation"):
     X = data._get_numeric_data()

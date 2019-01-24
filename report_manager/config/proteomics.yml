@@ -1,6 +1,6 @@
 args:
     imputation: True
-    imputation_method: distribution    
+    imputation_method: mixed
 overview: #section
     peptides:
         data: number of peptides 
@@ -47,9 +47,9 @@ overview: #section
     stratification:
         data: preprocessed
         analyses: 
-            - pca 
+            #- pca 
             #- tsne
-            #-   umap
+            -   umap
         plots:
             - scatterplot
         args: 
@@ -69,11 +69,11 @@ overview: #section
             - volcanoplot
         args: 
             alpha: 0.05
-            lfc: 1.0
+            fc: 2.0
             colorscale: 'Blues'
             showscale: False
             marker_size: 10
-            x_title: log2FC
+            x_title: logFC
             y_title: -log(pvalue)
             drop_cols: 
                 - sample

@@ -233,7 +233,7 @@ class AnalysisResult:
                     signature = data[pair]
                     args["title"] = args['title']+" "+pair[0]+" vs "+pair[1]
                     p = figure.run_volcano(signature, identifier+"_"+pair[0]+"_vs_"+pair[1], args)
-                    plot.append(p)
+                    plot.extend(p)
             elif name == 'network':
                 source = 'source'
                 target = 'target'

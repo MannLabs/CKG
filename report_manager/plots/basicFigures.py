@@ -196,62 +196,110 @@ def get_scatterplot(data, identifier, args):
     return dcc.Graph(id= identifier, figure = figure)
 
 def get_volcanoplot(results, args):
-    figure = {"data":[],"layout":None}
-    if "range_x" not in args:
-        range_x = [-max(abs(results['x']))-0.1, max(abs(results['x']))+0.1]#if symmetric_x else []
-    else:
-        range_x = args["range_x"]
-    if "range_y" not in args:
-        range_y = [0,max(abs(results['y']))+2.5]
-    else:
-        range_y = args["range_y"]
+    figures = []
+    for identifier,title in results:
+        result = results[(identifier,title)]
+        figure = {"data":[],"layout":None}
+        if "range_x" not in args:
+            range_x = [-max(abs(result['x']))-0.1, max(abs(result['x']))+0.1]#if symmetric_x else []
+        else:
+            range_x = args["range_x"]
+        if "range_y" not in args:
+            range_y = [0,max(abs(result['y']))+2.5]
+        else:
+            range_y = args["range_y"]
 
-    trace = Scattergl(x=results['x'],
-                    y=results['y'],
-                    mode='markers',
-                    text=results['text'],
-                    hoverinfo='text',
-                    marker={'color': results['color'], 'colorscale': args["colorscale"], 'showscale': args['showscale'], 'size': args['marker_size']}
-                    )
+        trace = Scattergl(x=result['x'],
+                        y=result['y'],
+                        mode='markers',
+                        text=result['text'],
+                        hoverinfo='text',
+                        marker={'color': result['color'], 'colorscale': args["colorscale"], 'showscale': args['showscale'], 'size': args['marker_size']}
+                        )
 
-    figure["data"].append(trace)
-    figure["layout"] = go.Layout(title=args['title'], xaxis={'title': args['x_title'], 'range': range_x}, yaxis={'title': args['y_title'], 'range': range_y}, hovermode='closest')
-
-    return figure
+        figure["data"].append(trace)
+        figure["layout"] = go.Layout(title=title, 
+                                        xaxis={'title': args['x_title'], 'range': range_x}, 
+                                        yaxis={'title': args['y_title'], 'range': range_y}, 
+                                        hovermode='closest',
+                                        shapes=[
+                                                {'type': 'line',
+                                                'x0': np.log10(args['fc']),
+                                                'y0': 0,
+                                                'x1': np.log10(args['fc']),
+                                                'y1': max(abs(result['y']))+2.5,
+                                                'line': {
+                                                    'color': 'grey',
+                                                    'width': 2,
+                                                    'dash':'dashdot'
+                                                    },
+                                                    },
+                                                {'type': 'line',
+                                                'x0': -np.log10(args['fc']),
+                                                'y0': 0,
+                                                'x1': -np.log10(args['fc']),
+                                                'y1': max(abs(result['y']))+2.5,
+                                                'line': {
+                                                    'color': 'grey',
+                                                    'width': 2,
+                                                    'dash': 'dashdot'
+                                                    },
+                                                    },
+                                                {'type': 'line',
+                                                'x0': -max(abs(result['x']))-0.1,
+                                                'y0': result['pvalue'],
+                                                'x1': max(abs(result['x']))+0.1,
+                                                'y1': result['pvalue'],
+                                                'line': {
+                                                    'color': 'grey',
+                                                    'width': 1,
+                                                    'dash': 'dashdot'
+                                                    },
+                                                    }
+                                                ],
+                                        showlegend=False)
+        
+        figures.append(dcc.Graph(id= identifier, figure = figure))
+    return figures
 
 def run_volcano(data, identifier, args):
     # Loop through signature
-    color = []
-    text = []
-    for index, row in data.iterrows():
-        # Text
-        text.append('<b>'+str(row['identifier'])+": "+str(index)+'<br>log2FC = '+str(round(row['log2FC'], ndigits=2))+'<br>p = '+'{:.2e}'.format(row['pvalue'])+'<br>FDR = '+'{:.2e}'.format(row['padj']))
 
-        # Color
-        if row['padj'] < args['alpha']:
-            if row['log2FC'] < -args['lfc']:
-                color.append('#2b83ba')
-            elif row['log2FC'] > args['lfc']:
-                color.append('#d7191c')
-            elif row['log2FC'] < -0.5:
-                color.append('#74a9cf')
-            elif row['log2FC'] > 0.5:
-                color.append('#fb6a4a')
+    volcano_plot_results = {}
+    grouping = data.groupby(['group1','group2'])
+    for group in grouping.groups:
+        signature = grouping.get_group(group)
+        color = []
+        text = []
+        gidentifier = identifier + "_".join(group)
+        title = 'Comparison: '+str(group[0])+' vs '+str(group[1])
+        min_sig_pval = 0
+        for index, row in signature.iterrows():
+            # Text
+            text.append('<b>'+str(row['identifier'])+": "+str(index)+'<br>Comparison: '+str(row['group1'])+' vs '+str(row['group2'])+'<br>logFC = '+str(round(row['logFC'], ndigits=2))+'<br>p = '+'{:.2e}'.format(row['pvalue'])+'<br>FDR = '+'{:.2e}'.format(row['padj']))
+
+            # Color
+            if row['padj'] < args['alpha']:
+                min_sig_pval = row['pvalue'] if row['pvalue'] > min_sig_pval else min_sig_pval 
+                if row['FC'] < -args['fc']:
+                    color.append('#2c7bb6')
+                elif row['FC'] > args['fc']:
+                    color.append('#d7191c')
+                elif row['FC'] < -1.:
+                    color.append('#abd9e9')
+                elif row['FC'] > 1.:
+                    color.append('#fdae61')
+                else:
+                    color.append('silver')
             else:
-                color.append('grey')
-        else:
-            if row['log2FC'] < -args['lfc']:
-                color.append("#abdda4")
-            elif row['log2FC'] > args['lfc']:
-                color.append('#fdae61')
-            else:
-                color.append('grey')
+                color.append('silver')
+        
+        # Return
+        volcano_plot_results[(gidentifier, title)] = {'x': signature['logFC'].values, 'y': signature['-Log pvalue'].values, 'text':text, 'color': color, 'pvalue':-np.log10(min_sig_pval)}
+    
+    figures = get_volcanoplot(volcano_plot_results, args)
 
-    # Return
-    volcano_plot_results = {'x': data['log2FC'].values, 'y': data['-Log pvalue'].values, 'text':text, 'color': color}
-    figure = get_volcanoplot(volcano_plot_results, args)
-
-    return  dcc.Graph(id= identifier, figure = figure)
+    return figures
 
 def get_heatmapplot(data, identifier, args):
     '''This function plots a simple Heatmap
