@@ -62,7 +62,7 @@ if __name__ == '__main__':
                         valid_entities = set([x.lower() for x in dbconfig['databases']]).intersection([x.lower() for x in args.data])
                         if len(valid_entities) > 0:
                             logger.info("These entities will be imported: {}".format(", ".join(valid_entities)))
-                            print("These entities will be loaded into the database: {}".format(", ".join(valid_entities)))
+                            print("These entities will be imported: {}".format(", ".join(valid_entities)))
                             importer.databasesImport(importDirectory='../../../data/imports', databases=valid_entities, n_jobs=args.n_jobs, download=args.download)
                         else:
                             logger.error("The indicated entities (--data) cannot be imported: {}".format(args.data))

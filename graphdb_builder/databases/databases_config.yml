@@ -17,7 +17,6 @@ databases :
     - "PathwayCommons"
     - "GWASCatalog"
     - "DGIdb" 
-    - "OncoKB"
     - "CancerGenomeInterpreter"
     - "SIDER"
     - "PhosphoSitePlus"

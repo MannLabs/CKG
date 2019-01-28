@@ -73,6 +73,11 @@ variants_header:
     - 'ID'
     - ':LABEL'
     - 'alternative_names'
+    - 'function'
+    - 'clinical_relevance'
+    - 'disease'
+    - 'original_source'
+    - 'source'
 
 peptides_header: 
     - 'ID'

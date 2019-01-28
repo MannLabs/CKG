@@ -15,6 +15,7 @@ entities_header:
     - 'alternative'
     - 'effect'
     - 'oncogeneicity'
+    - 'source'
 relationships_headers:
     'targets_clinically_relevant_variant':
         - 'START_ID'
