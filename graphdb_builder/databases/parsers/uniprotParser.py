@@ -161,7 +161,8 @@ def parseUniProtVariants(config, databases_directory, download=True):
                     altName = [externalID, data[5], pvariant, chromosome_coord]
                     if ref in aa and alt in aa:
                         altName.append(aa[ref]+pos+aa[alt])
-                    entities.add((ident, "Known_variant", ",".join(altName), impact, clin_relevance, disease, original_source, "UniProt"))
+                    pvariant = protein+"_"+pvariant
+                    entities.add((ident, "Known_variant", pvariant, ",".join(altName), impact, clin_relevance, disease, original_source, "UniProt"))
                     if chromosome != 'chr-':
                         relationships[('Chromosome','known_variant_found_in_chromosome')].add((ident, chromosome, "VARIANT_FOUND_IN_CHROMOSOME","UniProt"))
                     if gene != "":

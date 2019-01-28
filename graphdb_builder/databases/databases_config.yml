@@ -12,6 +12,7 @@ databases :
     - "STITCH"
     - "STRING"
     - "IntAct"
+    - "MutationDs"
     - "Mentions"
     - "HMDB"
     - "PathwayCommons"

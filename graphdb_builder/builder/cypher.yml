@@ -464,10 +464,11 @@ IMPORT_KNOWN_VARIANT_DATA:
     'description': 'Creates Known_variant nodes and their relationships to Chromosome, Gene and Protein nodes. Known variants are protein variants that have been found in a population (or disease) and registered/curated previously'
     'query': >
         CREATE CONSTRAINT ON (k:Known_variant) ASSERT k.id IS UNIQUE; 
+        CREATE CONSTRAINT ON (k:Known_variant) ASSERT k.pvariant_id IS UNIQUE;
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Known_variant.csv" AS line
         MERGE (k:Known_variant {id:line.ID})
-        ON CREATE SET k.alternative_names=line.alternative_names,k.effect=line.effect,k.clinical_relevance=line.clinical_relevance,k.disease=line.disease,k.original_source=line.original_source,k.source=line.source
+        ON CREATE SET k.pvariant_id=line.pvariant_id,k.alternative_names=line.alternative_names,k.effect=line.effect,k.clinical_relevance=line.clinical_relevance,k.disease=line.disease,k.original_source=line.original_source,k.source=line.source
         RETURN COUNT(k) AS known_variant;
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/uniprot_chromosome_known_variant_found_in_chromosome.csv" AS line
@@ -487,6 +488,12 @@ IMPORT_KNOWN_VARIANT_DATA:
         MATCH (p:Protein {id:line.END_ID}) 
         MERGE (k)-[r:VARIANT_FOUND_IN_PROTEIN]->(p)
         RETURN COUNT(r) AS known_variant_found_in_protein;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/mutation_curated_affects_interaction_with.csv" AS line
+        MATCH (k:Known_variant {protein_id:line.START_ID})
+        MATCH (p:Protein {id:line.END_ID}) 
+        MERGE (k)-[r:CURATED_AFFECTS_INTERACTION_WITH{effect:line.effect,interaction:line.interaction,evidence:line.evidence,internal_id:line.internal_id,source:line.source}]->(p)
+        RETURN COUNT(r) AS known_variant_affects_interaction_with;
                                 
 IMPORT_CLINICALLY_RELEVANT_VARIANT_DATA:
     'name': 'import clinically relevant variants'
@@ -516,7 +523,7 @@ IMPORT_CLINICALLY_RELEVANT_VARIANT_DATA:
         MATCH (d:Disease {id:line.END_ID})
         MERGE (k)-[r:ASSOCIATED_WITH{score:line.score,evidence_type:line.evidence_type,source:line.source,number_publications:line.number_publications}]->(d)
         RETURN COUNT(r) AS clinically_relevant_variant_associated_with_disease;
-        
+
 IMPORT_GWAS: 
     'name': 'import GWAS studies'
     'description': 'Creates GWAS_study nodes'

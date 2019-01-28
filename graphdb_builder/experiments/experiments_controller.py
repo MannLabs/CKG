@@ -558,7 +558,6 @@ def loadWESDataset(uri, configuration):
         Input: uri of the processed file resulting from the WES analysis pipeline. The resulting
         Annovar annotated VCF file from Mutect (sampleID_mutect_annovar.vcf)
         Output: pandas DataFrame with the columns and filters defined in config.py '''
-    regex = r"p\.(\w\d+\w)"
     aux = uri.split("/")[-1].split("_")
     sample = aux[0]
     #Get the columns from config 

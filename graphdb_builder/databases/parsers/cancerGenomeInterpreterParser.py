@@ -9,7 +9,7 @@ import re
 #   The Cancer Genome Interpreter     # 
 #######################################
 def parser(databases_directory, download = True):
-    regex = r"(chr\d+):g\.(\d+)(\w)>(\w)"
+    regex = r"(chr\d+):g\.(\d+)(\w+)>(\w)"
     
     config = ckg_utils.get_configuration('../databases/config/cancerGenomeInterpreterConfig.yml')
     url = config['cancerBiomarkers_url']

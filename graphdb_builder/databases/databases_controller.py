@@ -106,6 +106,13 @@ def parseDatabase(importDirectory, database, download=True):
             write_relationships(relationships, header, outputfile)
             logger.info("Database {} - Number of {} relationships: {}".format(database, "curated_interacts_with", len(relationships)))
             stats.add(builder_utils.buildStats(len(relationships), "relationships", "curated_interacts_with", database, outputfile))
+        elif database.lower() == "mutationds":
+            #MutationDs
+            relationships, header, outputfileName = mutationDsParser.parser(dbconfig["databasesDir"], download)
+            outputfile = os.path.join(importDirectory, outputfileName)
+            write_relationships(relationships, header, outputfile)
+            logger.info("Database {} - Number of {} relationships: {}".format(database, "curated_affects_interaction_with", len(relationships)))
+            stats.add(builder_utils.buildStats(len(relationships), "relationships", "curated_affects_interaction_with", database, outputfile))
         elif database.lower() == "string":
             #STRING
             proteinMapping, drugMapping = stringParser.parser(dbconfig["databasesDir"], importDirectory, download=download)
