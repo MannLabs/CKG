@@ -16,13 +16,14 @@ import kmapper as km
 
 def transform_into_long_format(data, index, columns, values, extra=[], use_index=False):
     df = data.copy()
-    cols = [index,columns, values]
+    cols = [columns, values]
+    cols.extend(index)
     df = df.drop_duplicates()
     if len(extra) > 0:
-        extra.append(index)
+        extra.extend(index)
         extra_cols = df[extra].set_index(index)
     df = df[cols]
-    df = df.pivot(index=index, columns=columns, values=values)
+    df = df.pivot_table(index=index, columns=columns, values=values)
     df = df.join(extra_cols)
     if not use_index:
         df = df.reset_index(drop=True)
@@ -391,6 +392,14 @@ def calculate_annova(df, group='group'):
 
     return (col, t, pvalue, log)
 
+def calculate_repeated_measures_annova(df, sample='sample', group='group'):
+    col = df.name
+    #group_values = df.groupby('group').apply(list).tolist()
+    num_df, den_df, f_stat, pvalue = stats.anova.AnovaRM(df.reset_index(), col, sample, within=[group]).fit().anova_table.values.to_list()[0]
+    log = -math.log(pvalue,10)
+
+    return (col, f_stat, pvalue, log)
+
 def get_max_permutations(df, group='group'):
     num_groups = len(list(df.index))
     num_per_group = df.groupby(group).size().tolist() 
@@ -399,7 +408,6 @@ def get_max_permutations(df, group='group'):
     return max_perm
 
 def anova(data, alpha=0.5, drop_cols=["sample"], group='group', permutations=50):
-    print(data.head())
     columns = ['identifier', 't-statistics', 'pvalue', '-Log pvalue']
     df = data.copy()
     df = df.set_index(group)
@@ -409,6 +417,49 @@ def anova(data, alpha=0.5, drop_cols=["sample"], group='group', permutations=50)
     scores = scores.set_index("identifier")
     scores = scores.dropna(how="all")
     
+    #FDR correction
+    if permutations > 0:
+        #max_perm = get_max_permutations(df)
+        #if max_perm < permutations:
+        #    permutations = max_perm
+        observed_pvalues = scores.pvalue
+        count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=alpha, permutations=permutations)
+        scores= scores.join(count)
+        aux = scores.loc[scores.rejected,:]
+    else:
+        rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'indep')
+        scores['padj'] = padj
+        scores['rejected'] = rejected
+    
+    #sigdf = df[list(scores[scores.rejected].index)]
+    res = None
+    for col in df.columns:
+        pairthsd = calculate_THSD(df[col])
+        if res is None:
+            res = pairthsd
+        else:
+            res = pd.concat([res,pairthsd], axis=0)
+    if res is not None:
+        res = res.join(scores[['t-statistics', 'pvalue', '-Log pvalue', 'padj']].astype('float'))
+    else:
+        res = scores
+        res["logFC"] = np.nan
+    
+    res = res.reset_index()
+    
+    return res
+
+def repeated_measurements_anova(data, alpha=0.5, drop_cols=[], sample='sample', group='group', permutations=50):
+    columns = ['identifier', 'F-statistics', 'pvalue', '-Log pvalue']
+    df = data.copy()
+    df = df.set_index([sample,group])
+    df = df.drop(drop_cols, axis=1)
+    scores = df.apply(func = calculate_repeated_measures_annova, axis=0,result_type='expand', sample=sample, group=group).T
+    scores.columns = columns
+    scores = scores.set_index("identifier")
+    scores = scores.dropna(how="all")
+    df = df.drop([sample], axis=1)
+
     #FDR correction
     if permutations > 0:
         #max_perm = get_max_permutations(df)

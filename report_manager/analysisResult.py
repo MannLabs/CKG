@@ -144,6 +144,24 @@ class AnalysisResult:
                 permutations = args["permutations"]
             anova_result = analyses.anova(self.data, drop_cols=drop_cols, group=group, alpha=alpha, permutations=permutations)
             result[self.analysis_type] = anova_result
+        elif self.analysis_type == "repeated_measurements_anova":
+            alpha = 0.05
+            drop_cols = []
+            group = 'group'
+            sample = 'sample'
+            permutations = 50
+            if "alpha" in args:
+                alpha = args["alpha"]
+            if "drop_cols" in args:
+                drop_cols = args['drop_cols']
+            if "group" in args:
+                group = args["group"]
+            if "sample" in args:
+                sample = args["sample"]
+            if "permutations" in args:
+                permutations = args["permutations"]
+            anova_result = analyses.repeated_measurements_anova(self.data, drop_cols=drop_cols, sample=sample, group=group, alpha=alpha, permutations=permutations)
+            result[self.analysis_type] = anova_result
         elif self.analysis_type  == "correlation":
             alpha = 0.05
             method = 'pearson'

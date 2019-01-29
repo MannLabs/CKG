@@ -109,7 +109,7 @@ clinical:
             WITH subject, bs, clinvar, r1
             WHERE project.id="PROJECTID"
             MATCH (bs)-[r2:SPLITTED_INTO]-(an:Analytical_sample)
-            RETURN subject.id AS subject, an.group AS group, clinvar.name AS clinical_variable, r1.value AS value ORDER BY subject
+            RETURN subject.id AS subject, bs.id AS biological_sample, an.group AS group, clinvar.name AS clinical_variable, r1.value AS value ORDER BY subject
 wes:
     NUMBER_SOMATIC_MUTATIONS:
         name: 'number somatic mutations'

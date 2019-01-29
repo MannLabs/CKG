@@ -287,6 +287,16 @@ class ProteomicsDataset(Dataset):
             processed_data = basicAnalysis.get_measurements_ready(data, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max)
         return processed_data
 
+class LongitudinalProteomicsDataset(ProteomicsDataset):
+    def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
+        config_file = "longitudinal_proteomics.yml"
+        ProteomicsDataset.__init__(self, identifier, data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
+        self.set_configuration_from_file(config_file)
+        if len(data) == 0:
+            self._data = self.query_data()
+        
+        self.preprocess_dataset()
+
 class ClinicalDataset(Dataset):
     def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
         config_file = "clinical.yml"

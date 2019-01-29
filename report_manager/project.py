@@ -6,7 +6,7 @@ from json import dumps
 import pandas as pd
 import ckg_utils
 import config.ckg_config as ckg_config
-from report_manager.dataset import ProteomicsDataset, ClinicalDataset, DNAseqDataset, RNAseqDataset
+from report_manager.dataset import ProteomicsDataset, ClinicalDataset, DNAseqDataset, RNAseqDataset, LongitudinalProteomicsDataset
 from report_manager.plots import basicFigures as figure
 from report_manager import report as rp
 from graphdb_connector import connector
@@ -208,6 +208,9 @@ class Project:
                 self.update_dataset({data_type:dataset})
             elif data_type == "wes" or data_type == "wgs":
                 dataset = DNAseqDataset(self.identifier, dataset_type=data_type, data={}, analyses={}, analysis_queries={}, report=None)
+                self.update_dataset({data_type:dataset})
+            elif data_type == "longitudinal_proteomics":
+                dataset = LongitudinalProteomicsDataset(self.identifier, dataset_type=data_type, data={}, analyses={}, analysis_queries={}, report=None)
                 self.update_dataset({data_type:dataset})
                 
            

@@ -1,5 +1,7 @@
 args:
-    index: subject
+    index: 
+        - subject
+        - biological_sample
     columns: clinical_variable
     values: value
     extra: 
