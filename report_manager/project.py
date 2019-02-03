@@ -2,6 +2,8 @@ import sys
 import os
 from collections import defaultdict
 from plotly.offline import iplot
+from IPython.display import IFrame, display
+import tempfile
 from json import dumps
 import pandas as pd
 import ckg_utils
@@ -254,9 +256,24 @@ class Project:
                     if environment == "notebook":
                         if hasattr(plot, 'figure'):
                             iplot(plot.figure)
-                        #else:
-                        #    iplot(plot)
+                        elif isinstance(plot, dict):
+                            if "notebook" in plot:
+                                net = plot['notebook']
+                                fnet = tempfile.NamedTemporaryFile(suffix=".html", delete=False, dir='tmp/')
+                                with open(fnet.name, 'w') as f:
+                                    f.write(net.html)
+                                display(IFrame(os.path.relpath(fnet.name),width=1400, height=1400))
+                                iplot(plot["net_tables"][0].figure)
+                                iplot(plot["net_tables"][1].figure)
                     else:
-                        app_plots[identifier].append(plot)
+                        if isinstance(plot, dict):
+                            if 'app' in plot:
+                                app_plots[identifier].append(plot['app'])
+                            if 'net_tables' in plot:
+                                tables = plot['net_tables']
+                                app_plots[identifier].append(tables[0])
+                                app_plots[identifier].append(tables[1])
+                        else:
+                            app_plots[identifier].append(plot)
         
         return app_plots        

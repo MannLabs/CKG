@@ -1,5 +1,14 @@
 import dash_html_components as html
 import bs4 as bs
+import random
+
+
+def generator_to_dict(genvar):
+    dictvar = {}
+    for i,gen in enumerate(genvar):
+            dictvar.update({n:i for n in gen})
+
+    return dictvar
 
 def parse_html(html_snippet):
     html_parsed = bs.BeautifulSoup(html_snippet)
@@ -32,3 +41,27 @@ def getNumberText(num):
         return numbers[num]
     else:
         return None
+
+def get_rgb_colors(n):
+    colors = []
+    r = int(random.random() * 256)
+    g = int(random.random() * 256)
+    b = int(random.random() * 256)
+    step = 256 / n
+    for i in range(n):
+        r += step
+        g += step
+        b += step
+        r = int(r) % 256
+        g = int(g) % 256
+        b = int(b) % 256
+        colors.append((r,g,b)) 
+    return colors
+
+def get_hex_colors(n):
+    colors = []
+    for i in range(n):
+        color = "#%06x" % random.randint(0, 0xFFFFFF)
+        colors.append(color)
+
+    return colors

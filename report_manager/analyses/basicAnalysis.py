@@ -9,24 +9,28 @@ import umap.umap_ as umap
 from sklearn import preprocessing, ensemble, cluster
 from scipy import stats
 import numpy as np
+import networkx as nx
+import community
 import math
 from random import shuffle
 from fancyimpute import KNN
 import kmapper as km
+from report_manager import utils
 
 def transform_into_long_format(data, index, columns, values, extra=[], use_index=False):
     df = data.copy()
-    cols = [columns, values]
-    cols.extend(index)
-    df = df.drop_duplicates()
-    if len(extra) > 0:
-        extra.extend(index)
-        extra_cols = df[extra].set_index(index)
-    df = df[cols]
-    df = df.pivot_table(index=index, columns=columns, values=values)
-    df = df.join(extra_cols)
-    if not use_index:
-        df = df.reset_index(drop=True)
+    if not df.empty:
+        cols = [columns, values]
+        cols.extend(index)
+        df = df.drop_duplicates()
+        if len(extra) > 0:
+            extra.extend(index)
+            extra_cols = df[extra].set_index(index)
+        df = df[cols]
+        df = df.pivot_table(index=index, columns=columns, values=values)
+        df = df.join(extra_cols)
+        if not use_index:
+            df = df.reset_index(drop=True)
 
     return df
 
@@ -446,6 +450,7 @@ def anova(data, alpha=0.5, drop_cols=["sample"], group='group', permutations=50)
         res["logFC"] = np.nan
     
     res = res.reset_index()
+    res['rejected'] = res['padj'] < alpha
     
     return res
 
@@ -489,6 +494,7 @@ def repeated_measurements_anova(data, alpha=0.5, drop_cols=[], sample='sample', 
         res["logFC"] = np.nan
     
     res = res.reset_index()
+    res['rejected'] = res['padj'] < alpha
     
     return res
 
@@ -685,4 +691,32 @@ def runMapper(data, lenses=["l2norm"], n_cubes = 15, overlap=0.5, n_clusters=3, 
 
 
     return simplicial_complex, {"labels":labels}
+
+def most_central_edge(G):
+    centrality = nx.eigenvector_centrality_numpy(G, weight='width')
+    
+    return max(centrality, key=centrality.get)
+
+def get_louvain_partitions(G, weight):
+    partition = community.best_partition(G)
+    
+    return partition
+
+def get_network_communities(graph, args):
+    if 'communities_algorithm' not in args:
+        args['communities_algorithm'] = 'louvain'
+    
+    if args['communities_algorithm'] == 'louvain':
+        communities = get_louvain_partitions(graph, args['values'])
+    elif args['communities_algorithm'] == 'greedy_modularity':
+        gcommunities = nx.algorithms.community.greedy_modularity_communities(graph, weight=args['values'])
+        communities = utils.generator_to_dict(gcommunities)
+    elif args['communities_algorithm'] == 'asyn_label_propagation':
+        gcommunities = nx.algorithms.community.label_propagation.asyn_lpa_communities(graph, args['values'])
+        communities = utils.generator_to_dict(gcommunities)
+    elif args['communities_algorithm'] == 'girvan_newman':
+        gcommunities = nx.algorithms.community.girvan_newman(graph, most_valuable_edge=most_central_edge)
+        communities = utils.generator_to_dict(gcommunities)
+    
+    return communities
 

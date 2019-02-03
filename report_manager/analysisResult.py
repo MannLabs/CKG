@@ -186,7 +186,7 @@ class AnalysisResult:
         if len(data) >=1:
             if name == "basicTable":
                 colors = ('#C2D4FF','#F5F8FF')
-                attr =  {'width':800, 'height':300, 'font':12}
+                attr =  {'width':800, 'height':1500, 'font':12}
                 subset = None
                 if "colors" in args:
                     colors = args["colors"]

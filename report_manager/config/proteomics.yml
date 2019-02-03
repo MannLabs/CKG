@@ -47,9 +47,9 @@ overview: #section
     stratification:
         data: preprocessed
         analyses: 
-            #- pca 
+            - pca 
             #- tsne
-            -   umap
+            #-   umap
         plots:
             - scatterplot
         args: 
@@ -87,7 +87,6 @@ overview: #section
         plots: 
             - heatmap
             - network
-            - basicTable
         args: 
             source: node1
             target: node2
@@ -98,15 +97,16 @@ overview: #section
             node_properties: {}
             width: 1600
             height: 1600
-            maxLinkWidth: 5
+            maxLinkWidth: 6
             maxRadius: 20
-            node_size: 'degree'
+            node_size: 'ev_centrality'
+            cutoff: 0.5
+            cutoff_abs: True
     interaction:
         data: regulated
         analyses: []
         plots:
             - network
-            - basicTable
         args:
             use: 
                 columns: identifiers
@@ -119,9 +119,9 @@ overview: #section
             node_properties: {}
             width: 1600
             height: 1600
-            maxLinkWidth: 5
+            maxLinkWidth: 7
             maxRadius: 20
-            node_size: 'betweenness'
+            node_size: 'ev_centrality'
     enrichment:
         data: regulated
         analyses: 
