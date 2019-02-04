@@ -49,7 +49,7 @@ overview: #section
         analyses: 
             - pca 
             #- tsne
-            #-   umap
+            #- umap
         plots:
             - scatterplot
         args: 

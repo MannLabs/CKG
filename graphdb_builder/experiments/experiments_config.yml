@@ -44,7 +44,7 @@ ox : &var_ox
         - 'Amino acid'
     'sequenceCol': 'Sequence window'
     'geneCol': 'Gene names'
-    'log': 'log10'
+    'log': 'log2'
     'modId': 'MOD:00256'
     'mod_acronym': 'ox'
     'file': 'Oxidation (M)Sites.txt'
@@ -84,7 +84,7 @@ gly : &var_gly
         - 'Amino acid'
     'sequenceCol': 'Sequence window'
     'geneCol': 'Gene names'
-    'log': 'log10'
+    'log': 'log2'
     'modId': 'MOD:00767'
     'mod_acronym': 'gly'
     'file': 'GlycationSites.txt'
@@ -124,7 +124,7 @@ p : &var_p
         - 'Amino acid'
     'sequenceCol': 'Sequence window'
     'geneCol': 'Gene names'
-    'log': 'log10'
+    'log': 'log2'
     'modId': 'MOD:00696'
     'mod_acronym': 'p'
     'file': 'Phosphosites (STY).txt'
@@ -163,7 +163,7 @@ dataTypes :
                     - 'is_razor'
                 'regex':
                     - 'Intensity'
-            'log': 'log10'
+            'log': 'log2'
             'file': 'proteinGroups.txt'
         'peptides':
             'columns':
@@ -199,7 +199,7 @@ dataTypes :
                 - 'Start position'
                 - 'End position'
             'type': 'tryptic peptide'
-            'log': 'log10'
+            'log': 'log2'
             'file': 'peptides.txt'
         'Oxydation(M)': *var_ox
         'Glycation': *var_gly

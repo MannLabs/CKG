@@ -226,9 +226,9 @@ def get_volcanoplot(results, args):
                                         hovermode='closest',
                                         shapes=[
                                                 {'type': 'line',
-                                                'x0': np.log10(args['fc']),
+                                                'x0': np.log2(args['fc']),
                                                 'y0': 0,
-                                                'x1': np.log10(args['fc']),
+                                                'x1': np.log2(args['fc']),
                                                 'y1': max(abs(result['y']))+2.5,
                                                 'line': {
                                                     'color': 'grey',
@@ -237,9 +237,9 @@ def get_volcanoplot(results, args):
                                                     },
                                                     },
                                                 {'type': 'line',
-                                                'x0': -np.log10(args['fc']),
+                                                'x0': -np.log2(args['fc']),
                                                 'y0': 0,
-                                                'x1': -np.log10(args['fc']),
+                                                'x1': -np.log2(args['fc']),
                                                 'y1': max(abs(result['y']))+2.5,
                                                 'line': {
                                                     'color': 'grey',
@@ -278,7 +278,7 @@ def run_volcano(data, identifier, args):
         min_sig_pval = 0
         for index, row in signature.iterrows():
             # Text
-            text.append('<b>'+str(row['identifier'])+": "+str(index)+'<br>Comparison: '+str(row['group1'])+' vs '+str(row['group2'])+'<br>logFC = '+str(round(row['logFC'], ndigits=2))+'<br>p = '+'{:.2e}'.format(row['pvalue'])+'<br>FDR = '+'{:.2e}'.format(row['padj']))
+            text.append('<b>'+str(row['identifier'])+": "+str(index)+'<br>Comparison: '+str(row['group1'])+' vs '+str(row['group2'])+'<br>log2FC = '+str(round(row['log2FC'], ndigits=2))+'<br>p = '+'{:.2e}'.format(row['pvalue'])+'<br>FDR = '+'{:.2e}'.format(row['padj']))
 
             # Color
             if row['padj'] < args['alpha']:
@@ -297,7 +297,7 @@ def run_volcano(data, identifier, args):
                 color.append('silver')
         
         # Return
-        volcano_plot_results[(gidentifier, title)] = {'x': signature['logFC'].values, 'y': signature['-Log pvalue'].values, 'text':text, 'color': color, 'pvalue':-np.log10(min_sig_pval)}
+        volcano_plot_results[(gidentifier, title)] = {'x': signature['log2FC'].values, 'y': signature['-log10 pvalue'].values, 'text':text, 'color': color, 'pvalue':-np.log10(min_sig_pval)}
     
     figures = get_volcanoplot(volcano_plot_results, args)
 

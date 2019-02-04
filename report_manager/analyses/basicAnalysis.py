@@ -65,11 +65,12 @@ def imputation_KNN(data, cutoff=0.5, alone = True):
     for g in df.group.unique():
         missDf = df.loc[df.group==g, value_cols]
         missDf = missDf.loc[:, missDf.notnull().mean() >= cutoff]
-        X = np.array(missDf.values, dtype=np.float64)
-        X_trans = KNN(k=3).fit_transform(X)
-        missingdata_df = missDf.columns.tolist()
-        dfm = pd.DataFrame(X_trans, index =list(missDf.index), columns = missingdata_df)
-        df.update(dfm)
+        if missDf.isnull().values.any():
+            X = np.array(missDf.values, dtype=np.float64)
+            X_trans = KNN(k=3).fit_transform(X)
+            missingdata_df = missDf.columns.tolist()
+            dfm = pd.DataFrame(X_trans, index =list(missDf.index), columns = missingdata_df)
+            df.update(dfm)
     if alone:
         df = df.dropna()
     
@@ -266,7 +267,7 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, per
         df_random = df.reset_index(drop=True)
         df_random.index = df_index
         df_random.index.name = 'group'
-        columns = ['identifier', 't-statistics', 'pvalue_'+str(i), '-Log pvalue']
+        columns = ['identifier', 't-statistics', 'pvalue_'+str(i), '-log10 pvalue']
         if list(df_random.index) != list(df.index):
             rand_scores = df_random.apply(func=calculate_annova, axis=0, result_type='expand').T
             rand_scores.columns = columns
@@ -381,10 +382,10 @@ def calculate_THSD(df):
     col = df.name
     result = pairwise_tukeyhsd(df, list(df.index))
     df_results = pd.DataFrame(data=result._results_table.data[1:], columns=result._results_table.data[0])
-    df_results.columns = ['group1', 'group2', 'logFC', 'lower', 'upper', 'rejected'] 
+    df_results.columns = ['group1', 'group2', 'log2FC', 'lower', 'upper', 'rejected'] 
     df_results['identifier'] = col
     df_results = df_results.set_index('identifier')
-    df_results['FC'] = df_results['logFC'].apply(lambda x: np.power(10,np.abs(x)) * -1 if x < 0 else np.power(10,np.abs(x)))
+    df_results['FC'] = df_results['log2FC'].apply(lambda x: np.power(2,np.abs(x)) * -1 if x < 0 else np.power(2,np.abs(x)))
     
     return df_results
 
@@ -407,12 +408,12 @@ def calculate_repeated_measures_annova(df, sample='sample', group='group'):
 def get_max_permutations(df, group='group'):
     num_groups = len(list(df.index))
     num_per_group = df.groupby(group).size().tolist() 
-    max_perm = math.factorial(num_groups)/np.prod(factorial(np.array(num_per_group)))
+    max_perm = factorial(num_groups)/np.prod(factorial(np.array(num_per_group)))
     
     return max_perm
 
 def anova(data, alpha=0.5, drop_cols=["sample"], group='group', permutations=50):
-    columns = ['identifier', 't-statistics', 'pvalue', '-Log pvalue']
+    columns = ['identifier', 't-statistics', 'pvalue', '-log10 pvalue']
     df = data.copy()
     df = df.set_index(group)
     df = df.drop(drop_cols, axis=1)
@@ -421,17 +422,21 @@ def anova(data, alpha=0.5, drop_cols=["sample"], group='group', permutations=50)
     scores = scores.set_index("identifier")
     scores = scores.dropna(how="all")
     
+    
+    max_perm = get_max_permutations(df)
+    print(max_perm)
     #FDR correction
-    if permutations > 0:
-        #max_perm = get_max_permutations(df)
-        #if max_perm < permutations:
-        #    permutations = max_perm
+    if permutations > 0 and max_perm>=10:
+        if max_perm < permutations:
+            permutations = max_perm
         observed_pvalues = scores.pvalue
         count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=alpha, permutations=permutations)
         scores= scores.join(count)
+        scores['correction'] = 'permutation FDR ({} perm)'.format(permutations)
         aux = scores.loc[scores.rejected,:]
     else:
         rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'indep')
+        scores['correction'] = 'FDR correction BH'
         scores['padj'] = padj
         scores['rejected'] = rejected
     
@@ -444,10 +449,11 @@ def anova(data, alpha=0.5, drop_cols=["sample"], group='group', permutations=50)
         else:
             res = pd.concat([res,pairthsd], axis=0)
     if res is not None:
-        res = res.join(scores[['t-statistics', 'pvalue', '-Log pvalue', 'padj']].astype('float'))
+        res = res.join(scores[['t-statistics', 'pvalue', '-log10 pvalue', 'padj']].astype('float'))
+        res['correction'] = scores['correction']
     else:
         res = scores
-        res["logFC"] = np.nan
+        res["log2FC"] = np.nan
     
     res = res.reset_index()
     res['rejected'] = res['padj'] < alpha
@@ -455,7 +461,7 @@ def anova(data, alpha=0.5, drop_cols=["sample"], group='group', permutations=50)
     return res
 
 def repeated_measurements_anova(data, alpha=0.5, drop_cols=[], sample='sample', group='group', permutations=50):
-    columns = ['identifier', 'F-statistics', 'pvalue', '-Log pvalue']
+    columns = ['identifier', 'F-statistics', 'pvalue', '-log10 pvalue']
     df = data.copy()
     df = df.set_index([sample,group])
     df = df.drop(drop_cols, axis=1)
@@ -488,10 +494,10 @@ def repeated_measurements_anova(data, alpha=0.5, drop_cols=[], sample='sample', 
         else:
             res = pd.concat([res,pairthsd], axis=0)
     if res is not None:
-        res = res.join(scores[['t-statistics', 'pvalue', '-Log pvalue', 'padj']].astype('float'))
+        res = res.join(scores[['t-statistics', 'pvalue', '-log10 pvalue', 'padj']].astype('float'))
     else:
         res = scores
-        res["logFC"] = np.nan
+        res["log2FC"] = np.nan
     
     res = res.reset_index()
     res['rejected'] = res['padj'] < alpha
@@ -503,7 +509,7 @@ def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample"], pair
     df = df.set_index('group')
     df = df.drop(drop_cols, axis = 1)
     tdf = df.loc[[condition1, condition2],:].T
-    columns = ['identifier', 't-statistics', 'pvalue', '-Log pvalue']
+    columns = ['identifier', 't-statistics', 'pvalue', '-log10 pvalue']
     if paired:
         scores = tdf.apply(func = calculate_paired_ttest, axis = 1, result_type='expand', args =(condition1, condition2))
     else:
@@ -513,7 +519,7 @@ def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample"], pair
     scores = scores.dropna(how="all")
     
     #Fold change
-    scores["logFC"] = tdf.apply(func = calculate_fold_change, axis = 1, args =(condition1, condition2))
+    scores["log2FC"] = tdf.apply(func = calculate_fold_change, axis = 1, args =(condition1, condition2))
     
     #Cohen's d
     scores["cohen_d"] = tdf.apply(func = cohen_d, axis = 1, args =(condition1, condition2, 1))

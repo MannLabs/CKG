@@ -177,6 +177,7 @@ class Dataset:
                     data = self.data[data_name]
                     if not data.empty:
                         if subsection in self.analysis_queries:
+                            print(section, subsection)
                             query = self.analysis_queries[subsection]                    
                             if "use" in args:
                                 for r_id in args["use"]:
@@ -191,6 +192,7 @@ class Dataset:
                         result = None 
                         if len(analysis_types) >= 1:
                             for analysis_type in analysis_types:
+                                print(analysis_type)
                                 result = ar.AnalysisResult(self.identifier, analysis_type, args, data)
                                 self.update_analyses(result.result)
                                 if subsection == "regulation":
@@ -201,7 +203,7 @@ class Dataset:
                                         sig_data = data[sig_hits]
                                         sig_data.index = data['group'].tolist()
                                         sig_data["sample"] = data["sample"].tolist()
-                                        self.update_data({"regulated":sig_data, "regulation_table":reg_data.loc[reg_data.rejected,:]})
+                                        self.update_data({"regulated":sig_data, "regulation_table":reg_data})
                                 for plot_type in plot_types:
                                     plots = result.get_plot(plot_type, subsection+"_"+analysis_type+"_"+plot_type)
                                     self.report.update_plots({(analysis_type, plot_type):plots})
