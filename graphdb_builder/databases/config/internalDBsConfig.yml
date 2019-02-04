@@ -59,7 +59,7 @@ internal_db_sources:
     '-23': 'COMPARTMENTS'
     'Drug': 'DrugBank'
 
-string_url: 'https://stringdb-static.org/download/protein.aliases.v10.5/9606.protein.aliases.v10.5.txt.gz'
+string_url: 'https://version-10-5.string-db.org/download/protein.aliases.v10.5/9606.protein.aliases.v10.5.txt.gz'
 stitch_url: 'http://stitch.embl.de/download/chemical.aliases.v5.0.tsv.gz'
 header: 
     - 'START_ID'

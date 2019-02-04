@@ -54,26 +54,26 @@ def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True, db = "ST
         builder_utils.downloadDB(url, directory)
     
     f = os.path.join(directory, file_name)
-    mf = gzip.open(f, 'r')
     first = True
-    for line in mf:
-        if first:
-            first = False
-            continue
-        data = line.decode('utf-8').rstrip("\r\n").split("\t")
-        if db == "STRING":
-            stringID = data[0]
-            alias = data[1]
-            sources = data[2].split(' ')
-        else:
-            stringID = data[0]
-            alias = data[2]
-            sources = data[3].split(' ')
-            if not alias.startswith('DB'):
+    with gzip.open(f, 'rb') as mf:
+        for line in mf:
+            if first:
+                first = False
                 continue
-        
-        if source in sources:
-            mapping[stringID].add(alias)
+            data = line.decode('utf-8').rstrip("\r\n").split("\t")
+            if db == "STRING":
+                stringID = data[0]
+                alias = data[1]
+                sources = data[2].split(' ')
+            else:
+                stringID = data[0]
+                alias = data[2]
+                sources = data[3].split(' ')
+                if not alias.startswith('DB'):
+                    continue
+            
+            if source in sources:
+                mapping[stringID].add(alias)
         
     return mapping
 

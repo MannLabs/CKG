@@ -65,16 +65,15 @@ def readDisGeNetProteinMapping(config, databases_directory):
     mapping = defaultdict(set)
     if "protein_mapping" in files:
         mappingFile = files["protein_mapping"]
-        f = gzip.open(os.path.join(directory,mappingFile), 'r')
-        for line in f:
-            if first:
-                first = False
-                continue
-            data = line.decode('utf-8').rstrip("\r\n").split("\t")
-            identifier = data[0]
-            intIdentifier = data[1]
-            mapping[intIdentifier].add(identifier)
-        f.close()
+        with gzip.open(os.path.join(directory,mappingFile), 'r') as f:
+            for line in f:
+                if first:
+                    first = False
+                    continue
+                data = line.decode('utf-8').rstrip("\r\n").split("\t")
+                identifier = data[0]
+                intIdentifier = data[1]
+                mapping[intIdentifier].add(identifier)
     return mapping
 
 def readDisGeNetDiseaseMapping(config, databases_directory):
@@ -85,18 +84,17 @@ def readDisGeNetDiseaseMapping(config, databases_directory):
     synonyms = defaultdict(set)
     if "disease_mapping" in files:
         mappingFile = files["disease_mapping"]
-        f = gzip.open(os.path.join(directory,mappingFile), 'r')
-        for line in f:
-            if first:
-                first = False
-                continue
-            data = line.decode('utf-8').rstrip("\r\n").split("\t")
-            identifier = data[0]
-            vocabulary = data[2]
-            code = data[3]
-            if vocabulary == "DO":
-                mapping[identifier].add(code)
-            else:
-                synonyms[identifier].add(code)
-        f.close()
+        with gzip.open(os.path.join(directory,mappingFile), 'r') as f:
+            for line in f:
+                if first:
+                    first = False
+                    continue
+                data = line.decode('utf-8').rstrip("\r\n").split("\t")
+                identifier = data[0]
+                vocabulary = data[2]
+                code = data[3]
+                if vocabulary == "DO":
+                    mapping[identifier].add(code)
+                else:
+                    synonyms[identifier].add(code)
     return mapping, synonyms
