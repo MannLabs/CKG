@@ -624,7 +624,7 @@ IMPORT_DATASETS:
             USING PERIODIC COMMIT 10000
             LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_somatic_mutation.csv" AS line
             MERGE (s:Somatic_mutation{id:line.ID})
-            ON CREATE SET s.chromosome=line.chromosome,s.reference=line.reference,s.alternative=line.alternative,s.position=line.position,s.effect=line.effect,s.impact=line.impact,s.gene=line.gene,s.feature_type=line.feature_type,s.biotype=line.biotype,s.alternative_names=SPLIT(line.alternative_names, ','),
+            ON CREATE SET s.chromosome=line.chromosome,s.reference=line.reference,s.alternative=line.alternative,s.position=line.position,s.effect=line.effect,s.impact=line.impact,s.gene=line.gene,s.feature_type=line.feature_type,s.biotype=line.biotype,s.alternative_names=line.alternative_names
             RETURN COUNT(s) AS PROJECTID_somatic_mutation;
             USING PERIODIC COMMIT 10000
             LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_somatic_mutation_known_variant.csv" AS line

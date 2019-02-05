@@ -59,7 +59,8 @@ if __name__ == '__main__':
                     if import_type.lower() == 'experiments' or import_type.lower() == 'experiment':
                         importer.experimentsImport(projects=args.data, n_jobs=1)
                     elif import_type.lower() == 'databases' or import_type.lower() == 'database':
-                        valid_entities = set([x.lower() for x in dbconfig['databases']]).intersection([x.lower() for x in args.data])
+                        databases = [d.lower() for d in dbconfig['databases']]
+                        valid_entities = [x.lower() for x in args.data if x.lower() in databases]
                         if len(valid_entities) > 0:
                             logger.info("These entities will be imported: {}".format(", ".join(valid_entities)))
                             print("These entities will be imported: {}".format(", ".join(valid_entities)))
@@ -68,7 +69,7 @@ if __name__ == '__main__':
                             logger.error("The indicated entities (--data) cannot be imported: {}".format(args.data))
                             print("The indicated entities (--data) cannot be imported: {}".format(args.data))
                     elif import_type.lower() == 'ontologies' or import_type.lower() == 'ontology':
-                        valid_entities = set([x.lower() for x in oconfig['ontologies']]).intersection([x.lower() for x in args.data])
+                        valid_entities = [x.lower() for x in args.data if x.lower() in oconfig['ontologies']]
                         if len(valid_entities) > 0:
                             logger.info("These entities will be imported: {}".format(", ".join(valid_entities)))
                             print("These entities will be loaded into the database: {}".format(", ".join(valid_entities)))
@@ -82,7 +83,7 @@ if __name__ == '__main__':
     elif args.build_type == 'load':
         logger.info("The build will load data into the database: {}".format("".join(args.load_entities)))
         if len(args.load_entities) > 0:
-            valid_entities = set([x.lower() for x in config['graph']]).intersection([x.lower() for x in args.load_entities])
+            valid_entities = [x.lower() for x in args.load_entities if x.lower() in config['graph']]
 
             if len(valid_entities) > 0:
                 logger.info("These entities will be loaded into the database: {}".format(", ".join(valid_entities)))

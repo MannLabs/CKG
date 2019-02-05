@@ -156,7 +156,7 @@ def parseUniProtVariants(config, databases_directory, download=True):
                 chr_matches = re.search(chromosome_regex, chromosome_coord)
                 if var_matches and chr_matches:
                     chromosome = 'chr'+chr_matches.group(1)
-                    ident = chromosome+":".join(var_matches.groups())
+                    ident = chromosome+":"+var_matches.group(1)
                     consequence = data[4]
                     altName = [externalID, data[5], pvariant, chromosome_coord]
                     if ref in aa and alt in aa:

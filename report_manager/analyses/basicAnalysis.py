@@ -59,11 +59,11 @@ def extract_percentage_missing(data, conditions, missing_max):
       
     return list(groups)
 
-def imputation_KNN(data, cutoff=0.5, alone = True):
+def imputation_KNN(data, drop_cols=['sample', 'group'], group='group', cutoff=0.5, alone = True):
     df = data.copy()
-    value_cols = [c for c in df.columns if c not in ['sample', 'group']]
-    for g in df.group.unique():
-        missDf = df.loc[df.group==g, value_cols]
+    value_cols = [c for c in df.columns if c not in drop_cols]
+    for g in df[group].unique():
+        missDf = df.loc[df[group]==g, value_cols]
         missDf = missDf.loc[:, missDf.notnull().mean() >= cutoff]
         if missDf.isnull().values.any():
             X = np.array(missDf.values, dtype=np.float64)
@@ -82,10 +82,11 @@ def imputation_mixed_norm_KNN(data):
     
     return df
 
-def imputation_normal_distribution(data, shift = 1.8, nstd = 0.3):
+def imputation_normal_distribution(data, index=['sample', 'group'], shift = 1.8, nstd = 0.3):
     np.random.seed(112736)
     df = data.copy()
-    df = df.set_index(['sample','group'])
+    if index is not None:
+        df = df.set_index(index)
     data_imputed = df.T
     for i in data_imputed.loc[:, data_imputed.isnull().any()]:
         missing = data_imputed[i].isnull()
@@ -133,11 +134,11 @@ def remove_group(data):
     data.drop(['group'], axis=1)
     return data
 
-def get_measurements_ready(data, imputation = True, method = 'distribution', missing_method = 'percentage', missing_max = 0.3, value_col='LFQ_intensity'):
+def get_proteomics_measurements_ready(data, imputation = True, method = 'distribution', missing_method = 'percentage', missing_max = 0.3, value_col='LFQ_intensity'):
     df = data.copy()
     conditions = df.group.unique()
     df = df.set_index(['group','sample'])
-    df['identifier'] = df['identifier'].map(str) +"-"+ df['name'].map(str)
+    df['identifier'] = df['name'].map(str) + "-" + df['identifier'].map(str)
     df = df.pivot_table(values=value_col, index=df.index, columns='identifier', aggfunc='first')
     df = df.reset_index()
     df[['group', 'sample']] = df["index"].apply(pd.Series)
@@ -166,12 +167,12 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
     df = df.reset_index()
     return df
 
-def runPCA(data, components = 2):
+def run_pca(data, drop_cols=['sample'], group='group', components=2):
     np.random.seed(112736)
     result = {}
     df = data.copy()
-    df = df.drop(['sample'], axis=1)
-    df = df.set_index('group')
+    df = df.drop(drop_cols, axis=1)
+    df = df.set_index(group)
     X = df._get_numeric_data()
     y = df.index
     pca = PCA(n_components=components)
@@ -194,11 +195,11 @@ def runPCA(data, components = 2):
     result['pca'] = resultDf
     return result, args
 
-def runTSNE(data, components=2, perplexity=40, n_iter=1000, init='pca'):
+def run_tsne(data, drop_cols=['sample'], group='group', components=2, perplexity=40, n_iter=1000, init='pca'):
     result = {}
     df = data.copy()
-    df = df.drop(['sample'], axis=1)
-    df = df.set_index('group')
+    df = df.drop(drop_cols, axis=1)
+    df = df.set_index(group)
     X = df._get_numeric_data()
     y = df.index
     
@@ -220,11 +221,11 @@ def runTSNE(data, components=2, perplexity=40, n_iter=1000, init='pca'):
     result['tsne'] = resultDf
     return result, args
     
-def runUMAP(data, n_neighbors=10, min_dist=0.3, metric='cosine'):
+def run_umap(data, drop_cols=['sample'], group='group', n_neighbors=10, min_dist=0.3, metric='cosine'):
     result = {}
     df = data.copy()
-    df = df.drop(['sample'], axis=1)
-    df = df.set_index('group')
+    df = df.drop(drop_cols, axis=1)
+    df = df.set_index(group)
     X = df._get_numeric_data()
     y = df.index
 
@@ -412,7 +413,7 @@ def get_max_permutations(df, group='group'):
     
     return max_perm
 
-def anova(data, alpha=0.5, drop_cols=["sample"], group='group', permutations=50):
+def anova(data, alpha=0.05, drop_cols=["sample"], group='group', permutations=50):
     columns = ['identifier', 't-statistics', 'pvalue', '-log10 pvalue']
     df = data.copy()
     df = df.set_index(group)
@@ -424,7 +425,6 @@ def anova(data, alpha=0.5, drop_cols=["sample"], group='group', permutations=50)
     
     
     max_perm = get_max_permutations(df)
-    print(max_perm)
     #FDR correction
     if permutations > 0 and max_perm>=10:
         if max_perm < permutations:

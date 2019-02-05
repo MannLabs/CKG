@@ -184,15 +184,16 @@ def get_scatterplot(data, identifier, args):
                                 height=900,
                                 )
     for name in data.name.unique():
+        m = {'size': 25, 'line': {'width': 0.5, 'color': 'grey'}}
+        if 'colors' in args:
+            if name in args['colors']:
+                m.update({'color' : args['colors'][name]})
         figure["data"].append(go.Scatter(x = data.loc[data["name"] == name, "x"],
                                         y = data.loc[data['name'] == name, "y"],
                                         text = name,
                                         mode = 'markers',
                                         opacity=0.7,
-                                        marker={
-                                            'size': 15,
-                                            'line': {'width': 0.5, 'color': 'white'}
-                                            },
+                                        marker= m,
                                         name=name))
 
     return dcc.Graph(id= identifier, figure = figure)
@@ -264,7 +265,7 @@ def get_volcanoplot(results, args):
         figures.append(dcc.Graph(id= identifier, figure = figure))
     return figures
 
-def run_volcano(data, identifier, args):
+def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blues', 'showscale': False, 'marker_size':6, 'x_title':'log2FC', 'y_title':'-log10(pvalue)'}):
     # Loop through signature
 
     volcano_plot_results = {}
@@ -512,7 +513,7 @@ def get2DPCAFigure(data, components, identifier, title, subplot = False):
     return  dcc.Graph(id = identifier, figure = figure)
 
 
-def getSankeyPlot(data, sourceCol, targetCol, weightCol, edgeColorCol, node_colors, identifier, title, plot_attr = {'orientation': 'h', 'valueformat': '.0f', 'arrangement':'freeform','width':800, 'height':800, 'font':12}, subplot = False):
+def getSankeyPlot(data, identifier, args={'orientation': 'h', 'valueformat': '.0f', 'arrangement':'freeform','width':800, 'height':800, 'font':12}):
     '''This function generates a Sankey plot in Plotly
         --> Input:
             - data: Pandas DataFrame with the format: source    target  weight
@@ -524,44 +525,35 @@ def getSankeyPlot(data, sourceCol, targetCol, weightCol, edgeColorCol, node_colo
             - identifier: identifier used to label the div that contains the network figure
             - Title of the plot
     '''
-    data_trace = dict(
-        type='sankey',
-        domain = dict(
-            x =  [0,1],
-            y =  [0,1]
-        ),
-        orientation = 'h' if 'orientation' not in plot_attr else plot_attr['orientation'],
-        valueformat = ".0f" if 'valueformat' not in plot_attr else plot_attr['valueformat'],
-        arrangement = 'freeform' if 'arrangement' not in plot_attr else plot_attr['arrangement'],
-        node = dict(
-            pad = 15 if 'pad' not in plot_attr else plot_attr['pad'],
-            thickness = 25 if 'thickness' not in plot_attr else plot_attr['thickness'],
-            line = dict(
-                color = "black",
-                width = 0.3
-            ),
-            label =  list(node_colors.keys()),
-            color =  ["rgba"+str(utils.hex2rgb(c)) if c.startswith('#') else c  for c in list(node_colors.values())]
-        ),
-        link = dict(
-            source =  [list(node_colors.keys()).index(i) for i in data[sourceCol].tolist()],
-            target =  [list(node_colors.keys()).index(i) for i in data[targetCol].tolist()],
-            value =  data[weightCol].tolist(),
-            color = ["rgba"+str(utils.hex2rgb(c)) if c.startswith('#') else c for c in data[edgeColorCol].tolist()]
-        ))
+    nodes = list(set(data[args['source']].tolist() + data[args['target']].tolist()))
+    node_colors = dict(zip(data[args['source']],data[args['source_colors']]))
+    node_colors.update(dict(zip(data[args['target']],data[args['target_colors']])))
+    data_trace = dict(type='sankey',
+                        #domain = dict(x =  [0,1], y =  [0,1]),
+                        orientation = 'h' if 'orientation' not in args else args['orientation'],
+                        valueformat = ".0f" if 'valueformat' not in args else args['valueformat'],
+                        arrangement = 'freeform' if 'arrangement' not in args else args['arrangement'],
+                        node = dict(pad = 25 if 'pad' not in args else args['pad'],
+                                    thickness = 25 if 'thickness' not in args else args['thickness'],
+                                    line = dict(color = "black", width = 0.3),
+                                    label =  nodes,
+                                    color =  ["rgba"+str(utils.hex2rgb(node_colors[c])) if node_colors[c].startswith('#') else node_colors[c] for c in nodes]
+                                    ),
+                        link = dict(source = [list(nodes).index(i) for i in data[args['source']].tolist()],
+                                    target = [list(nodes).index(i) for i in data[args['target']].tolist()],
+                                    value =  data[args['weight']].tolist(),
+                                    color = ["rgba"+str(utils.hex2rgb(c)) if c.startswith('#') else c for c in data[args['source_colors']].tolist()]
+                                    ))
     layout =  dict(
-        width= 800 if 'width' not in plot_attr else plot_attr['width'],
-        height= 800 if 'height' not in plot_attr else plot_attr['height'],
-        title = title,
+        width= 800 if 'width' not in args else args['width'],
+        height= 800 if 'height' not in args else args['height'],
+        title = args['title'],
         font = dict(
-            size = 12 if 'font' not in plot_attr else plot_attr['font'],
+            size = 12 if 'font' not in args else args['font'],
         )
     )
 
     figure = dict(data=[data_trace], layout=layout)
-
-    if subplot:
-        return (identifier, figure)
 
     return dcc.Graph(id = identifier, figure = figure)
 
