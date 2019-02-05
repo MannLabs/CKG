@@ -164,6 +164,29 @@ def get_scatterplot_matrix(data, identifier, args):
 
     return dcc.Graph(id=identifier, figure=figure)
 
+def get_simple_scatterplot(data, identifier, args):
+    figure = {}
+    m = {'size': 25, 'line': {'width': 0.5, 'color': 'grey'}}
+    figure["layout"] = go.Layout(title = args['title'],
+                                xaxis= {"title": args['x_title']},
+                                yaxis= {"title": args['y_title']},
+                                margin={'l': 40, 'b': 40, 't': 30, 'r': 10},
+                                legend={'x': 0, 'y': 1},
+                                hovermode='closest',
+                                height=900,
+                                )
+
+    figure['data'] = [go.Scatter(x = data.x,
+                                y = data.y,
+                                text = data.name,
+                                mode = 'markers',
+                                opacity=0.7,
+                                marker= m,
+                                )]
+
+    return dcc.Graph(id= identifier, figure = figure)
+
+
 def get_scatterplot(data, identifier, args):
     '''This function plots a simple Scatterplot
     --> input:
