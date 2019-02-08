@@ -1,0 +1,118 @@
+{
+  "src/lib/components/Network.react.js": {
+    "description": "Network graph component, based on D3 force layout",
+    "displayName": "Network",
+    "methods": [],
+    "props": {
+      "id": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": "The ID used to identify this component in Dash callbacks"
+      },
+      "setProps": {
+        "type": {
+          "name": "func"
+        },
+        "required": false,
+        "description": "Dash-assigned callback that should be called whenever any of the\nproperties change"
+      },
+      "width": {
+        "type": {
+          "name": "number"
+        },
+        "required": false,
+        "description": "Width of the figure to draw, in pixels",
+        "defaultValue": {
+          "value": "500",
+          "computed": false
+        }
+      },
+      "height": {
+        "type": {
+          "name": "number"
+        },
+        "required": false,
+        "description": "Height of the figure to draw, in pixels",
+        "defaultValue": {
+          "value": "500",
+          "computed": false
+        }
+      },
+      "data": {
+        "type": {
+          "name": "object"
+        },
+        "required": true,
+        "description": "The network data. Should have the form:\n\n  `{nodes: [node0, node1, ...], links: [link0, link1, ...]}`\n\nnodes have the form:\n\n  `{id: 'node id'[, radius: number][, color: 'css color string']}`\n\n`id` is required, must be unique, and is used both in links and\nas the node text.\n`radius` is an optional relative radius, scaled by `maxRadius`\n`color` is an optional css color string.\n\nlinks have the form:\n\n  `{source: sourceId, target: targetId[, width: number]}`\n\n`source` and `target` are required, and must match node ids.\n`width` is an optional relative width, scaled by `maxLinkWidth`"
+      },
+      "dataVersion": {
+        "type": {
+          "name": "union",
+          "value": [
+            {
+              "name": "string"
+            },
+            {
+              "name": "number"
+            }
+          ]
+        },
+        "required": false,
+        "description": "Optional version id for data, to avoid having to diff a large object"
+      },
+      "linkWidth": {
+        "type": {
+          "name": "number"
+        },
+        "required": false,
+        "description": "Optional default width of links, in px",
+        "defaultValue": {
+          "value": "4",
+          "computed": false
+        }
+      },
+      "maxLinkWidth": {
+        "type": {
+          "name": "number"
+        },
+        "required": false,
+        "description": "Optional maximum width of links, in px. If individual links have `width`,\nthese will be scaled linearly so the largest one has width `maxLinkWidth`.",
+        "defaultValue": {
+          "value": "20",
+          "computed": false
+        }
+      },
+      "nodeRadius": {
+        "type": {
+          "name": "number"
+        },
+        "required": false,
+        "description": "Optional default radius of nodes, in px",
+        "defaultValue": {
+          "value": "10",
+          "computed": false
+        }
+      },
+      "maxRadius": {
+        "type": {
+          "name": "number"
+        },
+        "required": false,
+        "description": "Optional maximum radius of nodes, in px. If individual nodes have `radius`,\nthese will be scaled linearly so the largest one has radius `maxRadius`.",
+        "defaultValue": {
+          "value": "20",
+          "computed": false
+        }
+      },
+      "selectedId": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": "The currently selected node id"
+      }
+    }
+  }
+}
