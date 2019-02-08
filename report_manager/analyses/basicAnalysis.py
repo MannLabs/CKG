@@ -2,7 +2,7 @@ import pandas as pd
 import itertools
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
-import statsmodels.stats.multitest as multitest
+from statsmodels.stats import multitest, anova as aov
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 from scipy.special import factorial, betainc
 import umap.umap_ as umap
@@ -22,13 +22,13 @@ def transform_into_long_format(data, index, columns, values, extra=[], use_index
     if not df.empty:
         cols = [columns, values]
         cols.extend(index)
-        df = df.drop_duplicates()
         if len(extra) > 0:
             extra.extend(index)
             extra_cols = df[extra].set_index(index)
         df = df[cols]
         df = df.pivot_table(index=index, columns=columns, values=values)
         df = df.join(extra_cols)
+        df = df.drop_duplicates()
         if not use_index:
             df = df.reset_index(drop=True)
 
@@ -59,7 +59,7 @@ def extract_percentage_missing(data, conditions, missing_max):
       
     return list(groups)
 
-def imputation_KNN(data, drop_cols=['sample', 'group'], group='group', cutoff=0.5, alone = True):
+def imputation_KNN(data, drop_cols=['group', 'sample', 'subject'], group='group', cutoff=0.5, alone = True):
     df = data.copy()
     value_cols = [c for c in df.columns if c not in drop_cols]
     for g in df[group].unique():
@@ -82,7 +82,7 @@ def imputation_mixed_norm_KNN(data):
     
     return df
 
-def imputation_normal_distribution(data, index=['sample', 'group'], shift = 1.8, nstd = 0.3):
+def imputation_normal_distribution(data, index=['group', 'sample', 'subject'], shift = 1.8, nstd = 0.3):
     np.random.seed(112736)
     df = data.copy()
     if index is not None:
@@ -134,18 +134,17 @@ def remove_group(data):
     data.drop(['group'], axis=1)
     return data
 
-def get_proteomics_measurements_ready(data, imputation = True, method = 'distribution', missing_method = 'percentage', missing_max = 0.3, value_col='LFQ_intensity'):
+def get_proteomics_measurements_ready(data, index=['group', 'sample', 'subject'], imputation = True, method = 'distribution', missing_method = 'percentage', missing_max = 0.3, value_col='LFQ_intensity'):
     df = data.copy()
     conditions = df.group.unique()
-    df = df.set_index(['group','sample'])
+    df = df.set_index(index)
     df['identifier'] = df['name'].map(str) + "-" + df['identifier'].map(str)
     df = df.pivot_table(values=value_col, index=df.index, columns='identifier', aggfunc='first')
     df = df.reset_index()
-    df[['group', 'sample']] = df["index"].apply(pd.Series)
+    df[index] = df["index"].apply(pd.Series)
     df = df.drop(["index"], axis=1)
-
-    aux = ['group', 'sample']
-
+    aux = index
+    
     if missing_method == 'at_least_x_per_group':
         aux.extend(extract_number_missing(df, conditions, missing_max))
     elif missing_method == 'percentage':
@@ -167,7 +166,7 @@ def get_proteomics_measurements_ready(data, imputation = True, method = 'distrib
     df = df.reset_index()
     return df
 
-def run_pca(data, drop_cols=['sample'], group='group', components=2):
+def run_pca(data, drop_cols=['sample', 'subject'], group='group', components=2):
     np.random.seed(112736)
     result = {}
     df = data.copy()
@@ -195,7 +194,7 @@ def run_pca(data, drop_cols=['sample'], group='group', components=2):
     result['pca'] = resultDf
     return result, args
 
-def run_tsne(data, drop_cols=['sample'], group='group', components=2, perplexity=40, n_iter=1000, init='pca'):
+def run_tsne(data, drop_cols=['sample', 'subject'], group='group', components=2, perplexity=40, n_iter=1000, init='pca'):
     result = {}
     df = data.copy()
     df = df.drop(drop_cols, axis=1)
@@ -221,7 +220,7 @@ def run_tsne(data, drop_cols=['sample'], group='group', components=2, perplexity
     result['tsne'] = resultDf
     return result, args
     
-def run_umap(data, drop_cols=['sample'], group='group', n_neighbors=10, min_dist=0.3, metric='cosine'):
+def run_umap(data, drop_cols=['sample', 'subject'], group='group', n_neighbors=10, min_dist=0.3, metric='cosine'):
     result = {}
     df = data.copy()
     df = df.drop(drop_cols, axis=1)
@@ -347,12 +346,13 @@ def runEfficientCorrelation(data, method='pearson'):
 def calculate_paired_ttest(df, condition1, condition2):
     group1 = df[condition1]
     group2 = df[condition2]
-    
-    if isinstance(group1, np.float64):
+    print(group1)
+    print(group2)
+    if isinstance(group1, np.float):
         group1 = np.array(group1)
     else:
         group1 = group1.values
-    if isinstance(group2, np.float64):
+    if isinstance(group2, np.float):
         group2 = np.array(group2)
     else:
         group2 = group2.values
@@ -365,11 +365,11 @@ def calculate_paired_ttest(df, condition1, condition2):
 def calculate_ttest(df, condition1, condition2):
     group1 = df[condition1]
     group2 = df[condition2]
-    if isinstance(group1, np.float64):
+    if isinstance(group1, np.float):
         group1 = np.array(group1)
     else:
         group1 = group1.values
-    if isinstance(group2, np.float64):
+    if isinstance(group2, np.float):
         group2 = np.array(group2)
     else:
         group2 = group2.values
@@ -392,7 +392,7 @@ def calculate_THSD(df):
 
 def calculate_annova(df, group='group'):
     col = df.name
-    group_values = df.groupby('group').apply(list).tolist()
+    group_values = df.groupby(group).apply(list).tolist()
     t, pvalue = stats.f_oneway(*group_values)
     log = -math.log(pvalue,10)
 
@@ -401,7 +401,7 @@ def calculate_annova(df, group='group'):
 def calculate_repeated_measures_annova(df, sample='sample', group='group'):
     col = df.name
     #group_values = df.groupby('group').apply(list).tolist()
-    num_df, den_df, f_stat, pvalue = stats.anova.AnovaRM(df.reset_index(), col, sample, within=[group]).fit().anova_table.values.to_list()[0]
+    num_df, den_df, f_stat, pvalue = aov.AnovaRM(df.reset_index(), col, sample, within=[group], aggregate_func='mean').fit().anova_table.values.tolist()[0]
     log = -math.log(pvalue,10)
 
     return (col, f_stat, pvalue, log)
@@ -413,7 +413,7 @@ def get_max_permutations(df, group='group'):
     
     return max_perm
 
-def anova(data, alpha=0.05, drop_cols=["sample"], group='group', permutations=50):
+def anova(data, alpha=0.05, drop_cols=["sample", 'subject'], group='group', permutations=50):
     columns = ['identifier', 't-statistics', 'pvalue', '-log10 pvalue']
     df = data.copy()
     df = df.set_index(group)
@@ -460,9 +460,23 @@ def anova(data, alpha=0.05, drop_cols=["sample"], group='group', permutations=50
     
     return res
 
-def repeated_measurements_anova(data, alpha=0.5, drop_cols=[], sample='sample', group='group', permutations=50):
+def repeated_measurements_anova(data, alpha=0.5, drop_cols=['sample'], subject='subject', sample='sample', group='group', permutations=50):
     columns = ['identifier', 'F-statistics', 'pvalue', '-log10 pvalue']
     df = data.copy()
+    group_df = df.groupby(group)
+    list_items = []
+    for n, g in group_df:
+        list_items.append(g[sample].tolist())
+    max_intersection = []
+    for l1,l2 in itertools.combinations(list_items,2):
+            print(len(l1),len(set(l1)))
+            print(len(l2),len(set(l2)))
+            print(l2)
+            intersect = set(l1).intersection(l2)
+            if len(intersect) > len(max_intersection):
+                max_intersection = intersect
+    
+    df = df[df[sample].isin(max_intersection)]
     df = df.set_index([sample,group])
     df = df.drop(drop_cols, axis=1)
     scores = df.apply(func = calculate_repeated_measures_annova, axis=0,result_type='expand', sample=sample, group=group).T
@@ -504,9 +518,9 @@ def repeated_measurements_anova(data, alpha=0.5, drop_cols=[], sample='sample', 
     
     return res
 
-def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample"], paired=False, permutations=50):
+def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample", 'subject'], group='group', paired=False, permutations=50):
     df = data.copy()
-    df = df.set_index('group')
+    df = df.set_index(group)
     df = df.drop(drop_cols, axis = 1)
     tdf = df.loc[[condition1, condition2],:].T
     columns = ['identifier', 't-statistics', 'pvalue', '-log10 pvalue']
@@ -520,7 +534,6 @@ def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample"], pair
     
     #Fold change
     scores["log2FC"] = tdf.apply(func = calculate_fold_change, axis = 1, args =(condition1, condition2))
-    
     #Cohen's d
     scores["cohen_d"] = tdf.apply(func = cohen_d, axis = 1, args =(condition1, condition2, 1))
     

@@ -70,16 +70,20 @@ def get_barplot(data, identifier, args):
     --> output:
         Barplot figure within the <div id="_dash-app-content">
     '''
-    height = 400
-    width = 900
     figure = {}
     figure["data"] = []
     if "group" in args:
         for g in data[args["group"]].unique():
+            color = None 
+            if 'colors' in args:
+                if g in args['colors']:
+                    color = args['colors'][g]
             trace = go.Bar(
-                        x = data.loc[data["group"] == g,args['x']], # assign x as the dataframe column 'x'
-                        y = data.loc[data["group"] == g, args['y']],
-                        name = g)
+                        x = data.loc[data[args["group"]] == g,args['x']], # assign x as the dataframe column 'x'
+                        y = data.loc[data[args["group"]] == g, args['y']],
+                        name = g,
+                        marker = dict(color=color)
+                        )
             figure["data"].append(trace)
     else:
         figure["data"].append(
@@ -92,8 +96,8 @@ def get_barplot(data, identifier, args):
                             title = args['title'],
                             xaxis={"title":args["x_title"]},
                             yaxis={"title":args["y_title"]},
-                            height = height,
-                            width = width
+                            height = args['height'],
+                            width = args['width']
                         )
 
     return dcc.Graph(id= identifier, figure = figure)
@@ -166,7 +170,11 @@ def get_scatterplot_matrix(data, identifier, args):
 
 def get_simple_scatterplot(data, identifier, args):
     figure = {}
-    m = {'size': 25, 'line': {'width': 0.5, 'color': 'grey'}}
+    m = {'size': 15, 'line': {'width': 0.5, 'color': 'grey'}}
+    if 'colors' in data.columns:
+        m.update({'color':data['colors'].tolist()})
+    if 'size' in data.columns:
+        m.update({'size':data['size'].tolist()})
     figure["layout"] = go.Layout(title = args['title'],
                                 xaxis= {"title": args['x_title']},
                                 yaxis= {"title": args['y_title']},
@@ -202,7 +210,7 @@ def get_scatterplot(data, identifier, args):
                                 xaxis= {"title": args['x_title']},
                                 yaxis= {"title": args['y_title']},
                                 margin={'l': 40, 'b': 40, 't': 30, 'r': 10},
-                                legend={'x': 0, 'y': 1},
+                                legend={'x': -.4, 'y': 1.2},
                                 hovermode='closest',
                                 height=900,
                                 )

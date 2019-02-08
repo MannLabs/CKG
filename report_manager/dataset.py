@@ -177,8 +177,7 @@ class Dataset:
                     data = self.data[data_name]
                     if not data.empty:
                         if subsection in self.analysis_queries:
-                            print(section, subsection)
-                            query = self.analysis_queries[subsection]                    
+                            query = self.analysis_queries[subsection]    
                             if "use" in args:
                                 for r_id in args["use"]:
                                     if r_id == "columns":
@@ -192,7 +191,6 @@ class Dataset:
                         result = None 
                         if len(analysis_types) >= 1:
                             for analysis_type in analysis_types:
-                                print(analysis_type)
                                 result = ar.AnalysisResult(self.identifier, analysis_type, args, data)
                                 self.update_analyses(result.result)
                                 if subsection == "regulation":
@@ -286,18 +284,14 @@ class ProteomicsDataset(Dataset):
                 if "value_col" in args:
                     value_col = args["value_col"]
             
-            processed_data = basicAnalysis.get_measurements_ready(data, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max)
+            processed_data = basicAnalysis.get_proteomics_measurements_ready(data, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max)
         return processed_data
 
 class LongitudinalProteomicsDataset(ProteomicsDataset):
     def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
         config_file = "longitudinal_proteomics.yml"
         ProteomicsDataset.__init__(self, identifier, data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
-        self.set_configuration_from_file(config_file)
-        if len(data) == 0:
-            self._data = self.query_data()
-        
-        self.preprocess_dataset()
+        self.set_configuration_from_file(config_file)  
 
 class ClinicalDataset(Dataset):
     def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):

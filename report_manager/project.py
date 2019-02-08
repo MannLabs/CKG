@@ -212,7 +212,7 @@ class Project:
                 dataset = DNAseqDataset(self.identifier, dataset_type=data_type, data={}, analyses={}, analysis_queries={}, report=None)
                 self.update_dataset({data_type:dataset})
             elif data_type == "longitudinal_proteomics":
-                dataset = LongitudinalProteomicsDataset(self.identifier, dataset_type=data_type, data={}, analyses={}, analysis_queries={}, report=None)
+                dataset = LongitudinalProteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
                 self.update_dataset({data_type:dataset})
                 
            

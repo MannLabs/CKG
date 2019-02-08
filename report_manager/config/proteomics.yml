@@ -43,6 +43,19 @@ overview: #section
             y_title: number of modified proteins
             plot_type: bar
             title: 'Number of modified proteins identified per type'
+    ranking:
+        data: protein_biomarkers
+        analyses: []
+        plots:
+            - ranking_plot
+        args:
+            x: x
+            y: y
+            group: group
+            highlight: is_biomarker
+            x_title: rank of identified proteins
+            y_title: intensity
+            title: 'Ranking of proteins'
 "data exploration":
     stratification:
         data: preprocessed
@@ -78,6 +91,7 @@ overview: #section
             y_title: -log(pvalue)
             drop_cols: 
                 - sample
+                - subject
             name: name
             title: 'Volcano plot'
     correlation:

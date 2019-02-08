@@ -70,7 +70,7 @@ class AnalysisResult:
             components = 2
             if "components" in args:
                 components = args["components"]
-            result, nargs = analyses.runPCA(self.data, components)
+            result, nargs = analyses.run_pca(self.data, components=components)
             args.update(nargs)
         elif self.analysis_type  == "tsne":
             components = 2
@@ -85,7 +85,7 @@ class AnalysisResult:
                 n_iter = args["n_iter"]
             if "init" in args:
                 init = args["init"]
-            result, nargs = analyses.runTSNE(self.data, components=components, perplexity=perplexity, n_iter=n_iter, init=init)
+            result, nargs = analyses.run_tsne(self.data, components=components, perplexity=perplexity, n_iter=n_iter, init=init)
             args.update(nargs)
         elif self.analysis_type  == "umap":
             n_neighbors=10 
@@ -98,7 +98,7 @@ class AnalysisResult:
             if "metric" in args:
                 metric = args["metric"]
             if n_neighbors < self.data.shape[0]:
-                result, nargs = analyses.runUMAP(self.data, n_neighbors=n_neighbors, min_dist=min_dist, metric=metric)
+                result, nargs = analyses.run_umap(self.data, n_neighbors=n_neighbors, min_dist=min_dist, metric=metric)
                 args.update(nargs)
         elif self.analysis_type  == "mapper":
             n_cubes = 15
@@ -174,6 +174,7 @@ class AnalysisResult:
                 correction = args["correction"]
             result[self.analysis_type] = analyses.runCorrelation(self.data, alpha=alpha, method=method, correction=correction)
         elif self.analysis_type == "interaction":
+            print(self.data)
             result[self.analysis_type], nargs = analyses.get_interaction_network(self.data)
             args.update(nargs)
          
