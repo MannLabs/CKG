@@ -47,7 +47,7 @@ def setup_logging(path='log.config', key=None):
     else:
         logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger(key)
-    
+
     return logger
 
 

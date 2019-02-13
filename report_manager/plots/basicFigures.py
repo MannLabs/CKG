@@ -11,6 +11,8 @@ import networkx as nx
 from networkx.readwrite import json_graph
 from dash_network import Network
 from report_manager.utils import hex2rgb, getNumberText
+from report_manager.plots import Dendrogram
+from report_manager.plots import wgcnaFigures
 
 
 def getPlotTraces(data, key='full', type = 'lines', div_factor=float(10^10000), horizontal=False):
@@ -46,14 +48,14 @@ def get_distplot(data, identifier, args):
     df = df.set_index(args['group'])
     df = df.transpose()
     df = df.dropna()
-    
+
     for i in df.index.unique():
         hist_data = []
         for c in df.columns.unique():
             hist_data.append(df.loc[i,c].values.tolist())
         group_labels = df.columns.unique().tolist()
         # Create distplot with custom bin_size
-        fig = FF.create_distplot(hist_data, group_labels, bin_size=.5, curve_type='normal')    
+        fig = FF.create_distplot(hist_data, group_labels, bin_size=.5, curve_type='normal')
         fig['layout'].update(height=600, width=1000, title='Distribution plot '+i)
         graphs.append(dcc.Graph(id=identifier+"_"+i, figure=fig))
 
@@ -218,9 +220,9 @@ def get_volcanoplot(results, args):
                         )
 
         figure["data"].append(trace)
-        figure["layout"] = go.Layout(title=title, 
-                                        xaxis={'title': args['x_title'], 'range': range_x}, 
-                                        yaxis={'title': args['y_title'], 'range': range_y}, 
+        figure["layout"] = go.Layout(title=title,
+                                        xaxis={'title': args['x_title'], 'range': range_x},
+                                        yaxis={'title': args['y_title'], 'range': range_y},
                                         hovermode='closest',
                                         shapes=[
                                                 {'type': 'line',
@@ -258,7 +260,7 @@ def get_volcanoplot(results, args):
                                                     }
                                                 ],
                                         showlegend=False)
-        
+
         figures.append(dcc.Graph(id= identifier, figure = figure))
     return figures
 
@@ -280,7 +282,7 @@ def run_volcano(data, identifier, args):
 
             # Color
             if row['padj'] < args['alpha']:
-                min_sig_pval = row['pvalue'] if row['pvalue'] > min_sig_pval else min_sig_pval 
+                min_sig_pval = row['pvalue'] if row['pvalue'] > min_sig_pval else min_sig_pval
                 if row['FC'] < -args['fc']:
                     color.append('#2c7bb6')
                 elif row['FC'] > args['fc']:
@@ -293,10 +295,10 @@ def run_volcano(data, identifier, args):
                     color.append('silver')
             else:
                 color.append('silver')
-        
+
         # Return
         volcano_plot_results[(gidentifier, title)] = {'x': signature['logFC'].values, 'y': signature['-Log pvalue'].values, 'text':text, 'color': color, 'pvalue':-np.log10(min_sig_pval)}
-    
+
     figures = get_volcanoplot(volcano_plot_results, args)
 
     return figures
@@ -682,6 +684,53 @@ def create_violinplot(df, variable, group_col='group'):
         traces.append(violin)
 
     return traces
+
+def plot_dendrogram(Z_dendrogram, cutoff_line=True, value=15, orientation='bottom', hang=30, hide_labels=False, labels=None,
+                    colorscale=None, hovertext=None, color_threshold=None):
+
+    dendrogram = Dendrogram(Z_dendrogram, orientation, hang, hide_labels, labels,
+                             colorscale, hovertext=hovertext, color_threshold=color_threshold)
+
+    if cutoff_line == True:
+        dendrogram.layout.update(add_line(dendrogram, value))
+
+    return go.Figure(data=dendrogram.data, layout=dendrogram.layout)
+
+def add_line(plotly_fig, value):
+    plotly_fig.layout.update({'shapes':[{'type':'line',
+                             'xref':'paper',
+                             'yref':'y',
+                             'x0':0, 'y0':value,
+                             'x1':1, 'y1':value,
+                             'line':{'color':'red'}}]})
+    return plotly_fig.layout
+
+def get_WGCNAPlots(data, identifier):
+
+    data_exp, data_cli, dissTOM, moduleColors, Features_per_Module, MEs,\
+    moduleTraitCor, textMatrix, MM, MMPvalue, FS, FSPvalue, METDiss, METcor = data
+    plots = []
+    #plot: sample dendrogram and clinical variables heatmap; input: data_exp, data_cli
+    plots.append(plot_complex_dendrogram(data_exp, data_cli, title='Clinical variables variation by sample', dendro_labels=data_exp.index, distfun='euclidean', linkagefun='average', hang=40, subplot='heatmap', color_missingvals=True, width=1000, height=800))
+    #plot: gene tree dendrogram and module colors; input: dissTOM, moduleColors
+    plots.append(plot_complex_dendrogram(dissTOM, moduleColors, title='Co-expression: dendrogram and module colors', dendro_labels=dissTOM.columns, distfun=None, linkagefun='average', hang=0.1, subplot='module colors', col_annotation=True, width=1000, height=800))
+    #plot: table with features per module; input: df
+    plots.append(getBasicTable(Features_per_Module, identifier='', title='Proteins/Genes module color', colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':1500, 'font':12}, subplot = False))
+    #plot: module-traits correlation with annotations; input: moduleTraitCor, textMatrix
+    plots.append(plot_labeled_heatmap(moduleTraitCor, textMatrix, title='Module-Clinical variable relationships', colorscale=[[0,'rgb(0,255,0)'],[0.5,'rgb(255,255,255)'],[1,'rgb(255,0,0)']], row_annotation=True, width=1000, height=800))
+    #plot: FS vs. MM correlation per trait/module scatter matrix; input: MM, FS, Features_per_Module
+    plots.append(plot_intramodular_correlation(MM, FS, Features_per_Module, title='Intramodular analysis: Feature Significance vs. Module Membership', width=2500, height=4000))
+    #input: METDiss, METcor
+    plots.append(plot_complex_dendrogram(METDiss, METcor, title='Eigengene network and clinical data associations', dendro_labels=METDiss.index, distfun=None, linkagefun='average', hang=0.9,
+                             subplot='heatmap', subplot_colorscale=[[0, 'rgb(0,255,0)'], [0.5, 'rgb(255,255,255)'], [1, 'rgb(255,0,0)']],
+                             color_missingvals=False, row_annotation=True, col_annotation=True, width=1000, height=800))
+
+    graphs = []
+    for i, j in enumerate(plots):
+        graphs.append(dcc.Graph(id=identifier+'_'+str(i), figure=j))
+
+    return graphs
+
 
 def getMapperFigure(data, identifier, title, labels):
     pl_brewer = [[0.0, '#67001f'],

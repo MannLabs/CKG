@@ -50,14 +50,6 @@ def get_clinical_data(filename, key, drop_cols=['group', 'biological_sample']):
 
     return df
 
-def get_clusters_elements(linkage_matrix, fcluster_method, fcluster_cutoff, labels):
-    clust = fcluster(linkage_matrix, fcluster_cutoff, fcluster_method)
-    clusters = defaultdict(list)
-    for i, j in zip(clust, labels):
-        clusters[i].append(j)
-
-    return clusters
-
 def get_dendrogram(df, labels, distfun='euclidean', linkagefun='average', div_clusters=True, fcluster_method='distance', fcluster_cutoff=15):
     if distfun is None:
         dist = np.asarray(stats.as_dist(df))
@@ -215,17 +207,24 @@ def calculate_ModuleTrait_correlation(df_exp, df_traits, MEs):
 
     moduleTraitCor.columns = moduleTraitCor.columns.str.replace('space', ' ')
     moduleTraitPvalue.columns = moduleTraitPvalue.columns.str.replace('space', ' ')
+    textMatrix.columns = textMatrix.columns.str.replace('space', ' ')
     moduleTraitCor.columns = moduleTraitCor.columns.str.replace('parentheses1', '(')
     moduleTraitCor.columns = moduleTraitCor.columns.str.replace('parentheses2', ')')
     moduleTraitPvalue.columns = moduleTraitPvalue.columns.str.replace('parentheses1', '(')
     moduleTraitPvalue.columns = moduleTraitPvalue.columns.str.replace('parentheses2', ')')
+    textMatrix.columns = textMatrix.columns.str.replace('parentheses1', '(')
+    textMatrix.columns = textMatrix.columns.str.replace('parentheses2', ')')
 
     return moduleTraitCor, textMatrix
 
 def calculate_ModuleMembership(df_exp, MEs):
     nSamples=len(df_exp.index)
+
+    df_exp_r = df_exp.copy()
+    df_exp_r.columns = df_exp_r.columns.str.replace('-', 'dash')
+
     modLabels = [i[2:] for i in list(MEs.colnames)]
-    FeatureModuleMembership = base.as_data_frame(WGCNA.cor(df_exp, MEs, use='p'))
+    FeatureModuleMembership = base.as_data_frame(WGCNA.cor(df_exp_r, MEs, use='p'))
     MMPvalue = base.as_data_frame(WGCNA.corPvalueStudent(base.as_matrix(FeatureModuleMembership), nSamples))
 
     FeatureModuleMembership.colnames = ['MM'+str(col) for col in modLabels]
@@ -233,18 +232,22 @@ def calculate_ModuleMembership(df_exp, MEs):
 
     FeatureModuleMembership = R2Py.R_matrix2Py_matrix(FeatureModuleMembership, FeatureModuleMembership.rownames, FeatureModuleMembership.colnames)
     MMPvalue = R2Py.R_matrix2Py_matrix(MMPvalue, MMPvalue.rownames, MMPvalue.colnames)
+    FeatureModuleMembership.index = FeatureModuleMembership.index.str.replace('dash', '-')
+    MMPvalue.index = MMPvalue.index.str.replace('dash', '-')
 
-    return FeatureModuleMembership
+    return FeatureModuleMembership, MMPvalue
 
-def calculate_FeatureTraitSignificance(df_exp, df_trait, trait=''):
+def calculate_FeatureTraitSignificance(df_exp, df_trait):
     nSamples=len(df_exp.index)
-    trait_df = pd.DataFrame(df_trait[trait])
 
-    trait_df.columns = trait_df.columns.str.replace(' ', 'space')
-    trait_df.columns = trait_df.columns.str.replace('(', 'parentheses1')
-    trait_df.columns = trait_df.columns.str.replace(')', 'parentheses2')
+    df_exp_r = df_exp.copy()
+    df_exp_r.columns = df_exp_r.columns.str.replace('-', 'dash')
+    df_cli_r = df_trait.copy()
+    df_cli_r.columns = df_cli_r.columns.str.replace(' ', 'space')
+    df_cli_r.columns = df_cli_r.columns.str.replace('(', 'parentheses1')
+    df_cli_r.columns = df_cli_r.columns.str.replace(')', 'parentheses2')
 
-    FeatureTraitSignificance = base.as_data_frame(WGCNA.cor(df_exp, trait_df, use='p'))
+    FeatureTraitSignificance = base.as_data_frame(WGCNA.cor(df_exp_r, df_cli_r, use='p'))
     FSPvalue = base.as_data_frame(WGCNA.corPvalueStudent(base.as_matrix(FeatureTraitSignificance), nSamples))
 
     FeatureTraitSignificance.colnames = ['GS.'+str(col) for col in FeatureTraitSignificance.colnames]
@@ -256,11 +259,13 @@ def calculate_FeatureTraitSignificance(df_exp, df_trait, trait=''):
     FeatureTraitSignificance.columns = FeatureTraitSignificance.columns.str.replace('space', ' ')
     FeatureTraitSignificance.columns = FeatureTraitSignificance.columns.str.replace('parentheses1', '(')
     FeatureTraitSignificance.columns = FeatureTraitSignificance.columns.str.replace('parentheses2', ')')
+    FeatureTraitSignificance.index = FeatureTraitSignificance.index.str.replace('dash', '-')
     FSPvalue.columns = FSPvalue.columns.str.replace('space', ' ')
     FSPvalue.columns = FSPvalue.columns.str.replace('parentheses1', '(')
     FSPvalue.columns = FSPvalue.columns.str.replace('parentheses2', ')')
+    FSPvalue.index = FSPvalue.index.str.replace('dash', '-')
 
-    return FeatureTraitSignificance
+    return FeatureTraitSignificance, FSPvalue
 
 def get_FeaturesPerModule(df_exp, modColors, mode='dictionary'):
     if mode == 'dataframe':
@@ -282,23 +287,25 @@ def get_ModuleFeatures(df_exp, modColors, modules=[]):
     selectfeatures = [allfeatures[x] for x in modules]
     return selectfeatures
 
-def get_EigengenesTrait_correlation(module_eigengenes, df_trait, trait):
-    trait_df = pd.DataFrame(df_trait[trait])
+def get_EigengenesTrait_correlation(module_eigengenes, df_trait):
+    df_trait_r =  df_trait.copy()
+    df_trait_r.columns = df_trait_r.columns.str.replace(' ', 'space')
+    df_trait_r.columns = df_trait_r.columns.str.replace('(', 'parentheses1')
+    df_trait_r.columns = df_trait_r.columns.str.replace(')', 'parentheses2')
+    df_trait_r.columns = df_trait_r.columns.str.replace('/', 'slash')
 
-    trait_df.columns = trait_df.columns.str.replace(' ', 'space')
-    trait_df.columns = trait_df.columns.str.replace('(', 'parentheses1')
-    trait_df.columns = trait_df.columns.str.replace(')', 'parentheses2')
-
-    MET = WGCNA.orderMEs(base.cbind(module_eigengenes, trait_df))
+    MET = WGCNA.orderMEs(base.cbind(module_eigengenes, df_trait_r))
     METcor = WGCNA.cor(MET, use='p')
     METcor = R2Py.R_matrix2Py_matrix(METcor, METcor.rownames, METcor.colnames)
 
     METcor.columns = METcor.columns.str.replace('space', ' ')
     METcor.columns = METcor.columns.str.replace('parentheses1', '(')
     METcor.columns = METcor.columns.str.replace('parentheses2', ')')
+    METcor.columns = METcor.columns.str.replace('slash', '/')
     METcor.index = METcor.index.str.replace('space', ' ')
     METcor.index = METcor.index.str.replace('parentheses1', '(')
     METcor.index = METcor.index.str.replace('parentheses2', ')')
+    METcor.index = METcor.index.str.replace('slash', '/')
 
     METDiss = 1 - METcor
 

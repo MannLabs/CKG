@@ -3,12 +3,12 @@ args:
     imputation_method: mixed
 overview: #section
     peptides:
-        data: number of peptides 
-        analyses: []            
-        plots: 
+        data: number of peptides
+        analyses: []
+        plots:
             - barplot
             - basicTable
-        args: 
+        args:
             x: x
             y: y
             group: group
@@ -18,7 +18,7 @@ overview: #section
     proteins:
         data: number of proteins
         analyses: []
-        plots: 
+        plots:
             - barplot
             - basicTable
         args:
@@ -31,10 +31,10 @@ overview: #section
     modifications:
         data: number of modified proteins
         analyses: []
-        plots: 
+        plots:
             - facetplot
             - basicTable
-        args: 
+        args:
             x: x
             y: y
             group: group
@@ -46,13 +46,13 @@ overview: #section
 "data exploration":
     stratification:
         data: preprocessed
-        analyses: 
-            #- pca 
+        analyses:
+            #- pca
             #- tsne
             -   umap
         plots:
             - scatterplot
-        args: 
+        args:
             x_title: PC1
             y_title: PC2
             components: 2
@@ -62,12 +62,12 @@ overview: #section
             title: 'Sample stratification'
     regulation:
         data: preprocessed
-        analyses: 
+        analyses:
             - anova
-        plots: 
+        plots:
             - basicTable
             - volcanoplot
-        args: 
+        args:
             alpha: 0.05
             fc: 2.0
             group: 'group'
@@ -76,19 +76,19 @@ overview: #section
             marker_size: 10
             x_title: logFC
             y_title: -log(pvalue)
-            drop_cols: 
+            drop_cols:
                 - sample
             name: name
             title: 'Volcano plot'
     correlation:
         data: regulated
-        analyses: 
+        analyses:
             - correlation
-        plots: 
+        plots:
             - heatmap
             - network
             - basicTable
-        args: 
+        args:
             source: node1
             target: node2
             title: 'Features correlation map'
@@ -108,7 +108,7 @@ overview: #section
             - network
             - basicTable
         args:
-            use: 
+            use:
                 columns: identifiers
             source: node1
             target: node2
@@ -122,14 +122,30 @@ overview: #section
             maxLinkWidth: 5
             maxRadius: 20
             node_size: 'betweenness'
+    wgcna:
+        data:
+        analyses:
+            - wgcna
+        plots:
+            - wgcnaplots
+        args:
+            RsquaredCut: 0.8
+            networkType: 'unsigned'
+            network_verbose: 2
+            minModuleSize: 30
+            deepSplit: 2
+            pamRespectsDendro: False
+            merge_modules: True
+            MEDissThres: 0.25
+            verbose_merge: 3
     enrichment:
         data: regulated
-        analyses: 
+        analyses:
             - enrichment
         plots:
             - basicTable
         args:
-            use: 
+            use:
                 columns: identifiers
             source: node1
             target: node2
@@ -140,11 +156,11 @@ overview: #section
             node_properties: {}
     #"topological data analysis":
     #    data: regulated
-    #    analyses: 
+    #    analyses:
     #        - mapper
     #    plots:
     #        - mapper
-    #    args: 
+    #    args:
     #        n_cubes: 15
     #        overlap: 0.5
     #        n_clusters: 3

@@ -1,3 +1,5 @@
+import pandas as import pd
+import numpy as np
 from rpy2 import robjects as ro
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.packages import importr
@@ -16,21 +18,18 @@ def call_Rpackage(call="function", designation="aov"):
         call = rpacks.importr(designation)
     return call
 
-def R_matrix2Py_matrix(r_matrix):
-    df = pd.DataFrame(pandas2ri.ri2py(r_matrix))
-    index, cols = R.rownames(r_matrix), R.colnames(r_matrix)
-    df.index, df.columns = index, cols
+def R_matrix2Py_matrix(r_matrix, index, columns):
+    matrix_class = r_matrix.rclass[0]
+
+    if matrix_class == 'character':
+        df = np.array(r_matrix)
+        df.shape = (len(index), len(columns))
+        df = pd.DataFrame(df)
+
+    elif matrix_class == 'data.frame' or 'matrix':
+        df = pd.DataFrame(pandas2ri.ri2py(r_matrix))
+        df.shape = (len(index), len(columns))
+
+    df.index, df.columns = index, columns
+
     return df
-
-def blockwiseModules(r, power, minModuleSize, reassignThreshold, mergeCutHeight, numericLabels, pamRespectsDendro, saveTOMs, saveTOMFileBase, verbose):
-    function = R(''' net <- function(r, power, minModuleSize, reassignThreshold, mergeCutHeight, numericLabels, pamRespectsDendro,
-                                    saveTOMs, saveTOMFileBase, verbose) {
-                                    blockwiseModules(r, power=power, minModuleSize=minModuleSize, reassignThreshold = reassignThreshold,
-                                    mergeCutHeight = mergeCutHeight, numericLabels = numericLabels, pamRespectsDendro = pamRespectsDendro,
-                                    saveTOMs = saveTOMs, saveTOMFileBase = saveTOMFileBase, verbose = verbose)}''')
-    return function
-
-def paste_matrices(matrix1, sigint1, matrix2, sigint2):
-    function = R(''' text <- function(matrix1, sigint1, matrix2, sigint2) {
-                                    paste(signif(matrix1, sigint1), signif(matrix2, sigint2), sep = "<br>")} ''')
-    return function

@@ -99,9 +99,7 @@ def get_heatmap(df, colorscale=None , color_missing=True):
     return figure
 
 
-def plot_labeled_heatmap(data, colorscale=[[0,'rgb(0,255,0)'],[0.5,'rgb(255,255,255)'],[1,'rgb(255,0,0)']], row_annotation=False, col_annotation=False):
-    df, textmatrix = data
-
+def plot_labeled_heatmap(df, textmatrix, title, colorscale=[[0,'rgb(0,255,0)'],[0.5,'rgb(255,255,255)'],[1,'rgb(255,0,0)']], width=1200, height=800, row_annotation=False, col_annotation=False):
     figure = get_heatmap(df, colorscale=colorscale, color_missing=False)
     figure.add_trace(get_module_color_annotation(list(df.index), row_annotation=row_annotation, col_annotation=col_annotation, bygene=False))
 
@@ -111,9 +109,9 @@ def plot_labeled_heatmap(data, colorscale=[[0,'rgb(0,255,0)'],[0.5,'rgb(255,255,
             annotations.append(go.layout.Annotation(text=str(textmatrix.values[n][m]), font=dict(size=8),
                                                     x=df.columns[m], y=df.index[n], xref='x', yref='y', showarrow=False))
 
-    layout = go.Layout(width=1200, height=800,
+    layout = go.Layout(width=width, height=height, title=title,
                        xaxis=dict(domain=[0.015, 1], autorange=True, showgrid=False, zeroline=False, showline=False, ticks='', showticklabels=True, automargin=True, anchor='y'),
-                       yaxis=dict(autorange='reversed', ticklen=5, ticks='outside', tickcolor='white', showticklabels=False, automargin=True, anchor='x'),
+                       yaxis=dict(autorange='reversed', ticklen=5, ticks='outside', tickcolor='white', showticklabels=False, automargin=True, showgrid=False, anchor='x'),
                        xaxis2=dict(domain=[0, 0.01], autorange=True, showgrid=False, zeroline=False, showline=False, ticks='', showticklabels=False, automargin=True, anchor='y2'),
                        yaxis2=dict(autorange='reversed', showgrid=False, zeroline=False, showline=False, ticks='', showticklabels=True, automargin=True, anchor='x2'))
 
@@ -140,66 +138,76 @@ def plot_dendrogram_guidelines(Z_tree, dendrogram):
     for i in values:
         d = dict(zip(keys, i))
         shapes.append(d)
+
     return shapes
 
+def plot_intramodular_correlation(MM, FS, feature_module_df, title, width=1000, height=800):
 
-def plot_MM_FS_correlations(data, module):
-    MM, FS, modColors, trait = data
+    MM['modColor'] = MM.index.map(feature_module_df.set_index('name')['modColor'].get)
 
-    MMColumn = [i[2:] for i in list(MM.columns)].index(module)
-    FSColumn = [i[3:] for i in list(FS.columns)].index(trait)
-    moduleFeatures = [i for i,e in enumerate(list(modColors)) if e==module]
+    figure = tls.make_subplots(rows=len(FS.columns), cols=len(MM.columns), shared_xaxes=True, shared_yaxes=True, vertical_spacing = 0.01, horizontal_spacing = 0.01, print_grid=False)
 
-    name = MM.iloc[moduleFeatures, MMColumn].index
-    x = abs(MM.iloc[moduleFeatures, MMColumn].values)
-    y = abs(FS.iloc[moduleFeatures, FSColumn].values)
-    df = pd.DataFrame([name, x, y]).T
-    df.columns = ['name', 'x', 'y']
+    layout = go.Layout(width=width, height=height, showlegend=False, title=title)
+    figure.layout.update(layout)
 
-    #Linear fit
-    slope, intercept, r_value, p_value, std_err = scp.stats.linregress(df.x.tolist(), df.y.tolist())
-    line = slope*df.x+intercept
+    axis_dict = {}
+    for i, j in enumerate(MM.columns[MM.columns.str.startswith('MM')]):
+        axis_dict['xaxis{}'.format(i+1)] = dict(title = j, titlefont = dict(size=13))
+    for a, b in enumerate(FS.columns):
+        name = b.split(' ')
+        if len(name) > 1:
+            #label = [' '.join(name[i:i+2]) for i in range(0, len(name), 2)]
+            label = ['<br>'.join(name[i:i+3]) for i in range(0, len(name), 3)][0]
+        else: label = name[0]
+        axis_dict['yaxis{}'.format(a+1)] = dict(title = label, titlefont = dict(size=13))
 
-    layout = go.Layout(showlegend=False,
-                       title = 'Module membership vs. gene significance <br> R={:0.2}, p={:.0e}'.format(r_value, p_value),
-                       xaxis= {'title': 'Module Membership in '+module+' module'},
-                       yaxis= {'title': 'Gene significance for '+trait})
+    annotation = []
+    for a, b in enumerate(FS.columns):
+        for i, j in enumerate(MM.columns[MM.columns.str.startswith('MM')]):
+            name = MM[MM['modColor'] == j[2:]].index
+            x = abs(MM[MM['modColor'] == j[2:]][j].values)
+            y = abs(FS[FS.index.isin(name)][b].values)
 
-    traces = []
-    for name in df.name.unique():
-        traces.append(go.Scatter(x = df.loc[df['name'] == name, 'x'],
-                                 y = df.loc[df['name'] == name, 'y'],
-                                 text = name,
-                                 mode = 'markers',
-                                 opacity=0.7,
-                                 marker={'size': 10,
-                                         'color': 'white',
-                                         'line': {'width': 1.5, 'color': module}},
-                                 name=name))
+            slope, intercept, r_value, p_value, std_err = scp.stats.linregress(x, y)
+            line = slope*x+intercept
 
-    figure = go.Figure(data=traces, layout=layout)
+            figure.append_trace(go.Scatter(x = x,
+                                           y = y,
+                                           text = name,
+                                           mode = 'markers',
+                                           opacity=0.7,
+                                           marker={'size': 7,
+                                                   'color': 'white',
+                                                   'line': {'width': 1.5, 'color': j[2:]}}), a+1, i+1)
 
-    figure.add_trace(go.Scatter(x = df.x, y = line, mode = 'lines', marker={'color': 'black'}))
+            figure.append_trace(go.Scatter(x = x, y = line, mode = 'lines', marker={'color': 'black'}), a+1, i+1)
+
+            annot = dict(x = 0.7, y = 0.7,
+                         xref = 'x{}'.format(i+1), yref = 'y{}'.format(a+1),
+                         text = 'R={:0.2}, p={:.0e}'.format(r_value, p_value),
+                         showarrow = False)
+            annotation.append(annot)
+
+    figure.layout.update(axis_dict)
+    figure.layout.update(annotations = annotation)
 
     return figure
 
-
-def plot_complex_dendrogram(data, dendro_labels=[], distfun='euclidean', linkagefun='average', hang=0.04, subplot='module colors', subplot_colorscale=[], color_missingvals=True, row_annotation=False, col_annotation=False):
-    dendro_df, subplot_df = data
+def plot_complex_dendrogram(dendro_df, subplot_df, title, dendro_labels=[], distfun='euclidean', linkagefun='average', hang=0.04, subplot='module colors', subplot_colorscale=[], color_missingvals=True, row_annotation=False, col_annotation=False, width=1000, height=800):
 
     dendro_tree = get_dendrogram(dendro_df, dendro_labels, distfun=distfun, linkagefun=linkagefun, div_clusters=False)
     dendrogram = plot_dendrogram(dendro_tree, hang=hang, cutoff_line=False)
 
-    layout = go.Layout(width=2000, height=1200, showlegend=False,
+    layout = go.Layout(width=width, height=height, showlegend=False, title=title,
                        xaxis=dict(domain=[0, 1], range=[np.min(dendrogram.layout.xaxis.tickvals)-6,np.max(dendrogram.layout.xaxis.tickvals)+4], showgrid=False,
                                   zeroline=True, ticks='', automargin=True, anchor='y'),
                        yaxis=dict(domain=[0.7, 1], autorange=True, showgrid=False, zeroline=False, ticks='outside', title='Height', automargin=True, anchor='x'),
-                       xaxis2=dict(domain=[0, 1], autorange=True, showgrid=True, zeroline=False, ticks='', showticklabels=True, automargin=True, anchor='y2'),
+                       xaxis2=dict(domain=[0, 1], autorange=True, showgrid=True, zeroline=False, ticks='', showticklabels=False, automargin=True, anchor='y2'),
                        yaxis2=dict(domain=[0, 0.64], autorange=True, showgrid=False, zeroline=False, automargin=True, anchor='x2'))
 
 
     if subplot == 'module colors':
-        figure = tls.make_subplots(rows=2, cols=1)
+        figure = tls.make_subplots(rows=2, cols=1, print_grid=False)
 
         for i in list(dendrogram.data):
             figure.append_trace(i, 1, 1)
@@ -226,7 +234,7 @@ def plot_complex_dendrogram(data, dendro_labels=[], distfun='euclidean', linkage
         if row_annotation == True and col_annotation == True:
             figure = tls.make_subplots(rows=3, cols=2, specs=[[{'colspan':2}, None],
                                                               [{}, {}],
-                                                              [{'colspan':2}, None]])
+                                                              [{'colspan':2}, None]], print_grid=False)
             for i in list(dendrogram.data):
                 figure.append_trace(i, 1, 1)
             for j in list(heatmap.data):
@@ -249,7 +257,7 @@ def plot_complex_dendrogram(data, dendro_labels=[], distfun='euclidean', linkage
 
 
         elif row_annotation == False and col_annotation == False:
-            figure = tls.make_subplots(rows=2, cols=1)
+            figure = tls.make_subplots(rows=2, cols=1, print_grid=False)
 
             for i in list(dendrogram.data):
                 figure.append_trace(i, 1, 1)
@@ -262,7 +270,7 @@ def plot_complex_dendrogram(data, dendro_labels=[], distfun='euclidean', linkage
 
         elif row_annotation == True:# and (col_annotation == False):
             figure = tls.make_subplots(rows=2, cols=2, specs=[[{'colspan':2}, None],
-                                                              [{}, {}]])
+                                                              [{}, {}]], print_grid=False)
             for i in list(dendrogram.data):
                 figure.append_trace(i, 1, 1)
             for j in list(heatmap.data):
@@ -280,7 +288,7 @@ def plot_complex_dendrogram(data, dendro_labels=[], distfun='euclidean', linkage
                                      'yaxis3':dict(domain=[0, 0.64], ticks='', showticklabels=False, automargin=True, anchor='x3')})
 
         elif col_annotation == True:
-            figure = tls.make_subplots(rows=3, cols=1, specs=[[{}], [{}], [{}]])
+            figure = tls.make_subplots(rows=3, cols=1, specs=[[{}], [{}], [{}]], print_grid=False)
 
             for i in list(dendrogram.data):
                 figure.append_trace(i, 1, 1)
