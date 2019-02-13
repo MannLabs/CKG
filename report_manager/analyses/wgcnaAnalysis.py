@@ -5,7 +5,6 @@ import scipy as scp
 from scipy.cluster.hierarchy import distance, linkage, dendrogram, fcluster
 from collections import OrderedDict, defaultdict
 from natsort import natsorted, index_natsorted, order_by_index
-import color_list_up
 import urllib.request
 
 import matplotlib.pyplot as plt
@@ -20,7 +19,7 @@ from rpy2.robjects import pandas2ri
 from rpy2.robjects.packages import importr
 from rpy2.robjects.vectors import StrVector, FloatVector
 import rpy2.robjects.packages as rpacks
-import R2Py
+from report_manager import R2Py
 pandas2ri.activate()
 
 R = ro.r

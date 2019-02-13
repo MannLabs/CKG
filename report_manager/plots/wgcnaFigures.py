@@ -5,7 +5,7 @@ import scipy as scp
 from scipy.cluster.hierarchy import distance, linkage, dendrogram, fcluster
 from collections import OrderedDict, defaultdict
 from natsort import natsorted, index_natsorted, order_by_index
-import color_list_up
+import color_list
 import urllib.request
 
 import matplotlib.pyplot as plt
@@ -17,7 +17,7 @@ import plotly.tools as tls
 from report_manager.plots import basicFigures
 
 def get_module_color_annotation(map_list, col_annotation=False, row_annotation=False, bygene=False, module_colors=[], dendrogram=[]):
-    colors_dict = color_list_up.make_color_dict()
+    colors_dict = color_list.make_color_dict()
 
     n = len(map_list)
     val = 1/(n-1)
@@ -196,7 +196,7 @@ def plot_intramodular_correlation(MM, FS, feature_module_df, title, width=1000, 
 def plot_complex_dendrogram(dendro_df, subplot_df, title, dendro_labels=[], distfun='euclidean', linkagefun='average', hang=0.04, subplot='module colors', subplot_colorscale=[], color_missingvals=True, row_annotation=False, col_annotation=False, width=1000, height=800):
 
     dendro_tree = get_dendrogram(dendro_df, dendro_labels, distfun=distfun, linkagefun=linkagefun, div_clusters=False)
-    dendrogram = plot_dendrogram(dendro_tree, hang=hang, cutoff_line=False)
+    dendrogram = basicFigures.plot_dendrogram(dendro_tree, hang=hang, cutoff_line=False)
 
     layout = go.Layout(width=width, height=height, showlegend=False, title=title,
                        xaxis=dict(domain=[0, 1], range=[np.min(dendrogram.layout.xaxis.tickvals)-6,np.max(dendrogram.layout.xaxis.tickvals)+4], showgrid=False,
