@@ -16,10 +16,11 @@ import logging.config
 import config.ckg_config as ckg_config
 import ckg_utils
 
-try:
-    dbconfig = ckg_utils.get_configuration(ckg_config.databases_config_file)
-except Exception as err:
-    raise Exception("Reading configuration > {}.".format(err))
+def setup_db_config():
+    try:
+        dbconfig = ckg_utils.get_configuration(ckg_config.databases_config_file)
+    except Exception as err:
+        raise Exception("Reading configuration > {}.".format(err))
 
 def setup_logging(path='log.config', key=None):
     """Setup logging configuration"""
@@ -34,6 +35,7 @@ def setup_logging(path='log.config', key=None):
     return logger
 
 def downloadDB(databaseURL, directory=None, file_name=None, user="", password=""):
+    setup_db_config()
     if directory is None:
         directory = dbconfig["databasesDir"]
     if file_name is None:
@@ -136,7 +138,9 @@ def getMedlineAbstracts(idList):
         
         results.append(aux)
 
-    return results
+    abstracts = pd.DataFrame.from_dict(results)
+
+    return abstracts
 
 def listDirectoryFiles(directory):
     from os import listdir

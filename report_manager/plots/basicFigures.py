@@ -14,6 +14,7 @@ from webweb import Web
 from networkx.readwrite import json_graph
 from dash_network import Network
 from report_manager import utils, analyses
+from wordcloud import WordCloud, STOPWORDS
 
 def getPlotTraces(data, key='full', type = 'lines', div_factor=float(10^10000), horizontal=False):
     '''This function returns traces for different kinds of plots
@@ -181,7 +182,8 @@ def get_simple_scatterplot(data, identifier, args):
                                 margin={'l': 40, 'b': 40, 't': 30, 'r': 10},
                                 legend={'x': 0, 'y': 1},
                                 hovermode='closest',
-                                height=900,
+                                height=args['height'],
+                                width=args['width']
                                 )
 
     figure['data'] = [go.Scatter(x = data.x,
@@ -212,7 +214,8 @@ def get_scatterplot(data, identifier, args):
                                 margin={'l': 40, 'b': 40, 't': 30, 'r': 10},
                                 legend={'x': -.4, 'y': 1.2},
                                 hovermode='closest',
-                                height=900,
+                                height=args['height'],
+                                width=args['width']
                                 )
     for name in data.name.unique():
         m = {'size': 25, 'line': {'width': 0.5, 'color': 'grey'}}
@@ -665,3 +668,145 @@ def getMapperFigure(data, identifier, title, labels):
                         left=50, bottom=50, summary_height=300, summary_width=400, summary_left=20, summary_right=20,
                         hist_left=25, hist_right=25, member_textbox_width=800, custom_tooltips=labels)
     return  dcc.Graph(id = identifier, figure=figure)
+
+def get_2_venn_diagram(data, identifier, cond1, cond2, args):
+    figure = {}
+    figure["data"] = []
+    total = len(set(data[cond1].dropna().index).union(set(data[cond2].dropna().index)))
+    unique1 = len(set(data[cond1].dropna().index).difference(data[cond2].dropna().index))#/total
+    unique2 = len(set(data[cond2].dropna().index).difference(data[cond1].dropna().index))#/total
+    intersection12 = len(set(data[cond1].dropna().index).intersection(data[cond2].dropna().index))#/total
+    
+    figure["data"] = [go.Scatter(
+        x=[1, 1.75, 2.5],
+        y=[1, 1, 1],
+        text=[cond1+": "+str(unique1), str(intersection12), cond2+": "+str(unique2)],
+        mode='text',
+        textfont=dict(
+            color='black',
+            size=18,
+            family='Arial',
+        )
+    )]
+
+    
+    figure["layout"] = {
+        'xaxis': {
+            'showticklabels': False,
+            'showgrid': False,
+            'zeroline': False,
+        },
+        'yaxis': {
+            'showticklabels': False,
+            'showgrid': False,
+            'zeroline': False,
+        },
+        'shapes': [
+            {
+                'opacity': 0.3,
+                'xref': 'x',
+                'yref': 'y',
+                'fillcolor': args['colors'][cond1],
+                'x0': 0,
+                'y0': 0,
+                'x1': 2,
+                'y1': 2,
+                'type': 'circle',
+                'line': {
+                    'color': args['colors'][cond1],
+                },
+            },
+            {
+                'opacity': 0.3,
+                'xref': 'x',
+                'yref': 'y',
+                'fillcolor': args['colors'][cond2],
+                'x0': 1.5,
+                'y0': 0,
+                'x1': 3.5,
+                'y1': 2,
+                'type': 'circle',
+                'line': {
+                    'color': args['colors'][cond2],
+                },
+            }
+        ],
+        'margin': {
+            'l': 20,
+            'r': 20,
+            'b': 100
+        },
+        'height': 600,
+        'width': 800,
+    }
+    
+    return dcc.Graph(id = identifier, figure=figure)
+
+def get_wordcloud(text, identifier, args={'stopwords':[], 'max_words': 400, 'max_font_size': 100, 'width':700, 'height':700, 'margin': 1}):
+    stopwords = set(STOPWORDS)
+    if 'stopwords' in args:
+        stopwords = stopwords.union(args['stopwords'])
+    wc = WordCloud(stopwords = stopwords,
+                   max_words = args['max_words'],
+                   max_font_size = args['max_font_size'],
+                   background_color='white',
+                   margin=args['margin'])
+    wc.generate(text)
+    
+    word_list=[]
+    freq_list=[]
+    fontsize_list=[]
+    position_list=[]
+    orientation_list=[]
+    color_list=[]
+
+    for (word, freq), fontsize, position, orientation, color in wc.layout_:
+        word_list.append(word)
+        freq_list.append(freq)
+        fontsize_list.append(fontsize)
+        position_list.append(position)
+        orientation_list.append(orientation)
+        color_list.append(color)
+        
+    # get the positions
+    x=[]
+    y=[]
+    j = 0
+    for i in position_list:
+        x.append(i[1]+fontsize_list[j]+10)
+        y.append(i[0]+5)
+        j += 1
+            
+    # get the relative occurence frequencies
+    new_freq_list = []
+    for i in freq_list:
+        new_freq_list.append(i*70)
+    new_freq_list
+    
+    trace = go.Scatter(x=x, 
+                       y=y, 
+                       textfont = dict(size=new_freq_list,
+                                       color=color_list),
+                       hoverinfo='text',
+                       hovertext=['{0} freq: {1}'.format(w, f) for w, f in zip(word_list, freq_list)],
+                       mode="text",  
+                       text=word_list
+                      )
+    
+    layout = go.Layout(
+                       xaxis=dict(showgrid=False, 
+                                  showticklabels=False,
+                                  zeroline=False,
+                                  automargin=True),
+                       yaxis=dict(showgrid=False,
+                                  showticklabels=False,
+                                  zeroline=False,
+                                  automargin=True),
+                      width=args['width'],
+                      height=args['height'],
+                      title=args['title']
+                      )
+    
+    figure = go.Figure(data=[trace], layout=layout)
+    
+    return dcc.Graph(id = identifier, figure=figure)
