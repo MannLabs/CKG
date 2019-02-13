@@ -116,6 +116,8 @@ def addUniProtTexts(textsFile, proteins):
 
 def parseUniProtVariants(config, databases_directory, download=True):
     data = defaultdict()
+    variant_regex = r"(g\.\w+>\w)"
+    chromosome_regex = r"(\w+)p"
     url = config['uniprot_variant_file']
     aa = config['amino_acids']
     entities = set()
@@ -141,22 +143,27 @@ def parseUniProtVariants(config, databases_directory, download=True):
                 gene = data[0]
                 protein = data[1]
                 pvariant = data[2]
+                externalID = data[3]
+                impact = data[4]
+                clin_relevance = data[5]
+                disease = data[6]
+                chromosome_coord = data[8]
+                original_source = data[13]
                 ref = pvariant[2:5]
                 pos = pvariant[5:-3]
                 alt = pvariant[-3:]
-                if ref in aa and alt in aa:
-                    ident = aa[ref]+pos+aa[alt]
-                    altName = [data[3]]
-                    altName.append(data[5])
+                var_matches = re.search(variant_regex, data[9])
+                chr_matches = re.search(chromosome_regex, chromosome_coord)
+                if var_matches and chr_matches:
+                    chromosome = 'chr'+chr_matches.group(1)
+                    ident = chromosome+":"+var_matches.group(1)
                     consequence = data[4]
-                    mutIdent = re.sub('NC_\d+\.', 'chr', data[9])
-                    altName.append(mutIdent)
-                    if len(data[9].split('.')) >1:
-                        chromosome = data[9].split('.')[1].split(':')[0]
-                    else:
-                        chromosome = data[9]
-                    entities.add((ident, "Known_variant", ",".join(altName)))
-                    if chromosome != '-':
+                    altName = [externalID, data[5], pvariant, chromosome_coord]
+                    if ref in aa and alt in aa:
+                        altName.append(aa[ref]+pos+aa[alt])
+                    pvariant = protein+"_"+pvariant
+                    entities.add((ident, "Known_variant", pvariant, ",".join(altName), impact, clin_relevance, disease, original_source, "UniProt"))
+                    if chromosome != 'chr-':
                         relationships[('Chromosome','known_variant_found_in_chromosome')].add((ident, chromosome, "VARIANT_FOUND_IN_CHROMOSOME","UniProt"))
                     if gene != "":
                         relationships[('Gene','known_variant_found_in_gene')].add((ident, gene, "VARIANT_FOUND_IN_GENE", "UniProt"))

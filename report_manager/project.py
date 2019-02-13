@@ -2,11 +2,13 @@ import sys
 import os
 from collections import defaultdict
 from plotly.offline import iplot
+from IPython.display import IFrame, display
+import tempfile
 from json import dumps
 import pandas as pd
 import ckg_utils
 import config.ckg_config as ckg_config
-from report_manager.dataset import ProteomicsDataset, ClinicalDataset, DNAseqDataset, RNAseqDataset
+from report_manager.dataset import ProteomicsDataset, ClinicalDataset, DNAseqDataset, RNAseqDataset, LongitudinalProteomicsDataset
 from report_manager.plots import basicFigures as figure
 from report_manager import report as rp
 from graphdb_connector import connector
@@ -209,6 +211,9 @@ class Project:
             elif data_type == "wes" or data_type == "wgs":
                 dataset = DNAseqDataset(self.identifier, dataset_type=data_type, data={}, analyses={}, analysis_queries={}, report=None)
                 self.update_dataset({data_type:dataset})
+            elif data_type == "longitudinal_proteomics":
+                dataset = LongitudinalProteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
+                self.update_dataset({data_type:dataset})
                 
            
     def generate_project_info_report(self):
@@ -251,9 +256,24 @@ class Project:
                     if environment == "notebook":
                         if hasattr(plot, 'figure'):
                             iplot(plot.figure)
-                        #else:
-                        #    iplot(plot)
+                        elif isinstance(plot, dict):
+                            if "notebook" in plot:
+                                net = plot['notebook']
+                                fnet = tempfile.NamedTemporaryFile(suffix=".html", delete=False, dir='tmp/')
+                                with open(fnet.name, 'w') as f:
+                                    f.write(net.html)
+                                display(IFrame(os.path.relpath(fnet.name),width=1400, height=1400))
+                                iplot(plot["net_tables"][0].figure)
+                                iplot(plot["net_tables"][1].figure)
                     else:
-                        app_plots[identifier].append(plot)
+                        if isinstance(plot, dict):
+                            if 'app' in plot:
+                                app_plots[identifier].append(plot['app'])
+                            if 'net_tables' in plot:
+                                tables = plot['net_tables']
+                                app_plots[identifier].append(tables[0])
+                                app_plots[identifier].append(tables[1])
+                        else:
+                            app_plots[identifier].append(plot)
         
         return app_plots        

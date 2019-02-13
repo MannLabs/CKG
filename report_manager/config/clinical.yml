@@ -1,10 +1,12 @@
 args:
-    index: subject
+    index: 
+        - subject
+        - biological_sample
     columns: clinical_variable
     values: value
     extra: 
         - group
-    use_index: False
+    use_index: True
 
 overview: #section
     clinical variables:

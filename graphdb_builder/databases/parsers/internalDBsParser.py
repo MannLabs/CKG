@@ -67,7 +67,6 @@ def parsePMClist(config, databases_directory, download=True):
     
     if download:
         builder_utils.downloadDB(url, directory)
-
     entities = pd.read_csv(fileName, sep = ',', dtype = str, compression = 'gzip', low_memory=False)
     entities = entities[config['PMC_fields']]
     entities = entities[entities.iloc[:,0].notnull()]

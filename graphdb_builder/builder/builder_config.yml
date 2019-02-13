@@ -30,30 +30,30 @@ statsCols :
 
 #Full Graph
 graph : 
-    - 'ontologies'
-    - 'chromosomes'
-    - 'genes'
-    - 'transcripts'
-    - 'proteins'
-    - 'annotations'
-    - 'modified_proteins'
-    - 'complexes'
-    - 'ppi'
-    - 'diseases'
-    - 'drugs'
-    - 'known_variants'
-    - 'clinical variants'
-    - 'pathology_expression'
-    - 'mentions'
-    - 'internal'
-    - 'side effects'
-    - 'metabolite'
-    - 'food'
-    - 'gwas'
-    - 'pathway'
-    - 'published'
-    - 'project'
-    - 'experiment'
+    - ontologies
+    - chromosomes
+    - genes
+    - transcripts
+    - proteins
+    - annotations
+    - modified_proteins
+    - complexes
+    - ppi
+    - diseases
+    - drugs
+    - known_variants
+    - clinical variants
+    - pathology_expression
+    - mentions
+    - internal
+    - side effects
+    - metabolite
+    - food
+    - gwas
+    - pathway
+    - published
+    - project
+    - experiment
 
 #Imports 
 ontology_entities : 

@@ -1,5 +1,16 @@
 import dash_html_components as html
 import bs4 as bs
+import random
+from Bio import Entrez
+from Bio import Medline
+import pandas as pd
+
+def generator_to_dict(genvar):
+    dictvar = {}
+    for i,gen in enumerate(genvar):
+            dictvar.update({n:i for n in gen})
+
+    return dictvar
 
 def parse_html(html_snippet):
     html_parsed = bs.BeautifulSoup(html_snippet)
@@ -32,3 +43,50 @@ def getNumberText(num):
         return numbers[num]
     else:
         return None
+
+def get_rgb_colors(n):
+    colors = []
+    r = int(random.random() * 256)
+    g = int(random.random() * 256)
+    b = int(random.random() * 256)
+    step = 256 / n
+    for i in range(n):
+        r += step
+        g += step
+        b += step
+        r = int(r) % 256
+        g = int(g) % 256
+        b = int(b) % 256
+        colors.append((r,g,b)) 
+    return colors
+
+def get_hex_colors(n):
+    colors = []
+    for i in range(n):
+        color = "#%06x" % random.randint(0, 0xFFFFFF)
+        colors.append(color)
+
+    return colors
+
+def getMedlineAbstracts(idList):
+    fields = {"TI":"title", "AU":"authors", "JT":"journal", "DP":"date", "MH":"keywords", "AB":"abstract", "PMID":"PMID"}
+    pubmedUrl = "https://www.ncbi.nlm.nih.gov/pubmed/"
+    handle = Entrez.efetch(db="pubmed", id=idList, rettype="medline", retmode="json")
+    records = Medline.parse(handle)
+    results = []
+    for record in records:
+        aux = {}
+        for field in fields:
+            if field in record:
+                aux[fields[field]] = record[field]
+        if "PMID" in aux:
+            aux["url"] = pubmedUrl + aux["PMID"]
+        else:
+            aux["url"] = ""
+        
+        results.append(aux)
+
+    abstracts = pd.DataFrame.from_dict(results)
+
+    return abstracts
+

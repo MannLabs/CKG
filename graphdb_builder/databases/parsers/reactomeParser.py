@@ -86,16 +86,16 @@ def parsePathwayRelationships(config, fhandler, mapping=None):
         if match:
             name = match.group(1)
             loc = match.group(2)
-        if organism in organisms:
-            organism = organisms[organism]
-            if mapping is not None:
-                if identifier in mapping:
-                    identifier = mapping[identifier]
-                elif name in mapping:
-                    identifier = mapping[name]
-                else:
-                    #print(name, identifier)
-                    continue
-            relationships.add((identifier, pathway, "ANNOTATED_TO_PATHWAY", evidence, organism, loc, "Reactome"))
+            if organism in organisms:
+                organism = organisms[organism]
+                if mapping is not None:
+                    if identifier in mapping:
+                        identifier = mapping[identifier]
+                    elif name in mapping:
+                        identifier = mapping[name]
+                    else:
+                        #print(name, identifier)
+                        continue
+                relationships.add((identifier, pathway, "ANNOTATED_TO_PATHWAY", evidence, organism, loc, "Reactome"))
     
     return relationships

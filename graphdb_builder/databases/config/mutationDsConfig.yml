@@ -1,0 +1,11 @@
+###### IntAct MutationDs Database #######
+mutations_url: 'ftp://ftp.ebi.ac.uk/pub/databases/intact/current/various/mutations.tsv'
+header: 
+    - 'START_ID'
+    - 'END_ID'
+    - 'TYPE'
+    - 'effect'
+    - 'interaction'
+    - 'evidence'
+    - 'internal_id'
+    - 'source'

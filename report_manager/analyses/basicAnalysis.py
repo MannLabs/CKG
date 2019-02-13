@@ -2,31 +2,36 @@ import pandas as pd
 import itertools
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
-import statsmodels.stats.multitest as multitest
+from statsmodels.stats import multitest, anova as aov
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 from scipy.special import factorial, betainc
 import umap.umap_ as umap
 from sklearn import preprocessing, ensemble, cluster
 from scipy import stats
 import numpy as np
+import networkx as nx
+import community
 import math
 from random import shuffle
 from fancyimpute import KNN
 import kmapper as km
+from report_manager import utils
 from report_manager.analyses import wgcnaAnalysis as wgcna
 
 def transform_into_long_format(data, index, columns, values, extra=[], use_index=False):
     df = data.copy()
-    cols = [index,columns, values]
-    df = df.drop_duplicates()
-    if len(extra) > 0:
-        extra.append(index)
-        extra_cols = df[extra].set_index(index)
-    df = df[cols]
-    df = df.pivot(index=index, columns=columns, values=values)
-    df = df.join(extra_cols)
-    if not use_index:
-        df = df.reset_index(drop=True)
+    if not df.empty:
+        cols = [columns, values]
+        cols.extend(index)
+        if len(extra) > 0:
+            extra.extend(index)
+            extra_cols = df[extra].set_index(index)
+        df = df[cols]
+        df = df.pivot_table(index=index, columns=columns, values=values)
+        df = df.join(extra_cols)
+        df = df.drop_duplicates()
+        if not use_index:
+            df = df.reset_index(drop=True)
 
     return df
 
@@ -55,17 +60,18 @@ def extract_percentage_missing(data, conditions, missing_max):
 
     return list(groups)
 
-def imputation_KNN(data, cutoff=0.5, alone = True):
+def imputation_KNN(data, drop_cols=['group', 'sample', 'subject'], group='group', cutoff=0.5, alone = True):
     df = data.copy()
-    value_cols = [c for c in df.columns if c not in ['sample', 'group']]
-    for g in df.group.unique():
-        missDf = df.loc[df.group==g, value_cols]
+    value_cols = [c for c in df.columns if c not in drop_cols]
+    for g in df[group].unique():
+        missDf = df.loc[df[group]==g, value_cols]
         missDf = missDf.loc[:, missDf.notnull().mean() >= cutoff]
-        X = np.array(missDf.values, dtype=np.float64)
-        X_trans = KNN(k=3).fit_transform(X)
-        missingdata_df = missDf.columns.tolist()
-        dfm = pd.DataFrame(X_trans, index =list(missDf.index), columns = missingdata_df)
-        df.update(dfm)
+        if missDf.isnull().values.any():
+            X = np.array(missDf.values, dtype=np.float64)
+            X_trans = KNN(k=3).fit_transform(X)
+            missingdata_df = missDf.columns.tolist()
+            dfm = pd.DataFrame(X_trans, index =list(missDf.index), columns = missingdata_df)
+            df.update(dfm)
     if alone:
         df = df.dropna()
 
@@ -77,10 +83,11 @@ def imputation_mixed_norm_KNN(data):
 
     return df
 
-def imputation_normal_distribution(data, shift = 1.8, nstd = 0.3):
+def imputation_normal_distribution(data, index=['group', 'sample', 'subject'], shift = 1.8, nstd = 0.3):
     np.random.seed(112736)
     df = data.copy()
-    df = df.set_index(['sample','group'])
+    if index is not None:
+        df = df.set_index(index)
     data_imputed = df.T
     for i in data_imputed.loc[:, data_imputed.isnull().any()]:
         missing = data_imputed[i].isnull()
@@ -128,17 +135,16 @@ def remove_group(data):
     data.drop(['group'], axis=1)
     return data
 
-def get_measurements_ready(data, imputation = True, method = 'distribution', missing_method = 'percentage', missing_max = 0.3, value_col='LFQ_intensity'):
+def get_proteomics_measurements_ready(data, index=['group', 'sample', 'subject'], imputation = True, method = 'distribution', missing_method = 'percentage', missing_max = 0.3, value_col='LFQ_intensity'):
     df = data.copy()
     conditions = df.group.unique()
-    df = df.set_index(['group','sample'])
-    df['identifier'] = df['identifier'].map(str) +"-"+ df['name'].map(str)
+    df = df.set_index(index)
+    df['identifier'] = df['name'].map(str) + "-" + df['identifier'].map(str)
     df = df.pivot_table(values=value_col, index=df.index, columns='identifier', aggfunc='first')
     df = df.reset_index()
-    df[['group', 'sample']] = df["index"].apply(pd.Series)
+    df[index] = df["index"].apply(pd.Series)
     df = df.drop(["index"], axis=1)
-
-    aux = ['group', 'sample']
+    aux = index
 
     if missing_method == 'at_least_x_per_group':
         aux.extend(extract_number_missing(df, conditions, missing_max))
@@ -161,12 +167,12 @@ def get_measurements_ready(data, imputation = True, method = 'distribution', mis
     df = df.reset_index()
     return df
 
-def runPCA(data, components = 2):
+def run_pca(data, drop_cols=['sample', 'subject'], group='group', components=2):
     np.random.seed(112736)
     result = {}
     df = data.copy()
-    df = df.drop(['sample'], axis=1)
-    df = df.set_index('group')
+    df = df.drop(drop_cols, axis=1)
+    df = df.set_index(group)
     X = df._get_numeric_data()
     y = df.index
     pca = PCA(n_components=components)
@@ -189,11 +195,11 @@ def runPCA(data, components = 2):
     result['pca'] = resultDf
     return result, args
 
-def runTSNE(data, components=2, perplexity=40, n_iter=1000, init='pca'):
+def run_tsne(data, drop_cols=['sample', 'subject'], group='group', components=2, perplexity=40, n_iter=1000, init='pca'):
     result = {}
     df = data.copy()
-    df = df.drop(['sample'], axis=1)
-    df = df.set_index('group')
+    df = df.drop(drop_cols, axis=1)
+    df = df.set_index(group)
     X = df._get_numeric_data()
     y = df.index
 
@@ -215,11 +221,11 @@ def runTSNE(data, components=2, perplexity=40, n_iter=1000, init='pca'):
     result['tsne'] = resultDf
     return result, args
 
-def runUMAP(data, n_neighbors=10, min_dist=0.3, metric='cosine'):
+def run_umap(data, drop_cols=['sample', 'subject'], group='group', n_neighbors=10, min_dist=0.3, metric='cosine'):
     result = {}
     df = data.copy()
-    df = df.drop(['sample'], axis=1)
-    df = df.set_index('group')
+    df = df.drop(drop_cols, axis=1)
+    df = df.set_index(group)
     X = df._get_numeric_data()
     y = df.index
 
@@ -262,7 +268,7 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, per
         df_random = df.reset_index(drop=True)
         df_random.index = df_index
         df_random.index.name = 'group'
-        columns = ['identifier', 't-statistics', 'pvalue_'+str(i), '-Log pvalue']
+        columns = ['identifier', 't-statistics', 'pvalue_'+str(i), '-log10 pvalue']
         if list(df_random.index) != list(df.index):
             rand_scores = df_random.apply(func=calculate_annova, axis=0, result_type='expand').T
             rand_scores.columns = columns
@@ -341,12 +347,13 @@ def runEfficientCorrelation(data, method='pearson'):
 def calculate_paired_ttest(df, condition1, condition2):
     group1 = df[condition1]
     group2 = df[condition2]
-
-    if isinstance(group1, np.float64):
+    print(group1)
+    print(group2)
+    if isinstance(group1, np.float):
         group1 = np.array(group1)
     else:
         group1 = group1.values
-    if isinstance(group2, np.float64):
+    if isinstance(group2, np.float):
         group2 = np.array(group2)
     else:
         group2 = group2.values
@@ -359,11 +366,11 @@ def calculate_paired_ttest(df, condition1, condition2):
 def calculate_ttest(df, condition1, condition2):
     group1 = df[condition1]
     group2 = df[condition2]
-    if isinstance(group1, np.float64):
+    if isinstance(group1, np.float):
         group1 = np.array(group1)
     else:
         group1 = group1.values
-    if isinstance(group2, np.float64):
+    if isinstance(group2, np.float):
         group2 = np.array(group2)
     else:
         group2 = group2.values
@@ -377,31 +384,38 @@ def calculate_THSD(df):
     col = df.name
     result = pairwise_tukeyhsd(df, list(df.index))
     df_results = pd.DataFrame(data=result._results_table.data[1:], columns=result._results_table.data[0])
-    df_results.columns = ['group1', 'group2', 'logFC', 'lower', 'upper', 'rejected']
+    df_results.columns = ['group1', 'group2', 'log2FC', 'lower', 'upper', 'rejected']
     df_results['identifier'] = col
     df_results = df_results.set_index('identifier')
-    df_results['FC'] = df_results['logFC'].apply(lambda x: np.power(10,np.abs(x)) * -1 if x < 0 else np.power(10,np.abs(x)))
+    df_results['FC'] = df_results['log2FC'].apply(lambda x: np.power(2,np.abs(x)) * -1 if x < 0 else np.power(2,np.abs(x)))
 
     return df_results
 
 def calculate_annova(df, group='group'):
     col = df.name
-    group_values = df.groupby('group').apply(list).tolist()
+    group_values = df.groupby(group).apply(list).tolist()
     t, pvalue = stats.f_oneway(*group_values)
     log = -math.log(pvalue,10)
 
     return (col, t, pvalue, log)
 
+def calculate_repeated_measures_annova(df, sample='sample', group='group'):
+    col = df.name
+    #group_values = df.groupby('group').apply(list).tolist()
+    num_df, den_df, f_stat, pvalue = aov.AnovaRM(df.reset_index(), col, sample, within=[group], aggregate_func='mean').fit().anova_table.values.tolist()[0]
+    log = -math.log(pvalue,10)
+
+    return (col, f_stat, pvalue, log)
+
 def get_max_permutations(df, group='group'):
     num_groups = len(list(df.index))
     num_per_group = df.groupby(group).size().tolist()
-    max_perm = math.factorial(num_groups)/np.prod(factorial(np.array(num_per_group)))
+    max_perm = factorial(num_groups)/np.prod(factorial(np.array(num_per_group)))
 
     return max_perm
 
-def anova(data, alpha=0.5, drop_cols=["sample"], group='group', permutations=50):
-    print(data.head())
-    columns = ['identifier', 't-statistics', 'pvalue', '-Log pvalue']
+def anova(data, alpha=0.05, drop_cols=["sample", 'subject'], group='group', permutations=50):
+    columns = ['identifier', 't-statistics', 'pvalue', '-log10 pvalue']
     df = data.copy()
     df = df.set_index(group)
     df = df.drop(drop_cols, axis=1)
@@ -410,11 +424,73 @@ def anova(data, alpha=0.5, drop_cols=["sample"], group='group', permutations=50)
     scores = scores.set_index("identifier")
     scores = scores.dropna(how="all")
 
+
+    max_perm = get_max_permutations(df)
     #FDR correction
-    if permutations > 0:
-        max_perm = get_max_permutations(df)
+    if permutations > 0 and max_perm>=10:
         if max_perm < permutations:
             permutations = max_perm
+        observed_pvalues = scores.pvalue
+        count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=alpha, permutations=permutations)
+        scores= scores.join(count)
+        scores['correction'] = 'permutation FDR ({} perm)'.format(permutations)
+        aux = scores.loc[scores.rejected,:]
+    else:
+        rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'indep')
+        scores['correction'] = 'FDR correction BH'
+        scores['padj'] = padj
+        scores['rejected'] = rejected
+
+    #sigdf = df[list(scores[scores.rejected].index)]
+    res = None
+    for col in df.columns:
+        pairthsd = calculate_THSD(df[col])
+        if res is None:
+            res = pairthsd
+        else:
+            res = pd.concat([res,pairthsd], axis=0)
+    if res is not None:
+        res = res.join(scores[['t-statistics', 'pvalue', '-log10 pvalue', 'padj']].astype('float'))
+        res['correction'] = scores['correction']
+    else:
+        res = scores
+        res["log2FC"] = np.nan
+
+    res = res.reset_index()
+    res['rejected'] = res['padj'] < alpha
+
+    return res
+
+def repeated_measurements_anova(data, alpha=0.5, drop_cols=['sample'], subject='subject', sample='sample', group='group', permutations=50):
+    columns = ['identifier', 'F-statistics', 'pvalue', '-log10 pvalue']
+    df = data.copy()
+    group_df = df.groupby(group)
+    list_items = []
+    for n, g in group_df:
+        list_items.append(g[sample].tolist())
+    max_intersection = []
+    for l1,l2 in itertools.combinations(list_items,2):
+            print(len(l1),len(set(l1)))
+            print(len(l2),len(set(l2)))
+            print(l2)
+            intersect = set(l1).intersection(l2)
+            if len(intersect) > len(max_intersection):
+                max_intersection = intersect
+
+    df = df[df[sample].isin(max_intersection)]
+    df = df.set_index([sample,group])
+    df = df.drop(drop_cols, axis=1)
+    scores = df.apply(func = calculate_repeated_measures_annova, axis=0,result_type='expand', sample=sample, group=group).T
+    scores.columns = columns
+    scores = scores.set_index("identifier")
+    scores = scores.dropna(how="all")
+    df = df.drop([sample], axis=1)
+
+    #FDR correction
+    if permutations > 0:
+        #max_perm = get_max_permutations(df)
+        #if max_perm < permutations:
+        #    permutations = max_perm
         observed_pvalues = scores.pvalue
         count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=alpha, permutations=permutations)
         scores= scores.join(count)
@@ -433,21 +509,22 @@ def anova(data, alpha=0.5, drop_cols=["sample"], group='group', permutations=50)
         else:
             res = pd.concat([res,pairthsd], axis=0)
     if res is not None:
-        res = res.join(scores[['t-statistics', 'pvalue', '-Log pvalue', 'padj']].astype('float'))
+        res = res.join(scores[['t-statistics', 'pvalue', '-log10 pvalue', 'padj']].astype('float'))
     else:
         res = scores
-        res["logFC"] = np.nan
+        res["log2FC"] = np.nan
 
     res = res.reset_index()
+    res['rejected'] = res['padj'] < alpha
 
     return res
 
-def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample"], paired=False, permutations=50):
+def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample", 'subject'], group='group', paired=False, permutations=50):
     df = data.copy()
-    df = df.set_index('group')
+    df = df.set_index(group)
     df = df.drop(drop_cols, axis = 1)
     tdf = df.loc[[condition1, condition2],:].T
-    columns = ['identifier', 't-statistics', 'pvalue', '-Log pvalue']
+    columns = ['identifier', 't-statistics', 'pvalue', '-log10 pvalue']
     if paired:
         scores = tdf.apply(func = calculate_paired_ttest, axis = 1, result_type='expand', args =(condition1, condition2))
     else:
@@ -457,8 +534,7 @@ def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample"], pair
     scores = scores.dropna(how="all")
 
     #Fold change
-    scores["logFC"] = tdf.apply(func = calculate_fold_change, axis = 1, args =(condition1, condition2))
-
+    scores["log2FC"] = tdf.apply(func = calculate_fold_change, axis = 1, args =(condition1, condition2))
     #Cohen's d
     scores["cohen_d"] = tdf.apply(func = cohen_d, axis = 1, args =(condition1, condition2, 1))
 
@@ -653,3 +729,31 @@ def runWGCNA(filename_exp, filename_cli, key_exp, key_cli, drop_cols_exp, drop_c
     METDiss, METcor = wgcna.get_EigengenesTrait_correlation(MEs, data_cli)
 
     return data_exp, data_cli, dissTOM, moduleColors, Features_per_Module, MEs, moduleTraitCor, textMatrix, MM, MMPvalue, FS, FSPvalue, METDiss, METcor
+
+def most_central_edge(G):
+    centrality = nx.eigenvector_centrality_numpy(G, weight='width')
+
+    return max(centrality, key=centrality.get)
+
+def get_louvain_partitions(G, weight):
+    partition = community.best_partition(G)
+
+    return partition
+
+def get_network_communities(graph, args):
+    if 'communities_algorithm' not in args:
+        args['communities_algorithm'] = 'louvain'
+
+    if args['communities_algorithm'] == 'louvain':
+        communities = get_louvain_partitions(graph, args['values'])
+    elif args['communities_algorithm'] == 'greedy_modularity':
+        gcommunities = nx.algorithms.community.greedy_modularity_communities(graph, weight=args['values'])
+        communities = utils.generator_to_dict(gcommunities)
+    elif args['communities_algorithm'] == 'asyn_label_propagation':
+        gcommunities = nx.algorithms.community.label_propagation.asyn_lpa_communities(graph, args['values'])
+        communities = utils.generator_to_dict(gcommunities)
+    elif args['communities_algorithm'] == 'girvan_newman':
+        gcommunities = nx.algorithms.community.girvan_newman(graph, most_valuable_edge=most_central_edge)
+        communities = utils.generator_to_dict(gcommunities)
+
+    return communities

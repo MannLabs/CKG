@@ -467,7 +467,7 @@ IMPORT_KNOWN_VARIANT_DATA:
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Known_variant.csv" AS line
         MERGE (k:Known_variant {id:line.ID})
-        ON CREATE SET k.alternative_names=line.alternative_names
+        ON CREATE SET k.pvariant_id=line.pvariant_id,k.alternative_names=line.alternative_names,k.effect=line.effect,k.clinical_relevance=line.clinical_relevance,k.disease=line.disease,k.original_source=line.original_source,k.source=line.source
         RETURN COUNT(k) AS known_variant;
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/uniprot_chromosome_known_variant_found_in_chromosome.csv" AS line
@@ -487,6 +487,12 @@ IMPORT_KNOWN_VARIANT_DATA:
         MATCH (p:Protein {id:line.END_ID}) 
         MERGE (k)-[r:VARIANT_FOUND_IN_PROTEIN]->(p)
         RETURN COUNT(r) AS known_variant_found_in_protein;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/mutation_curated_affects_interaction_with.csv" AS line
+        MATCH (k:Known_variant {protein_id:line.START_ID})
+        MATCH (p:Protein {id:line.END_ID}) 
+        MERGE (k)-[r:CURATED_AFFECTS_INTERACTION_WITH{effect:line.effect,interaction:line.interaction,evidence:line.evidence,internal_id:line.internal_id,source:line.source}]->(p)
+        RETURN COUNT(r) AS known_variant_affects_interaction_with;
                                 
 IMPORT_CLINICALLY_RELEVANT_VARIANT_DATA:
     'name': 'import clinically relevant variants'
@@ -496,7 +502,7 @@ IMPORT_CLINICALLY_RELEVANT_VARIANT_DATA:
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_Clinically_relevant_variant.csv" AS line
         MERGE (k:Clinically_relevant_variant {id:line.ID})
-        ON CREATE SET k.alternative_names=line.alternative_names,k.chromosome=line.chromosome,k.position=toInt(line.position),k.reference=line.reference,k.alternative=line.alternative,k.effect=line.effect,k.oncogeneicity=line.oncogeneicity
+        ON CREATE SET k.alternative_names=line.alternative_names,k.chromosome=line.chromosome,k.position=toInt(line.position),k.reference=line.reference,k.alternative=line.alternative,k.effect=line.effect,k.oncogeneicity=line.oncogeneicity,k.source=line.source
         RETURN COUNT(k) AS clinically_relevant_variant;
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_known_variant_is_clinically_relevant.csv" AS line
@@ -516,7 +522,7 @@ IMPORT_CLINICALLY_RELEVANT_VARIANT_DATA:
         MATCH (d:Disease {id:line.END_ID})
         MERGE (k)-[r:ASSOCIATED_WITH{score:line.score,evidence_type:line.evidence_type,source:line.source,number_publications:line.number_publications}]->(d)
         RETURN COUNT(r) AS clinically_relevant_variant_associated_with_disease;
-        
+
 IMPORT_GWAS: 
     'name': 'import GWAS studies'
     'description': 'Creates GWAS_study nodes'
@@ -617,14 +623,7 @@ IMPORT_DATASETS:
             USING PERIODIC COMMIT 10000
             LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_somatic_mutation.csv" AS line
             MERGE (s:Somatic_mutation{id:line.ID})
-            ON CREATE SET s.region=line.region,s.function=line.function,s.alternative_names=SPLIT(line.alternative_names, ','),s.Xref=line.Xref,s.SIFT_score=line.SIFT_score,
-            s.SIFT_pred=line.SIFT_pred,s.Polyphen2_HDIV_score=line.Polyphen2_HDIV_score,s.Polyphen2_HDIV_pred=line.Polyphen2_HDIV_pred,
-            s.Polyphen2_HVAR_score=line.Polyphen2_HVAR_score,s.Polyphen2_HVAR_pred=line.Polyphen2_HVAR_pred,s.LRT_score=line.LRT_score,
-            s.LRT_pred=line.LRT_pred,s.MutationTaster_score=line.MutationTaster_score,s.MutationTaster_pred=line.MutationTaster_pred,
-            s.MutationAssessor_score=line.MutationAssessor_score,s.MutationAssessor_pred=line.MutationAssessor_pred,s.FATHMM_score=line.FATHMM_score,
-            s.FATHMM_pred=line.FATHMM_pred,s.PROVEAN_score=line.PROVEAN_score,s.PROVEAN_pred=line.PROVEAN_pred,s.VEST3_score=line.VEST3_score,
-            s.CADD_raw=line.CADD_raw,s.CLINSIG=line.CLINSIG,s.CLNDBN=line.CLNDBN,s.CLNACC=line.CLNACC,s.CLNDSDB=line.CLNDSDB,s.CLNDSDBID=line.CLNDSDBID,
-            s.cosmic70=line.cosmic70,s.ICGC_Id=line.ICGC_Id,s.ICGC_Occurrence=line.ICGC_Occurrence
+            ON CREATE SET s.chromosome=line.chromosome,s.reference=line.reference,s.alternative=line.alternative,s.position=line.position,s.effect=line.effect,s.impact=line.impact,s.gene=line.gene,s.feature_type=line.feature_type,s.biotype=line.biotype,s.alternative_names=line.alternative_names
             RETURN COUNT(s) AS PROJECTID_somatic_mutation;
             USING PERIODIC COMMIT 10000
             LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_somatic_mutation_known_variant.csv" AS line
@@ -662,6 +661,12 @@ CREATE_PROJECT: &create_project
         MERGE (p:Project {id:line.ID}) 
         ON CREATE SET p.name=line.name,p.description=line.description,p.acronym=line.acronym,p.responsible=line.responsible,p.type=line.type
         RETURN COUNT(p) AS PROJECTID_project;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_studies_disease.csv" AS line 
+        MATCH (p:Project {id:line.START_ID})
+        MATCH (d:Disease {id:line.END_ID}) 
+        MERGE (p)-[r:STUDIES_DISEASE]->(d)
+        RETURN COUNT(r) AS PROJECTID_studies_disease;
         
 CREATE_SUBJECTS: &create_subject
     'name': 'create subjects'

@@ -9,6 +9,7 @@ ontologies:
     'Phenotype': 'HPO'
     'Experiment': 'PSI-MS'
     'Modification': 'PSI-MOD'
+    'Molecular_interactions': 'PSI-MI'
     'Gene_ontology': 'GO'
 
 entities:
@@ -18,6 +19,7 @@ entities:
     'HPO': 'Phenotype'
     'PSI-MS': 'Experiment'
     'PSI-MOD': 'Modification'
+    'PSI-MI': 'Molecular_interaction'
     'biological_process': 'Biological_process'
     'molecular_function': 'Molecular_function'
     'cellular_component': 'Cellular_component'
@@ -29,7 +31,8 @@ ontology_types:
     'HPO': '-44'
     'PSI-MOD': '-41'
     'PSI-MS': '-42'
-    'BBC': '-43'
+    'PSI-MI': '-43'
+    'HPO': '-44'
     'SMASH': '-42'
     'GO': '-21'
     
@@ -53,6 +56,8 @@ urls:
         - 'https://github.com/HUPO-PSI/psi-mod-CV/raw/master/PSI-MOD.obo'
     '-42': 
         - 'https://github.com/HUPO-PSI/psi-ms-CV/raw/master/psi-ms.obo'
+    '-43':
+        - 'https://raw.githubusercontent.com/HUPO-PSI/psi-mi-CV/master/psi-mi.obo'
     '-44': 
         - 'http://purl.obolibrary.org/obo/hp.obo'
         - 'http://compbio.charite.de/jenkins/job/hpo.annotations/lastStableBuild/artifact/misc/phenotype_annotation_hpoteam.tab'

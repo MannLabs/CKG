@@ -72,7 +72,13 @@ proteins_header:
 variants_header: 
     - 'ID'
     - ':LABEL'
+    - 'pvariant_id'
     - 'alternative_names'
+    - 'effect'
+    - 'clinical_relevance'
+    - 'disease'
+    - 'original_source'
+    - 'source'
 
 peptides_header: 
     - 'ID'

@@ -177,7 +177,7 @@ class Dataset:
                     data = self.data[data_name]
                     if not data.empty:
                         if subsection in self.analysis_queries:
-                            query = self.analysis_queries[subsection]                    
+                            query = self.analysis_queries[subsection]    
                             if "use" in args:
                                 for r_id in args["use"]:
                                     if r_id == "columns":
@@ -201,7 +201,7 @@ class Dataset:
                                         sig_data = data[sig_hits]
                                         sig_data.index = data['group'].tolist()
                                         sig_data["sample"] = data["sample"].tolist()
-                                        self.update_data({"regulated":sig_data, "regulation_table":reg_data.loc[reg_data.rejected,:]})
+                                        self.update_data({"regulated":sig_data, "regulation_table":reg_data})
                                 for plot_type in plot_types:
                                     plots = result.get_plot(plot_type, subsection+"_"+analysis_type+"_"+plot_type)
                                     self.report.update_plots({(analysis_type, plot_type):plots})
@@ -284,8 +284,14 @@ class ProteomicsDataset(Dataset):
                 if "value_col" in args:
                     value_col = args["value_col"]
             
-            processed_data = basicAnalysis.get_measurements_ready(data, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max)
+            processed_data = basicAnalysis.get_proteomics_measurements_ready(data, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max)
         return processed_data
+
+class LongitudinalProteomicsDataset(ProteomicsDataset):
+    def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
+        config_file = "longitudinal_proteomics.yml"
+        ProteomicsDataset.__init__(self, identifier, data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
+        self.set_configuration_from_file(config_file)  
 
 class ClinicalDataset(Dataset):
     def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):

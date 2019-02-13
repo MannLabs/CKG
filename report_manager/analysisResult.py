@@ -70,7 +70,7 @@ class AnalysisResult:
             components = 2
             if "components" in args:
                 components = args["components"]
-            result, nargs = analyses.runPCA(self.data, components)
+            result, nargs = analyses.run_pca(self.data, components=components)
             args.update(nargs)
         elif self.analysis_type  == "tsne":
             components = 2
@@ -85,7 +85,7 @@ class AnalysisResult:
                 n_iter = args["n_iter"]
             if "init" in args:
                 init = args["init"]
-            result, nargs = analyses.runTSNE(self.data, components=components, perplexity=perplexity, n_iter=n_iter, init=init)
+            result, nargs = analyses.run_tsne(self.data, components=components, perplexity=perplexity, n_iter=n_iter, init=init)
             args.update(nargs)
         elif self.analysis_type  == "umap":
             n_neighbors=10
@@ -98,7 +98,7 @@ class AnalysisResult:
             if "metric" in args:
                 metric = args["metric"]
             if n_neighbors < self.data.shape[0]:
-                result, nargs = analyses.runUMAP(self.data, n_neighbors=n_neighbors, min_dist=min_dist, metric=metric)
+                result, nargs = analyses.run_umap(self.data, n_neighbors=n_neighbors, min_dist=min_dist, metric=metric)
                 args.update(nargs)
         elif self.analysis_type  == "mapper":
             n_cubes = 15
@@ -144,6 +144,24 @@ class AnalysisResult:
                 permutations = args["permutations"]
             anova_result = analyses.anova(self.data, drop_cols=drop_cols, group=group, alpha=alpha, permutations=permutations)
             result[self.analysis_type] = anova_result
+        elif self.analysis_type == "repeated_measurements_anova":
+            alpha = 0.05
+            drop_cols = []
+            group = 'group'
+            sample = 'sample'
+            permutations = 50
+            if "alpha" in args:
+                alpha = args["alpha"]
+            if "drop_cols" in args:
+                drop_cols = args['drop_cols']
+            if "group" in args:
+                group = args["group"]
+            if "sample" in args:
+                sample = args["sample"]
+            if "permutations" in args:
+                permutations = args["permutations"]
+            anova_result = analyses.repeated_measurements_anova(self.data, drop_cols=drop_cols, sample=sample, group=group, alpha=alpha, permutations=permutations)
+            result[self.analysis_type] = anova_result
         elif self.analysis_type  == "correlation":
             alpha = 0.05
             method = 'pearson'
@@ -156,6 +174,7 @@ class AnalysisResult:
                 correction = args["correction"]
             result[self.analysis_type] = analyses.runCorrelation(self.data, alpha=alpha, method=method, correction=correction)
         elif self.analysis_type == "interaction":
+            print(self.data)
             result[self.analysis_type], nargs = analyses.get_interaction_network(self.data)
             args.update(nargs)
         elif self.analysis_type == "wgcna":
@@ -204,7 +223,7 @@ class AnalysisResult:
         if len(data) >=1:
             if name == "basicTable":
                 colors = ('#C2D4FF','#F5F8FF')
-                attr =  {'width':800, 'height':300, 'font':12}
+                attr =  {'width':800, 'height':1500, 'font':12}
                 subset = None
                 if "colors" in args:
                     colors = args["colors"]

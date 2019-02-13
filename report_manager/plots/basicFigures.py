@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
@@ -8,12 +9,14 @@ from scipy.spatial.distance import pdist, squareform
 from plotly.graph_objs import *
 from kmapper import plotlyviz
 import networkx as nx
+from pyvis.network import Network as visnet
+from webweb import Web
 from networkx.readwrite import json_graph
 from dash_network import Network
-from report_manager.utils import hex2rgb, getNumberText
+from report_manager import utils, analyses
+from wordcloud import WordCloud, STOPWORDS
 from report_manager.plots import Dendrogram
 from report_manager.plots import wgcnaFigures
-
 
 def getPlotTraces(data, key='full', type = 'lines', div_factor=float(10^10000), horizontal=False):
     '''This function returns traces for different kinds of plots
@@ -70,16 +73,20 @@ def get_barplot(data, identifier, args):
     --> output:
         Barplot figure within the <div id="_dash-app-content">
     '''
-    height = 400
-    width = 900
     figure = {}
     figure["data"] = []
     if "group" in args:
         for g in data[args["group"]].unique():
+            color = None
+            if 'colors' in args:
+                if g in args['colors']:
+                    color = args['colors'][g]
             trace = go.Bar(
-                        x = data.loc[data["group"] == g,args['x']], # assign x as the dataframe column 'x'
-                        y = data.loc[data["group"] == g, args['y']],
-                        name = g)
+                        x = data.loc[data[args["group"]] == g,args['x']], # assign x as the dataframe column 'x'
+                        y = data.loc[data[args["group"]] == g, args['y']],
+                        name = g,
+                        marker = dict(color=color)
+                        )
             figure["data"].append(trace)
     else:
         figure["data"].append(
@@ -92,8 +99,8 @@ def get_barplot(data, identifier, args):
                             title = args['title'],
                             xaxis={"title":args["x_title"]},
                             yaxis={"title":args["y_title"]},
-                            height = height,
-                            width = width
+                            height = args['height'],
+                            width = args['width']
                         )
 
     return dcc.Graph(id= identifier, figure = figure)
@@ -164,6 +171,34 @@ def get_scatterplot_matrix(data, identifier, args):
 
     return dcc.Graph(id=identifier, figure=figure)
 
+def get_simple_scatterplot(data, identifier, args):
+    figure = {}
+    m = {'size': 15, 'line': {'width': 0.5, 'color': 'grey'}}
+    if 'colors' in data.columns:
+        m.update({'color':data['colors'].tolist()})
+    if 'size' in data.columns:
+        m.update({'size':data['size'].tolist()})
+    figure["layout"] = go.Layout(title = args['title'],
+                                xaxis= {"title": args['x_title']},
+                                yaxis= {"title": args['y_title']},
+                                margin={'l': 40, 'b': 40, 't': 30, 'r': 10},
+                                legend={'x': 0, 'y': 1},
+                                hovermode='closest',
+                                height=args['height'],
+                                width=args['width']
+                                )
+
+    figure['data'] = [go.Scatter(x = data.x,
+                                y = data.y,
+                                text = data.name,
+                                mode = 'markers',
+                                opacity=0.7,
+                                marker= m,
+                                )]
+
+    return dcc.Graph(id= identifier, figure = figure)
+
+
 def get_scatterplot(data, identifier, args):
     '''This function plots a simple Scatterplot
     --> input:
@@ -179,20 +214,22 @@ def get_scatterplot(data, identifier, args):
                                 xaxis= {"title": args['x_title']},
                                 yaxis= {"title": args['y_title']},
                                 margin={'l': 40, 'b': 40, 't': 30, 'r': 10},
-                                legend={'x': 0, 'y': 1},
+                                legend={'x': -.4, 'y': 1.2},
                                 hovermode='closest',
-                                height=900,
+                                height=args['height'],
+                                width=args['width']
                                 )
     for name in data.name.unique():
+        m = {'size': 25, 'line': {'width': 0.5, 'color': 'grey'}}
+        if 'colors' in args:
+            if name in args['colors']:
+                m.update({'color' : args['colors'][name]})
         figure["data"].append(go.Scatter(x = data.loc[data["name"] == name, "x"],
                                         y = data.loc[data['name'] == name, "y"],
                                         text = name,
                                         mode = 'markers',
                                         opacity=0.7,
-                                        marker={
-                                            'size': 15,
-                                            'line': {'width': 0.5, 'color': 'white'}
-                                            },
+                                        marker= m,
                                         name=name))
 
     return dcc.Graph(id= identifier, figure = figure)
@@ -226,9 +263,9 @@ def get_volcanoplot(results, args):
                                         hovermode='closest',
                                         shapes=[
                                                 {'type': 'line',
-                                                'x0': np.log10(args['fc']),
+                                                'x0': np.log2(args['fc']),
                                                 'y0': 0,
-                                                'x1': np.log10(args['fc']),
+                                                'x1': np.log2(args['fc']),
                                                 'y1': max(abs(result['y']))+2.5,
                                                 'line': {
                                                     'color': 'grey',
@@ -237,9 +274,9 @@ def get_volcanoplot(results, args):
                                                     },
                                                     },
                                                 {'type': 'line',
-                                                'x0': -np.log10(args['fc']),
+                                                'x0': -np.log2(args['fc']),
                                                 'y0': 0,
-                                                'x1': -np.log10(args['fc']),
+                                                'x1': -np.log2(args['fc']),
                                                 'y1': max(abs(result['y']))+2.5,
                                                 'line': {
                                                     'color': 'grey',
@@ -264,7 +301,7 @@ def get_volcanoplot(results, args):
         figures.append(dcc.Graph(id= identifier, figure = figure))
     return figures
 
-def run_volcano(data, identifier, args):
+def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blues', 'showscale': False, 'marker_size':6, 'x_title':'log2FC', 'y_title':'-log10(pvalue)'}):
     # Loop through signature
 
     volcano_plot_results = {}
@@ -278,7 +315,7 @@ def run_volcano(data, identifier, args):
         min_sig_pval = 0
         for index, row in signature.iterrows():
             # Text
-            text.append('<b>'+str(row['identifier'])+": "+str(index)+'<br>Comparison: '+str(row['group1'])+' vs '+str(row['group2'])+'<br>logFC = '+str(round(row['logFC'], ndigits=2))+'<br>p = '+'{:.2e}'.format(row['pvalue'])+'<br>FDR = '+'{:.2e}'.format(row['padj']))
+            text.append('<b>'+str(row['identifier'])+": "+str(index)+'<br>Comparison: '+str(row['group1'])+' vs '+str(row['group2'])+'<br>log2FC = '+str(round(row['log2FC'], ndigits=2))+'<br>p = '+'{:.2e}'.format(row['pvalue'])+'<br>FDR = '+'{:.2e}'.format(row['padj']))
 
             # Color
             if row['padj'] < args['alpha']:
@@ -297,7 +334,7 @@ def run_volcano(data, identifier, args):
                 color.append('silver')
 
         # Return
-        volcano_plot_results[(gidentifier, title)] = {'x': signature['logFC'].values, 'y': signature['-Log pvalue'].values, 'text':text, 'color': color, 'pvalue':-np.log10(min_sig_pval)}
+        volcano_plot_results[(gidentifier, title)] = {'x': signature['log2FC'].values, 'y': signature['-log10 pvalue'].values, 'text':text, 'color': color, 'pvalue':-np.log10(min_sig_pval)}
 
     figures = get_volcanoplot(volcano_plot_results, args)
 
@@ -411,136 +448,76 @@ def get_complex_heatmapplot(data, identifier, args):
 
     return dcc.Graph(id=identifier, figure=figure)
 
+def get_notebook_network_pyvis(graph, args):
+    notebook_net = visnet(args['width'], args['height'], notebook=True)
+    notebook_net.barnes_hut(overlap=0.8)
+    notebook_net.from_nx(graph)
+    notebook_net.show_buttons(['nodes', 'edges', 'physics'])
+    notebook_net.generate_html(notebook=True)
+
+    return notebook_net
+
+def get_notebook_network_web(graph, args):
+    notebook_net = Web(nx.to_numpy_matrix(graph).tolist())
+    notebook_net.display.scaleLinkWidth = True
+
+    return notebook_net
+
+def network_to_tables(graph):
+    edges_table = nx.to_pandas_edgelist(graph)
+    nodes_table = pd.DataFrame.from_dict(dict(graph.nodes(data=True))).transpose().reset_index()
+
+    return nodes_table, edges_table
+
+
 def get_network(data, identifier, args):
     net = None
+    if 'cutoff_abs' not in args:
+        args['cutoff_abs'] = False
     if not data.empty:
+        if 'cutoff' in args:
+            if args['cutoff_abs']:
+                data = data[np.abs(data[args['values']]) > args['cutoff']]
+            else:
+                data = data > arg['cutoff']
+
         data = data.rename(index=str, columns={args['values']: "width"})
+        args['values'] = 'width'
         edge_prop_columns = [c for c in data.columns if c not in [args['source'], args['target']]]
         edge_properties = [str(d) for d in data.to_dict(orient='index').values()]
         graph = nx.from_pandas_edgelist(data, args['source'], args['target'], edge_prop_columns)
-        betweenness = nx.betweenness_centrality(graph)
+
+        betweenness = nx.betweenness_centrality(graph, weight='width')
+        ev_centrality = nx.eigenvector_centrality_numpy(graph)
         degrees = dict(graph.degree())
+
+        nx.set_node_attributes(graph, betweenness, 'betweenness centrality')
+        nx.set_node_attributes(graph, ev_centrality, 'eigenvector centrality')
+        nx.set_node_attributes(graph, degrees, 'degree')
+
         if args['node_size'] == 'betweenness':
             nx.set_node_attributes(graph, betweenness, 'radius')
+        elif args['node_size'] == 'ev_centrality':
+            nx.set_node_attributes(graph, ev_centrality, 'radius')
         elif args['node_size'] == 'degree':
             nx.set_node_attributes(graph, degrees, 'radius')
 
-        jgraph = json_graph.node_link_data(graph)
+        clusters = analyses.basicAnalysis.get_network_communities(graph, args)
+        col = utils.get_hex_colors(len(set(clusters.values())))
+        colors = {n:col[clusters[n]] for n in clusters}
+        nx.set_node_attributes(graph, colors, 'color')
+        nx.set_node_attributes(graph, clusters, 'cluster')
 
-        net = Network(id=identifier, data=jgraph, width=args['width'], height=args['height'], maxLinkWidth=args['maxLinkWidth'], maxRadius=args['maxRadius'])
+        jgraph = json_graph.node_link_data(graph)
+        notebook_net = get_notebook_network_pyvis(graph, args)
+
+        nodes_table, edges_table = network_to_tables(graph)
+        nodes_fig_table = getBasicTable(nodes_table, identifier=identifier+"_nodes_table", title=args['title']+" nodes table")
+        edges_fig_table = getBasicTable(edges_table, identifier=identifier+"_edges_table", title=args['title']+" edges table")
+
+        net = {"notebook":notebook_net, "app":Network(id=identifier, data=jgraph, width=args['width'], height=args['height'], maxLinkWidth=args['maxLinkWidth'], maxRadius=args['maxRadius']), "net_tables":(nodes_fig_table, edges_fig_table)}
 
     return net
-
-def get_3d_network(data, identifier, args):
-    '''This function generates a 3D network in plotly
-        --> Input:
-            - data: Pandas DataFrame with the format: source    target  edge_property1 ...
-            - sourceCol: name of the column with the source node
-            - targetCol: name of the column with the target node
-            - node_properties: dictionary with the properties for each node: {node:{color:..,size:..}}
-            - identifier: identifier used to label the div that contains the network figure
-            - Title of the plot
-    '''
-    edge_prop_columns = [c for c in data.columns if c not in [args['source'], args['target']]]
-    edge_properties = [str(d) for d in data.to_dict(orient='index').values()]
-    graph = nx.from_pandas_edgelist(data, args['source'], args['target'], edge_prop_columns)
-    pos=nx.spring_layout(graph, dim=3)
-    edges = graph.edges()
-    N = len(graph.nodes())
-
-    Xn=[pos[k][0] for k in pos]
-    Yn=[pos[k][1] for k in pos]
-    Zn=[pos[k][2] for k in pos]# z-coordinates
-
-    Xed=[]
-    Yed=[]
-    Zed=[]
-    for edge in edges:
-        Xed+=[pos[edge[0]][0],pos[edge[1]][0], None]
-        Yed+=[pos[edge[0]][1],pos[edge[1]][1], None]
-        Zed+=[pos[edge[0]][2],pos[edge[1]][2], None]
-
-    weight = np.abs(data[args['values']].tolist())
-    degrees = dict(graph.degree())
-    colors = []
-    sizes = []
-    labels = []
-    annotations = []
-    for node in graph.nodes():
-        #colors.append(node_properties[node]["color"])
-        size = degrees[node]
-        if node in args["node_properties"]:
-            if "size" in args["node_properties"][node]:
-                size= args["node_properties"][node]["size"]
-
-        label = "{} (degree:{})".format(node, size)
-        labels.append(label)
-        annotations.append(dict(text=node,
-                                x=pos[node][0],
-                                y=pos[node][1],
-                                z=pos[node][2],
-                                ax=0, ay=-0.,
-                                font=dict(color= 'black', size=10),
-                                showarrow=False))
-
-        if size > 50:
-            size = 50
-        if size < 3:
-            size = 5
-        sizes.append(size)
-
-
-    trace1=Scatter3d(x=Xed,
-               y=Yed,
-               z=Zed,
-               mode='lines',
-               opacity = 0.5,
-               line=dict(color='rgb(155,155,155)', width=1),
-               text=edge_properties,
-               hoverinfo='text'
-               )
-    trace2=Scatter3d(x=Xn,
-               y=Yn,
-               z=Zn,
-               mode='markers',
-               name='proteins',
-               marker=scatter3d.Marker(symbol='circle',
-                             size=sizes,
-                             #color=colors,
-                             colorscale='Viridis',
-                             ),
-               text=labels,
-               hoverinfo='text'
-               )
-    axis=dict(showbackground=False,
-          showline=False,
-          zeroline=False,
-          showgrid=False,
-
-          showticklabels=False,
-          title=''
-          )
-
-    layout = Layout(
-         title=args['title'] + "(3D visualization)",
-         width=1500,
-         height=1500,
-         showlegend=True,
-         scene=Scene(
-                    xaxis=XAxis(axis),
-                    yaxis=YAxis(axis),
-                    zaxis=ZAxis(axis),
-                    annotations= annotations,
-                    ),
-        margin=Margin(t=1),
-        hovermode='closest',
-    )
-
-    data=Data([trace1, trace2])
-    figure=Figure(data=data, layout=layout)
-
-    return dcc.Graph(id = identifier, figure = figure)
-
 
 def get2DPCAFigure(data, components, identifier, title, subplot = False):
     traces = []
@@ -572,7 +549,7 @@ def get2DPCAFigure(data, components, identifier, title, subplot = False):
     return  dcc.Graph(id = identifier, figure = figure)
 
 
-def getSankeyPlot(data, sourceCol, targetCol, weightCol, edgeColorCol, node_colors, identifier, title, plot_attr = {'orientation': 'h', 'valueformat': '.0f', 'arrangement':'freeform','width':800, 'height':800, 'font':12}, subplot = False):
+def getSankeyPlot(data, identifier, args={'orientation': 'h', 'valueformat': '.0f', 'arrangement':'freeform','width':800, 'height':800, 'font':12}):
     '''This function generates a Sankey plot in Plotly
         --> Input:
             - data: Pandas DataFrame with the format: source    target  weight
@@ -584,48 +561,39 @@ def getSankeyPlot(data, sourceCol, targetCol, weightCol, edgeColorCol, node_colo
             - identifier: identifier used to label the div that contains the network figure
             - Title of the plot
     '''
-    data_trace = dict(
-        type='sankey',
-        domain = dict(
-            x =  [0,1],
-            y =  [0,1]
-        ),
-        orientation = 'h' if 'orientation' not in plot_attr else plot_attr['orientation'],
-        valueformat = ".0f" if 'valueformat' not in plot_attr else plot_attr['valueformat'],
-        arrangement = 'freeform' if 'arrangement' not in plot_attr else plot_attr['arrangement'],
-        node = dict(
-            pad = 15 if 'pad' not in plot_attr else plot_attr['pad'],
-            thickness = 25 if 'thickness' not in plot_attr else plot_attr['thickness'],
-            line = dict(
-                color = "black",
-                width = 0.3
-            ),
-            label =  list(node_colors.keys()),
-            color =  ["rgba"+str(hex2rgb(c)) if c.startswith('#') else c  for c in list(node_colors.values())]
-        ),
-        link = dict(
-            source =  [list(node_colors.keys()).index(i) for i in data[sourceCol].tolist()],
-            target =  [list(node_colors.keys()).index(i) for i in data[targetCol].tolist()],
-            value =  data[weightCol].tolist(),
-            color = ["rgba"+str(hex2rgb(c)) if c.startswith('#') else c for c in data[edgeColorCol].tolist()]
-        ))
+    nodes = list(set(data[args['source']].tolist() + data[args['target']].tolist()))
+    node_colors = dict(zip(data[args['source']],data[args['source_colors']]))
+    node_colors.update(dict(zip(data[args['target']],data[args['target_colors']])))
+    data_trace = dict(type='sankey',
+                        #domain = dict(x =  [0,1], y =  [0,1]),
+                        orientation = 'h' if 'orientation' not in args else args['orientation'],
+                        valueformat = ".0f" if 'valueformat' not in args else args['valueformat'],
+                        arrangement = 'freeform' if 'arrangement' not in args else args['arrangement'],
+                        node = dict(pad = 25 if 'pad' not in args else args['pad'],
+                                    thickness = 25 if 'thickness' not in args else args['thickness'],
+                                    line = dict(color = "black", width = 0.3),
+                                    label =  nodes,
+                                    color =  ["rgba"+str(utils.hex2rgb(node_colors[c])) if node_colors[c].startswith('#') else node_colors[c] for c in nodes]
+                                    ),
+                        link = dict(source = [list(nodes).index(i) for i in data[args['source']].tolist()],
+                                    target = [list(nodes).index(i) for i in data[args['target']].tolist()],
+                                    value =  data[args['weight']].tolist(),
+                                    color = ["rgba"+str(utils.hex2rgb(c)) if c.startswith('#') else c for c in data[args['source_colors']].tolist()]
+                                    ))
     layout =  dict(
-        width= 800 if 'width' not in plot_attr else plot_attr['width'],
-        height= 800 if 'height' not in plot_attr else plot_attr['height'],
-        title = title,
+        width= 800 if 'width' not in args else args['width'],
+        height= 800 if 'height' not in args else args['height'],
+        title = args['title'],
         font = dict(
-            size = 12 if 'font' not in plot_attr else plot_attr['font'],
+            size = 12 if 'font' not in args else args['font'],
         )
     )
 
     figure = dict(data=[data_trace], layout=layout)
 
-    if subplot:
-        return (identifier, figure)
-
     return dcc.Graph(id = identifier, figure = figure)
 
-def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':1500, 'font':12}, subplot = False):
+def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':2500, 'font':12}, subplot = False):
     if subset is not None:
         data = data[subset]
     data_trace = go.Table(header=dict(values=data.columns,
@@ -715,7 +683,7 @@ def get_WGCNAPlots(data, identifier):
     #plot: gene tree dendrogram and module colors; input: dissTOM, moduleColors
     plots.append(wgcnaFigures.plot_complex_dendrogram(dissTOM, moduleColors, title='Co-expression: dendrogram and module colors', dendro_labels=dissTOM.columns, distfun=None, linkagefun='average', hang=0.1, subplot='module colors', col_annotation=True, width=1000, height=800))
     #plot: table with features per module; input: df
-    plots.append(getBasicTable(Features_per_Module, identifier='', title='Proteins/Genes module color', colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':1500, 'font':12}, subplot = False))
+    plots.append(getBasicTable(Features_per_Module, identifier='', title='Proteins/Genes module color', colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':1500, 'font':12}, subplot = False).figure)
     #plot: module-traits correlation with annotations; input: moduleTraitCor, textMatrix
     plots.append(wgcnaFigures.plot_labeled_heatmap(moduleTraitCor, textMatrix, title='Module-Clinical variable relationships', colorscale=[[0,'rgb(0,255,0)'],[0.5,'rgb(255,255,255)'],[1,'rgb(255,0,0)']], row_annotation=True, width=1000, height=800))
     #plot: FS vs. MM correlation per trait/module scatter matrix; input: MM, FS, Features_per_Module
@@ -750,58 +718,144 @@ def getMapperFigure(data, identifier, title, labels):
                         hist_left=25, hist_right=25, member_textbox_width=800, custom_tooltips=labels)
     return  dcc.Graph(id = identifier, figure=figure)
 
-def getDashboardLayout():
-    layout = dict(
-                autosize=True,
-                height=500,
-                font=dict(color='#CCCCCC'),
-                titlefont=dict(color='#CCCCCC', size='14'),
-                margin=dict(
-                           l=35,
-                           r=35,
-                           b=35,
-                           t=45
-                           ),
-                hovermode="closest",
-                plot_bgcolor="#191A1A",
-                paper_bgcolor="#020202",
-                legend=dict(font=dict(size=10), orientation='h'),
-                title='Satellite Overview',
-                mapbox=dict(
-                            style="dark",
-                            center=dict(
-                            lon=-78.05,
-                            lat=42.54
-                            ),
-                zoom=7,
-                )
-            )
+def get_2_venn_diagram(data, identifier, cond1, cond2, args):
+    figure = {}
+    figure["data"] = []
+    total = len(set(data[cond1].dropna().index).union(set(data[cond2].dropna().index)))
+    unique1 = len(set(data[cond1].dropna().index).difference(data[cond2].dropna().index))#/total
+    unique2 = len(set(data[cond2].dropna().index).difference(data[cond1].dropna().index))#/total
+    intersection12 = len(set(data[cond1].dropna().index).intersection(data[cond2].dropna().index))#/total
 
-    return layout
+    figure["data"] = [go.Scatter(
+        x=[1, 1.75, 2.5],
+        y=[1, 1, 1],
+        text=[cond1+": "+str(unique1), str(intersection12), cond2+": "+str(unique2)],
+        mode='text',
+        textfont=dict(
+            color='black',
+            size=18,
+            family='Arial',
+        )
+    )]
 
 
-def getDashboardPlots(figures, cols, distribution):
-    divs = []
+    figure["layout"] = {
+        'xaxis': {
+            'showticklabels': False,
+            'showgrid': False,
+            'zeroline': False,
+        },
+        'yaxis': {
+            'showticklabels': False,
+            'showgrid': False,
+            'zeroline': False,
+        },
+        'shapes': [
+            {
+                'opacity': 0.3,
+                'xref': 'x',
+                'yref': 'y',
+                'fillcolor': args['colors'][cond1],
+                'x0': 0,
+                'y0': 0,
+                'x1': 2,
+                'y1': 2,
+                'type': 'circle',
+                'line': {
+                    'color': args['colors'][cond1],
+                },
+            },
+            {
+                'opacity': 0.3,
+                'xref': 'x',
+                'yref': 'y',
+                'fillcolor': args['colors'][cond2],
+                'x0': 1.5,
+                'y0': 0,
+                'x1': 3.5,
+                'y1': 2,
+                'type': 'circle',
+                'line': {
+                    'color': args['colors'][cond2],
+                },
+            }
+        ],
+        'margin': {
+            'l': 20,
+            'r': 20,
+            'b': 100
+        },
+        'height': 600,
+        'width': 800,
+    }
 
-    className = getNumberText(cols)+' columns offset-by-one'
-    i = 0
-    for name,dist in distribution:
-        row = [html.H5(
-                        '',
-                        id = name,
-                        className= getNumberText(len(dist))+' columns'
-                        )
-        ]
-        for c in dist:
-            identifier, figure = figures[i]
-            i = i + 1
-            row.append(html.Div([
-                            dcc.Graph(id= identifier, figure = dict(data= figure, layout=getDashboardLayout()))
-                            ],
-                            className=str(c)+' columns',
-                            style={'margin-top': '20'}
-                            )
-                        )
-        divs.append(html.Div(row, className = 'row'))
+    return dcc.Graph(id = identifier, figure=figure)
 
-    return html.Div(divs, className = className)
+def get_wordcloud(text, identifier, args={'stopwords':[], 'max_words': 400, 'max_font_size': 100, 'width':700, 'height':700, 'margin': 1}):
+    stopwords = set(STOPWORDS)
+    if 'stopwords' in args:
+        stopwords = stopwords.union(args['stopwords'])
+    wc = WordCloud(stopwords = stopwords,
+                   max_words = args['max_words'],
+                   max_font_size = args['max_font_size'],
+                   background_color='white',
+                   margin=args['margin'])
+    wc.generate(text)
+
+    word_list=[]
+    freq_list=[]
+    fontsize_list=[]
+    position_list=[]
+    orientation_list=[]
+    color_list=[]
+
+    for (word, freq), fontsize, position, orientation, color in wc.layout_:
+        word_list.append(word)
+        freq_list.append(freq)
+        fontsize_list.append(fontsize)
+        position_list.append(position)
+        orientation_list.append(orientation)
+        color_list.append(color)
+
+    # get the positions
+    x=[]
+    y=[]
+    j = 0
+    for i in position_list:
+        x.append(i[1]+fontsize_list[j]+10)
+        y.append(i[0]+5)
+        j += 1
+
+    # get the relative occurence frequencies
+    new_freq_list = []
+    for i in freq_list:
+        new_freq_list.append(i*70)
+    new_freq_list
+
+    trace = go.Scatter(x=x,
+                       y=y,
+                       textfont = dict(size=new_freq_list,
+                                       color=color_list),
+                       hoverinfo='text',
+                       hovertext=['{0} freq: {1}'.format(w, f) for w, f in zip(word_list, freq_list)],
+                       mode="text",
+                       text=word_list
+                      )
+
+    layout = go.Layout(
+                       xaxis=dict(showgrid=False,
+                                  showticklabels=False,
+                                  zeroline=False,
+                                  automargin=True),
+                       yaxis=dict(showgrid=False,
+                                  showticklabels=False,
+                                  zeroline=False,
+                                  automargin=True),
+                      width=args['width'],
+                      height=args['height'],
+                      title=args['title']
+                      )
+
+    figure = go.Figure(data=[trace], layout=layout)
+
+    return dcc.Graph(id = identifier, figure=figure)

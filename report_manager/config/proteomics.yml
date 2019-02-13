@@ -43,13 +43,26 @@ overview: #section
             y_title: number of modified proteins
             plot_type: bar
             title: 'Number of modified proteins identified per type'
+    ranking:
+        data: protein_biomarkers
+        analyses: []
+        plots:
+            - ranking_plot
+        args:
+            x: x
+            y: y
+            group: group
+            highlight: is_biomarker
+            x_title: rank of identified proteins
+            y_title: intensity
+            title: 'Ranking of proteins'
 "data exploration":
     stratification:
         data: preprocessed
         analyses:
-            #- pca
+            - pca
             #- tsne
-            -   umap
+            #- umap
         plots:
             - scatterplot
         args:
@@ -78,6 +91,7 @@ overview: #section
             y_title: -log(pvalue)
             drop_cols:
                 - sample
+                - subject
             name: name
             title: 'Volcano plot'
     correlation:
@@ -87,7 +101,6 @@ overview: #section
         plots:
             - heatmap
             - network
-            - basicTable
         args:
             source: node1
             target: node2
@@ -98,15 +111,16 @@ overview: #section
             node_properties: {}
             width: 1600
             height: 1600
-            maxLinkWidth: 5
+            maxLinkWidth: 6
             maxRadius: 20
-            node_size: 'degree'
+            node_size: 'ev_centrality'
+            cutoff: 0.5
+            cutoff_abs: True
     interaction:
         data: regulated
         analyses: []
         plots:
             - network
-            - basicTable
         args:
             use:
                 columns: identifiers
@@ -119,9 +133,9 @@ overview: #section
             node_properties: {}
             width: 1600
             height: 1600
-            maxLinkWidth: 5
+            maxLinkWidth: 7
             maxRadius: 20
-            node_size: 'betweenness'
+            node_size: 'ev_centrality'
     wgcna:
         data:
         analyses:

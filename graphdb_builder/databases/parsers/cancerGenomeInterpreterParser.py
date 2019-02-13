@@ -9,7 +9,7 @@ import re
 #   The Cancer Genome Interpreter     # 
 #######################################
 def parser(databases_directory, download = True):
-    regex = r"(chr\d+)\:g\.(\d+)(\w)>(\w)"
+    regex = r"(chr\d+):g\.(\d+)(\w+)>(\w)"
     
     config = ckg_utils.get_configuration('../databases/config/cancerGenomeInterpreterConfig.yml')
     url = config['cancerBiomarkers_url']
@@ -45,37 +45,36 @@ def parser(databases_directory, download = True):
                     tumors = data[16].split(';')
                     publications = data[17].split(';')
                     identifier = data[21]
-                    variant = data[22]
+                    prot_variant = data[22]
                     matches = re.match(regex, identifier)
                     chromosome = "NA"
                     position = "NA"
                     reference = "NA" 
                     alternative = "NA"
-
+                    alternative_names = [identifier]
                     if matches is not None:
                         cpra = matches.groups()
                         chromosome, position, reference, alternative = cpra
-
-                    if variant != "":
-                        variant = variant.split(':')[1]
-                        entities.add((variant, "Clinically_relevant_variant", identifier, chromosome, position, reference, alternative, "", ""))
+                        variant = chromosome+":g."+position+reference+">"+alternative
+                        if prot_variant != "":
+                            prot_variant = prot_variant.split(':')[1]
+                            alternative_names.append(prot_variant)
+                        
+                        entities.add((variant, "Clinically_relevant_variant",  ",".join(alternative_names), chromosome, position, reference, alternative, "", "", "CGI"))
                         relationships["known_variant_is_clinically_relevant"].add((variant, variant, "KNOWN_VARIANT_IS_CLINICALLY_RELEVANT", "CGI"))
-
-                    for drug in drugs:
-                        if drug.lower() in drugmapping:
-                            drug = drugmapping[drug.lower()]
-                        elif drug.split(" ")[0].lower() in drugmapping:
-                            drug = drugmapping[drug.split(" ")[0].lower()]
-                        elif " ".join(drug.split(" ")[1:]).lower() in drugmapping:
-                            drug = drugmapping[" ".join(drug.split(" ")[1:]).lower()]
-                        for tumor in tumors:                         
-                            if tumor.lower() in mapping:
-                                tumor = mapping[tumor.lower()]
-                                relationships["targets"].add((drug, gene, "CURATED_TARGETS", evidence, response, tumor, "curated", "CGI"))
-                                if variant != "":
+                        for drug in drugs:
+                            if drug.lower() in drugmapping:
+                                drug = drugmapping[drug.lower()]
+                            elif drug.split(" ")[0].lower() in drugmapping:
+                                drug = drugmapping[drug.split(" ")[0].lower()]
+                            elif " ".join(drug.split(" ")[1:]).lower() in drugmapping:
+                                drug = drugmapping[" ".join(drug.split(" ")[1:]).lower()]
+                            relationships["targets"].add((drug, gene, "CURATED_TARGETS", evidence, response, ",".join(tumors), "curated", "CGI"))
+                            relationships["targets_clinically_relevant_variant"].add((drug, variant, "TARGETS_CLINICALLY_RELEVANT_VARIANT", evidence, response, "".join(tumors), "curated", "CGI"))
+                            
+                            for tumor in tumors:                         
+                                if tumor.lower() in mapping:
+                                    tumor = mapping[tumor.lower()]
                                     relationships["associated_with"].add((variant, tumor, "ASSOCIATED_WITH", "curated","curated", "CGI", len(publications)))
-                                    relationships["targets_clinically_relevant_variant"].add((drug, variant, "TARGETS_CLINICALLY_RELEVANT_VARIANT", evidence, response, tumor, "curated", "CGI"))
-                                    #relationships["clinically_relevant_variant_found_in_gene"].add((variant, gene, "CLINICALLY_RELEVANT_VARIANT_FOUND_IN_GENE"))
-                                    #relationships["clinically_relevant_variant_found_in_chromosome"].add((variant, chromosome, "CLINICALLY_RELEVANT_VARIANT_FOUND_IN_CHROMOSOME"))
 
     return (entities, relationships, entities_header, relationships_headers)

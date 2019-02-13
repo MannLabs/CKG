@@ -216,7 +216,7 @@ def loadStats(statsFile):
         if os.path.isfile(statsFile):
             hdf = pd.HDFStore(statsFile)
     except Exception as err:
-        logger.error("Loading Stats object {} in file:{} > {}.".format(stats_name, statsFile, err))
+        logger.error("Loading Stats file:{} > {}.".format(statsFile, err))
 
     return hdf
 
