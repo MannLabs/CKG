@@ -176,6 +176,7 @@ def get_simple_scatterplot(data, identifier, args):
         m.update({'color':data['colors'].tolist()})
     if 'size' in data.columns:
         m.update({'size':data['size'].tolist()})
+        
     figure["layout"] = go.Layout(title = args['title'],
                                 xaxis= {"title": args['x_title']},
                                 yaxis= {"title": args['y_title']},

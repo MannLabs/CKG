@@ -46,7 +46,8 @@ def load_into_database(driver, queries, requester):
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            raise Exception("{}, file: {}, line: {}.\n Query: {}".format(err, fname, exc_tb.tb_lineno, query))        
+            logger.error("Loading: {}, file: {}, line: {} - query: {}".format(err, fname, exc_tb.tb_lineno, query))
+            #raise Exception("{}, file: {}, line: {}.\n Query: {}".format(err, fname, exc_tb.tb_lineno, query))        
     
     return result
 
@@ -225,6 +226,7 @@ def updateDB(driver, imports=None):
                         queries.extend(code.replace("IMPORTDIR", datasetDir).replace('PROJECTID', project).split(';')[0:-1])
             else:
                 logger.error("Non-existing dataset. The dataset you are trying to import does not exist: {}.".format(i))
+            print(queries)
             load_into_database(driver, queries, i)
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()

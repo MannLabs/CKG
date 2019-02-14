@@ -254,7 +254,7 @@ def getStatsName(import_type):
 
 
 if __name__ == "__main__":
-    #fullImport()
+    fullImport()
     #databasesImport(importDirectory='../../../data/imports', databases=['CancerGenomeInterpreter'], n_jobs=1, download=False, import_type="partial")
     #experimentsImport(projects=["P0000001", "P0000002", "P0000003", "P0000004"], n_jobs=1)
-    ontologiesImport(importDirectory='../../../data/imports')
+    #ontologiesImport(importDirectory='../../../data/imports')

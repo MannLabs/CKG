@@ -11,6 +11,8 @@ overview: #section
         args: 
             x: x
             y: y
+            height: 700
+            width: 900
             group: group
             x_title: Analytical sample
             y_title: number of peptides
@@ -24,6 +26,8 @@ overview: #section
         args:
             x: x
             y: y
+            height: 700
+            width: 900
             group: group
             x_title: Analytical sample
             y_title: number of proteins
@@ -68,6 +72,8 @@ overview: #section
         args: 
             x_title: PC1
             y_title: PC2
+            height: 700
+            width: 900
             components: 2
             perplexity: 40
             n_iter: 1000

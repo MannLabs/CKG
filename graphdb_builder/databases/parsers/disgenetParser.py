@@ -31,7 +31,7 @@ def parser(databases_directory, download = True):
         dtype, atype = f.split('_') 
         if dtype == 'gene':
             idType = "Protein"
-            scorePos = 7
+            scorePos = 8
         if dtype == 'variant':
             idType = "Transcript"
             scorePos = 5
@@ -42,10 +42,12 @@ def parser(databases_directory, download = True):
             try:
                 data = line.decode('utf-8').rstrip("\r\n").split("\t")
                 geneId = data[0]
-                diseaseId = data[2]
-                score = float(data[4])
-                pmids = data[5]
-                source = data[scorePos]
+                disease_specificity_index =  data[2]
+                disease_pleiotropy_index = data[3]
+                diseaseId = data[4]
+                score = float(data[scorePos])
+                pmids = data[12]
+                source = data[-1]
                 if geneId in proteinMapping:
                     for identifier in proteinMapping[geneId]:
                         if diseaseId in diseaseMapping:

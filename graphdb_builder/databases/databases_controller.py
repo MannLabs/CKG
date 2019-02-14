@@ -297,7 +297,7 @@ def parseDatabase(importDirectory, database, download=True):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         logger.error("Database {}: {}, file: {},line: {}".format(database, sys.exc_info(), fname, exc_tb.tb_lineno))
-        raise Exception("Error when importing database {}.\n {}".format(database, err))
+        #raise Exception("Error when importing database {}.\n {}".format(database, err))
     return stats
     
 

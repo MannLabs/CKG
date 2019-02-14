@@ -3,8 +3,8 @@ disgenet_url: 'http://www.disgenet.org/static/disgenet_ap1/files/downloads/'
 disgenet_files: 
     'gene_curated': 'curated_gene_disease_associations.tsv.gz'
     'gene_befree': 'befree_gene_disease_associations.tsv.gz'
-    'variant_curated': 'curated_variant_disease_associations.tsv.gz'
-    'variant_befree': 'befree_variant_disease_associations.tsv.gz'
+    #'variant_curated': 'curated_variant_disease_associations.tsv.gz'
+    #'variant_befree': 'befree_variant_disease_associations.tsv.gz'
 
 disgenet_mapping_files: 
     'protein_mapping': 'mapa_geneid_4_uniprot_crossref.tsv.gz'
@@ -22,3 +22,6 @@ disgenet_header:
     - 'number_publications'
 
 outputfileName: 'disgenet_associated_with.csv'
+
+#Current gene associations header v6.0
+#geneId	geneSymbol	DSI	DPI	diseaseId	diseaseName	diseaseType	diseaseClass	diseaseSemanticType	score	EI	YearInitial	YearFinal	NofPmids	NofSnps	source
