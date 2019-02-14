@@ -270,6 +270,7 @@ class ProteomicsDataset(Dataset):
             missing_method = 'percentage'
             missing_max = 0.3
             value_col = 'LFQ intensity'
+            index=['group', 'sample', 'subject']
             args = {}
             if "args" in self.configuration:
                 args = self.configuration["args"]
@@ -284,7 +285,7 @@ class ProteomicsDataset(Dataset):
                 if "value_col" in args:
                     value_col = args["value_col"]
             
-            processed_data = basicAnalysis.get_proteomics_measurements_ready(data, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max)
+            processed_data = basicAnalysis.get_proteomics_measurements_ready(data, index=index, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max)
         return processed_data
 
 class LongitudinalProteomicsDataset(ProteomicsDataset):

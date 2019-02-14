@@ -37,6 +37,7 @@ class Project:
         self._description = None 
         self._status = None
         self._num_subjects = None
+        print("Datasets", self._datasets)
         if self._datasets is None:
             self._datasets = {}
             self.build_project()
