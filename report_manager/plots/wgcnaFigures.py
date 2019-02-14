@@ -5,7 +5,7 @@ import scipy as scp
 from scipy.cluster.hierarchy import distance, linkage, dendrogram, fcluster
 from collections import OrderedDict, defaultdict
 from natsort import natsorted, index_natsorted, order_by_index
-import color_list
+from report_manager.plots import color_list
 import urllib.request
 
 import matplotlib.pyplot as plt
@@ -14,7 +14,9 @@ import matplotlib.colors
 import plotly.plotly as py
 import plotly.graph_objs as go
 import plotly.tools as tls
+from report_manager.plots import Dendrogram
 from report_manager.plots import basicFigures
+from report_manager.analyses import wgcnaAnalysis
 
 def get_module_color_annotation(map_list, col_annotation=False, row_annotation=False, bygene=False, module_colors=[], dendrogram=[]):
     colors_dict = color_list.make_color_dict()
@@ -89,7 +91,7 @@ def get_heatmap(df, colorscale=None , color_missing=True):
                                      showscale=True,
                                      colorbar=dict(x=1, y=0, xanchor='left', yanchor='bottom', len=0.35, thickness=15)))
     if color_missing == True:
-        df_missing = get_miss_values_df(df)
+        df_missing = wgcnaAnalysis.get_miss_values_df(df)
         figure.add_trace(go.Heatmap(z=df_missing.values.tolist(),
                                       y=list(df.index),
                                       x=list(df.columns),
@@ -195,8 +197,8 @@ def plot_intramodular_correlation(MM, FS, feature_module_df, title, width=1000, 
 
 def plot_complex_dendrogram(dendro_df, subplot_df, title, dendro_labels=[], distfun='euclidean', linkagefun='average', hang=0.04, subplot='module colors', subplot_colorscale=[], color_missingvals=True, row_annotation=False, col_annotation=False, width=1000, height=800):
 
-    dendro_tree = get_dendrogram(dendro_df, dendro_labels, distfun=distfun, linkagefun=linkagefun, div_clusters=False)
-    dendrogram = basicFigures.plot_dendrogram(dendro_tree, hang=hang, cutoff_line=False)
+    dendro_tree = wgcnaAnalysis.get_dendrogram(dendro_df, dendro_labels, distfun=distfun, linkagefun=linkagefun, div_clusters=False)
+    dendrogram = Dendrogram.plot_dendrogram(dendro_tree, hang=hang, cutoff_line=False)
 
     layout = go.Layout(width=width, height=height, showlegend=False, title=title,
                        xaxis=dict(domain=[0, 1], range=[np.min(dendrogram.layout.xaxis.tickvals)-6,np.max(dendrogram.layout.xaxis.tickvals)+4], showgrid=False,
@@ -224,9 +226,9 @@ def plot_complex_dendrogram(dendro_df, subplot_df, title, dendro_labels=[], dist
 
     elif subplot == 'heatmap':
         if all(list(subplot_df.columns.map(lambda x: subplot_df[x].between(-1,1, inclusive=True).all()))) != True:
-            df = get_percentiles_heatmap(subplot_df, dendro_tree, bydendro=True, bycols=True)
+            df = wgcnaAnalysis.get_percentiles_heatmap(subplot_df, dendro_tree, bydendro=True, bycols=True)
         else:
-            df = df_sort_by_dendrogram(df_sort_by_dendrogram(subplot_df.T, dendro_tree), dendro_tree)
+            df = wgcnaAnalysis.df_sort_by_dendrogram(wgcnaAnalysis.df_sort_by_dendrogram(subplot_df.T, dendro_tree), dendro_tree)
 
         heatmap = get_heatmap(df, colorscale=subplot_colorscale, color_missing=color_missingvals)
 
