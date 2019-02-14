@@ -137,7 +137,7 @@ def remove_group(data):
 
 def get_proteomics_measurements_ready(data, index=['group', 'sample', 'subject'], imputation = True, method = 'distribution', missing_method = 'percentage', missing_max = 0.3, value_col='LFQ_intensity'):
     df = data.copy()
-    conditions = df.group.unique()
+    conditions = df['group'].unique()
     df = df.set_index(index)
     df['identifier'] = df['name'].map(str) + "-" + df['identifier'].map(str)
     df = df.pivot_table(values=value_col, index=df.index, columns='identifier', aggfunc='first')

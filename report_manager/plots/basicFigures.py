@@ -15,7 +15,6 @@ from networkx.readwrite import json_graph
 from dash_network import Network
 from report_manager import utils, analyses
 from wordcloud import WordCloud, STOPWORDS
-from report_manager.plots import Dendrogram
 from report_manager.plots import wgcnaFigures
 
 def getPlotTraces(data, key='full', type = 'lines', div_factor=float(10^10000), horizontal=False):
@@ -652,26 +651,6 @@ def create_violinplot(df, variable, group_col='group'):
         traces.append(violin)
 
     return traces
-
-def plot_dendrogram(Z_dendrogram, cutoff_line=True, value=15, orientation='bottom', hang=30, hide_labels=False, labels=None,
-                    colorscale=None, hovertext=None, color_threshold=None):
-
-    dendrogram = Dendrogram(Z_dendrogram, orientation, hang, hide_labels, labels,
-                             colorscale, hovertext=hovertext, color_threshold=color_threshold)
-
-    if cutoff_line == True:
-        dendrogram.layout.update(add_line(dendrogram, value))
-
-    return go.Figure(data=dendrogram.data, layout=dendrogram.layout)
-
-def add_line(plotly_fig, value):
-    plotly_fig.layout.update({'shapes':[{'type':'line',
-                             'xref':'paper',
-                             'yref':'y',
-                             'x0':0, 'y0':value,
-                             'x1':1, 'y1':value,
-                             'line':{'color':'red'}}]})
-    return plotly_fig.layout
 
 def get_WGCNAPlots(data, identifier):
 

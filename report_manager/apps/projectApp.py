@@ -10,7 +10,7 @@ class ProjectApp(basicApp.BasicApp):
         self._page_type = "projectPage"
         basicApp.BasicApp.__init__(self, title, subtitle, description, self.page_type, layout, logo, footer)
         self.build_page()
-    
+
     @property
     def project_id(self):
         return self._project_id
@@ -30,5 +30,3 @@ class ProjectApp(basicApp.BasicApp):
             tabs.append(tab)
         lc = dcc.Tabs(id="tabs", children=tabs)
         self.add_to_layout(lc)
-        
-        

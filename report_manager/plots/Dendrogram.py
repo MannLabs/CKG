@@ -3,6 +3,25 @@ import scipy as scp
 from collections import OrderedDict
 import plotly.graph_objs as go
 
+def plot_dendrogram(Z_dendrogram, cutoff_line=True, value=15, orientation='bottom', hang=30, hide_labels=False, labels=None,
+                    colorscale=None, hovertext=None, color_threshold=None):
+
+    dendrogram = Dendrogram(Z_dendrogram, orientation, hang, hide_labels, labels, colorscale, hovertext=hovertext, color_threshold=color_threshold)
+
+    if cutoff_line == True:
+        dendrogram.layout.update(add_line(dendrogram, value))
+
+    return go.Figure(data=dendrogram.data, layout=dendrogram.layout)
+
+def add_line(plotly_fig, value):
+    plotly_fig.layout.update({'shapes':[{'type':'line',
+                             'xref':'paper',
+                             'yref':'y',
+                             'x0':0, 'y0':value,
+                             'x1':1, 'y1':value,
+                             'line':{'color':'red'}}]})
+    return plotly_fig.layout
+
 class Dendrogram(object):
 
     def __init__(self, Z_dendrogram, orientation='bottom', hang=1, hide_labels=False, labels=None, colorscale=None, hovertext=None,
@@ -211,4 +230,3 @@ class Dendrogram(object):
             trace_list.append(trace)
 
         return trace_list, icoord, dcoord, ordered_labels, Z_dendrogram['leaves']
-

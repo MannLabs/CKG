@@ -6,7 +6,6 @@ from dash_network import Network
 from app import app
 from apps import initialApp, projectApp, importsApp
 
-
 app.layout = html.Div([
     dcc.Location(id='url', refresh=True),
     html.Div(id='page-content', style={'padding-top':50})

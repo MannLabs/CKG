@@ -28,7 +28,6 @@ R('options(stringsAsFactors = FALSE)')
 base = R2Py.call_Rpackage("package", "base")
 stats = R2Py.call_Rpackage("package", "stats")
 WGCNA = R2Py.call_Rpackage("package", "WGCNA")
-dynamicTreeCut = R2Py.call_Rpackage("function", "cutreeDynamic")
 
 
 def get_proteomics_data(filename, key, drop_cols=['group', 'sample']):

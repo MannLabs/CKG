@@ -33,8 +33,8 @@ class Project:
         self._name = None
         self._acronym = None
         self._data_types = None
-        self._responsible = None 
-        self._description = None 
+        self._responsible = None
+        self._description = None
         self._status = None
         self._num_subjects = None
         if self._datasets is None:
@@ -45,7 +45,7 @@ class Project:
     @property
     def identifier(self):
         return self._identifier
-    
+
     @identifier.setter
     def identifier(self, identifier):
         self._identifier = identifier
@@ -53,7 +53,7 @@ class Project:
     @property
     def name(self):
         return self._name
-    
+
     @name.setter
     def name(self, name):
         self._name = name
@@ -61,7 +61,7 @@ class Project:
     @property
     def acronym(self):
         return self._acronym
-    
+
     @acronym.setter
     def acronym(self, acronym):
         self._acronym = acronym
@@ -77,7 +77,7 @@ class Project:
     @property
     def responsible(self):
         return self._responsible
-    
+
     @responsible.setter
     def responsible(self, responsible):
         self._responsible = responsible
@@ -85,15 +85,15 @@ class Project:
     @property
     def description(self):
         return self._description
-    
+
     @description.setter
     def description(self, description):
         self._description = description
-    
+
     @property
     def status(self):
         return self._status
-    
+
     @status.setter
     def status(self, status):
         self._status = status
@@ -101,7 +101,7 @@ class Project:
     @property
     def num_subjects(self):
         return self._num_subjects
-    
+
     @num_subjects.setter
     def num_subjects(self, num_subjects):
         self._num_subjects = num_subjects
@@ -121,7 +121,7 @@ class Project:
     @report.setter
     def report(self, report):
         self._report = report
-    
+
     def get_dataset(self, dataset):
         if dataset in self.datasets:
             return self.datasets[dataset]
@@ -152,29 +152,29 @@ class Project:
                 self.num_subjects = attributes["number_subjects"]
 
     def to_dict(self):
-        d = {"identifier" : self.identifier, 
-            "name" : self.name, 
-            "acronym" : self.acronym, 
+        d = {"identifier" : self.identifier,
+            "name" : self.name,
+            "acronym" : self.acronym,
             "description" : self.description,
-            "data_types" : self.data_types, 
+            "data_types" : self.data_types,
             "responsible": self.responsible,
             "status": self.status,
             "number_subjects": self.num_subjects
             }
-        
+
         return d
-    
+
     def to_dataframe(self):
-        d = self.to_dict() 
+        d = self.to_dict()
         df = pd.DataFrame.from_dict(d, orient='index')
         df = df.transpose()
-        
+
         return df
 
     def to_json(self):
         d = self.to_dict()
         djson = dumps(d)
-        
+
         return djson
 
     def query_data(self):
@@ -195,7 +195,7 @@ class Project:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             logger.error("Reading queries from file {}: {}, file: {},line: {}".format(queries_path, sys.exc_info(), fname, exc_tb.tb_lineno))
-        
+
         return data
 
     def build_project(self):
@@ -214,8 +214,8 @@ class Project:
             elif data_type == "longitudinal_proteomics":
                 dataset = LongitudinalProteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
                 self.update_dataset({data_type:dataset})
-                
-           
+
+
     def generate_project_info_report(self):
         report = rp.Report(identifier="project_info")
         project_df = self.to_dataframe()
@@ -225,7 +225,7 @@ class Project:
         report.plots = {("Project info","Project Information"): plot}
 
         return report
-    
+
     def generate_report(self):
         if len(self.report) == 0:
             project_report = self.generate_project_info_report()
@@ -235,7 +235,7 @@ class Project:
                 if dataset is not None:
                     dataset.generate_report()
                     self.update_report({dataset.dataset_type:dataset.report})
-    
+
     def empty_report(self):
         self.report = {}
 
@@ -275,5 +275,5 @@ class Project:
                                 app_plots[identifier].append(tables[1])
                         else:
                             app_plots[identifier].append(plot)
-        
-        return app_plots        
+
+        return app_plots

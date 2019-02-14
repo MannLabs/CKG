@@ -178,10 +178,10 @@ class AnalysisResult:
             result[self.analysis_type], nargs = analyses.get_interaction_network(self.data)
             args.update(nargs)
         elif self.analysis_type == "wgcna":
-            filename_exp = '/Users/plh450/Clinical_Proteomics/CKG/WGCNA/proteomics.hi5'
+            filename_exp = '/Users/plh450/Clinical_Proteomics/CKG/WGCNA/proteomics.h5'
             key_exp = 'preprocessed'
             drop_cols_exp = ['group', 'sample']
-            filename_cli = '/Users/plh450/Clinical_Proteomics/CKG/WGCNA/clinical.hi5'
+            filename_cli = '/Users/plh450/Clinical_Proteomics/CKG/WGCNA/clinical.h5'
             key_cli = 'preprocessed'
             drop_cols_cli = ['group', 'biological_sample']
             RsquaredCut = 0.8
@@ -363,12 +363,6 @@ class AnalysisResult:
                     plot.extend(figure.get_violinplot(data[id], identifier, args))
             elif name == "wgcnaplots":
                 for id in data:
-                    if isinstance(id, tuple):
-                        identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                        figure_title = args['title'] + id[0]+" vs "+id[1]
-                    else:
-                        figure_title = args['title']
-                    args["title"] = figure_title
-                    plot.extend(figure.get_WGCNAPlots(data[id], identifier, args))
+                    plot.extend(figure.get_WGCNAPlots(data[id], identifier))
 
         return plot
