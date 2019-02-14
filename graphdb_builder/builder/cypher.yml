@@ -667,6 +667,12 @@ CREATE_PROJECT: &create_project
         MATCH (d:Disease {id:line.END_ID}) 
         MERGE (p)-[r:STUDIES_DISEASE]->(d)
         RETURN COUNT(r) AS PROJECTID_studies_disease;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_studies_intervention.csv" AS line 
+        MATCH (p:Project {id:line.START_ID})
+        MATCH (c:Clinical_variable {id:line.END_ID}) 
+        MERGE (p)-[r:STUDIES_INTERVENTION]->(c)
+        RETURN COUNT(r) AS PROJECTID_studies_intervention;
         
 CREATE_SUBJECTS: &create_subject
     'name': 'create subjects'

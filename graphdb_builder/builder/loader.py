@@ -226,7 +226,6 @@ def updateDB(driver, imports=None):
                         queries.extend(code.replace("IMPORTDIR", datasetDir).replace('PROJECTID', project).split(';')[0:-1])
             else:
                 logger.error("Non-existing dataset. The dataset you are trying to import does not exist: {}.".format(i))
-            print(queries)
             load_into_database(driver, queries, i)
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()

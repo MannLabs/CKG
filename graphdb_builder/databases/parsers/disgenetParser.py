@@ -31,7 +31,7 @@ def parser(databases_directory, download = True):
         dtype, atype = f.split('_') 
         if dtype == 'gene':
             idType = "Protein"
-            scorePos = 8
+            scorePos = 9
         if dtype == 'variant':
             idType = "Transcript"
             scorePos = 5
@@ -41,7 +41,7 @@ def parser(databases_directory, download = True):
                 continue
             try:
                 data = line.decode('utf-8').rstrip("\r\n").split("\t")
-                geneId = data[0]
+                geneId = str(int(data[0]))
                 disease_specificity_index =  data[2]
                 disease_pleiotropy_index = data[3]
                 diseaseId = data[4]
@@ -57,6 +57,7 @@ def parser(databases_directory, download = True):
             except UnicodeDecodeError:
                 continue
         associations.close()
+
     return (relationships,header,outputfileName)
     
 def readDisGeNetProteinMapping(config, databases_directory):
