@@ -16,6 +16,7 @@ from random import shuffle
 from fancyimpute import KNN
 import kmapper as km
 from report_manager import utils
+from report_manager.analyses import wgcnaAnalysis as wgcna
 
 def transform_into_long_format(data, index, columns, values, extra=[], use_index=False):
     df = data.copy()
@@ -42,7 +43,7 @@ def extract_number_missing(df, conditions, missing_max):
         groups = groups.drop(["sample"], axis = 1)
         groups = data.set_index("group").notnull().groupby(level=0).sum(axis = 1)
         groups = groups[groups>=missing_max]
-    
+
     groups = groups.dropna(how='all', axis=1)
     return list(groups.columns)
 
@@ -56,7 +57,7 @@ def extract_percentage_missing(data, conditions, missing_max):
         groups = groups.isnull().groupby(level=0).mean()
         groups = groups[groups<=missing_max]
         groups = groups.dropna(how='all', axis=1).columns
-      
+
     return list(groups)
 
 def imputation_KNN(data, drop_cols=['group', 'sample', 'subject'], group='group', cutoff=0.5, alone = True):
@@ -73,13 +74,13 @@ def imputation_KNN(data, drop_cols=['group', 'sample', 'subject'], group='group'
             df.update(dfm)
     if alone:
         df = df.dropna()
-    
+
     return df
 
 def imputation_mixed_norm_KNN(data):
     df = imputation_KNN(data, cutoff=0.6, alone = False)
     df = imputation_normal_distribution(df, shift = 1.8, nstd = 0.3)
-    
+
     return df
 
 def imputation_normal_distribution(data, index=['group', 'sample', 'subject'], shift = 1.8, nstd = 0.3):
@@ -110,24 +111,24 @@ def polish_median_normalization(data, max_iter = 10):
         row_median = mediandf.median(axis = 1)
         if row_median.mean() == 0 and col_median.mean() ==0:
             break
-            
+
         mediandf = mediandf.sub(row_median, axis=0)
         mediandf = mediandf.sub(col_median, axis=1)
-        
+
     normData = data - mediandf
-    
+
     return normData
 
 def quantile_normalization(data):
     rank_mean = data.stack().groupby(data.rank(method='first').stack().astype(int)).mean()
     normdf = data.rank(method='min').stack().astype(int).map(rank_mean).unstack()
-    
+
     return normdf
 
 def linear_normalization(data, method = "l1", axis = 0):
     normvalues = preprocessing.normalize(data.fillna(0).values, norm=method, axis=axis, copy=True, return_norm=False)
     normdf = pd.DataFrame(normvalues, index = data.index, columns = data.columns)
-    
+
     return normdf
 
 def remove_group(data):
@@ -137,7 +138,6 @@ def remove_group(data):
 def get_proteomics_measurements_ready(data, index=['group', 'sample', 'subject'], imputation = True, method = 'distribution', missing_method = 'percentage', missing_max = 0.3, value_col='LFQ_intensity'):
     df = data.copy()
     conditions = df['group'].unique()
-    print(index)
     df = df.set_index(index)
     df['identifier'] = df['name'].map(str) + "-" + df['identifier'].map(str)
     df = df.pivot_table(values=value_col, index=df.index, columns='identifier', aggfunc='first')
@@ -145,12 +145,12 @@ def get_proteomics_measurements_ready(data, index=['group', 'sample', 'subject']
     df[index] = df["index"].apply(pd.Series)
     df = df.drop(["index"], axis=1)
     aux = index
-    
+
     if missing_method == 'at_least_x_per_group':
         aux.extend(extract_number_missing(df, conditions, missing_max))
     elif missing_method == 'percentage':
-        aux.extend(extract_percentage_missing(df, conditions, missing_max))  
-    
+        aux.extend(extract_percentage_missing(df, conditions, missing_max))
+
     df = df[list(set(aux))]
     if imputation:
         if method == "KNN":
@@ -163,7 +163,7 @@ def get_proteomics_measurements_ready(data, index=['group', 'sample', 'subject']
             df = imputation_mixed_norm_KNN(df)
         else:
             sys.exit()
-    
+
     df = df.reset_index()
     return df
 
@@ -202,7 +202,7 @@ def run_tsne(data, drop_cols=['sample', 'subject'], group='group', components=2,
     df = df.set_index(group)
     X = df._get_numeric_data()
     y = df.index
-    
+
     tsne = TSNE(n_components=components, verbose=0, perplexity=perplexity, n_iter=n_iter, init=init)
     X = tsne.fit_transform(X)
     args = {"x_title":"C1","y_title":"C2"}
@@ -220,7 +220,7 @@ def run_tsne(data, drop_cols=['sample', 'subject'], group='group', components=2,
         resultDf.columns = ["name", "x", "y", "z"] + cols
     result['tsne'] = resultDf
     return result, args
-    
+
 def run_umap(data, drop_cols=['sample', 'subject'], group='group', n_neighbors=10, min_dist=0.3, metric='cosine'):
     result = {}
     df = data.copy()
@@ -283,7 +283,7 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, per
     count = observed_pvalues.to_frame().apply(func=get_counts_permutation_fdr, result_type='expand', axis=1, args=(rand_pvalues, observed_pvalues, permutations, alpha))
     count.columns = ['padj', 'rejected']
     #count = count.set_index('identifier')
-    
+
     return count
 
 def get_counts_permutation_fdr(value, random, observed, n, alpha):
@@ -305,7 +305,7 @@ def runCorrelation(data, alpha=0.05, method='pearson', correction=('fdr', 'indep
     calculated = set()
     df = data.copy()
     df = df.dropna()._get_numeric_data()
-    
+
     r, p = runEfficientCorrelation(df, method=method)
     rdf = pd.DataFrame(r, index=df.columns, columns=df.columns)
     pdf = pd.DataFrame(p, index=df.columns, columns=df.columns)
@@ -313,16 +313,16 @@ def runCorrelation(data, alpha=0.05, method='pearson', correction=('fdr', 'indep
     pdf.values[[np.arange(len(pdf))]*2] = np.nan
     correlation = convertToEdgeList(rdf, ["node1", "node2", "weight"])
     pvalues = convertToEdgeList(pdf, ["node1", "node2", "pvalue"])
-     
+
     if correction[0] == 'fdr':
         rejected, padj = apply_pvalue_fdrcorrection(pvalues["pvalue"].tolist(), alpha=alpha, method=correction[1])
     elif correction[0] == '2fdr':
         rejected, padj = apply_pvalue_twostage_fdrcorrection(pvalues["pvalue"].tolist(), alpha=alpha, method=correction[1])
-    
+
     correlation["padj"] = padj
     correlation["rejected"] = rejected
     correlation = correlation[correlation.rejected]
-    
+
     return correlation
 
 def runEfficientCorrelation(data, method='pearson'):
@@ -331,7 +331,7 @@ def runEfficientCorrelation(data, method='pearson'):
         r = np.corrcoef(matrix, rowvar=False)
     elif method == 'spearman':
         r, p = spearmanr(matrix, axis=0)
-    
+
     rf = r[np.triu_indices(r.shape[0], 1)]
     df = matrix.shape[1] - 2
     ts = rf * rf * (df / (1 - rf * rf))
@@ -341,9 +341,9 @@ def runEfficientCorrelation(data, method='pearson'):
     p[np.tril_indices(p.shape[0], -1)] = pf
     p[np.diag_indices(p.shape[0])] = np.ones(p.shape[0])
 
-    
+
     return r, p
-    
+
 def calculate_paired_ttest(df, condition1, condition2):
     group1 = df[condition1]
     group2 = df[condition2]
@@ -357,10 +357,10 @@ def calculate_paired_ttest(df, condition1, condition2):
         group2 = np.array(group2)
     else:
         group2 = group2.values
-    
+
     t, pvalue = stats.ttest_rel(group1, group2, nan_policy='omit')
     log = -math.log(pvalue, 10)
-        
+
     return (df.name, t, pvalue, log)
 
 def calculate_ttest(df, condition1, condition2):
@@ -374,21 +374,21 @@ def calculate_ttest(df, condition1, condition2):
         group2 = np.array(group2)
     else:
         group2 = group2.values
-  
+
     t, pvalue = stats.ttest_ind(group1, group2, nan_policy='omit')
     log = -math.log(pvalue, 10)
-        
+
     return (df.name, t, pvalue, log)
 
 def calculate_THSD(df):
     col = df.name
     result = pairwise_tukeyhsd(df, list(df.index))
     df_results = pd.DataFrame(data=result._results_table.data[1:], columns=result._results_table.data[0])
-    df_results.columns = ['group1', 'group2', 'log2FC', 'lower', 'upper', 'rejected'] 
+    df_results.columns = ['group1', 'group2', 'log2FC', 'lower', 'upper', 'rejected']
     df_results['identifier'] = col
     df_results = df_results.set_index('identifier')
     df_results['FC'] = df_results['log2FC'].apply(lambda x: np.power(2,np.abs(x)) * -1 if x < 0 else np.power(2,np.abs(x)))
-    
+
     return df_results
 
 def calculate_annova(df, group='group'):
@@ -409,9 +409,9 @@ def calculate_repeated_measures_annova(df, sample='sample', group='group'):
 
 def get_max_permutations(df, group='group'):
     num_groups = len(list(df.index))
-    num_per_group = df.groupby(group).size().tolist() 
+    num_per_group = df.groupby(group).size().tolist()
     max_perm = factorial(num_groups)/np.prod(factorial(np.array(num_per_group)))
-    
+
     return max_perm
 
 def anova(data, alpha=0.05, drop_cols=["sample", 'subject'], group='group', permutations=50):
@@ -423,8 +423,8 @@ def anova(data, alpha=0.05, drop_cols=["sample", 'subject'], group='group', perm
     scores.columns = columns
     scores = scores.set_index("identifier")
     scores = scores.dropna(how="all")
-    
-    
+
+
     max_perm = get_max_permutations(df)
     #FDR correction
     if permutations > 0 and max_perm>=10:
@@ -440,7 +440,7 @@ def anova(data, alpha=0.05, drop_cols=["sample", 'subject'], group='group', perm
         scores['correction'] = 'FDR correction BH'
         scores['padj'] = padj
         scores['rejected'] = rejected
-    
+
     #sigdf = df[list(scores[scores.rejected].index)]
     res = None
     for col in df.columns:
@@ -455,10 +455,10 @@ def anova(data, alpha=0.05, drop_cols=["sample", 'subject'], group='group', perm
     else:
         res = scores
         res["log2FC"] = np.nan
-    
+
     res = res.reset_index()
     res['rejected'] = res['padj'] < alpha
-    
+
     return res
 
 def repeated_measurements_anova(data, alpha=0.5, drop_cols=['sample'], subject='subject', sample='sample', group='group', permutations=50):
@@ -476,7 +476,7 @@ def repeated_measurements_anova(data, alpha=0.5, drop_cols=['sample'], subject='
             intersect = set(l1).intersection(l2)
             if len(intersect) > len(max_intersection):
                 max_intersection = intersect
-    
+
     df = df[df[sample].isin(max_intersection)]
     df = df.set_index([sample,group])
     df = df.drop(drop_cols, axis=1)
@@ -499,7 +499,7 @@ def repeated_measurements_anova(data, alpha=0.5, drop_cols=['sample'], subject='
         rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'indep')
         scores['padj'] = padj
         scores['rejected'] = rejected
-    
+
     #sigdf = df[list(scores[scores.rejected].index)]
     res = None
     for col in df.columns:
@@ -513,10 +513,10 @@ def repeated_measurements_anova(data, alpha=0.5, drop_cols=['sample'], subject='
     else:
         res = scores
         res["log2FC"] = np.nan
-    
+
     res = res.reset_index()
     res['rejected'] = res['padj'] < alpha
-    
+
     return res
 
 def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample", 'subject'], group='group', paired=False, permutations=50):
@@ -532,12 +532,12 @@ def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample", 'subj
     scores.columns = columns
     scores = scores.set_index("identifier")
     scores = scores.dropna(how="all")
-    
+
     #Fold change
     scores["log2FC"] = tdf.apply(func = calculate_fold_change, axis = 1, args =(condition1, condition2))
     #Cohen's d
     scores["cohen_d"] = tdf.apply(func = cohen_d, axis = 1, args =(condition1, condition2, 1))
-    
+
     #Hedge's g
     scores["hedges_g"] = tdf.apply(func = hedges_g, axis = 1, args =(condition1, condition2, 1))
     #FDR correction
@@ -558,7 +558,7 @@ def ttest(data, condition1, condition2, alpha = 0.05, drop_cols=["sample", 'subj
 
 def runFisher(group1, group2, alternative='two-sided'):
     '''         annotated   not-annotated
-        group1      a               b   
+        group1      a               b
         group2      c               d
         ------------------------------------
 
@@ -606,7 +606,7 @@ def runEnrichment(data, foreground, background, method='fisher'):
         result = pd.DataFrame({'terms':terms, 'identifiers':ids, 'padj':padj, 'rejected':rejected})
         result = result[result.rejected]
     return result
-    
+
 def calculate_fold_change(df, condition1, condition2):
     group1 = df[condition1]
     group2 = df[condition2]
@@ -646,18 +646,18 @@ def cohen_d(df, condition1, condition2, ddof = 0):
     if np.isnan(group1).all() or np.isnan(group2).all():
         d = np.nan
     else:
-        meang1 = np.nanmean(group1) 
+        meang1 = np.nanmean(group1)
         meang2 = np.nanmean(group2)
         sdg1 = np.nanstd(group1, ddof = ddof)
         sdg2 = np.nanstd(group2, ddof = ddof)
         d = (meang1 - meang2) / np.sqrt(((ng1-1)* sdg1 ** 2 + (ng2-1)* sdg2 ** 2) / dof)
-    
+
     return d
 
 def hedges_g(df, condition1, condition2, ddof = 0):
     group1 = df[condition1]
     group2 = df[condition2]
-    
+
     if isinstance(group1, np.float64):
         group1 = np.array(group1)
     else:
@@ -674,7 +674,7 @@ def hedges_g(df, condition1, condition2, ddof = 0):
     if np.isnan(group1).all() or np.isnan(group2).all():
         g = np.nan
     else:
-        meang1 = np.nanmean(group1) 
+        meang1 = np.nanmean(group1)
         meang2 = np.nanmean(group2)
         sdpooled = np.nanstd(np.concatenate([group1, group2]), ddof = ddof)
 
@@ -683,49 +683,67 @@ def hedges_g(df, condition1, condition2, ddof = 0):
             g = ((meang1 - meang2) / sdpooled) * ((ng1+ng2-3) / (ng1+ng2-2.25)) * np.sqrt((ng1+ng2-2) / (ng1+ng2))
         else:
             g = ((meang1 - meang2) / sdpooled)
-        
+
     return g
 
 def runMapper(data, lenses=["l2norm"], n_cubes = 15, overlap=0.5, n_clusters=3, linkage="complete", affinity="correlation"):
     X = data._get_numeric_data()
-    labels ={i:data.index[i] for i in range(len(data.index))} 
+    labels ={i:data.index[i] for i in range(len(data.index))}
 
     model = ensemble.IsolationForest(random_state=1729)
     model.fit(X)
     lens1 = model.decision_function(X).reshape((X.shape[0], 1))
-    
+
     # Create another 1-D lens with L2-norm
     mapper = km.KeplerMapper(verbose=0)
     lens2 = mapper.fit_transform(X, projection=lenses[0])
-    
+
     # Combine both lenses to get a 2-D [Isolation Forest, L^2-Norm] lens
     lens = np.c_[lens1, lens2]
-    
+
     # Define the simplicial complex
     simplicial_complex = mapper.map(lens,
                       X,
                       nr_cubes=n_cubes,
                       overlap_perc=overlap,
                       clusterer=cluster.AgglomerativeClustering(n_clusters=n_clusters, linkage=linkage, affinity=affinity))
-    
+
 
 
     return simplicial_complex, {"labels":labels}
 
+def runWGCNA(filename_exp, filename_cli, key_exp, key_cli, drop_cols_exp, drop_cols_cli, RsquaredCut=0.8, networkType='unsigned', network_verbose=2, minModuleSize=30, deepSplit=2, pamRespectsDendro=False, merge_modules=True, MEDissThres=0.25, verbose_merge=3):
+
+    data_exp = wgcna.get_proteomics_data(filename_exp, key_exp, drop_cols=drop_cols_exp)
+    data_cli = wgcna.get_clinical_data(filename_cli, key_cli, drop_cols=drop_cols_cli)
+
+    softPower = wgcna.pick_softThreshold(data_exp, RsquaredCut=RsquaredCut, networkType=networkType, verbose=network_verbose)
+    dissTOM, moduleColors = wgcna.build_network(data_exp, softPower=softPower, networkType=networkType, minModuleSize=minModuleSize, deepSplit=deepSplit,
+                                          pamRespectsDendro=pamRespectsDendro, merge_modules=merge_modules, MEDissThres=MEDissThres, verbose_merge=verbose_merge)
+
+    Features_per_Module = wgcna.get_FeaturesPerModule(data_exp, moduleColors, mode='dataframe')
+    MEs = wgcna.calculate_module_eigengenes(data_exp, moduleColors, softPower=softPower, dissimilarity=False)
+    moduleTraitCor, textMatrix = wgcna.calculate_ModuleTrait_correlation(data_exp, data_cli, MEs)
+    MM, MMPvalue = wgcna.calculate_ModuleMembership(data_exp, MEs)
+    FS, FSPvalue = wgcna.calculate_FeatureTraitSignificance(data_exp, data_cli)
+    METDiss, METcor = wgcna.get_EigengenesTrait_correlation(MEs, data_cli)
+
+    return data_exp, data_cli, dissTOM, moduleColors, Features_per_Module, MEs, moduleTraitCor, textMatrix, MM, MMPvalue, FS, FSPvalue, METDiss, METcor
+
 def most_central_edge(G):
     centrality = nx.eigenvector_centrality_numpy(G, weight='width')
-    
+
     return max(centrality, key=centrality.get)
 
 def get_louvain_partitions(G, weight):
     partition = community.best_partition(G)
-    
+
     return partition
 
 def get_network_communities(graph, args):
     if 'communities_algorithm' not in args:
         args['communities_algorithm'] = 'louvain'
-    
+
     if args['communities_algorithm'] == 'louvain':
         communities = get_louvain_partitions(graph, args['values'])
     elif args['communities_algorithm'] == 'greedy_modularity':
@@ -737,6 +755,5 @@ def get_network_communities(graph, args):
     elif args['communities_algorithm'] == 'girvan_newman':
         gcommunities = nx.algorithms.community.girvan_newman(graph, most_valuable_edge=most_central_edge)
         communities = utils.generator_to_dict(gcommunities)
-    
-    return communities
 
+    return communities

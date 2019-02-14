@@ -28,7 +28,7 @@ class AnalysisResult:
     @analysis_type.setter
     def identifier(self, analysis_type):
         self._analysis_type = analysis_type
-    
+
     @property
     def args(self):
         return self._args
@@ -63,7 +63,7 @@ class AnalysisResult:
         result = {}
         args = self.args
         if self.analysis_type == "long_format":
-            r = analyses.transform_into_long_format(self.data, args['index'], args['x'], 
+            r = analyses.transform_into_long_format(self.data, args['index'], args['x'],
                                                                 args['y'], extra=[args['group']], use_index=args['use_index'])
             result[self.analysis_type] = r
         if self.analysis_type == "pca":
@@ -88,7 +88,7 @@ class AnalysisResult:
             result, nargs = analyses.run_tsne(self.data, components=components, perplexity=perplexity, n_iter=n_iter, init=init)
             args.update(nargs)
         elif self.analysis_type  == "umap":
-            n_neighbors=10 
+            n_neighbors=10
             min_dist=0.3
             metric='cosine'
             if "n_neighbors" in args:
@@ -177,7 +177,43 @@ class AnalysisResult:
             print(self.data)
             result[self.analysis_type], nargs = analyses.get_interaction_network(self.data)
             args.update(nargs)
-         
+        elif self.analysis_type == "wgcna":
+            filename_exp = '/Users/plh450/Clinical_Proteomics/CKG/WGCNA/proteomics.h5'
+            key_exp = 'preprocessed'
+            drop_cols_exp = ['group', 'sample']
+            filename_cli = '/Users/plh450/Clinical_Proteomics/CKG/WGCNA/clinical.h5'
+            key_cli = 'preprocessed'
+            drop_cols_cli = ['group', 'biological_sample']
+            RsquaredCut = 0.8
+            networkType = 'unsigned'
+            network_verbose = 2
+            minModuleSize = 30
+            deepSplit = 2
+            pamRespectsDendro = False
+            merge_modules = True
+            MEDissThres = 0.25
+            verbose_merge = 3
+            if "RsquaredCut" in args:
+                RsquaredCut = args["RsquaredCut"]
+            if "networkType" in args:
+                networkType = args["networkType"]
+            if "network_verbose" in args:
+                network_verbose = args["network_verbose"]
+            if "minModuleSize" in args:
+                minModuleSize = args["minModuleSize"]
+            if "deepSplit" in args:
+                deepSplit = args["deepSplit"]
+            if "pamRespectsDendro" in args:
+                pamRespectsDendro = args["pamRespectsDendro"]
+            if "merge_modules" in args:
+                merge_modules = args["merge_modules"]
+            if "MEDissThres" in args:
+                MEDissThres = args["MEDissThres"]
+            if "verbose_merge" in args:
+                verbose_merge = args["verbose_merge"]
+            result[self.analysis_type] = analyses.runWGCNA(filename_exp, filename_cli, key_exp, key_cli, drop_cols_exp, drop_cols_cli, RsquaredCut=RsquaredCut,
+                                                            networkType=networkType, network_verbose=network_verbose, minModuleSize=minModuleSize, deepSplit=deepSplit,
+                                                            pamRespectsDendro=pamRespectsDendro, merge_modules=merge_modules, MEDissThres=MEDissThres, verbose_merge=verbose_merge)
         return result, args
 
     def get_plot(self, name, identifier):
@@ -209,7 +245,7 @@ class AnalysisResult:
                     x_title = args["x_title"]
                 if "y_title" in args:
                     y_title = args["y_title"]
-                for id in data:     
+                for id in data:
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
                         figure_title = args['title'] + id[0]+" vs "+id[1]
@@ -227,7 +263,7 @@ class AnalysisResult:
                     args["y_title"] = y_title
                 if "plot_type" not in args:
                     args["plot_type"] = plot_type
-                for id in data:     
+                for id in data:
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
                         figure_title = args['title'] + id[0]+" vs "+id[1]
@@ -299,7 +335,7 @@ class AnalysisResult:
                         figure_title = args['title']
                     plot.append(figure.getMapperFigure(data[id], identifier, title=figure_title, labels=args["labels"]))
             elif name == "scatterplot_matrix":
-                for id in data:     
+                for id in data:
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
                         figure_title = args['title'] + id[0]+" vs "+id[1]
@@ -308,7 +344,7 @@ class AnalysisResult:
                     args["title"] = figure_title
                     plot.append(figure.get_scatterplot_matrix(data[id], identifier, args))
             elif name == "distplot":
-                for id in data:  
+                for id in data:
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
                         figure_title = args['title'] + id[0]+" vs "+id[1]
@@ -325,5 +361,8 @@ class AnalysisResult:
                         figure_title = args['title']
                     args["title"] = figure_title
                     plot.extend(figure.get_violinplot(data[id], identifier, args))
-    
+            elif name == "wgcnaplots":
+                for id in data:
+                    plot.extend(figure.get_WGCNAPlots(data[id], identifier))
+
         return plot

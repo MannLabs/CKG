@@ -59,7 +59,7 @@ class Dataset:
     def configuration(self):
         return self._configuration
 
-    @configuration.setter   
+    @configuration.setter
     def configuration(self, configuration):
         self._configuration = configuration
 
@@ -84,12 +84,12 @@ class Dataset:
 
     def update_analysis_queries(self, query):
         self.analysis_queries.update(query)
-    
+
     def get_dataset(self, dataset):
         if dataset in self.data:
             return self.data[dataset]
         return None
-    
+
     def get_analysis(self, analysis):
         if analysis in self.analyses:
             return self.analyses[analysis]
@@ -141,7 +141,7 @@ class Dataset:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             logger.error("Reading queries from file {}: {}, file: {},line: {}".format(queries_path, sys.exc_info(), fname, exc_tb.tb_lineno))
-        
+
         return data
 
     def send_query(self, query):
@@ -149,7 +149,7 @@ class Dataset:
         data = connector.getCursorData(driver, query)
 
         return data
-    
+
     def extract_configuration(self, configuration):
         data_name = None
         analysis_types = None
@@ -165,7 +165,7 @@ class Dataset:
             args = configuration["args"]
 
         return data_name, analysis_types, plot_types, args
-            
+
     def generate_report(self):
         self.report = rp.Report(identifier=self.dataset_type.capitalize(), plots={})
         for section in self.configuration:
@@ -177,7 +177,7 @@ class Dataset:
                     data = self.data[data_name]
                     if not data.empty:
                         if subsection in self.analysis_queries:
-                            query = self.analysis_queries[subsection]    
+                            query = self.analysis_queries[subsection]
                             if "use" in args:
                                 for r_id in args["use"]:
                                     if r_id == "columns":
@@ -188,7 +188,7 @@ class Dataset:
                                         rep = ",".join(['"{}"'.format(i) for i in data[r_id].tolist()])
                                     query = query.replace(args["use"][r_id].upper(),rep)
                                 data = self.send_query(query)
-                        result = None 
+                        result = None
                         if len(analysis_types) >= 1:
                             for analysis_type in analysis_types:
                                 result = ar.AnalysisResult(self.identifier, analysis_type, args, data)
@@ -214,7 +214,7 @@ class Dataset:
                             for plot_type in plot_types:
                                 plots = result.get_plot(plot_type, "_".join(subsection.split(' '))+"_"+plot_type)
                                 self.report.update_plots({("_".join(subsection.split(' ')), plot_type): plots})
-        
+
         self.save_dataset()
         #self.save_dataset_report()
 
@@ -226,7 +226,7 @@ class Dataset:
             store[name] = self.data[data]
 
         store.close()
-    
+
     def save_dataset_report(self):
         dataset_directory = self.get_dataset_data_directory()
         self.report.save_report(directory=dataset_directory)
@@ -236,11 +236,11 @@ class Dataset:
         dataset_directory = self.get_dataset_data_directory()
         dataset_store = os.path.join(dataset_directory, self.dataset_type+".h5")
         if os.path.isfile(dataset_store):
-            f = h5py.File(filename, 'r') 
+            f = h5py.File(filename, 'r')
             for key in list(f.keys()):
                 data[key] = pd.read_hdf(filename, key)
-        
-        return data 
+
+        return data
 
     def load_dataset_report(self):
         dataset_directory = self.get_dataset_data_directory()
@@ -254,13 +254,13 @@ class ProteomicsDataset(Dataset):
         self.set_configuration_from_file(config_file)
         if len(data) == 0:
             self._data = self.query_data()
-        
+
         self.preprocess_dataset()
-        
+
     def preprocess_dataset(self):
         processed_data = self.preprocessing()
         self.update_data({"preprocessed":processed_data})
-    
+
     def preprocessing(self):
         processed_data = None
         data = self.get_dataset("dataset")
@@ -284,7 +284,7 @@ class ProteomicsDataset(Dataset):
                     missing_max = args["missing_max"]
                 if "value_col" in args:
                     value_col = args["value_col"]
-            
+
             processed_data = basicAnalysis.get_proteomics_measurements_ready(data, index=index, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max)
         return processed_data
 
@@ -292,7 +292,7 @@ class LongitudinalProteomicsDataset(ProteomicsDataset):
     def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
         config_file = "longitudinal_proteomics.yml"
         ProteomicsDataset.__init__(self, identifier, data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
-        self.set_configuration_from_file(config_file)  
+        self.set_configuration_from_file(config_file)
 
 class ClinicalDataset(Dataset):
     def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
@@ -307,7 +307,7 @@ class ClinicalDataset(Dataset):
     def preprocess_dataset(self):
         processed_data = self.preprocessing()
         self.update_data({"preprocessed":processed_data})
-    
+
     def preprocessing(self):
         processed_data = None
         data = self.get_dataset("dataset")
@@ -330,10 +330,10 @@ class ClinicalDataset(Dataset):
                     extra = args["extra"]
                 if "use_index" in args:
                     use_index = args["use_index"]
-            
+
             processed_data = basicAnalysis.transform_into_long_format(data, index=index, columns=columns, values=values, extra=extra, use_index=use_index)
         return processed_data
-        
+
 class DNAseqDataset(Dataset):
     def __init__(self, identifier, dataset_type, data={}, analyses={}, analysis_queries={}, report=None):
         config_file = "DNAseq.yml"

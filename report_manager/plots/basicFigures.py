@@ -15,6 +15,7 @@ from networkx.readwrite import json_graph
 from dash_network import Network
 from report_manager import utils, analyses
 from wordcloud import WordCloud, STOPWORDS
+from report_manager.plots import wgcnaFigures
 
 def getPlotTraces(data, key='full', type = 'lines', div_factor=float(10^10000), horizontal=False):
     '''This function returns traces for different kinds of plots
@@ -49,14 +50,14 @@ def get_distplot(data, identifier, args):
     df = df.set_index(args['group'])
     df = df.transpose()
     df = df.dropna()
-    
+
     for i in df.index.unique():
         hist_data = []
         for c in df.columns.unique():
             hist_data.append(df.loc[i,c].values.tolist())
         group_labels = df.columns.unique().tolist()
         # Create distplot with custom bin_size
-        fig = FF.create_distplot(hist_data, group_labels, bin_size=.5, curve_type='normal')    
+        fig = FF.create_distplot(hist_data, group_labels, bin_size=.5, curve_type='normal')
         fig['layout'].update(height=600, width=1000, title='Distribution plot '+i)
         graphs.append(dcc.Graph(id=identifier+"_"+i, figure=fig))
 
@@ -75,7 +76,7 @@ def get_barplot(data, identifier, args):
     figure["data"] = []
     if "group" in args:
         for g in data[args["group"]].unique():
-            color = None 
+            color = None
             if 'colors' in args:
                 if g in args['colors']:
                     color = args['colors'][g]
@@ -256,9 +257,9 @@ def get_volcanoplot(results, args):
                         )
 
         figure["data"].append(trace)
-        figure["layout"] = go.Layout(title=title, 
-                                        xaxis={'title': args['x_title'], 'range': range_x}, 
-                                        yaxis={'title': args['y_title'], 'range': range_y}, 
+        figure["layout"] = go.Layout(title=title,
+                                        xaxis={'title': args['x_title'], 'range': range_x},
+                                        yaxis={'title': args['y_title'], 'range': range_y},
                                         hovermode='closest',
                                         shapes=[
                                                 {'type': 'line',
@@ -296,7 +297,7 @@ def get_volcanoplot(results, args):
                                                     }
                                                 ],
                                         showlegend=False)
-        
+
         figures.append(dcc.Graph(id= identifier, figure = figure))
     return figures
 
@@ -318,7 +319,7 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
 
             # Color
             if row['padj'] < args['alpha']:
-                min_sig_pval = row['pvalue'] if row['pvalue'] > min_sig_pval else min_sig_pval 
+                min_sig_pval = row['pvalue'] if row['pvalue'] > min_sig_pval else min_sig_pval
                 if row['FC'] < -args['fc']:
                     color.append('#2c7bb6')
                 elif row['FC'] > args['fc']:
@@ -331,10 +332,10 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
                     color.append('silver')
             else:
                 color.append('silver')
-        
+
         # Return
         volcano_plot_results[(gidentifier, title)] = {'x': signature['log2FC'].values, 'y': signature['-log10 pvalue'].values, 'text':text, 'color': color, 'pvalue':-np.log10(min_sig_pval)}
-    
+
     figures = get_volcanoplot(volcano_plot_results, args)
 
     return figures
@@ -453,19 +454,19 @@ def get_notebook_network_pyvis(graph, args):
     notebook_net.from_nx(graph)
     notebook_net.show_buttons(['nodes', 'edges', 'physics'])
     notebook_net.generate_html(notebook=True)
-    
+
     return notebook_net
 
 def get_notebook_network_web(graph, args):
     notebook_net = Web(nx.to_numpy_matrix(graph).tolist())
     notebook_net.display.scaleLinkWidth = True
-    
+
     return notebook_net
 
 def network_to_tables(graph):
     edges_table = nx.to_pandas_edgelist(graph)
     nodes_table = pd.DataFrame.from_dict(dict(graph.nodes(data=True))).transpose().reset_index()
-    
+
     return nodes_table, edges_table
 
 
@@ -479,21 +480,21 @@ def get_network(data, identifier, args):
                 data = data[np.abs(data[args['values']]) > args['cutoff']]
             else:
                 data = data > arg['cutoff']
-    
+
         data = data.rename(index=str, columns={args['values']: "width"})
         args['values'] = 'width'
         edge_prop_columns = [c for c in data.columns if c not in [args['source'], args['target']]]
         edge_properties = [str(d) for d in data.to_dict(orient='index').values()]
         graph = nx.from_pandas_edgelist(data, args['source'], args['target'], edge_prop_columns)
-        
+
         betweenness = nx.betweenness_centrality(graph, weight='width')
         ev_centrality = nx.eigenvector_centrality_numpy(graph)
         degrees = dict(graph.degree())
-        
+
         nx.set_node_attributes(graph, betweenness, 'betweenness centrality')
         nx.set_node_attributes(graph, ev_centrality, 'eigenvector centrality')
         nx.set_node_attributes(graph, degrees, 'degree')
-        
+
         if args['node_size'] == 'betweenness':
             nx.set_node_attributes(graph, betweenness, 'radius')
         elif args['node_size'] == 'ev_centrality':
@@ -652,6 +653,33 @@ def create_violinplot(df, variable, group_col='group'):
 
     return traces
 
+def get_WGCNAPlots(data, identifier):
+
+    data_exp, data_cli, dissTOM, moduleColors, Features_per_Module, MEs,\
+    moduleTraitCor, textMatrix, MM, MMPvalue, FS, FSPvalue, METDiss, METcor = data
+    plots = []
+    #plot: sample dendrogram and clinical variables heatmap; input: data_exp, data_cli
+    plots.append(wgcnaFigures.plot_complex_dendrogram(data_exp, data_cli, title='Clinical variables variation by sample', dendro_labels=data_exp.index, distfun='euclidean', linkagefun='average', hang=40, subplot='heatmap', color_missingvals=True, width=1000, height=800))
+    #plot: gene tree dendrogram and module colors; input: dissTOM, moduleColors
+    plots.append(wgcnaFigures.plot_complex_dendrogram(dissTOM, moduleColors, title='Co-expression: dendrogram and module colors', dendro_labels=dissTOM.columns, distfun=None, linkagefun='average', hang=0.1, subplot='module colors', col_annotation=True, width=1000, height=800))
+    #plot: table with features per module; input: df
+    plots.append(getBasicTable(Features_per_Module, identifier='', title='Proteins/Genes module color', colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':1500, 'font':12}, subplot = False).figure)
+    #plot: module-traits correlation with annotations; input: moduleTraitCor, textMatrix
+    plots.append(wgcnaFigures.plot_labeled_heatmap(moduleTraitCor, textMatrix, title='Module-Clinical variable relationships', colorscale=[[0,'rgb(0,255,0)'],[0.5,'rgb(255,255,255)'],[1,'rgb(255,0,0)']], row_annotation=True, width=1000, height=800))
+    #plot: FS vs. MM correlation per trait/module scatter matrix; input: MM, FS, Features_per_Module
+    plots.append(wgcnaFigures.plot_intramodular_correlation(MM, FS, Features_per_Module, title='Intramodular analysis: Feature Significance vs. Module Membership', width=2500, height=4000))
+    #input: METDiss, METcor
+    plots.append(wgcnaFigures.plot_complex_dendrogram(METDiss, METcor, title='Eigengene network and clinical data associations', dendro_labels=METDiss.index, distfun=None, linkagefun='average', hang=0.9,
+                             subplot='heatmap', subplot_colorscale=[[0, 'rgb(0,255,0)'], [0.5, 'rgb(255,255,255)'], [1, 'rgb(255,0,0)']],
+                             color_missingvals=False, row_annotation=True, col_annotation=True, width=1000, height=800))
+
+    graphs = []
+    for i, j in enumerate(plots):
+        graphs.append(dcc.Graph(id=identifier+'_'+str(i), figure=j))
+
+    return graphs
+
+
 def getMapperFigure(data, identifier, title, labels):
     pl_brewer = [[0.0, '#67001f'],
              [0.1, '#b2182b'],
@@ -677,7 +705,7 @@ def get_2_venn_diagram(data, identifier, cond1, cond2, args):
     unique1 = len(set(data[cond1].dropna().index).difference(data[cond2].dropna().index))#/total
     unique2 = len(set(data[cond2].dropna().index).difference(data[cond1].dropna().index))#/total
     intersection12 = len(set(data[cond1].dropna().index).intersection(data[cond2].dropna().index))#/total
-    
+
     figure["data"] = [go.Scatter(
         x=[1, 1.75, 2.5],
         y=[1, 1, 1],
@@ -690,7 +718,7 @@ def get_2_venn_diagram(data, identifier, cond1, cond2, args):
         )
     )]
 
-    
+
     figure["layout"] = {
         'xaxis': {
             'showticklabels': False,
@@ -740,7 +768,7 @@ def get_2_venn_diagram(data, identifier, cond1, cond2, args):
         'height': 600,
         'width': 800,
     }
-    
+
     return dcc.Graph(id = identifier, figure=figure)
 
 def get_wordcloud(text, identifier, args={'stopwords':[], 'max_words': 400, 'max_font_size': 100, 'width':700, 'height':700, 'margin': 1}):
@@ -753,7 +781,7 @@ def get_wordcloud(text, identifier, args={'stopwords':[], 'max_words': 400, 'max
                    background_color='white',
                    margin=args['margin'])
     wc.generate(text)
-    
+
     word_list=[]
     freq_list=[]
     fontsize_list=[]
@@ -768,7 +796,7 @@ def get_wordcloud(text, identifier, args={'stopwords':[], 'max_words': 400, 'max
         position_list.append(position)
         orientation_list.append(orientation)
         color_list.append(color)
-        
+
     # get the positions
     x=[]
     y=[]
@@ -777,25 +805,25 @@ def get_wordcloud(text, identifier, args={'stopwords':[], 'max_words': 400, 'max
         x.append(i[1]+fontsize_list[j]+10)
         y.append(i[0]+5)
         j += 1
-            
+
     # get the relative occurence frequencies
     new_freq_list = []
     for i in freq_list:
         new_freq_list.append(i*70)
     new_freq_list
-    
-    trace = go.Scatter(x=x, 
-                       y=y, 
+
+    trace = go.Scatter(x=x,
+                       y=y,
                        textfont = dict(size=new_freq_list,
                                        color=color_list),
                        hoverinfo='text',
                        hovertext=['{0} freq: {1}'.format(w, f) for w, f in zip(word_list, freq_list)],
-                       mode="text",  
+                       mode="text",
                        text=word_list
                       )
-    
+
     layout = go.Layout(
-                       xaxis=dict(showgrid=False, 
+                       xaxis=dict(showgrid=False,
                                   showticklabels=False,
                                   zeroline=False,
                                   automargin=True),
@@ -807,7 +835,7 @@ def get_wordcloud(text, identifier, args={'stopwords':[], 'max_words': 400, 'max
                       height=args['height'],
                       title=args['title']
                       )
-    
+
     figure = go.Figure(data=[trace], layout=layout)
-    
+
     return dcc.Graph(id = identifier, figure=figure)
