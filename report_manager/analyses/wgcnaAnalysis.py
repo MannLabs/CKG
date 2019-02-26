@@ -1,6 +1,6 @@
 import os
-import pandas as pd
 import numpy as np
+import pandas as pd
 import scipy as scp
 from scipy.cluster.hierarchy import distance, linkage, dendrogram, fcluster
 from collections import OrderedDict, defaultdict
@@ -24,6 +24,9 @@ pandas2ri.activate()
 
 R = ro.r
 R('options(stringsAsFactors = FALSE)')
+R('source("http://bioconductor.org/biocLite.R")')
+R('biocLite(c("GO.db", "preprocessCore", "impute"))')
+
 
 base = R2Py.call_Rpackage("package", "base")
 stats = R2Py.call_Rpackage("package", "stats")
