@@ -215,6 +215,8 @@ class Project:
             elif data_type == "longitudinal_proteomics":
                 dataset = LongitudinalProteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
                 self.update_dataset({data_type:dataset})
+        if len(self.data_types) > 1:
+                multiomics_dataset = MultiOmicsDataset(self.identifier, data=self.datasets, analyses={}, report=None)
 
 
     def generate_project_info_report(self):

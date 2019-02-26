@@ -64,7 +64,7 @@ overview: #section
             x_title: rank of identified proteins
             y_title: intensity
             title: 'Ranking of proteins'
-"data exploration":
+data exploration:
     stratification:
         data: preprocessed
         analyses:
@@ -148,22 +148,7 @@ overview: #section
             maxLinkWidth: 7
             maxRadius: 20
             node_size: 'ev_centrality'
-    wgcna:
-        data: preprocessed
-        analyses:
-            - wgcna
-        plots:
-            - wgcnaplots
-        args:
-            RsquaredCut: 0.8
-            networkType: 'unsigned'
-            network_verbose: 2
-            minModuleSize: 30
-            deepSplit: 2
-            pamRespectsDendro: False
-            merge_modules: True
-            MEDissThres: 0.25
-            verbose_merge: 3
+    
     # enrichment:
     #     data: regulated
     #     analyses:

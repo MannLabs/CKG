@@ -85,10 +85,18 @@ class Dataset:
     def update_analysis_queries(self, query):
         self.analysis_queries.update(query)
 
-    def get_dataset(self, dataset):
-        if dataset in self.data:
-            return self.data[dataset]
+    def get_dataset(self, dataset_name):
+        if dataset_name in self.data:
+            return self.data[dataset_name]
         return None
+
+    def get_datasets(self, dataset_names):
+        datasets = {}
+        for dataset_name in dataset_names:
+            if dataset_name in self.data:
+                datasets[dataset_name] = self.data[dataset_name]
+        
+        return datasets
 
     def get_analysis(self, analysis):
         if analysis in self.analyses:
@@ -172,51 +180,54 @@ class Dataset:
             if section == "args":
                 continue
             for subsection in self.configuration[section]:
-                data_name, analysis_types, plot_types, args = self.extract_configuration(self.configuration[section][subsection])
-                if data_name in self.data:
-                    data = self.data[data_name]
-                    if not data.empty:
-                        if subsection in self.analysis_queries:
-                            query = self.analysis_queries[subsection]
-                            if "use" in args:
-                                for r_id in args["use"]:
-                                    if r_id == "columns":
-                                        rep = ",".join(['"{}"'.format(i) for i in data.columns.tolist()])
-                                    elif r_id == "index":
-                                        rep = ",".join(['"{}"'.format(i) for i in data.index.tolist()])
-                                    elif r_id in data.columns:
-                                        rep = ",".join(['"{}"'.format(i) for i in data[r_id].tolist()])
-                                    query = query.replace(args["use"][r_id].upper(),rep)
-                                data = self.send_query(query)
-                        result = None
-                        if len(analysis_types) >= 1:
-                            for analysis_type in analysis_types:
-                                result = ar.AnalysisResult(self.identifier, analysis_type, args, data)
-                                self.update_analyses(result.result)
-                                if subsection == "regulation":
-                                    reg_data = result.result[analysis_type]
-                                    if not reg_data.empty:
-                                        sig_hits = list(set(reg_data.loc[reg_data.rejected,"identifier"]))
-                                        #sig_names = list(set(reg_data.loc[reg_data.rejected,"name"]))
-                                        sig_data = data[sig_hits]
-                                        sig_data.index = data['group'].tolist()
-                                        sig_data["sample"] = data["sample"].tolist()
-                                        self.update_data({"regulated":sig_data, "regulation_table":reg_data})
-                                for plot_type in plot_types:
-                                    plots = result.get_plot(plot_type, subsection+"_"+analysis_type+"_"+plot_type)
-                                    self.report.update_plots({(analysis_type, plot_type):plots})
-                        else:
-                            if result is None:
-                                dictresult = {}
-                                dictresult["_".join(subsection.split(' '))] = data
-                                result = ar.AnalysisResult(self.identifier,"_".join(subsection.split(' ')), args, data, result = dictresult)
-                                self.update_analyses(result.result)
+                data_names, analysis_types, plot_types, args = self.extract_configuration(self.configuration[section][subsection])
+                if isinstance(data_names, list):
+                    data = self.get_datasets(data_names)
+                else:
+                    data = self.get_dataset(data_names)
+                
+                if data is not None and len(data) > 0:
+                    if subsection in self.analysis_queries:
+                        query = self.analysis_queries[subsection]
+                        if "use" in args:
+                            for r_id in args["use"]:
+                                if r_id == "columns":
+                                    rep = ",".join(['"{}"'.format(i) for i in data.columns.tolist()])
+                                elif r_id == "index":
+                                    rep = ",".join(['"{}"'.format(i) for i in data.index.tolist()])
+                                elif r_id in data.columns:
+                                    rep = ",".join(['"{}"'.format(i) for i in data[r_id].tolist()])
+                                query = query.replace(args["use"][r_id].upper(),rep)
+                            data = self.send_query(query)
+                    result = None
+                    if len(analysis_types) >= 1:
+                        for analysis_type in analysis_types:
+                            result = ar.AnalysisResult(self.identifier, analysis_type, args, data)
+                            self.update_analyses(result.result)
+                            if subsection == "regulation":
+                                reg_data = result.result[analysis_type]
+                                if not reg_data.empty:
+                                    sig_hits = list(set(reg_data.loc[reg_data.rejected,"identifier"]))
+                                    #sig_names = list(set(reg_data.loc[reg_data.rejected,"name"]))
+                                    sig_data = data[sig_hits]
+                                    sig_data.index = data['group'].tolist()
+                                    sig_data["sample"] = data["sample"].tolist()
+                                    self.update_data({"regulated":sig_data, "regulation_table":reg_data})
                             for plot_type in plot_types:
-                                plots = result.get_plot(plot_type, "_".join(subsection.split(' '))+"_"+plot_type)
-                                self.report.update_plots({("_".join(subsection.split(' ')), plot_type): plots})
+                                plots = result.get_plot(plot_type, subsection+"_"+analysis_type+"_"+plot_type)
+                                self.report.update_plots({(analysis_type, plot_type):plots})
+                    else:
+                        if result is None:
+                            dictresult = {}
+                            dictresult["_".join(subsection.split(' '))] = data
+                            result = ar.AnalysisResult(self.identifier,"_".join(subsection.split(' ')), args, data, result = dictresult)
+                            self.update_analyses(result.result)
+                        for plot_type in plot_types:
+                            plots = result.get_plot(plot_type, "_".join(subsection.split(' '))+"_"+plot_type)
+                            self.report.update_plots({("_".join(subsection.split(' ')), plot_type): plots})
 
         self.save_dataset()
-        #self.save_dataset_report()
+        self.save_dataset_report()
 
     def save_dataset(self):
         dataset_directory = self.get_dataset_data_directory()
@@ -246,6 +257,23 @@ class Dataset:
         dataset_directory = self.get_dataset_data_directory()
         report = self.report.load_report(directory=dataset_directory)
         self.update_report(report)
+
+class MultiOmicsDataset(dataset):
+    def __init__(self, identifier, data, analyses={}, report=None):
+        config_file = "multiomics.yml"
+        Dataset.__init__(self, identifier, "multiomics", data=data, analyses=analyses, analysis_queries={}, report=report)
+        self.configuration_from_file(config_file)
+
+    def get_datasets(self, datasets):
+        print("This is a multiomics dataset")
+        data = {}
+        for dataset_type in datasets:
+            dataset_name = datasets[dataset_type]
+            if dataset_type in self.data:
+                if dataset_name in self.data[dataset_type]:
+                    data[dataset_name] = self.data[dataset_type][dataset_name]
+        
+        return data
 
 class ProteomicsDataset(Dataset):
     def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
