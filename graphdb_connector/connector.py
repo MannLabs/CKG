@@ -46,6 +46,28 @@ def removeRelationshipDB(entity1, entity2, relationship):
     sendQuery(driver, deletest)
     print("Existing entries after deletion: %d" % sendQuery(driver, countst).data()[0]['count'])
 
+def modifyEntityProperty(parameters):
+    '''parameters: tuple with entity name, entity id, property name to modify, and value'''
+
+    driver = connector.getGraphDatabaseConnectionConfiguration()
+    entity, entityid, attribute, value = parameters
+
+    try:
+        cwd = os.path.abspath(os.path.dirname(__file__))
+        queries_path = "./queries.yml"
+        project_cypher = ckg_utils.get_queries(os.path.join(cwd, queries_path))
+        for query_name in project_cypher:
+            title = query_name.lower().replace('_',' ')
+            if title == 'modify':
+                query = project_cypher[query_name]['query'] % (entity, entityid, attribute, value)
+                sendQuery(driver, query)
+                print("Property successfully modified")
+    except Exception as err:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            logger.error("Reading queries from file {}: {}, file: {},line: {}".format(queries_path, sys.exc_info(), fname, exc_tb.tb_lineno))
+
+
 def sendQuery(driver, query):
     #print(query)
     result = None
@@ -70,5 +92,5 @@ def sendQuery(driver, query):
 def getCursorData(driver, query):
     result = sendQuery(driver, query)
     df = pd.DataFrame(result.data())
-    
+
     return df

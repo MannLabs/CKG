@@ -10,6 +10,7 @@ from graphdb_connector import connector
 import logging
 import logging.config
 
+
 log_config = ckg_config.report_manager_log
 logger = ckg_utils.setup_logging(log_config, key="dataset")
 
@@ -234,8 +235,7 @@ class Dataset:
         store = pd.HDFStore(os.path.join(dataset_directory, self.dataset_type+".h5"))
         for data in self.data:
             name = data.replace(" ", "-")
-            store[name] = self.data[data]
-
+            store.put(name, self.data[data], format='table')
         store.close()
 
     def save_dataset_report(self):

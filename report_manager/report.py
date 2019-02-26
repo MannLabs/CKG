@@ -16,7 +16,7 @@ class Report:
     @identifier.setter
     def identifier(self, identifier):
         self._identifier = identifier
-    
+
     @property
     def plots(self):
         return self._plots
@@ -56,7 +56,7 @@ class Report:
                     fig_set = grp.create_dataset("figure", (1,), dtype=dt)
                     fig_set[:] = str(figure_json)
                     fig_set.attrs['identifier'] = plot.id
-    
+
     #ToDo load Network data
     def read_report(self, directory):
         with h5.File(os.path.join(directory, "report.h5"), 'r') as f:
