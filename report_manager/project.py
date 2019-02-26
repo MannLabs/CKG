@@ -8,7 +8,7 @@ from json import dumps
 import pandas as pd
 import ckg_utils
 import config.ckg_config as ckg_config
-from report_manager.dataset import ProteomicsDataset, ClinicalDataset, DNAseqDataset, RNAseqDataset, LongitudinalProteomicsDataset
+from report_manager.dataset import ProteomicsDataset, ClinicalDataset, DNAseqDataset, RNAseqDataset, LongitudinalProteomicsDataset, MultiOmicsDataset
 from report_manager.plots import basicFigures as figure
 from report_manager import report as rp
 from graphdb_connector import connector
@@ -73,6 +73,9 @@ class Project:
     @data_types.setter
     def data_types(self, data_types):
         self._data_types = data_types
+
+    def append_data_type(self, data_type):
+        self._data_types.append(data_type)
 
     @property
     def responsible(self):
@@ -215,7 +218,9 @@ class Project:
                 dataset = LongitudinalProteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
                 self.update_dataset({data_type:dataset})
         if len(self.data_types) > 1:
-                multiomics_dataset = MultiOmicsDataset(self.identifier, data=self.datasets, analyses={}, report=None)
+                dataset = MultiOmicsDataset(self.identifier, data=self.datasets, analyses={}, report=None)
+                self.update_dataset({'multiomics':dataset})
+                self.append_data_type('multiomics')
 
 
     def generate_project_info_report(self):
@@ -233,6 +238,7 @@ class Project:
             project_report = self.generate_project_info_report()
             self.update_report({"Project information":project_report})
             for dataset_type in self.data_types:
+                print(dataset_type)
                 dataset = self.get_dataset(dataset_type)
                 if dataset is not None:
                     dataset.generate_report()

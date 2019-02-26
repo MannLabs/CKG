@@ -40,8 +40,6 @@ def removeRelationshipDB(entity1, entity2, relationship):
     deleteCy = cy.REMOVE_RELATIONSHIPS
     countst = countCy.replace('ENTITY1', entity1).replace('ENTITY2', entity2).replace('RELATIONSHIP', relationship)
     deletest = deleteCy.replace('ENTITY1', entity1).replace('ENTITY2', entity2).replace('RELATIONSHIP', relationship)
-    print(countst)
-    print(sendQuery(driver, countst).data()[0])
     print("Removing %d entries in the database" % sendQuery(driver, countst).data()[0]['count'])
     sendQuery(driver, deletest)
     print("Existing entries after deletion: %d" % sendQuery(driver, countst).data()[0]['count'])

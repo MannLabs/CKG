@@ -24,8 +24,8 @@ pandas2ri.activate()
 
 R = ro.r
 R('options(stringsAsFactors = FALSE)')
-R('source("http://bioconductor.org/biocLite.R")')
-R('biocLite(c("GO.db", "preprocessCore", "impute"))')
+#R('source("http://bioconductor.org/biocLite.R")')
+#R('biocLite(c("GO.db", "preprocessCore", "impute"))')
 
 
 base = R2Py.call_Rpackage("package", "base")
@@ -44,6 +44,7 @@ def get_data(data, drop_cols_exp=['group', 'sample'], drop_cols_cli=['group', 'b
             df = df.reindex(index=natsorted(df.index))
             df = df.drop(drop_cols_cli, axis=1)
         else:
+            print(df.head())
             df.set_index(['subject'], inplace=True)
             df = df.reindex(index=natsorted(df.index))
             df = df.drop(drop_cols_exp, axis=1)

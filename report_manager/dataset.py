@@ -182,7 +182,9 @@ class Dataset:
                 continue
             for subsection in self.configuration[section]:
                 data_names, analysis_types, plot_types, args = self.extract_configuration(self.configuration[section][subsection])
-                if isinstance(data_names, list):
+                print(data_names)
+                if isinstance(data_names, dict):
+                    print("I am in DICT")
                     data = self.get_datasets(data_names)
                 else:
                     data = self.get_dataset(data_names)
@@ -228,7 +230,7 @@ class Dataset:
                             self.report.update_plots({("_".join(subsection.split(' ')), plot_type): plots})
 
         self.save_dataset()
-        self.save_dataset_report()
+        #self.save_dataset_report()
 
     def save_dataset(self):
         dataset_directory = self.get_dataset_data_directory()
@@ -258,20 +260,20 @@ class Dataset:
         report = self.report.load_report(directory=dataset_directory)
         self.update_report(report)
 
-class MultiOmicsDataset(dataset):
+class MultiOmicsDataset(Dataset):
     def __init__(self, identifier, data, analyses={}, report=None):
         config_file = "multiomics.yml"
         Dataset.__init__(self, identifier, "multiomics", data=data, analyses=analyses, analysis_queries={}, report=report)
-        self.configuration_from_file(config_file)
+        self.set_configuration_from_file(config_file)
 
     def get_datasets(self, datasets):
-        print("This is a multiomics dataset")
+        print("Getting the data from the multiomics")
         data = {}
         for dataset_type in datasets:
             dataset_name = datasets[dataset_type]
             if dataset_type in self.data:
-                if dataset_name in self.data[dataset_type]:
-                    data[dataset_name] = self.data[dataset_type][dataset_name]
+                dataset = self.data[dataset_type]
+                data[dataset_type] = self.data[dataset_type].get_dataset(dataset_name)
         
         return data
 
