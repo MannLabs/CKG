@@ -1,0 +1,19 @@
+data exploration:
+    wgcna:
+        data: 
+            proteomics: preprocessed
+            clinical: preprocessed
+        analyses:
+            - wgcna
+        plots:
+            - wgcnaplots
+        args:
+            RsquaredCut: 0.8
+            networkType: 'unsigned'
+            network_verbose: 2
+            minModuleSize: 30
+            deepSplit: 2
+            pamRespectsDendro: False
+            merge_modules: True
+            MEDissThres: 0.25
+            verbose_merge: 3
