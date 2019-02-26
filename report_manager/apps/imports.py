@@ -239,9 +239,13 @@ def plot_total_numbers_per_date(stats_file, plot_title):
         traces = list(chain.from_iterable(traces))
     else: pass
 
-    layout = go.Layout(title='', xaxis={'showgrid':True}, yaxis={'title':'Imported entities/relationships'},
-                        legend={'font':{'size':11}}, height=550, margin=go.layout.Margin(l=80,r=40,t=100,b=100),
-                        annotations=[dict(text='<b>{}<b>'.format(plot_title), font=dict(family='Arial', size = 18),
+    layout = go.Layout(title='', 
+                    xaxis={'showgrid':True}, 
+                    yaxis={'title':'Imported entities/relationships'},
+                    legend={'font':{'size':11}}, 
+                    height=550, 
+                    margin=go.layout.Margin(l=80,r=40,t=100,b=100),
+                    annotations=[dict(text='<b>{}<b>'.format(plot_title), font=dict(family='Arial', size = 18),
                         showarrow=False, xref='paper', x=-0.06, xanchor='left', yref='paper', y=1.15, yanchor='top')])
 
     fig = go.Figure(data=traces, layout=layout)

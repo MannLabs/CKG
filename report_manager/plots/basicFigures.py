@@ -58,7 +58,7 @@ def get_distplot(data, identifier, args):
         group_labels = df.columns.unique().tolist()
         # Create distplot with custom bin_size
         fig = FF.create_distplot(hist_data, group_labels, bin_size=.5, curve_type='normal')
-        fig['layout'].update(height=600, width=1000, title='Distribution plot '+i)
+        fig['layout'].update(height=600, width=1000, title='Distribution plot '+i, annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')])
         graphs.append(dcc.Graph(id=identifier+"_"+i, figure=fig))
 
     return graphs
@@ -99,7 +99,8 @@ def get_barplot(data, identifier, args):
                             xaxis={"title":args["x_title"]},
                             yaxis={"title":args["y_title"]},
                             height = args['height'],
-                            width = args['width']
+                            width = args['width'],
+                            annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')]
                         )
 
     return dcc.Graph(id= identifier, figure = figure)
@@ -115,9 +116,10 @@ def get_facet_grid_plot(data, identifier, args):
                                 color_is_cat=True,
                                 trace_type=args['plot_type'],
                                 )
-    figure['layout']['title'] = args['title'].title()
-    figure['layout']['paper_bgcolor'] = None
-    figure['layout']['legend'] = None
+    figure['layout'] = dict(title = args['title'].title(),
+                            paper_bgcolor = None,
+                            legend = None,
+                            annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')])
 
     return dcc.Graph(id= identifier, figure = figure)
 
@@ -166,6 +168,7 @@ def get_scatterplot_matrix(data, identifier, args):
                             autosize=True,
                             hovermode='closest',
                             plot_bgcolor='rgba(240,240,240, 0.95)',
+                            annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')]
                             )
 
     return dcc.Graph(id=identifier, figure=figure)
@@ -185,7 +188,8 @@ def get_simple_scatterplot(data, identifier, args):
                                 legend={'x': 0, 'y': 1},
                                 hovermode='closest',
                                 height=args['height'],
-                                width=args['width']
+                                width=args['width'],
+                                annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')]
                                 )
 
     figure['data'] = [go.Scatter(x = data.x,
@@ -217,7 +221,8 @@ def get_scatterplot(data, identifier, args):
                                 legend={'x': -.4, 'y': 1.2},
                                 hovermode='closest',
                                 height=args['height'],
-                                width=args['width']
+                                width=args['width'],
+                                annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')]
                                 )
     for name in data.name.unique():
         m = {'size': 25, 'line': {'width': 0.5, 'color': 'grey'}}
@@ -296,6 +301,7 @@ def get_volcanoplot(results, args):
                                                     },
                                                     }
                                                 ],
+                                        annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')],
                                         showlegend=False)
 
         figures.append(dcc.Graph(id= identifier, figure = figure))
@@ -359,7 +365,8 @@ def get_heatmapplot(data, identifier, args):
     figure["data"] = []
     figure["layout"] = {"title":args['title'],
                         "height": 500,
-                        "width": 700}
+                        "width": 700,
+                        "annotations" : [dict(xref='paper', yref='paper', showarrow=False, text='')]}
     figure['data'].append(go.Heatmap(z=df.values.tolist(),
                                     x = list(df.columns),
                                     y = list(df.index)))
@@ -443,7 +450,9 @@ def get_complex_heatmapplot(data, identifier, args):
                                        'showline': False,
                                        'zeroline': False,
                                        'showticklabels': False,
-                                       'ticks':""}})
+                                       'ticks':""}, 
+                                       'annotations': [dict(xref='paper', yref='paper', showarrow=False, text='')]
+                                       })
 
 
     return dcc.Graph(id=identifier, figure=figure)
@@ -539,7 +548,7 @@ def get2DPCAFigure(data, components, identifier, title, subplot = False):
 
     d = Data(traces)
     layout = Layout(xaxis=layout.XAxis(title='PC'+str(components[0]), showline=False),
-                    yaxis=layout.YAxis(title='PC'+str(components[1]), showline=False))
+                    yaxis=layout.YAxis(title='PC'+str(components[1]), showline=False), annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')])
     figure = Figure(data=d, layout=layout)
 
     if subplot:
@@ -549,26 +558,43 @@ def get2DPCAFigure(data, components, identifier, title, subplot = False):
     return  dcc.Graph(id = identifier, figure = figure)
 
 
-def getSankeyPlot(data, identifier, args={'orientation': 'h', 'valueformat': '.0f', 'arrangement':'freeform','width':800, 'height':800, 'font':12}):
+def getSankeyPlot(data, identifier, args={'source':'source', 'target':'target', 'weight':'weight','source_colors':'source_colors', 'target_colors':'target_colors', 'orientation': 'h', 'valueformat': '.0f', 'width':800, 'height':800, 'font':12, 'title':'Sankey plot'}):
     '''This function generates a Sankey plot in Plotly
-        --> Input:
+        parms:
             - data: Pandas DataFrame with the format: source    target  weight
-            - sourceCol: name of the column with the source node
-            - targetCol: name of the column with the target node
-            - weightCol: name of the column with the edge weight
-            - edgeColorCol: name of the column with the edge color
-            - colors: dictionary with the color for each node: {node: rgba(r,g,b,alpha)}
-            - identifier: identifier used to label the div that contains the network figure
-            - Title of the plot
+            - identifier: id for the web app
+            - args: dictionary with the following items:
+                - source: name of the column containing the source 
+                - target: name of the column containing the target 
+                - weight: name of the column containing the weight 
+                - source_colors: name of the column in data that contains the colors of each source item
+                - target_colors: name of the column in data that contains the colors of each target item
+                - title: Plot title 
+                - orientation: whether to plot horizontal ('h') or vertical ('v')
+                - valueformat: how to show the value ('.0f')
+                - width: plot width
+                - height: plot height
+                - font: font size
+        returns:
+            dcc.Graph 
     '''
     nodes = list(set(data[args['source']].tolist() + data[args['target']].tolist()))
-    node_colors = dict(zip(data[args['source']],data[args['source_colors']]))
-    node_colors.update(dict(zip(data[args['target']],data[args['target_colors']])))
+    if 'source_colors' in args:
+        node_colors = dict(zip(data[args['source']],data[args['source_colors']]))
+    else:
+        scolors = ['blue']*len(data['source'].tolist())
+        node_colors = dict(zip(data[args['source']],scolors))
+        args['source_colors'] = 'source_colors'
+        data['source_colors'] = scolors
+    if 'target_colors' in args:
+        node_colors.update(dict(zip(data[args['target']],data[args['target_colors']])))
+    else:
+        node_colors.update(dict(zip(data[args['target']],['red']*len(data['target'].tolist()))))
     data_trace = dict(type='sankey',
                         #domain = dict(x =  [0,1], y =  [0,1]),
                         orientation = 'h' if 'orientation' not in args else args['orientation'],
                         valueformat = ".0f" if 'valueformat' not in args else args['valueformat'],
-                        arrangement = 'freeform' if 'arrangement' not in args else args['arrangement'],
+                        arrangement = 'freeform',
                         node = dict(pad = 25 if 'pad' not in args else args['pad'],
                                     thickness = 25 if 'thickness' not in args else args['thickness'],
                                     line = dict(color = "black", width = 0.3),
@@ -584,6 +610,7 @@ def getSankeyPlot(data, identifier, args={'orientation': 'h', 'valueformat': '.0
         width= 800 if 'width' not in args else args['width'],
         height= 800 if 'height' not in args else args['height'],
         title = args['title'],
+        annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')],
         font = dict(
             size = 12 if 'font' not in args else args['font'],
         )
@@ -604,6 +631,7 @@ def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subse
                     align = ['left','center']))
     layout =  dict(
         title = title,
+        annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')],
         font = dict(
             size = 12 if 'font' not in plot_attr else plot_attr['font'],
         )
@@ -626,6 +654,7 @@ def get_violinplot(data, identifier, args):
             figure = {"data": traces,
                     "layout":{
                             "title": "Violinplot per group for variable: "+c,
+                            "annotations": [dict(xref='paper', yref='paper', showarrow=False, text='')],
                             "yaxis": {
                                 "zeroline":False,
                                 }
@@ -833,7 +862,8 @@ def get_wordcloud(text, identifier, args={'stopwords':[], 'max_words': 400, 'max
                                   automargin=True),
                       width=args['width'],
                       height=args['height'],
-                      title=args['title']
+                      title=args['title'],
+                      annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')],
                       )
 
     figure = go.Figure(data=[trace], layout=layout)

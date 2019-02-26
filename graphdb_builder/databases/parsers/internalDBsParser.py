@@ -12,6 +12,7 @@ def parser(databases_directory, download=True):
     config = ckg_utils.get_configuration('../databases/config/internalDBsConfig.yml')
     string_url = config['string_url']
     string_mapping = mp.getSTRINGMapping(string_url, download=download)
+    
     for qtype in config['internal_db_types']:
         relationships = parseInternalDatabasePairs(config, databases_directory, qtype, string_mapping)
         entity1, entity2 = config['internal_db_types'][qtype]
@@ -21,12 +22,35 @@ def parser(databases_directory, download=True):
     
     return result
 
+def read_valid_pubs(organisms, organisms_file):
+    pubs = set()
+    with open(ifile, 'r') as idbf:
+        for line in idbf:
+            data = line.rstrip('\r\n').split('\t')
+            if data[0] in organisms:
+                pubs.update(set(data[1]).split(" "))
+    return pubs
+    
+
 def parserMentions(databases_directory, importDirectory, download=True):
     config = ckg_utils.get_configuration('../databases/config/internalDBsConfig.yml')
     entities, header = parsePMClist(config, databases_directory, download)
     outputfileName = "Publications.csv"
+    
+    directory = os.path.join(databases_directory, "InternalDatabases")
+    builder_utils.checkDirectory(directory)
+    
+    organisms = config['organisms']
+    organism_file =  config['organisms_file']
+    
+    if download:
+        builder_utils.downloadDB(url.replace("FILE", ifile), os.path.join(directory,"textmining"))
+    
+    ifile = os.path.join(directory,os.path.join("textmining",ifile))
+    valid_pubs = read_valid_pubs(organisms, ifile)
+
     for qtype in config['internal_db_mentions_types']:
-        parseInternalDatabaseMentions(config, databases_directory, qtype, importDirectory)
+        parseInternalDatabaseMentions(config, databases_directory, qtype, importDirectory, valid_pubs, download)
 
     return (entities, header, outputfileName)
 
@@ -81,7 +105,7 @@ def parsePMClist(config, databases_directory, download=True):
     
     return entities, header
 
-def parseInternalDatabaseMentions(config, databases_directory, qtype, importDirectory, download=True):
+def parseInternalDatabaseMentions(config, databases_directory, qtype, importDirectory, valid_pubs, download=True):
     url = config['internal_db_url']
     string_url = config['string_url']
     stitch_url = config['stitch_url']
@@ -107,7 +131,7 @@ def parseInternalDatabaseMentions(config, databases_directory, qtype, importDire
                 data = line.rstrip("\r\n").split('\t')
                 id1 = data[0]
                 pubmedids = data[1].split(" ")
-                
+                pubmedids = list(set(pubmedids).intersection(valid_pubs))
                 if qtype == "9606":
                     id1 = "9606."+id1
                     if id1 in mapping:

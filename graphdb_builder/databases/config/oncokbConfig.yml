@@ -3,6 +3,28 @@ OncoKB_annotated_url: 'http://oncokb.org/api/v1/utils/allAnnotatedVariants.txt'
 
 OncoKB_actionable_url: 'http://oncokb.org/api/v1/utils/allActionableVariants.txt'
 
+amino_acids: 
+    'A': 'Ala'
+    'C': 'Cys'
+    'D': 'Asp'
+    'E': 'Glu'
+    'F': 'Phe'
+    'G': 'Gly'
+    'H': 'His'
+    'I': 'Ile'
+    'K': 'Lys'
+    'L': 'Leu'
+    'M': 'Met'
+    'N': 'Asn'
+    'P': 'Pro'
+    'Q': 'Gln'
+    'R': 'Arg'
+    'S': 'Ser'
+    'T': 'Thr'
+    'V': 'Val'
+    'W': 'Trp'
+    'Y': 'Tyr'
+
 OncoKB_levels: 
     '1': 
         - 'approved'
@@ -69,3 +91,5 @@ relationships_headers:
         - 'END_ID'
         - 'TYPE'
         - 'source'
+
+

@@ -11,6 +11,8 @@ from graphdb_builder import builder_utils
 #       UniProt         # 
 #########################
 def parser(databases_directory, download=True):
+	'''
+		'''
     result = {"Protein":None, "Known_variant":None, "Peptide":None}
     config = ckg_utils.get_configuration('../databases/config/uniprotConfig.yml')
     uniprot_texts_file = config['uniprot_text_file']
@@ -164,7 +166,7 @@ def parseUniProtVariants(config, databases_directory, download=True):
                     pvariant = protein+"_"+pvariant
                     entities.add((ident, "Known_variant", pvariant, ",".join(altName), impact, clin_relevance, disease, original_source, "UniProt"))
                     if chromosome != 'chr-':
-                        relationships[('Chromosome','known_variant_found_in_chromosome')].add((ident, chromosome, "VARIANT_FOUND_IN_CHROMOSOME","UniProt"))
+                        relationships[('Chromosome','known_variant_found_in_chromosome')].add((ident, chromosome.replace('chr',''), "VARIANT_FOUND_IN_CHROMOSOME","UniProt"))
                     if gene != "":
                         relationships[('Gene','known_variant_found_in_gene')].add((ident, gene, "VARIANT_FOUND_IN_GENE", "UniProt"))
                     if protein !="":

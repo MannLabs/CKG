@@ -1,6 +1,11 @@
 ##### Internal Databases (jensenlab.org) #####
 internal_db_url: 'http://download.jensenlab.org/FILE'
 
+organisms_file: organism_textmining_mentions.tsv
+
+organisms: 
+    - 9606
+
 internal_db_files: 
     '-26': 'human_disease_integrated_full.tsv'
     '-25': 'human_tissue_integrated_full.tsv'

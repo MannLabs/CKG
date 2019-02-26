@@ -464,6 +464,7 @@ IMPORT_KNOWN_VARIANT_DATA:
     'description': 'Creates Known_variant nodes and their relationships to Chromosome, Gene and Protein nodes. Known variants are protein variants that have been found in a population (or disease) and registered/curated previously'
     'query': >
         CREATE CONSTRAINT ON (k:Known_variant) ASSERT k.id IS UNIQUE; 
+        CREATE INDEX ON :Known_variant(pvariant_id);
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Known_variant.csv" AS line
         MERGE (k:Known_variant {id:line.ID})
@@ -489,7 +490,7 @@ IMPORT_KNOWN_VARIANT_DATA:
         RETURN COUNT(r) AS known_variant_found_in_protein;
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/mutation_curated_affects_interaction_with.csv" AS line
-        MATCH (k:Known_variant {protein_id:line.START_ID})
+        MATCH (k:Known_variant {pvariant_id:line.START_ID})
         MATCH (p:Protein {id:line.END_ID}) 
         MERGE (k)-[r:CURATED_AFFECTS_INTERACTION_WITH{effect:line.effect,interaction:line.interaction,evidence:line.evidence,internal_id:line.internal_id,source:line.source}]->(p)
         RETURN COUNT(r) AS known_variant_affects_interaction_with;
@@ -668,11 +669,17 @@ CREATE_PROJECT: &create_project
         MERGE (p)-[r:STUDIES_DISEASE]->(d)
         RETURN COUNT(r) AS PROJECTID_studies_disease;
         USING PERIODIC COMMIT 10000
-        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_studies_intervention.csv" AS line 
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_studies_intervention.csv" AS line
         MATCH (p:Project {id:line.START_ID})
         MATCH (c:Clinical_variable {id:line.END_ID}) 
         MERGE (p)-[r:STUDIES_INTERVENTION]->(c)
         RETURN COUNT(r) AS PROJECTID_studies_intervention;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_studies_tissue.csv" AS line
+        MATCH (p:Project {id:line.START_ID})
+        MATCH (t:Tissue {id:line.END_ID}) 
+        MERGE (p)-[r:STUDIES_TISSUE]->(t)
+        RETURN COUNT(r) AS PROJECTID_studies_tissue;
         
 CREATE_SUBJECTS: &create_subject
     'name': 'create subjects'
