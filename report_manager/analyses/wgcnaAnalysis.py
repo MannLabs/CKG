@@ -33,23 +33,25 @@ stats = R2Py.call_Rpackage("package", "stats")
 WGCNA = R2Py.call_Rpackage("package", "WGCNA")
 
 
-def get_proteomics_data(filename, key, drop_cols=['group', 'sample']):
-    df = pd.read_hdf(filename, key)
-    df.set_index(['subject'], inplace = True)
-    df = df.reindex(index = natsorted(df.index))
-    df = df.drop(drop_cols, axis=1)
+def get_data(data, drop_cols_exp=['group', 'sample'], drop_cols_cli=['group', 'biological_sample']):
+    wgcna_data = {}
+    for i in data:
+        df = data[i]
+        if i == 'clinical':
+            df.drop_duplicates(keep='first', inplace=True)
+            df = df.reset_index()
+            df.set_index(['subject'], inplace=True)
+            df = df.reindex(index=natsorted(df.index))
+            df = df.drop(drop_cols_cli, axis=1)
+        else:
+            df.set_index(['subject'], inplace=True)
+            df = df.reindex(index=natsorted(df.index))
+            df = df.drop(drop_cols_exp, axis=1)
 
-    return df
+        wgcna_data[i] = df
 
-def get_clinical_data(filename, key, drop_cols=['group', 'biological_sample']):
-    df = pd.read_hdf(filename, key)
-    df.drop_duplicates(keep='first', inplace=True)
-    df = df.reset_index()
-    df.set_index(['subject'], inplace=True)
-    df = df.reindex(index=natsorted(df.index))
-    df = df.drop(drop_cols, axis=1)
+    return wgcna_data
 
-    return df
 
 def get_dendrogram(df, labels, distfun='euclidean', linkagefun='average', div_clusters=True, fcluster_method='distance', fcluster_cutoff=15):
     if distfun is None:

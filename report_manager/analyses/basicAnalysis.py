@@ -712,10 +712,12 @@ def runMapper(data, lenses=["l2norm"], n_cubes = 15, overlap=0.5, n_clusters=3, 
 
     return simplicial_complex, {"labels":labels}
 
-def runWGCNA(filename_exp, filename_cli, key_exp, key_cli, drop_cols_exp, drop_cols_cli, RsquaredCut=0.8, networkType='unsigned', network_verbose=2, minModuleSize=30, deepSplit=2, pamRespectsDendro=False, merge_modules=True, MEDissThres=0.25, verbose_merge=3):
+def runWGCNA(data, drop_cols_exp, drop_cols_cli, RsquaredCut=0.8, networkType='unsigned', network_verbose=2, minModuleSize=30, deepSplit=2, pamRespectsDendro=False, merge_modules=True, MEDissThres=0.25, verbose_merge=3):
 
-    data_exp = wgcna.get_proteomics_data(filename_exp, key_exp, drop_cols=drop_cols_exp)
-    data_cli = wgcna.get_clinical_data(filename_cli, key_cli, drop_cols=drop_cols_cli)
+    dfs = wgcna.get_data(data, drop_cols_exp=drop_cols_exp, drop_cols_cli=drop_cols_cli)
+    data_cli = dfs['clinical']
+    data_exp, = [i for i in dfs.keys() if i != 'clinical']
+    data_exp = dfs[data_exp]
 
     softPower = wgcna.pick_softThreshold(data_exp, RsquaredCut=RsquaredCut, networkType=networkType, verbose=network_verbose)
     dissTOM, moduleColors = wgcna.build_network(data_exp, softPower=softPower, networkType=networkType, minModuleSize=minModuleSize, deepSplit=deepSplit,

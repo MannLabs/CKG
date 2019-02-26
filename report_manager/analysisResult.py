@@ -177,12 +177,12 @@ class AnalysisResult:
             result[self.analysis_type], nargs = analyses.get_interaction_network(self.data)
             args.update(nargs)
         elif self.analysis_type == "wgcna":
-            filename_exp = '/Users/plh450/Clinical_Proteomics/CKG/WGCNA/proteomics.h5'
-            key_exp = 'preprocessed'
-            drop_cols_exp = ['group', 'sample']
-            filename_cli = '/Users/plh450/Clinical_Proteomics/CKG/WGCNA/clinical.h5'
-            key_cli = 'preprocessed'
-            drop_cols_cli = ['group', 'biological_sample']
+            # filename_exp = '/Users/plh450/Clinical_Proteomics/CKG/WGCNA/proteomics.h5'
+            # key_exp = 'preprocessed'
+            # filename_cli = '/Users/plh450/Clinical_Proteomics/CKG/WGCNA/clinical.h5'
+            # key_cli = 'preprocessed'
+            drop_cols_exp = []
+            drop_cols_cli = []
             RsquaredCut = 0.8
             networkType = 'unsigned'
             network_verbose = 2
@@ -192,6 +192,10 @@ class AnalysisResult:
             merge_modules = True
             MEDissThres = 0.25
             verbose_merge = 3
+            if "drop_cols_exp" in args:
+                drop_cols_exp = args['drop_cols_exp']
+            if "drop_cols_cli" in args:
+                drop_cols_cli = args['drop_cols_cli']
             if "RsquaredCut" in args:
                 RsquaredCut = args["RsquaredCut"]
             if "networkType" in args:
@@ -210,9 +214,9 @@ class AnalysisResult:
                 MEDissThres = args["MEDissThres"]
             if "verbose_merge" in args:
                 verbose_merge = args["verbose_merge"]
-            result[self.analysis_type] = analyses.runWGCNA(filename_exp, filename_cli, key_exp, key_cli, drop_cols_exp, drop_cols_cli, RsquaredCut=RsquaredCut,
-                                                            networkType=networkType, network_verbose=network_verbose, minModuleSize=minModuleSize, deepSplit=deepSplit,
-                                                            pamRespectsDendro=pamRespectsDendro, merge_modules=merge_modules, MEDissThres=MEDissThres, verbose_merge=verbose_merge)
+            result[self.analysis_type] = analyses.runWGCNA(self.data, drop_cols_exp, drop_cols_cli, RsquaredCut=0.8, networkType=networkType, network_verbose=network_verbose,
+                                                            minModuleSize=minModuleSize, deepSplit=deepSplit, pamRespectsDendro=pamRespectsDendro, merge_modules=merge_modules,
+                                                            MEDissThres=MEDissThres, verbose_merge=verbose_merge)
         return result, args
 
     def get_plot(self, name, identifier):

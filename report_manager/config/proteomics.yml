@@ -148,7 +148,29 @@ data exploration:
             maxLinkWidth: 7
             maxRadius: 20
             node_size: 'ev_centrality'
-    
+    wgcna:
+        data: preprocessed
+        analyses:
+            - wgcna
+        plots:
+            - wgcnaplots
+        args:
+            drop_cols_exp:
+                - group
+                - sample
+            drop_cols_cli:
+                - group
+                - biological_sample
+            RsquaredCut: 0.8
+            networkType: 'unsigned'
+            network_verbose: 2
+            minModuleSize: 30
+            deepSplit: 2
+            pamRespectsDendro: False
+            merge_modules: True
+            MEDissThres: 0.25
+            verbose_merge: 3
+
     # enrichment:
     #     data: regulated
     #     analyses:
