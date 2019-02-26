@@ -1,6 +1,6 @@
 data exploration:
     wgcna:
-        data: 
+        data:
             proteomics: preprocessed
             clinical: preprocessed
         analyses:
@@ -8,6 +8,12 @@ data exploration:
         plots:
             - wgcnaplots
         args:
+            drop_cols_exp:
+                - group
+                - sample
+            drop_cols_cli:
+                - group
+                - biological_sample
             RsquaredCut: 0.8
             networkType: 'unsigned'
             network_verbose: 2

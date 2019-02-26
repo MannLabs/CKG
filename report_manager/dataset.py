@@ -96,7 +96,7 @@ class Dataset:
         for dataset_name in dataset_names:
             if dataset_name in self.data:
                 datasets[dataset_name] = self.data[dataset_name]
-        
+
         return datasets
 
     def get_analysis(self, analysis):
@@ -188,7 +188,7 @@ class Dataset:
                     data = self.get_datasets(data_names)
                 else:
                     data = self.get_dataset(data_names)
-                
+
                 if data is not None and len(data) > 0:
                     if subsection in self.analysis_queries:
                         query = self.analysis_queries[subsection]
@@ -229,7 +229,7 @@ class Dataset:
                             plots = result.get_plot(plot_type, "_".join(subsection.split(' '))+"_"+plot_type)
                             self.report.update_plots({("_".join(subsection.split(' ')), plot_type): plots})
 
-        self.save_dataset()
+        #self.save_dataset()
         #self.save_dataset_report()
 
     def save_dataset(self):
@@ -274,7 +274,7 @@ class MultiOmicsDataset(Dataset):
             if dataset_type in self.data:
                 dataset = self.data[dataset_type]
                 data[dataset_type] = self.data[dataset_type].get_dataset(dataset_name)
-        
+
         return data
 
 class ProteomicsDataset(Dataset):

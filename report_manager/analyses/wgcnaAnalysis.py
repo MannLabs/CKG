@@ -152,7 +152,6 @@ def build_network(data, softPower=6, networkType='unsigned', minModuleSize=30, d
     dissTOM.index = data.columns
 
     moduleColors = identify_module_colors(dissTOM, minModuleSize=minModuleSize, deepSplit=deepSplit, pamRespectsDendro=pamRespectsDendro)
-
     if merge_modules == True:
         MEs, moduleColors = merge_similar_modules(data, moduleColors, MEDissThres=MEDissThres, verbose=verbose_merge)
     else: pass
