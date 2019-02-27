@@ -123,12 +123,15 @@ def get_facet_grid_plot(data, identifier, args):
 
     return dcc.Graph(id= identifier, figure = figure)
 
+def get_ranking_plot(data, identifier, args):
+    pass
+    
+
 def get_scatterplot_matrix(data, identifier, args):
     df = data.copy()
     if "format" in args:
         if args["format"] == "long":
             columns = [args["variables"], args["values"]]
-            df = data.copy()
             groups = df[args["group"]]
             df = df[columns]
             df = df.pivot(columns=args["variables"], values=args["values"])
@@ -623,7 +626,7 @@ def getSankeyPlot(data, identifier, args={'source':'source', 'target':'target', 
 def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':2500, 'font':12}, subplot = False):
     if subset is not None:
         data = data[subset]
-    data_trace = go.Table(header=dict(values=data.columns,
+    data_trace = go.Table(header=dict(values=[c.title() for c in data.columns],
                     fill = dict(color = colors[0]),
                     align = ['center','center']),
                     cells=dict(values=[data[c].round(5) if data[c].dtype == np.float64 else data[c] for c in data.columns],

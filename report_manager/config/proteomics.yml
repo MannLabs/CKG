@@ -65,6 +65,26 @@ overview: #section
             y_title: intensity
             title: 'Ranking of proteins'
 data exploration:
+    ranking:
+        data: preprocessed
+        analyses: 
+            - long_format
+        plots:
+            - ranking
+        args:
+            drop_columns: 
+                - sample
+                - subject
+            columns:
+                - x
+                - name
+                - y
+            group: group
+            x_title: Ranking of proteins
+            y_title: log2 LFQ intensity
+            height: 700
+            width: 900
+            title: Protein ranking
     stratification:
         data: preprocessed
         analyses:
@@ -76,8 +96,6 @@ data exploration:
         args:
             x_title: PC1
             y_title: PC2
-            height: 700
-            width: 900
             components: 2
             perplexity: 40
             n_iter: 1000

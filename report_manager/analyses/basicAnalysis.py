@@ -18,7 +18,7 @@ import kmapper as km
 from report_manager import utils
 from report_manager.analyses import wgcnaAnalysis as wgcna
 
-def transform_into_long_format(data, index, columns, values, extra=[], use_index=False):
+def transform_into_wide_format(data, index, columns, values, extra=[], use_index=False):
     df = data.copy()
     if not df.empty:
         cols = [columns, values]
@@ -34,6 +34,17 @@ def transform_into_long_format(data, index, columns, values, extra=[], use_index
             df = df.reset_index(drop=True)
 
     return df
+
+def transform_into_long_format(data, drop_columns, group, columns=['x', 'mame','y']):
+    data = data.drop(drop_columns, axis=1)
+    data = data.set_index(group)
+    long_data = pd.DataFrame(columns=columns)
+    for index in data.index:
+        intensities = data.loc[index, :].mean(axis=1).sort_values(ascending=False).to_frame().reset_index().reset_index()
+        intensities.columns = columns
+        long_data = long_data.append(intensities, ignore_index=True)
+
+    return long_data
 
 def extract_number_missing(df, conditions, missing_max):
     if conditions is None:

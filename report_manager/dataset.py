@@ -182,9 +182,7 @@ class Dataset:
                 continue
             for subsection in self.configuration[section]:
                 data_names, analysis_types, plot_types, args = self.extract_configuration(self.configuration[section][subsection])
-                print(data_names)
                 if isinstance(data_names, dict):
-                    print("I am in DICT")
                     data = self.get_datasets(data_names)
                 else:
                     data = self.get_dataset(data_names)
@@ -267,7 +265,6 @@ class MultiOmicsDataset(Dataset):
         self.set_configuration_from_file(config_file)
 
     def get_datasets(self, datasets):
-        print("Getting the data from the multiomics")
         data = {}
         for dataset_type in datasets:
             dataset_name = datasets[dataset_type]
@@ -361,7 +358,7 @@ class ClinicalDataset(Dataset):
                 if "use_index" in args:
                     use_index = args["use_index"]
 
-            processed_data = basicAnalysis.transform_into_long_format(data, index=index, columns=columns, values=values, extra=extra, use_index=use_index)
+            processed_data = basicAnalysis.transform_into_wide_format(data, index=index, columns=columns, values=values, extra=extra, use_index=use_index)
         return processed_data
 
 class DNAseqDataset(Dataset):

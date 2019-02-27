@@ -62,8 +62,8 @@ class AnalysisResult:
     def get_analysis_result(self):
         result = {}
         args = self.args
-        if self.analysis_type == "long_format":
-            r = analyses.transform_into_long_format(self.data, args['index'], args['x'],
+        if self.analysis_type == "wide_format":
+            r = analyses.transform_into_wide_format(self.data, args['index'], args['x'],
                                                                 args['y'], extra=[args['group']], use_index=args['use_index'])
             result[self.analysis_type] = r
         if self.analysis_type == "pca":
@@ -176,11 +176,9 @@ class AnalysisResult:
         elif self.analysis_type == "interaction":
             result[self.analysis_type], nargs = analyses.get_interaction_network(self.data)
             args.update(nargs)
+        elif self.analysis_type == 'long_format':
+            result[self.analysis_type] = analyses.transform_into_long_format(self.data, drop_columns=args['drop_columns'], group=args['group'], columns=args['columns'])
         elif self.analysis_type == "wgcna":
-            # filename_exp = '/Users/plh450/Clinical_Proteomics/CKG/WGCNA/proteomics.h5'
-            # key_exp = 'preprocessed'
-            # filename_cli = '/Users/plh450/Clinical_Proteomics/CKG/WGCNA/clinical.h5'
-            # key_cli = 'preprocessed'
             drop_cols_exp = []
             drop_cols_cli = []
             RsquaredCut = 0.8
@@ -367,5 +365,8 @@ class AnalysisResult:
             elif name == "wgcnaplots":
                 for id in data:
                     plot.extend(figure.get_WGCNAPlots(data[id], identifier))
+            elif name == 'ranking':
+                for id in data:
+                    plot.append(figure.get_ranking_plot(data[id], identifier, args))
 
         return plot

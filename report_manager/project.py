@@ -238,7 +238,6 @@ class Project:
             project_report = self.generate_project_info_report()
             self.update_report({"Project information":project_report})
             for dataset_type in self.data_types:
-                print(dataset_type)
                 dataset = self.get_dataset(dataset_type)
                 if dataset is not None:
                     dataset.generate_report()
@@ -267,6 +266,8 @@ class Project:
                         elif isinstance(plot, dict):
                             if "notebook" in plot:
                                 net = plot['notebook']
+                                if not os.path.isdir('./tmp'):
+                                    os.makedirs('./tmp')
                                 fnet = tempfile.NamedTemporaryFile(suffix=".html", delete=False, dir='tmp/')
                                 with open(fnet.name, 'w') as f:
                                     f.write(net.html)

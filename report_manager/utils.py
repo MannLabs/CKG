@@ -4,7 +4,16 @@ import random
 from Bio import Entrez
 from Bio import Medline
 import pandas as pd
+import plotly.plotly as py
+import base64
+from xhtml2pdf import pisa
 
+
+def get_image(figure, width, height):
+    img = base64.b64encode(py.image.get(figure, width=width, height=height)).decode('utf-8')
+
+    return img
+    
 def generator_to_dict(genvar):
     dictvar = {}
     for i,gen in enumerate(genvar):
@@ -14,7 +23,6 @@ def generator_to_dict(genvar):
 
 def parse_html(html_snippet):
     html_parsed = bs.BeautifulSoup(html_snippet)
-    print(html_parsed)
     return html_parsed    
 
 def extract_style(el):
@@ -90,3 +98,19 @@ def getMedlineAbstracts(idList):
 
     return abstracts
 
+
+# Utility function
+def convert_html_to_pdf(source_html, output_filename):
+    # open output file for writing (truncated binary)
+    result_file = open(output_filename, "w+b")
+
+    # convert HTML to PDF
+    pisa_status = pisa.CreatePDF(
+            source_html,                # the HTML to convert
+            dest=result_file)           # file handle to recieve result
+
+    # close output file
+    result_file.close()                 # close output file
+
+    # return True on success and False on errors
+    return pisa_status.err
