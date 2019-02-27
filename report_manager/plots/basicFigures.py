@@ -4,6 +4,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 import plotly.figure_factory as FF
+import dash_table
 from plotly import tools
 from scipy.spatial.distance import pdist, squareform
 from plotly.graph_objs import *
@@ -626,26 +627,32 @@ def getSankeyPlot(data, identifier, args={'source':'source', 'target':'target', 
 def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':2500, 'font':12}, subplot = False):
     if subset is not None:
         data = data[subset]
-    data_trace = go.Table(header=dict(values=[c.title() for c in data.columns],
-                    fill = dict(color = colors[0]),
-                    align = ['center','center']),
-                    cells=dict(values=[data[c].round(5) if data[c].dtype == np.float64 else data[c] for c in data.columns],
-                    fill = dict(color= colors[1]),
-                    align = ['left','center']))
-    layout =  dict(
-        title = title,
-        annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')],
-        font = dict(
-            size = 12 if 'font' not in plot_attr else plot_attr['font'],
-        )
-    )
+    
+    data_trace = dash_table.DataTable(id='table_'+identifier,
+                                        style_data={'whiteSpace': 'normal'},
+                                        style_cell={
+                                            'minWidth': '0px', 'maxWidth': '180px',
+                                            'textAlign': 'left', 'padding': '5px', 'vertical-align': 'top'
+                                        },
+                                        css=[{
+                                            'selector': '.dash-cell div.dash-cell-value',
+                                            'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                                        }],
+                                        columns=[{"name": i.replace('_', ' ').title(), "id": i} for i in data.columns],
+                                        style_table={
+                                            'maxHeight': '500',
+                                            'overflowY': 'scroll'
+                                        },
+                                        style_header={
+                                            'backgroundColor': '#2b8cbe',
+                                            'fontWeight': 'bold',
+                                            'position': 'sticky'
+                                        },
+                                        data=data.to_dict("rows"),
+                                        sorting=True,
+                                        )
 
-    figure = dict(data=[data_trace], layout=layout)
-
-    if subplot:
-        return (identifier, figure)
-
-    return dcc.Graph(id = identifier, figure = figure)
+    return html.Div([data_trace])
 
 def get_violinplot(data, identifier, args):
     df = data.copy()
@@ -695,7 +702,7 @@ def get_WGCNAPlots(data, identifier):
     #plot: gene tree dendrogram and module colors; input: dissTOM, moduleColors
     plots.append(wgcnaFigures.plot_complex_dendrogram(dissTOM, moduleColors, title='Co-expression: dendrogram and module colors', dendro_labels=dissTOM.columns, distfun=None, linkagefun='average', hang=0.1, subplot='module colors', col_annotation=True, width=1000, height=800))
     #plot: table with features per module; input: df
-    plots.append(getBasicTable(Features_per_Module, identifier='', title='Proteins/Genes module color', colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':1500, 'font':12}, subplot = False).figure)
+    plots.append(getBasicTable(Features_per_Module, identifier='', title='Proteins/Genes module color', colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':1500, 'font':12}, subplot = False))
     #plot: module-traits correlation with annotations; input: moduleTraitCor, textMatrix
     plots.append(wgcnaFigures.plot_labeled_heatmap(moduleTraitCor, textMatrix, title='Module-Clinical variable relationships', colorscale=[[0,'rgb(0,255,0)'],[0.5,'rgb(255,255,255)'],[1,'rgb(255,0,0)']], row_annotation=True, width=1000, height=800))
     #plot: FS vs. MM correlation per trait/module scatter matrix; input: MM, FS, Features_per_Module
