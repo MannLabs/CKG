@@ -13,7 +13,7 @@ def parser(databases_directory, download = True):
     config = ckg_utils.get_configuration('../databases/config/hpaConfig.yml')
     url = config['hpa_pathology_url']
     disease_mapping = mp.getMappingFromOntology(ontology = "Disease", source = None)
-    protein_mapping = mp.getMappingForEntity("Protein")
+    protein_mapping = mp.getMultipleMappingForEntity("Protein")
     directory = os.path.join(databases_directory, "HPA")
     builder_utils.checkDirectory(directory)
     compressed_fileName = os.path.join(directory, url.split('/')[-1])
@@ -66,12 +66,13 @@ def parsePathologyFile(config, fhandler, file_name, protein_mapping, disease_map
             
             if identifier in protein_mapping or name in protein_mapping:
                 if identifier in protein_mapping:
-                    identifier = protein_mapping[identifier]
+                    identifiers = protein_mapping[identifier]
                 else:
-                    identifier = protein_mapping[name]
-                if disease_name in disease_mapping:
-                    disease_id = disease_mapping[disease_name]
-                    pathology[("protein", "detected_in_pathology_sample")].add((identifier, disease_id, "DETECTED_IN_PATHOLOGY_SAMPLE", hexpr, mexpr, lexpr, ndetected, prog_pos, prog_neg, linkout, "Human Protein Atlas pathology"))
+                    identifiers = protein_mapping[name]
+                for identifier in identifiers:
+                    if disease_name in disease_mapping:
+                        disease_id = disease_mapping[disease_name]
+                        pathology[("protein", "detected_in_pathology_sample")].add((identifier, disease_id, "DETECTED_IN_PATHOLOGY_SAMPLE", hexpr, mexpr, lexpr, ndetected, prog_pos, prog_neg, linkout, "Human Protein Atlas pathology"))
                     
     return pathology
 

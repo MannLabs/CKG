@@ -197,18 +197,18 @@ def extractSubjectClinicalVariablesRelationships(data):
 
     return df
 
-def extractBiologicalSampleClinicalVariablesRelationships(data):
-    df = data.copy()
-    if "biological_sample id" in df.columns:
-        df = df.set_index("biological_sample id")
-        df = df._get_numeric_data()
-        df = df.stack()
-        df = df.reset_index()
-        df.columns = ['START_ID', 'END_ID', "value"]
-        df['TYPE'] = "HAS_QUANTIFIED_CLINICAL"
-        df = df[['START_ID', 'END_ID','TYPE', 'value']]
-        df['END_ID'] = df['END_ID'].apply(lambda x: int(x) if isinstance(x,float) else x)
-        df = df.dropna()
+def extractBiologicalSampleClinicalVariablesRelationships(df):
+    if not data.empty:
+        if "biological_sample id" in df.columns:
+            df = df.set_index("biological_sample id")
+            df = df._get_numeric_data()
+            df = df.stack()
+            df = df.reset_index()
+            df.columns = ['START_ID', 'END_ID', "value"]
+            df['TYPE'] = "HAS_QUANTIFIED_CLINICAL"
+            df = df[['START_ID', 'END_ID','TYPE', 'value']]
+            df['END_ID'] = df['END_ID'].apply(lambda x: int(x) if isinstance(x,float) else x)
+            df = df.dropna()
 
     return df
 

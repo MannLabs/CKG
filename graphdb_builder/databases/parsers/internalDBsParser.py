@@ -24,7 +24,7 @@ def parser(databases_directory, download=True):
 
 def read_valid_pubs(organisms, organisms_file):
     pubs = set()
-    with open(ifile, 'r') as idbf:
+    with open(organisms_file, 'r') as idbf:
         for line in idbf:
             data = line.rstrip('\r\n').split('\t')
             if data[0] in organisms:
@@ -149,3 +149,4 @@ def parseInternalDatabaseMentions(config, databases_directory, qtype, importDire
                         aux["START_ID"] = i
                         aux["TYPE"] = "MENTIONED_IN_PUBLICATION"
                         aux.to_csv(path_or_buf=f, header=False, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
+

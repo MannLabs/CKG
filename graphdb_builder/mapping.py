@@ -44,6 +44,22 @@ def getMappingForEntity(entity):
 
     return mapping
 
+def getMultipleMappingForEntity(entity):
+    mapping = defaultdict(set)
+    if entity in dbconfig["sources"]:
+        mapping_file = os.path.join(dbconfig["databasesDir"], os.path.join(dbconfig["sources"][entity],"mapping.tsv"))
+        mapping = {}
+        while not os.path.isfile(mapping_file):
+            time.sleep(5)
+        with open(mapping_file, 'r') as mf:
+            for line in mf:
+                data = line.rstrip("\r\n").split("\t")
+                if len(data) > 1:
+                    ident = data[0]
+                    alias = data[1]
+                    mapping[alias].add(ident)
+    return mapping
+
 def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True, db = "STRING"):
     mapping = defaultdict(set)
     

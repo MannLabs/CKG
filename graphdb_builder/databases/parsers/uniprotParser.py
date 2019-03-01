@@ -117,7 +117,7 @@ def addUniProtTexts(textsFile, proteins):
 def parseUniProtVariants(config, databases_directory, download=True):
     data = defaultdict()
     variant_regex = r"(g\.\w+>\w)"
-    chromosome_regex = r"(\w+)p"
+    chromosome_regex = r"(\w+)[p|q]"
     url = config['uniprot_variant_file']
     aa = config['amino_acids']
     entities = set()

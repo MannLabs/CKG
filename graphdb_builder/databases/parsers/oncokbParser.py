@@ -17,7 +17,7 @@ def parser(databases_directory, download = True):
     mapping = mp.getMappingFromOntology(ontology = "Disease", source = None)
 
     drug_mapping = mp.getMappingForEntity("Drug")
-    protein_mapping = mp.getMappingForEntity("Protein")
+    protein_mapping = mp.getMultipleMappingForEntity("Protein")
 
     levels = config['OncoKB_levels']
     entities = set()
@@ -43,12 +43,12 @@ def parser(databases_directory, download = True):
             oncogenicity = data[5]
             effect = data[6]         
             if gene in protein_mapping:
-                match = re.search(variant_regex, variant)
-                if match:
-                    protein = protein_mapping[gene]
-                    if variant[0] in amino_acids and variant[-1] in amino_acids:
-                        valid_variant = protein + '_p.' + amino_acids[variant[0]] + ''.join(variant[1:-1]) + amino_acids[variant[-1]]
-                        entities.add((valid_variant,"Clinically_relevant_variant", "", "", "", "", "", effect, oncogenicity))
+                for protein in protein_mapping[gene]:
+                    match = re.search(variant_regex, variant)
+                    if match:
+                        if variant[0] in amino_acids and variant[-1] in amino_acids:
+                            valid_variant = protein + '_p.' + amino_acids[variant[0]] + ''.join(variant[1:-1]) + amino_acids[variant[-1]]
+                            entities.add((valid_variant,"Clinically_relevant_variant", "", "", "", "", "", effect, oncogenicity))
     
     with open(acfileName, 'r', errors='replace') as associations:
         first = True
@@ -67,21 +67,21 @@ def parser(databases_directory, download = True):
             if level in levels:
                 level = levels[level]
             
-            valid_variant = None
+            valid_variants = []
             if gene in protein_mapping:
-                match = re.search(variant_regex, variant)
-                if match:
-                    protein = protein_mapping[gene]
-                    if variant[0] in amino_acids and variant[-1] in amino_acids:
-                        valid_variant = protein + '_p.' + amino_acids[variant[0]] + ''.join(variant[1:-1]) + amino_acids[variant[-1]]
+                for protein in protein_mapping[gene]:
+                    match = re.search(variant_regex, variant)
+                    if match:
+                        if variant[0] in amino_acids and variant[-1] in amino_acids:
+                            valid_variants.append(protein + '_p.' + amino_acids[variant[0]] + ''.join(variant[1:-1]) + amino_acids[variant[-1]])
             for drug in drugs:
                 for d in drug.split(' + '):
                     if d.lower() in drug_mapping:
                         drug = drug_mapping[d.lower()]
                         relationships["targets"].add((drug, gene, "CURATED_TARGETS", "curated", "NA", "NA", "curated", "OncoKB"))
-                        if valid_variant is not None:
+                        for valid_variant in valid_variants:
                             relationships["targets_clinically_relevant_variant"].add((drug, valid_variant, "TARGETS_KNOWN_VARIANT", level[0], level[1], disease, "curated", "OncoKB"))
-            if valid_variant is not None:
+            for valid_variant in valid_variants:
                 if disease.lower() in mapping:
                     disease = mapping[disease.lower()]
                     relationships["associated_with"].add((valid_variant, disease, "ASSOCIATED_WITH", "curated","curated", "OncoKB", len(pubmed_ids)))   
