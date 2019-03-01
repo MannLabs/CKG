@@ -11,8 +11,6 @@ from graphdb_builder import builder_utils
 #       UniProt         # 
 #########################
 def parser(databases_directory, download=True):
-	'''
-		'''
     result = {"Protein":None, "Known_variant":None, "Peptide":None}
     config = ckg_utils.get_configuration('../databases/config/uniprotConfig.yml')
     uniprot_texts_file = config['uniprot_text_file']

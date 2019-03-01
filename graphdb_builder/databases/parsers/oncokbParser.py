@@ -11,11 +11,13 @@ def parser(databases_directory, download = True):
     config = ckg_utils.get_configuration('../databases/config/oncokbConfig.yml')
     url_actionable = config['OncoKB_actionable_url']
     url_annotation = config['OncoKB_annotated_url']
+    amino_acids = config['amino_acids']
     entities_header = config['entities_header']
     relationships_headers = config['relationships_headers']
     mapping = mp.getMappingFromOntology(ontology = "Disease", source = None)
 
-    drugmapping = mp.getMappingForEntity("Drug")
+    drug_mapping = mp.getMappingForEntity("Drug")
+    protein_mapping = mp.getMappingForEntity("Protein")
 
     levels = config['OncoKB_levels']
     entities = set()
@@ -28,7 +30,7 @@ def parser(databases_directory, download = True):
         builder_utils.downloadDB(url_actionable, directory)
         builder_utils.downloadDB(url_annotation, directory)
 
-    regex = r"\w\d+(\w|\*|\.)"
+    variant_regex = r"(\D\d+\D)$"
     with open(anfileName, 'r', errors='replace') as variants:
         first = True
         for line in variants:
@@ -39,10 +41,15 @@ def parser(databases_directory, download = True):
             gene = data[3]
             variant = data[4]
             oncogenicity = data[5]
-            effect = data[6]          
-            entities.add((variant,"Clinically_relevant_variant", "", "", "", "", "", effect, oncogenicity))
-            relationships["variant_found_in_gene"].add((variant, gene, "VARIANT_FOUND_IN_GENE"))
-
+            effect = data[6]         
+            if gene in protein_mapping:
+                match = re.search(variant_regex, variant)
+                if match:
+                    protein = protein_mapping[gene]
+                    if variant[0] in amino_acids and variant[-1] in amino_acids:
+                        valid_variant = protein + '_p.' + amino_acids[variant[0]] + ''.join(variant[1:-1]) + amino_acids[variant[-1]]
+                        entities.add((valid_variant,"Clinically_relevant_variant", "", "", "", "", "", effect, oncogenicity))
+    
     with open(acfileName, 'r', errors='replace') as associations:
         first = True
         for line in associations:
@@ -59,23 +66,28 @@ def parser(databases_directory, download = True):
             pubmed_ids = data[9].split(',')
             if level in levels:
                 level = levels[level]
+            
+            valid_variant = None
+            if gene in protein_mapping:
+                match = re.search(variant_regex, variant)
+                if match:
+                    protein = protein_mapping[gene]
+                    if variant[0] in amino_acids and variant[-1] in amino_acids:
+                        valid_variant = protein + '_p.' + amino_acids[variant[0]] + ''.join(variant[1:-1]) + amino_acids[variant[-1]]
             for drug in drugs:
                 for d in drug.split(' + '):
-                    if d.lower() in drugmapping:
-                        drug = drugmapping[d.lower()]
-                        relationships["targets_clinically_relevant_variant"].add((drug, variant, "TARGETS_KNOWN_VARIANT", level[0], level[1], disease, "curated", "OncoKB"))
+                    if d.lower() in drug_mapping:
+                        drug = drug_mapping[d.lower()]
                         relationships["targets"].add((drug, gene, "CURATED_TARGETS", "curated", "NA", "NA", "curated", "OncoKB"))
-                    else:
-                        pass
-                        #print(drug)
-            if disease.lower() in mapping:
-                disease = mapping[disease.lower()]
-                relationships["associated_with"].add((variant, disease, "ASSOCIATED_WITH", "curated","curated", "OncoKB", len(pubmed_ids)))   
-            else:
-                pass
-                #print disease
-            relationships["known_variant_is_clinically_relevant"].add((variant, variant, "KNOWN_VARIANT_IS_CLINICALLY_RELEVANT", "OncoKB"))
-        relationships["variant_found_in_chromosome"].add(("","",""))
-
+                        if valid_variant is not None:
+                            relationships["targets_clinically_relevant_variant"].add((drug, valid_variant, "TARGETS_KNOWN_VARIANT", level[0], level[1], disease, "curated", "OncoKB"))
+            if valid_variant is not None:
+                if disease.lower() in mapping:
+                    disease = mapping[disease.lower()]
+                    relationships["associated_with"].add((valid_variant, disease, "ASSOCIATED_WITH", "curated","curated", "OncoKB", len(pubmed_ids)))   
+                else:
+                    pass
+                    #print disease
+                relationships["known_variant_is_clinically_relevant"].add((valid_variant, valid_variant, "KNOWN_VARIANT_IS_CLINICALLY_RELEVANT", "OncoKB"))
 
     return (entities, relationships, entities_header, relationships_headers)

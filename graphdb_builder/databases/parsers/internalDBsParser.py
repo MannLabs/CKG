@@ -36,12 +36,12 @@ def parserMentions(databases_directory, importDirectory, download=True):
     config = ckg_utils.get_configuration('../databases/config/internalDBsConfig.yml')
     entities, header = parsePMClist(config, databases_directory, download)
     outputfileName = "Publications.csv"
+    url = config['internal_db_url']
+    ifile = config['organisms_file']
+    organisms = config['organisms']
     
     directory = os.path.join(databases_directory, "InternalDatabases")
     builder_utils.checkDirectory(directory)
-    
-    organisms = config['organisms']
-    organism_file =  config['organisms_file']
     
     if download:
         builder_utils.downloadDB(url.replace("FILE", ifile), os.path.join(directory,"textmining"))
