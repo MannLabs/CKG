@@ -125,8 +125,8 @@ def get_facet_grid_plot(data, identifier, args):
     return dcc.Graph(id= identifier, figure = figure)
 
 def get_ranking_plot(data, identifier, args):
-    print(data.head())
-    graph = get_scatter_plot_matrix(data, identifier, args)
+    print(data.tail()) 
+    graph = get_scatterplot_matrix(data, identifier, args)
     
     return graph
     

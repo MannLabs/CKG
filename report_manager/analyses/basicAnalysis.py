@@ -36,6 +36,7 @@ def transform_into_wide_format(data, index, columns, values, extra=[], use_index
     return df
 
 def transform_into_long_format(data, drop_columns, group, columns=['x', 'mame','y']):
+    print(columns)
     data = data.drop(drop_columns, axis=1)
     data = data.set_index(group)
     long_data = pd.DataFrame(columns=columns)

@@ -177,6 +177,7 @@ class AnalysisResult:
             result[self.analysis_type], nargs = analyses.get_interaction_network(self.data)
             args.update(nargs)
         elif self.analysis_type == 'long_format':
+            print("ARGS: ",args['columns'])
             result[self.analysis_type] = analyses.transform_into_long_format(self.data, drop_columns=args['drop_columns'], group=args['group'], columns=args['columns'])
         elif self.analysis_type == "wgcna":
             drop_cols_exp = []

@@ -50,41 +50,28 @@ overview: #section
             x_title: Analytical sample
             y_title: number of modified proteins
             plot_type: bar
-            title: 'Number of modified proteins identified per type'
-    ranking:
-        data: protein_biomarkers
-        analyses: []
-        plots:
-            - ranking_plot
-        args:
-            x: x
-            y: y
-            group: group
-            highlight: is_biomarker
-            x_title: rank of identified proteins
-            y_title: intensity
-            title: 'Ranking of proteins'
+            title: 'Number of modified proteins identified per type'    
+    #ranking:
+     #   data: preprocessed
+     #   analyses: 
+     #       - long_format
+     #   plots:
+     #       - ranking
+     #   args:
+     #       drop_columns: 
+     #           - sample
+     #           - subject
+     #       columns:
+     #           - x
+     #           - group
+     #           - y
+     #       group: group
+     #       x_title: Ranking of proteins
+     #       y_title: log2 LFQ intensity
+     #       height: 700
+     #       width: 900
+     #       title: Protein ranking
 data exploration:
-    ranking:
-        data: preprocessed
-        analyses: 
-            - long_format
-        plots:
-            - ranking
-        args:
-            drop_columns: 
-                - sample
-                - subject
-            columns:
-                - x
-                - name
-                - y
-            group: group
-            x_title: Ranking of proteins
-            y_title: log2 LFQ intensity
-            height: 700
-            width: 900
-            title: Protein ranking
     stratification:
         data: preprocessed
         analyses:
