@@ -10,16 +10,15 @@ from graphdb_builder import builder_utils
 #########################
 #       UniProt         # 
 #########################
-def parser(databases_directory, download=True):
+def parser(databases_directory, import_directory, download=True):
     result = {"Protein":None, "Known_variant":None, "Peptide":None}
     config = ckg_utils.get_configuration('../databases/config/uniprotConfig.yml')
     uniprot_texts_file = config['uniprot_text_file']
     relationships_header = config['relationships_header']
-    proteins, proteins_relationships = parseUniProtDatabase(config, databases_directory, download=download)
+    proteins, relationships = parseUniProtDatabase(config, databases_directory, download=download)
     addUniProtTexts(uniprot_texts_file, proteins)
-    proteins_outputfileName = "Protein.csv"
-    proteins_header = config['proteins_header']
-    protein_entities = set()
+    entities_header = config['proteins_header']
+    entities = set()
     for protein in proteins:
         accession = ""
         name = ""
@@ -36,29 +35,43 @@ def parser(databases_directory, download=True):
             taxid = int(proteins[protein]["NCBI_TaxID"])
         if "description" in proteins[protein]:
             description = proteins[protein]["description"]
-        protein_entities.add((protein, "Protein", accession , name, ",".join(synonyms), description, taxid))
-
-    result["Protein"] = (protein_entities, proteins_relationships, proteins_header, relationships_header)
+        entities.add((protein, "Protein", accession , name, ",".join(synonyms), description, taxid))
+    
+    stats = print_out_file(entities, entities_header, relationships, relationships_header, "Protein", import_directory)
     
     #Peptides
-    peptides, peptides_relationships = parseUniProtPeptides(config, databases_directory, download)
-    peptides_outputfile = "Peptides.csv"
-    peptides_header = config['peptides_header']
-    result["Peptide"] = (peptides, peptides_relationships, peptides_header, relationships_header)
+    entities, relationships = parseUniProtPeptides(config, databases_directory, download)
+    entities_header = config['peptides_header']
+    stats.update(print_out_file(entities, entities_header, relationships, relationships_header, "Pepetide", import_directory))
 
     #Variants
-    variants, variants_relationships = parseUniProtVariants(config, databases_directory, download)
-    variants_outputfile = "Known_variant.csv"
-    variants_header = config['variants_header']
-    result["Known_variant"] = (variants, variants_relationships, variants_header, relationships_header)
+    entities, relationships = parseUniProtVariants(config, databases_directory, download)
+    entities_header = config['variants_header']
+    stats.update(print_out_file(entities, entities_header, relationships, relationships_header, "Known_variant", import_directory))
     
     #Gene ontology annotation
-    go_annotations = parseUniProtAnnotations(config, databases_directory, download)
-    go_annotations_header = config['go_header']
-    result["go"] = (None, go_annotations, None, go_annotations_header)
+    entities = None
+    entities_header = None
+    relationships = parseUniProtAnnotations(config, databases_directory, download)
+    relationships_header = config['go_header']
+    stats.update(print_out_file(entities, entities_header, relationships, relationships_header, "go", import_directory))
 
-    return result
+    return stats 
 
+def print_out_file(entities, entities_header, relationships, relationship_header, dataset, import_directory):
+    stats = set()
+    if entities is not None:
+        outputfile = os.path.join(import_directory, dataset+".csv")
+        builder_utils.write_entities(entities, entities_header, outputfile)
+        #logger.info("Database {} - Number of {} entities: {}".format(database, dataset, len(entities)))
+        stats.add(builder_utils.buildStats(len(entities), "entity", dataset, "UniProt", outputfile))
+        for entity, rel in relationships:
+            outputfile = os.path.join(import_directory, "uniprot_"+entity.lower()+"_"+rel.lower()+".csv")
+            builder_utils.write_relationships(relationships[(entity,rel)], relationship_header, outputfile)
+            #logger.info("Database {} - Number of {} relationships: {}".format(database, rel, len(relationships[(entity,rel)])))
+            stats.add(builder_utils.buildStats(len(relationships[(entity,rel)]), "relationships", rel, "UniProt", outputfile))
+
+    return stats
 
 def parseUniProtDatabase(config, databases_directory, download=True):
     proteins = {}

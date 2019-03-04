@@ -31,7 +31,6 @@ def getMappingForEntity(entity):
     mapping = {}
     if entity in dbconfig["sources"]:
         mapping_file = os.path.join(dbconfig["databasesDir"], os.path.join(dbconfig["sources"][entity],"mapping.tsv"))
-        mapping = {}
         while not os.path.isfile(mapping_file):
             time.sleep(5)
         with open(mapping_file, 'r') as mf:
@@ -48,7 +47,6 @@ def getMultipleMappingForEntity(entity):
     mapping = defaultdict(set)
     if entity in dbconfig["sources"]:
         mapping_file = os.path.join(dbconfig["databasesDir"], os.path.join(dbconfig["sources"][entity],"mapping.tsv"))
-        mapping = {}
         while not os.path.isfile(mapping_file):
             time.sleep(5)
         with open(mapping_file, 'r') as mf:

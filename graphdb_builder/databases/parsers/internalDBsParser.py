@@ -27,7 +27,7 @@ def read_valid_pubs(organisms, organisms_file):
     with open(organisms_file, 'r') as idbf:
         for line in idbf:
             data = line.rstrip('\r\n').split('\t')
-            if data[0] in organisms:
+            if str(data[0]) in organisms:
                 pubs.update(set(data[1]).split(" "))
     return pubs
     
@@ -47,10 +47,10 @@ def parserMentions(databases_directory, importDirectory, download=True):
         builder_utils.downloadDB(url.replace("FILE", ifile), os.path.join(directory,"textmining"))
     
     ifile = os.path.join(directory,os.path.join("textmining",ifile))
-    valid_pubs = read_valid_pubs(organisms, ifile)
-
+    #valid_pubs = read_valid_pubs(organisms, ifile)
+    #print(valid_pubs)
     for qtype in config['internal_db_mentions_types']:
-        parseInternalDatabaseMentions(config, databases_directory, qtype, importDirectory, valid_pubs, download)
+        parseInternalDatabaseMentions(config, databases_directory, qtype, importDirectory, download)
 
     return (entities, header, outputfileName)
 
@@ -105,7 +105,7 @@ def parsePMClist(config, databases_directory, download=True):
     
     return entities, header
 
-def parseInternalDatabaseMentions(config, databases_directory, qtype, importDirectory, valid_pubs, download=True):
+def parseInternalDatabaseMentions(config, databases_directory, qtype, importDirectory, download=True):
     url = config['internal_db_url']
     string_url = config['string_url']
     stitch_url = config['stitch_url']
@@ -131,7 +131,7 @@ def parseInternalDatabaseMentions(config, databases_directory, qtype, importDire
                 data = line.rstrip("\r\n").split('\t')
                 id1 = data[0]
                 pubmedids = data[1].split(" ")
-                pubmedids = list(set(pubmedids).intersection(valid_pubs))
+                #pubmedids = list(set(pubmedids).intersection(valid_pubs))
                 if qtype == "9606":
                     id1 = "9606."+id1
                     if id1 in mapping:

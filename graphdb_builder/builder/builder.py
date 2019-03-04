@@ -34,7 +34,7 @@ def set_arguments():
     parser.add_argument("-l", "--load_entities",  help="define which entities you want to load into the database (partial load)",  nargs='+', default=config["graph"])
     parser.add_argument("-d", "--data", help="define which ontology/ies, experiment/s or database/s you want to import",  nargs='+', default=None)
     parser.add_argument("-n", "--n_jobs", help="define number of cores used when importing data", type=int, default=4)
-    parser.add_argument("-w", "--download", help="define whether or not to download imported data", type=bool, default=True)
+    parser.add_argument("-w", "--download", help="define whether or not to download imported data", type=str, default='True')
     parser.add_argument("-u", "--user", help="define the user that will build the database", type=str, required=True)
     
     return parser
@@ -64,7 +64,7 @@ if __name__ == '__main__':
                         if len(valid_entities) > 0:
                             logger.info("These entities will be imported: {}".format(", ".join(valid_entities)))
                             print("These entities will be imported: {}".format(", ".join(valid_entities)))
-                            importer.databasesImport(importDirectory='../../../data/imports', databases=valid_entities, n_jobs=args.n_jobs, download=args.download)
+                            importer.databasesImport(importDirectory='../../../data/imports', databases=valid_entities, n_jobs=args.n_jobs, download=bool(args.download))
                         else:
                             logger.error("The indicated entities (--data) cannot be imported: {}".format(args.data))
                             print("The indicated entities (--data) cannot be imported: {}".format(args.data))

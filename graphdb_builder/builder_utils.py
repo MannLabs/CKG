@@ -1,3 +1,5 @@
+import pandas as pd
+import csv
 import certifi
 import urllib3
 import ftplib
@@ -15,6 +17,26 @@ import logging
 import logging.config
 import config.ckg_config as ckg_config
 import ckg_utils
+
+
+def write_relationships(relationships, header, outputfile):
+    try:
+        df = pd.DataFrame(list(relationships), columns=header)
+        df.to_csv(path_or_buf=outputfile, 
+                header=True, index=False, quotechar='"', 
+                line_terminator='\n', escapechar='\\')
+    except Exception as err:
+        raise csv.Error("Error writing relationships to file: {}.\n {}".format(outputfile, err))
+
+def write_entities(entities, header, outputfile):
+    try:
+        with open(outputfile, 'w') as csvfile:
+            writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
+            writer.writerow(header)
+            for entity in entities:
+                writer.writerow(entity)
+    except csv.Error as err:
+        raise csv.Error("Error writing etities to file: {}.\n {}".format(outputfile, err))
 
 def setup_db_config():
     try:

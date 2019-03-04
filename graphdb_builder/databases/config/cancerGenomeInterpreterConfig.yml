@@ -5,6 +5,29 @@ cancerBioactivities_url: 'https://www.cancergenomeinterpreter.org/data/cancer_bi
 
 cancerBiomarkers_url: 'https://www.cancergenomeinterpreter.org/data/cgi_biomarkers_latest.zip'
 cancerBiomarkers_variant_file: 'cgi_biomarkers_per_variant.tsv'
+
+amino_acids: 
+    'A': 'Ala'
+    'C': 'Cys'
+    'D': 'Asp'
+    'E': 'Glu'
+    'F': 'Phe'
+    'G': 'Gly'
+    'H': 'His'
+    'I': 'Ile'
+    'K': 'Lys'
+    'L': 'Leu'
+    'M': 'Met'
+    'N': 'Asn'
+    'P': 'Pro'
+    'Q': 'Gln'
+    'R': 'Arg'
+    'S': 'Ser'
+    'T': 'Thr'
+    'V': 'Val'
+    'W': 'Trp'
+    'Y': 'Tyr'
+
 entities_header: 
     - 'ID'
     - ':LABEL'
