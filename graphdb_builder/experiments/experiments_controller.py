@@ -20,7 +20,7 @@ except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
 
 #########################
-# General functionality # 
+# General functionality #
 #########################
 def readDataset(uri):
     if uri.endswith('.xlsx'):
@@ -98,7 +98,7 @@ def mergeColAttributes(data, attributes, index):
         data = data.set_index(index)
         data = data.join(attributes)
         data = data.reset_index()
-    
+
     return data
 
 def calculateMedianReplicates(data, log = "log2"):
@@ -117,7 +117,7 @@ def updateGroups(data, groups):
     return data
 
 ############################
-#           Parsers        # 
+#           Parsers        #
 ############################
 ########### Clinical Variables Datasets ############
 def parseClinicalDataset(projectId, configuration, dataDir):
@@ -125,16 +125,27 @@ def parseClinicalDataset(projectId, configuration, dataDir):
     Input: uri of the clinical data file. Format: Subjects as rows, clinical variables as columns
     Output: pandas DataFrame with the same input format but the clinical variables mapped to the
     right ontology (defined in config), i.e. type = -40 -> SNOMED CT'''
-    
-    dfile = configuration['file']
-    filepath = os.path.join(dataDir, dfile)
-    data = None
-    if os.path.isfile(filepath):
-        data = readDataset(filepath)
-        data['subject id'] = data['subject id']#.astype('int64')
-        data = data.set_index('subject id')
-    
-    return data
+
+    pro_file = configuration['file_pro']
+    pro_filepath = os.path.join(dataDir, pro_file)
+    pro_data = None
+    if os.path.isfile(pro_filepath):
+        pro_data = readDataset(pro_filepath)
+
+    cli_file = configuration['file_cli']
+    cli_filepath = os.path.join(dataDir, cli_file)
+    cli_data = None
+    if os.path.isfile(cli_filepath):
+        cli_data = readDataset(cli_filepath)
+        strings = [i for i in cli_data.columns if str(i).endswith(' id') or str(i).endswith(' source') or str(i).endswith(' units')
+                    or str(i).endswith(' conservation_conditions') or str(i).endswith(' storage') or str(i).endswith(' status') or str(i).startswith('grouping')]
+        for i in strings:
+            if cli_data[i].astype(str).str.endswith('.0').any() == True:
+                cli_data[i] = cli_data[i].astype(str).replace('\.0+$', '', regex=True).replace('nan', np.nan, regex=True)
+        else:
+            pass
+
+    return pro_data, cli_data
 
 ########### Proteomics Datasets ############
 def parseProteomicsDataset(projectId, configuration, dataDir):
@@ -171,99 +182,139 @@ def parseWESDataset(projectId, configuration, dataDir):
     return datasets
 
 ###############################
-#           Extractors        # 
+#           Extractors        #
 ###############################
 ########### Clinical Variables Datasets ############
-def extractSubjectClinicalVariablesRelationships(data):
-    df = data.copy()
-    intervention = None
-    if "intervention" in df.columns:
-        intervention = df["intervention"].to_frame()
-        intervention = intervention.reset_index()
-        intervention.columns = ['START_ID', 'END_ID']
-        intervention['END_ID'] = intervention['END_ID'].astype('int64')
-        intervention['value'] = True
-    df = df.drop(["external id", "biological_sample id", "analytical_sample id"], axis=1)
-    df = df.stack()
-    df = df.reset_index()
-    df.columns = ['START_ID', 'END_ID', "value"]
-    if intervention is not None:
-        df = df.append(intervention, sort=True)
-    df['TYPE'] = "HAS_CLINICAL_STATE"
-    df = df[['START_ID', 'END_ID','TYPE', 'value']]
-    df['END_ID'] = df['END_ID'].apply(lambda x: int(x) if isinstance(x,float) else x)
-    df = df[df['value'].apply(lambda x: isinstance(x, str))]
-    df = df.dropna()
+def extractProjectInfo(project_data):
+        df = project_data.copy()
+        df.columns = ['ID', 'name', 'acronym', 'description', 'type', 'responsible', 'start_date', 'end_date', 'status']
+        return df
 
-    return df
-
-def extractBiologicalSampleClinicalVariablesRelationships(df):
-    if not df.empty:
-        if "biological_sample id" in df.columns:
-            df = df.set_index("biological_sample id")
-            df = df._get_numeric_data()
-            if not df.empty:
-                df = df.stack()
-                df = df.reset_index()
-                df.columns = ['START_ID', 'END_ID', "value"]
-                df['TYPE'] = "HAS_QUANTIFIED_CLINICAL"
-                df = df[['START_ID', 'END_ID','TYPE', 'value']]
-                df['END_ID'] = df['END_ID'].apply(lambda x: int(x) if isinstance(x,float) else x)
-                df = df.dropna()
-
-    return df
-
-def extractSubjectGroupRelationships(data):
-    cols = list(data.columns)
-    if "group" in data.columns:
-        data = data["group"].to_frame()
-        data = data.reset_index()
-        data.columns = ['START_ID', 'END_ID']
-        data['TYPE'] = "BELONGS_TO_GROUP"
-        return data
+def extractSubjectIds(clinical_data):
+    df = clinical_data.set_index('subject id').copy()
+    if 'subject external id' in df.columns:
+        df = df[['subject external id']].dropna(axis=0).reset_index()
+        df = df.drop_duplicates(keep='first').reset_index(drop=True)
+        df.columns = ['ID', 'external_id']
+        if len(df.ID) != len(clinical_data['subject id'].unique()):
+            df = []
+        return df
     else:
         return None
 
-def extractTimepoints(data):
-    cols = list(data.columns)
-    if "timepoint" in cols:
-        data = data["timepoint"].to_frame()
-        data['type'] = "Timepoint"
-        data['units'] = 'days'
-        data = data.set_index("timepoint")
-        data = data.reset_index()
-        data.columns = ['ID', 'type', "units"]
-        return data
+def extractBiologicalSamplesSubjectRelationships(clinical_data):
+    df = clinical_data.copy()
+    if 'biological_sample id' in df.columns:
+        df = df[['biological_sample id', 'subject id']].drop_duplicates(keep='first').reset_index(drop=True)
+        df.columns = ['START_ID', 'END_ID']
+        df['TYPE'] = 'BELONGS_TO_SUBJECT'
+        return df
     else:
-        return pd.DataFrame(columns=['ID', 'type', "units"])
+        return None
 
-def extractBiologicalSampleTimepointRelationships(data):
-    cols = list(data.columns)
-    if "biological_sample id" in cols and "timepoint" in cols and "intervention" in cols:
-        data = data[["biological_sample id","timepoint","intervention"]]
-        data = data.set_index("biological_sample id")
-        data = data.reset_index()
-        data.columns = ['START_ID', 'END_ID', "intervention"]
-        data['TYPE'] = "SAMPLED_AT_TIMEPOINT"
-        return data
+def extractProjectTissueRelationships(project_data, clinical_data):
+    df = clinical_data.copy()
+    if 'tissue id' in df.columns:
+        df = pd.DataFrame(df['tissue id'].dropna().unique())
+        df.insert(loc=0, column='', value=project_data['ProjectID'].unique()[0])
+        df.columns = ['START_ID', 'END_ID']
+        df['TYPE'] = 'STUDIES_TISSUE'
+        return df
     else:
-        return pd.DataFrame(columns=['START_ID', 'END_ID', "intervention", "TYPE"])
+        return None
 
-def extractSubjectDiseaseRelationships(data):
-    cols = list(data.columns)
-    if "disease" in data.columns:
-        data = data["disease"].to_frame()
-        expanded = data.disease.str.split(';',expand=True)
-        if expanded.shape[1] > 1:
-            data = (data.disease.str.split(';',expand=True)[0]).append(data.disease.str.split(';',expand=True)[1].dropna())
-        data = data.reset_index()
-        data.columns = ['START_ID', 'END_ID']
-        data['TYPE'] = "HAS_DISEASE"
-        data = data.dropna()
-        data = data.drop_duplicates(keep='first')
-        return data
+def extractProjectInterventionRelationships(project_data, clinical_data):
+    df = clinical_data.copy()
+    if 'intervention id' in df.columns:
+        df = pd.DataFrame(df['intervention id'].dropna().unique())
+        df.insert(loc=0, column='', value=project_data['ProjectID'].unique()[0])
+        df.columns = ['START_ID', 'END_ID']
+        df['TYPE'] = 'STUDIES_INTERVENTION'
+        return df
     else:
         return pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE'])
+
+def extractProjectDiseaseRelationships(project_data, clinical_data):
+    df = clinical_data.copy()
+    if 'disease id' in df.columns:
+        if len(df['disease id'].dropna().str.split(';', expand=True).columns) > 1:
+            df = pd.DataFrame((df['disease id'].dropna().str.split(';',expand=True)[0]).append(df['disease id'].str.split(';',expand=True)[1].dropna()).unique().tolist())
+        else:
+            df = pd.DataFrame(df['disease id'].dropna().str.split(';',expand=True)[0].dropna().unique().tolist())
+        df.insert(loc=0, column='', value=project_data['ProjectID'].unique()[0])
+        df.columns = ['START_ID', 'END_ID']
+        df['TYPE'] = 'STUDIES_DISEASE'
+        return df
+    else:
+        return None
+
+def extractProjectSubjectRelationships(project_data, clinical_data):
+    df = clinical_data.copy()
+    if 'subject id' in df.columns:
+        df = pd.DataFrame(df['subject id'].dropna().unique())
+        df.insert(loc=0, column='', value=project_data['ProjectID'].unique()[0])
+        df.columns = ['START_ID', 'END_ID']
+        df['TYPE'] = 'HAS_ENROLLED'
+        return df
+    else:
+        return None
+
+def extractBiologicalSamplesAnalyticalSamplesRelationships(clinical_data):
+    df = clinical_data.copy()
+    if 'analytical_sample id' in df.columns:
+        df = df[['biological_sample id', 'analytical_sample id', 'analytical_sample quantity', 'analytical_sample quantity units']].drop_duplicates(keep='first').reset_index(drop=True)
+        df.columns = ['START_ID', 'END_ID', 'quantity', 'quantity_units']
+        df.insert(loc=2, column='TYPE', value='SPLITTED_INTO')
+        return df
+    else:
+        return None
+
+def extractBiologicalSamplesInfo(project_data, clinical_data):
+    df = clinical_data.copy()
+    if 'biological_sample id' in df.columns:
+        cols = [i for i in df.columns if str(i).startswith('biological_sample ')]
+        df = df.loc[:, df.columns.isin(cols)]
+        df['owner'] = project_data['ProjectResponsible'].unique()[0]
+        df = df.drop_duplicates(keep='first').reset_index(drop=True)
+        return df
+    else:
+        return None
+
+def extractBiologicalSampleTimepointRelationships(clinical_data):
+    df = clinical_data.copy()
+    if 'timepoint' in df.columns:
+        df = df[['biological_sample id', 'timepoint', 'intervention id']].drop_duplicates(keep='first').reset_index(drop=True)
+        df.columns = ['START_ID', 'END_ID', 'intervention']
+        df.insert(loc=2, column='TYPE', value='SAMPLE_AT_TIMEPOINT')
+        return df
+    else:
+        return pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE', 'intervention'])
+
+
+def extractAnalyticalSamplesInfo(clinical_data):
+    df = clinical_data.copy()
+    if 'analytical_sample id' in df.columns:
+        cols = [i for i in df.columns if str(i).startswith('analytical_sample ')]
+        df = df.loc[:, df.columns.isin(cols)]
+        df[['group', 'secondary group']] = clinical_data[['grouping1', 'grouping2']]
+        return df
+    else:
+        return None
+
+def extractBiosamplesGroupsRelationships(clinical_data):
+    df = clinical_data.copy()
+    if 'grouping1' in df.columns:
+        df = df[['biological_sample external id', 'grouping1', 'grouping2']]
+        df = pd.melt(df, id_vars=['biological_sample external id'], value_vars=['grouping1', 'grouping2'])
+        df['primary'] = df['variable'].map(lambda x: x=='grouping1')
+        df = df.drop(['variable'], axis=1).dropna(subset=['value']).sort_values('biological_sample external id').reset_index(drop=True)
+        df.columns = ['START_ID', 'END_ID', 'primary']
+        df.insert(loc=2, column='TYPE', value='BELONGS_TO_GROUP')
+        df = df.drop_duplicates(keep='first').sort_values(by=['START_ID'], ascending=True).reset_index(drop=True)
+        return df
+    else:
+        return None
+
 
 ########### Proteomics Datasets ############
 ############## ProteinModification entity ####################
@@ -278,7 +329,7 @@ def extractModificationProteinRelationships(data, configuration):
     aux = aux[['START_ID', 'END_ID','TYPE', "position", "residue"]]
     aux['position'] = aux['position'].astype('int64')
     aux = aux.drop_duplicates()
-    
+
     return aux
 
 def extractProteinModificationSubjectRelationships(data, configuration):
@@ -298,7 +349,7 @@ def extractProteinModificationSubjectRelationships(data, configuration):
     aux = aux.reset_index()
     aux.columns = ["c"+str(i) for i in range(len(aux.columns))]
     columns = ['END_ID', 'START_ID',"value"]
-    
+
     attributes = configuration["attributes"]
     (cAttributes,cCols), (rAttributes,regexCols) = extractAttributes(newIndexdf, attributes)
     if not rAttributes.empty:
@@ -307,14 +358,14 @@ def extractProteinModificationSubjectRelationships(data, configuration):
     if not cAttributes.empty:
         aux = mergeColAttributes(aux, cAttributes, "c0")
         columns.extend(cCols)
-    
+
 
     aux['TYPE'] = "HAS_QUANTIFIED_MODIFIED_PROTEIN"
     columns.append("TYPE")
     aux.columns = columns
     aux = aux[['START_ID', 'END_ID', 'TYPE', "value"] + regexCols + cCols]
     aux = aux.drop_duplicates()
-    
+
     return aux
 
 def extractProteinProteinModificationRelationships(data, configuration):
@@ -362,7 +413,7 @@ def extractProteinModifications(data, configuration):
     cols = [proteinCol, sequenceCol]
     cols.extend(positionCols)
     aux = data.copy().reset_index()
-    aux = aux[cols] 
+    aux = aux[cols]
     aux["ID"] =  aux[proteinCol].map(str) + "_" + aux[positionCols[1]].map(str) + aux[positionCols[0]].map(str)+'-'+configuration["mod_acronym"]
     aux = aux.set_index("ID")
     aux = aux.reset_index()
@@ -370,7 +421,7 @@ def extractProteinModifications(data, configuration):
     aux["source"] = "experimentally_identified"
     aux.columns = ["ID", "protein", "sequence_window", "position", "residue", "source"]
     aux = aux.drop_duplicates()
-        
+
     return aux
 
 def extractProteinModificationsModification(data, configuration):
@@ -381,11 +432,11 @@ def extractProteinModificationsModification(data, configuration):
     cols = [proteinCol, sequenceCol]
     cols.extend(positionCols)
     aux = data.copy().reset_index()
-    aux = aux[cols] 
+    aux = aux[cols]
     aux["START_ID"] =  aux[proteinCol].map(str) + "_" + aux[positionCols[1]].map(str) + aux[positionCols[0]].map(str)+'-'+configuration["mod_acronym"]
     aux["END_ID"] = modID
     aux = aux[["START_ID", "END_ID"]]
-    
+
     return aux
 
 ################# Peptide entity ####################
@@ -398,7 +449,7 @@ def extractPeptides(data, configuration):
     aux = aux.groupby(aux.columns.tolist()).size().reset_index().rename(columns={0:'count'})
     aux.columns = ["ID", "type", "count"]
     aux = aux.drop_duplicates()
-    
+
     return aux
 
 def extractPeptideSubjectRelationships(data, configuration):
@@ -418,13 +469,13 @@ def extractPeptideSubjectRelationships(data, configuration):
     if not cAttributes.empty:
         aux = mergeColAttributes(aux, cAttributes, "c0")
         columns.extend(cCols)
-        
+
     aux['TYPE'] = "HAS_QUANTIFIED_PEPTIDE"
     columns.append("TYPE")
     aux.columns = columns
     aux = aux[['START_ID', 'END_ID', 'TYPE', "value"] + regexCols + cCols]
     aux = aux.drop_duplicates()
-    
+
     return aux
 
 def extractPeptideProteinRelationships(data, configuration):
@@ -477,12 +528,12 @@ def extractWESRelationships(data, configuration):
     variantAux = variantAux[["START_ID", "END_ID", "TYPE"]]
 
     sampleAux = data.copy()
-    sampleAux = sampleAux.rename(index=str, columns={"ID": "END_ID", "sample": "START_ID"})   
+    sampleAux = sampleAux.rename(index=str, columns={"ID": "END_ID", "sample": "START_ID"})
     sampleAux["TYPE"] = "HAS_MUTATION"
     sampleAux = sampleAux[["START_ID", "END_ID", "TYPE"]]
-    
+
     geneAux = data.copy()
-    geneAux = geneAux.rename(index=str, columns={"ID": "START_ID", "gene": "END_ID"})   
+    geneAux = geneAux.rename(index=str, columns={"ID": "START_ID", "gene": "END_ID"})
     geneAux["TYPE"] = "VARIANT_FOUND_IN_GENE"
     geneAux = geneAux[["START_ID", "END_ID", "TYPE"]]
     s = geneAux["END_ID"].str.split(';').apply(pd.Series, 1).stack().reset_index(level=1, drop=True)
@@ -491,7 +542,7 @@ def extractWESRelationships(data, configuration):
     geneAux = geneAux.join(aux)
 
     chrAux = data.copy()
-    chrAux = chrAux.rename(index=str, columns={"ID": "START_ID", "chr": "END_ID"})   
+    chrAux = chrAux.rename(index=str, columns={"ID": "START_ID", "chr": "END_ID"})
     chrAux["END_ID"] = chrAux["END_ID"].str.replace("chr",'')
     chrAux["TYPE"] = "VARIANT_FOUND_IN_CHROMOSOME"
     chrAux = chrAux[["START_ID", "END_ID", "TYPE"]]
@@ -499,7 +550,7 @@ def extractWESRelationships(data, configuration):
     return entityAux, variantAux, sampleAux, geneAux, chrAux
 
 ############################
-#           Loaders        # 
+#           Loaders        #
 ############################
 ########### Proteomics Datasets ############
 def loadProteomicsDataset(uri, configuration):
@@ -511,7 +562,7 @@ def loadProteomicsDataset(uri, configuration):
     columns = configuration["columns"]
     regexCols = [c.replace("\\\\","\\") for c in columns if '+' in c]
     columns = set(columns).difference(regexCols)
-    
+
     #Read the filters defined in config, i.e. reverse, contaminant, etc.
     filters = configuration["filters"]
     proteinCol = configuration["proteinCol"]
@@ -519,7 +570,7 @@ def loadProteomicsDataset(uri, configuration):
     groupCol = configuration["groupCol"]
     if "geneCol" in configuration:
         geneCol = configuration["geneCol"]
-    
+
     #Read the data from file
     data = readDataset(uri)
 
@@ -536,7 +587,7 @@ def loadProteomicsDataset(uri, configuration):
         columns.update(set(filter(r.match, data.columns)))
     #Add simple and regex columns into a single DataFrame
     data = data[list(columns)]
-    
+
     return data, regexCols
 
 def expand_groups(data, configuration):
@@ -550,7 +601,7 @@ def expand_groups(data, configuration):
     data = data.join(pdf)
     data["is_razor"] = ~ data[configuration["groupCol"]].duplicated()
     data = data.set_index(configuration["indexCol"])
-    
+
     return data
 
 ############ Whole Exome Sequencing #############
@@ -561,7 +612,7 @@ def loadWESDataset(uri, configuration):
         Output: pandas DataFrame with the columns and filters defined in config.py '''
     aux = uri.split("/")[-1].split("_")
     sample = aux[0]
-    #Get the columns from config 
+    #Get the columns from config
     columns = configuration["columns"]
     #Read the data from file
     data = readDataset(uri)
@@ -578,9 +629,9 @@ def loadWESDataset(uri, configuration):
     data["ID"] = data[configuration["id_fields"]].apply(lambda x: str(x[0])+":g."+str(x[1])+str(x[2])+'>'+str(x[3]), axis=1)
     data.columns = configuration['new_columns']
     return sample, data
-    
+
 ########################################
-#          Generate graph files        # 
+#          Generate graph files        #
 ########################################
 def generateDatasetImports(projectId, dataType):
     stats = set()
@@ -590,26 +641,44 @@ def generateDatasetImports(projectId, dataType):
                 dataDir = config["dataTypes"][dataType]["directory"].replace("PROJECTID", projectId)
                 configuration = config["dataTypes"][dataType]
                 if dataType == "clinical":
-                    data = parseClinicalDataset(projectId, configuration, dataDir)
-                    if data is not None:
-                        dataRows = extractSubjectClinicalVariablesRelationships(data)
+                    project_data, clinical_data = parseClinicalDataset(projectId, configuration, dataDir)
+                    if clinical_data is not None:
+                        dataRows = extractProjectInfo(project_data)
                         if dataRows is not None:
-                            generateGraphFiles(dataRows,'clinical_state', projectId, stats, d = dataType)
-                        dataRows = extractBiologicalSampleClinicalVariablesRelationships(data)
+                            generateGraphFiles(dataRows,'', projectId, stats, d = dataType)
+                        dataRows = extractSubjectIds(clinical_data)
                         if dataRows is not None:
-                            generateGraphFiles(dataRows,'clinical_quant', projectId, stats, d = dataType)
-                        dataRows = extractSubjectGroupRelationships(data)
+                            generateGraphFiles(dataRows,'subjects', projectId, stats, d = dataType)
+                        dataRows = extractBiologicalSamplesSubjectRelationships(clinical_data)
+                        if dataRows is not None:
+                            generateGraphFiles(dataRows,'subject_biosample', projectId, stats, d = dataType)
+                        dataRows = extractProjectTissueRelationships(project_data, clinical_data)
+                        if dataRows is not None:
+                            generateGraphFiles(dataRows,'studies_tissue', projectId, stats, d = dataType)
+                        dataRows = extractProjectInterventionRelationships(project_data, clinical_data)
+                        if dataRows is not None:
+                            generateGraphFiles(dataRows,'studies_intervention', projectId, stats, d = dataType)
+                        dataRows = extractProjectDiseaseRelationships(project_data, clinical_data)
+                        if dataRows is not None:
+                            generateGraphFiles(dataRows, 'studies_disease', projectId, stats, d = dataType)
+                        dataRows = extractProjectSubjectRelationships(project_data, clinical_data)
+                        if dataRows is not None:
+                            generateGraphFiles(dataRows,'project', projectId, stats, d = dataType)
+                        dataRows = extractBiologicalSamplesAnalyticalSamplesRelationships(clinical_data)
+                        if dataRows is not None:
+                            generateGraphFiles(dataRows,'biosample_analytical', projectId, stats, d = dataType)
+                        dataRows = extractBiologicalSamplesInfo(project_data, clinical_data)
+                        if dataRows is not None:
+                            generateGraphFiles(dataRows,'biological_samples', projectId, stats, d = dataType)
+                        dataRows = extractBiologicalSampleTimepointRelationships(clinical_data)
+                        if dataRows is not None:
+                            generateGraphFiles(dataRows,'biological_sample_sample_at_timepoint', projectId, stats, d = dataType)
+                        dataRows = extractAnalyticalSamplesInfo(clinical_data)
+                        if dataRows is not None:
+                            generateGraphFiles(dataRows,'analytical_samples', projectId, stats, d = dataType)
+                        dataRows = extractBiosamplesGroupsRelationships(clinical_data)
                         if dataRows is not None:
                             generateGraphFiles(dataRows,'groups', projectId, stats, d = dataType)
-                        dataRows = extractSubjectDiseaseRelationships(data)
-                        if dataRows is not None:
-                            generateGraphFiles(dataRows,'disease', projectId, stats, d = dataType)
-                        dataRows = extractTimepoints(data)
-                        if dataRows is not None:
-                            generateGraphFiles(dataRows, 'timepoint', projectId, stats, d = dataType)
-                        dataRows = extractBiologicalSampleTimepointRelationships(data)
-                        if dataRows is not None:
-                            generateGraphFiles(dataRows,'biological_sample_timepoint', projectId, stats, d = dataType)
                 elif dataType == "proteomics":
                     data = parseProteomicsDataset(projectId, configuration, dataDir)
                     if data is not None:
@@ -618,7 +687,7 @@ def generateDatasetImports(projectId, dataType):
                                 dataRows = extractProteinSubjectRelationships(data[dtype], configuration[dtype])
                                 generateGraphFiles(dataRows,dtype, projectId, stats)
                             elif dtype == "peptides":
-                                dataRows = extractPeptideSubjectRelationships(data[dtype], configuration[dtype]) 
+                                dataRows = extractPeptideSubjectRelationships(data[dtype], configuration[dtype])
                                 generateGraphFiles(dataRows, "subject_peptide", projectId, stats)
                                 dataRows = extractPeptideProteinRelationships(data[dtype], configuration[dtype])
                                 generateGraphFiles(dataRows,"peptide_protein", projectId, stats)
@@ -627,7 +696,7 @@ def generateDatasetImports(projectId, dataType):
                             else:
                                 #dataRows = extractModificationProteinRelationships(data[dtype], configuration[dtype])
                                 #generateGraphFiles(dataRows,"protein_modification", projectId, ot = 'a')
-                                dataRows = extractProteinModificationSubjectRelationships(data[dtype], configuration[dtype])                
+                                dataRows = extractProteinModificationSubjectRelationships(data[dtype], configuration[dtype])
                                 generateGraphFiles(dataRows, "modifiedprotein_subject", projectId, stats, ot = 'a')
                                 dataRows = extractProteinProteinModificationRelationships(data[dtype], configuration[dtype])
                                 generateGraphFiles(dataRows, "modifiedprotein_protein", projectId, stats, ot = 'a')
@@ -659,13 +728,13 @@ def generateDatasetImports(projectId, dataType):
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         logger.error("Experiment {}: {} file: {}, line: {}".format(projectId, sys.exc_info(), fname, exc_tb.tb_lineno))
         raise Exception("Error when importing experiment {}.\n {}".format(projectId, err))
-        
+
 def generateGraphFiles(data, dataType, projectId, stats, ot = 'w', d = 'proteomics'):
     importDir = os.path.join(config["experimentsImportDirectory"], os.path.join(projectId,d))
     outputfile = os.path.join(importDir, projectId+"_"+dataType.lower()+".csv")
-    with open(outputfile, ot) as f:  
-        data.to_csv(path_or_buf = f, 
-            header=True, index=False, quotechar='"', 
+    with open(outputfile, ot) as f:
+        data.to_csv(path_or_buf = f,
+            header=True, index=False, quotechar='"',
             line_terminator='\n', escapechar='\\')
     logger.info("Experiment {} - Number of {} relationships: {}".format(projectId, dataType, data.shape[0]))
     stats.add(builder_utils.buildStats(data.shape[0], "relationships", dataType, "Experiment", outputfile))
