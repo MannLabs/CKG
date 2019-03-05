@@ -10,7 +10,7 @@ proteomicsDirectory : &var_proteomicsDirectory '../../../data/experiments/PROJEC
 genomicsDirectory : &var_genomicsDirectory '../../../data/experiments/PROJECTID/wes/'
 
 ox : &var_ox
-    'columns': 
+    'columns':
         - 'Proteins'
         - 'Positions within proteins'
         - 'id'
@@ -24,7 +24,7 @@ ox : &var_ox
         - 'Delta score'
         - 'Score for localization'
         - 'Localization prob'
-    'filters': 
+    'filters':
         - 'Reverse'
         - 'Potential contaminant'
     'attributes':
@@ -39,7 +39,7 @@ ox : &var_ox
     'groupCol': 'id'
     'valueCol': 'Intensity'
     'multipositions': 'Positions within proteins'
-    'positionCols': 
+    'positionCols':
         - 'Positions within proteins'
         - 'Amino acid'
     'sequenceCol': 'Sequence window'
@@ -50,7 +50,7 @@ ox : &var_ox
     'file': 'Oxidation (M)Sites.txt'
 
 gly : &var_gly
-    'columns': 
+    'columns':
         - 'Proteins'
         - 'Positions within proteins'
         - 'id'
@@ -64,7 +64,7 @@ gly : &var_gly
         - 'Delta score'
         - 'Score for localization'
         - 'Localization prob'
-    'filters': 
+    'filters':
         - 'Reverse'
         - 'Potential contaminant'
     'attributes':
@@ -79,7 +79,7 @@ gly : &var_gly
     'groupCol': 'id'
     'valueCol': 'Intensity'
     'multipositions': 'Positions within proteins'
-    'positionCols': 
+    'positionCols':
         - 'Positions within proteins'
         - 'Amino acid'
     'sequenceCol': 'Sequence window'
@@ -90,7 +90,7 @@ gly : &var_gly
     'file': 'GlycationSites.txt'
 
 p : &var_p
-    'columns': 
+    'columns':
         - 'Proteins'
         - 'Positions within proteins'
         - 'Amino acid'
@@ -104,7 +104,7 @@ p : &var_p
         - 'Delta score'
         - 'Score for localization'
         - 'Localization prob'
-    'filters': 
+    'filters':
         - 'Reverse'
         - 'Potential contaminant'
     'attributes':
@@ -119,7 +119,7 @@ p : &var_p
     'groupCol': 'id'
     'valueCol': 'Intensity'
     'multipositions': 'Positions within proteins'
-    'positionCols': 
+    'positionCols':
         - 'Positions within proteins'
         - 'Amino acid'
     'sequenceCol': 'Sequence window'
@@ -132,7 +132,8 @@ p : &var_p
 dataTypes :
     'clinical':
         'directory': *var_clinicalDirectory
-        'file': 'clinicalData.xlsx'
+        'file_cli': 'ClinicalData.xlsx'
+        'file_pro': 'ProjectData.xlsx'
     'proteomics':
         'directory': *var_proteomicsDirectory
         'proteins':
@@ -147,7 +148,7 @@ dataTypes :
                 - 'Potential contaminant'
                 - 'Only identified by site'
                 - 'is_razor'
-            'filters': 
+            'filters':
                 - 'Reverse'
                 - 'Potential contaminant'
                 - 'Only identified by site'
@@ -184,7 +185,7 @@ dataTypes :
                 - 'Intensity \d+\w?_AS\d+_?-?\d*'
                 - 'Reverse'
                 - 'Potential contaminant'
-            'filters': 
+            'filters':
                 - 'Reverse'
                 - 'Potential contaminant'
             'attributes':
@@ -206,7 +207,7 @@ dataTypes :
         'Phosphorylation': *var_p
     'wes':
         'directory': *var_genomicsDirectory
-        'columns': 
+        'columns':
             - 'CHROM'
             - 'POS'
             - 'REF'
@@ -219,12 +220,12 @@ dataTypes :
             - 'ANN_HGVS_p'
         'position': 'POS'
         'filter': 'FILTER_PASS'
-        'id_fields': 
+        'id_fields':
             - 'CHROM'
             - 'POS'
             - 'REF'
             - 'ALT_1'
-        'alt_names': 
+        'alt_names':
             - 'ANN_HGVS_p'
         'new_columns':
             - 'chr'
