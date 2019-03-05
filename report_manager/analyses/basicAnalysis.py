@@ -35,16 +35,13 @@ def transform_into_wide_format(data, index, columns, values, extra=[], use_index
 
     return df
 
-def transform_into_long_format(data, drop_columns, group, columns=['x', 'mame','y']):
-    print(columns)
+def transform_into_long_format(data, drop_columns, group, columns=['mame','y']):
     data = data.drop(drop_columns, axis=1)
-    data = data.set_index(group)
-    long_data = pd.DataFrame(columns=columns)
-    for index in data.index:
-        intensities = data.loc[index, :].mean(axis=1).sort_values(ascending=False).to_frame().reset_index().reset_index()
-        intensities.columns = columns
-        long_data = long_data.append(intensities, ignore_index=True)
-
+    
+    long_data = pd.melt(data, id_vars=group, var_name=columns[0], value_name=columns[1])
+    long_data = long_data.set_index(group)
+    long_data.columns = columns
+    
     return long_data
 
 def extract_number_missing(df, conditions, missing_max):

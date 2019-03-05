@@ -17,7 +17,7 @@ overview: #section
         args: 
             title: 'List of clinical variables'
     measurement matrix:
-        data: preprocessed
+        data: processed
         analyses: []
         plots: 
             - violinplot
@@ -28,7 +28,7 @@ overview: #section
             y_title: value
             title: 'Clinical variables measurements per group'
     comparison:
-        data: preprocessed
+        data: processed
         analyses: 
             - anova
         plots: 

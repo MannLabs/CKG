@@ -272,8 +272,9 @@ class Project:
                                 with open(fnet.name, 'w') as f:
                                     f.write(net.html)
                                 display(IFrame(os.path.relpath(fnet.name),width=1400, height=1400))
-                                iplot(plot["net_tables"][0].figure)
-                                iplot(plot["net_tables"][1].figure)
+                                if hasattr(plot["net_tables"][0], 'figure') and hasattr(plot["net_tables"][1], 'figure'):
+                                    iplot(plot["net_tables"][0].figure)
+                                    iplot(plot["net_tables"][1].figure)
                     else:
                         if isinstance(plot, dict):
                             if 'app' in plot:

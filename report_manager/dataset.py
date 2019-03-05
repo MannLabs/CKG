@@ -282,13 +282,13 @@ class ProteomicsDataset(Dataset):
         if len(data) == 0:
             self._data = self.query_data()
 
-        self.preprocess_dataset()
+        self.process_dataset()
 
-    def preprocess_dataset(self):
-        processed_data = self.preprocessing()
-        self.update_data({"preprocessed":processed_data})
+    def process_dataset(self):
+        processed_data = self.processing()
+        self.update_data({"processed":processed_data})
 
-    def preprocessing(self):
+    def processing(self):
         processed_data = None
         data = self.get_dataset("dataset")
         if data is not None:
@@ -329,13 +329,13 @@ class ClinicalDataset(Dataset):
         if len(data) == 0:
             self._data = self.query_data()
 
-        self.preprocess_dataset()
+        self.process_dataset()
 
-    def preprocess_dataset(self):
-        processed_data = self.preprocessing()
-        self.update_data({"preprocessed":processed_data})
+    def process_dataset(self):
+        processed_data = self.processing()
+        self.update_data({"processed":processed_data})
 
-    def preprocessing(self):
+    def processing(self):
         processed_data = None
         data = self.get_dataset("dataset")
         if data is not None:

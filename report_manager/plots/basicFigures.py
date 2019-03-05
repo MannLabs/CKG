@@ -4,6 +4,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 import plotly.figure_factory as FF
+import math
 import dash_table
 from plotly import tools
 from scipy.spatial.distance import pdist, squareform
@@ -125,10 +126,35 @@ def get_facet_grid_plot(data, identifier, args):
     return dcc.Graph(id= identifier, figure = figure)
 
 def get_ranking_plot(data, identifier, args):
-    print(data.tail()) 
-    graph = get_scatterplot_matrix(data, identifier, args)
-    
-    return graph
+    num_cols = 3
+    fig = {}
+    num_groups = len(data.index.unique())
+    num_rows = math.ceil(num_groups/num_cols)
+    #subplot_title = "Ranking of proteins in {} samples"
+    #subplot_titles = [subplot_title.format(index.title()) for index in data.index.unique()]
+    fig = tools.make_subplots(rows=num_rows, cols=num_cols, shared_yaxes=True,vertical_spacing=0.1)
+    if 'index' in args and args['index']:
+        r = 1
+        c = 1
+        for index in data.index.unique():
+            gdata = data.loc[index, :].dropna().groupby('name', as_index=False).mean().sort_values(by='y', ascending=False)
+            gdata = gdata.reset_index().reset_index()
+            gdata.columns = ['x', 'group', 'name', 'y'] 
+            trace = get_simple_scatterplot(gdata, identifier+'_'+index, args).figure['data'].pop()
+            trace.name = index
+            fig.append_trace(trace, r, c)
+            
+            if c >= num_cols:
+                r += 1
+                c = 1
+            else:
+                c += 1
+
+        fig['layout'].update(dict(height = args['height'], width=args['width'],  title=args['title'], xaxis= {"title": args['x_title']}, yaxis= {"title": args['y_title']}))
+    else:
+        fig = get_simple_scatterplot(data, identifier+'_'+group, args).figure
+
+    return dcc.Graph(id=identifier, figure=fig)
     
 
 def get_scatterplot_matrix(data, identifier, args):
@@ -198,7 +224,7 @@ def get_simple_scatterplot(data, identifier, args):
                                 width=args['width'],
                                 annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')]
                                 )
-
+    
     figure['data'] = [go.Scatter(x = data.x,
                                 y = data.y,
                                 text = data.name,

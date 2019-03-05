@@ -51,29 +51,30 @@ overview: #section
             y_title: number of modified proteins
             plot_type: bar
             title: 'Number of modified proteins identified per type'    
-    #ranking:
-     #   data: preprocessed
-     #   analyses: 
-     #       - long_format
-     #   plots:
-     #       - ranking
-     #   args:
-     #       drop_columns: 
-     #           - sample
-     #           - subject
-     #       columns:
-     #           - x
-     #           - group
-     #           - y
-     #       group: group
-     #       x_title: Ranking of proteins
-     #       y_title: log2 LFQ intensity
-     #       height: 700
-     #       width: 900
-     #       title: Protein ranking
+    ranking:
+        data: processed
+        analyses: 
+            - long_format
+        plots:
+            - ranking
+        args:
+            drop_columns: 
+                - sample
+                - subject
+            columns:
+                - name
+                - y
+            group: group
+            index: True
+            x_title: Ranking of proteins
+            y_title: log2 LFQ intensity
+            size: 9
+            height: 900
+            width: 1500
+            title: Protein ranking
 data exploration:
     stratification:
-        data: preprocessed
+        data: processed
         analyses:
             - pca
             #- tsne
@@ -91,7 +92,7 @@ data exploration:
             height: 700
             title: 'Sample stratification'
     regulation:
-        data: preprocessed
+        data: processed
         analyses:
             - anova
         plots:
