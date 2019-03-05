@@ -47,7 +47,7 @@ def readDataFromTXT(uri):
 
 def readDataFromExcel(uri):
     #Read the data from Excel file
-    data = pd.read_excel(uri, index_col=None, na_values=['NA'], convert_float = False)
+    data = pd.read_excel(uri, index_col=None, na_values=['NA'], convert_float = True)
 
     return data
 
@@ -137,13 +137,6 @@ def parseClinicalDataset(projectId, configuration, dataDir):
     cli_data = None
     if os.path.isfile(cli_filepath):
         cli_data = readDataset(cli_filepath)
-        strings = [i for i in cli_data.columns if str(i).endswith(' id') or str(i).endswith(' source') or str(i).endswith(' units')
-                    or str(i).endswith(' conservation_conditions') or str(i).endswith(' storage') or str(i).endswith(' status') or str(i).startswith('grouping')]
-        for i in strings:
-            if cli_data[i].astype(str).str.endswith('.0').any() == True:
-                cli_data[i] = cli_data[i].astype(str).replace('\.0+$', '', regex=True).replace('nan', np.nan, regex=True)
-        else:
-            pass
 
     return pro_data, cli_data
 
