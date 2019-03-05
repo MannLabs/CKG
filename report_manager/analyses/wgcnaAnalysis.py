@@ -141,23 +141,23 @@ def cutreeDynamic(distmatrix, linkagefun, minModuleSize=30, deepSplit=2, pamResp
     return np.array(cutree)
 
 
-def build_network(data, softPower=6, networkType='unsigned', minModuleSize=30, deepSplit=2, pamRespectsDendro=False, merge_modules=True, MEDissThres=0.25, verbose_merge=3):
-    #softPower = pick_softThreshold(data, RsquaredCut=RsquaredCut, networkType=networkType, verbose=network_verbose)
+def build_network(data, softPower=6, networkType='unsigned', minModuleSize=30, deepSplit=2, pamRespectsDendro=False, merge_modules=True, MEDissThres=0.25, verbose=0):
+    #softPower = pick_softThreshold(data, RsquaredCut=0.8, networkType=networkType, verbose=verbose)
     adjacency = WGCNA.adjacency(data, power=softPower, type=networkType)
 
-    TOM = WGCNA.TOMsimilarity(adjacency)
+    TOM = WGCNA.TOMsimilarity(adjacency,verbose = verbose)
     dissTOM = pd.DataFrame(R("1") - TOM)
     dissTOM.columns = data.columns
     dissTOM.index = data.columns
 
     moduleColors = identify_module_colors(dissTOM, minModuleSize=minModuleSize, deepSplit=deepSplit, pamRespectsDendro=pamRespectsDendro)
     if merge_modules == True:
-        MEs, moduleColors = merge_similar_modules(data, moduleColors, MEDissThres=MEDissThres, verbose=verbose_merge)
+        MEs, moduleColors = merge_similar_modules(data, moduleColors, MEDissThres=MEDissThres, verbose=verbose)
     else: pass
 
     return dissTOM, moduleColors
 
-def pick_softThreshold(data, RsquaredCut=0.8, networkType='unsigned', verbose=2):
+def pick_softThreshold(data, RsquaredCut=0.8, networkType='unsigned', verbose=0):
     powers = np.arange(1,20,1)
     sft = WGCNA.pickSoftThreshold(data, RsquaredCut=RsquaredCut, powerVector=powers, networkType=networkType, verbose=verbose)
     softPower = sft.rx2('powerEstimate')[0]
@@ -173,18 +173,18 @@ def identify_module_colors(network, minModuleSize=30, deepSplit=2, pamRespectsDe
     return dynamicColors
 
 def calculate_module_eigengenes(df_exp, modColors, softPower=6, dissimilarity=True):
-    MEList = WGCNA.moduleEigengenes(df_exp, modColors, softPower=softPower)
+    MEList = WGCNA.moduleEigengenes(df_exp, modColors, softPower=softPower, verbose=0)
     MEs0 = MEList.rx2('eigengenes')
-    MEs = WGCNA.orderMEs(MEs0)
+    MEs = WGCNA.orderMEs(MEs0, verbose=0)
     if dissimilarity:
-        MEcor = WGCNA.cor(MEs)
+        MEcor = WGCNA.cor(MEs, verbose=0)
         MEcor = R2Py.R_matrix2Py_matrix(MEcor, MEcor.rownames, MEcor.colnames)
         MEDiss = 1 - MEcor
         return MEs, MEDiss
     else:
         return MEs
 
-def merge_similar_modules(df_exp, modColors, MEDissThres=0.25, verbose=3):
+def merge_similar_modules(df_exp, modColors, MEDissThres=0.25, verbose=0):
     merge = WGCNA.mergeCloseModules(df_exp, modColors, cutHeight=MEDissThres, verbose=verbose)
     mergedColors = merge.rx2('colors')
     mergedMEs = merge.rx2('newMEs')
@@ -200,7 +200,7 @@ def calculate_ModuleTrait_correlation(df_exp, df_traits, MEs):
     df_traits_r.columns = df_traits_r.columns.str.replace('(', 'parentheses1')
     df_traits_r.columns = df_traits_r.columns.str.replace(')', 'parentheses2')
 
-    moduleTraitCor_r = WGCNA.cor(MEs, df_traits_r, use='p')
+    moduleTraitCor_r = WGCNA.cor(MEs, df_traits_r, use='p', verbose=0)
     moduleTraitPvalue_r = WGCNA.corPvalueStudent(moduleTraitCor_r, nSamples)
     textMatrix = paste_matrices(moduleTraitCor_r, moduleTraitPvalue_r)
 
@@ -226,7 +226,7 @@ def calculate_ModuleMembership(df_exp, MEs):
     df_exp_r.columns = df_exp_r.columns.str.replace('-', 'dash')
 
     modLabels = [i[2:] for i in list(MEs.colnames)]
-    FeatureModuleMembership = base.as_data_frame(WGCNA.cor(df_exp_r, MEs, use='p'))
+    FeatureModuleMembership = base.as_data_frame(WGCNA.cor(df_exp_r, MEs, use='p', verbose=0))
     MMPvalue = base.as_data_frame(WGCNA.corPvalueStudent(base.as_matrix(FeatureModuleMembership), nSamples))
 
     FeatureModuleMembership.colnames = ['MM'+str(col) for col in modLabels]
@@ -249,7 +249,7 @@ def calculate_FeatureTraitSignificance(df_exp, df_trait):
     df_cli_r.columns = df_cli_r.columns.str.replace('(', 'parentheses1')
     df_cli_r.columns = df_cli_r.columns.str.replace(')', 'parentheses2')
 
-    FeatureTraitSignificance = base.as_data_frame(WGCNA.cor(df_exp_r, df_cli_r, use='p'))
+    FeatureTraitSignificance = base.as_data_frame(WGCNA.cor(df_exp_r, df_cli_r, use='p', verbose=0))
     FSPvalue = base.as_data_frame(WGCNA.corPvalueStudent(base.as_matrix(FeatureTraitSignificance), nSamples))
 
     FeatureTraitSignificance.colnames = ['GS.'+str(col) for col in FeatureTraitSignificance.colnames]
@@ -296,8 +296,8 @@ def get_EigengenesTrait_correlation(module_eigengenes, df_trait):
     df_trait_r.columns = df_trait_r.columns.str.replace(')', 'parentheses2')
     df_trait_r.columns = df_trait_r.columns.str.replace('/', 'slash')
 
-    MET = WGCNA.orderMEs(base.cbind(module_eigengenes, df_trait_r))
-    METcor = WGCNA.cor(MET, use='p')
+    MET = WGCNA.orderMEs(base.cbind(module_eigengenes, df_trait_r), verbose=0)
+    METcor = WGCNA.cor(MET, use='p', verbose=0)
     METcor = R2Py.R_matrix2Py_matrix(METcor, METcor.rownames, METcor.colnames)
 
     METcor.columns = METcor.columns.str.replace('space', ' ')

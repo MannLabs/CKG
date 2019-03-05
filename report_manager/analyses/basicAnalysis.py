@@ -77,7 +77,7 @@ def imputation_KNN(data, drop_cols=['group', 'sample', 'subject'], group='group'
         missDf = missDf.loc[:, missDf.notnull().mean() >= cutoff]
         if missDf.isnull().values.any():
             X = np.array(missDf.values, dtype=np.float64)
-            X_trans = KNN(k=3).fit_transform(X)
+            X_trans = KNN(k=3,verbose=False).fit_transform(X)
             missingdata_df = missDf.columns.tolist()
             dfm = pd.DataFrame(X_trans, index =list(missDf.index), columns = missingdata_df)
             df.update(dfm)
@@ -356,8 +356,6 @@ def runEfficientCorrelation(data, method='pearson'):
 def calculate_paired_ttest(df, condition1, condition2):
     group1 = df[condition1]
     group2 = df[condition2]
-    print(group1)
-    print(group2)
     if isinstance(group1, np.float):
         group1 = np.array(group1)
     else:
@@ -411,6 +409,7 @@ def calculate_annova(df, group='group'):
 def calculate_repeated_measures_annova(df, sample='sample', group='group'):
     col = df.name
     #group_values = df.groupby('group').apply(list).tolist()
+    print(df.head())
     num_df, den_df, f_stat, pvalue = aov.AnovaRM(df.reset_index(), col, sample, within=[group], aggregate_func='mean').fit().anova_table.values.tolist()[0]
     log = -math.log(pvalue,10)
 
@@ -721,25 +720,29 @@ def runMapper(data, lenses=["l2norm"], n_cubes = 15, overlap=0.5, n_clusters=3, 
 
     return simplicial_complex, {"labels":labels}
 
-def runWGCNA(data, drop_cols_exp, drop_cols_cli, RsquaredCut=0.8, networkType='unsigned', network_verbose=2, minModuleSize=30, deepSplit=2, pamRespectsDendro=False, merge_modules=True, MEDissThres=0.25, verbose_merge=3):
-
+def runWGCNA(data, drop_cols_exp, drop_cols_cli, RsquaredCut=0.8, networkType='unsigned', minModuleSize=30, deepSplit=2, pamRespectsDendro=False, merge_modules=True, MEDissThres=0.25, verbose=0):
+    print(type(verbose))
     dfs = wgcna.get_data(data, drop_cols_exp=drop_cols_exp, drop_cols_cli=drop_cols_cli)
-    data_cli = dfs['clinical']
-    data_exp, = [i for i in dfs.keys() if i != 'clinical']
-    data_exp = dfs[data_exp]
+    if 'clinical' in dfs:
+        data_cli = dfs['clinical']
+        data_exp, = [i for i in dfs.keys() if i != 'clinical']
+        data_exp = dfs[data_exp]
 
-    softPower = wgcna.pick_softThreshold(data_exp, RsquaredCut=RsquaredCut, networkType=networkType, verbose=network_verbose)
-    dissTOM, moduleColors = wgcna.build_network(data_exp, softPower=softPower, networkType=networkType, minModuleSize=minModuleSize, deepSplit=deepSplit,
-                                          pamRespectsDendro=pamRespectsDendro, merge_modules=merge_modules, MEDissThres=MEDissThres, verbose_merge=verbose_merge)
+        softPower = wgcna.pick_softThreshold(data_exp, RsquaredCut=RsquaredCut, networkType=networkType, verbose=verbose)
+        dissTOM, moduleColors = wgcna.build_network(data_exp, softPower=softPower, networkType=networkType, minModuleSize=minModuleSize, deepSplit=deepSplit,
+                                              pamRespectsDendro=pamRespectsDendro, merge_modules=merge_modules, MEDissThres=MEDissThres, verbose=verbose)
 
-    Features_per_Module = wgcna.get_FeaturesPerModule(data_exp, moduleColors, mode='dataframe')
-    MEs = wgcna.calculate_module_eigengenes(data_exp, moduleColors, softPower=softPower, dissimilarity=False)
-    moduleTraitCor, textMatrix = wgcna.calculate_ModuleTrait_correlation(data_exp, data_cli, MEs)
-    MM, MMPvalue = wgcna.calculate_ModuleMembership(data_exp, MEs)
-    FS, FSPvalue = wgcna.calculate_FeatureTraitSignificance(data_exp, data_cli)
-    METDiss, METcor = wgcna.get_EigengenesTrait_correlation(MEs, data_cli)
+        Features_per_Module = wgcna.get_FeaturesPerModule(data_exp, moduleColors, mode='dataframe')
+        MEs = wgcna.calculate_module_eigengenes(data_exp, moduleColors, softPower=softPower, dissimilarity=False)
+        moduleTraitCor, textMatrix = wgcna.calculate_ModuleTrait_correlation(data_exp, data_cli, MEs)
+        MM, MMPvalue = wgcna.calculate_ModuleMembership(data_exp, MEs)
+        FS, FSPvalue = wgcna.calculate_FeatureTraitSignificance(data_exp, data_cli)
+        METDiss, METcor = wgcna.get_EigengenesTrait_correlation(MEs, data_cli)
 
-    return data_exp, data_cli, dissTOM, moduleColors, Features_per_Module, MEs, moduleTraitCor, textMatrix, MM, MMPvalue, FS, FSPvalue, METDiss, METcor
+        return data_exp, data_cli, dissTOM, moduleColors, Features_per_Module, MEs, moduleTraitCor, textMatrix, MM, MMPvalue, FS, FSPvalue, METDiss, METcor
+
+    else:
+        return None
 
 def most_central_edge(G):
     centrality = nx.eigenvector_centrality_numpy(G, weight='width')

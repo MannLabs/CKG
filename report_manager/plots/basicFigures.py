@@ -132,7 +132,7 @@ def get_ranking_plot(data, identifier, args):
     num_rows = math.ceil(num_groups/num_cols)
     #subplot_title = "Ranking of proteins in {} samples"
     #subplot_titles = [subplot_title.format(index.title()) for index in data.index.unique()]
-    fig = tools.make_subplots(rows=num_rows, cols=num_cols, shared_yaxes=True,vertical_spacing=0.1)
+    fig = tools.make_subplots(rows=num_rows, cols=num_cols, shared_yaxes=True,vertical_spacing=0.1, print_grid=False)
     if 'index' in args and args['index']:
         r = 1
         c = 1
@@ -723,31 +723,32 @@ def create_violinplot(df, variable, group_col='group'):
     return traces
 
 def get_WGCNAPlots(data, identifier):
-
-    data_exp, data_cli, dissTOM, moduleColors, Features_per_Module, MEs,\
-    moduleTraitCor, textMatrix, MM, MMPvalue, FS, FSPvalue, METDiss, METcor = data
-    plots = []
-    #plot: sample dendrogram and clinical variables heatmap; input: data_exp, data_cli
-    plots.append(wgcnaFigures.plot_complex_dendrogram(data_exp, data_cli, title='Clinical variables variation by sample', dendro_labels=data_exp.index, distfun='euclidean', linkagefun='average', hang=40, subplot='heatmap', color_missingvals=True, width=1000, height=800))
-    #plot: gene tree dendrogram and module colors; input: dissTOM, moduleColors
-    plots.append(wgcnaFigures.plot_complex_dendrogram(dissTOM, moduleColors, title='Co-expression: dendrogram and module colors', dendro_labels=dissTOM.columns, distfun=None, linkagefun='average', hang=0.1, subplot='module colors', col_annotation=True, width=1000, height=800))
-    #plot: table with features per module; input: df
-    plots.append(getBasicTable(Features_per_Module, identifier='', title='Proteins/Genes module color', colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':1500, 'font':12}, subplot = False))
-    #plot: module-traits correlation with annotations; input: moduleTraitCor, textMatrix
-    plots.append(wgcnaFigures.plot_labeled_heatmap(moduleTraitCor, textMatrix, title='Module-Clinical variable relationships', colorscale=[[0,'#67a9cf'],[0.5,'#f7f7f7'],[1,'#ef8a62']], row_annotation=True, width=1000, height=800))
-    #plot: FS vs. MM correlation per trait/module scatter matrix; input: MM, FS, Features_per_Module
-    plots.append(wgcnaFigures.plot_intramodular_correlation(MM, FS, Features_per_Module, title='Intramodular analysis: Feature Significance vs. Module Membership', width=1500, height=4000))
-    #input: METDiss, METcor
-    plots.append(wgcnaFigures.plot_complex_dendrogram(METDiss, METcor, title='Eigengene network and clinical data associations', dendro_labels=METDiss.index, distfun=None, linkagefun='average', hang=0.9,
-                             subplot='heatmap', subplot_colorscale=[[0,'#67a9cf'],[0.5,'#f7f7f7'],[1,'#ef8a62']],
-                             color_missingvals=False, row_annotation=True, col_annotation=True, width=1000, height=800))
-
     graphs = []
-    for i, j in enumerate(plots):
-        if isinstance(j, html.Div):
-            graphs.append(j)
-        else:
-            graphs.append(dcc.Graph(id=identifier+'_'+str(i), figure=j))
+    if data is not None:
+        data_exp, data_cli, dissTOM, moduleColors, Features_per_Module, MEs,\
+        moduleTraitCor, textMatrix, MM, MMPvalue, FS, FSPvalue, METDiss, METcor = data
+        plots = []
+        #plot: sample dendrogram and clinical variables heatmap; input: data_exp, data_cli
+        plots.append(wgcnaFigures.plot_complex_dendrogram(data_exp, data_cli, title='Clinical variables variation by sample', dendro_labels=data_exp.index, distfun='euclidean', linkagefun='average', hang=40, subplot='heatmap', color_missingvals=True, width=1000, height=800))
+        #plot: gene tree dendrogram and module colors; input: dissTOM, moduleColors
+        plots.append(wgcnaFigures.plot_complex_dendrogram(dissTOM, moduleColors, title='Co-expression: dendrogram and module colors', dendro_labels=dissTOM.columns, distfun=None, linkagefun='average', hang=0.1, subplot='module colors', col_annotation=True, width=1000, height=800))
+        #plot: table with features per module; input: df
+        plots.append(getBasicTable(Features_per_Module, identifier='', title='Proteins/Genes module color', colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':1500, 'font':12}, subplot = False))
+        #plot: module-traits correlation with annotations; input: moduleTraitCor, textMatrix
+        plots.append(wgcnaFigures.plot_labeled_heatmap(moduleTraitCor, textMatrix, title='Module-Clinical variable relationships', colorscale=[[0,'#67a9cf'],[0.5,'#f7f7f7'],[1,'#ef8a62']], row_annotation=True, width=1000, height=800))
+        #plot: FS vs. MM correlation per trait/module scatter matrix; input: MM, FS, Features_per_Module
+        plots.append(wgcnaFigures.plot_intramodular_correlation(MM, FS, Features_per_Module, title='Intramodular analysis: Feature Significance vs. Module Membership', width=1500, height=4000))
+        #input: METDiss, METcor
+        plots.append(wgcnaFigures.plot_complex_dendrogram(METDiss, METcor, title='Eigengene network and clinical data associations', dendro_labels=METDiss.index, distfun=None, linkagefun='average', hang=0.9,
+                                 subplot='heatmap', subplot_colorscale=[[0,'#67a9cf'],[0.5,'#f7f7f7'],[1,'#ef8a62']],
+                                 color_missingvals=False, row_annotation=True, col_annotation=True, width=1000, height=800))
+
+        graphs = []
+        for i, j in enumerate(plots):
+            if isinstance(j, html.Div):
+                graphs.append(j)
+            else:
+                graphs.append(dcc.Graph(id=identifier+'_'+str(i), figure=j))
 
     return graphs
 

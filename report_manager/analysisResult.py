@@ -177,20 +177,18 @@ class AnalysisResult:
             result[self.analysis_type], nargs = analyses.get_interaction_network(self.data)
             args.update(nargs)
         elif self.analysis_type == 'long_format':
-            print("ARGS: ",args['columns'])
             result[self.analysis_type] = analyses.transform_into_long_format(self.data, drop_columns=args['drop_columns'], group=args['group'], columns=args['columns'])
         elif self.analysis_type == "wgcna":
             drop_cols_exp = []
             drop_cols_cli = []
             RsquaredCut = 0.8
             networkType = 'unsigned'
-            network_verbose = 2
             minModuleSize = 30
             deepSplit = 2
             pamRespectsDendro = False
             merge_modules = True
             MEDissThres = 0.25
-            verbose_merge = 3
+            verbose = 0 
             if "drop_cols_exp" in args:
                 drop_cols_exp = args['drop_cols_exp']
             if "drop_cols_cli" in args:
@@ -199,8 +197,6 @@ class AnalysisResult:
                 RsquaredCut = args["RsquaredCut"]
             if "networkType" in args:
                 networkType = args["networkType"]
-            if "network_verbose" in args:
-                network_verbose = args["network_verbose"]
             if "minModuleSize" in args:
                 minModuleSize = args["minModuleSize"]
             if "deepSplit" in args:
@@ -211,11 +207,11 @@ class AnalysisResult:
                 merge_modules = args["merge_modules"]
             if "MEDissThres" in args:
                 MEDissThres = args["MEDissThres"]
-            if "verbose_merge" in args:
-                verbose_merge = args["verbose_merge"]
-            result[self.analysis_type] = analyses.runWGCNA(self.data, drop_cols_exp, drop_cols_cli, RsquaredCut=0.8, networkType=networkType, network_verbose=network_verbose,
+            if "verbose" in args:
+                verbose = args["verbose"]
+            result[self.analysis_type] = analyses.runWGCNA(self.data, drop_cols_exp, drop_cols_cli, RsquaredCut=0.8, networkType=networkType, 
                                                             minModuleSize=minModuleSize, deepSplit=deepSplit, pamRespectsDendro=pamRespectsDendro, merge_modules=merge_modules,
-                                                            MEDissThres=MEDissThres, verbose_merge=verbose_merge)
+                                                            MEDissThres=MEDissThres, verbose=verbose)
         return result, args
 
     def get_plot(self, name, identifier):
