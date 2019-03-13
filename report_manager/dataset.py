@@ -163,6 +163,7 @@ class Dataset:
         data_name = None
         analysis_types = None
         plot_types = None
+        store_analysis = False
         args = None
         if "data" in configuration:
             data_name = configuration["data"]
@@ -170,10 +171,12 @@ class Dataset:
             analysis_types = configuration["analyses"]
         if "plots" in configuration:
             plot_types = configuration["plots"]
+        if "store_analysis" in configuration:
+            store_analysis = configuration["store_analysis"]
         if "args" in configuration:
             args = configuration["args"]
 
-        return data_name, analysis_types, plot_types, args
+        return data_name, analysis_types, plot_types, store_analysis, args
 
     def generate_report(self):
         self.report = rp.Report(identifier=self.dataset_type.capitalize(), plots={})
@@ -181,7 +184,7 @@ class Dataset:
             if section == "args":
                 continue
             for subsection in self.configuration[section]:
-                data_names, analysis_types, plot_types, args = self.extract_configuration(self.configuration[section][subsection])
+                data_names, analysis_types, plot_types, store_analysis, args = self.extract_configuration(self.configuration[section][subsection])
                 if isinstance(data_names, dict):
                     data = self.get_datasets(data_names)
                 else:
@@ -205,15 +208,18 @@ class Dataset:
                         for analysis_type in analysis_types:
                             result = ar.AnalysisResult(self.identifier, analysis_type, args, data)
                             self.update_analyses(result.result)
-                            if subsection == "regulation":
-                                reg_data = result.result[analysis_type]
-                                if not reg_data.empty:
-                                    sig_hits = list(set(reg_data.loc[reg_data.rejected,"identifier"]))
-                                    #sig_names = list(set(reg_data.loc[reg_data.rejected,"name"]))
-                                    sig_data = data[sig_hits]
-                                    sig_data.index = data['group'].tolist()
-                                    sig_data["sample"] = data["sample"].tolist()
-                                    self.update_data({"regulated":sig_data, "regulation_table":reg_data})
+                            if store_analysis:
+                                if subsection == "regulation":
+                                    reg_data = result.result[analysis_type]
+                                    if not reg_data.empty:
+                                        sig_hits = list(set(reg_data.loc[reg_data.rejected,"identifier"]))
+                                        #sig_names = list(set(reg_data.loc[reg_data.rejected,"name"]))
+                                        sig_data = data[sig_hits]
+                                        sig_data.index = data['group'].tolist()
+                                        sig_data["sample"] = data["sample"].tolist()
+                                        self.update_data({"regulated":sig_data, "regulation_table":reg_data})
+                                else:
+                                    self.update_data({analysis_type: result.result[analysis_type]})
                             for plot_type in plot_types:
                                 plots = result.get_plot(plot_type, subsection+"_"+analysis_type+"_"+plot_type)
                                 self.report.update_plots({(analysis_type, plot_type):plots})
@@ -358,7 +364,7 @@ class ClinicalDataset(Dataset):
                 if "use_index" in args:
                     use_index = args["use_index"]
 
-            processed_data = basicAnalysis.transform_into_wide_format(data, index=index, columns=columns, values=values, extra=extra, use_index=use_index)
+            processed_data = basicAnalysis.transform_into_wide_format(data, index=index, columns=columns, values=values, extra=extra)
         return processed_data
 
 class DNAseqDataset(Dataset):

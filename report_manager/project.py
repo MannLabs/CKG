@@ -146,9 +146,9 @@ class Project:
             if "description" in attributes:
                 self.description = attributes["description"]
             if "data_types" in attributes:
-                self.data_types = attributes["data_types"].split(',')
+                self.data_types = [i.strip(' ') for i in attributes["data_types"].split(',')]
             if "responsible" in attributes:
-                self.responsible = attributes["responsible"].split(',')
+                self.responsible = [i.strip(' ') for i in attributes["responsible"].split(',')]
             if "status" in attributes:
                 self.status = attributes["status"]
             if "number_subjects" in attributes:

@@ -1,6 +1,6 @@
 args:
     imputation: True
-    imputation_method: mixed
+    imputation_method: mixed 
 overview: #section
     peptides:
         data: number of peptides
@@ -11,8 +11,6 @@ overview: #section
         args:
             x: x
             y: y
-            height: 700
-            width: 900
             group: group
             width: 900
             height: 700
@@ -28,8 +26,6 @@ overview: #section
         args:
             x: x
             y: y
-            height: 700
-            width: 900
             group: group
             width: 900
             height: 700
@@ -80,7 +76,7 @@ data exploration:
             #- tsne
             #- umap
         plots:
-            - scatterplot
+            - pca
         args:
             x_title: PC1
             y_title: PC2
@@ -88,8 +84,9 @@ data exploration:
             perplexity: 40
             n_iter: 1000
             init: 'pca'
-            width: 900
+            width: 1000
             height: 700
+            loadings: 15
             title: 'Sample stratification'
     regulation:
         data: processed
@@ -98,10 +95,12 @@ data exploration:
         plots:
             - basicTable
             - volcanoplot
+        store_analysis: True
         args:
             alpha: 0.05
             fc: 2.0
             group: 'group'
+            subject: subject
             colorscale: 'Blues'
             showscale: False
             marker_size: 10
@@ -111,18 +110,18 @@ data exploration:
                 - sample
                 - subject
             name: name
-            title: 'Volcano plot'
+            title: 'Differential regulation ANOVA'
     correlation:
-        data: regulated
+        data: processed
         analyses:
             - correlation
         plots:
-            - heatmap
             - network
+        store_analysis: True
         args:
             source: node1
             target: node2
-            title: 'Features correlation map'
+            title: 'Features correlation network'
             format: edgelist
             values: weight
             dist: False
@@ -131,9 +130,10 @@ data exploration:
             height: 1600
             maxLinkWidth: 6
             maxRadius: 20
-            node_size: 'ev_centrality'
+            node_size: 'degree'
             cutoff: 0.5
             cutoff_abs: True
+            communities_algorithm: affinity_propagation
     interaction:
         data: regulated
         analyses: []
@@ -154,6 +154,18 @@ data exploration:
             maxLinkWidth: 7
             maxRadius: 20
             node_size: 'ev_centrality'
+            communities_algorithm: affinity_propagation
+    drug_associations:
+        data: regulated
+        analyses: []
+        plots:
+            - basicTable
+        args:
+            use:
+                columns: identifiers
+            height: 700
+            width: 900
+            title: 'List of drugs targetting differentially regulated proteins'
     # enrichment:
     #     data: regulated
     #     analyses:
