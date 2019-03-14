@@ -11,6 +11,7 @@ from scipy.spatial.distance import pdist, squareform
 from plotly.graph_objs import *
 from kmapper import plotlyviz
 import networkx as nx
+from clustergrammer2 import net as clustergrammer_net
 from pyvis.network import Network as visnet
 from webweb import Web
 from networkx.readwrite import json_graph
@@ -18,6 +19,7 @@ from dash_network import Network
 from report_manager import utils, analyses
 from wordcloud import WordCloud, STOPWORDS
 from report_manager.plots import wgcnaFigures
+import dash_cytoscape as cyto
 
 def getPlotTraces(data, key='full', type = 'lines', div_factor=float(10^10000), horizontal=False):
     '''This function returns traces for different kinds of plots
@@ -514,7 +516,6 @@ def network_to_tables(graph):
 
 def get_network(data, identifier, args):
     net = None
-    print("NETWORK")
     if 'cutoff_abs' not in args:
         args['cutoff_abs'] = False
     if not data.empty:
@@ -531,9 +532,7 @@ def get_network(data, identifier, args):
         
 
         degrees = dict(graph.degree())
-        print("CAlcylated centralities")
         nx.set_node_attributes(graph, degrees, 'degree')
-        print("attribute set")
         betweenness = None
         ev_centrality = None
         if data.shape[0] < 100:
@@ -554,17 +553,13 @@ def get_network(data, identifier, args):
         colors = {n:col[clusters[n]] for n in clusters}
         nx.set_node_attributes(graph, colors, 'color')
         nx.set_node_attributes(graph, clusters, 'cluster')
-        print("Convert to json")
         jgraph = json_graph.node_link_data(graph)
-        print("Get notebook_pynet")
         notebook_net = get_notebook_network_pyvis(graph, args)
-        print("Done")
         nodes_table, edges_table = network_to_tables(graph)
         nodes_fig_table = getBasicTable(nodes_table, identifier=identifier+"_nodes_table", title=args['title']+" nodes table")
         edges_fig_table = getBasicTable(edges_table, identifier=identifier+"_edges_table", title=args['title']+" edges table")
 
         net = {"notebook":notebook_net, "app":Network(id=identifier, data=jgraph, width=args['width'], height=args['height'], maxLinkWidth=args['maxLinkWidth'], maxRadius=args['maxRadius']), "net_tables":(nodes_fig_table, edges_fig_table)}
-    print("DRAWN")
     return net
 
 def get_pca_plot(data, identifier, args):
@@ -758,6 +753,16 @@ def create_violinplot(df, variable, group_col='group'):
 
     return traces
 
+
+def get_clustergrammer_plot(df, identifier, args):
+    df = df[['node1', 'node2', 'weight']].pivot(index='node1', columns='node2') 
+    clustergrammer_net.load_df(df)
+
+    link = utils.get_clustergrammer_link(clustergrammer_net, filename=None)
+
+    iframe = html.Iframe(src=link, width=1000, height=900)
+
+    return html.Div([html.H2(args['title']),iframe])
 
 def get_parallel_plot(data, identifier, args):
     lines = []
@@ -984,3 +989,16 @@ def get_wordcloud(text, identifier, args={'stopwords':[], 'max_words': 400, 'max
     figure = go.Figure(data=[trace], layout=layout)
 
     return dcc.Graph(id = identifier, figure=figure)
+
+
+def get_cytoscape_network(net, identifier, args):
+    cytonet = html.Div([cyto.Cytoscape(id=identifier,
+                                    elements=[{'data': 
+                                                {'id': 'one', 'label': 'Node 1'}, 'position': {'x': 50, 'y': 50}},
+                                                {'data': {'id': 'two', 'label': 'Node 2'}, 'position': {'x': 200, 'y': 200}},
+                                                {'data': {'source': 'one', 'target': 'two','label': 'Node 1 to 2'}}
+                                                ],
+                                    layout={'name': 'preset'})
+                    ])
+
+    return cytonet

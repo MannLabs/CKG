@@ -400,5 +400,11 @@ class AnalysisResult:
             elif name == 'ranking':
                 for id in data:
                     plot.append(figure.get_ranking_plot(data[id], identifier, args))
+            elif name == 'clustergrammer':
+                for id in data:
+                    plot.append(figure.get_clustergrammer_plot(data[id], identifier, args))
+            elif name == 'cytonet':
+                for id in data:
+                    plot.append(figure.get_cytoscape_network(data[id], identifier, args))
 
         return plot

@@ -117,6 +117,7 @@ data exploration:
             - correlation
         plots:
             - network
+            - clustergrammer
         store_analysis: True
         args:
             source: node1
@@ -166,6 +167,18 @@ data exploration:
             height: 700
             width: 900
             title: 'List of drugs targetting differentially regulated proteins'
+    disease_associations:
+        data: regulated
+        analyses: []
+        plots:
+            - basicTable
+        args:
+            use:
+                columns: identifiers
+            height: 700
+            width: 900
+            title: 'List of diseases associated with the differentially regulated proteins'
+
     # enrichment:
     #     data: regulated
     #     analyses:

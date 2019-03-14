@@ -76,16 +76,17 @@ overview: #section
             #- tsne
             #-   umap
         plots:
-            - scatterplot
+            - pca
         args: 
             x_title: PC1
             y_title: PC2
-            height: 700
-            width: 900
             components: 2
             perplexity: 40
             n_iter: 1000
             init: 'pca'
+            width: 1000
+            height: 700
+            loadings: 15
             title: 'Sample stratification'
     regulation:
         data: processed
@@ -108,7 +109,7 @@ overview: #section
             drop_cols:
                 - sample
             name: name
-            title: 'Volcano plot'
+            title: 'Differential regulation ANOVA'
     correlation:
         data: processed
         analyses:
@@ -116,6 +117,7 @@ overview: #section
         plots:
             - basicTable
             - network
+            - clustergrammer
         store_analysis: True
         args:
             source: node1

@@ -6,6 +6,7 @@ import ckg_utils
 import config.ckg_config as ckg_config
 from report_manager import analysisResult as ar, report as rp
 from report_manager.analyses import basicAnalysis
+from report_manager.plots import basicFigures
 from graphdb_connector import connector
 import logging
 import logging.config
@@ -178,8 +179,42 @@ class Dataset:
 
         return data_name, analysis_types, plot_types, store_analysis, args
 
+    def add_configuration_to_report(self):
+        net = []
+        root = self.dataset_type.title() + " Standard analysis pipeline"
+        net.append({'data':{'id':0, 'label':root, 'faveColor':'#6FB1FC'}})
+        i = 0
+        for section in self.configuration:
+            if section == "args":
+                continue
+            net.append({'data':{'id':i+1, 'label':section, 'faveColor':'#6FB1FC'}})
+            net.append({'data':{'source':i, 'target':i+1, 'faveColor':'#6FB1FC'}})
+            i += 1
+            for subsection in self.configuration[section]:
+                net.append({'data':{'id':i+1, 'label':subsection, 'faveColor':'#6FB1FC'}})
+                net.append({'data':{'source':i, 'target':i+1, 'faveColor':'#6FB1FC'}})
+                i += 1
+                j = i
+                data_names, analysis_types, plot_types, store_analysis, args = self.extract_configuration(self.configuration[section][subsection])
+                for d in data_names:
+                    net.append({'data':{'id':i+1, 'label':d, 'faveColor':'#6FB1FC'}})
+                    net.append({'data':{'source':j, 'target':i+1, 'faveColor':'#6FB1FC'}})
+                    i += 1
+                for at in analysis_types:
+                    net.append({'data':{'id':i+1, 'label':at, 'faveColor':'#6FB1FC'}})
+                    net.append({'data':{'source':j, 'target':i+1, 'faveColor':'#6FB1FC'}})
+                    i += 1
+                for a in args:
+                    net.append({'data':{'id':i+1, 'label':a, 'faveColor':'#6FB1FC'}})
+                    net.append({'data':{'source':j, 'target':i+1, 'faveColor':'#6FB1FC'}})
+                    i += 1
+        
+        conf_plot = basicFigures.get_cytoscape_network(net, self.dataset_type, None)
+        self.report.update_plots({(self.dataset_type+'_pipeline','cytoscape_network'):conf_plot})
+
     def generate_report(self):
         self.report = rp.Report(identifier=self.dataset_type.capitalize(), plots={})
+        self.add_configuration_to_report()
         for section in self.configuration:
             if section == "args":
                 continue
@@ -235,6 +270,7 @@ class Dataset:
 
         #self.save_dataset()
         #self.save_dataset_report()
+
 
     def save_dataset(self):
         dataset_directory = self.get_dataset_data_directory()

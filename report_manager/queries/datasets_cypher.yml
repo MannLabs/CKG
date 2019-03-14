@@ -105,6 +105,19 @@ proteomics:
             MATCH (drug:Drug)-[r:ACTS_ON]->(protein:Protein) 
             WHERE ((protein.name+"-"+protein.id) IN [IDENTIFIERS]) AND r.score>=0.4
             RETURN protein.name+"-"+protein.id AS Protein,drug.name AS Drug,r.score AS score, r.source AS source,r.action AS action
+    DISEASE_ASSOCIATIONS:
+        name: 'get diseases associated to the list of proteins'
+        description: 'Get all the disease-protein associations for the relevant proteins'
+        involved_nodes:
+            - Protein
+            - Disease
+        involved_relationships:
+            - ASSOCIATED_WITH
+        query_type: post
+        query: >
+            MATCH (disease:Disease)<-[r:ASSOCIATED_WITH]-(protein:Protein) 
+            WHERE ((protein.name+"-"+protein.id) IN [IDENTIFIERS]) AND ((r.score>=2.0 AND r.source="DISEASES") OR (r.score>=0.7 AND toLower(r.source) =~ "disgenet.+") OR toLower(toString(r.score))="curated")
+            RETURN protein.name+"-"+protein.id AS Protein,disease.name AS Disease,r.score AS score, r.source AS source
 clinical:
     CLINICAL_VARIABLES:
         name: 'get clinical variables and clinical states'

@@ -19,6 +19,11 @@ from fancyimpute import KNN
 import kmapper as km
 from report_manager import utils
 from report_manager.analyses import wgcnaAnalysis as wgcna
+import statsmodels.api as sm
+from statsmodels.formula.api import ols
+import time
+from joblib import Parallel, delayed
+import numba
 
 def transform_into_wide_format(data, index, columns, values, extra=[]):
     df = data.copy()
@@ -275,6 +280,7 @@ def apply_pvalue_twostage_fdrcorrection(pvalues, alpha=0.05, method='bh'):
     return (rejected, padj)
 
 def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, permutations=250):
+    np.random.seed(176782)
     i = permutations
     df_index = list(df.index)
     columns = ['identifier']
@@ -339,7 +345,6 @@ def runCorrelation(df, alpha=0.05, method='pearson', correction=('fdr', 'indep')
         correlation["padj"] = padj
         correlation["rejected"] = rejected
         correlation = correlation[correlation.rejected]
-    print(correlation)
     return correlation
 
 def rmcorr(data, x, y, subject):
@@ -388,9 +393,7 @@ def rmcorr(data, x, y, subject):
         >>> # Compute the repeated measure correlation
         >>> rmcorr(data, x='X', y='Y', subject='Ss')
             (0.647, 0.001, 19)
-    """
-    import statsmodels.api as sm
-    from statsmodels.formula.api import ols
+    """ 
     # Remove Nans
     data = data[[x, y, subject]].dropna(axis=0)
     # ANCOVA model
@@ -409,6 +412,13 @@ def rmcorr(data, x, y, subject):
     pval = table.loc[x, 'PR(>F)']
     return np.round(rm, 3), pval, dof
 
+def calculate_rm_correlation(df, x, y, subject):
+    cordata = df[[x,y]]
+    cols = cordata.columns
+    cordata.columns = ['x', 'y']
+    r, p, dof = rmcorr(data=cordata.reset_index(), x='x', y='y', subject=subject)
+    
+    return (cols[0],cols[1],r,p)
 
 def run_rm_correlation(df, alpha=0.05, subject='subject', correction=('fdr', 'indep')):
     calculated = set()
@@ -416,14 +426,16 @@ def run_rm_correlation(df, alpha=0.05, subject='subject', correction=('fdr', 'in
     #df = df.dropna()._get_numeric_data()
     if not df.empty:
         df = df.set_index(subject)._get_numeric_data()
+        start = time.time()
         for x, y in itertools.combinations(df.columns, 2):
-            cordata = df[[x,y]]
-            cols = cordata.columns
-            cordata.columns = ['x', 'y']
-            r, p, dof = rmcorr(data=cordata.reset_index(), x='x', y='y', subject=subject)
-            rows.append((cols[0],cols[1],r,p))
-        correlation = pd.DataFrame(rows, columns=["node1", "node2", "weight", "pvalue"])
+            row = calculate_rm_correlation(df, x, y, subject)
+            rows.append(row)
+        end = time.time()
+        print(end - start)
 
+        print(rows)
+        correlation = pd.DataFrame(rows, columns=["node1", "node2", "weight", "pvalue"])
+        
         if correction[0] == 'fdr':
             rejected, padj = apply_pvalue_fdrcorrection(correlation["pvalue"].tolist(), alpha=alpha, method=correction[1])
         elif correction[0] == '2fdr':
@@ -532,13 +544,12 @@ def calculate_anova(df, group='group'):
     group_values = df.groupby(group).apply(list).tolist()
     t, pvalue = stats.f_oneway(*group_values)
     log = -math.log(pvalue,10)
-
     return (col, t, pvalue, log)
 
 def calculate_repeated_measures_anova(df, column, subject='subject', group='group', alpha=0.05):
-    aov = pg.rm_anova(dv=column, within=group,subject=subject, data=df, detailed=True, remove_na=True, correction=True)
-    aov.columns = ['Source', 'SS', 'DF', 'MS', 'F', 'pvalue', 'padj (GG)', 'np2', 'eps', 'sphericity', 'Mauchlys sphericity', 'p-spher']
-    t, pvalue = aov.loc[0, ['F', 'pvalue']].values 
+    aov_result = pg.rm_anova(dv=column, within=group,subject=subject, data=df, detailed=True, remove_na=True, correction=True)
+    aov_result.columns = ['Source', 'SS', 'DF', 'MS', 'F', 'pvalue', 'padj (GG)', 'np2', 'eps', 'sphericity', 'Mauchlys sphericity', 'p-spher']
+    t, pvalue = aov_result.loc[0, ['F', 'pvalue']].values 
     log = -math.log(pvalue,10)
 
     return (column, t, pvalue, log)
@@ -567,11 +578,10 @@ def anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', gro
     else:
         df = df.set_index([group])
         df = df.drop(drop_cols, axis=1)
-        scores = df.apply(func = calculate_anova, axis=0,result_type='expand', group=group).T
+        scores = df.apply(func = calculate_anova, axis=0, result_type='expand', group=group).T
         scores.columns = columns
         scores = scores.set_index("identifier")
         scores = scores.dropna(how="all")
-
 
         max_perm = get_max_permutations(df)
         #FDR correction
@@ -587,7 +597,6 @@ def anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', gro
             scores['correction'] = 'FDR correction BH'
             scores['padj'] = padj
             scores['rejected'] = rejected
-
         res = None
         for col in df.columns:
             pairwise = calculate_THSD(df[col])
@@ -605,7 +614,7 @@ def anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', gro
         res = res.reset_index()
         res['rejected'] = res['padj'] < alpha
         res['rejected'] = res['rejected'] 
-
+    
     return res
 
 def repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subject='subject', group='group', permutations=50):

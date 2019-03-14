@@ -238,6 +238,7 @@ class Project:
             project_report = self.generate_project_info_report()
             self.update_report({"Project information":project_report})
             for dataset_type in self.data_types:
+                print('dataset_type', dataset_type)
                 dataset = self.get_dataset(dataset_type)
                 if dataset is not None:
                     dataset.generate_report()
@@ -245,12 +246,6 @@ class Project:
 
     def empty_report(self):
         self.report = {}
-
-    def generate_dataset_report(self, dataset):
-        dataset = self.get_dataset(dataset_type)
-        if dataset is not None:
-            report = dataset.generate_report()
-            self.update_report({dataset.dataset_type:report})
 
     def show_report(self, environment):
         app_plots = defaultdict(list)
