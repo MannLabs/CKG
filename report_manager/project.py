@@ -238,7 +238,6 @@ class Project:
             project_report = self.generate_project_info_report()
             self.update_report({"Project information":project_report})
             for dataset_type in self.data_types:
-                print('dataset_type', dataset_type)
                 dataset = self.get_dataset(dataset_type)
                 if dataset is not None:
                     dataset.generate_report()

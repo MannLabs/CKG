@@ -993,12 +993,15 @@ def get_wordcloud(text, identifier, args={'stopwords':[], 'max_words': 400, 'max
 
 def get_cytoscape_network(net, identifier, args):
     cytonet = html.Div([cyto.Cytoscape(id=identifier,
-                                    elements=[{'data': 
-                                                {'id': 'one', 'label': 'Node 1'}, 'position': {'x': 50, 'y': 50}},
-                                                {'data': {'id': 'two', 'label': 'Node 2'}, 'position': {'x': 200, 'y': 200}},
-                                                {'data': {'source': 'one', 'target': 'two','label': 'Node 1 to 2'}}
-                                                ],
-                                    layout={'name': 'preset'})
+                                    stylesheet=args['stylesheet'],
+                                    elements=net,
+                                    layout={
+                                        'name': 'breadthfirst',
+                                        'roots': '#0',
+                                        },
+                                    style={'width': '100%', 'height': '500px'}
+                                    )
                     ])
+
 
     return cytonet

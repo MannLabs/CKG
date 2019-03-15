@@ -180,37 +180,102 @@ class Dataset:
         return data_name, analysis_types, plot_types, store_analysis, args
 
     def add_configuration_to_report(self):
-        net = []
+        nodes = []
+        edges = []
+        args = {}
         root = self.dataset_type.title() + " Standard analysis pipeline"
-        net.append({'data':{'id':0, 'label':root, 'faveColor':'#6FB1FC'}})
+        nodes.append({'data':{'id':0, 'label':root}, 'classes': 'root'})
         i = 0
         for section in self.configuration:
             if section == "args":
                 continue
-            net.append({'data':{'id':i+1, 'label':section, 'faveColor':'#6FB1FC'}})
-            net.append({'data':{'source':i, 'target':i+1, 'faveColor':'#6FB1FC'}})
+            nodes.append({'data':{'id':i+1, 'label':section}, 'classes': 'section'})
+            edges.append({'data':{'source':0, 'target':i+1}})
             i += 1
+            k = i
             for subsection in self.configuration[section]:
-                net.append({'data':{'id':i+1, 'label':subsection, 'faveColor':'#6FB1FC'}})
-                net.append({'data':{'source':i, 'target':i+1, 'faveColor':'#6FB1FC'}})
+                nodes.append({'data':{'id':i+1, 'label':subsection}, 'classes': 'subsection'})
+                edges.append({'data':{'source':k, 'target':i+1}})
                 i += 1
                 j = i
                 data_names, analysis_types, plot_types, store_analysis, args = self.extract_configuration(self.configuration[section][subsection])
-                for d in data_names:
-                    net.append({'data':{'id':i+1, 'label':d, 'faveColor':'#6FB1FC'}})
-                    net.append({'data':{'source':j, 'target':i+1, 'faveColor':'#6FB1FC'}})
+                if isinstance(data_names, dict):
+                    for d in data_names:
+                        nodes.append({'data':{'id':i+1, 'label':d+':'+data_names[d]}, 'classes': 'data'})
+                        edges.append({'data':{'source':j, 'target':i+1}})
+                        i += 1
+                else:
+                    nodes.append({'data':{'id':i+1, 'label':data_names}, 'classes': 'data'})
+                    edges.append({'data':{'source':j, 'target':i+1}})
                     i += 1
                 for at in analysis_types:
-                    net.append({'data':{'id':i+1, 'label':at, 'faveColor':'#6FB1FC'}})
-                    net.append({'data':{'source':j, 'target':i+1, 'faveColor':'#6FB1FC'}})
+                    nodes.append({'data':{'id':i+1, 'label':at},'classes': 'analysis'})
+                    edges.append({'data':{'source':j, 'target':i+1}})
                     i += 1
                 for a in args:
-                    net.append({'data':{'id':i+1, 'label':a, 'faveColor':'#6FB1FC'}})
-                    net.append({'data':{'source':j, 'target':i+1, 'faveColor':'#6FB1FC'}})
+                    nodes.append({'data':{'id':i+1, 'label':a+':'+str(args[a])},'classes': 'argument'})
+                    edges.append({'data':{'source':j, 'target':i+1}})
                     i += 1
-        
-        conf_plot = basicFigures.get_cytoscape_network(net, self.dataset_type, None)
-        self.report.update_plots({(self.dataset_type+'_pipeline','cytoscape_network'):conf_plot})
+        config_stylesheet = [
+                        # Group selectors
+                        {
+                            'selector': 'node',
+                            'style': {
+                                'content': 'data(label)'
+                                }
+                        },
+                        # Class selectors
+                        {
+                            'selector': '.root',
+                            'style': {
+                                'background-color': '#66c2a5',
+                                'line-color': 'black'
+                            }
+                        },
+                        # Class selectors
+                        {
+                            'selector': '.section',
+                            'style': {
+                                'background-color': '#a6cee3',
+                                'line-color': 'black'
+                            }
+                        },
+                        # Class selectors
+                        {
+                            'selector': '.subsection',
+                            'style': {
+                                'background-color': '#1f78b4',
+                                'line-color': 'black'
+                            }
+                        },
+                        {
+                            'selector': '.data',
+                            'style': {
+                                'background-color': '#b2df8a',
+                                'line-color': 'black'
+                            }
+                        },
+                        {
+                            'selector': '.analysis',
+                            'style': {
+                                'background-color': '#33a02c',
+                                'line-color': 'black'
+                            }
+                        },
+                        {
+                            'selector': '.argument',
+                            'style': {
+                                'background-color': '#fb9a99',
+                                'line-color': 'black'
+                            }
+                        },
+                    ]
+        net = []
+        net.extend(nodes)
+        net.extend(edges)
+        args['stylesheet'] = config_stylesheet
+        conf_plot = basicFigures.get_cytoscape_network(net, self.dataset_type, args)
+        self.report.update_plots({(self.dataset_type+'_pipeline','cytoscape_network'):[conf_plot]})
 
     def generate_report(self):
         self.report = rp.Report(identifier=self.dataset_type.capitalize(), plots={})
@@ -267,7 +332,6 @@ class Dataset:
                         for plot_type in plot_types:
                             plots = result.get_plot(plot_type, "_".join(subsection.split(' '))+"_"+plot_type)
                             self.report.update_plots({("_".join(subsection.split(' ')), plot_type): plots})
-
         #self.save_dataset()
         #self.save_dataset_report()
 
