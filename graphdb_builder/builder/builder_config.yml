@@ -12,6 +12,8 @@ experimentsDirectory : '../../../data/imports/experiments'
 databasesDirectory : '../../../data/imports/databases'
 #ontologies import diretory
 ontologiesDirectory : '../../../data/imports/ontologies'
+#users directory
+usersDirectory : '../../../data/imports/users'
 
 download: True
 
@@ -54,6 +56,7 @@ graph :
     - published
     - project
     - experiment
+    - user
 
 #Imports 
 ontology_entities : 

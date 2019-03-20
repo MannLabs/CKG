@@ -180,13 +180,13 @@ def parseWESDataset(projectId, configuration, dataDir):
 ########### Clinical Variables Datasets ############
 def extractProjectInfo(project_data):
         df = project_data.copy()
-        df.columns = ['ID', 'name', 'acronym', 'description', 'type', 'tissue id', 'responsible', 'start_date', 'end_date', 'status']
+        df.columns = ['ID', 'name', 'acronym', 'description', 'type', 'tissue', 'responsible', 'participant', 'start_date', 'end_date', 'status']
         return df
 
 def extractSubjectIds(clinical_data):
     df = clinical_data.set_index('subject id').copy()
-    if 'subject external id' in df.columns:
-        df = df[['subject external id']].dropna(axis=0).reset_index()
+    if 'subject external_id' in df.columns:
+        df = df[['subject external_id']].dropna(axis=0).reset_index()
         df = df.drop_duplicates(keep='first').reset_index(drop=True)
         df.columns = ['ID', 'external_id']
         if len(df.ID) != len(clinical_data['subject id'].unique()):
@@ -284,7 +284,7 @@ def extractSubjectDiseaseRelationships(clinical_data):
 def extractBiologicalSampleAnalyticalSampleRelationships(clinical_data):
     df = clinical_data.copy()
     if 'analytical_sample id' in df.columns:
-        df = df[['biological_sample id', 'analytical_sample id', 'analytical_sample quantity', 'analytical_sample quantity units']].drop_duplicates(keep='first').reset_index(drop=True)
+        df = df[['biological_sample id', 'analytical_sample id', 'analytical_sample quantity', 'analytical_sample quantity_units']].drop_duplicates(keep='first').reset_index(drop=True)
         df.columns = ['START_ID', 'END_ID', 'quantity', 'quantity_units']
         df.insert(loc=2, column='TYPE', value='SPLITTED_INTO')
         return df
@@ -296,6 +296,8 @@ def extractBiologicalSamplesInfo(project_data, clinical_data):
     if 'biological_sample id' in df.columns:
         cols = [i for i in df.columns if str(i).startswith('biological_sample ')]
         df = df.loc[:, df.columns.isin(cols)]
+        df.columns = df.columns.str.replace('biological_sample ', '')
+        df = df.rename(columns={'id':'ID'})
         df['owner'] = project_data['ProjectResponsible'].unique()[0]
         df = df.drop_duplicates(keep='first').reset_index(drop=True)
         return df
@@ -318,7 +320,9 @@ def extractAnalyticalSamplesInfo(clinical_data):
     if 'analytical_sample id' in df.columns:
         cols = [i for i in df.columns if str(i).startswith('analytical_sample ')]
         df = df.loc[:, df.columns.isin(cols)]
-        df[['group', 'secondary group']] = clinical_data[['grouping1', 'grouping2']]
+        df.columns = df.columns.str.replace('analytical_sample ', '')
+        df = df.rename(columns={'id':'ID'})
+        df[['group', 'secondary_group']] = clinical_data[['grouping1', 'grouping2']]
         return df
     else:
         return None
@@ -818,7 +822,10 @@ def generateDatasetImports(projectId, dataType):
 
 def generateGraphFiles(data, dataType, projectId, stats, ot = 'w', d = 'proteomics'):
     importDir = os.path.join(config["experimentsImportDirectory"], os.path.join(projectId,d))
-    outputfile = os.path.join(importDir, projectId+"_"+dataType.lower()+".csv")
+    if dataType.lower() == '':
+        outputfile = os.path.join(importDir, projectId+dataType.lower()+".csv")
+    else:
+        outputfile = os.path.join(importDir, projectId+"_"+dataType.lower()+".csv")
     with open(outputfile, ot) as f:
         data.to_csv(path_or_buf = f,
             header=True, index=False, quotechar='"',

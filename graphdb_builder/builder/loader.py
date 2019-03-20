@@ -201,6 +201,13 @@ def updateDB(driver, imports=None):
                 publicationImportCode = cypher_queries['IMPORT_PUBLISHED_IN']['query']
                 for entity in config["publicationEntities"]:
                     queries.extend(publicationImportCode.replace("IMPORTDIR", importDir).replace("ENTITY", entity).split(';')[0:-1])
+            #Users
+            elif "user" == i:
+                usersDir = os.path.join(os.getcwd(),config["usersDirectory"])
+                user_cypher = cypher_queries['CREATE_USER_NODE']
+                code = user_cypher['query']
+                queries.extend(code.replace("IMPORTDIR", usersDir).split(';')[0:-1])
+
             #Projects
             elif "project" == i:
                 importDir = os.path.join(os.getcwd(),config["experimentsDirectory"])
@@ -208,6 +215,7 @@ def updateDB(driver, imports=None):
                 project_cypher = cypher_queries['IMPORT_PROJECT']
                 for project in projects:
                     projectDir = os.path.join(importDir, project)
+                    projectDir = os.path.join(projectDir, 'clinical')
                     for project_section in project_cypher:
                         code = project_section['query']
                         queries.extend(code.replace("IMPORTDIR", projectDir).replace('PROJECTID', project).split(';')[0:-1])
