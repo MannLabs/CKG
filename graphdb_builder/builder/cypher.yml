@@ -552,24 +552,6 @@ IMPORT_DATASETS:
             MATCH (c:Clinical_variable{id:line.END_ID}) 
             MERGE (s)-[r:HAS_QUANTIFIED_CLINICAL{value:toFloat(line.value)}]->(c)
             RETURN COUNT(r) AS PROJECTID_biological_sample_has_quantified_clinical_variable;
-            USING PERIODIC COMMIT 10000
-            LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_disease.csv" AS line 
-            MATCH (s:Subject {id:line.START_ID})
-            MATCH (d:Disease {id:line.END_ID}) 
-            MERGE (s)-[r:HAS_DISEASE]->(d)
-            RETURN COUNT(r) AS PROJECTID_subject_has_disease;
-            CREATE CONSTRAINT ON (t:Timepoint) ASSERT t.id IS UNIQUE;
-            USING PERIODIC COMMIT 10000
-            LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_timepoint.csv" AS line
-            MERGE (t:Timepoint {id:line.ID})
-            ON CREATE SET t.units=line.units
-            RETURN COUNT(t) AS PROJECTID_timepoint;
-            USING PERIODIC COMMIT 10000
-            LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_biological_sample_timepoint.csv" AS line
-            MATCH (b:Biological_sample {id:line.START_ID})
-            MATCH (t:Timepoint {id:line.END_ID}) 
-            MERGE (b)-[r:SAMPLED_AT_TIMEPOINT{intervention:line.intervention}]->(t)
-            RETURN COUNT(r) AS PROJECTID_biological_sample_sampled_at_timepoint;
     "proteomics":
         'name': 'import proteomics dataset'
         'description': 'Loads into the database all the Proteomic data obtained in a Project: identified Protein, Peptide and Modified_protein nodes'
@@ -651,6 +633,18 @@ IMPORT_DATASETS:
             MERGE (a)-[r:CONTAINS_MUTATION]->(s)
             RETURN COUNT(s) AS PROJECTID_analytical_sample_contains_somatic_mutation;
 
+CREATE_USER_NODE:
+    'name': ''
+    'description': ''
+    'query': >
+        CREATE CONSTRAINT ON (u:User) ASSERT u.id IS UNIQUE;
+        CREATE INDEX ON :User(name);
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/CKG_users.csv" AS line
+        MERGE (u:User {id:line.ID})
+        ON CREATE SET u.acroym=line.acronym,u.name=line.name,u.username=line.username,u.email=line.email
+        RETURN COUNT(u) AS Users_in_the_system;
+
 CREATE_PROJECT: &create_project 
     'name': 'create project'
     'description': 'Creates Project nodes'
@@ -659,9 +653,17 @@ CREATE_PROJECT: &create_project
         CREATE CONSTRAINT ON (p:Project) ASSERT p.name IS UNIQUE; 
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID.csv" AS line
-        MERGE (p:Project {id:line.ID}) 
-        ON CREATE SET p.name=line.name,p.description=line.description,p.acronym=line.acronym,p.responsible=line.responsible,p.type=line.type
-        RETURN COUNT(p) AS PROJECTID_project;
+        MERGE (p:Project {id:line.ID})
+        ON CREATE SET p.name=line.name,p.acronym=line.acronym,p.description=line.description,p.type=line.type,p.tissue=line.tissue,p.responsible=line.responsible,p.participant=line.participant,p.start_date=line.start_date,p.end_date=line.end_date,p.status=line.status
+        WITH p, SPLIT(p.responsible, ",") AS responsibles, SPLIT(p.participant, ',') AS participants
+        MATCH (p)
+        UNWIND responsibles AS user_mentioned
+        MATCH (mentioned:User {name:user_mentioned})
+        UNWIND participants AS user_participating
+        MATCH (participant:User {name:user_participating})
+        MERGE (mentioned)-[r:IS_RESPONSIBLE]->(p)
+        MERGE (participant)-[rel:PARTICIPATES_IN]->(p)
+        RETURN COUNT(p) AS PROJECTID_project, COUNT(r) AS Users_responsible_project, COUNT(rel) AS Users_participating_project;
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_studies_disease.csv" AS line 
         MATCH (p:Project {id:line.START_ID})
@@ -697,6 +699,12 @@ CREATE_SUBJECTS: &create_subject
         MATCH (s:Subject {id:line.END_ID}) 
         MERGE (p)-[r:HAS_ENROLLED]->(s)
         RETURN COUNT(r) AS PROJECTID_project_has_enrolled_subject;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_disease.csv" AS line 
+        MATCH (s:Subject {id:line.START_ID})
+        MATCH (d:Disease {id:line.END_ID}) 
+        MERGE (s)-[r:HAS_DISEASE]->(d)
+        RETURN COUNT(r) AS PROJECTID_subject_has_disease;
         
 CREATE_BIOSAMPLES: &create_bio
     'name': 'create biological samples'
@@ -706,7 +714,7 @@ CREATE_BIOSAMPLES: &create_bio
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_biological_samples.csv" AS line
         MERGE (s:Biological_sample {id:line.ID})
-        ON CREATE SET s.source=line.source,s.external_id=line.external_id,s.owner=line.owner,s.collection_date=line.collection_date,s.conservation_conditions=line.conservation_conditions,s.storage=line.storage,s.status=line.status,s.quantity=line.quantity,s.quantity_units=line.quantity_units
+        ON CREATE SET s.external_id=line.external_id,s.quantity=line.quantity,s.quantity_units=line.quantity_units,s.source=line.source,s.collection_date=line.collection_date,s.conservation_conditions=line.conservation_conditions,s.storage=line.storage,s.status=line.status,s.owner=line.owner
         RETURN COUNT(s) AS PROJECTID_biological_samples;
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_subject_biosample.csv" AS line 
@@ -714,6 +722,12 @@ CREATE_BIOSAMPLES: &create_bio
         MATCH (s:Subject {id:line.END_ID})
         MERGE (b)-[r:BELONGS_TO_SUBJECT]->(s)
         RETURN COUNT(r) AS PROJECTID_biological_samples_belongs_to_subject;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_biosample_tissue.csv" AS line 
+        MATCH (b:Biological_sample {id:line.START_ID}) 
+        MATCH (t:Tissue {id:line.END_ID})
+        MERGE (b)-[r:FROM_TISSUE]->(t)
+        RETURN COUNT(r) AS PROJECTID_biological_samples_come_from_tissue;
 
 CREATE_ANALYTICALSAMPLES: &create_ana
     'name': 'create analytical samples'
@@ -724,7 +738,7 @@ CREATE_ANALYTICALSAMPLES: &create_ana
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_analytical_samples.csv" AS line
         MERGE (s:Analytical_sample {id:line.ID})
-        ON CREATE SET s.collection_date=line.collection_date,s.conservation_conditions=line.conservation_conditions,s.storage=line.storage,s.status=line.status,s.quantity=line.quantity,s.quantity_units=line.quantity_units,s.group=line.group,s.secondary_group=line.secondary_group
+        ON CREATE SET s.external_id=line.external_id,s.quantity=line.quantity,s.quantity_units=line.quantity_units,s.source=line.source,s.collection_date=line.collection_date,s.conservation_conditions=line.conservation_conditions,s.storage=line.storage,s.status=line.status,s.group=line.group,s.secondary_group=line.secondary_group
         RETURN COUNT(s) AS PROJECTID_analytical_sample;
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_biosample_analytical.csv" AS line
@@ -733,8 +747,26 @@ CREATE_ANALYTICALSAMPLES: &create_ana
         MERGE (s1)-[r:SPLITTED_INTO{quantity:line.quantity,quantity_units:line.quantity_units}]->(s2)
         RETURN COUNT(r) AS PROJECTID_biological_sample_splitted_into_analytical_sample;
 
+CREATE_TIMEPOINT: &create_timepoint
+    'name': 'create timepoint'
+    'description': 'Creates Timepoint nodes and links them to the Biological_sample nodes of origin. Timepoints are defined by the users and a unit must be given (e.g. days, hours).'
+    'query': >
+        CREATE CONSTRAINT ON (t:Timepoint) ASSERT t.id IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_timepoint.csv" AS line
+        MERGE (t:Timepoint {id:line.ID})
+        ON CREATE SET t.units=line.units
+        RETURN COUNT(t) AS PROJECTID_timepoint;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_biological_sample_timepoint.csv" AS line
+        MATCH (b:Biological_sample {id:line.START_ID})
+        MATCH (t:Timepoint {id:line.END_ID}) 
+        MERGE (b)-[r:SAMPLED_AT_TIMEPOINT{intervention:line.intervention}]->(t)
+        RETURN COUNT(r) AS PROJECTID_biological_sample_sampled_at_timepoint;
+
 IMPORT_PROJECT: 
     - *create_project
     - *create_subject
     - *create_bio
     - *create_ana
+    - *create_timepoint
