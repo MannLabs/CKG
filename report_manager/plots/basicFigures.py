@@ -359,11 +359,11 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
             text.append('<b>'+str(row['identifier'])+": "+str(index)+'<br>Comparison: '+str(row['group1'])+' vs '+str(row['group2'])+'<br>log2FC = '+str(round(row['log2FC'], ndigits=2))+'<br>p = '+'{:.2e}'.format(row['pvalue'])+'<br>FDR = '+'{:.2e}'.format(row['padj']))
 
             # Color
-            if row['padj'] < args['alpha']:
+            if row['padj'] <= args['alpha']:
                 min_sig_pval = row['pvalue'] if row['pvalue'] > min_sig_pval else min_sig_pval
-                if row['FC'] < -args['fc']:
+                if row['FC'] <= -args['fc']:
                     color.append('#2c7bb6')
-                elif row['FC'] > args['fc']:
+                elif row['FC'] >= args['fc']:
                     color.append('#d7191c')
                 elif row['FC'] < -1.:
                     color.append('#abd9e9')
@@ -571,8 +571,8 @@ def get_pca_plot(data, identifier, args):
     traces.extend(sct['data'])
     figure['layout'] = sct['layout']
     for index in list(loadings.index)[0:args['loadings']]:
-        x = loadings.loc[index,'x'] * 3 
-        y = loadings.loc[index, 'y'] * 3
+        x = loadings.loc[index,'x'] * 5 
+        y = loadings.loc[index, 'y'] * 5
         value = loadings.loc[index, 'value']
 
         trace = go.Scatter(x= [0,x],
@@ -755,14 +755,19 @@ def create_violinplot(df, variable, group_col='group'):
 
 
 def get_clustergrammer_plot(df, identifier, args):
-    df = df[['node1', 'node2', 'weight']].pivot(index='node1', columns='node2') 
-    clustergrammer_net.load_df(df)
+    div = None
+    if not df.empty:
+        if 'format' in args:
+            if args['format'] == 'edgelist':
+                df = df[['node1', 'node2', 'weight']].pivot(index='node1', columns='node2') 
+        clustergrammer_net.load_df(df)
 
-    link = utils.get_clustergrammer_link(clustergrammer_net, filename=None)
+        link = utils.get_clustergrammer_link(clustergrammer_net, filename=None)
 
-    iframe = html.Iframe(src=link, width=1000, height=900)
+        iframe = html.Iframe(src=link, width=1000, height=900)
 
-    return html.Div([html.H2(args['title']),iframe])
+        div = html.Div([html.H2(args['title']),iframe])
+    return div
 
 def get_parallel_plot(data, identifier, args):
     lines = []
@@ -992,13 +997,10 @@ def get_wordcloud(text, identifier, args={'stopwords':[], 'max_words': 400, 'max
 
 
 def get_cytoscape_network(net, identifier, args):
-    cytonet = html.Div([cyto.Cytoscape(id=identifier,
+    cytonet = html.Div([html.H2(args['title']), cyto.Cytoscape(id=identifier,
                                     stylesheet=args['stylesheet'],
                                     elements=net,
-                                    layout={
-                                        'name': 'breadthfirst',
-                                        'roots': '#0',
-                                        },
+                                    layout=args['layout'],
                                     style={'width': '100%', 'height': '500px'}
                                     )
                     ])

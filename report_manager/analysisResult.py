@@ -167,6 +167,12 @@ class AnalysisResult:
             method = 'pearson'
             correction = ('fdr', 'indep')
             cutoff = 0.5
+            subject='subject'
+            group='group'
+            if 'group' in args:
+                group=args['group']
+            if 'subject' in args:
+                subject= args['subject']
             if "alpha" in args:
                 alpha = args["args"]
             if "method" in args:
@@ -175,7 +181,7 @@ class AnalysisResult:
                 correction = args["correction"]
             if "cutoff" in args:
                 cutoff = args['cutoff']
-            result[self.analysis_type] = analyses.runCorrelation(self.data, alpha=alpha, method=method, correction=correction)
+            result[self.analysis_type] = analyses.run_correlation(self.data, alpha=alpha, subject=subject, group=group, method=method, correction=correction)
         elif self.analysis_type  == "rm_correlation":
             alpha = 0.05
             method = 'pearson'

@@ -183,18 +183,18 @@ class Dataset:
         nodes = []
         edges = []
         args = {}
-        root = self.dataset_type.title() + " Standard analysis pipeline"
+        root = self.dataset_type.title() + " default analysis pipeline"
         nodes.append({'data':{'id':0, 'label':root}, 'classes': 'root'})
         i = 0
         for section in self.configuration:
             if section == "args":
                 continue
-            nodes.append({'data':{'id':i+1, 'label':section}, 'classes': 'section'})
+            nodes.append({'data':{'id':i+1, 'label':section.title()}, 'classes': 'section'})
             edges.append({'data':{'source':0, 'target':i+1}})
             i += 1
             k = i
             for subsection in self.configuration[section]:
-                nodes.append({'data':{'id':i+1, 'label':subsection}, 'classes': 'subsection'})
+                nodes.append({'data':{'id':i+1, 'label':subsection.title()}, 'classes': 'subsection'})
                 edges.append({'data':{'source':k, 'target':i+1}})
                 i += 1
                 j = i
@@ -229,44 +229,48 @@ class Dataset:
                             'selector': '.root',
                             'style': {
                                 'background-color': '#66c2a5',
-                                'line-color': 'black'
+                                'line-color': 'black',
+                                'font-size': '14'
                             }
                         },
-                        # Class selectors
                         {
                             'selector': '.section',
                             'style': {
                                 'background-color': '#a6cee3',
-                                'line-color': 'black'
+                                'line-color': 'black',
+                                'font-size': '12'
                             }
                         },
-                        # Class selectors
                         {
                             'selector': '.subsection',
                             'style': {
                                 'background-color': '#1f78b4',
-                                'line-color': 'black'
+                                'line-color': 'black',
+                                'font-size': '12'
                             }
                         },
                         {
                             'selector': '.data',
                             'style': {
                                 'background-color': '#b2df8a',
-                                'line-color': 'black'
+                                'line-color': 'black',
+                                'font-size': '12'
                             }
                         },
                         {
                             'selector': '.analysis',
                             'style': {
                                 'background-color': '#33a02c',
-                                'line-color': 'black'
+                                'line-color': 'black',
+                                'font-size': '12'
                             }
                         },
                         {
                             'selector': '.argument',
                             'style': {
                                 'background-color': '#fb9a99',
-                                'line-color': 'black'
+                                'line-color': 'black',
+                                'font-size': '12'
                             }
                         },
                     ]
@@ -274,6 +278,8 @@ class Dataset:
         net.extend(nodes)
         net.extend(edges)
         args['stylesheet'] = config_stylesheet
+        args['title'] = 'Analysis Pipeline'
+        args['layout'] = {'name': 'breadthfirst', 'roots': '#0'}
         conf_plot = basicFigures.get_cytoscape_network(net, self.dataset_type, args)
         self.report.update_plots({(self.dataset_type+'_pipeline','cytoscape_network'):[conf_plot]})
 
