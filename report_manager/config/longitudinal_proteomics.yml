@@ -72,20 +72,21 @@ overview: #section
     stratification:
         data: processed
         analyses: 
-            #- pca 
+            - pca 
             #- tsne
-            -   umap
+            #-   umap
         plots:
-            - scatterplot
+            - pca
         args: 
             x_title: PC1
             y_title: PC2
-            height: 700
-            width: 900
             components: 2
             perplexity: 40
             n_iter: 1000
             init: 'pca'
+            width: 1000
+            height: 700
+            loadings: 15
             title: 'Sample stratification'
     regulation:
         data: processed
@@ -98,7 +99,7 @@ overview: #section
             alpha: 0.05
             fc: 2.0
             group: group
-            sample: subject
+            subject: subject
             permutations: 0
             colorscale: Blues
             showscale: False
@@ -108,75 +109,30 @@ overview: #section
             drop_cols:
                 - sample
             name: name
-            title: 'Volcano plot'
+            title: 'Differential regulation ANOVA'
     correlation:
-        data: regulated
-        analyses: 
-            - correlation
-        plots: 
-            - heatmap
-            - network
+        data: processed
+        analyses:
+            - rm_correlation
+        plots:
             - basicTable
-        args: 
+            - network
+            - clustergrammer
+        store_analysis: True
+        args:
             source: node1
             target: node2
-            title: 'Features correlation map'
+            title: 'Features correlation network'
             format: edgelist
             values: weight
+            subject: subject
             dist: False
             node_properties: {}
             width: 1600
             height: 1600
-            maxLinkWidth: 5
+            maxLinkWidth: 6
             maxRadius: 20
             node_size: 'degree'
-    interaction:
-        data: regulated
-        analyses: []
-        plots:
-            - network
-            - basicTable
-        args:
-            use: 
-                columns: identifiers
-            source: node1
-            target: node2
-            title: 'Protein-Protein interaction network'
-            format: edgelist
-            values: score
-            dist: False
-            node_properties: {}
-            width: 1600
-            height: 1600
-            maxLinkWidth: 5
-            maxRadius: 20
-            node_size: 'betweenness'
-    enrichment:
-        data: regulated
-        analyses: 
-            - enrichment
-        plots:
-            - basicTable
-        args:
-            use: 
-                columns: identifiers
-            source: node1
-            target: node2
-            title: 'Protein-Protein interaction network'
-            format: edgelist
-            values: score
-            dist: False
-            node_properties: {}
-    #"topological data analysis":
-    #    data: regulated
-    #    analyses: 
-    #        - mapper
-    #    plots:
-    #        - mapper
-    #    args: 
-    #        n_cubes: 15
-    #        overlap: 0.5
-    #        n_clusters: 3
-    #        linkage: complete
-    #        affinity: correlation
-
+            cutoff: 0.5
+            cutoff_abs: True
+            communities_algorithm: affinity_propagation

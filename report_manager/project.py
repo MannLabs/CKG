@@ -146,9 +146,9 @@ class Project:
             if "description" in attributes:
                 self.description = attributes["description"]
             if "data_types" in attributes:
-                self.data_types = attributes["data_types"].split(',')
+                self.data_types = [i.strip(' ') for i in attributes["data_types"].split(',')]
             if "responsible" in attributes:
-                self.responsible = attributes["responsible"].split(',')
+                self.responsible = [i.strip(' ') for i in attributes["responsible"].split(',')]
             if "status" in attributes:
                 self.status = attributes["status"]
             if "number_subjects" in attributes:
@@ -245,12 +245,6 @@ class Project:
 
     def empty_report(self):
         self.report = {}
-
-    def generate_dataset_report(self, dataset):
-        dataset = self.get_dataset(dataset_type)
-        if dataset is not None:
-            report = dataset.generate_report()
-            self.update_report({dataset.dataset_type:report})
 
     def show_report(self, environment):
         app_plots = defaultdict(list)

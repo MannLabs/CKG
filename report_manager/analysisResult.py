@@ -148,7 +148,7 @@ class AnalysisResult:
             alpha = 0.05
             drop_cols = []
             group = 'group'
-            sample = 'sample'
+            subject = 'subject'
             permutations = 50
             if "alpha" in args:
                 alpha = args["alpha"]
@@ -156,23 +156,43 @@ class AnalysisResult:
                 drop_cols = args['drop_cols']
             if "group" in args:
                 group = args["group"]
-            if "sample" in args:
-                sample = args["sample"]
+            if "subject" in args:
+                subject = args["subject"]
             if "permutations" in args:
                 permutations = args["permutations"]
-            anova_result = analyses.repeated_measurements_anova(self.data, drop_cols=drop_cols, sample=sample, group=group, alpha=alpha, permutations=permutations)
+            anova_result = analyses.repeated_measurements_anova(self.data, drop_cols=drop_cols, subject=subject, group=group, alpha=alpha, permutations=permutations)
             result[self.analysis_type] = anova_result
         elif self.analysis_type  == "correlation":
             alpha = 0.05
             method = 'pearson'
             correction = ('fdr', 'indep')
+            cutoff = 0.5
             if "alpha" in args:
                 alpha = args["args"]
             if "method" in args:
                 method = args["method"]
             if "correction" in args:
                 correction = args["correction"]
+            if "cutoff" in args:
+                cutoff = args['cutoff']
             result[self.analysis_type] = analyses.runCorrelation(self.data, alpha=alpha, method=method, correction=correction)
+        elif self.analysis_type  == "rm_correlation":
+            alpha = 0.05
+            method = 'pearson'
+            correction = ('fdr', 'indep')
+            cutoff = 0.5
+            subject='subject'
+            if 'subject' in args:
+                subject= args['subject']
+            if "alpha" in args:
+                alpha = args["args"]
+            if "method" in args:
+                method = args["method"]
+            if "correction" in args:
+                correction = args["correction"]
+            if "cutoff" in args:
+                cutoff = args['cutoff']
+            result[self.analysis_type] = analyses.run_rm_correlation(self.data, alpha=alpha, subject=subject, correction=correction)
         elif self.analysis_type == "interaction":
             result[self.analysis_type], nargs = analyses.get_interaction_network(self.data)
             args.update(nargs)
@@ -284,6 +304,21 @@ class AnalysisResult:
                         figure_title = args['title']
                     args['title'] = figure_title
                     plot.append(figure.get_scatterplot(data[id], identifier, args))
+            elif name == 'pca':
+                x_title = "x"
+                y_title = "y"
+                if "x_title" in args:
+                    x_title = args["x_title"]
+                if "y_title" in args:
+                    y_title = args["y_title"]
+                for id in data:
+                    if isinstance(id, tuple):
+                        identifier = identifier+"_"+id[0]+"_vs_"+id[1]
+                        figure_title = args['title'] + id[0]+" vs "+id[1]
+                    else:
+                        figure_title = args['title']
+                    args['title'] = figure_title
+                    plot.append(figure.get_pca_plot(data[id], identifier, args))
             elif name == "volcanoplot":
                 alpha = 0.05
                 lfc = 1.0
@@ -365,5 +400,11 @@ class AnalysisResult:
             elif name == 'ranking':
                 for id in data:
                     plot.append(figure.get_ranking_plot(data[id], identifier, args))
+            elif name == 'clustergrammer':
+                for id in data:
+                    plot.append(figure.get_clustergrammer_plot(data[id], identifier, args))
+            elif name == 'cytonet':
+                for id in data:
+                    plot.append(figure.get_cytoscape_network(data[id], identifier, args))
 
         return plot

@@ -11,6 +11,7 @@ from scipy.spatial.distance import pdist, squareform
 from plotly.graph_objs import *
 from kmapper import plotlyviz
 import networkx as nx
+from clustergrammer2 import net as clustergrammer_net
 from pyvis.network import Network as visnet
 from webweb import Web
 from networkx.readwrite import json_graph
@@ -18,6 +19,7 @@ from dash_network import Network
 from report_manager import utils, analyses
 from wordcloud import WordCloud, STOPWORDS
 from report_manager.plots import wgcnaFigures
+import dash_cytoscape as cyto
 
 def getPlotTraces(data, key='full', type = 'lines', div_factor=float(10^10000), horizontal=False):
     '''This function returns traces for different kinds of plots
@@ -522,24 +524,26 @@ def get_network(data, identifier, args):
                 data = data[np.abs(data[args['values']]) > args['cutoff']]
             else:
                 data = data > arg['cutoff']
-
         data = data.rename(index=str, columns={args['values']: "width"})
         args['values'] = 'width'
         edge_prop_columns = [c for c in data.columns if c not in [args['source'], args['target']]]
         edge_properties = [str(d) for d in data.to_dict(orient='index').values()]
-        graph = nx.from_pandas_edgelist(data, args['source'], args['target'], edge_prop_columns)
+        graph = nx.from_pandas_edgelist(data, args['source'], args['target'], edge_attr=True)
+        
 
-        betweenness = nx.betweenness_centrality(graph, weight='width')
-        ev_centrality = nx.eigenvector_centrality_numpy(graph)
         degrees = dict(graph.degree())
-
-        nx.set_node_attributes(graph, betweenness, 'betweenness centrality')
-        nx.set_node_attributes(graph, ev_centrality, 'eigenvector centrality')
         nx.set_node_attributes(graph, degrees, 'degree')
+        betweenness = None
+        ev_centrality = None
+        if data.shape[0] < 100:
+            betweenness = nx.betweenness_centrality(graph, weight='width')
+            ev_centrality = nx.eigenvector_centrality_numpy(graph)
+            nx.set_node_attributes(graph, betweenness, 'betweenness centrality')
+            nx.set_node_attributes(graph, ev_centrality, 'eigenvector centrality')
 
-        if args['node_size'] == 'betweenness':
+        if args['node_size'] == 'betweenness' and betweeness is not None:
             nx.set_node_attributes(graph, betweenness, 'radius')
-        elif args['node_size'] == 'ev_centrality':
+        elif args['node_size'] == 'ev_centrality' and ev_centrality is not None:
             nx.set_node_attributes(graph, ev_centrality, 'radius')
         elif args['node_size'] == 'degree':
             nx.set_node_attributes(graph, degrees, 'radius')
@@ -549,44 +553,60 @@ def get_network(data, identifier, args):
         colors = {n:col[clusters[n]] for n in clusters}
         nx.set_node_attributes(graph, colors, 'color')
         nx.set_node_attributes(graph, clusters, 'cluster')
-
         jgraph = json_graph.node_link_data(graph)
         notebook_net = get_notebook_network_pyvis(graph, args)
-
         nodes_table, edges_table = network_to_tables(graph)
         nodes_fig_table = getBasicTable(nodes_table, identifier=identifier+"_nodes_table", title=args['title']+" nodes table")
         edges_fig_table = getBasicTable(edges_table, identifier=identifier+"_edges_table", title=args['title']+" edges table")
 
         net = {"notebook":notebook_net, "app":Network(id=identifier, data=jgraph, width=args['width'], height=args['height'], maxLinkWidth=args['maxLinkWidth'], maxRadius=args['maxRadius']), "net_tables":(nodes_fig_table, edges_fig_table)}
-
     return net
 
-def get2DPCAFigure(data, components, identifier, title, subplot = False):
+def get_pca_plot(data, identifier, args):
+    pca_data, loadings = data    
+    figure = {}
     traces = []
-    groups = data["groups"].unique()
+    annotations = []
+    sct = get_scatterplot(pca_data, identifier, args).figure
+    traces.extend(sct['data'])
+    figure['layout'] = sct['layout']
+    for index in list(loadings.index)[0:args['loadings']]:
+        x = loadings.loc[index,'x'] * 3 
+        y = loadings.loc[index, 'y'] * 3
+        value = loadings.loc[index, 'value']
 
-    for name in groups:
-        trace = Scatter(
-            x=Y_sklearn[y==name,components[0]],
-            y=Y_sklearn[y==name,components[1]],
-            mode='markers',
-            name=name,
-            marker=scatter.Marker(
-                size=18,
-                line=scatter.Line(
-                    color='rgba(217, 217, 217, 0.14)',
-                    width=0.5),
-                opacity=0.8))
+        trace = go.Scatter(x= [0,x],
+                        y = [0,y],
+                        mode='markers+lines',
+                        text=index+" loading: {0:.2f}".format(value),
+                        name = index,
+                        marker= dict(size=9,
+                                    symbol= 4,
+                                    color = 'darkgrey', #set color equal to a variable
+                                    showscale=False,
+                                    opacity=0.7,
+                                    ),
+                        showlegend=False,
+                        )
+        annotation = dict( x=x,
+                        y=y,
+                        xref='x',
+                        yref='y',
+                        text=index,
+                        showarrow=False,
+                        font=dict(
+                                size=10,
+                                color='darkgrey'
+                            ),
+                            align='center',
+                            ax=20,
+                            ay=-30,
+                            )
+        annotations.append(annotation) 
         traces.append(trace)
 
-    d = Data(traces)
-    layout = Layout(xaxis=layout.XAxis(title='PC'+str(components[0]), showline=False),
-                    yaxis=layout.YAxis(title='PC'+str(components[1]), showline=False), annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')])
-    figure = Figure(data=d, layout=layout)
-
-    if subplot:
-        return (identifier, figure)
-
+    figure['data'] = traces   
+    figure['layout'].annotations = annotations
 
     return  dcc.Graph(id = identifier, figure = figure)
 
@@ -656,20 +676,24 @@ def getSankeyPlot(data, identifier, args={'source':'source', 'target':'target', 
 def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':2500, 'font':12}, subplot = False):
     if subset is not None:
         data = data[subset]
+
+    booleanDictionary = {True: 'TRUE', False: 'FALSE'}
+    data = data.replace(booleanDictionary)
     
     data_trace = dash_table.DataTable(id='table_'+identifier,
-                                        style_data={'whiteSpace': 'normal'},
-                                        style_cell={
-                                            'minWidth': '0px', 'maxWidth': '180px',
-                                            'textAlign': 'left', 'padding': '0=px', 'vertical-align': 'top'
-                                        },
+                                        data=data.to_dict("rows"),
+                                        columns=[{"name": i.replace('_', ' ').title(), "id": i} for i in data.columns],
                                         css=[{
                                             'selector': '.dash-cell div.dash-cell-value',
                                             'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
                                         }],
-                                        columns=[{"name": i.replace('_', ' ').title(), "id": i} for i in data.columns],
+                                        style_data={'whiteSpace': 'normal'},
+                                        style_cell={
+                                            'minWidth': '50px', 'maxWidth': '180px',
+                                            'textAlign': 'left', 'padding': '1px', 'vertical-align': 'top'
+                                        },
                                         style_table={
-                                            'maxHeight': '500',
+                                            'maxHeight': '800',
                                             'overflowY': 'scroll',
                                             'overflowX': 'scroll'
                                         },
@@ -678,7 +702,14 @@ def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subse
                                             'fontWeight': 'bold',
                                             'position': 'sticky'
                                         },
-                                        data=data.to_dict("rows"),
+                                        style_data_conditional=[{
+                                            "if": 
+                                                {"column_id": "rejected", "filter": 'rejected eq "TRUE"'},
+                                                "backgroundColor": "#3B8861",
+                                                'color': 'white'
+                                            },
+                                            ],
+                                        n_fixed_rows=1,
                                         sorting=True,
                                         )
 
@@ -721,6 +752,51 @@ def create_violinplot(df, variable, group_col='group'):
         traces.append(violin)
 
     return traces
+
+
+def get_clustergrammer_plot(df, identifier, args):
+    df = df[['node1', 'node2', 'weight']].pivot(index='node1', columns='node2') 
+    clustergrammer_net.load_df(df)
+
+    link = utils.get_clustergrammer_link(clustergrammer_net, filename=None)
+
+    iframe = html.Iframe(src=link, width=1000, height=900)
+
+    return html.Div([html.H2(args['title']),iframe])
+
+def get_parallel_plot(data, identifier, args):
+    lines = []
+    for col in data:
+        for group in data[col]:
+
+            pass
+
+
+    trace = [go.Parcoords(
+                line = dict(color = df[args['group']],
+                #colorscale = [[0,'#D7C16B'],[0.5,'#23D8C3'],[1,'#F3F10F']]),
+                dimensions = list([
+                    dict(range = [0,8],
+                        constraintrange = [4,8],
+                        label = 'Sepal Length', values = df['sepal_length']),
+                    dict(range = [0,8],
+                        label = 'Sepal Width', values = df['sepal_width']),
+                    dict(range = [0,8],
+                        label = 'Petal Length', values = df['petal_length']),
+                    dict(range = [0,8],
+                        label = 'Petal Width', values = df['petal_width'])        
+                    ])
+                ))
+    ]
+    
+    layout = go.Layout(
+        plot_bgcolor = '#E5E5E5',
+        paper_bgcolor = '#E5E5E5'
+        )
+    
+    fig = go.Figure(data = data, layout = layout)
+
+    return dcc.Graph(id=identifier, figure=fig)
 
 def get_WGCNAPlots(data, identifier):
     graphs = []
@@ -913,3 +989,19 @@ def get_wordcloud(text, identifier, args={'stopwords':[], 'max_words': 400, 'max
     figure = go.Figure(data=[trace], layout=layout)
 
     return dcc.Graph(id = identifier, figure=figure)
+
+
+def get_cytoscape_network(net, identifier, args):
+    cytonet = html.Div([cyto.Cytoscape(id=identifier,
+                                    stylesheet=args['stylesheet'],
+                                    elements=net,
+                                    layout={
+                                        'name': 'breadthfirst',
+                                        'roots': '#0',
+                                        },
+                                    style={'width': '100%', 'height': '500px'}
+                                    )
+                    ])
+
+
+    return cytonet

@@ -6,7 +6,6 @@ args:
     values: value
     extra: 
         - group
-    use_index: True
 
 overview: #section
     clinical variables:
@@ -33,16 +32,20 @@ overview: #section
             - anova
         plots: 
             - basicTable
+        store_analysis: True
         args:
             alpha: 0.05
             fc: 2.0
             permutations: 0
             group: group
+            subject: subject
             colorscale: Blues
             showscale: False
             marker_size: 10
             x_title: logFC
             y_title: -log(pvalue)
-            drop_cols: [] 
+            drop_cols:
+                - subject
+                - biological_sample
             name: clinical_variable
             title: 'Volcano plot'
