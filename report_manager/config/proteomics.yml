@@ -133,6 +133,7 @@ data exploration:
             maxRadius: 20
             node_size: 'degree'
             cutoff: 0.5
+            subject: subject
             cutoff_abs: True
             communities_algorithm: affinity_propagation
     interaction:

@@ -323,28 +323,32 @@ def convertToEdgeList(data, cols):
 
     return edge_list
 
-def runCorrelation(df, alpha=0.05, method='pearson', correction=('fdr', 'indep')):
+def run_correlation(df, alpha=0.05, subject='subject', group='group', method='pearson', correction=('fdr', 'indep')):
     calculated = set()
     correlation = pd.DataFrame()
-    df = df.dropna()._get_numeric_data()
-    if not df.empty:
-        r, p = runEfficientCorrelation(df, method=method)
-        rdf = pd.DataFrame(r, index=df.columns, columns=df.columns)
-        pdf = pd.DataFrame(p, index=df.columns, columns=df.columns)
-        rdf.values[[np.arange(len(rdf))]*2] = np.nan
-        pdf.values[[np.arange(len(pdf))]*2] = np.nan
-        
-        correlation = convertToEdgeList(rdf, ["node1", "node2", "weight"])
-        pvalues = convertToEdgeList(pdf, ["node1", "node2", "pvalue"])
+    if check_is_paired(df, subject, group):
+        if len(df[subject].unique()) > 1:
+            correlation = run_rm_correlation(df, alpha=alpha, subject=subject, correction=correction)
+    else:
+        df = df.dropna()._get_numeric_data()
+        if not df.empty:
+            r, p = runEfficientCorrelation(df, method=method)
+            rdf = pd.DataFrame(r, index=df.columns, columns=df.columns)
+            pdf = pd.DataFrame(p, index=df.columns, columns=df.columns)
+            rdf.values[[np.arange(len(rdf))]*2] = np.nan
+            pdf.values[[np.arange(len(pdf))]*2] = np.nan
+            
+            correlation = convertToEdgeList(rdf, ["node1", "node2", "weight"])
+            pvalues = convertToEdgeList(pdf, ["node1", "node2", "pvalue"])
 
-        if correction[0] == 'fdr':
-            rejected, padj = apply_pvalue_fdrcorrection(pvalues["pvalue"].tolist(), alpha=alpha, method=correction[1])
-        elif correction[0] == '2fdr':
-            rejected, padj = apply_pvalue_twostage_fdrcorrection(pvalues["pvalue"].tolist(), alpha=alpha, method=correction[1])
+            if correction[0] == 'fdr':
+                rejected, padj = apply_pvalue_fdrcorrection(pvalues["pvalue"].tolist(), alpha=alpha, method=correction[1])
+            elif correction[0] == '2fdr':
+                rejected, padj = apply_pvalue_twostage_fdrcorrection(pvalues["pvalue"].tolist(), alpha=alpha, method=correction[1])
 
-        correlation["padj"] = padj
-        correlation["rejected"] = rejected
-        correlation = correlation[correlation.rejected]
+            correlation["padj"] = padj
+            correlation["rejected"] = rejected
+            correlation = correlation[correlation.rejected]
     return correlation
 
 def rmcorr(data, x, y, subject):
@@ -513,7 +517,7 @@ def calculate_THSD(df):
     df_results.columns = ['group1', 'group2', 'log2FC', 'lower', 'upper', 'rejected']
     df_results['identifier'] = col
     df_results = df_results.set_index('identifier')
-    df_results['FC'] = df_results['log2FC'].apply(lambda x: np.power(np.abs(x),2) * -1 if x < 0 else np.power(np.abs(x),2))
+    df_results['FC'] = df_results['log2FC'].apply(lambda x: np.power(2,np.abs(x)) * -1 if x < 0 else np.power(2,np.abs(x)))
     df_results['rejected'] = df_results['rejected']
 
     return df_results
@@ -535,7 +539,7 @@ def calculate_pairwise_ttest(df, column, subject='subject', group='group', corre
 def complement_posthoc(posthoc, identifier):
     posthoc['identifier'] = identifier
     posthoc['log2FC'] = posthoc['mean(group1)'] -posthoc['mean(group2)']
-    posthoc['FC'] = posthoc['log2FC'].apply(lambda x: np.power(np.abs(x),2) * -1 if x < 0 else np.power(np.abs(x),2))
+    posthoc['FC'] = posthoc['log2FC'].apply(lambda x: np.power(2,np.abs(x)) * -1 if x < 0 else np.power(2,np.abs(x)))
 
     return posthoc
 
@@ -562,9 +566,12 @@ def get_max_permutations(df, group='group'):
     return max_perm
 
 def check_is_paired(df, subject, group):
-    count_subject_groups = df.groupby(subject)[group].count()
+    is_pair = False
+    if subject is not None:
+        count_subject_groups = df.groupby(subject)[group].count()
+        is_pair = (count_subject_groups > 1).all()
 
-    return (count_subject_groups > 1).all()
+    return is_pair
 
 def anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', group='group', permutations=50):
     columns = ['identifier', 't-statistics', 'pvalue', '-log10 pvalue']
@@ -707,7 +714,7 @@ def ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], subjec
         scores['rejected'] = scores['rejected']
     scores['group1'] = condition1
     scores['group2'] = condition2
-    scores['FC'] = scores['log2FC'].apply(lambda x: np.power(np.abs(x),2) * -1 if x < 0 else np.power(np.abs(x),2))
+    scores['FC'] = scores['log2FC'].apply(lambda x: np.power(2,np.abs(x)) * -1 if x < 0 else np.power(2,np.abs(x)))
     scores['-log10 pvalue'] = scores['pvalue'].apply(lambda x: - math.log(x,10))
     scores = scores.reset_index() 
 
