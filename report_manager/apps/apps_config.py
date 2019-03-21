@@ -55,7 +55,8 @@ pages = {"projectPage":{
                 "proteomics": proteomicsPage,
                 #"wes": wesPage
                 },
-            "importsPage":{"stats_file":stats_file}
+            "importsPage":{"stats_file":stats_file},
+            "projectCreationPage":{}
             }
 ## Overview 
 ## Project Name
