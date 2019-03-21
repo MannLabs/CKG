@@ -135,7 +135,7 @@ data exploration:
             cutoff: 0.5
             subject: subject
             cutoff_abs: True
-            communities_algorithm: affinity_propagation
+            communities_algorithm: louvain 
     interaction:
         data: regulated
         analyses: []
@@ -156,7 +156,7 @@ data exploration:
             maxLinkWidth: 7
             maxRadius: 20
             node_size: 'ev_centrality'
-            communities_algorithm: affinity_propagation
+            communities_algorithm: louvain
     drug_associations:
         data: regulated
         analyses: []

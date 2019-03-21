@@ -135,4 +135,26 @@ overview: #section
             node_size: 'degree'
             cutoff: 0.5
             cutoff_abs: True
-            communities_algorithm: affinity_propagation
+            communities_algorithm: louvain
+    drug_associations:
+        data: regulated
+        analyses: []
+        plots:
+            - basicTable
+        args:
+            use:
+                columns: identifiers
+            height: 700
+            width: 900
+            title: 'List of drugs targetting differentially regulated proteins'
+    disease_associations:
+        data: regulated
+        analyses: []
+        plots:
+            - basicTable
+        args:
+            use:
+                columns: identifiers
+            height: 700
+            width: 900
+            title: 'List of diseases associated with the differentially regulated proteins'

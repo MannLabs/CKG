@@ -12,7 +12,6 @@ import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
-import dash_table_experiments as dt
 import dash_table
 import flask
 
@@ -21,10 +20,10 @@ import report_manager.app
 from report_manager.app import app
 
 ###Create queries for these
-Users = pd.read_csv('/Users/plh450/Clinical_Proteomics/CKG/ClinicalDataApp/CKG_users.csv')
-DataTypes = pd.read_csv('/Users/plh450/Clinical_Proteomics/CKG/ClinicalDataApp/CKG_datatypes.csv')
-Tissues = pd.read_csv('/Users/plh450/Clinical_Proteomics/CKG/ClinicalDataApp/TissueNames.csv')
-ClinicalVariables = pd.read_csv('/Users/plh450/Clinical_Proteomics/CKG/ClinicalDataApp/clinicalvariables.csv')
+Users = pd.read_csv('./apps/templates/tmp_data/CKG_users.csv')
+DataTypes = pd.read_csv('./apps/templates/tmp_data/CKG_datatypes.csv')
+Tissues = pd.read_csv('./apps/templates/tmp_data/TissueNames.csv')
+ClinicalVariables = pd.read_csv('./apps/templates/tmp_data/clinicalvariables.csv')
 ###Works
 template_cols = pd.read_excel(os.path.join(os.getcwd(), 'apps/templates/ClinicalData_template.xlsx'))
 template_cols = template_cols.columns.tolist()
