@@ -12,7 +12,8 @@ from dash_network import Network
 from app import app
 from apps import initialApp, projectApp, importsApp, projectCreationApp
 
-
+template_cols = pd.read_excel(os.path.join(os.getcwd(), 'apps/templates/ClinicalData_template.xlsx'))
+template_cols = template_cols.columns.tolist()
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=True),
@@ -81,10 +82,16 @@ def update_data(contents, filename, n_clicks, value, existing_columns):
         df = parse_contents(contents, filename)
         if df is not None:
             data = df.to_dict('rows')
+            for i in df.columns:
+                if i not in template_cols:
+                    existing_columns.append({'id': i, 'name': i,
+                                             'editable_name': False, 'deletable': True})
+                else:
+                    pass
 
         if n_clicks is not None and n_clicks > 0:
-            for i in value:
-                existing_columns.append({'id': i, 'name': i,
+            for j in value:
+                existing_columns.append({'id': j, 'name': j,
                                      'editable_name': False, 'deletable': True})
         return data, existing_columns
 
