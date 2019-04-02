@@ -458,6 +458,17 @@ IMPORT_FOOD_DATA:
         MATCH (m:Metabolite{id:line.END_ID}) 
         MERGE (f)-[r:HAS_CONTENT{minimum:line.min,maximum:line.max,average:line.average,units:line.units,source:line.source}]->(m)
         RETURN COUNT(r) AS food_has_content_metabolite;
+
+IMPORT_BIOMARKERS:
+    'name': 'import protein biomarkers'
+    'description': 'Creates relationships is_biomarker_of (Disease, ...)'
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/curated/protein_is_biomarker_of_disease.csv" AS line
+        MATCH (p:Protein{id:line.START_ID})
+        MATCH (d:Disease{id:line.END_ID}) 
+        MERGE (p)-[r:IS_BIOMARKER_OF_DISEASE{is_used_in_clinic:toBoolean(line.used_in_clinic),assay:line.assay,is_routine:toBoolean(line.is_routine),reference:(line.reference),source:line.source,age_range:line.age_range,age_units:line.age_units,sex:line.sex,normal_range:line.normal_range,units:line.units,notes:line.notes}]->(d)
+        RETURN COUNT(r) AS protein_is_biomarker_of_disease;
         
 IMPORT_KNOWN_VARIANT_DATA: 
     'name': 'import known variant data'

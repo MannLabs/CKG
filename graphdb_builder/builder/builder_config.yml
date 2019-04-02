@@ -42,6 +42,7 @@ graph :
     - complexes
     - ppi
     - diseases
+    - biomarkers
     - drugs
     - known_variants
     - clinical variants
