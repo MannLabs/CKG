@@ -50,6 +50,16 @@ def transform_into_long_format(data, drop_columns, group, columns=['mame','y']):
     
     return long_data
 
+def get_ranking_with_markers(data, drop_columns, group, columns, list_markers, annotation={}):
+    long_data = transform_into_long_format(data, drop_columns, group, columns)
+    if len(set(long_data['name'].values.tolist()).intersection(list_markers)) > 0:
+        long_data['symbol'] = [ 17 if p in list_markers else 0 for p in long_data['name'].tolist()]
+        long_data['size'] = [25 if p in list_markers else 9 for p in long_data['name'].tolist()]
+        long_data['name'] = [p+' marker in '+annotation[p] if p in annotation else p for p in long_data['name'].tolist()]
+
+    return long_data
+
+
 def extract_number_missing(df, conditions, missing_max):
     if conditions is None:
         groups = data.loc[:, data.notnull().sum(axis = 1) >= missing_max]
@@ -180,6 +190,8 @@ def get_proteomics_measurements_ready(data, index=['group', 'sample', 'subject']
             sys.exit()
 
     df = df.reset_index()
+    print(df.shape)
+
     return df
 
 def run_pca(data, drop_cols=['sample', 'subject'], group='group', components=2):

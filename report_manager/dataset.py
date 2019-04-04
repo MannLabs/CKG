@@ -291,7 +291,7 @@ class Dataset:
                 continue
             for subsection in self.configuration[section]:
                 data_names, analysis_types, plot_types, store_analysis, args = self.extract_configuration(self.configuration[section][subsection])
-                if isinstance(data_names, dict):
+                if isinstance(data_names, dict) or isinstance(data_names, list):
                     data = self.get_datasets(data_names)
                 else:
                     data = self.get_dataset(data_names)

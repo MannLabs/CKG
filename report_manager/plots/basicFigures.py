@@ -141,7 +141,9 @@ def get_ranking_plot(data, identifier, args):
         for index in data.index.unique():
             gdata = data.loc[index, :].dropna().groupby('name', as_index=False).mean().sort_values(by='y', ascending=False)
             gdata = gdata.reset_index().reset_index()
-            gdata.columns = ['x', 'group', 'name', 'y'] 
+            cols = ['x', 'group', 'name', 'y']
+            cols.extend(gdata.columns[4:])
+            gdata.columns = cols
             trace = get_simple_scatterplot(gdata, identifier+'_'+index, args).figure['data'].pop()
             trace.name = index
             fig.append_trace(trace, r, c)
@@ -211,11 +213,16 @@ def get_scatterplot_matrix(data, identifier, args):
 def get_simple_scatterplot(data, identifier, args):
     figure = {}
     m = {'size': 15, 'line': {'width': 0.5, 'color': 'grey'}}
+    text = data.name
     if 'colors' in data.columns:
         m.update({'color':data['colors'].tolist()})
     if 'size' in data.columns:
         m.update({'size':data['size'].tolist()})
-        
+    if 'symbol' in data.columns:
+        m.update({'symbol':data['symbol'].tolist()})
+    if 'annotation' in data.columns:
+        text = data.annotation
+    
     figure["layout"] = go.Layout(title = args['title'],
                                 xaxis= {"title": args['x_title']},
                                 yaxis= {"title": args['y_title']},
@@ -229,7 +236,7 @@ def get_simple_scatterplot(data, identifier, args):
     
     figure['data'] = [go.Scatter(x = data.x,
                                 y = data.y,
-                                text = data.name,
+                                text = text,
                                 mode = 'markers',
                                 opacity=0.7,
                                 marker= m,

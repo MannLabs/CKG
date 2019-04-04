@@ -48,9 +48,12 @@ overview: #section
             plot_type: bar
             title: 'Number of modified proteins identified per type'    
     ranking:
-        data: processed
+        data: 
+            - processed
+            - protein biomarkers 
         analyses: 
-            - long_format
+            - ranking_with_markers
+            - basicTable
         plots:
             - ranking
         args:
@@ -60,6 +63,11 @@ overview: #section
             columns:
                 - name
                 - y
+            data: processed
+            markers: protein biomarkers
+            identifier: identifier
+            marker_of: disease
+            annotate: True
             group: group
             index: True
             x_title: Ranking of proteins

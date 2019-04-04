@@ -55,14 +55,15 @@ proteomics:
             - IS_BIOMARKER_IN_DISEASE
         query_type: pre
         query: >
-            MATCH (project:Project)-[:STUDIES_DISEASE]->(disease:Disease) 
+            MATCH (project:Project)-[:STUDIES_DISEASE]->(disease:Disease)-[:HAS_PARENT]->(pdisease:Disease)<-[:HAS_PARENT]-(cdiseases:Disease)
             WHERE project.id="PROJECTID"
-            WITH project, disease
+            WITH project, disease, pdisease, cdiseases
             MATCH (project:Project)-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
             WHERE toBoolean(r.is_razor)
-            WITH project, disease, protein, a, r
-            MATCH (protein)-[:IS_BIOMARKER_IN_DISEASE]->(disease)
-            RETURN  protein.id AS identifier, a.group AS group, toFloat(r.value) as LFQ_intensity, protein.name AS name, disease.name AS disease_name ORDER BY group;
+            WITH disease.id as disease, pdisease.id as pdisease, cdiseases.id as cdiseases, protein
+            MATCH (protein)-[:IS_BIOMARKER_OF_DISEASE]->(d)
+            WHERE d.id IN disease OR d.id IN pdisease OR d.id IN cdiseases
+            RETURN DISTINCT protein.name+"-"+protein.id AS identifier, d.name AS disease;
     DATASET:
         name: 'get dataset from project'
         description: 'Extracts the dataset matrix of quantified proteins in a given Project. Requires: Project.id'

@@ -1,5 +1,6 @@
 import report_manager.analyses.basicAnalysis as analyses
 from report_manager.plots import basicFigures as figure
+import pandas as pd
 import itertools
 
 
@@ -204,6 +205,25 @@ class AnalysisResult:
             args.update(nargs)
         elif self.analysis_type == 'long_format':
             result[self.analysis_type] = analyses.transform_into_long_format(self.data, drop_columns=args['drop_columns'], group=args['group'], columns=args['columns'])
+        elif self.analysis_type == 'ranking_with_markers':
+            list_markers = []
+            annotation = {}
+            marker_col = 'identifier'
+            marker_of_col = 'disease'
+            if 'identifier' in args:
+                marker_col = args['identifier']
+            if 'marker_of' in args:
+                marker_of_col = args['marker_of']
+            if 'markers' in args:
+                if args['markers'] in self.data:
+                    if marker_col in self.data[args['markers']]:
+                        list_markers = self.data[args['markers']][marker_col].tolist()
+                        if 'annotate' in args:
+                            if args['annotate']:
+                                annotation = pd.Series(self.data[args['markers']][marker_of_col].values, index=self.data[args['markers']][marker_col]).to_dict()
+            if 'data' in args:
+                if args['data'] in self.data:
+                    result[self.analysis_type] = analyses.get_ranking_with_markers(self.data[args['data']], drop_columns=args['drop_columns'], group=args['group'], columns=args['columns'], list_markers=list_markers, annotation = annotation)
         elif self.analysis_type == "wgcna":
             drop_cols_exp = []
             drop_cols_cli = []
