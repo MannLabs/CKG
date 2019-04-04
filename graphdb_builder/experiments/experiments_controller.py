@@ -1,4 +1,4 @@
-from graphdb_builder.ontologies import ontologies_controller as oh
+# from graphdb_builder.ontologies import ontologies_controller as oh
 from graphdb_builder import builder_utils
 import sys
 import re
@@ -120,25 +120,23 @@ def updateGroups(data, groups):
 #           Parsers        #
 ############################
 ########### Clinical Variables Datasets ############
-def parseClinicalDataset(projectId, configuration, dataDir):
+def parseClinicalDataset(projectId, configuration, dataDir, key='project'):
     '''This function parses clinical data from subjects in the project
     Input: uri of the clinical data file. Format: Subjects as rows, clinical variables as columns
     Output: pandas DataFrame with the same input format but the clinical variables mapped to the
     right ontology (defined in config), i.e. type = -40 -> SNOMED CT'''
 
-    pro_file = configuration['file_pro']
-    pro_filepath = os.path.join(dataDir, pro_file)
-    pro_data = None
-    if os.path.isfile(pro_filepath):
-        pro_data = readDataset(pro_filepath)
+    if key == 'project':
+        data_file = configuration['file_pro']
+    elif key == 'clinical':
+        data_file = configuration['file_cli']
 
-    cli_file = configuration['file_cli']
-    cli_filepath = os.path.join(dataDir, cli_file)
-    cli_data = None
-    if os.path.isfile(cli_filepath):
-        cli_data = readDataset(cli_filepath)
+    filepath = os.path.join(dataDir, data_file)
+    data = None
+    if os.path.isfile(filepath):
+        data = readDataset(filepath)
 
-    return pro_data, cli_data
+    return data
 
 ########### Proteomics Datasets ############
 def parseProteomicsDataset(projectId, configuration, dataDir):
@@ -180,7 +178,7 @@ def parseWESDataset(projectId, configuration, dataDir):
 ########### Clinical Variables Datasets ############
 def extractProjectInfo(project_data):
         df = project_data.copy()
-        df.columns = ['ID', 'name', 'acronym', 'description', 'type', 'tissue', 'responsible', 'participant', 'start_date', 'end_date', 'status']
+        df.columns = ['internal_id', 'name', 'acronym', 'description', 'type', 'tissue', 'responsible', 'participant', 'start_date', 'end_date', 'status']
         return df
 
 def extractSubjectIds(clinical_data):
@@ -717,8 +715,9 @@ def generateDatasetImports(projectId, dataType):
                 dataDir = config["dataTypes"][dataType]["directory"].replace("PROJECTID", projectId)
                 configuration = config["dataTypes"][dataType]
                 if dataType == "clinical":
-                    project_data, clinical_data = parseClinicalDataset(projectId, configuration, dataDir)
-                    if clinical_data is not None:
+                    project_data = parseClinicalDataset(projectId, configuration, dataDir, key='project')
+                    clinical_data = parseClinicalDataset(projectId, configuration, dataDir, key='clinical')
+                    if project_data is not None and clinical_data is not None:
                         dataRows = extractProjectInfo(project_data)
                         if dataRows is not None:
                             generateGraphFiles(dataRows,'', projectId, stats, d = dataType)
@@ -822,6 +821,7 @@ def generateDatasetImports(projectId, dataType):
 
 def generateGraphFiles(data, dataType, projectId, stats, ot = 'w', d = 'proteomics'):
     importDir = os.path.join(config["experimentsImportDirectory"], os.path.join(projectId,d))
+    ckg_utils.checkDirectory(importDir)
     if dataType.lower() == '':
         outputfile = os.path.join(importDir, projectId+dataType.lower()+".csv")
     else:
