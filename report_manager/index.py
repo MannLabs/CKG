@@ -301,10 +301,13 @@ def update_table_download_link(n_clicks, columns, rows, filename, path_name, dat
         #Retrieve identifiers from database
         project_id, subject_id, biosample_id, anasample_id = IDRetriver.retrieve_identifiers_from_database(driver, project_external_id)
 
-        #Add subject, biosample and anasample id columns to data
-        data.insert(loc=0, column='subject id', value=data['subject external id'].map(attribute_internal_ids(data, 'subject external id', subject_id).get))
-        data.insert(loc=1, column='biological_sample id', value=data['biological_sample external id'].map(attribute_internal_ids(data, 'biological_sample external id', biosample_id).get))
-        data.insert(loc=2, column='analytical_sample id', value=data['analytical_sample external id'].map(attribute_internal_ids(data, 'analytical_sample external id', anasample_id).get))
+        if data_type == 'clinical':
+            #Add subject, biosample and anasample id columns to data
+            data.insert(loc=0, column='subject id', value=data['subject external id'].map(attribute_internal_ids(data, 'subject external id', subject_id).get))
+            data.insert(loc=1, column='biological_sample id', value=data['biological_sample external id'].map(attribute_internal_ids(data, 'biological_sample external id', biosample_id).get))
+            data.insert(loc=2, column='analytical_sample id', value=data['analytical_sample external id'].map(attribute_internal_ids(data, 'analytical_sample external id', anasample_id).get))
+        else:
+          pass
 
         # # Path to new local folder
         dataDir = '../../data/experiments/PROJECTID/DATATYPE/'.replace('PROJECTID', project_id).replace('DATATYPE', data_type)
