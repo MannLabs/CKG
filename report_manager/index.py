@@ -1,12 +1,14 @@
 import io
 import os
+import re
 import pandas as pd
 import time
 from datetime import datetime
 import base64
+import qrcode
+import barcode
 import flask
 import urllib.parse
-import qrcode
 from IPython.display import HTML
 
 import dash_core_components as dcc
@@ -15,7 +17,7 @@ from dash.dependencies import Input, Output, State
 from dash_network import Network
 
 from app import app
-from apps import initialApp, projectApp, importsApp, projectCreationApp, dataUploadApp, projectCreationQueue
+from apps import initialApp, projectApp, importsApp, projectCreationApp, dataUploadApp, IDRetriver
 from graphdb_builder import builder_utils
 from graphdb_builder.builder import loader
 from graphdb_builder.experiments import experiments_controller as eh
@@ -33,7 +35,7 @@ from apps.worker import conn
 
 
 driver = connector.getGraphDatabaseConnectionConfiguration()
-q = Queue(connection=conn)
+# q = Queue(connection=conn)
 
 config = ckg_utils.get_configuration('../graphdb_builder/experiments/experiments_config.yml')
 
@@ -164,17 +166,17 @@ def create_project(n_clicks, name, acronym, responsible, datatype, participant, 
         project_csv_string = projectData.to_excel(os.path.join(dataDir, 'ProjectData.xlsx'), index=False, encoding='utf-8')
         #project_csv_string = "data:text/csv;charset=utf-8," + urllib.parse.quote(project_csv_string)
 
-        job = q.enqueue_call(func=projectCreationQueue.project_app_importer, args=(internal_id,), result_ttl=5000)
-        print(job.get_id())
+        ###QUEUE
+        # job = q.enqueue_call(func=projectCreationQueue.project_app_importer, args=(internal_id,), result_ttl=5000)
+        # print(job.get_id())
         # job2 = q.enqueue_call(func=projectCreationQueue.project_app_loader, args=(driver,internal_id,), result_ttl=5000)
         # print(job2.get_id())
 
-        # #Creates project .csv in /imports 
-        # projectCreationQueue.project_app_importer(internal_id)
+        #Creates project .csv in /imports 
+        IDRetriver.project_app_importer(internal_id)
 
-        # #Loads project .csv into the database
-        # projectCreationQueue.project_app_loader(driver, internal_id)
-
+        #Loads project .csv into the database
+        IDRetriver.project_app_loader(driver, internal_id)
 
         return "Project successfully submitted."
 
@@ -200,6 +202,29 @@ def parse_contents(contents, filename):
     elif file == 'xlsx' or file == 'xls':
         df = pd.read_excel(io.BytesIO(decoded))        
     return df
+
+def export_contents(data, dataDir, filename):
+    file = filename.split('.')[-1]
+    
+    if file == 'txt':
+        csv_string = data.to_csv(os.path.join(dataDir, filename), sep='\t', index=False, encoding='utf-8')
+    elif file == 'csv':
+        csv_string = data.to_csv(os.path.join(dataDir, filename), sep=',', index=False, encoding='utf-8')
+    elif file == 'xlsx' or file == 'xls':
+        csv_string = data.to_excel(os.path.join(dataDir, filename), index=False, encoding='utf-8')   
+    return csv_string
+
+def attribute_internal_ids(data, column, first_id):
+    prefix = re.split(r'(^[^\d]+)', first_id)[1]
+    id_value = int(re.split(r'(^[^\d]+)', first_id)[-1])
+    
+    mapping = {}
+    for i in data[column].unique():
+        new_id = prefix+str(id_value)
+        mapping[i] = new_id
+        id_value += 1
+    
+    return mapping
 
 
 @app.callback([Output('clinical-table', 'data'),
@@ -262,36 +287,36 @@ def update_table_download_link(n_clicks, columns, rows, data_type):
              [Input('submit_button', 'n_clicks')],
              [State('clinical-table', 'columns'),
               State('clinical-table', 'data'),
+              State('upload-data', 'filename'),
               State('url', 'pathname'),
               State('upload-data-type', 'value')])
-def update_table_download_link(n_clicks, columns, rows, path_name, data_type):
+def update_table_download_link(n_clicks, columns, rows, filename, path_name, data_type):
     if n_clicks != None:
         # Get Clinical data from Uploaded and updated table
         cols = [d['id'] for d in columns]
-        clinicalData = pd.DataFrame(rows, columns=cols)
+        data = pd.DataFrame(rows, columns=cols)
 
-        projectId = path_name.split('/')[-1]
-
-        identifier = [(p['internal_id']) for p in driver.nodes.match('Project') if p['id'] == projectId]
-
-        # Path to new local folder
-        dataDir = '../../data/experiments/PROJECTID/DATATYPE/'.replace('PROJECTID', identifier[0]).replace('DATATYPE', data_type)
+        project_external_id = path_name.split('/')[-1]
         
-        # Check/create folders based on local
+        #Retrieve identifiers from database
+        project_id, subject_id, biosample_id, anasample_id = IDRetriver.retrieve_identifiers_from_database(driver, project_external_id)
+
+        #Add subject, biosample and anasample id columns to data
+        data.insert(loc=0, column='subject id', value=data['subject external id'].map(attribute_internal_ids(data, 'subject external id', subject_id).get))
+        data.insert(loc=1, column='biological_sample id', value=data['biological_sample external id'].map(attribute_internal_ids(data, 'biological_sample external id', biosample_id).get))
+        data.insert(loc=2, column='analytical_sample id', value=data['analytical_sample external id'].map(attribute_internal_ids(data, 'analytical_sample external id', anasample_id).get))
+
+        # # Path to new local folder
+        dataDir = '../../data/experiments/PROJECTID/DATATYPE/'.replace('PROJECTID', project_id).replace('DATATYPE', data_type)
+        
+        # # Check/create folders based on local
         ckg_utils.checkDirectory(dataDir)
 
-        clinical_csv_string = clinicalData.to_excel(os.path.join(dataDir, 'ClinicalData.xlsx'), index=False, encoding='utf-8')
+        csv_string = export_contents(data, dataDir, filename)
+        
+        message = 'FILE successfully uploaded.'.replace('FILE', '"'+filename+'"')
 
-        return 'Data successfully uploaded.'
-
-
-@app.callback(Output('submit_button', 'disabled'),
-             [Input('submit_button', 'n_clicks')])
-def disable_submit_button(n_clicks):
-    if n_clicks > 0:
-        return True
-
-
+        return message
 
 
 
@@ -329,9 +354,6 @@ def disable_submit_button(n_clicks):
 
 #         # Add png names as new column in dataframe
 #         clinicalData['QR code'] = images
-
-
-
 
 
 

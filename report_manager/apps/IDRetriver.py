@@ -67,7 +67,30 @@ def project_app_loader(driver, projectId):
     
     
 
-           
+def retrieve_identifiers_from_database(driver, projectId):
+    #Queries
+    project_identifier = "MATCH (p:Project) WHERE p.external_id = 'EXTERNALID' RETURN p.internal_id AS result"
+    subject_identifier = "MATCH (s:Subject) WITH max(toInteger(SPLIT(s.id, 'S')[1]))+1 as new_id RETURN SUBSTRING('S',0,1) + new_id AS result"
+    biosample_identifier = "MATCH (b:Biological_sample) WITH max(toInteger(SPLIT(b.id, 'BS')[1]))+1 as new_id RETURN SUBSTRING('BS',0,2) + new_id AS result"
+    anasample_identifier = "MATCH (a:Analytical_sample) WITH max(toInteger(SPLIT(a.id, 'AS')[1]))+1 as new_id RETURN SUBSTRING('AS',0,2) + new_id AS result"
+
+    #Get external id from database
+    project_id = connector.sendQuery(driver, project_identifier.replace('EXTERNALID', projectId))
+    project_id = [record['result'] for record in project_id][0]
+        
+    subject_id = connector.sendQuery(driver, subject_identifier)
+    subject_id = [record['result'] for record in subject_id][0]
+
+    biosample_id = connector.sendQuery(driver, biosample_identifier)
+    biosample_id = [record['result'] for record in biosample_id][0]
+
+    anasample_id = connector.sendQuery(driver, anasample_identifier)
+    anasample_id = [record['result'] for record in anasample_id][0]
+
+    return project_id, subject_id, biosample_id, anasample_id
+
+
+
 
 
 
