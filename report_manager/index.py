@@ -7,8 +7,6 @@ import base64
 import flask
 import urllib.parse
 import qrcode
-import barcode
-from barcode.writer import ImageWriter
 from IPython.display import HTML
 
 import dash_core_components as dcc
