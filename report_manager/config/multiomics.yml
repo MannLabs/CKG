@@ -12,6 +12,7 @@ data exploration:
                 - group
                 - sample
             drop_cols_cli:
+                - index
                 - group
                 - biological_sample
             RsquaredCut: 0.8
