@@ -65,7 +65,7 @@ class AnalysisResult:
         args = self.args
         if self.analysis_type == "wide_format":
             r = analyses.transform_into_wide_format(self.data, args['index'], args['x'],
-                                                                args['y'], extra=[args['group']], use_index=args['use_index'])
+                                                                args['y'], extra=[args['group']])
             result[self.analysis_type] = r
         if self.analysis_type == "pca":
             components = 2

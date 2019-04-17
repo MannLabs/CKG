@@ -24,21 +24,10 @@ from graphdb_builder.experiments import experiments_controller as eh
 import ckg_utils
 import config.ckg_config as ckg_config
 
-import py2neo
-import logging
-import logging.config
+from worker import hello
 from graphdb_connector import connector
 
-from rq import Queue
-from rq.job import Job
-from apps.worker import conn
-
-
 driver = connector.getGraphDatabaseConnectionConfiguration()
-# q = Queue(connection=conn)
-
-config = ckg_utils.get_configuration('../graphdb_builder/experiments/experiments_config.yml')
-
 
 
 app.layout = html.Div([
@@ -171,6 +160,8 @@ def create_project(n_clicks, name, acronym, responsible, datatype, participant, 
         # print(job.get_id())
         # job2 = q.enqueue_call(func=projectCreationQueue.project_app_loader, args=(driver,internal_id,), result_ttl=5000)
         # print(job2.get_id())
+        hello.delay()
+
 
         #Creates project .csv in /imports 
         IDRetriver.project_app_importer(internal_id)

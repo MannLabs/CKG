@@ -15,7 +15,6 @@ import dash_html_components as html
 import dash_table
 import flask
 
-import config.ckg_config as ckg_config
 from apps import basicApp
 
 class ProjectCreationApp(basicApp.BasicApp):

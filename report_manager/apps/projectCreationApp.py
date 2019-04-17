@@ -1,27 +1,12 @@
-import base64
-import io
 import os
 import pandas as pd
-import json
 
-import dash
-from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
-import dash_table
-import flask
 
-import config.ckg_config as ckg_config
 from apps import basicApp
 
-
-
 from graphdb_connector import connector
-import logging
-import logging.config
-
-
-import py2neo
 
 
 driver = connector.getGraphDatabaseConnectionConfiguration()

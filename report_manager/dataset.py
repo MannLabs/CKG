@@ -451,26 +451,34 @@ class ClinicalDataset(Dataset):
         processed_data = None
         data = self.get_dataset("dataset")
         if data is not None:
-            index = 'index'
+            subject_id = 'subject'
+            sample_id = 'biological_sample'
+            group_id = 'group'
             columns = 'clinical_variable'
-            values = 'value'
+            values = 'values'
             extra = []
-            use_index = False
+            imputation  = True
+            imputation_method = 'KNN'
             args = {}
             if "args" in self.configuration:
                 args = self.configuration["args"]
-                if "index" in args:
-                    index = args["index"]
+                if "subject_id" in args:
+                    subject_id = args["subject_id"]
+                if "sample_id" in args:
+                    sample_id = args["sample_id"]
                 if "columns" in args:
                     columns = args["columns"]
                 if "values" in args:
                     values = args["values"]
                 if "extra" in args:
                     extra = args["extra"]
-                if "use_index" in args:
-                    use_index = args["use_index"]
+                if 'imputation_method' in args:
+                    imputation = True
+                    imputation_method = args['imputation_method']
+                if 'group_id' in args:
+                    group_id = args['group_id']
 
-            processed_data = basicAnalysis.transform_into_wide_format(data, index=index, columns=columns, values=values, extra=extra)
+            processed_data = basicAnalysis.get_clinical_measurements_ready(data, subject_id=subject_id, sample_id=sample_id, group_id=group_id, columns=columns, values=values, extra=extra, imputation=imputation, imputation_method=imputation_method)
         return processed_data
 
 class DNAseqDataset(Dataset):

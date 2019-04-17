@@ -171,9 +171,9 @@ def get_proteomics_measurements_ready(df, index=['group', 'sample', 'subject'], 
     aux = index
 
     if missing_method == 'at_least_x_per_group':
-        aux.extend(extract_number_missing(df, missing_max, drop_cols, group))
+        aux.extend(extract_number_missing(df, missing_max, drop_cols, group=None))
     elif missing_method == 'percentage':
-        aux.extend(extract_percentage_missing(df,  missing_max, drop_cols, group))
+        aux.extend(extract_percentage_missing(df,  missing_max, drop_cols, group=None))
 
     df = df[list(set(aux))]
     if imputation:
@@ -189,6 +189,25 @@ def get_proteomics_measurements_ready(df, index=['group', 'sample', 'subject'], 
     df = df.reset_index()
 
     return df
+
+def get_clinical_measurements_ready(df, subject_id='subject', sample_id='biological_sample', group_id='group', columns=['clinical_variable'], values='values', extra=['group'], imputation=True, imputation_method='KNN'):
+    index = [subject_id, sample_id]
+    drop_cols = [subject_id, sample_id]
+    drop_cols.append(group_id)
+    
+    processed_df = transform_into_wide_format(df, index=index, columns=columns, values=values, extra=extra)
+    if imputation:
+        if imputation_method.lower() == "knn":
+            df = imputation_KNN(processed_df, drop_cols=drop_cols, group=group_id)
+        elif imputation_method.lower() == "distribution":
+            df = imputation_normal_distribution(processed_df, index=index)
+        elif imputation_method.lower() == 'group_median':
+            df = imputation_median_by_group(processed_df)
+        elif imputation_method.lower() == 'mixed':
+            df = imputation_mixed_norm_KNN(processed_df,index_cols=index, group=group_id)
+    
+    return df
+
 
 def run_pca(data, drop_cols=['sample', 'subject'], group='group', components=2):
     np.random.seed(112736)
@@ -320,7 +339,7 @@ def get_counts_permutation_fdr(value, random, observed, n, alpha):
     a = (random <= value.values[0]).sum().sum()
     b = (observed <= value.values[0]).sum()
     qvalue = 1
-    if b != 0:
+    if a!=0 and b != 0:
         qvalue = (a/b * 1/n)
     return (qvalue, qvalue <= alpha)
 
@@ -494,9 +513,8 @@ def calculate_paired_ttest(df, condition1, condition2):
     mean2 = group2.mean()
     log2fc = mean1 - mean2
     t, pvalue = stats.ttest_rel(group1, group2, nan_policy='omit')
-    log = -math.log(pvalue, 10)
 
-    return (df.name, t, pvalue, log, mean1, mean2, log2fc)
+    return (df.name, t, pvalue, mean1, mean2, log2fc)
 
 def calculate_ttest(df, condition1, condition2):
     group1 = df[condition1]
@@ -514,9 +532,8 @@ def calculate_ttest(df, condition1, condition2):
     mean2 = group2.mean()
     log2fc = mean1 - mean2
     t, pvalue = stats.ttest_ind(group1, group2, nan_policy='omit')
-    log = -math.log(pvalue, 10)
 
-    return (df.name, t, pvalue, log, mean1, mean2, log2fc)
+    return (df.name, t, pvalue, mean1, mean2, log2fc)
 
 def calculate_THSD(df):
     col = df.name
@@ -561,7 +578,6 @@ def calculate_repeated_measures_anova(df, column, subject='subject', group='grou
     aov_result = pg.rm_anova(dv=column, within=group,subject=subject, data=df, detailed=True, remove_na=True, correction=True)
     aov_result.columns = ['Source', 'SS', 'DF', 'MS', 'F', 'pvalue', 'padj (GG)', 'np2', 'eps', 'sphericity', 'Mauchlys sphericity', 'p-spher']
     t, pvalue = aov_result.loc[0, ['F', 'pvalue']].values 
-    log = -math.log(pvalue,10)
 
     return (column, t, pvalue, log)
 
@@ -628,7 +644,7 @@ def anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', gro
         res = res.reset_index()
         res['rejected'] = res['padj'] < alpha
         res['rejected'] = res['rejected']
-        res['-log10 pvalue'] = res['padj'].apply(lambda x: - math.log(x,10))
+        res['-log10 pvalue'] = res['padj'].apply(lambda x: -np.log10(x))
     
     return res
 
@@ -677,7 +693,7 @@ def repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subject='s
     res = res.reset_index()
     res['rejected'] = res['padj'] < alpha
     res['rejected'] = res['rejected']
-    res['-log10 pvalue'] = res['padj'].apply(lambda x: - math.log(x,10))
+    res['-log10 pvalue'] = res['padj'].apply(lambda x: - np.log10(x))
     
     
     return res
@@ -724,7 +740,7 @@ def ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], subjec
     scores['group1'] = condition1
     scores['group2'] = condition2
     scores['FC'] = scores['log2FC'].apply(lambda x: np.power(2,np.abs(x)) * -1 if x < 0 else np.power(2,np.abs(x)))
-    scores['-log10 pvalue'] = scores['padj'].apply(lambda x: - math.log(x,10))
+    scores['-log10 pvalue'] = scores['padj'].apply(lambda x: - np.log10(x))
     scores = scores.reset_index() 
 
     return scores

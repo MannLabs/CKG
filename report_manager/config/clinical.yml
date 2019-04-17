@@ -1,12 +1,12 @@
 args:
-    index: 
-        - subject
-        - biological_sample
+    subject_id: subject
+    sample_id: biological_sample
+    group_id: group
+    imputation_method: KNN
     columns: clinical_variable
     values: value
     extra: 
         - group
-
 overview: #section
     clinical variables:
         data: clinical variables 

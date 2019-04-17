@@ -1,19 +1,26 @@
+import os
+import flask
+import redis
 import dash
 import dash_auth
 
-app = dash.Dash()
-server = app.server
+
+server = flask.Flask('app')
+server.secret_key = os.environ.get('secret_key', 'secret')
+
+app = dash.Dash('auth', server=server)
 
 # Keep this out of source code repository - save in a file or a database
 VALID_USERNAME_PASSWORD_PAIRS = [
     ['hello', 'world']
 ]
 
-app = dash.Dash('auth')
 auth = dash_auth.BasicAuth(
     app,
     VALID_USERNAME_PASSWORD_PAIRS
 )
+
+r = redis.StrictRedis.from_url('redis://localhost:6379')
 
 with open("app_template.html", 'r') as f:
     template = f.read()

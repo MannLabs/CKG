@@ -298,7 +298,6 @@ def get_volcanoplot(results, args):
             range_y = [0,max(abs(result['y']))+0.8]
         else:
             range_y = args["range_y"]
-
         trace = Scattergl(x=result['x'],
                         y=result['y'],
                         mode='markers',
@@ -317,7 +316,7 @@ def get_volcanoplot(results, args):
                                                 'x0': np.log2(args['fc']),
                                                 'y0': 0,
                                                 'x1': np.log2(args['fc']),
-                                                'y1': max(abs(result['y']))+0.5,
+                                                'y1': range_y[1],
                                                 'line': {
                                                     'color': 'grey',
                                                     'width': 2,
@@ -328,7 +327,7 @@ def get_volcanoplot(results, args):
                                                 'x0': -np.log2(args['fc']),
                                                 'y0': 0,
                                                 'x1': -np.log2(args['fc']),
-                                                'y1': max(abs(result['y']))+0.5,
+                                                'y1': range_y[1],
                                                 'line': {
                                                     'color': 'grey',
                                                     'width': 2,
@@ -426,7 +425,6 @@ def get_heatmapplot(data, identifier, args):
 def get_complex_heatmapplot(data, identifier, args):
     df = data.copy()
     figure = {'data':[], 'layout':{}}
-
     if args['format'] == "edgelist":
         df = df.set_index(args['source'])
         df = df.pivot_table(values=args['values'], index=df.index, columns=args['target'], aggfunc='first')
@@ -540,7 +538,6 @@ def get_network(data, identifier, args):
             else:
                 data = data > arg['cutoff']
         data = data.rename(index=str, columns={args['values']: "width"})
-        args['values'] = 'width'
         edge_prop_columns = [c for c in data.columns if c not in [args['source'], args['target']]]
         edge_properties = [str(d) for d in data.to_dict(orient='index').values()]
         graph = nx.from_pandas_edgelist(data, args['source'], args['target'], edge_attr=True)
