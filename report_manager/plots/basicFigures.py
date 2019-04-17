@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pandas as pd
 import dash_core_components as dcc
@@ -7,6 +8,7 @@ import plotly.figure_factory as FF
 import math
 import dash_table
 from plotly import tools
+import plotly.io as pio
 from scipy.spatial.distance import pdist, squareform
 from plotly.graph_objs import *
 from kmapper import plotlyviz
@@ -132,6 +134,8 @@ def get_ranking_plot(data, identifier, args):
     fig = {}
     num_groups = len(data.index.unique())
     num_rows = math.ceil(num_groups/num_cols)
+    if 'group' in args:
+        group=args['group']
     #subplot_title = "Ranking of proteins in {} samples"
     #subplot_titles = [subplot_title.format(index.title()) for index in data.index.unique()]
     fig = tools.make_subplots(rows=num_rows, cols=num_cols, shared_yaxes=True,vertical_spacing=0.1, print_grid=False)
@@ -144,7 +148,7 @@ def get_ranking_plot(data, identifier, args):
             cols = ['x', 'group', 'name', 'y']
             cols.extend(gdata.columns[4:])
             gdata.columns = cols
-            trace = get_simple_scatterplot(gdata, identifier+'_'+index, args).figure['data'].pop()
+            trace = get_simple_scatterplot(gdata, identifier+'_'+str(index), args).figure['data'].pop()
             trace.name = index
             fig.append_trace(trace, r, c)
             
@@ -291,7 +295,7 @@ def get_volcanoplot(results, args):
         else:
             range_x = args["range_x"]
         if "range_y" not in args:
-            range_y = [0,max(abs(result['y']))+2.5]
+            range_y = [0,max(abs(result['y']))+0.8]
         else:
             range_y = args["range_y"]
 
@@ -313,7 +317,7 @@ def get_volcanoplot(results, args):
                                                 'x0': np.log2(args['fc']),
                                                 'y0': 0,
                                                 'x1': np.log2(args['fc']),
-                                                'y1': max(abs(result['y']))+2.5,
+                                                'y1': max(abs(result['y']))+0.5,
                                                 'line': {
                                                     'color': 'grey',
                                                     'width': 2,
@@ -324,7 +328,7 @@ def get_volcanoplot(results, args):
                                                 'x0': -np.log2(args['fc']),
                                                 'y0': 0,
                                                 'x1': -np.log2(args['fc']),
-                                                'y1': max(abs(result['y']))+2.5,
+                                                'y1': max(abs(result['y']))+0.5,
                                                 'line': {
                                                     'color': 'grey',
                                                     'width': 2,
@@ -358,16 +362,16 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
         signature = grouping.get_group(group)
         color = []
         text = []
-        gidentifier = identifier + "_".join(group)
+        gidentifier = identifier + "_".join(map(str,group))
         title = 'Comparison: '+str(group[0])+' vs '+str(group[1])
-        min_sig_pval = 0
+        sig_pval = False
         for index, row in signature.iterrows():
             # Text
             text.append('<b>'+str(row['identifier'])+": "+str(index)+'<br>Comparison: '+str(row['group1'])+' vs '+str(row['group2'])+'<br>log2FC = '+str(round(row['log2FC'], ndigits=2))+'<br>p = '+'{:.2e}'.format(row['pvalue'])+'<br>FDR = '+'{:.2e}'.format(row['padj']))
 
             # Color
             if row['padj'] <= args['alpha']:
-                min_sig_pval = row['pvalue'] if row['pvalue'] > min_sig_pval else min_sig_pval
+                sig_pval = True
                 if row['FC'] <= -args['fc']:
                     color.append('#2c7bb6')
                 elif row['FC'] >= args['fc']:
@@ -377,12 +381,16 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
                 elif row['FC'] > 1.:
                     color.append('#fdae61')
                 else:
-                    color.append('silver')
+                    color.append('lightblue')
             else:
                 color.append('silver')
 
+        if not sig_pval:
+            alpha = 0.0000000000001
+        else:
+            alpha = args['alpha']
         # Return
-        volcano_plot_results[(gidentifier, title)] = {'x': signature['log2FC'].values, 'y': signature['-log10 pvalue'].values, 'text':text, 'color': color, 'pvalue':-np.log10(min_sig_pval)}
+        volcano_plot_results[(gidentifier, title)] = {'x': signature['log2FC'].values, 'y': signature['-log10 pvalue'].values, 'text':text, 'color': color, 'pvalue':-np.log10(alpha)}
 
     figures = get_volcanoplot(volcano_plot_results, args)
 
@@ -1014,3 +1022,14 @@ def get_cytoscape_network(net, identifier, args):
 
 
     return cytonet
+
+def save_DASH_plot(plot, name, plot_format='svg', directory='.'):
+    if not os.path.exists(directory):
+        os.mkdir(directory)
+    if plot_format in ['svg', 'pdf', 'png', 'jpeg', 'jpg']:
+        plot_file = os.path.join(directory, str(name)+'.'+str(plot_format))
+        pio.write_image(plot.figure, plot_file)
+        
+    
+    
+    

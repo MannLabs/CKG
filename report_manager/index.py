@@ -6,7 +6,7 @@ import time
 from datetime import datetime
 import base64
 import qrcode
-import barcode
+#import barcode
 import flask
 import urllib.parse
 from IPython.display import HTML

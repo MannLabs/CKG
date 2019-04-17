@@ -60,8 +60,8 @@ def get_ranking_with_markers(data, drop_columns, group, columns, list_markers, a
     return long_data
 
 
-def extract_number_missing(df, conditions, missing_max):
-    if conditions is None:
+def extract_number_missing(df, missing_max, drop_cols=['sample'], group='group'):
+    if group is None:
         groups = data.loc[:, data.notnull().sum(axis = 1) >= missing_max]
     else:
         groups = data.copy()
@@ -72,20 +72,20 @@ def extract_number_missing(df, conditions, missing_max):
     groups = groups.dropna(how='all', axis=1)
     return list(groups.columns)
 
-def extract_percentage_missing(data, conditions, missing_max):
-    if conditions is None:
+def extract_percentage_missing(data, missing_max, drop_cols=['sample'], group='group'):
+    if group is None:
         groups = data.loc[:, data.isnull().mean() <= missing_max].columns
     else:
         groups = data.copy()
-        groups = groups.drop(["sample"], axis = 1)
-        groups = data.set_index("group")
+        groups = groups.drop(drop_cols, axis = 1)
+        groups = data.set_index(group)
         groups = groups.isnull().groupby(level=0).mean()
         groups = groups[groups<=missing_max]
         groups = groups.dropna(how='all', axis=1).columns
 
     return list(groups)
 
-def imputation_KNN(data, drop_cols=['group', 'sample', 'subject'], group='group', cutoff=0.5, alone = True):
+def imputation_KNN(data, drop_cols=['group', 'sample', 'subject'], group='group', cutoff=0.6, alone = True):
     df = data.copy()
     value_cols = [c for c in df.columns if c not in drop_cols]
     for g in df[group].unique():
@@ -102,9 +102,9 @@ def imputation_KNN(data, drop_cols=['group', 'sample', 'subject'], group='group'
 
     return df
 
-def imputation_mixed_norm_KNN(data):
-    df = imputation_KNN(data, cutoff=0.6, alone = False)
-    df = imputation_normal_distribution(df, shift = 1.8, nstd = 0.3)
+def imputation_mixed_norm_KNN(data, index_cols=['group', 'sample', 'subject'], shift = 1.8, nstd = 0.3, group='group', cutoff=0.6):
+    df = imputation_KNN(data, drop_cols=index_cols, group=group, cutoff=cutoff, alone = False)
+    df = imputation_normal_distribution(df, index=index_cols, shift=shift, nstd=nstd)
 
     return df
 
@@ -160,21 +160,20 @@ def remove_group(data):
     data.drop(['group'], axis=1)
     return data
 
-def get_proteomics_measurements_ready(data, index=['group', 'sample', 'subject'], imputation = True, method = 'distribution', missing_method = 'percentage', missing_max = 0.3, value_col='LFQ_intensity'):
-    df = data.copy()
-    conditions = df['group'].unique()
+def get_proteomics_measurements_ready(df, index=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation = True, method = 'distribution', missing_method = 'percentage', missing_max = 0.3, value_col='LFQ_intensity'):
     df = df.set_index(index)
-    df['identifier'] = df['name'].map(str) + "-" + df['identifier'].map(str)
-    df = df.pivot_table(values=value_col, index=df.index, columns='identifier', aggfunc='first')
+    if extra_identifier is not None and extra_identifier in df.columns:
+        df[identifier] = df[extra_identifier].map(str) + "-" + df[identifier].map(str)
+    df = df.pivot_table(values=value_col, index=df.index, columns=identifier, aggfunc='first')
     df = df.reset_index()
     df[index] = df["index"].apply(pd.Series)
     df = df.drop(["index"], axis=1)
     aux = index
 
     if missing_method == 'at_least_x_per_group':
-        aux.extend(extract_number_missing(df, conditions, missing_max))
+        aux.extend(extract_number_missing(df, missing_max, drop_cols, group))
     elif missing_method == 'percentage':
-        aux.extend(extract_percentage_missing(df, conditions, missing_max))
+        aux.extend(extract_percentage_missing(df,  missing_max, drop_cols, group))
 
     df = df[list(set(aux))]
     if imputation:
@@ -186,11 +185,8 @@ def get_proteomics_measurements_ready(data, index=['group', 'sample', 'subject']
             df = imputation_median_by_group(df)
         elif method == 'mixed':
             df = imputation_mixed_norm_KNN(df)
-        else:
-            sys.exit()
-
+            
     df = df.reset_index()
-    print(df.shape)
 
     return df
 
@@ -302,7 +298,7 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, per
         df_random = df.reset_index(drop=True)
         df_random.index = df_index
         df_random.index.name = 'group'
-        columns = ['identifier', 't-statistics', 'pvalue_'+str(i), '-log10 pvalue']
+        columns = ['identifier', 'F-statistics', 'pvalue_'+str(i)]
         if list(df_random.index) != list(df.index):
             rand_scores = df_random.apply(func=calculate_anova, axis=0, result_type='expand').T
             rand_scores.columns = columns
@@ -559,8 +555,7 @@ def calculate_anova(df, group='group'):
     col = df.name
     group_values = df.groupby(group).apply(list).tolist()
     t, pvalue = stats.f_oneway(*group_values)
-    log = -math.log(pvalue,10)
-    return (col, t, pvalue, log)
+    return (col, t, pvalue)
 
 def calculate_repeated_measures_anova(df, column, subject='subject', group='group', alpha=0.05):
     aov_result = pg.rm_anova(dv=column, within=group,subject=subject, data=df, detailed=True, remove_na=True, correction=True)
@@ -586,8 +581,8 @@ def check_is_paired(df, subject, group):
     return is_pair
 
 def anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', group='group', permutations=50):
-    columns = ['identifier', 't-statistics', 'pvalue', '-log10 pvalue']
-    if check_is_paired(df, subject, group):
+    columns = ['identifier', 'F-statistics', 'pvalue']
+    if subject is not None and check_is_paired(df, subject, group):
         groups = df[group].unique()
         drop_cols = [d for d in drop_cols if d != subject]
         if len(groups) == 2:
@@ -602,7 +597,7 @@ def anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', gro
         scores = scores.set_index("identifier")
         scores = scores.dropna(how="all")
 
-        max_perm = get_max_permutations(df)
+        max_perm = get_max_permutations(df, group=group)
         #FDR correction
         if permutations > 0 and max_perm>=10:
             if max_perm < permutations:
@@ -624,7 +619,7 @@ def anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', gro
             else:
                 res = pd.concat([res,pairwise], axis=0)
         if res is not None:
-            res = res.join(scores[['t-statistics', 'pvalue', '-log10 pvalue', 'padj']].astype('float'))
+            res = res.join(scores[['F-statistics', 'pvalue', 'padj']].astype('float'))
             res['correction'] = scores['correction']
         else:
             res = scores
@@ -632,7 +627,8 @@ def anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', gro
 
         res = res.reset_index()
         res['rejected'] = res['padj'] < alpha
-        res['rejected'] = res['rejected'] 
+        res['rejected'] = res['rejected']
+        res['-log10 pvalue'] = res['padj'].apply(lambda x: - math.log(x,10))
     
     return res
 
@@ -644,7 +640,7 @@ def repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subject='s
         aov = calculate_repeated_measures_anova(df[col].reset_index(), column=col, subject=subject, group=group, alpha=alpha)
         aov_result.append(aov)
 
-    scores = pd.DataFrame(aov_result, columns = ['identifier','t-statistics', 'pvalue', '-log10 pvalue'])
+    scores = pd.DataFrame(aov_result, columns = ['identifier','F-statistics', 'pvalue'])
     scores = scores.set_index('identifier')
 
     max_perm = get_max_permutations(df)
@@ -672,7 +668,7 @@ def repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subject='s
         else:
             res = pd.concat([res,pairwise], axis=0)
     if res is not None:
-        res = res.join(scores[['t-statistics', 'pvalue', '-log10 pvalue', 'padj']].astype('float'))
+        res = res.join(scores[['F-statistics', 'pvalue', 'padj']].astype('float'))
         res['correction'] = scores['correction']
     else:
         res = scores
@@ -680,7 +676,8 @@ def repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subject='s
 
     res = res.reset_index()
     res['rejected'] = res['padj'] < alpha
-    res['rejected'] = res['rejected'] 
+    res['rejected'] = res['rejected']
+    res['-log10 pvalue'] = res['padj'].apply(lambda x: - math.log(x,10))
     
     
     return res
@@ -727,7 +724,7 @@ def ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], subjec
     scores['group1'] = condition1
     scores['group2'] = condition2
     scores['FC'] = scores['log2FC'].apply(lambda x: np.power(2,np.abs(x)) * -1 if x < 0 else np.power(2,np.abs(x)))
-    scores['-log10 pvalue'] = scores['pvalue'].apply(lambda x: - math.log(x,10))
+    scores['-log10 pvalue'] = scores['padj'].apply(lambda x: - math.log(x,10))
     scores = scores.reset_index() 
 
     return scores
