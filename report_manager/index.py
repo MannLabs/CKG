@@ -17,14 +17,14 @@ from dash.dependencies import Input, Output, State
 from dash_network import Network
 
 from app import app
-from apps import initialApp, projectApp, importsApp, projectCreationApp, dataUploadApp, IDRetriver
+from apps import initialApp, projectApp, importsApp, projectCreationApp, dataUploadApp
 from graphdb_builder import builder_utils
 from graphdb_builder.builder import loader
 from graphdb_builder.experiments import experiments_controller as eh
 import ckg_utils
 import config.ckg_config as ckg_config
 
-from worker import hello
+from worker import create_new_project
 from graphdb_connector import connector
 
 driver = connector.getGraphDatabaseConnectionConfiguration()
@@ -139,7 +139,6 @@ def create_project(n_clicks, name, acronym, responsible, datatype, participant, 
     if n_clicks != None:
         # Get project data from filled-in fields
         projectData = pd.DataFrame([name, acronym, description, datatype, tissue, responsible, participant, start_date, end_date]).T
-        name,p.acronym=line.acronym,p.description=line.description,p.type=line.type,p.tissue=line.tissue,p.responsible=line.responsible,p.participant=line.participant,p.start_date=line.start_date,p.end_date=line.end_date,p.status=line.status
         projectData.columns = ['name', 'acronym', 'description', 'datatypes', 'tissue', 'responsible', 'participant', 'start_date', 'end_date']
         projectData['status'] = ''
 
@@ -150,7 +149,7 @@ def create_project(n_clicks, name, acronym, responsible, datatype, participant, 
         
         projectData.insert(loc=0, column='internal_id', value=internal_id)
 
-        result = project_creation.create_new_project.delay(driver, projectId, ProjectData)
+        result = create_new_project.apply_async(args=[internal_id, projectData.to_json()], task_id='project_creation_'+internal_id)
         if result is not None:
             response = "Project successfully submitted."
         else:

@@ -1,0 +1,23 @@
+increment_project_id:
+    name:  create new external identifier 
+    description: 'Returns a new Project identifier based on the existing projects in the database (sequential identifier)'
+    involved_nodes:
+        - Project
+    involved_rels:
+    query: >
+        MATCH (p:Project) 
+        WITH toInteger(SPLIT(max(p.id), 'P')[1])+1 AS new_external_id, SIZE(SPLIT(max(p.id), 'P')[1]) AS length, SIZE(toString(toInteger(SPLIT(max(p.id), 'P')[1])+1)) AS new_length 
+        RETURN SUBSTRING('P', 0, 1) + SUBSTRING('00000000000', 0, length-new_length) + new_external_id AS Project_external_id;
+create_project:
+    name:  create project from file
+    description: 'Returns a new Project identifier based on the existing projects in the database (sequential identifier)'
+    involved_nodes:
+        - Project
+    involved_rels:
+    query: >
+        CREATE CONSTRAINT ON (p:Project) ASSERT p.id IS UNIQUE;
+        CREATE CONSTRAINT ON (p:Project) ASSERT p.internal_id IS UNIQUE;
+        CREATE CONSTRAINT ON (p:Project) ASSERT p.name IS UNIQUE;
+        MERGE (p:Project {internal_id:$internal_id}) 
+        ON CREATE SET p.id=$external_id,p.name=$name,p.acronym=$acronym,p.description=$description,p.type=$datatypes,p.tissue=$tissue,p.responsible=$responsible,p.participant=$participant,p.start_date=$start_date,p.end_date=$end_date,p.status=$status 
+        RETURN COUNT(p) AS PROJECTID_project;

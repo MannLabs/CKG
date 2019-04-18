@@ -1,14 +1,17 @@
 import os
-import time
+import pandas as pd
 import datetime
 from celery import Celery
+from report_manager.apps import projectCreation
+from graphdb_connector import connector
 
-
-celery_app = Celery('hello', broker='redis://localhost:6379')
+celery_app = Celery('create_new_project', broker='redis://localhost:6379')
 
 
 @celery_app.task
-def hello():
-    time.sleep(10)
-    with open ('hellos.txt', 'a') as hellofile:
-        hellofile.write('Hello {}\n'.format(datetime.datetime.now()))
+def create_new_project(identifier, data):
+    print("Holaaaaam")
+    driver = connector.getGraphDatabaseConnectionConfiguration()
+    result = projectCreation.create_new_project(driver, identifier, pd.read_json(data))
+    
+    return result
