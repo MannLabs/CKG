@@ -66,11 +66,11 @@ def modifyEntityProperty(parameters):
             logger.error("Reading queries from file {}: {}, file: {},line: {}".format(queries_path, sys.exc_info(), fname, exc_tb.tb_lineno))
 
 
-def sendQuery(driver, query):
+def sendQuery(driver, query, parameters={}):
     #print(query)
     result = None
     try:
-        result = driver.run(query)
+        result = driver.run(query, parameters)
     except py2neo.database.DatabaseError as err:
         raise py2neo.database.DatabaseError("Database failed to service the request. {}".format(err))
     except py2neo.database.ClientError as err:
@@ -87,8 +87,8 @@ def sendQuery(driver, query):
 
     return result
 
-def getCursorData(driver, query):
-    result = sendQuery(driver, query)
+def getCursorData(driver, query, parameters={}):
+    result = sendQuery(driver, query, parameters)
     df = pd.DataFrame(result.data())
 
     return df

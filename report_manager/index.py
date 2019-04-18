@@ -139,46 +139,30 @@ def create_project(n_clicks, name, acronym, responsible, datatype, participant, 
     if n_clicks != None:
         # Get project data from filled-in fields
         projectData = pd.DataFrame([name, acronym, description, datatype, tissue, responsible, participant, start_date, end_date]).T
-        projectData.columns = ['ProjectName', 'ProjectAcronym', 'ProjectDescription', 'ProjectDataTypes', 'ProjectTissue', 'ProjectResponsible', 'ProjectParticipant', 'ProjectStartDate', 'ProjectEndDate']
-        projectData['ProjectStatus'] = ''
+        name,p.acronym=line.acronym,p.description=line.description,p.type=line.type,p.tissue=line.tissue,p.responsible=line.responsible,p.participant=line.participant,p.start_date=line.start_date,p.end_date=line.end_date,p.status=line.status
+        projectData.columns = ['name', 'acronym', 'description', 'datatypes', 'tissue', 'responsible', 'participant', 'start_date', 'end_date']
+        projectData['status'] = ''
 
         # Generate project internal identifier bsed on timestamp
         # Excel file is saved in folder with internal id name
         epoch = time.time()
         internal_id = "%s%d" % ("P", epoch)
         
-        projectData.insert(loc=0, column='Project internal_id', value=internal_id)
-        
-        dataDir = '../../data/experiments/PROJECTID/clinical/'.replace("PROJECTID", internal_id)
-        ckg_utils.checkDirectory(dataDir)
+        projectData.insert(loc=0, column='internal_id', value=internal_id)
 
-        project_csv_string = projectData.to_excel(os.path.join(dataDir, 'ProjectData.xlsx'), index=False, encoding='utf-8')
-        #project_csv_string = "data:text/csv;charset=utf-8," + urllib.parse.quote(project_csv_string)
+        result = project_creation.create_new_project.delay(driver, projectId, ProjectData)
+        if result is not None:
+            response = "Project successfully submitted."
+        else:
+            response = "There was a problem when creating the project"
 
-        ###QUEUE
-        # job = q.enqueue_call(func=projectCreationQueue.project_app_importer, args=(internal_id,), result_ttl=5000)
-        # print(job.get_id())
-        # job2 = q.enqueue_call(func=projectCreationQueue.project_app_loader, args=(driver,internal_id,), result_ttl=5000)
-        # print(job2.get_id())
-        hello.delay()
-
-
-        #Creates project .csv in /imports 
-        IDRetriver.project_app_importer(internal_id)
-
-        #Loads project .csv into the database
-        IDRetriver.project_app_loader(driver, internal_id)
-
-        return "Project successfully submitted."
-
+        return response
 
 @app.callback(Output('project_button', 'disabled'),
              [Input('project_button', 'n_clicks')])
 def disable_submit_button(n_clicks):
     if n_clicks > 0:
         return True
-
-
 
 ###Callbacks for data upload app
 def parse_contents(contents, filename):
