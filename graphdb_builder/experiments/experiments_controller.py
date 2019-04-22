@@ -4,6 +4,7 @@ import sys
 import re
 import os.path
 import pandas as pd
+from dask import dataframe as dd
 import numpy as np
 from collections import defaultdict
 import config.ckg_config as ckg_config
@@ -665,15 +666,13 @@ def loadProteomicsDataset(uri, configuration):
     return data, regexCols
 
 def expand_groups(data, configuration):
-    s = data[configuration["proteinCol"]].str.split(';').apply(pd.Series, 1).stack().reset_index(level=1, drop=True)
-    del data[configuration["proteinCol"]]
-    pdf = s.to_frame(configuration["proteinCol"])
+    ddata = dd.from_pandas(data, 6)
+    ddata = ddata.map_partitions(lambda df: df.drop(configuration["proteinCol"], axis=1).join(df[configuration["proteinCol"]].str.split(';', expand=True).stack().reset_index(drop=True, level=1).rename(configuration["proteinCol"])))
     if "multipositions" in configuration:
-        s2 = data[configuration["multipositions"]].str.split(';').apply(pd.Series, 1).stack().reset_index(level=1, drop=True)
-        del data[configuration["multipositions"]]
-        pdf = pd.concat([s,s2], axis=1, keys=[configuration["proteinCol"],configuration["multipositions"]])
-    data = data.join(pdf)
-    data["is_razor"] = ~ data[configuration["groupCol"]].duplicated()
+        ddata = ddata.map_partitions(lambda df: df.drop(configuration["multipositions"], axis=1).join(df[configuration["multipositions"]].str.split(';', expand=True).stack().reset_index(drop=True, level=1).rename(configuration["multipositions"])))
+    ddata = ddata.compute()
+    ddata["is_razor"] = ~ ddata[group_col].duplicated()
+
     data = data.set_index(configuration["indexCol"])
 
     return data

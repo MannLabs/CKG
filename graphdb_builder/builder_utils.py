@@ -22,7 +22,7 @@ import ckg_utils
 def write_relationships(relationships, header, outputfile):
     try:
         df = pd.DataFrame(list(relationships), columns=header)
-        df.to_csv(path_or_buf=outputfile, 
+        df.to_csv(path_or_buf=outputfile, sep='\t',
                 header=True, index=False, quotechar='"', 
                 line_terminator='\n', escapechar='\\')
     except Exception as err:
@@ -30,17 +30,17 @@ def write_relationships(relationships, header, outputfile):
 
 def write_entities(entities, header, outputfile):
     try:
-        with open(outputfile, 'w') as csvfile:
-            writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
-            writer.writerow(header)
-            for entity in entities:
-                writer.writerow(entity)
+        df = pd.DataFrame(list(entities), columns=header)
+        df.to_csv(path_or_buf=outputfile, sep='\t',
+                header=True, index=False, quotechar='"', 
+                line_terminator='\n', escapechar='\\')
     except csv.Error as err:
         raise csv.Error("Error writing etities to file: {}.\n {}".format(outputfile, err))
 
 def setup_db_config():
     try:
-        dbconfig = ckg_utils.get_configuration(ckg_config.databases_config_file)
+        dirname = os.path.dirname(__file__)
+        dbconfig = ckg_utils.get_configuration(os.path.join(dirname, ckg_config.databases_config_file))
     except Exception as err:
         raise Exception("Reading configuration > {}.".format(err))
 

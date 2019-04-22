@@ -145,7 +145,7 @@ def create_project(n_clicks, name, acronym, responsible, datatype, participant, 
         # Generate project internal identifier bsed on timestamp
         # Excel file is saved in folder with internal id name
         epoch = time.time()
-        internal_id = "%s%d" % ("P", epoch)
+        internal_id = "%s%d" % ("CP", epoch)
         
         projectData.insert(loc=0, column='internal_id', value=internal_id)
 

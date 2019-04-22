@@ -205,7 +205,6 @@ def get_clinical_measurements_ready(df, subject_id='subject', sample_id='biologi
             df = imputation_median_by_group(processed_df)
         elif imputation_method.lower() == 'mixed':
             df = imputation_mixed_norm_KNN(processed_df,index_cols=index, group=group_id)
-    
     return df
 
 

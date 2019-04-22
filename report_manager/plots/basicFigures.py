@@ -346,13 +346,13 @@ def get_volcanoplot(results, args):
                                                     },
                                                     }
                                                 ],
-                                        annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')],
+                                        annotations = result['annotations']+[dict(xref='paper', yref='paper', showarrow=False, text='')],
                                         showlegend=False)
 
         figures.append(dcc.Graph(id= identifier, figure = figure))
     return figures
 
-def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blues', 'showscale': False, 'marker_size':6, 'x_title':'log2FC', 'y_title':'-log10(pvalue)'}):
+def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blues', 'showscale': False, 'marker_size':6, 'x_title':'log2FC', 'y_title':'-log10(pvalue)', 'num_annotations':10}):
     # Loop through signature
 
     volcano_plot_results = {}
@@ -361,9 +361,12 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
         signature = grouping.get_group(group)
         color = []
         text = []
+        annotations = []
+        num_annotations = args['num_annotations'] if 'num_annotations' in args else 10
         gidentifier = identifier + "_".join(map(str,group))
         title = 'Comparison: '+str(group[0])+' vs '+str(group[1])
         sig_pval = False
+        signature = signature.sort_values(by="padj",ascending=True)
         for index, row in signature.iterrows():
             # Text
             text.append('<b>'+str(row['identifier'])+": "+str(index)+'<br>Comparison: '+str(row['group1'])+' vs '+str(row['group2'])+'<br>log2FC = '+str(round(row['log2FC'], ndigits=2))+'<br>p = '+'{:.2e}'.format(row['pvalue'])+'<br>FDR = '+'{:.2e}'.format(row['padj']))
@@ -372,8 +375,26 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
             if row['padj'] <= args['alpha']:
                 sig_pval = True
                 if row['FC'] <= -args['fc']:
+                    annotations.append({'x': row['log2FC'], 
+                                    'y': row['-log10 pvalue'], 
+                                    'xref':'x', 
+                                    'yref': 'y', 
+                                    'text': str(row['identifier']), 
+                                    'showarrow': False, 
+                                    'ax': 0, 
+                                    'ay': -10,
+                                    'font': dict(color = "#2c7bb6", size = 7)})
                     color.append('#2c7bb6')
                 elif row['FC'] >= args['fc']:
+                    annotations.append({'x': row['log2FC'], 
+                                    'y': row['-log10 pvalue'], 
+                                    'xref':'x', 
+                                    'yref': 'y', 
+                                    'text': str(row['identifier']), 
+                                    'showarrow': False, 
+                                    'ax': 0, 
+                                    'ay': -10,
+                                    'font': dict(color = "#d7191c", size = 7)})
                     color.append('#d7191c')
                 elif row['FC'] < -1.:
                     color.append('#abd9e9')
@@ -388,8 +409,12 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
             alpha = 0.0000000000001
         else:
             alpha = args['alpha']
+        
+        if len(annotations) < num_annotations:
+            num_annotations = len(annotations)
+
         # Return
-        volcano_plot_results[(gidentifier, title)] = {'x': signature['log2FC'].values, 'y': signature['-log10 pvalue'].values, 'text':text, 'color': color, 'pvalue':-np.log10(alpha)}
+        volcano_plot_results[(gidentifier, title)] = {'x': signature['log2FC'].values, 'y': signature['-log10 pvalue'].values, 'text':text, 'color': color, 'pvalue':-np.log10(alpha), 'annotations':annotations[0:num_annotations]}
 
     figures = get_volcanoplot(volcano_plot_results, args)
 
