@@ -662,7 +662,6 @@ CREATE_PROJECT: &create_project
     'query': >
         CREATE CONSTRAINT ON (p:Project) ASSERT p.id IS UNIQUE;
         CREATE CONSTRAINT ON (p:Project) ASSERT p.name IS UNIQUE; 
-        USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID.csv" AS line
         MERGE (p:Project {id:line.ID})
         ON CREATE SET p.name=line.name,p.acronym=line.acronym,p.description=line.description,p.type=line.type,p.tissue=line.tissue,p.responsible=line.responsible,p.participant=line.participant,p.start_date=line.start_date,p.end_date=line.end_date,p.status=line.status

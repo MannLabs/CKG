@@ -16,11 +16,13 @@ try:
 except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
 
-def getGraphDatabaseConnectionConfiguration(configuration):
-    host = configuration.dbURL
-    port = configuration.dbPort
-    user = configuration.dbUser
-    password = configuration.dbPassword
+def getGraphDatabaseConnectionConfiguration(configuration=None):
+    if configuration is None:
+        configuration = config
+    host = configuration['db_ulr']
+    port = configuration['db_port']
+    user = configuration['db_user']
+    password = configuration['db_password']
 
     driver = connectToDB(host, port, user, password)
 
