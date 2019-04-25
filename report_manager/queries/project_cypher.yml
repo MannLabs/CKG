@@ -10,4 +10,13 @@ attributes:
         WHERE project.id="PROJECTID"
         RETURN project.id AS identifier, project.name AS name, project.acronym AS acronym,
         project.type AS data_types, project.responsible AS responsible, project.description AS description, number_subjects, project.status AS status;
-
+extract_projectID:
+    name: project identifier
+    description: 'Returns project external identifier. Requires internal identifier.'
+    involved_nodes:
+        - Project
+    involved_rels:
+    query: >
+        MATCH (p:Project)
+        WHERE p.internal_id = "INTERNALID"
+        RETURN p.id;

@@ -1,5 +1,8 @@
 import os
 import sys
+import re
+import pandas as pd
+import numpy as np
 import config.ckg_config as ckg_config
 import ckg_utils
 from graphdb_connector import connector
@@ -38,7 +41,6 @@ def get_new_project_identifier(driver, projectId):
     
     return external_identifier
 
-
 def create_new_project(driver, projectId, data):
     query_name = 'create_project'
     external_identifier='No Identifier Assigned'
@@ -58,23 +60,107 @@ def create_new_project(driver, projectId, data):
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         logger.error("Reading query {}: {}, file: {},line: {}".format(query_name, sys.exc_info(), fname, exc_tb.tb_lineno))
     
-    store_new_project_as_file(external_identifier, data)
+    store_new_project_as_file(external_identifier, data, '')
 
-    return result
+    return result.values[0], external_identifier
 
-def store_new_project_as_file(identifier, data):
+def store_new_project_as_file(identifier, data, name):
     if data is not None:
         importDir = os.path.join(os.path.join(cwd, '../../../data/imports/experiments'), os.path.join(identifier,'clinical'))
         ckg_utils.checkDirectory(importDir)
-        outputfile = os.path.join(importDir, identifier+".csv")
+        outputfile = os.path.join(importDir, identifier+name+".csv")
         with open(outputfile, 'w') as f:
             data.to_csv(path_or_buf = f,
                         header=True, index=False, quotechar='"',
                         line_terminator='\n', escapechar='\\')
 
+def get_new_subject_identifier(driver, projectId):
+    query_name = 'increment_subject_id'
+    try:
+        project_creation_cypher = get_project_creation_queries()
+        query = project_creation_cypher[query_name]['query']
+        subject_identifier = connector.getCursorData(driver, query).values[0][0]
+    except Exception as err:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        logger.error("Reading query {}: {}, file: {},line: {}".format(query_name, sys.exc_info(), fname, exc_tb.tb_lineno))
+    
+    return subject_identifier
+
+def create_new_subject(driver, projectId, subjects):
+    data = pd.DataFrame(index=np.arange(1), columns=np.arange(subjects))
+    query_name = 'create_subjects'
+    subject_identifier='No Identifier Assigned'
+    try:
+        subject_identifier = get_new_subject_identifier(driver, projectId)
+        #Creates dataframe with sequential subject numbers
+        number = int(subject_identifier.split('S')[1])
+        for i in data.columns:
+            data[i] = number
+            number += 1
+        data = data.T
+        data[0] = 'S' + data[0].astype(str)
+
+        done = []
+        project_creation_cypher = get_project_creation_queries()
+        query = project_creation_cypher[query_name]['query']
+        for q in query.split(';')[0:-1]:
+            if '$' in q:
+                for index, row in data.iterrows():
+                    result = connector.getCursorData(driver, q+';', parameters={'subject_id': str(row[0]), 'external_id': str(projectId)})
+                    done.append(result.values[0][0])
+            else:
+                result = connector.getCursorData(driver, q+';')
+    except Exception as err:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        logger.error("Reading query {}: {}, file: {},line: {}".format(query_name, sys.exc_info(), fname, exc_tb.tb_lineno))
+    
+    #Add node and relationship type to dataframe and store as csv file
+    data.insert(loc=0, column='', value=projectId)
+    data.columns = ['START_ID', 'END_ID']
+    data['TYPE'] = 'HAS_ENROLLED'
+    store_new_project_as_file(projectId, data, '_project')
+
+    return len(done)
+
+def create_new_timepoint(driver, projectId, timepoints):
+    query_name = 'create_timepoint'
+    timepoints = timepoints.replace(' ', '').split(',')
+    data = []
+    for i in timepoints:
+        value = int(''.join(filter(str.isdigit, i)))
+        units = re.sub('[^a-zA-Z]+', '', i)
+        data.append({'ID': value, 'units': units})  
+
+    data = pd.DataFrame(data)
+    data['type'] = 'Timepoint'
+    try:
+        done = []
+        project_creation_cypher = get_project_creation_queries()
+        query = project_creation_cypher[query_name]['query']
+        for q in query.split(';')[0:-1]:
+            if '$' in q:
+                for index, row in data.iterrows():
+                    result = connector.getCursorData(driver, q+';', parameters={'timepoint': str(row['ID']), 'units': str(row['units'])})
+                    done.append(result.values[0][0])
+            else:
+                result = connector.getCursorData(driver, q+';')
+    except Exception as err:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        logger.error("Reading query {}: {}, file: {},line: {}".format(query_name, sys.exc_info(), fname, exc_tb.tb_lineno))
+    
+    store_new_project_as_file(projectId, data, '_timepoint')
+
+    return len(done)
+
+
+
+
 def retrieve_identifiers_from_database(driver, projectId):
     #Queries
-    project_identifier = "MATCH (p:Project) WHERE p.external_id = 'EXTERNALID' RETURN p.internal_id AS result"
+    project_identifier = "MATCH (p:Project) WHERE p.id = 'EXTERNALID' RETURN p.internal_id AS result"
     subject_identifier = "MATCH (s:Subject) WITH max(toInteger(SPLIT(s.id, 'S')[1]))+1 as new_id RETURN SUBSTRING('S',0,1) + new_id AS result"
     biosample_identifier = "MATCH (b:Biological_sample) WITH max(toInteger(SPLIT(b.id, 'BS')[1]))+1 as new_id RETURN SUBSTRING('BS',0,2) + new_id AS result"
     anasample_identifier = "MATCH (a:Analytical_sample) WITH max(toInteger(SPLIT(a.id, 'AS')[1]))+1 as new_id RETURN SUBSTRING('AS',0,2) + new_id AS result"
