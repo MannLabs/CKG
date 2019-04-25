@@ -17,7 +17,7 @@ from dash.dependencies import Input, Output, State
 from dash_network import Network
 
 from app import app
-from apps import initialApp, projectApp, importsApp, projectCreationApp, dataUploadApp
+from apps import initialApp, projectApp, importsApp, projectCreationApp, dataUploadApp, projectCreation
 from graphdb_builder import builder_utils
 from graphdb_builder.builder import loader
 from graphdb_builder.experiments import experiments_controller as eh
@@ -26,6 +26,9 @@ import config.ckg_config as ckg_config
 
 from worker import create_new_project
 from graphdb_connector import connector
+
+# from celery.result import AsyncResult
+# from task import app
 
 driver = connector.getGraphDatabaseConnectionConfiguration()
 
@@ -84,12 +87,17 @@ def serve_static(path):
 
 @app.callback(Output('dum-div', 'children'),
              [Input('responsible', 'value'),
-              Input('data-types', 'value'),
               Input('participant', 'value'),
+              Input('data-types', 'value'),
+              Input('disease', 'value'),
               Input('tissue', 'value'),
-              Input('upload-data-type', 'value')])
-def update_input(responsible, datatype, participant, tissue, upload_dt):
-    return responsible, datatype, participant, tissue, upload_dt
+              Input('intervention', 'value'),
+              Input('number_subjects', 'value'),
+              Input('number_timepoints', 'value'),
+              Input('upload-data-type', 'value'),
+              Input('update_project_id', 'value')])
+def update_input(responsible, participant, datatype, timepoints, disease, tissue, intervention, upload_dt, project_id):
+    return responsible, participant, datatype, timepoints, disease, tissue, intervention, upload_dt, project_id
 
 
 @app.callback(Output('responsible', 'value'),
@@ -97,50 +105,68 @@ def update_input(responsible, datatype, participant, tissue, upload_dt):
              [State('responsible-picker','value')])
 def update_dropdown(n_clicks, value):
     if n_clicks != None:
-        return ', '.join(value)
-
-
-@app.callback(Output('data-types', 'value'),
-             [Input('add_datatype', 'n_clicks')],
-             [State('data-types-picker','value')])
-def update_dropdown(n_clicks, value):
-    if n_clicks != None:
-        return ', '.join(value)
-
+        return ','.join(value)
 
 @app.callback(Output('participant', 'value'),
              [Input('add_participant', 'n_clicks')],
              [State('participant-picker','value')])
 def update_dropdown(n_clicks, value):
     if n_clicks != None:
-        return ', '.join(value)
+        return ','.join(value)
 
+@app.callback(Output('data-types', 'value'),
+             [Input('add_datatype', 'n_clicks')],
+             [State('data-types-picker','value')])
+def update_dropdown(n_clicks, value):
+    if n_clicks != None:
+        return ','.join(value)
+
+@app.callback(Output('disease', 'value'),
+             [Input('add_disease', 'n_clicks')],
+             [State('disease-picker','value')])
+def update_dropdown(n_clicks, value):
+    if n_clicks != None:
+        return ','.join(value)
 
 @app.callback(Output('tissue', 'value'),
              [Input('add_tissue', 'n_clicks')],
              [State('tissue-picker','value')])
 def update_dropdown(n_clicks, value):
     if n_clicks != None:
-        return ', '.join(value)
+        return ','.join(value)
+
+@app.callback(Output('intervention', 'value'),
+             [Input('add_intervention', 'n_clicks')],
+             [State('intervention-picker','value')])
+def update_dropdown(n_clicks, value):
+    if n_clicks != None:
+        return ','.join(value)
 
 
-@app.callback(Output('project-creation', 'children'),
-             [Input('project_button', 'n_clicks')],
-             [State('project name', 'value'),
-              State('project acronym', 'value'),
-              State('responsible', 'value'),
-              State('data-types', 'value'),
-              State('participant', 'value'),
-              State('tissue', 'value'),
-              State('project description', 'value'),
-              State('date-picker-start', 'date'),
-              State('date-picker-end', 'date')])
-def create_project(n_clicks, name, acronym, responsible, datatype, participant, tissue, description, start_date, end_date):
+@app.callback([Output('project-creation', 'children'),
+               Output('update_project_id','children'),
+               Output('update_project_id','style')],
+              [Input('project_button', 'n_clicks')],
+              [State('project name', 'value'),
+               State('project acronym', 'value'),
+               State('responsible', 'value'),
+               State('participant', 'value'),
+               State('data-types', 'value'),
+               State('number_timepoints', 'value'),
+               State('disease', 'value'),
+               State('tissue', 'value'),
+               State('intervention', 'value'),
+               State('number_subjects', 'value'),
+               State('project description', 'value'),
+               State('date-picker-start', 'date'),
+               State('date-picker-end', 'date')])
+def create_project(n_clicks, name, acronym, responsible, participant, datatype, timepoints, disease, tissue, intervention, number_subjects, description, start_date, end_date):
     if n_clicks != None:
         # Get project data from filled-in fields
-        projectData = pd.DataFrame([name, acronym, description, datatype, tissue, responsible, participant, start_date, end_date]).T
-        projectData.columns = ['name', 'acronym', 'description', 'datatypes', 'tissue', 'responsible', 'participant', 'start_date', 'end_date']
+        projectData = pd.DataFrame([name, acronym, description, number_subjects, datatype, timepoints, disease, tissue, intervention, responsible, participant, start_date, end_date]).T
+        projectData.columns = ['name', 'acronym', 'description', 'subjects', 'datatypes', 'timepoints', 'disease', 'tissue', 'intervention', 'responsible', 'participant', 'start_date', 'end_date']
         projectData['status'] = ''
+        # projectData = projectData.astype({'subjects': int})
 
         # Generate project internal identifier bsed on timestamp
         # Excel file is saved in folder with internal id name
@@ -148,20 +174,23 @@ def create_project(n_clicks, name, acronym, responsible, datatype, participant, 
         internal_id = "%s%d" % ("CP", epoch)
         
         projectData.insert(loc=0, column='internal_id', value=internal_id)
+       
+        result = create_new_project.apply_async(args=[internal_id, projectData.to_json(), int(number_subjects), timepoints], task_id='project_creation_'+internal_id)
+        result_output = result.get(timeout=1, propagate=False)
 
-        result = create_new_project.apply_async(args=[internal_id, projectData.to_json()], task_id='project_creation_'+internal_id)
         if result is not None:
             response = "Project successfully submitted."
         else:
             response = "There was a problem when creating the project"
 
-        return response
+        return response, '- '+list(result_output.keys())[0], {'display': 'inline-block'}
 
 @app.callback(Output('project_button', 'disabled'),
              [Input('project_button', 'n_clicks')])
 def disable_submit_button(n_clicks):
     if n_clicks > 0:
         return True
+
 
 ###Callbacks for data upload app
 def parse_contents(contents, filename):
