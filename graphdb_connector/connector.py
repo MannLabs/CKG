@@ -4,7 +4,6 @@ import py2neo
 import pandas as pd
 import ckg_config
 from graphdb_builder import graphdb_utils
-from graphdb_connector import connector_config as config
 
 import logging
 import logging.config
