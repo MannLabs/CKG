@@ -2,13 +2,26 @@ import sys
 import os
 import py2neo
 import pandas as pd
+import ckg_config
+from graphdb_builder import graphdb_utils
 from graphdb_connector import connector_config as config
 
-def getGraphDatabaseConnectionConfiguration():
-    host = config.dbURL
-    port = config.dbPort
-    user = config.dbUser
-    password = config.dbPassword
+import logging
+import logging.config
+
+log_config = ckg_config.graphdb_connector_log
+logger = builder_utils.setup_logging(log_config, key="connector")
+
+try:
+    config = ckg_utils.get_configuration(ckg_config.connector_config_file)
+except Exception as err:
+    logger.error("Reading configuration > {}.".format(err))
+
+def getGraphDatabaseConnectionConfiguration(configuration):
+    host = configuration.dbURL
+    port = configuration.dbPort
+    user = configuration.dbUser
+    password = configuration.dbPassword
 
     driver = connectToDB(host, port, user, password)
 

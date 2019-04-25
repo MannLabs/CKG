@@ -10,7 +10,6 @@ celery_app = Celery('create_new_project', broker='redis://localhost:6379')
 
 @celery_app.task
 def create_new_project(identifier, data):
-    print("Holaaaaam")
     driver = connector.getGraphDatabaseConnectionConfiguration()
     result = projectCreation.create_new_project(driver, identifier, pd.read_json(data))
     
