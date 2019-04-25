@@ -17,6 +17,7 @@ import logging
 import logging.config
 import config.ckg_config as ckg_config
 import ckg_utils
+import subprocess
 
 
 def write_relationships(relationships, header, outputfile):
@@ -243,4 +244,9 @@ def compress_directory(folder_to_backup, dest_folder, file_name):
     folder_to_backup = folder_to_backup.replace("(","\(").replace(")","\)")
     os.system("tar -zcf {} {}".format(filePath, folder_to_backup))
 
-    
+
+def read_gzipped_file(filepath):
+    p = subprocess.Popen(["gzcat", filepath],
+        stdout=subprocess.PIPE
+    )
+    return p.stdout
