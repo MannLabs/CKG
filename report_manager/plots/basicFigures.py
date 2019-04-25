@@ -24,15 +24,18 @@ from report_manager.plots import wgcnaFigures
 import dash_cytoscape as cyto
 
 def getPlotTraces(data, key='full', type = 'lines', div_factor=float(10^10000), horizontal=False):
-    '''This function returns traces for different kinds of plots
-    --> input:
-        - data: is a Pandas DataFrame with one variable as data.index (i.e. 'x') and all others as columns (i.e. 'y')
-        - type: 'lines', 'scaled markers', 'bars'
-        - div_factor: relative size of the markers
-        - horizontal: bar orientation
-    --> output:
-        List of traces
-    '''
+    """
+    This function returns traces for different kinds of plots.
+    
+    Args:
+        data: is a Pandas DataFrame with one variable as data.index (i.e. 'x') and all others as columns (i.e. 'y').
+        type: 'lines', 'scaled markers', 'bars'.
+        div_factor: relative size of the markers.
+        horizontal: bar orientation.
+    
+    Returns:
+        List of traces.
+    """
     if type == 'lines':
         traces = [go.Scatter(x=data.index, y=data[col], name = col+' '+key, mode='markers+lines') for col in data.columns]
 
@@ -70,14 +73,16 @@ def get_distplot(data, identifier, args):
     return graphs
 
 def get_barplot(data, identifier, args):
-    '''This function plots a simple barplot
-    --> input:
-        - data: is a Pandas DataFrame with three columns: "name" of the bars, 'x' values and 'y' values to plot
-        - identifier: is the id used to identify the div where the figure will be generated
-        - title: The title of the figure
-    --> output:
-        Barplot figure within the <div id="_dash-app-content">
-    '''
+    """
+    This function plots a simple barplot.
+    
+    Args:
+        data: is a Pandas DataFrame with three columns: "name" of the bars, 'x' values and 'y' values to plot.
+        identifier: is the id used to identify the div where the figure will be generated.
+        title: The title of the figure.
+    Returns:
+        Barplot figure within the <div id="_dash-app-content"> .
+    """
     figure = {}
     figure["data"] = []
     if "group" in args:
@@ -250,14 +255,17 @@ def get_simple_scatterplot(data, identifier, args):
 
 
 def get_scatterplot(data, identifier, args):
-    '''This function plots a simple Scatterplot
-    --> input:
-        - data: is a Pandas DataFrame with four columns: "name", x values and y values (provided as variables) to plot
-        - identifier: is the id used to identify the div where the figure will be generated
-        - title: The title of the figure
-    --> output:
-        Scatterplot figure within the <div id="_dash-app-content">
-    '''
+    """
+    This function plots a simple Scatterplot.
+    
+    Args:
+        data: is a Pandas DataFrame with four columns: "name", x values and y values (provided as variables) to plot.
+        identifier: is the id used to identify the div where the figure will be generated.
+        title: The title of the figure.
+    
+    Returns:
+        Scatterplot figure within the <div id="_dash-app-content"> .
+    """
     figure = {}
     figure["data"] = []
     figure["layout"] = go.Layout(title = args['title'],
@@ -421,15 +429,18 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
     return figures
 
 def get_heatmapplot(data, identifier, args):
-    '''This function plots a simple Heatmap
-    --> input:
-        - data: is a Pandas DataFrame with the shape of the heatmap where index corresponds to rows
-            and column names corresponds to columns, values in the heatmap corresponds to the row values
-        - identifier: is the id used to identify the div where the figure will be generated
-        - title: The title of the figure
-    --> output:
-        Heatmap figure within the <div id="_dash-app-content">
-    '''
+    """
+    This function plots a simple Heatmap.
+    
+    Args:
+        data: is a Pandas DataFrame with the shape of the heatmap where index corresponds to rows
+              and column names corresponds to columns, values in the heatmap corresponds to the row values.
+        identifier: is the id used to identify the div where the figure will be generated.
+        title: The title of the figure.
+    
+    Returns:
+        Heatmap figure within the <div id="_dash-app-content">.
+    """
     df = data.copy()
     if args['format'] == "edgelist":
         df = df.set_index(args['source'])
@@ -649,11 +660,13 @@ def get_pca_plot(data, identifier, args):
 
 
 def getSankeyPlot(data, identifier, args={'source':'source', 'target':'target', 'weight':'weight','source_colors':'source_colors', 'target_colors':'target_colors', 'orientation': 'h', 'valueformat': '.0f', 'width':800, 'height':800, 'font':12, 'title':'Sankey plot'}):
-    '''This function generates a Sankey plot in Plotly
-        parms:
-            - data: Pandas DataFrame with the format: source    target  weight
-            - identifier: id for the web app
-            - args: dictionary with the following items:
+    """
+    This function generates a Sankey plot in Plotly.
+    
+    Args:
+        data: Pandas DataFrame with the format: source  target  weight.
+        identifier: id for the web app.
+            args: dictionary with the following items:
                 - source: name of the column containing the source 
                 - target: name of the column containing the target 
                 - weight: name of the column containing the weight 
@@ -665,9 +678,10 @@ def getSankeyPlot(data, identifier, args={'source':'source', 'target':'target', 
                 - width: plot width
                 - height: plot height
                 - font: font size
-        returns:
-            dcc.Graph 
-    '''
+    
+    Returns:
+        dcc.Graph.
+    """
     nodes = list(set(data[args['source']].tolist() + data[args['target']].tolist()))
     if 'source_colors' in args:
         node_colors = dict(zip(data[args['source']],data[args['source_colors']]))
@@ -841,6 +855,16 @@ def get_parallel_plot(data, identifier, args):
     return dcc.Graph(id=identifier, figure=fig)
 
 def get_WGCNAPlots(data, identifier):
+    """ 
+    Takes data from runWGCNA function and builds WGCNA plots: 
+
+    Args:
+        data: tuple with multiple pandas dataframes.
+        identifier: is the id used to identify the div where the figure will be generated.
+    
+    Returns:
+        List of dcc.Graph.
+    """
     graphs = []
     if data is not None:
         data_exp, data_cli, dissTOM, moduleColors, Features_per_Module, MEs,\

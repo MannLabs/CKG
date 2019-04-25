@@ -901,11 +901,30 @@ def runMapper(data, lenses=["l2norm"], n_cubes = 15, overlap=0.5, n_clusters=3, 
     return simplicial_complex, {"labels":labels}
 
 def runWGCNA(data, drop_cols_exp, drop_cols_cli, RsquaredCut=0.8, networkType='unsigned', minModuleSize=30, deepSplit=2, pamRespectsDendro=False, merge_modules=True, MEDissThres=0.25, verbose=0):
+    """ 
+    Runs an automated weighted gene co-expression network analysis (WGCNA), using input proteomics/transcriptomics/genomics and clinical variables data.
+
+    Args:
+        data: 
+        drop_cols_exp: list of strings for columns in experimental dataset to be removed.
+        drop_cols_cli: list of strings for columns in clinical dataset to be removed.
+        RsquaredCut: desired minimum scale free topology fitting index R^2.
+        networkType: network type ('unsigned', 'signed', 'signed hybrid', 'distance').
+        minModuleSize: minimum module size.
+        deepSplit: provides a rough control over sensitivity to cluster splitting, the higher the value (with 'hybrid' method) or if True (with 'tree' method), the more and smaller modules.
+        pamRespectsDendro: only used for method 'hybrid'. Objects and small modules will only be assigned to modules that belong to the same branch in the dendrogram structure.
+        merge_modules: if True, very similar modules are merged.
+        MEDissThres: maximum dissimilarity (i.e., 1-correlation) that qualifies modules for merging.
+        verbose: integer level of verbosity. Zero means silent, higher values make the output progressively more and more verbose.
+    
+    Returns:
+        Tuple with multiple pandas dataframes.
+    """
     dfs = wgcna.get_data(data, drop_cols_exp=drop_cols_exp, drop_cols_cli=drop_cols_cli)
     if 'clinical' in dfs:
-        data_cli = dfs['clinical']
-        data_exp, = [i for i in dfs.keys() if i != 'clinical']
-        data_exp = dfs[data_exp]
+        data_cli = dfs['clinical']   #Extract clinical data
+        data_exp, = [i for i in dfs.keys() if i != 'clinical']   #Get dictionary key for experimental data
+        data_exp = dfs[data_exp]   #Extract experimental data
 
         softPower = wgcna.pick_softThreshold(data_exp, RsquaredCut=RsquaredCut, networkType=networkType, verbose=verbose)
         dissTOM, moduleColors = wgcna.build_network(data_exp, softPower=softPower, networkType=networkType, minModuleSize=minModuleSize, deepSplit=deepSplit,
