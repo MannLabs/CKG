@@ -2,8 +2,9 @@ import sys
 import os
 import py2neo
 import pandas as pd
+import ckg_utils
 from config import ckg_config
-from graphdb_builder import graphdb_utils
+from graphdb_builder import builder_utils
 
 import logging
 import logging.config
@@ -13,13 +14,14 @@ logger = builder_utils.setup_logging(log_config, key="connector")
 
 try:
     config = ckg_utils.get_configuration(ckg_config.connector_config_file)
+    print(config)
 except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
 
 def getGraphDatabaseConnectionConfiguration(configuration=None):
     if configuration is None:
         configuration = config
-    host = configuration['db_ulr']
+    host = configuration['db_url']
     port = configuration['db_port']
     user = configuration['db_user']
     password = configuration['db_password']
