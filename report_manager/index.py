@@ -175,8 +175,8 @@ def create_project(n_clicks, name, acronym, responsible, participant, datatype, 
         
         projectData.insert(loc=0, column='internal_id', value=internal_id)
        
-        result = create_new_project.apply_async(args=[internal_id, projectData.to_json(), int(number_subjects), timepoints], task_id='project_creation_'+internal_id)
-        result_output = result.get(timeout=1, propagate=False)
+        result = create_new_project.apply_async(args=[internal_id, projectData.to_json()], task_id='project_creation_'+internal_id)
+        result_output = result.get(timeout=10, propagate=False)
 
         if result is not None:
             response = "Project successfully submitted."
@@ -301,8 +301,8 @@ def update_table_download_link(n_clicks, columns, rows, filename, path_name, dat
 
         project_external_id = path_name.split('/')[-1]
         
-        #Retrieve identifiers from database
-        project_id, subject_id, biosample_id, anasample_id = IDRetriver.retrieve_identifiers_from_database(driver, project_external_id)
+        # #Retrieve identifiers from database
+        # project_id, subject_id, biosample_id, anasample_id = IDRetriver.retrieve_identifiers_from_database(driver, project_external_id)
 
         if data_type == 'clinical':
             #Add subject, biosample and anasample id columns to data
@@ -313,7 +313,7 @@ def update_table_download_link(n_clicks, columns, rows, filename, path_name, dat
           pass
 
         # # Path to new local folder
-        dataDir = '../../data/experiments/PROJECTID/DATATYPE/'.replace('PROJECTID', project_id).replace('DATATYPE', data_type)
+        dataDir = '../../data/imports/experiments/PROJECTID/DATATYPE/'.replace('PROJECTID', project_external_id).replace('DATATYPE', data_type)
         
         # # Check/create folders based on local
         ckg_utils.checkDirectory(dataDir)
