@@ -6,6 +6,7 @@ import dash_html_components as html
 import plotly.graph_objs as go
 import plotly.figure_factory as FF
 import math
+import random
 import dash_table
 from plotly import tools
 import plotly.io as pio
@@ -137,23 +138,44 @@ def get_facet_grid_plot(data, identifier, args):
 def get_ranking_plot(data, identifier, args):
     num_cols = 3
     fig = {}
+    layouts = []
     num_groups = len(data.index.unique())
     num_rows = math.ceil(num_groups/num_cols)
     if 'group' in args:
         group=args['group']
     #subplot_title = "Ranking of proteins in {} samples"
     #subplot_titles = [subplot_title.format(index.title()) for index in data.index.unique()]
-    fig = tools.make_subplots(rows=num_rows, cols=num_cols, shared_yaxes=True,vertical_spacing=0.1, print_grid=False)
+    fig = tools.make_subplots(rows=num_rows, cols=num_cols, shared_yaxes=True,print_grid=False)
     if 'index' in args and args['index']:
         r = 1
         c = 1
+        range_y = [data['y'].min(), data['y'].max()+1]
         for index in data.index.unique():
             gdata = data.loc[index, :].dropna().groupby('name', as_index=False).mean().sort_values(by='y', ascending=False)
             gdata = gdata.reset_index().reset_index()
             cols = ['x', 'group', 'name', 'y']
             cols.extend(gdata.columns[4:])
             gdata.columns = cols
-            trace = get_simple_scatterplot(gdata, identifier+'_'+str(index), args).figure['data'].pop()
+            gfig = get_simple_scatterplot(gdata, identifier+'_'+str(index), args)
+            trace = gfig.figure['data'].pop()
+            glayout = gfig.figure['layout']['annotations']
+
+            for l in glayout:
+                nlayout = dict(x = l.x,
+                            y = l.y,
+                            xref = 'x'+str(c),
+                            yref = 'y',
+                            text = l.text,
+                            showarrow = True,
+                            ax = l.ax,
+                            ay = l.ay,
+                            font = l.font,
+                            align='center',
+                            arrowhead=1,
+                            arrowsize=1,
+                            arrowwidth=1,
+                            arrowcolor='#636363')
+                layouts.append(nlayout)
             trace.name = index
             fig.append_trace(trace, r, c)
             
@@ -162,11 +184,14 @@ def get_ranking_plot(data, identifier, args):
                 c = 1
             else:
                 c += 1
-
-        fig['layout'].update(dict(height = args['height'], width=args['width'],  title=args['title'], xaxis= {"title": args['x_title']}, yaxis= {"title": args['y_title']}))
+        fig['layout'].update(dict(height = args['height'], 
+                                width=args['width'],  
+                                title=args['title'], 
+                                xaxis= {"title": args['x_title'], 'autorange':True}, 
+                                yaxis= {"title": args['y_title'], 'range':range_y}))
+        fig['layout'].annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')] + layouts 
     else:
         fig = get_simple_scatterplot(data, identifier+'_'+group, args).figure
-
     return dcc.Graph(id=identifier, figure=fig)
     
 
@@ -190,7 +215,9 @@ def get_scatterplot_matrix(data, identifier, args):
     for col in df.columns:
         if col != args["group"]:
             dimensions.append(dict(label=col, values=df[col]))
-
+    
+    
+            
     figure["data"].append(go.Splom(dimensions=dimensions,
                     text=text,
                     marker=dict(color=color_vals,
@@ -229,9 +256,29 @@ def get_simple_scatterplot(data, identifier, args):
         m.update({'size':data['size'].tolist()})
     if 'symbol' in data.columns:
         m.update({'symbol':data['symbol'].tolist()})
-    if 'annotation' in data.columns:
-        text = data.annotation
     
+    annots=[]
+    if 'annotations' in args:
+        for index, row in data.iterrows():
+            name = row['name'].split(' ')[0]
+            if name in args['annotations']:
+                annots.append({'x': row['x'], 
+                            'y': row['y'], 
+                            'xref':'x', 
+                            'yref': 'y', 
+                            'text': name, 
+                            'showarrow': False, 
+                            'ax': 55, 
+                            'ay': -1,
+                            'font': dict(size = 8)})
+    figure['data'] = [go.Scatter(x = data.x,
+                                y = data.y,
+                                text = text,
+                                mode = 'markers',
+                                opacity=0.7,
+                                marker= m,
+                                )]
+                                
     figure["layout"] = go.Layout(title = args['title'],
                                 xaxis= {"title": args['x_title']},
                                 yaxis= {"title": args['y_title']},
@@ -240,17 +287,10 @@ def get_simple_scatterplot(data, identifier, args):
                                 hovermode='closest',
                                 height=args['height'],
                                 width=args['width'],
-                                annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')]
+                                annotations = annots + [dict(xref='paper', yref='paper', showarrow=False, text='')],
+                                showlegend=False
                                 )
     
-    figure['data'] = [go.Scatter(x = data.x,
-                                y = data.y,
-                                text = text,
-                                mode = 'markers',
-                                opacity=0.7,
-                                marker= m,
-                                )]
-
     return dcc.Graph(id= identifier, figure = figure)
 
 
@@ -628,8 +668,8 @@ def get_pca_plot(data, identifier, args):
                         mode='markers+lines',
                         text=index+" loading: {0:.2f}".format(value),
                         name = index,
-                        marker= dict(size=9,
-                                    symbol= 4,
+                        marker= dict(size=3,
+                                    symbol= 1,
                                     color = 'darkgrey', #set color equal to a variable
                                     showscale=False,
                                     opacity=0.7,
@@ -1074,7 +1114,10 @@ def save_DASH_plot(plot, name, plot_format='svg', directory='.'):
         os.mkdir(directory)
     if plot_format in ['svg', 'pdf', 'png', 'jpeg', 'jpg']:
         plot_file = os.path.join(directory, str(name)+'.'+str(plot_format))
-        pio.write_image(plot.figure, plot_file)
+        if hasattr(plot, 'figure'):
+            pio.write_image(plot.figure, plot_file)
+        else:
+            pio.write_image(plot, plot_file)
         
     
     

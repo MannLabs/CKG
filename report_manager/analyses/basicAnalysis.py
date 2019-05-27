@@ -53,10 +53,11 @@ def transform_into_long_format(data, drop_columns, group, columns=['mame','y']):
 def get_ranking_with_markers(data, drop_columns, group, columns, list_markers, annotation={}):
     long_data = transform_into_long_format(data, drop_columns, group, columns)
     if len(set(long_data['name'].values.tolist()).intersection(list_markers)) > 0:
+        long_data = long_data.drop_duplicates()
         long_data['symbol'] = [ 17 if p in list_markers else 0 for p in long_data['name'].tolist()]
-        long_data['size'] = [25 if p in list_markers else 9 for p in long_data['name'].tolist()]
+        long_data['size'] = [25 if p in list_markers else 7 for p in long_data['name'].tolist()]
         long_data['name'] = [p+' marker in '+annotation[p] if p in annotation else p for p in long_data['name'].tolist()]
-
+        
     return long_data
 
 

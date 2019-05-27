@@ -3,7 +3,8 @@ import os
 import py2neo
 import pandas as pd
 from config import ckg_config
-from graphdb_builder import graphdb_utils
+import ckg_utils
+from graphdb_builder import builder_utils
 
 import logging
 import logging.config
