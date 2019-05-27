@@ -17,7 +17,6 @@ create_project:
         - Subject
         - Disease
         - Tissue
-        - Clinical_variable
     involved_rels:
     query: >
         CREATE CONSTRAINT ON (p:Project) ASSERT p.id IS UNIQUE;
@@ -25,27 +24,21 @@ create_project:
         CREATE CONSTRAINT ON (p:Project) ASSERT p.name IS UNIQUE;
         MERGE (p:Project {internal_id:$internal_id}) 
         ON CREATE SET p.id=$external_id,p.name=$name,p.acronym=$acronym,p.description=$description,p.subjects=$subjects,p.type=$datatypes,p.timepoints=$timepoints,p.disease=$disease,p.tissue=$tissue,p.intervention=$intervention,p.responsible=$responsible,p.participant=$participant,p.start_date=$start_date,p.end_date=$end_date,p.status=$status 
-        WITH p, SPLIT(p.responsible, ",") AS responsibles, SPLIT(p.participant, ",") AS participants
+        WITH p, SPLIT(p.responsible, ",") AS responsibles, SPLIT(p.participant, ",") AS participants, SPLIT(p.disease, ",") AS diseases, SPLIT(p.tissue, ",") AS tissues
         MATCH (p)
         UNWIND responsibles AS user_mentioned
         MATCH (mentioned:User {name:user_mentioned})
         UNWIND participants AS user_participating
         MATCH (participant:User {name:user_participating})
+        UNWIND diseases AS disease_studied
+        MATCH (d_studied:Disease {name:disease_studied})
+        UNWIND tissues AS tissue_studied
+        MATCH (t_studied:Tissue {name:tissue_studied})
         MERGE (mentioned)-[r:IS_RESPONSIBLE]->(p)
         MERGE (participant)-[r2:PARTICIPATES_IN]->(p)
-        WITH p, r, r2
-        MATCH (p)
-        MATCH (d:Disease {name:$disease}) 
-        MERGE (p)-[r3:STUDIES_DISEASE]->(d)
-        WITH p, r, r2, r3
-        MATCH (p)
-        MATCH (t:Tissue {name:$tissue}) 
-        MERGE (p)-[r4:STUDIES_TISSUE]->(t)
-        WITH p, r, r2, r3, r4
-        MATCH (p)
-        MATCH (c:Clinical_variable {name:$intervention}) 
-        MERGE (p)-[r5:STUDIES_INTERVENTION]->(c)
-        RETURN COUNT(p) AS PROJECTID_project, COUNT(r) AS PROJECTID_responsibles, COUNT(r2) AS PROJECTID_participants, COUNT(r3) AS PROJECTID_studies_disease, COUNT(r4) AS PROJECTID_studies_tissue, COUNT(r5) AS PROJECTID_studies_intervention;
+        MERGE (p)-[r3:STUDIES_DISEASE]->(d_studied)
+        MERGE (p)-[r4:STUDIES_TISSUE]->(t_studied)
+        RETURN COUNT(p) AS PROJECTID_project, COUNT(r) AS PROJECTID_responsibles, COUNT(r2) AS PROJECTID_participants, COUNT(r3) AS PROJECTID_studies_disease, COUNT(r4) AS PROJECTID_studies_tissue;
 increment_subject_id:
     name: create new subject id
     description: 'Returns a new Subject identifier based on existing subjects in the database (sequential identifier).'
@@ -70,7 +63,7 @@ create_subjects:
         MATCH (p:Project {id:$external_id})
         MATCH (s) 
         MERGE (p)-[r:HAS_ENROLLED]->(s)
-        RETURN s.id, COUNT(s) AS PROJECTID_subject, COUNT(r) AS PROJECTID_project_has_enrolled_subject;
+        RETURN COUNT(s) AS PROJECTID_subject, COUNT(r) AS PROJECTID_project_has_enrolled_subject;
 create_timepoint:
     name: create timepoint from file
     description: 'Creates Timepoint nodes, directly from projectCreationApp (web app).'
@@ -82,5 +75,18 @@ create_timepoint:
         MERGE (t:Timepoint {id:$timepoint})
         ON CREATE SET t.units=$units
         RETURN COUNT(t) AS PROJECTID_timepoint;
+create_intervention_relationship:
+    name:
+    description: 'Creates relationships betweeen project and interventions studied.'
+    involved_nodes:
+        - Project
+        - Clinical_variable
+    involved_rels:
+    query: >
+        MATCH (p:Project {id:$external_id})
+        MATCH (c:Clinical_variable {name:$intervention}) 
+        MERGE (p)-[r:STUDIES_INTERVENTION]->(c)
+        RETURN COUNT(r) AS PROJECTID_studies_intervention;
+
 
 

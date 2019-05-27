@@ -188,6 +188,25 @@ IMPORT_MODIFIED_PROTEIN_ANNOTATIONS:
         MERGE (m)-[r:IS_SUBSTRATE_OF{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type}]->(p)
         RETURN COUNT(r) AS modified_protein_is_substrate_of_protein;
 
+IMPORT_PROTEIN_STRUCTURES:
+    'name': 'import protein structure data'
+    'description': 'Creates Protein structure nodes and their relationships to Protein nodes'
+    'query': >
+        CREATE CONSTRAINT ON (s:Protein_structure) ASSERT s.id IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Protein_structures.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (s:Protein_structure {id:line.ID})
+        ON CREATE SET s.source=line.source,s.link=line.link
+        RETURN COUNT(s) AS Protein_structures;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Protein_has_structure.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p:Protein {id:line.START_ID})
+        MATCH (s:Protein_structure {id:line.END_ID})
+        MERGE (p)-[r:HAS_STRUCTURE{source:line.source}]->(s)
+        RETURN COUNT(r) AS protein_has_structure;
+
 IMPORT_GENE_DATA:
     'name': 'import gene data'
     'description': 'Creates the Gene nodes'

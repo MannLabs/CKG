@@ -58,6 +58,7 @@ graph :
     - project
     - experiment
     - user
+    - protein_structure
 
 #Imports 
 ontology_entities : 

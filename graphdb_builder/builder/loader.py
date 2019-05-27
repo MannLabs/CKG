@@ -56,7 +56,7 @@ def updateDB(driver, imports=None):
     Populates the graph database with information for each Database, Ontology or Experiment
     specified in imports. If imports is not defined, the function populates the entire graph 
     database based on the graph variable defined in the grapher_config.py module.
-    This function also updates the graph stats object with numbers from the loaded entities and
+    This function also updates the graph stats object with numbers from the loaded entities andq
     relationships.
     Args:
         driver (py2neo driver): py2neo driver, which provides the 
@@ -133,6 +133,10 @@ def updateDB(driver, imports=None):
                 ppiDataImportCode = cypher_queries['IMPORT_PPI_ACTION']['query']
                 for resource in config["PPI_action_resources"]:
                     queries.extend(ppiDataImportCode.replace("IMPORTDIR", importDir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
+            #PDBs
+            elif "protein_structure" == i:
+                structureDataImportCode= cypher_queries['IMPORT_PROTEIN_STRUCTURES']['query']
+                queries = structureDataImportCode.replace("IMPORTDIR", importDir).split(';')[0:-1]
             #Diseases
             elif "diseases" == i:
                 diseaseDataImportCode = cypher_queries['IMPORT_DISEASE_DATA']['query']

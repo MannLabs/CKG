@@ -13,10 +13,10 @@ celery_app.conf.update(broker_url = 'redis://localhost:6379',
 
 
 @celery_app.task
-def create_new_project(identifier, data, subjects, timepoints):
+def create_new_project(identifier, data):
     driver = connector.getGraphDatabaseConnectionConfiguration()
     project_result, projectId = projectCreation.create_new_project(driver, identifier, pd.read_json(data))
-    subject_result = projectCreation.create_new_subject(driver, projectId, subjects)
-    timepoint_result = projectCreation.create_new_timepoint(driver, projectId, timepoints)
+    # subject_result = projectCreation.create_new_subject(driver, projectId, subjects)
+    # timepoint_result = projectCreation.create_new_timepoint(driver, projectId, timepoints)
 
-    return {str(projectId): str(project_result), 'subjects':str(subject_result), 'timepoints':str(timepoint_result)}
+    return {str(projectId): str(project_result)}

@@ -1,7 +1,7 @@
 #Database configuration
-dbURL: "localhost"
+db_url: "localhost"
 #dbPort = 7688 #Production environment
-dbPort: 7687 #Test environment
-dbUser: "neo4j"
-dbPassword: "bioinfo1112"
+db_port: 7687 #Test environment
+db_user: "neo4j"
+db_password: "bioinfo1112"
 
