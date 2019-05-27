@@ -220,10 +220,10 @@ class AnalysisResult:
                         list_markers = self.data[args['markers']][marker_col].tolist()
                         if 'annotate' in args:
                             if args['annotate']:
-                                annotation = pd.Series(self.data[args['markers']][marker_of_col].values, index=self.data[args['markers']][marker_col]).to_dict()
+                                args['annotations'] = pd.Series(self.data[args['markers']][marker_of_col].values, index=self.data[args['markers']][marker_col]).to_dict()
             if 'data' in args:
                 if args['data'] in self.data:
-                    result[self.analysis_type] = analyses.get_ranking_with_markers(self.data[args['data']], drop_columns=args['drop_columns'], group=args['group'], columns=args['columns'], list_markers=list_markers, annotation = annotation)
+                    result[self.analysis_type] = analyses.get_ranking_with_markers(self.data[args['data']], drop_columns=args['drop_columns'], group=args['group'], columns=args['columns'], list_markers=list_markers, annotation = args['annotations'])
         elif self.analysis_type == "wgcna":
             drop_cols_exp = []
             drop_cols_cli = []

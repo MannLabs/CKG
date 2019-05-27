@@ -13,8 +13,9 @@ log_config = ckg_config.graphdb_connector_log
 logger = builder_utils.setup_logging(log_config, key="connector")
 
 try:
-    config = ckg_utils.get_configuration(ckg_config.connector_config_file)
-    print(config)
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    path = os.path.join(cwd, ckg_config.connector_config_file)
+    config = ckg_utils.get_configuration(path)
 except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
 

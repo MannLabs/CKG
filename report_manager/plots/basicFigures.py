@@ -164,7 +164,7 @@ def get_ranking_plot(data, identifier, args):
                 nlayout = dict(x = l.x,
                             y = l.y,
                             xref = 'x'+str(c),
-                            yref = 'y',
+                            yref = 'y'+str(r),
                             text = l.text,
                             showarrow = True,
                             ax = l.ax,
