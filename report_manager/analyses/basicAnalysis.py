@@ -115,17 +115,18 @@ def imputation_normal_distribution(data, index=['group', 'sample', 'subject'], s
     if index is not None:
         df = df.set_index(index)
     data_imputed = df.T
-    for i in data_imputed.loc[:, data_imputed.isnull().any()]:
-        missing = data_imputed[i].isnull()
-        std = data_imputed[i].std()
-        mean = data_imputed[i].mean()
+    null_columns = data_imputed.columns[data_imputed.isnull().any()]
+    for c in null_columns:
+        missing = data_imputed[data_imputed[c].isnull()].index.tolist()
+        std = data_imputed[c].std()
+        mean = data_imputed[c].mean()
         sigma = std*nstd
         mu = mean - (std*shift)
         value = 0.0
         if not math.isnan(std) and not math.isnan(mean) and not math.isnan(sigma) and not math.isnan(mu):
-            value = np.random.normal(mu, sigma, size=len(data_imputed[missing]))
+            value = np.random.normal(mu, sigma, size=len(missing))
             value[value<0] = 0.0
-        data_imputed.loc[missing, i] = value
+        data_imputed.loc[missing, c] = value
 
     return data_imputed.T
 
@@ -756,44 +757,58 @@ def runFisher(group1, group2, alternative='two-sided'):
 
         odds, pvalue = stats.fisher_exact([[a, b], [c, d]])
     '''
+
     odds, pvalue = stats.fisher_exact([group1, group2], alternative)
 
     return (odds, pvalue)
 
-def runEnrichment(data, foreground, background, method='fisher'):
+def get_regulation_enrichment(regulation_data, annotation, identifier='identifier', groups=['group1', 'group2'], annotation_col='annotation', reject_col='rejected', method='fisher'):
+    foreground_list = regulation_data[regulation_data[reject_col]][identifier].unique().tolist()
+    background_list = regulation_data[~regulation_data[reject_col]][identifier].unique().tolist()
+    grouping = []
+    for i in annotation[identifier]:
+        if i in foreground_list:
+            grouping.append('foreground')
+        elif i in background_list:
+            grouping.append('background')
+        else:
+            grouping.append(np.nan)
+    annotation['group'] = grouping
+    annotation = annotation.dropna(subset=['group'])
+
+    result = run_enrichment(annotation, foreground='foreground', background='background', foreground_pop=len(foreground_list), background_pop=len(background_list), annotation_col=annotation_col, group_col='group', identifier_col=identifier, method=method)
+    
+    
+    return result
+
+def run_enrichment(data, foreground, background, foreground_pop, background_pop, annotation_col='annotation', group_col='group', identifier_col='identifier', method='fisher'):
     result = pd.DataFrame()
     df = data.copy()
-    grouping = df['group'].value_counts().to_dict()
     terms = []
     ids = []
     pvalues = []
-    if foreground in grouping and background in grouping:
-        foreground_pop = grouping[foreground]
-        background_pop = grouping[background]
-        countsdf = df.groupby(['annotation','group']).agg(['count'])[('identifier','count')].reset_index().set_index('annotation')
-        countsdf.columns = ['group', 'count']
-        for annotation in countsdf.index:
-            counts = countsdf[annotation]
-            num_foreground = counts.loc[counts['group'] == foreground,'count'].values
-            num_background = counts.loc[counts['group'] == background,'count'].values
-            if len(num_foreground) == 1:
-                num_foreground = num_foreground[0]
-            else:
-                num_foreground = 0
-            if len(num_background) == 1:
-                num_background = num_background[0]
-            else:
-                num_background = 0
-            if method == 'fisher':
-                odds, pvalue = runFisher([num_foreground, foreground_pop-num_foreground],[num_background, background_pop-num_background])
-            terms.append(annotation)
-            pvalues.append(pvalue)
-            ids.append(df.loc[(df['annotation']==annotation) & (df['group'] == foregorund), "identifier"].tolist())
-
+    countsdf = df.groupby([annotation_col,group_col]).agg(['count'])[(identifier_col,'count')].reset_index()
+    countsdf.columns = [annotation_col, group_col, 'count']
+    for annotation in countsdf[countsdf[group_col] == foreground][annotation_col].unique().tolist():
+        counts = countsdf[countsdf[annotation_col] == annotation]
+        num_foreground = counts.loc[counts[group_col] == foreground,'count'].values
+        num_background = counts.loc[counts[group_col] == background,'count'].values
+        
+        if len(num_foreground) == 1:
+            num_foreground = num_foreground[0]
+        if len(num_background) == 1:
+            num_background = num_background[0]
+        else:
+            num_background=0
+        if method == 'fisher':
+            odds, pvalue = runFisher([num_foreground, foreground_pop-num_foreground],[num_background, background_pop-num_background])
+        terms.append(annotation)
+        pvalues.append(pvalue)
+        ids.append(df.loc[(df[annotation_col]==annotation) & (df[group_col] == foreground), identifier_col].tolist())
     if len(pvalues) > 1:
         rejected,padj = apply_pvalue_fdrcorrection(pvalues, alpha=0.05, method='indep')
         result = pd.DataFrame({'terms':terms, 'identifiers':ids, 'padj':padj, 'rejected':rejected})
-        result = result[result.rejected]
+        #result = result[result.rejected]
     return result
 
 def calculate_fold_change(df, condition1, condition2):

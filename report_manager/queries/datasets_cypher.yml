@@ -64,6 +64,36 @@ proteomics:
             MATCH (protein)-[:IS_BIOMARKER_OF_DISEASE]->(d)
             WHERE d.id IN disease OR d.id IN pdisease OR d.id IN cdiseases
             RETURN DISTINCT protein.name+"-"+protein.id AS identifier, d.name AS disease;
+    PATHWAY_ANNOTATION:
+        name: 'get pathway annotations for the proteins identified'
+        description: 'Get all the pathway annotations for the all the proteins identified in a project'
+        involved_nodes:
+            - Project
+            - Analytical_sample
+            - Protein
+            - Pathway
+        involved_relationships:
+            - ANNOTATED_IN_PATHWAY
+        query_type: pre
+        query: >
+            MATCH (project:Project)-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein)-[rp:ANNOTATED_IN_PATHWAY]->(pathway:Pathway) 
+            WHERE toBoolean(r.is_razor)
+            RETURN DISTINCT protein.name+"-"+protein.id AS identifier,pathway.name AS annotation,rp.source AS source
+    GO_ANNOTATION:
+        name: 'get gene ontology annotations for the proteins identified'
+        description: 'Get all the gene ontology annotations for the all the proteins identified in a project'
+        involved_nodes:
+            - Project
+            - Analytical_sample
+            - Protein
+            - Biological_process
+        involved_relationships:
+            - ASSOCIATED_WITH
+        query_type: pre
+        query: >
+            MATCH (project:Project)-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein)-[rp:ASSOCIATED_WITH]->(go:Biological_process) 
+            WHERE toBoolean(r.is_razor)
+            RETURN DISTINCT protein.name+"-"+protein.id AS identifier,go.name AS annotation,rp.source AS source
     DATASET:
         name: 'get dataset from project'
         description: 'Extracts the dataset matrix of quantified proteins in a given Project. Requires: Project.id'
@@ -105,7 +135,7 @@ proteomics:
         query: >
             MATCH (drug:Drug)-[r:ACTS_ON]->(protein:Protein) 
             WHERE ((protein.name+"-"+protein.id) IN [IDENTIFIERS]) AND r.score>=0.4
-            RETURN protein.name+"-"+protein.id AS Protein,drug.name AS Drug,r.score AS score, r.source AS source,r.action AS action
+            RETURN DISTINCT protein.name+"-"+protein.id AS Protein,drug.name AS Drug,r.score AS score, r.source AS source,r.action AS action
     DISEASE_ASSOCIATIONS:
         name: 'get diseases associated to the list of proteins'
         description: 'Get all the disease-protein associations for the relevant proteins'
@@ -118,7 +148,7 @@ proteomics:
         query: >
             MATCH (disease:Disease)<-[r:ASSOCIATED_WITH]-(protein:Protein) 
             WHERE ((protein.name+"-"+protein.id) IN [IDENTIFIERS]) AND ((r.score>=2.0 AND r.source="DISEASES") OR (r.score>=0.7 AND toLower(r.source) =~ "disgenet.+") OR toLower(toString(r.score))="curated")
-            RETURN protein.name+"-"+protein.id AS Protein,disease.name AS Disease,r.score AS score, r.source AS source
+            RETURN DISTINCT protein.name+"-"+protein.id AS Protein,disease.name AS Disease,r.score AS score, r.source AS source 
 clinical:
     CLINICAL_VARIABLES:
         name: 'get clinical variables and clinical states'

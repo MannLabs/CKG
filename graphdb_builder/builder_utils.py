@@ -40,7 +40,7 @@ def write_entities(entities, header, outputfile):
 
 def setup_db_config():
     try:
-        dirname = os.path.dirname(__file__)
+        dirname = os.path.abspath(os.path.dirname(__file__)) 
         dbconfig = ckg_utils.get_configuration(os.path.join(dirname, ckg_config.databases_config_file))
     except Exception as err:
         raise Exception("Reading configuration > {}.".format(err))

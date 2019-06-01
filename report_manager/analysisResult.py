@@ -203,6 +203,8 @@ class AnalysisResult:
         elif self.analysis_type == "interaction":
             result[self.analysis_type], nargs = analyses.get_interaction_network(self.data)
             args.update(nargs)
+        elif self.analysis_type == "enrichment":
+            result[self.analysis_type] = analyses.get_regulation_enrichment(self.data[args['regulation_data']], self.data[args['annotation']], identifier='identifier', groups=['group1', 'group2'], annotation_col='annotation', reject_col='rejected', method='fisher')
         elif self.analysis_type == 'long_format':
             result[self.analysis_type] = analyses.transform_into_long_format(self.data, drop_columns=args['drop_columns'], group=args['group'], columns=args['columns'])
         elif self.analysis_type == 'ranking_with_markers':

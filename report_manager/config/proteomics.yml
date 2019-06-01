@@ -77,25 +77,6 @@ overview: #section
             width: 1500
             title: Protein ranking
 data exploration:
-    stratification:
-        data: processed
-        analyses:
-            - pca
-            #- tsne
-            #- umap
-        plots:
-            - pca
-        args:
-            x_title: PC1
-            y_title: PC2
-            components: 2
-            perplexity: 40
-            n_iter: 1000
-            init: 'pca'
-            width: 1000
-            height: 700
-            loadings: 15
-            title: 'Sample stratification'
     regulation:
         data: processed
         analyses:
@@ -119,94 +100,18 @@ data exploration:
                 - subject
             name: name
             title: 'Differential regulation ANOVA'
-    correlation:
-        data: processed
+    go_enrichment:
+        data: 
+            - regulation table
+            - go annotation
         analyses:
-            - correlation
-        plots:
-            - network
-            - heatmap
-        store_analysis: True
-        args:
-            source: node1
-            target: node2
-            title: 'Features correlation network'
-            format: edgelist
-            values: weight
-            dist: False
-            node_properties: {}
-            width: 1600
-            height: 1600
-            maxLinkWidth: 6
-            maxRadius: 20
-            node_size: 'degree'
-            cutoff: 0.5
-            subject: subject
-            cutoff_abs: True
-            communities_algorithm: louvain
-            width: 1000
-            height: 700
-    interaction:
-        data: regulated
-        analyses: []
-        plots:
-            - network
-        args:
-            use:
-                columns: identifiers
-            source: node1
-            target: node2
-            title: 'Protein-Protein interaction network'
-            format: edgelist
-            values: score
-            dist: False
-            node_properties: {}
-            width: 1600
-            height: 1600
-            maxLinkWidth: 7
-            maxRadius: 20
-            node_size: 'ev_centrality'
-            communities_algorithm: louvain
-    drug_associations:
-        data: regulated
-        analyses: []
+            - enrichment
         plots:
             - basicTable
         args:
-            use:
-                columns: identifiers
-            height: 700
-            width: 900
-            title: 'List of drugs targetting differentially regulated proteins'
-    disease_associations:
-        data: regulated
-        analyses: []
-        plots:
-            - basicTable
-        args:
-            use:
-                columns: identifiers
-            height: 700
-            width: 900
-            title: 'List of diseases associated with the differentially regulated proteins'
-    # enrichment:
-    #    data: 
-    #        - processed
-    #        - protein biomarkers
-    #     analyses:
-    #         - enrichment
-    #     plots:
-    #         - basicTable
-    #     args:
-    #         use:
-    #             columns: identifiers
-    #         source: node1
-    #         target: node2
-    #         title: 'Protein-Protein interaction network'
-    #         format: edgelist
-    #         values: score
-    #         dist: False
-    #         node_properties: {}
+            regulation_data: regulation table
+            annotation: go annotation
+            title: 'Pathway Enrichment'
     #"topological data analysis":
     #    data: regulated
     #    analyses:

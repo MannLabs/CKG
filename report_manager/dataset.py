@@ -87,18 +87,21 @@ class Dataset:
     def update_analysis_queries(self, query):
         self.analysis_queries.update(query)
 
-    def get_dataset(self, dataset_name):
+    def get_dataframe(self, dataset_name):
         if dataset_name in self.data:
             return self.data[dataset_name]
         return None
 
-    def get_datasets(self, dataset_names):
+    def get_dataframes(self, dataset_names):
         datasets = {}
         for dataset_name in dataset_names:
             if dataset_name in self.data:
                 datasets[dataset_name] = self.data[dataset_name]
 
         return datasets
+
+    def list_dataframes(self):
+        return list(self.data.keys())
 
     def get_analysis(self, analysis):
         if analysis in self.analyses:
@@ -292,9 +295,9 @@ class Dataset:
             for subsection in self.configuration[section]:
                 data_names, analysis_types, plot_types, store_analysis, args = self.extract_configuration(self.configuration[section][subsection])
                 if isinstance(data_names, dict) or isinstance(data_names, list):
-                    data = self.get_datasets(data_names)
+                    data = self.get_dataframes(data_names)
                 else:
-                    data = self.get_dataset(data_names)
+                    data = self.get_dataframe(data_names)
 
                 if data is not None and len(data) > 0:
                     if subsection in self.analysis_queries:
@@ -302,12 +305,15 @@ class Dataset:
                         if "use" in args:
                             for r_id in args["use"]:
                                 if r_id == "columns":
-                                    rep = ",".join(['"{}"'.format(i) for i in data.columns.tolist()])
+                                    rep_str = args["use"][r_id].upper()
+                                    rep = ",".join(['"{}"'.format(i) for i in data.columns.unique().tolist()])
                                 elif r_id == "index":
-                                    rep = ",".join(['"{}"'.format(i) for i in data.index.tolist()])
+                                    rep_str = args["use"][r_id].upper()
+                                    rep = ",".join(['"{}"'.format(i) for i in data.index.unique().tolist()])
                                 elif r_id in data.columns:
-                                    rep = ",".join(['"{}"'.format(i) for i in data[r_id].tolist()])
-                                query = query.replace(args["use"][r_id].upper(),rep)
+                                    rep_str = r_id.upper()
+                                    rep = ",".join(['"{}"'.format(i) for i in data[r_id].unique().tolist()])
+                                query = query.replace(rep_str,rep)
                             data = self.send_query(query)
                     result = None
                     if len(analysis_types) >= 1:
@@ -323,7 +329,7 @@ class Dataset:
                                         sig_data = data[sig_hits]
                                         sig_data.index = data['group'].tolist()
                                         sig_data["sample"] = data["sample"].tolist()
-                                        self.update_data({"regulated":sig_data, "regulation_table":reg_data})
+                                        self.update_data({"regulated":sig_data, "regulation table":reg_data})
                                 else:
                                     self.update_data({analysis_type: result.result[analysis_type]})
                             for plot_type in plot_types:
@@ -376,13 +382,13 @@ class MultiOmicsDataset(Dataset):
         Dataset.__init__(self, identifier, "multiomics", data=data, analyses=analyses, analysis_queries={}, report=report)
         self.set_configuration_from_file(config_file)
 
-    def get_datasets(self, datasets):
+    def get_dataframes(self, datasets):
         data = {}
         for dataset_type in datasets:
             dataset_name = datasets[dataset_type]
             if dataset_type in self.data:
                 dataset = self.data[dataset_type]
-                data[dataset_type] = self.data[dataset_type].get_dataset(dataset_name)
+                data[dataset_type] = self.data[dataset_type].get_dataframe(dataset_name)
 
         return data
 
@@ -402,7 +408,7 @@ class ProteomicsDataset(Dataset):
 
     def processing(self):
         processed_data = None
-        data = self.get_dataset("dataset")
+        data = self.get_dataframe("dataset")
         if data is not None:
             imputation = True
             method = "mixed"
@@ -449,7 +455,7 @@ class ClinicalDataset(Dataset):
 
     def processing(self):
         processed_data = None
-        data = self.get_dataset("dataset")
+        data = self.get_dataframe("dataset")
         if data is not None:
             subject_id = 'subject'
             sample_id = 'biological_sample'
