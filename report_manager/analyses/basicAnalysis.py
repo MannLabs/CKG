@@ -3,6 +3,7 @@ import itertools
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.cluster import AffinityPropagation
+from sklearn.utils import shuffle
 from statsmodels.stats import multitest, anova as aov
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 from scipy.special import factorial, betainc
@@ -14,7 +15,6 @@ import numpy as np
 import networkx as nx
 import community
 import math
-from random import shuffle
 from fancyimpute import KNN
 import kmapper as km
 from report_manager import utils
@@ -308,13 +308,14 @@ def apply_pvalue_twostage_fdrcorrection(pvalues, alpha=0.05, method='bh'):
     return (rejected, padj)
 
 def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, permutations=250):
-    np.random.seed(176782)
+    initial_seed = 176782
     i = permutations
-    df_index = list(df.index)
+    df_index = df.index.values
     columns = ['identifier']
     rand_pvalues = None
     while i>0:
-        shuffle(df_index)
+        df_index = shuffle(df_index, random_state=initial_seed + i)
+        print(df_index)
         df_random = df.reset_index(drop=True)
         df_random.index = df_index
         df_random.index.name = 'group'
