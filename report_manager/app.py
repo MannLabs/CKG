@@ -3,7 +3,7 @@ import flask
 import redis
 import dash
 import dash_auth
-
+import dash_cytoscape as cyto
 
 server = flask.Flask('app')
 server.secret_key = os.environ.get('secret_key', 'secret')

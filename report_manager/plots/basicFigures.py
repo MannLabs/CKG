@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
+import ast
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
@@ -641,14 +642,53 @@ def get_network(data, identifier, args):
         colors = {n:col[clusters[n]] for n in clusters}
         nx.set_node_attributes(graph, colors, 'color')
         nx.set_node_attributes(graph, clusters, 'cluster')
-        jgraph = json_graph.node_link_data(graph)
         notebook_net = get_notebook_network_pyvis(graph, args)
         nodes_table, edges_table = network_to_tables(graph)
         nodes_fig_table = getBasicTable(nodes_table, identifier=identifier+"_nodes_table", title=args['title']+" nodes table")
         edges_fig_table = getBasicTable(edges_table, identifier=identifier+"_edges_table", title=args['title']+" edges table")
+        
+        stylesheet, layout = get_network_style(colors, args['color_weight'])
+        args['stylesheet'] = stylesheet
+        args['layout'] = layout
+        
+        cy_graph = json_graph.cytoscape_data(graph)
+        cy_nodes = cy_graph['elements']['nodes']
+        cy_edges = cy_graph['elements']['edges']
+        cy_elements = cy_nodes
+        cy_elements.extend(cy_edges)
 
-        net = {"notebook":notebook_net, "app":Network(id=identifier, data=jgraph, width=args['width'], height=args['height'], maxLinkWidth=args['maxLinkWidth'], maxRadius=args['maxRadius']), "net_tables":(nodes_fig_table, edges_fig_table)}
+        net = {"notebook":notebook_net, "app":get_cytoscape_network(cy_elements, identifier, args), "net_tables":(nodes_fig_table, edges_fig_table)}
     return net
+
+def get_network_style(node_colors, color_edges):
+    color_selector = "{'selector': '[name = \"KEY\"]', 'style': {'background-color': 'VALUE'}}"
+    stylesheet=[{'selector': 'node', 'style': {'label': 'data(name)'}}, 
+                {'selector':'edge','style':{'curve-style': 'bezier'}}]
+
+    layout = {'name': 'cose',
+                'idealEdgeLength': 100,
+                'nodeOverlap': 20,
+                'refresh': 20,
+                'fit': True,
+                'padding': 30,
+                'randomize': False,
+                'componentSpacing': 100,
+                'nodeRepulsion': 400000,
+                'edgeElasticity': 100,
+                'nestingFactor': 5,
+                'gravity': 80,
+                'numIter': 1000,
+                'initialTemp': 200,
+                'coolingFactor': 0.95,
+                'minTemp': 1.0}
+
+    if color_edges:
+        stylesheet.extend([{'selector':'[width < 0]', 'style':{'line-color':'#3288bd'}},{'selector':'[width > 0]', 'style':{'line-color':'#d73027'}}])
+
+    for k,v in node_colors.items():
+        stylesheet.append(ast.literal_eval(color_selector.replace("KEY", k).replace("VALUE",v)))
+
+    return stylesheet, layout
 
 def get_pca_plot(data, identifier, args):
     pca_data, loadings = data    
@@ -768,8 +808,9 @@ def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subse
     if subset is not None:
         data = data[subset]
 
-    booleanDictionary = {True: 'TRUE', False: 'FALSE'}
-    data = data.replace(booleanDictionary)
+    #booleanDictionary = {True: 'TRUE', False: 'FALSE'}
+    #if 'rejected' in data.columns:
+    #    data['rejected'] = data['rejected'].replace(booleanDictionary)
     
     data_trace = dash_table.DataTable(id='table_'+identifier,
                                         data=data.to_dict("rows"),
@@ -1102,6 +1143,8 @@ def get_cytoscape_network(net, identifier, args):
                                     stylesheet=args['stylesheet'],
                                     elements=net,
                                     layout=args['layout'],
+                                    minZoom = 0.2,
+                                    maxZoom = 1.8,
                                     style={'width': '100%', 'height': '500px'}
                                     )
                     ])

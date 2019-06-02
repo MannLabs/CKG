@@ -134,7 +134,7 @@ class AnalysisResult:
             alpha = 0.05
             drop_cols = []
             group = 'group'
-            permutations = 50
+            permutations = 150
             if "alpha" in args:
                 alpha = args["alpha"]
             if "drop_cols" in args:
@@ -150,7 +150,7 @@ class AnalysisResult:
             drop_cols = []
             group = 'group'
             subject = 'subject'
-            permutations = 50
+            permutations = 150
             if "alpha" in args:
                 alpha = args["alpha"]
             if "drop_cols" in args:
@@ -170,6 +170,7 @@ class AnalysisResult:
             cutoff = 0.5
             subject='subject'
             group='group'
+            color_weight = False
             if 'group' in args:
                 group=args['group']
             if 'subject' in args:

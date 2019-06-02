@@ -95,8 +95,10 @@ def get_rgb_colors(n):
     return colors
 
 def get_hex_colors(n):
+    initial_seed = 123
     colors = []
     for i in range(n):
+        random.seed(initial_seed + i)
         color = "#%06x" % random.randint(0, 0xFFFFFF)
         colors.append(color)
 

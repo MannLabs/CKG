@@ -315,7 +315,6 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, per
     rand_pvalues = None
     while i>0:
         df_index = shuffle(df_index, random_state=initial_seed + i)
-        print(df_index)
         df_random = df.reset_index(drop=True)
         df_random.index = df_index
         df_random.index.name = 'group'
@@ -598,7 +597,7 @@ def check_is_paired(df, subject, group):
 
     return is_pair
 
-def anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', group='group', permutations=50):
+def anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', group='group', permutations=250):
     columns = ['identifier', 'F-statistics', 'pvalue']
     if subject is not None and check_is_paired(df, subject, group):
         groups = df[group].unique()
@@ -650,7 +649,7 @@ def anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', gro
     
     return res
 
-def repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subject='subject', group='group', permutations=50):
+def repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subject='subject', group='group', permutations=250):
     df = df.set_index([subject,group])
     df = df.drop(drop_cols, axis=1)
     aov_result = []
@@ -700,7 +699,7 @@ def repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subject='s
     
     return res
 
-def ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], subject='subject', group='group', paired=False, permutations=50):
+def ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], subject='subject', group='group', paired=False, permutations=250):
     df = df.set_index([subject, group])
     df = df.drop(drop_cols, axis = 1)
     #tdf = df.loc[[condition1, condition2],:].T
