@@ -199,45 +199,38 @@ def get_scatterplot_matrix(data, identifier, args):
     num_cols = 3
     fig = {}
     layouts = []
-    num_groups = len(data.index.unique())
-    num_rows = math.ceil(num_groups/num_cols)
     if 'group' in args:
         group=args['group']
-    #subplot_title = "Ranking of proteins in {} samples"
-    #subplot_titles = [subplot_title.format(index.title()) for index in data.index.unique()]
+
+    num_groups = len(data[group].unique())
+    num_rows = math.ceil(num_groups/num_cols)
     fig = tools.make_subplots(rows=num_rows, cols=num_cols, shared_yaxes=True,print_grid=False)
-    if 'index' in args and args['index']:
-        r = 1
-        c = 1
-        range_y = [data['y'].min(), data['y'].max()+1]
-        for index in data.index.unique():
-            gdata = data.loc[index, :].dropna().groupby('name', as_index=False).mean().sort_values(by='y', ascending=False)
-            gdata = gdata.reset_index().reset_index()
-            cols = ['x', 'group', 'name', 'y']
-            cols.extend(gdata.columns[4:])
-            gdata.columns = cols
-            gfig = get_simple_scatterplot(gdata, identifier+'_'+str(index), args)
-            trace = gfig.figure['data'].pop()
-            trace.name = index
-            fig.append_trace(trace, r, c)
-            
-            if c >= num_cols:
-                r += 1
-                c = 1
-            else:
-                c += 1
-        fig['layout'].update(dict(height = args['height'], 
-                                width=args['width'],  
-                                title=args['title'], 
-                                xaxis= {"title": args['x_title'], 'autorange':True}, 
-                                yaxis= {"title": args['y_title'], 'range':range_y}))
-        fig['layout'].annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')] 
-    else:
-        fig = get_simple_scatterplot(data, identifier+'_'+group, args).figure
+    r = 1
+    c = 1
+    range_y = [data['y'].min(), data['y'].max()+1]
+    for g in data[group].unique():
+        gdata = data[data[group] == g].dropna()
+        gfig = get_simple_scatterplot(gdata, identifier+'_'+str(g), args)
+        trace = gfig.figure['data'].pop()
+        trace.name = g
+        fig.append_trace(trace, r, c)
+        
+        if c >= num_cols:
+            r += 1
+            c = 1
+        else:
+            c += 1
+
+    fig['layout'].update(dict(height = args['height'], 
+                            width=args['width'],  
+                            title=args['title'], 
+                            xaxis= {"title": args['x_title'], 'autorange':True}, 
+                            yaxis= {"title": args['y_title'], 'range':range_y}))
+
+    fig['layout'].annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')] 
+    
     return dcc.Graph(id=identifier, figure=fig)
     
-    
-
 def get_scatterplot_matrix_old(data, identifier, args):
     df = data.copy()
     if "format" in args:
@@ -392,7 +385,7 @@ def get_volcanoplot(results, args):
             range_y = [0,max(abs(result['y']))+0.8]
         else:
             range_y = args["range_y"]
-        trace = Scattergl(x=result['x'],
+        trace = Scatter(x=result['x'],
                         y=result['y'],
                         mode='markers',
                         text=result['text'],
@@ -714,11 +707,11 @@ def get_network_style(node_colors, color_edges):
                 'idealEdgeLength': 100,
                 'nodeOverlap': 20,
                 'refresh': 20,
-                'fit': True,
-                'padding': 30,
+                #'fit': True,
+                #'padding': 30,
                 'randomize': False,
                 'componentSpacing': 100,
-                'nodeRepulsion': 450000,
+                'nodeRepulsion': 400000,
                 'edgeElasticity': 100,
                 'nestingFactor': 5,
                 'gravity': 80,
@@ -1190,7 +1183,7 @@ def get_cytoscape_network(net, identifier, args):
                                     layout=args['layout'],
                                     minZoom = 0.2,
                                     maxZoom = 1.8,
-                                    style={'width': '100%', 'height': '500px'}
+                                    style={'width': '100%', 'height': '700px'}
                                     )
                     ])
 

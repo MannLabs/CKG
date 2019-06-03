@@ -168,7 +168,8 @@ def calculate_coefficient_variation(values):
     
     return cv
 
-def get_coefficient_variation(df, drop_columns, group, columns):
+def get_coefficient_variation(data, drop_columns, group, columns):
+    df = data.copy()
     formated_df = df.reset_index().drop(drop_columns, axis=1)
     cvs = formated_df.groupby(group).apply(func=calculate_coefficient_variation)
     cols = formated_df.set_index(group).columns.tolist()
