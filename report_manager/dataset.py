@@ -331,10 +331,10 @@ class Dataset:
                                         sig_data["sample"] = data["sample"].tolist()
                                         self.update_data({"regulated":sig_data, "regulation table":reg_data})
                                 else:
-                                    self.update_data({analysis_type: result.result[analysis_type]})
+                                    self.update_data({subsection+"_"+analysis_type: result.result[analysis_type]})
                             for plot_type in plot_types:
                                 plots = result.get_plot(plot_type, subsection+"_"+analysis_type+"_"+plot_type)
-                                self.report.update_plots({(analysis_type, plot_type):plots})
+                                self.report.update_plots({(subsection+"_"+analysis_type, plot_type):plots})
                     else:
                         if result is None:
                             dictresult = {}

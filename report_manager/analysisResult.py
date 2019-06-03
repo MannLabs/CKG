@@ -294,18 +294,20 @@ class AnalysisResult:
                 colors = ('#C2D4FF','#F5F8FF')
                 attr =  {'width':800, 'height':1500, 'font':12}
                 subset = None
+                figure_title = 'Basic table'
                 if "colors" in args:
                     colors = args["colors"]
                 if "attr" in args:
                     attr = args["attr"]
                 if "subset" in args:
                     subset = args["subset"]
+                if "title" in args:
+                    figure_title = args["title"]
                 for id in data:
+                    print(id)
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
                         figure_title = args["title"] + id[0]+" vs "+id[1]
-                    else:
-                        figure_title = args["title"]
                     plot.append(figure.getBasicTable(data[id], identifier, figure_title, colors=colors, subset=subset, plot_attr=attr))
             elif name == "barplot":
                 x_title = "x"
@@ -396,7 +398,6 @@ class AnalysisResult:
                     else:
                         figure_title = args["title"]
                     args["title"] = figure_title
-                    print(identifier)
                     plot.append(figure.get_network(data[id], identifier, args))
             elif name == "heatmap":
                 for id in data:
