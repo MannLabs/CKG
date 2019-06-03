@@ -46,16 +46,16 @@ overview: #section
             x_title: Analytical sample
             y_title: number of modified proteins
             plot_type: bar
-            title: 'Number of modified proteins identified per type'    
+            title: 'Number of modified proteins identified per type'
     ranking:
         data: 
             - processed
             - protein biomarkers 
         analyses: 
             - ranking_with_markers
-            - basicTable
         plots:
             - ranking
+            - basicTable
         args:
             drop_columns: 
                 - sample
@@ -76,6 +76,27 @@ overview: #section
             height: 900
             width: 1500
             title: Protein ranking
+    coefficient_variation:
+        data: processed
+        analyses:
+            - coefficient_of_variation
+        plots:
+            - scatterplot_matrix
+        args:
+            drop_columns:
+                - sample
+                - subject
+            columns:
+                - name
+                - y
+            group: group
+            index: True
+            x_title: '%CV'
+            y_title: log2 LFQ intensity
+            size: 9
+            height: 900
+            width: 1500
+            title: 'Proteins %CV'
 data exploration:
     stratification:
         data: processed
@@ -200,6 +221,14 @@ data exploration:
         args:
             regulation_data: regulation table
             annotation: go annotation
+            identifier: identifier
+            groups:
+                - group1
+                - group2
+            annotation_type: Biological_processes
+            annotation_col: annotation
+            reject_col: rejected
+            method: fisher
             title: 'Gene Ontology Enrichment'
     pathway_enrichment:
         data: 
@@ -212,6 +241,14 @@ data exploration:
         args:
             regulation_data: regulation table
             annotation: pathway annotation
+            identifier: identifier
+            groups:
+                - group1
+                - group2
+            annotation_type: Pathways
+            annotation_col: annotation
+            reject_col: rejected
+            method: fisher
             title: 'Pathway Enrichment'
     #"topological data analysis":
     #    data: regulated

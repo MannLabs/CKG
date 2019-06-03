@@ -194,9 +194,51 @@ def get_ranking_plot(data, identifier, args):
     else:
         fig = get_simple_scatterplot(data, identifier+'_'+group, args).figure
     return dcc.Graph(id=identifier, figure=fig)
-    
 
 def get_scatterplot_matrix(data, identifier, args):
+    num_cols = 3
+    fig = {}
+    layouts = []
+    num_groups = len(data.index.unique())
+    num_rows = math.ceil(num_groups/num_cols)
+    if 'group' in args:
+        group=args['group']
+    #subplot_title = "Ranking of proteins in {} samples"
+    #subplot_titles = [subplot_title.format(index.title()) for index in data.index.unique()]
+    fig = tools.make_subplots(rows=num_rows, cols=num_cols, shared_yaxes=True,print_grid=False)
+    if 'index' in args and args['index']:
+        r = 1
+        c = 1
+        range_y = [data['y'].min(), data['y'].max()+1]
+        for index in data.index.unique():
+            gdata = data.loc[index, :].dropna().groupby('name', as_index=False).mean().sort_values(by='y', ascending=False)
+            gdata = gdata.reset_index().reset_index()
+            cols = ['x', 'group', 'name', 'y']
+            cols.extend(gdata.columns[4:])
+            gdata.columns = cols
+            gfig = get_simple_scatterplot(gdata, identifier+'_'+str(index), args)
+            trace = gfig.figure['data'].pop()
+            trace.name = index
+            fig.append_trace(trace, r, c)
+            
+            if c >= num_cols:
+                r += 1
+                c = 1
+            else:
+                c += 1
+        fig['layout'].update(dict(height = args['height'], 
+                                width=args['width'],  
+                                title=args['title'], 
+                                xaxis= {"title": args['x_title'], 'autorange':True}, 
+                                yaxis= {"title": args['y_title'], 'range':range_y}))
+        fig['layout'].annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')] 
+    else:
+        fig = get_simple_scatterplot(data, identifier+'_'+group, args).figure
+    return dcc.Graph(id=identifier, figure=fig)
+    
+    
+
+def get_scatterplot_matrix_old(data, identifier, args):
     df = data.copy()
     if "format" in args:
         if args["format"] == "long":
@@ -208,7 +250,10 @@ def get_scatterplot_matrix(data, identifier, args):
     classes=np.unique(df[args["group"]].values).tolist()
     class_code={classes[k]: k for k in range(len(classes))}
     color_vals=[class_code[cl] for cl in df[args["group"]]]
-    text=[data.loc[ k, args["group"]] for k in range(len(df))]
+    if 'name' in data.columns:
+        text = data.name
+    else:
+        text= data[args['group']]
 
     figure = {}
     figure["data"] = []
@@ -673,7 +718,7 @@ def get_network_style(node_colors, color_edges):
                 'padding': 30,
                 'randomize': False,
                 'componentSpacing': 100,
-                'nodeRepulsion': 400000,
+                'nodeRepulsion': 450000,
                 'edgeElasticity': 100,
                 'nestingFactor': 5,
                 'gravity': 80,

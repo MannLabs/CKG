@@ -6,6 +6,7 @@ from sklearn.cluster import AffinityPropagation
 from sklearn.utils import shuffle
 from statsmodels.stats import multitest, anova as aov
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
+import scipy.stats
 from scipy.special import factorial, betainc
 import umap.umap_ as umap
 from sklearn import preprocessing, ensemble, cluster
@@ -161,6 +162,30 @@ def linear_normalization(data, method = "l1", axis = 0):
 def remove_group(data):
     data.drop(['group'], axis=1)
     return data
+
+def calculate_coefficient_variation(values):
+    cv = scipy.stats.variation(values.apply(lambda x: np.power(2,x)).values) *100
+    
+    return cv
+
+def get_coefficient_variation(df, drop_columns, group, columns):
+    formated_df = df.reset_index().drop(drop_columns, axis=1)
+    cvs = formated_df.groupby(group).apply(func=calculate_coefficient_variation)
+    cols = formated_df.set_index(group).columns.tolist()
+    cvs_df = pd.DataFrame()
+    for i in cvs.index:
+        gcvs = cvs[i].tolist()
+        ints = formated_df.set_index('group').mean().values.tolist()
+        tdf = pd.DataFrame(data= {'name':cols, 'x':gcvs, 'y':ints})
+        tdf['group'] = i
+        
+        if cvs_df.empty:
+            cvs_df = tdf.copy()
+        else:
+            cvs_df = cvs_df.append(tdf)
+
+    return cvs_df
+
 
 def get_proteomics_measurements_ready(df, index=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation = True, method = 'distribution', missing_method = 'percentage', missing_max = 0.3, value_col='LFQ_intensity'):
     df = df.set_index(index)

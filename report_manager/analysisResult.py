@@ -205,7 +205,27 @@ class AnalysisResult:
             result[self.analysis_type], nargs = analyses.get_interaction_network(self.data)
             args.update(nargs)
         elif self.analysis_type == "enrichment":
-            result[self.analysis_type] = analyses.get_regulation_enrichment(self.data[args['regulation_data']], self.data[args['annotation']], identifier='identifier', groups=['group1', 'group2'], annotation_col='annotation', reject_col='rejected', method='fisher')
+            identifier='identifier'
+            groups=['group1', 'group2']
+            annotation_col='annotation'
+            reject_col='rejected'
+            method='fisher'
+            annotation_type = 'functional'
+            if 'identifier' in args:
+                identifier = args['identifier']
+            if 'groups' in args:
+                groups = args['groups']
+            if 'annotation_col' in args:
+                annotation_col = args['annotation_col']
+            if 'reject_col' in args:
+                reject_col = args['reject_col']
+            if 'method' in args:
+                method = args['method']
+            if 'annotation_type' in args:
+                annotation_type = args['annotation_type']
+
+            if 'regulation_data' in args and 'annotation' in args:
+                result[annotation_type+"_"+self.analysis_type] = analyses.get_regulation_enrichment(self.data[args['regulation_data']], self.data[args['annotation']], identifier=identifier, groups=groups, annotation_col=annotation_col, reject_col=reject_col, method=method)
         elif self.analysis_type == 'long_format':
             result[self.analysis_type] = analyses.transform_into_long_format(self.data, drop_columns=args['drop_columns'], group=args['group'], columns=args['columns'])
         elif self.analysis_type == 'ranking_with_markers':
@@ -227,6 +247,8 @@ class AnalysisResult:
             if 'data' in args:
                 if args['data'] in self.data:
                     result[self.analysis_type] = analyses.get_ranking_with_markers(self.data[args['data']], drop_columns=args['drop_columns'], group=args['group'], columns=args['columns'], list_markers=list_markers, annotation = args['annotations'])
+        elif self.analysis_type == 'coefficient_of_variation':
+            result[self.analysis_type] = analyses.get_coefficient_variation(self.data, drop_columns=args['drop_columns'], group=args['group'], columns=args['columns'])
         elif self.analysis_type == "wgcna":
             drop_cols_exp = []
             drop_cols_cli = []
@@ -374,6 +396,7 @@ class AnalysisResult:
                     else:
                         figure_title = args["title"]
                     args["title"] = figure_title
+                    print(identifier)
                     plot.append(figure.get_network(data[id], identifier, args))
             elif name == "heatmap":
                 for id in data:
