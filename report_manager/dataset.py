@@ -288,7 +288,6 @@ class Dataset:
 
     def generate_report(self):
         self.report = rp.Report(identifier=self.dataset_type.capitalize(), plots={})
-        self.add_configuration_to_report()
         for section in self.configuration:
             if section == "args":
                 continue
@@ -343,6 +342,8 @@ class Dataset:
                         for plot_type in plot_types:
                             plots = result.get_plot(plot_type, "_".join(subsection.split(' '))+"_"+plot_type)
                             self.report.update_plots({("_".join(subsection.split(' ')), plot_type): plots})
+        
+        self.add_configuration_to_report()
         #self.save_dataset()
         #self.save_dataset_report()
 

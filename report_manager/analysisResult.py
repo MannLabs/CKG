@@ -3,7 +3,6 @@ from report_manager.plots import basicFigures as figure
 import pandas as pd
 import itertools
 
-
 class AnalysisResult:
     def __init__(self, identifier, analysis_type, args, data, result=None):
         self._identifier = identifier
@@ -12,6 +11,7 @@ class AnalysisResult:
         self._data = data
         self._result = result
         if self._result is None:
+            self._result = {}
             self.generate_result()
 
     @property
@@ -54,53 +54,44 @@ class AnalysisResult:
     def result(self, result):
         self._result = result
 
-
     def generate_result(self):
-        result, args = self.get_analysis_result()
-        self.result = result
-        self.args = args
-
-    def get_analysis_result(self):
-        result = {}
-        args = self.args
         if self.analysis_type == "wide_format":
-            r = analyses.transform_into_wide_format(self.data, args['index'], args['x'],
-                                                                args['y'], extra=[args['group']])
-            result[self.analysis_type] = r
+            r = analyses.transform_into_wide_format(self.data, self.args['index'], self.args['x'], self.args['y'], extra=[self.args['group']])
+            self.result[self.analysis_type] = r
         if self.analysis_type == "pca":
             components = 2
-            if "components" in args:
-                components = args["components"]
-            result, nargs = analyses.run_pca(self.data, components=components)
-            args.update(nargs)
+            if "components" in self.args:
+                components = self.args["components"]
+            self.result, nargs = analyses.run_pca(self.data, components=components)
+            self.args.update(nargs)
         elif self.analysis_type  == "tsne":
             components = 2
             perplexity = 40
             n_iter = 1000
             init='pca'
-            if "components" in args:
-                components = args["components"]
-            if "perplexity" in args:
-                perplexity = args["perplexity"]
-            if "n_iter" in args:
-                n_iter = args["n_iter"]
-            if "init" in args:
-                init = args["init"]
-            result, nargs = analyses.run_tsne(self.data, components=components, perplexity=perplexity, n_iter=n_iter, init=init)
-            args.update(nargs)
+            if "components" in self.args:
+                components = self.args["components"]
+            if "perplexity" in self.args:
+                perplexity = self.args["perplexity"]
+            if "n_iter" in self.args:
+                n_iter = self.args["n_iter"]
+            if "init" in self.args:
+                init = self.args["init"]
+            self.result, nargs = analyses.run_tsne(self.data, components=components, perplexity=perplexity, n_iter=n_iter, init=init)
+            self.args.update(nargs)
         elif self.analysis_type  == "umap":
             n_neighbors=10
             min_dist=0.3
             metric='cosine'
-            if "n_neighbors" in args:
-                n_neighbors = args["n_neighbors"]
-            if "min_dist" in args:
-                min_dist = args["min_dist"]
-            if "metric" in args:
-                metric = args["metric"]
+            if "n_neighbors" in self.args:
+                n_neighbors = self.args["n_neighbors"]
+            if "min_dist" in self.args:
+                min_dist = self.args["min_dist"]
+            if "metric" in self.args:
+                metric = self.args["metric"]
             if n_neighbors < self.data.shape[0]:
-                result, nargs = analyses.run_umap(self.data, n_neighbors=n_neighbors, min_dist=min_dist, metric=metric)
-                args.update(nargs)
+                self.result, nargs = analyses.run_umap(self.data, n_neighbors=n_neighbors, min_dist=min_dist, metric=metric)
+                self.args.update(nargs)
         elif self.analysis_type  == "mapper":
             n_cubes = 15
             overlap = 0.5
@@ -108,61 +99,61 @@ class AnalysisResult:
             linkage = "complete"
             affinity = "correlation"
             labels = {}
-            if "labels" in args:
-                labels = args["labels"]
-            if "n_cubes" in args:
-                n_cubes = args["n_cubes"]
-            if "overlap" in args:
-                overlap = args["overlap"]
-            if "n_clusters" in args:
-                n_clusters = args["n_clusters"]
-            if "linkage" in args:
-                linkage = args["linkage"]
-            if "affinity" in args:
-                affinity = args["affinity"]
-            r, nargs = analyses.runMapper(self.data, n_cubes=n_cubes, overlap=overlap, n_clusters=n_clusters, linkage=linkage, affinity=affinity)
-            args.update(nargs)
-            result[self.analysis_type] = r
+            if "labels" in self.args:
+                labels = self.args["labels"]
+            if "n_cubes" in self.args:
+                n_cubes = self.args["n_cubes"]
+            if "overlap" in self.args:
+                overlap = self.args["overlap"]
+            if "n_clusters" in self.args:
+                n_clusters = self.args["n_clusters"]
+            if "linkage" in self.args:
+                linkage = self.args["linkage"]
+            if "affinity" in self.args:
+                affinity = self.args["affinity"]
+            r, nargs = analyses.run_mapper(self.data, n_cubes=n_cubes, overlap=overlap, n_clusters=n_clusters, linkage=linkage, affinity=affinity)
+            self.args.update(nargs)
+            self.result[self.analysis_type] = r
         elif self.analysis_type  == 'ttest':
             alpha = 0.05
-            if "alpha" in args:
-                alpha = args["alpha"]
+            if "alpha" in self.args:
+                alpha = self.args["alpha"]
             for pair in itertools.combinations(self.data.group.unique(),2):
-                ttest_result = analyses.ttest(self.data, pair[0], pair[1], alpha = 0.05)
-                result[pair] = ttest_result
+                ttest_result = analyses.run_ttest(self.data, pair[0], pair[1], alpha = 0.05)
+                self.result[pair] = ttest_result
         elif self.analysis_type  == 'anova':
             alpha = 0.05
             drop_cols = []
             group = 'group'
             permutations = 150
-            if "alpha" in args:
-                alpha = args["alpha"]
-            if "drop_cols" in args:
-                drop_cols = args['drop_cols']
-            if "group" in args:
-                group = args["group"]
-            if "permutations" in args:
-                permutations = args["permutations"]
-            anova_result = analyses.anova(self.data, drop_cols=drop_cols, group=group, alpha=alpha, permutations=permutations)
-            result[self.analysis_type] = anova_result
+            if "alpha" in self.args:
+                alpha = self.args["alpha"]
+            if "drop_cols" in self.args:
+                drop_cols = self.args['drop_cols']
+            if "group" in self.args:
+                group = self.args["group"]
+            if "permutations" in self.args:
+                permutations = self.args["permutations"]
+            anova_result = analyses.run_anova(self.data, drop_cols=drop_cols, group=group, alpha=alpha, permutations=permutations)
+            self.result[self.analysis_type] = anova_result
         elif self.analysis_type == "repeated_measurements_anova":
             alpha = 0.05
             drop_cols = []
             group = 'group'
             subject = 'subject'
             permutations = 150
-            if "alpha" in args:
-                alpha = args["alpha"]
-            if "drop_cols" in args:
-                drop_cols = args['drop_cols']
-            if "group" in args:
-                group = args["group"]
-            if "subject" in args:
-                subject = args["subject"]
-            if "permutations" in args:
-                permutations = args["permutations"]
-            anova_result = analyses.repeated_measurements_anova(self.data, drop_cols=drop_cols, subject=subject, group=group, alpha=alpha, permutations=permutations)
-            result[self.analysis_type] = anova_result
+            if "alpha" in self.args:
+                alpha = self.args["alpha"]
+            if "drop_cols" in self.args:
+                drop_cols = self.args['drop_cols']
+            if "group" in self.args:
+                group = self.args["group"]
+            if "subject" in self.args:
+                subject = self.args["subject"]
+            if "permutations" in self.args:
+                permutations = self.args["permutations"]
+            anova_result = analyses.run_repeated_measurements_anova(self.data, drop_cols=drop_cols, subject=subject, group=group, alpha=alpha, permutations=permutations)
+            self.result[self.analysis_type] = anova_result
         elif self.analysis_type  == "correlation":
             alpha = 0.05
             method = 'pearson'
@@ -171,85 +162,83 @@ class AnalysisResult:
             subject='subject'
             group='group'
             color_weight = False
-            if 'group' in args:
-                group=args['group']
-            if 'subject' in args:
-                subject= args['subject']
-            if "alpha" in args:
-                alpha = args["args"]
-            if "method" in args:
-                method = args["method"]
-            if "correction" in args:
-                correction = args["correction"]
-            if "cutoff" in args:
-                cutoff = args['cutoff']
-            result[self.analysis_type] = analyses.run_correlation(self.data, alpha=alpha, subject=subject, group=group, method=method, correction=correction)
-        elif self.analysis_type  == "rm_correlation":
+            if 'group' in self.args:
+                group = self.args['group']
+            if 'subject' in self.args:
+                subject= self.args['subject']
+            if "alpha" in self.args:
+                alpha = self.args["args"]
+            if "method" in self.args:
+                method = self.args["method"]
+            if "correction" in self.args:
+                correction = self.args["correction"]
+            if "cutoff" in self.args:
+                cutoff = self.args['cutoff']
+            self.result[self.analysis_type] = analyses.run_correlation(self.data, alpha=alpha, subject=subject, group=group, method=method, correction=correction)
+        elif self.analysis_type  == "repeated_measurements_correlation":
             alpha = 0.05
             method = 'pearson'
             correction = ('fdr', 'indep')
             cutoff = 0.5
             subject='subject'
-            if 'subject' in args:
-                subject= args['subject']
-            if "alpha" in args:
-                alpha = args["args"]
-            if "method" in args:
-                method = args["method"]
-            if "correction" in args:
-                correction = args["correction"]
-            if "cutoff" in args:
-                cutoff = args['cutoff']
-            result[self.analysis_type] = analyses.run_rm_correlation(self.data, alpha=alpha, subject=subject, correction=correction)
-        elif self.analysis_type == "interaction":
-            result[self.analysis_type], nargs = analyses.get_interaction_network(self.data)
-            args.update(nargs)
-        elif self.analysis_type == "enrichment":
+            if 'subject' in self.args:
+                subject= self.args['subject']
+            if "alpha" in self.args:
+                alpha = self.args["args"]
+            if "method" in self.args:
+                method = self.args["method"]
+            if "correction" in self.args:
+                correction = self.args["correction"]
+            if "cutoff" in self.args:
+                cutoff = self.args['cutoff']
+            self.result[self.analysis_type] = analyses.run_rm_correlation(self.data, alpha=alpha, subject=subject, correction=correction)
+        elif self.analysis_type == "regulation_enrichment":
             identifier='identifier'
             groups=['group1', 'group2']
             annotation_col='annotation'
             reject_col='rejected'
             method='fisher'
             annotation_type = 'functional'
-            if 'identifier' in args:
-                identifier = args['identifier']
-            if 'groups' in args:
-                groups = args['groups']
-            if 'annotation_col' in args:
-                annotation_col = args['annotation_col']
-            if 'reject_col' in args:
-                reject_col = args['reject_col']
-            if 'method' in args:
-                method = args['method']
-            if 'annotation_type' in args:
-                annotation_type = args['annotation_type']
+            if 'identifier' in self.args:
+                identifier = self.args['identifier']
+            if 'groups' in self.args:
+                groups = self.args['groups']
+            if 'annotation_col' in self.args:
+                annotation_col = self.args['annotation_col']
+            if 'reject_col' in self.args:
+                reject_col = self.args['reject_col']
+            if 'method' in self.args:
+                method = self.args['method']
+            if 'annotation_type' in self.args:
+                annotation_type = self.args['annotation_type']
 
-            if 'regulation_data' in args and 'annotation' in args:
-                if args['regulation_data'] in self.data and args['annotation'] in self.data:
-                    result[annotation_type+"_"+self.analysis_type] = analyses.get_regulation_enrichment(self.data[args['regulation_data']], self.data[args['annotation']], identifier=identifier, groups=groups, annotation_col=annotation_col, reject_col=reject_col, method=method)
+            if 'regulation_data' in self.args and 'annotation' in self.args:
+                if self.args['regulation_data'] in self.data and self.args['annotation'] in self.data:
+                    self.result[annotation_type+"_"+self.analysis_type] = analyses.run_regulation_enrichment(self.data[self.args['regulation_data']], self.data[self.args['annotation']], identifier=identifier, groups=groups, annotation_col=annotation_col, reject_col=reject_col, method=method)
         elif self.analysis_type == 'long_format':
-            result[self.analysis_type] = analyses.transform_into_long_format(self.data, drop_columns=args['drop_columns'], group=args['group'], columns=args['columns'])
+            self.result[self.analysis_type] = analyses.transform_into_long_format(self.data, drop_columns=self.args['drop_columns'], group=self.args['group'], columns=self.args['columns'])
         elif self.analysis_type == 'ranking_with_markers':
             list_markers = []
             annotations = {}
             marker_col = 'identifier'
             marker_of_col = 'disease'
-            if 'identifier' in args:
-                marker_col = args['identifier']
-            if 'marker_of' in args:
-                marker_of_col = args['marker_of']
-            if 'markers' in args:
-                if args['markers'] in self.data:
-                    if marker_col in self.data[args['markers']]:
-                        list_markers = self.data[args['markers']][marker_col].tolist()
-                        if 'annotate' in args:
-                            if args['annotate']:
-                                annotations = pd.Series(self.data[args['markers']][marker_of_col].values, index=self.data[args['markers']][marker_col]).to_dict()
-            if 'data' in args:
-                if args['data'] in self.data:
-                    result[self.analysis_type] = analyses.get_ranking_with_markers(self.data[args['data']], drop_columns=args['drop_columns'], group=args['group'], columns=args['columns'], list_markers=list_markers, annotation = annotations)
+            if 'identifier' in self.args:
+                marker_col = self.args['identifier']
+            if 'marker_of' in self.args:
+                marker_of_col = self.args['marker_of']
+            if 'markers' in self.args:
+                if self.args['markers'] in self.data:
+                    if marker_col in self.data[self.args['markers']]:
+                        list_markers = self.data[self.args['markers']][marker_col].tolist()
+                        if 'annotate' in self.args:
+                            if self.args['annotate']:
+                                annotations = pd.Series(self.data[self.args['markers']][marker_of_col].values, index=self.data[self.args['markers']][marker_col]).to_dict()
+            self.args['annotations'] = annotations
+            if 'data' in self.args:
+                if self.args['data'] in self.data:
+                    self.result[self.analysis_type] = analyses.get_ranking_with_markers(self.data[self.args['data']], drop_columns=self.args['drop_columns'], group=self.args['group'], columns=self.args['columns'], list_markers=list_markers, annotation = annotations)
         elif self.analysis_type == 'coefficient_of_variation':
-            result[self.analysis_type] = analyses.get_coefficient_variation(self.data, drop_columns=args['drop_columns'], group=args['group'], columns=args['columns'])
+            self.result[self.analysis_type] = analyses.get_coefficient_variation(self.data, drop_columns=self.args['drop_columns'], group=self.args['group'], columns=self.args['columns'])
         elif self.analysis_type == "wgcna":
             drop_cols_exp = []
             drop_cols_cli = []
@@ -261,203 +250,200 @@ class AnalysisResult:
             merge_modules = True
             MEDissThres = 0.25
             verbose = 0 
-            if "drop_cols_exp" in args:
-                drop_cols_exp = args['drop_cols_exp']
-            if "drop_cols_cli" in args:
-                drop_cols_cli = args['drop_cols_cli']
-            if "RsquaredCut" in args:
-                RsquaredCut = args["RsquaredCut"]
-            if "networkType" in args:
-                networkType = args["networkType"]
-            if "minModuleSize" in args:
-                minModuleSize = args["minModuleSize"]
-            if "deepSplit" in args:
-                deepSplit = args["deepSplit"]
-            if "pamRespectsDendro" in args:
-                pamRespectsDendro = args["pamRespectsDendro"]
-            if "merge_modules" in args:
-                merge_modules = args["merge_modules"]
-            if "MEDissThres" in args:
-                MEDissThres = args["MEDissThres"]
-            if "verbose" in args:
-                verbose = args["verbose"]
-            result[self.analysis_type] = analyses.runWGCNA(self.data, drop_cols_exp, drop_cols_cli, RsquaredCut=0.8, networkType=networkType, 
+            if "drop_cols_exp" in self.args:
+                drop_cols_exp = self.args['drop_cols_exp']
+            if "drop_cols_cli" in self.args:
+                drop_cols_cli = self.args['drop_cols_cli']
+            if "RsquaredCut" in self.args:
+                RsquaredCut = self.args["RsquaredCut"]
+            if "networkType" in self.args:
+                networkType = self.args["networkType"]
+            if "minModuleSize" in self.args:
+                minModuleSize = self.args["minModuleSize"]
+            if "deepSplit" in self.args:
+                deepSplit = self.args["deepSplit"]
+            if "pamRespectsDendro" in self.args:
+                pamRespectsDendro = self.args["pamRespectsDendro"]
+            if "merge_modules" in self.args:
+                merge_modules = self.args["merge_modules"]
+            if "MEDissThres" in self.args:
+                MEDissThres = self.args["MEDissThres"]
+            if "verbose" in self.args:
+                verbose = self.args["verbose"]
+            self.result[self.analysis_type] = analyses.run_WGCNA(self.data, drop_cols_exp, drop_cols_cli, RsquaredCut=0.8, networkType=networkType, 
                                                             minModuleSize=minModuleSize, deepSplit=deepSplit, pamRespectsDendro=pamRespectsDendro, merge_modules=merge_modules,
                                                             MEDissThres=MEDissThres, verbose=verbose)
-        return result, args
 
     def get_plot(self, name, identifier):
-        data = self.result
-        args = self.args
         plot = []
-        if len(data) >=1:
+        if len(self.result) >=1:
             if name == "basicTable":
                 colors = ('#C2D4FF','#F5F8FF')
                 attr =  {'width':800, 'height':1500, 'font':12}
                 subset = None
                 figure_title = 'Basic table'
-                if "colors" in args:
-                    colors = args["colors"]
-                if "attr" in args:
-                    attr = args["attr"]
-                if "subset" in args:
-                    subset = args["subset"]
-                if "title" in args:
-                    figure_title = args["title"]
-                for id in data:
+                if "colors" in self.args:
+                    colors = self.args["colors"]
+                if "attr" in self.args:
+                    attr = self.args["attr"]
+                if "subset" in self.args:
+                    subset = self.args["subset"]
+                if "title" in self.args:
+                    figure_title = self.args["title"]
+                for id in self.result:
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                        figure_title = args["title"] + id[0]+" vs "+id[1]
-                    plot.append(figure.getBasicTable(data[id], identifier, figure_title, colors=colors, subset=subset, plot_attr=attr))
+                        figure_title = self.args["title"] + id[0]+" vs "+id[1]
+                    plot.append(figure.getBasicTable(self.result[id], identifier, figure_title, colors=colors, subset=subset, plot_attr=attr))
             elif name == "barplot":
                 x_title = "x"
                 y_title = "y"
-                if "x_title" in args:
-                    x_title = args["x_title"]
-                if "y_title" in args:
-                    y_title = args["y_title"]
-                for id in data:
+                if "x_title" in self.args:
+                    x_title = self.args["x_title"]
+                if "y_title" in self.args:
+                    y_title = self.args["y_title"]
+                for id in self.result:
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                        figure_title = args['title'] + id[0]+" vs "+id[1]
+                        figure_title = self.args['title'] + id[0]+" vs "+id[1]
                     else:
-                        figure_title = args['title']
-                    args["title"] = figure_title
-                    plot.append(figure.get_barplot(data[id], identifier, args))
+                        figure_title = self.args['title']
+                    self.args["title"] = figure_title
+                    plot.append(figure.get_barplot(self.result[id], identifier, self.args))
             elif name == "facetplot":
                 x_title = "x"
                 y_title = "y"
                 plot_type = "bar"
-                if "x_title" not in args:
-                    args["x_title"] = x_title
-                if "y_title" not in args:
-                    args["y_title"] = y_title
-                if "plot_type" not in args:
-                    args["plot_type"] = plot_type
-                for id in data:
+                if "x_title" not in self.args:
+                    self.args["x_title"] = x_title
+                if "y_title" not in self.args:
+                    self.args["y_title"] = y_title
+                if "plot_type" not in self.args:
+                    self.args["plot_type"] = plot_type
+                for id in self.result:
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                        figure_title = args['title'] + id[0]+" vs "+id[1]
+                        figure_title = self.args['title'] + id[0]+" vs "+id[1]
                     else:
-                        figure_title = args['title']
-                    args['title'] = figure_title
-                    plot.append(figure.get_facet_grid_plot(data[id], identifier, args))
+                        figure_title = self.args['title']
+                    self.args['title'] = figure_title
+                    plot.append(figure.get_facet_grid_plot(self.result[id], identifier, self.args))
             elif name == "scatterplot":
                 x_title = "x"
                 y_title = "y"
-                if "x_title" in args:
-                    x_title = args["x_title"]
-                if "y_title" in args:
-                    y_title = args["y_title"]
-                for id in data:
+                if "x_title" in self.args:
+                    x_title = self.args["x_title"]
+                if "y_title" in self.args:
+                    y_title = self.args["y_title"]
+                for id in self.result:
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                        figure_title = args['title'] + id[0]+" vs "+id[1]
+                        figure_title = self.args['title'] + id[0]+" vs "+id[1]
                     else:
-                        figure_title = args['title']
-                    args['title'] = figure_title
-                    plot.append(figure.get_scatterplot(data[id], identifier, args))
+                        figure_title = self.args['title']
+                    self.args['title'] = figure_title
+                    plot.append(figure.get_scatterplot(self.result[id], identifier, self.args))
             elif name == 'pca':
                 x_title = "x"
                 y_title = "y"
-                if "x_title" in args:
-                    x_title = args["x_title"]
-                if "y_title" in args:
-                    y_title = args["y_title"]
-                for id in data:
+                if "x_title" in self.args:
+                    x_title = self.args["x_title"]
+                if "y_title" in self.args:
+                    y_title = self.args["y_title"]
+                for id in self.result:
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                        figure_title = args['title'] + id[0]+" vs "+id[1]
+                        figure_title = self.args['title'] + id[0]+" vs "+id[1]
                     else:
-                        figure_title = args['title']
-                    args['title'] = figure_title
-                    plot.append(figure.get_pca_plot(data[id], identifier, args))
+                        figure_title = self.args['title']
+                    self.args['title'] = figure_title
+                    plot.append(figure.get_pca_plot(self.result[id], identifier, self.args))
             elif name == "volcanoplot":
                 alpha = 0.05
                 lfc = 1.0
-                if "alpha" in args:
-                    alpha = args["alpha"]
-                if "lfc" in args:
-                    lfc = args["lfc"]
-                for pair in data:
-                    signature = data[pair]
-                    args["title"] = args['title']+" "+pair[0]+" vs "+pair[1]
-                    p = figure.run_volcano(signature, identifier+"_"+pair[0]+"_vs_"+pair[1], args)
+                if "alpha" in self.args:
+                    alpha = self.args["alpha"]
+                if "lfc" in self.args:
+                    lfc = self.args["lfc"]
+                for pair in self.result:
+                    signature = self.result[pair]
+                    self.args["title"] = self.args['title']+" "+pair[0]+" vs "+pair[1]
+                    p = figure.run_volcano(signature, identifier+"_"+pair[0]+"_vs_"+pair[1], self.args)
                     plot.extend(p)
             elif name == 'network':
                 source = 'source'
                 target = 'target'
-                if "source" in args:
-                    source = args["source"]
-                if "target" in args:
-                    target = args["target"]
-                for id in data:
+                if "source" in self.args:
+                    source = self.args["source"]
+                if "target" in self.args:
+                    target = self.args["target"]
+                for id in self.result:
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                        figure_title = args["title"] + id[0]+" vs "+id[1]
+                        figure_title = self.args["title"] + id[0]+" vs "+id[1]
                     else:
-                        figure_title = args["title"]
-                    args["title"] = figure_title
-                    plot.append(figure.get_network(data[id], identifier, args))
+                        figure_title = self.args["title"]
+                    self.args["title"] = figure_title
+                    plot.append(figure.get_network(self.result[id], identifier, self.args))
             elif name == "heatmap":
-                for id in data:
-                    if not data[id].empty:
+                for id in self.result:
+                    if not self.result[id].empty:
                         if isinstance(id, tuple):
                             identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                            figure_title = args["title"] + id[0]+" vs "+id[1]
+                            figure_title = self.args["title"] + id[0]+" vs "+id[1]
                         else:
-                            figure_title = args["title"]
-                        args["title"] = figure_title
-                        plot.append(figure.get_complex_heatmapplot(data[id], identifier, args))
+                            figure_title = self.args["title"]
+                        self.args["title"] = figure_title
+                        plot.append(figure.get_complex_heatmapplot(self.result[id], identifier, self.args))
             elif name == "mapper":
-                for id in data:
+                for id in self.result:
                     labels = {}
-                    if "labels" in args:
-                        labels = args["labels"]
+                    if "labels" in self.args:
+                        labels = self.args["labels"]
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                        figure_title = args['title'] + id[0]+" vs "+id[1]
+                        figure_title = self.args['title'] + id[0]+" vs "+id[1]
                     else:
-                        figure_title = args['title']
-                    plot.append(figure.getMapperFigure(data[id], identifier, title=figure_title, labels=args["labels"]))
+                        figure_title = self.args['title']
+                    plot.append(figure.getMapperFigure(self.result[id], identifier, title=figure_title, labels=self.args["labels"]))
             elif name == "scatterplot_matrix":
-                for id in data:
+                for id in self.result:
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                        figure_title = args['title'] + id[0]+" vs "+id[1]
+                        figure_title = self.args['title'] + id[0]+" vs "+id[1]
                     else:
-                        figure_title = args['title']
-                    args["title"] = figure_title
-                    plot.append(figure.get_scatterplot_matrix(data[id], identifier, args))
+                        figure_title = self.args['title']
+                    self.args["title"] = figure_title
+                    plot.append(figure.get_scatterplot_matrix(self.result[id], identifier, self.args))
             elif name == "distplot":
-                for id in data:
+                for id in self.result:
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                        figure_title = args['title'] + id[0]+" vs "+id[1]
+                        figure_title = self.args['title'] + id[0]+" vs "+id[1]
                     else:
-                        figure_title = args['title']
-                    args["title"] = figure_title
-                    plot.extend(figure.get_distplot(data[id], identifier, args))
+                        figure_title = self.args['title']
+                    self.args["title"] = figure_title
+                    plot.extend(figure.get_distplot(self.result[id], identifier, self.args))
             elif name == "violinplot":
-                for id in data:
+                for id in self.result:
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
-                        figure_title = args['title'] + id[0]+" vs "+id[1]
+                        figure_title = self.args['title'] + id[0]+" vs "+id[1]
                     else:
-                        figure_title = args['title']
-                    args["title"] = figure_title
-                    plot.extend(figure.get_violinplot(data[id], identifier, args))
+                        figure_title = self.args['title']
+                    self.args["title"] = figure_title
+                    plot.extend(figure.get_violinplot(self.result[id], identifier, self.args))
             elif name == "wgcnaplots":
-                for id in data:
-                    plot.extend(figure.get_WGCNAPlots(data[id], identifier))
+                for id in self.result:
+                    plot.extend(figure.get_WGCNAPlots(self.result[id], identifier))
             elif name == 'ranking':
-                for id in data:
-                    plot.append(figure.get_ranking_plot(data[id], identifier, args))
+                for id in self.result:
+                    plot.append(figure.get_ranking_plot(self.result[id], identifier, self.args))
             elif name == 'clustergrammer':
-                for id in data:
-                    plot.append(figure.get_clustergrammer_plot(data[id], identifier, args))
+                for id in self.result:
+                    plot.append(figure.get_clustergrammer_plot(self.result[id], identifier, self.args))
             elif name == 'cytonet':
-                for id in data:
-                    plot.append(figure.get_cytoscape_network(data[id], identifier, args))
+                for id in self.result:
+                    plot.append(figure.get_cytoscape_network(self.result[id], identifier, self.args))
 
         return plot

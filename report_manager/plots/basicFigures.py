@@ -644,6 +644,7 @@ def network_to_tables(graph):
 
 def get_network(data, identifier, args):
     net = None
+    print(data.head(), identifier)
     if 'cutoff_abs' not in args:
         args['cutoff_abs'] = False
     if not data.empty:

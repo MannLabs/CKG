@@ -140,12 +140,82 @@ data exploration:
                 - subject
             name: name
             title: 'Differential regulation ANOVA'
+    correlation:
+        data: processed
+        analyses:
+            - correlation
+        plots:
+            - network
+            - heatmap
+        store_analysis: True
+        args:
+            source: node1
+            target: node2
+            title: 'Features correlation network'
+            format: edgelist
+            values: weight
+            dist: False
+            node_properties: {}
+            maxLinkWidth: 6
+            maxRadius: 20
+            node_size: 'degree'
+            cutoff: 0.5
+            subject: subject
+            cutoff_abs: True
+            color_weight: True
+            communities_algorithm: louvain
+            width: 1600
+            height: 1600
+    interaction_network:
+        data: regulated
+        analyses: []
+        plots:
+            - network
+        args:
+            use:
+                columns: identifiers
+            source: node1
+            target: node2
+            title: 'Protein-Protein interaction network'
+            format: edgelist
+            values: score
+            dist: False
+            node_properties: {}
+            width: 1600
+            height: 1600
+            maxLinkWidth: 7
+            maxRadius: 20
+            color_weight: False
+            node_size: 'ev_centrality'
+            communities_algorithm: louvain
+    drug_associations:
+        data: regulated
+        analyses: []
+        plots:
+            - basicTable
+        args:
+            use:
+                columns: identifiers
+            height: 700
+            width: 900
+            title: 'List of drugs targetting differentially regulated proteins'
+    disease_associations:
+        data: regulated
+        analyses: []
+        plots:
+            - basicTable
+        args:
+            use:
+                columns: identifiers
+            height: 700
+            width: 900
+            title: 'List of diseases associated with the differentially regulated proteins'
     go_enrichment:
         data: 
             - regulation table
             - go annotation
         analyses:
-            - enrichment
+            - regulation_enrichment
         plots:
             - basicTable
         store_analysis: False
@@ -166,7 +236,7 @@ data exploration:
             - regulation table
             - pathway annotation
         analyses:
-            - enrichment
+            - regulation_enrichment
         plots:
             - basicTable
         store_analysis: False

@@ -108,7 +108,7 @@ proteomics:
             MATCH (project:Project)-[]-(subject:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
             WHERE project.id="PROJECTID" AND toBoolean(r.is_razor)
             RETURN subject.id as subject, a.id AS sample, protein.id AS identifier, a.group AS group, toFloat(r.value) as LFQ_intensity, protein.name AS name ORDER BY group;
-    INTERACTION:
+    INTERACTION_NETWORK:
         name: 'get PPI network'
         description: 'Get all the protein-protein interactions for the relevant proteins'
         involved_nodes:

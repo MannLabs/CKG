@@ -623,7 +623,7 @@ def check_is_paired(df, subject, group):
 
     return is_pair
 
-def anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', group='group', permutations=250):
+def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', group='group', permutations=250):
     columns = ['identifier', 'F-statistics', 'pvalue']
     if subject is not None and check_is_paired(df, subject, group):
         groups = df[group].unique()
@@ -675,7 +675,7 @@ def anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', gro
     
     return res
 
-def repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subject='subject', group='group', permutations=250):
+def run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subject='subject', group='group', permutations=250):
     df = df.set_index([subject,group])
     df = df.drop(drop_cols, axis=1)
     aov_result = []
@@ -725,7 +725,7 @@ def repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subject='s
     
     return res
 
-def ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], subject='subject', group='group', paired=False, permutations=250):
+def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], subject='subject', group='group', paired=False, permutations=250):
     df = df.set_index([subject, group])
     df = df.drop(drop_cols, axis = 1)
     #tdf = df.loc[[condition1, condition2],:].T
@@ -772,7 +772,7 @@ def ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], subjec
 
     return scores
 
-def runFisher(group1, group2, alternative='two-sided'):
+def run_fisher(group1, group2, alternative='two-sided'):
     '''         annotated   not-annotated
         group1      a               b
         group2      c               d
@@ -788,7 +788,7 @@ def runFisher(group1, group2, alternative='two-sided'):
 
     return (odds, pvalue)
 
-def get_regulation_enrichment(regulation_data, annotation, identifier='identifier', groups=['group1', 'group2'], annotation_col='annotation', reject_col='rejected', group_col='group', method='fisher'):
+def run_regulation_enrichment(regulation_data, annotation, identifier='identifier', groups=['group1', 'group2'], annotation_col='annotation', reject_col='rejected', group_col='group', method='fisher'):
     foreground_list = regulation_data[regulation_data[reject_col]][identifier].unique().tolist()
     background_list = regulation_data[~regulation_data[reject_col]][identifier].unique().tolist()
     grouping = []
@@ -827,10 +827,10 @@ def run_enrichment(data, foreground, background, foreground_pop, background_pop,
         else:
             num_background=0
         if method == 'fisher':
-            odds, pvalue = runFisher([num_foreground, foreground_pop-num_foreground],[num_background, background_pop-num_background])
+            odds, pvalue = run_fisher([num_foreground, foreground_pop-num_foreground],[num_background, background_pop-num_background])
         terms.append(annotation)
         pvalues.append(pvalue)
-        ids.append(df.loc[(df[annotation_col]==annotation) & (df[group_col] == foreground), identifier_col].tolist())
+        ids.append(",".join(df.loc[(df[annotation_col]==annotation) & (df[group_col] == foreground), identifier_col].tolist()))
     if len(pvalues) > 1:
         rejected,padj = apply_pvalue_fdrcorrection(pvalues, alpha=0.05, method='indep')
         result = pd.DataFrame({'terms':terms, 'identifiers':ids, 'padj':padj, 'rejected':rejected})
@@ -916,7 +916,7 @@ def hedges_g(df, condition1, condition2, ddof = 0):
 
     return g
 
-def runMapper(data, lenses=["l2norm"], n_cubes = 15, overlap=0.5, n_clusters=3, linkage="complete", affinity="correlation"):
+def run_mapper(data, lenses=["l2norm"], n_cubes = 15, overlap=0.5, n_clusters=3, linkage="complete", affinity="correlation"):
     X = data._get_numeric_data()
     labels ={i:data.index[i] for i in range(len(data.index))}
 
@@ -942,7 +942,7 @@ def runMapper(data, lenses=["l2norm"], n_cubes = 15, overlap=0.5, n_clusters=3, 
 
     return simplicial_complex, {"labels":labels}
 
-def runWGCNA(data, drop_cols_exp, drop_cols_cli, RsquaredCut=0.8, networkType='unsigned', minModuleSize=30, deepSplit=2, pamRespectsDendro=False, merge_modules=True, MEDissThres=0.25, verbose=0):
+def run_WGCNA(data, drop_cols_exp, drop_cols_cli, RsquaredCut=0.8, networkType='unsigned', minModuleSize=30, deepSplit=2, pamRespectsDendro=False, merge_modules=True, MEDissThres=0.25, verbose=0):
     """ 
     Runs an automated weighted gene co-expression network analysis (WGCNA), using input proteomics/transcriptomics/genomics and clinical variables data.
 
