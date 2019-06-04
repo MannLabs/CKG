@@ -148,7 +148,7 @@ proteomics:
         query: >
             MATCH (disease:Disease)<-[r:ASSOCIATED_WITH]-(protein:Protein) 
             WHERE ((protein.name+"-"+protein.id) IN [IDENTIFIERS]) AND ((r.score>=2.0 AND r.source="DISEASES") OR (r.score>=0.7 AND toLower(r.source) =~ "disgenet.+") OR toLower(toString(r.score))="curated")
-            RETURN DISTINCT protein.name+"-"+protein.id AS Protein,disease.name AS Disease,r.score AS score, r.source AS source 
+            RETURN DISTINCT protein.name+"-"+protein.id AS Protein,disease.name AS Disease,disease.description AS Description, r.score AS score, r.source AS source 
 clinical:
     CLINICAL_VARIABLES:
         name: 'get clinical variables and clinical states'

@@ -225,12 +225,13 @@ class AnalysisResult:
                 annotation_type = args['annotation_type']
 
             if 'regulation_data' in args and 'annotation' in args:
-                result[annotation_type+"_"+self.analysis_type] = analyses.get_regulation_enrichment(self.data[args['regulation_data']], self.data[args['annotation']], identifier=identifier, groups=groups, annotation_col=annotation_col, reject_col=reject_col, method=method)
+                if args['regulation_data'] in self.data and args['annotation'] in self.data:
+                    result[annotation_type+"_"+self.analysis_type] = analyses.get_regulation_enrichment(self.data[args['regulation_data']], self.data[args['annotation']], identifier=identifier, groups=groups, annotation_col=annotation_col, reject_col=reject_col, method=method)
         elif self.analysis_type == 'long_format':
             result[self.analysis_type] = analyses.transform_into_long_format(self.data, drop_columns=args['drop_columns'], group=args['group'], columns=args['columns'])
         elif self.analysis_type == 'ranking_with_markers':
             list_markers = []
-            annotation = {}
+            annotations = {}
             marker_col = 'identifier'
             marker_of_col = 'disease'
             if 'identifier' in args:
@@ -243,10 +244,10 @@ class AnalysisResult:
                         list_markers = self.data[args['markers']][marker_col].tolist()
                         if 'annotate' in args:
                             if args['annotate']:
-                                args['annotations'] = pd.Series(self.data[args['markers']][marker_of_col].values, index=self.data[args['markers']][marker_col]).to_dict()
+                                annotations = pd.Series(self.data[args['markers']][marker_of_col].values, index=self.data[args['markers']][marker_col]).to_dict()
             if 'data' in args:
                 if args['data'] in self.data:
-                    result[self.analysis_type] = analyses.get_ranking_with_markers(self.data[args['data']], drop_columns=args['drop_columns'], group=args['group'], columns=args['columns'], list_markers=list_markers, annotation = args['annotations'])
+                    result[self.analysis_type] = analyses.get_ranking_with_markers(self.data[args['data']], drop_columns=args['drop_columns'], group=args['group'], columns=args['columns'], list_markers=list_markers, annotation = annotations)
         elif self.analysis_type == 'coefficient_of_variation':
             result[self.analysis_type] = analyses.get_coefficient_variation(self.data, drop_columns=args['drop_columns'], group=args['group'], columns=args['columns'])
         elif self.analysis_type == "wgcna":
@@ -304,7 +305,6 @@ class AnalysisResult:
                 if "title" in args:
                     figure_title = args["title"]
                 for id in data:
-                    print(id)
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
                         figure_title = args["title"] + id[0]+" vs "+id[1]

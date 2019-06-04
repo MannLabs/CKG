@@ -1182,7 +1182,7 @@ def get_cytoscape_network(net, identifier, args):
                                     elements=net,
                                     layout=args['layout'],
                                     minZoom = 0.2,
-                                    maxZoom = 1.8,
+                                    maxZoom = 1.5,
                                     style={'width': '100%', 'height': '700px'}
                                     )
                     ])

@@ -788,7 +788,7 @@ def runFisher(group1, group2, alternative='two-sided'):
 
     return (odds, pvalue)
 
-def get_regulation_enrichment(regulation_data, annotation, identifier='identifier', groups=['group1', 'group2'], annotation_col='annotation', reject_col='rejected', method='fisher'):
+def get_regulation_enrichment(regulation_data, annotation, identifier='identifier', groups=['group1', 'group2'], annotation_col='annotation', reject_col='rejected', group_col='group', method='fisher'):
     foreground_list = regulation_data[regulation_data[reject_col]][identifier].unique().tolist()
     background_list = regulation_data[~regulation_data[reject_col]][identifier].unique().tolist()
     grouping = []
@@ -802,7 +802,7 @@ def get_regulation_enrichment(regulation_data, annotation, identifier='identifie
     annotation['group'] = grouping
     annotation = annotation.dropna(subset=['group'])
 
-    result = run_enrichment(annotation, foreground='foreground', background='background', foreground_pop=len(foreground_list), background_pop=len(background_list), annotation_col=annotation_col, group_col='group', identifier_col=identifier, method=method)
+    result = run_enrichment(annotation, foreground='foreground', background='background', foreground_pop=len(foreground_list), background_pop=len(background_list), annotation_col=annotation_col, group_col=group_col, identifier_col=identifier, method=method)
     
     
     return result

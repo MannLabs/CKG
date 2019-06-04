@@ -179,7 +179,7 @@ class Dataset:
             store_analysis = configuration["store_analysis"]
         if "args" in configuration:
             args = configuration["args"]
-
+        
         return data_name, analysis_types, plot_types, store_analysis, args
 
     def add_configuration_to_report(self):
@@ -201,7 +201,7 @@ class Dataset:
                 edges.append({'data':{'source':k, 'target':i+1}})
                 i += 1
                 j = i
-                data_names, analysis_types, plot_types, store_analysis, args = self.extract_configuration(self.configuration[section][subsection])
+                data_names, analysis_types, plot_types, store_analysis, arguments = self.extract_configuration(self.configuration[section][subsection])
                 if isinstance(data_names, dict):
                     for d in data_names:
                         nodes.append({'data':{'id':i+1, 'label':d+':'+data_names[d]}, 'classes': 'data'})
@@ -215,8 +215,8 @@ class Dataset:
                     nodes.append({'data':{'id':i+1, 'label':at},'classes': 'analysis'})
                     edges.append({'data':{'source':j, 'target':i+1}})
                     i += 1
-                for a in args:
-                    nodes.append({'data':{'id':i+1, 'label':a+':'+str(args[a])},'classes': 'argument'})
+                for a in arguments:
+                    nodes.append({'data':{'id':i+1, 'label':a+':'+str(arguments[a])},'classes': 'argument'})
                     edges.append({'data':{'source':j, 'target':i+1}})
                     i += 1
         config_stylesheet = [
@@ -280,10 +280,10 @@ class Dataset:
         net = []
         net.extend(nodes)
         net.extend(edges)
-        args['stylesheet'] = config_stylesheet
-        args['title'] = 'Analysis Pipeline'
-        args['layout'] = {'name': 'breadthfirst', 'roots': '#0'}
-        conf_plot = basicFigures.get_cytoscape_network(net, self.dataset_type, args)
+        arguments['stylesheet'] = config_stylesheet
+        arguments['title'] = 'Analysis Pipeline'
+        arguments['layout'] = {'name': 'breadthfirst', 'roots': '#0'}
+        conf_plot = basicFigures.get_cytoscape_network(net, self.dataset_type, arguments)
         self.report.update_plots({(self.dataset_type+'_pipeline','cytoscape_network'):[conf_plot]})
 
     def generate_report(self):
@@ -325,7 +325,6 @@ class Dataset:
                                     reg_data = result.result[analysis_type]
                                     if not reg_data.empty:
                                         sig_hits = list(set(reg_data.loc[reg_data.rejected,"identifier"]))
-                                        #sig_names = list(set(reg_data.loc[reg_data.rejected,"name"]))
                                         sig_data = data[sig_hits]
                                         sig_data.index = data['group'].tolist()
                                         sig_data["sample"] = data["sample"].tolist()

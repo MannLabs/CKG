@@ -7,6 +7,7 @@ data exploration:
             - wgcna
         plots:
             - wgcnaplots
+        store_analysis: True
         args:
             drop_cols_exp:
                 - group

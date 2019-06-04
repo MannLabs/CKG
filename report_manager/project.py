@@ -253,7 +253,6 @@ class Project:
             plots = r.plots
             identifier = r.identifier
             for plot_type in plots:
-                print("PLeoasd", plot_type)
                 for plot in plots[plot_type]:
                     if environment == "notebook":
                         if hasattr(plot, 'figure'):
