@@ -144,9 +144,9 @@ class Dataset:
                 title = query_name.lower().replace('_',' ')
                 query_type = datasets_cypher[self.dataset_type][query_name]['query_type']
                 query = datasets_cypher[self.dataset_type][query_name]['query']
+                for r,by in replace:
+                    query = query.replace(r,by)
                 if query_type == "pre":
-                    for r,by in replace:
-                        query = query.replace(r,by)
                     data[title] = self.send_query(query)
                 else:
                     self.update_analysis_queries({query_name.lower(): query})

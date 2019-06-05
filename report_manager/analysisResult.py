@@ -239,6 +239,8 @@ class AnalysisResult:
                     self.result[self.analysis_type] = analyses.get_ranking_with_markers(self.data[self.args['data']], drop_columns=self.args['drop_columns'], group=self.args['group'], columns=self.args['columns'], list_markers=list_markers, annotation = annotations)
         elif self.analysis_type == 'coefficient_of_variation':
             self.result[self.analysis_type] = analyses.get_coefficient_variation(self.data, drop_columns=self.args['drop_columns'], group=self.args['group'], columns=self.args['columns'])
+        elif self.analysis_type == 'publications_abstracts':
+            self.result[self.analysis_type] = analyses.get_publications_abstracts(self.data, publication_col="publication", join_by=['publication','Proteins','Diseases'], index="PMID")
         elif self.analysis_type == "wgcna":
             drop_cols_exp = []
             drop_cols_cli = []
@@ -445,5 +447,8 @@ class AnalysisResult:
             elif name == 'cytonet':
                 for id in self.result:
                     plot.append(figure.get_cytoscape_network(self.result[id], identifier, self.args))
+            elif name == 'wordcloud':
+                for id in self.result:
+                    plot.append(figure.get_wordcloud(self.result[id], identifier, self.args))
 
         return plot

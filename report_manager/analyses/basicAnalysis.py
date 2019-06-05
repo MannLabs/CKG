@@ -1017,3 +1017,13 @@ def get_network_communities(graph, args):
 
 
     return communities
+
+def get_publications_abstracts(data, publication_col="publication", join_by=['publication','Proteins','Diseases'], index="PMID"):
+    abstracts = utils.getMedlineAbstracts(list(data.reset_index()[publication_col].unique()))
+    abstracts = abstracts.set_index(index)
+    abstracts = abstracts.join(data.reset_index()[join_by].set_index(publication_col)).reset_index()
+
+    return abstracts
+
+    
+    

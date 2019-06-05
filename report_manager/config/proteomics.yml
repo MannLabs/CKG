@@ -210,6 +210,23 @@ data exploration:
             height: 700
             width: 900
             title: 'List of diseases associated with the differentially regulated proteins'
+    literature_associations:
+        data: regulated
+        analyses: 
+            - publications_abstracts
+        plots:
+            - basicTable
+            - wordcloud
+        args:
+            use:
+                columns: identifiers
+            height: 700
+            width: 900
+            max_words: 400
+            max_font_size: 100
+            margin: 1
+            text_col: 'abstract'
+            title: 'List of publications mentioning regulated proteins together with related diseases'
     go_enrichment:
         data: 
             - regulation table

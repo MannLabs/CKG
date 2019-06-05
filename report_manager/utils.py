@@ -2,6 +2,7 @@ import dash_html_components as html
 import bs4 as bs
 import random
 from Bio import Entrez
+Entrez.email = 'alberto.santos@cpr.ku.dk'
 from Bio import Medline
 import pandas as pd
 import plotly.plotly as py

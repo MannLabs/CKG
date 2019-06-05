@@ -21,7 +21,11 @@ from webweb import Web
 from networkx.readwrite import json_graph
 from dash_network import Network
 from report_manager import utils, analyses
-from wordcloud import WordCloud, STOPWORDS
+from wordcloud import WordCloud
+from nltk.corpus import stopwords
+import nltk
+nltk.download('stopwords')
+
 from report_manager.plots import wgcnaFigures
 import dash_cytoscape as cyto
 
@@ -644,7 +648,6 @@ def network_to_tables(graph):
 
 def get_network(data, identifier, args):
     net = None
-    print(data.head(), identifier)
     if 'cutoff_abs' not in args:
         args['cutoff_abs'] = False
     if not data.empty:
@@ -1106,11 +1109,20 @@ def get_2_venn_diagram(data, identifier, cond1, cond2, args):
 
     return dcc.Graph(id = identifier, figure=figure)
 
-def get_wordcloud(text, identifier, args={'stopwords':[], 'max_words': 400, 'max_font_size': 100, 'width':700, 'height':700, 'margin': 1}):
-    stopwords = set(STOPWORDS)
+def get_wordcloud(data, identifier, args={'stopwords':[], 'max_words': 400, 'max_font_size': 100, 'width':700, 'height':700, 'margin': 1}):
+    sw = set(stopwords.words('english'))
     if 'stopwords' in args:
-        stopwords = stopwords.union(args['stopwords'])
-    wc = WordCloud(stopwords = stopwords,
+        sw = sw.union(args['stopwords'])
+
+    if isinstance(data, pd.DataFrame):
+        if "text_col" in args:
+            text = ''.join(str(a) for a in data[args["text_col"]].unique().tolist())
+        else:
+            return None
+    else:
+        text = data
+
+    wc = WordCloud(stopwords = sw,
                    max_words = args['max_words'],
                    max_font_size = args['max_font_size'],
                    background_color='white',
