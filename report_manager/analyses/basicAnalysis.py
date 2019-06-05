@@ -629,9 +629,9 @@ def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject',
         groups = df[group].unique()
         drop_cols = [d for d in drop_cols if d != subject]
         if len(groups) == 2:
-            res = ttest(df, groups[0], groups[1], alpha = alpha, drop_cols=drop_cols, subject=subject, group=group, paired=True, permutations=permutations)
+            res = run_ttest(df, groups[0], groups[1], alpha = alpha, drop_cols=drop_cols, subject=subject, group=group, paired=True, permutations=permutations)
         else:
-            res = repeated_measurements_anova(df, alpha=alpha, drop_cols=drop_cols, subject=subject, group=group, permutations=0)
+            res = run_repeated_measurements_anova(df, alpha=alpha, drop_cols=drop_cols, subject=subject, group=group, permutations=0)
     else:
         df = df.set_index([group])
         df = df.drop(drop_cols, axis=1)
