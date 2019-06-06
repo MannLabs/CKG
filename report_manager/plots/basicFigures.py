@@ -996,6 +996,7 @@ def get_WGCNAPlots(data, identifier):
         List of dcc.Graph.
     """
     graphs = []
+    data = tuple(data[k] for k in data)
     if data is not None:
         data_exp, data_cli, dissTOM, moduleColors, Features_per_Module, MEs,\
         moduleTraitCor, textMatrix, MM, MMPvalue, FS, FSPvalue, METDiss, METcor = data

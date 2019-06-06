@@ -862,6 +862,7 @@ def run_WGCNA(data, drop_cols_exp, drop_cols_cli, RsquaredCut=0.8, networkType='
     Returns:
         Tuple with multiple pandas dataframes.
     """
+    result = {}
     dfs = wgcna.get_data(data, drop_cols_exp=drop_cols_exp, drop_cols_cli=drop_cols_cli)
     if 'clinical' in dfs:
         data_cli = dfs['clinical']   #Extract clinical data
@@ -879,7 +880,20 @@ def run_WGCNA(data, drop_cols_exp, drop_cols_cli, RsquaredCut=0.8, networkType='
         FS, FSPvalue = wgcna.calculate_FeatureTraitSignificance(data_exp, data_cli)
         METDiss, METcor = wgcna.get_EigengenesTrait_correlation(MEs, data_cli)
 
-        return data_exp, data_cli, dissTOM, moduleColors, Features_per_Module, MEs, moduleTraitCor, textMatrix, MM, MMPvalue, FS, FSPvalue, METDiss, METcor
+        result['dissTOM'] = dissTOM
+        result['module_colors'] = moduleColors
+        result['features_per_module'] = Features_per_Module
+        result['MEs'] = MEs
+        result['module_trait_cor'] = moduleTraitCor
+        result['text_matrix'] = textMatrix
+        result['module_membership'] = MM
+        result['module_membership_pval'] = MMPvalue
+        result['feature_significance'] = FS
+        result['feature_significance_pval'] = FSPvalue
+        result['ME_trait_diss'] = METDiss
+        result['ME_trait_cor'] = METcor
+
+        return result
 
     else:
         return None
