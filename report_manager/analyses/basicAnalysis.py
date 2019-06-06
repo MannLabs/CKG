@@ -24,7 +24,7 @@ import statsmodels.api as sm
 from statsmodels.formula.api import ols
 import time
 from joblib import Parallel, delayed
-import numba
+from numba import jit
 
 def transform_into_wide_format(data, index, columns, values, extra=[]):
     df = data.copy()
@@ -380,29 +380,29 @@ def convertToEdgeList(data, cols):
 def run_correlation(df, alpha=0.05, subject='subject', group='group', method='pearson', correction=('fdr', 'indep')):
     calculated = set()
     correlation = pd.DataFrame()
-    if check_is_paired(df, subject, group):
-        if len(df[subject].unique()) > 1:
-            correlation = run_rm_correlation(df, alpha=alpha, subject=subject, correction=correction)
-    else:
-        df = df.dropna()._get_numeric_data()
-        if not df.empty:
-            r, p = run_efficient_correlation(df, method=method)
-            rdf = pd.DataFrame(r, index=df.columns, columns=df.columns)
-            pdf = pd.DataFrame(p, index=df.columns, columns=df.columns)
-            rdf.values[[np.arange(len(rdf))]*2] = np.nan
-            pdf.values[[np.arange(len(pdf))]*2] = np.nan
-            
-            correlation = convertToEdgeList(rdf, ["node1", "node2", "weight"])
-            pvalues = convertToEdgeList(pdf, ["node1", "node2", "pvalue"])
+    #if check_is_paired(df, subject, group):
+    #    if len(df[subject].unique()) > 1:
+    #        correlation = run_rm_correlation(df, alpha=alpha, subject=subject, correction=correction)
+    #else:
+    df = df.dropna()._get_numeric_data()
+    if not df.empty:
+        r, p = run_efficient_correlation(df, method=method)
+        rdf = pd.DataFrame(r, index=df.columns, columns=df.columns)
+        pdf = pd.DataFrame(p, index=df.columns, columns=df.columns)
+        rdf.values[[np.arange(len(rdf))]*2] = np.nan
+        pdf.values[[np.arange(len(pdf))]*2] = np.nan
+        
+        correlation = convertToEdgeList(rdf, ["node1", "node2", "weight"])
+        pvalues = convertToEdgeList(pdf, ["node1", "node2", "pvalue"])
 
-            if correction[0] == 'fdr':
-                rejected, padj = apply_pvalue_fdrcorrection(pvalues["pvalue"].tolist(), alpha=alpha, method=correction[1])
-            elif correction[0] == '2fdr':
-                rejected, padj = apply_pvalue_twostage_fdrcorrection(pvalues["pvalue"].tolist(), alpha=alpha, method=correction[1])
+        if correction[0] == 'fdr':
+            rejected, padj = apply_pvalue_fdrcorrection(pvalues["pvalue"].tolist(), alpha=alpha, method=correction[1])
+        elif correction[0] == '2fdr':
+            rejected, padj = apply_pvalue_twostage_fdrcorrection(pvalues["pvalue"].tolist(), alpha=alpha, method=correction[1])
 
-            correlation["padj"] = padj
-            correlation["rejected"] = rejected
-            correlation = correlation[correlation.rejected]
+        correlation["padj"] = padj
+        correlation["rejected"] = rejected
+        correlation = correlation[correlation.rejected]
     return correlation
 
 def calculate_rm_correlation(df, x, y, subject):
@@ -436,12 +436,13 @@ def run_rm_correlation(df, alpha=0.05, subject='subject', correction=('fdr', 'in
 
     return correlation
 
+@jit(nopython=False, parallel=True)
 def run_efficient_correlation(data, method='pearson'):
     matrix = data.values
     if method == 'pearson':
         r = np.corrcoef(matrix, rowvar=False)
     elif method == 'spearman':
-        r, p = spearmanr(matrix, axis=0)
+        r, p = stats.spearmanr(matrix, axis=0)
 
     rf = r[np.triu_indices(r.shape[0], 1)]
     df = matrix.shape[1] - 2
@@ -452,7 +453,7 @@ def run_efficient_correlation(data, method='pearson'):
     p[np.tril_indices(p.shape[0], -1)] = pf
     p[np.diag_indices(p.shape[0])] = np.ones(p.shape[0])
 
-
+    print("Done with the analysis")
     return r, p
 
 def calculate_paired_ttest(df, condition1, condition2):

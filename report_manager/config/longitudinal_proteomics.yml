@@ -144,9 +144,8 @@ overview: #section
         analyses:
             - correlation
         plots:
-            - basicTable
             - network
-            - clustergrammer
+            - heatmap
         store_analysis: True
         args:
             source: node1
@@ -154,17 +153,18 @@ overview: #section
             title: 'Features correlation network'
             format: edgelist
             values: weight
-            subject: subject
             dist: False
             node_properties: {}
-            width: 1600
-            height: 1600
             maxLinkWidth: 6
             maxRadius: 20
             node_size: 'degree'
             cutoff: 0.5
+            subject: subject
             cutoff_abs: True
+            color_weight: True
             communities_algorithm: louvain
+            width: 1600
+            height: 1600
     interaction_network:
         data: regulated
         analyses: []
