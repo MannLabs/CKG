@@ -21,7 +21,7 @@ from webweb import Web
 from networkx.readwrite import json_graph
 from dash_network import Network
 from report_manager import utils, analyses
-from wordcloud import WordCloud
+from wordcloud import WordCloud, STOPWORDS
 from nltk.corpus import stopwords
 import nltk
 nltk.download('stopwords')
@@ -686,8 +686,8 @@ def get_network(data, identifier, args):
         nx.set_node_attributes(graph, clusters, 'cluster')
         notebook_net = get_notebook_network_pyvis(graph, args)
         nodes_table, edges_table = network_to_tables(graph)
-        nodes_fig_table = getBasicTable(nodes_table, identifier=identifier+"_nodes_table", title=args['title']+" nodes table")
-        edges_fig_table = getBasicTable(edges_table, identifier=identifier+"_edges_table", title=args['title']+" edges table")
+        nodes_fig_table = get_table(nodes_table, identifier=identifier+"_nodes_table", title=args['title']+" nodes table")
+        edges_fig_table = get_table(edges_table, identifier=identifier+"_edges_table", title=args['title']+" edges table")
         
         stylesheet, layout = get_network_style(colors, args['color_weight'])
         args['stylesheet'] = stylesheet
@@ -846,14 +846,20 @@ def getSankeyPlot(data, identifier, args={'source':'source', 'target':'target', 
 
     return dcc.Graph(id = identifier, figure = figure)
 
-def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':2500, 'font':12}, subplot = False):
+def get_table(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':2500, 'font':12}, subplot = False):
     if subset is not None:
         data = data[subset]
 
     #booleanDictionary = {True: 'TRUE', False: 'FALSE'}
     #if 'rejected' in data.columns:
     #    data['rejected'] = data['rejected'].replace(booleanDictionary)
+
+    list_cols = data.applymap(lambda x: isinstance(x, list)).all()
+    list_cols = list_cols.index[list_cols].tolist()
     
+    for c in list_cols:
+        data[c] = data[c].apply(lambda x: ";".join(x))
+
     data_trace = dash_table.DataTable(id='table_'+identifier,
                                         data=data.to_dict("rows"),
                                         columns=[{"name": i.replace('_', ' ').title(), "id": i} for i in data.columns],
@@ -885,6 +891,7 @@ def getBasicTable(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subse
                                             ],
                                         n_fixed_rows=1,
                                         sorting=True,
+                                        filtering='be'
                                         )
 
     return html.Div([html.H2(title),data_trace])
@@ -998,7 +1005,7 @@ def get_WGCNAPlots(data, identifier):
         #plot: gene tree dendrogram and module colors; input: dissTOM, moduleColors
         plots.append(wgcnaFigures.plot_complex_dendrogram(dissTOM, moduleColors, title='Co-expression: dendrogram and module colors', dendro_labels=dissTOM.columns, distfun=None, linkagefun='average', hang=0.1, subplot='module colors', col_annotation=True, width=1000, height=800))
         #plot: table with features per module; input: df
-        plots.append(getBasicTable(Features_per_Module, identifier='', title='Proteins/Genes module color', colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':1500, 'font':12}, subplot = False))
+        plots.append(get_table(Features_per_Module, identifier='', title='Proteins/Genes module color', colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':1500, 'font':12}, subplot = False))
         #plot: module-traits correlation with annotations; input: moduleTraitCor, textMatrix
         plots.append(wgcnaFigures.plot_labeled_heatmap(moduleTraitCor, textMatrix, title='Module-Clinical variable relationships', colorscale=[[0,'#67a9cf'],[0.5,'#f7f7f7'],[1,'#ef8a62']], row_annotation=True, width=1000, height=800))
         #plot: FS vs. MM correlation per trait/module scatter matrix; input: MM, FS, Features_per_Module
@@ -1110,7 +1117,7 @@ def get_2_venn_diagram(data, identifier, cond1, cond2, args):
     return dcc.Graph(id = identifier, figure=figure)
 
 def get_wordcloud(data, identifier, args={'stopwords':[], 'max_words': 400, 'max_font_size': 100, 'width':700, 'height':700, 'margin': 1}):
-    sw = set(stopwords.words('english'))
+    sw = set(stopwords.words('english')).union(set(STOPWORDS))
     if 'stopwords' in args:
         sw = sw.union(args['stopwords'])
 

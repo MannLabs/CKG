@@ -20,3 +20,34 @@ extract_projectID:
         MATCH (p:Project)
         WHERE p.internal_id = "INTERNALID"
         RETURN p.id;
+pearson_measure:
+    name: pearson_similarity
+    description: The Pearson Similarity function computes the similarity of two given projects based on the proteins identified.
+    involved_nodes:
+        - Project
+        - Protein
+    involved_rels:
+        - HAS_QUANTIFIED_PROTEIN
+    query: >
+        MATCH (project1:Project{id:'PROJECT1'})-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) WHERE toBoolean(r.is_razor)
+        WITH project1, algo.similarity.asVector(protein, r.value) AS p1Vector
+        MATCH (project2:Project{id:'PROJECT2'})-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) WHERE toBoolean(r.is_razor)
+        WITH project1, project2, p1Vector, algo.similarity.asVector(protein, r.value) AS p2Vector
+        RETURN project1.name AS from, project2.name AS to, algo.similarity.pearson(p1Vector, p2Vector, {vectorType: "maps"}) AS similarity
+overlap_measure:
+    name: overlap_similarity
+    description: Get overlap of entities between projects i.e. ENTITY = Biological_process, RELATIONSHIP = ASSOCIATED_WITH
+    involved_nodes:
+        - Project
+    involved_rels:
+    query: >
+        MATCH (project:Project)-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein)-[:RELATIONSHIP]-(entity:ENTITY) 
+        WHERE toBoolean(r.is_razor)
+        WITH {item:id(project), categories: collect(DISTINCT id(entity))} as projectData
+        WITH collect(projectData) as data
+        CALL algo.similarity.overlap.stream(data)
+        YIELD item1, item2, count1, count2, intersection, similarity
+        MATCH (from:Project) WHERE id(from)=item1
+        WITH from, item2, count1, count2, intersection, similarity
+        MATCH (to:Project) WHERE id(to)=item2
+        RETURN from.id, to.id, count1, count2, intersection, similarity ORDER BY similarity DESC

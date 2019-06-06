@@ -296,7 +296,7 @@ class AnalysisResult:
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
                         figure_title = self.args["title"] + id[0]+" vs "+id[1]
-                    plot.append(figure.getBasicTable(self.result[id], identifier, figure_title, colors=colors, subset=subset, plot_attr=attr))
+                    plot.append(figure.get_table(self.result[id], identifier, figure_title, colors=colors, subset=subset, plot_attr=attr))
             elif name == "barplot":
                 x_title = "x"
                 y_title = "y"

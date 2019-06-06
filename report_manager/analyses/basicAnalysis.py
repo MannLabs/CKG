@@ -170,7 +170,7 @@ def calculate_coefficient_variation(values):
 
 def get_coefficient_variation(data, drop_columns, group, columns):
     df = data.copy()
-    formated_df = df.reset_index().drop(drop_columns, axis=1)
+    formated_df = df.drop(drop_columns, axis=1)
     cvs = formated_df.groupby(group).apply(func=calculate_coefficient_variation)
     cols = formated_df.set_index(group).columns.tolist()
     cvs_df = pd.DataFrame()
@@ -340,7 +340,7 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, per
     columns = ['identifier']
     rand_pvalues = None
     while i>0:
-        df_index = shuffle(df_index, random_state=initial_seed + i)
+        df_index = shuffle(df_index, random_state=int(initial_seed + i))
         df_random = df.reset_index(drop=True)
         df_random.index = df_index
         df_random.index.name = 'group'
@@ -386,7 +386,7 @@ def run_correlation(df, alpha=0.05, subject='subject', group='group', method='pe
     else:
         df = df.dropna()._get_numeric_data()
         if not df.empty:
-            r, p = runEfficientCorrelation(df, method=method)
+            r, p = run_efficient_correlation(df, method=method)
             rdf = pd.DataFrame(r, index=df.columns, columns=df.columns)
             pdf = pd.DataFrame(p, index=df.columns, columns=df.columns)
             rdf.values[[np.arange(len(rdf))]*2] = np.nan
@@ -405,78 +405,10 @@ def run_correlation(df, alpha=0.05, subject='subject', group='group', method='pe
             correlation = correlation[correlation.rejected]
     return correlation
 
-def rmcorr(data, x, y, subject):
-    """Repeated measures correlation (Bakdash and Marusich 2017).
-    
-    https://www.frontiersin.org/articles/10.3389/fpsyg.2017.00456/full
-    
-    Tested against the `rmcorr` R package.
-    
-    Parameters
-    ----------
-    data : pd.DataFrame 
-        Dataframe containing the variables
-    x, y : string
-        Name of columns in data containing the two dependent variables
-    subject : string
-        Name of column in data containing the subject indicator
-    
-    Returns
-    -------
-    r : float
-        Repeated measures correlation coefficient  
-    p : float
-        P-value
-    dof : int
-        Degrees of freedom
-        
-    Notes
-    -----
-    Repeated measures correlation (rmcorr) is a statistical technique 
-    for determining the common within-individual association for paired measures 
-    assessed on two or more occasions for multiple individuals.
-    
-    Please note that NaN are automatically removed from the dataframe.
-    
-    Examples
-    --------
-    
-        >>> import numpy as np
-        >>> import pandas as pd
-        >>> # Generate random correlated data
-        >>> np.random.seed(123)
-        >>> mean, cov = [4, 6], [[1, 0.6], [0.6, 1]]
-        >>> x, y = np.round(np.random.multivariate_normal(mean, cov, 30), 1).T
-        >>> data = pd.DataFrame({'X': x, 'Y': y, 'Ss': np.repeat(np.arange(10), 3)})
-        >>> # Compute the repeated measure correlation
-        >>> rmcorr(data, x='X', y='Y', subject='Ss')
-            (0.647, 0.001, 19)
-    """ 
-    # Remove Nans
-    data = data[[x, y, subject]].dropna(axis=0)
-    # ANCOVA model
-    formula = y + ' ~ ' + 'C(' + subject + ') + ' + x
-    model = ols(formula, data=data).fit()
-    table = sm.stats.anova_lm(model, typ=3)
-    # Extract the sign of the correlation
-    sign = np.sign(model.params[x])
-    # Extract degrees of freedom
-    dof = int(table.loc['Residual', 'df'])
-    # Extract correlation coefficient from sum of squares
-    ssfactor = table.loc[x, 'sum_sq']
-    sserror = table.loc['Residual', 'sum_sq']
-    rm = sign * np.sqrt(ssfactor / (ssfactor + sserror))
-    # Extract p-value
-    pval = table.loc[x, 'PR(>F)']
-    return np.round(rm, 3), pval, dof
-
 def calculate_rm_correlation(df, x, y, subject):
-    cordata = df[[x,y]]
-    cols = cordata.columns
-    cordata.columns = ['x', 'y']
-    r, p, dof = rmcorr(data=cordata.reset_index(), x='x', y='y', subject=subject)
+    r, dof, pvalue, ci, power = pg.rm_corr(data=df, x=x, y=y, subject=subject)
     
-    return (cols[0],cols[1],r,p)
+    return (x, y, r, pvalue, dof, ci, power)
 
 def run_rm_correlation(df, alpha=0.05, subject='subject', correction=('fdr', 'indep')):
     calculated = set()
@@ -485,14 +417,13 @@ def run_rm_correlation(df, alpha=0.05, subject='subject', correction=('fdr', 'in
     if not df.empty:
         df = df.set_index(subject)._get_numeric_data()
         start = time.time()
-        for x, y in itertools.combinations(df.columns, 2):
+        combinations = itertools.combinations(df.columns, 2)
+        df = df.reset_index()
+        for x, y in combinations:
             row = calculate_rm_correlation(df, x, y, subject)
             rows.append(row)
         end = time.time()
-        print(end - start)
-
-        print(rows)
-        correlation = pd.DataFrame(rows, columns=["node1", "node2", "weight", "pvalue"])
+        correlation = pd.DataFrame(rows, columns=["node1", "node2", "weight", "pvalue", "dof", "CI95%", "power"])
         
         if correction[0] == 'fdr':
             rejected, padj = apply_pvalue_fdrcorrection(correlation["pvalue"].tolist(), alpha=alpha, method=correction[1])
@@ -505,7 +436,7 @@ def run_rm_correlation(df, alpha=0.05, subject='subject', correction=('fdr', 'in
 
     return correlation
 
-def runEfficientCorrelation(data, method='pearson'):
+def run_efficient_correlation(data, method='pearson'):
     matrix = data.values
     if method == 'pearson':
         r = np.corrcoef(matrix, rowvar=False)
@@ -575,12 +506,12 @@ def calculate_THSD(df):
     return df_results
 
 def calculate_pairwise_ttest(df, column, subject='subject', group='group', correction='none'):
-    posthoc_columns = ['Contrast', 'group1', 'group2', 'mean(group1)', 'std(group1)', 'mean(group2)', 'std(group2)', 'Paired', 'T', 'tail', 'pvalue', 'BF10', 'efsize', 'eftype']
+    posthoc_columns = ['Contrast', 'group1', 'group2', 'mean(group1)', 'std(group1)', 'mean(group2)', 'std(group2)', 'Paired', 'Parametric', 'T', 'dof', 'tail', 'padj', 'BF10', 'efsize', 'eftype']
     if correction == "none":
-        valid_cols = ['group1', 'group2', 'mean(group1)', 'std(group1)', 'mean(group2)', 'std(group2)', 'Paired', 'T', 'BF10', 'efsize', 'eftype']
+        valid_cols = ['group1', 'group2', 'mean(group1)', 'std(group1)', 'mean(group2)', 'std(group2)', 'Paired','Parametric', 'T', 'dof', 'BF10', 'efsize', 'eftype']
     else:
         valid_cols = posthoc_columns
-    posthoc = pg.pairwise_ttests(data=df, dv=column, between=group, subject=subject, effsize='hedges', return_desc=True, padjust=correction)
+    posthoc = df.pairwise_ttests(dv=column, between=group, subject=subject, effsize='hedges', return_desc=True, padjust=correction)
     posthoc.columns =  posthoc_columns
     posthoc = posthoc[valid_cols]
     posthoc = complement_posthoc(posthoc, column)
@@ -602,11 +533,11 @@ def calculate_anova(df, group='group'):
     return (col, t, pvalue)
 
 def calculate_repeated_measures_anova(df, column, subject='subject', group='group', alpha=0.05):
-    aov_result = pg.rm_anova(dv=column, within=group,subject=subject, data=df, detailed=True, remove_na=True, correction=True)
-    aov_result.columns = ['Source', 'SS', 'DF', 'MS', 'F', 'pvalue', 'padj (GG)', 'np2', 'eps', 'sphericity', 'Mauchlys sphericity', 'p-spher']
-    t, pvalue = aov_result.loc[0, ['F', 'pvalue']].values 
+    aov_result = df.rm_anova(dv=column, within=group,subject=subject, detailed=True, correction=True)
+    aov_result.columns = ['Source', 'SS', 'DF', 'MS', 'F', 'pvalue', 'padj', 'np2', 'eps', 'sphericity', 'Mauchlys sphericity', 'p-spher']
+    t, pvalue, padj = aov_result.loc[0, ['F', 'pvalue', 'padj']].values 
 
-    return (column, t, pvalue, log)
+    return (column, t, pvalue, padj)
 
 def get_max_permutations(df, group='group'):
     num_groups = len(list(df.index))
@@ -629,8 +560,9 @@ def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject',
         groups = df[group].unique()
         drop_cols = [d for d in drop_cols if d != subject]
         if len(groups) == 2:
-            res = run_ttest(df, groups[0], groups[1], alpha = alpha, drop_cols=drop_cols, subject=subject, group=group, paired=True, permutations=permutations)
+            res = run_ttest(df, groups[0], groups[1], alpha = alpha, drop_cols=drop_cols, subject=subject, group=group, correction='fdr_bh')
         else:
+            
             res = run_repeated_measurements_anova(df, alpha=alpha, drop_cols=drop_cols, subject=subject, group=group, permutations=0)
     else:
         df = df.set_index([group])
@@ -670,7 +602,6 @@ def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject',
 
         res = res.reset_index()
         res['rejected'] = res['padj'] < alpha
-        res['rejected'] = res['rejected']
         res['-log10 pvalue'] = res['padj'].apply(lambda x: -np.log10(x))
     
     return res
@@ -680,29 +611,14 @@ def run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subjec
     df = df.drop(drop_cols, axis=1)
     aov_result = []
     for col in df.columns:
-        aov = calculate_repeated_measures_anova(df[col].reset_index(), column=col, subject=subject, group=group, alpha=alpha)
+        aov = calculate_repeated_measures_anova(df.reset_index(), column=col, subject=subject, group=group, alpha=alpha)
         aov_result.append(aov)
 
-    scores = pd.DataFrame(aov_result, columns = ['identifier','F-statistics', 'pvalue'])
+    scores = pd.DataFrame(aov_result, columns = ['identifier','F-statistics', 'pvalue', 'padj'])
     scores = scores.set_index('identifier')
 
-    max_perm = get_max_permutations(df)
-    #FDR correction
-    if permutations > 0 and max_perm>=10:
-        if max_perm < permutations:
-            permutations = max_perm
-        observed_pvalues = scores.pvalue
-        count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=alpha, permutations=permutations)
-        scores= scores.join(count)
-        scores['correction'] = 'permutation FDR ({} perm)'.format(permutations)
-    else:
-        rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'indep')
-        scores['correction'] = 'FDR correction BH'
-        scores['padj'] = padj
-        scores['rejected'] = rejected
-        scores['rejected'] = scores['rejected'] 
+    scores['correction'] = 'Greenhouse-Geisser correction'
     
-    #sigdf = df[list(scores[scores.rejected].index)]
     res = None
     for col in df.columns:
         pairwise = calculate_pairwise_ttest(df[col].reset_index(), column=col, subject=subject, group=group)
@@ -712,27 +628,23 @@ def run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subjec
             res = pd.concat([res,pairwise], axis=0)
     if res is not None:
         res = res.join(scores[['F-statistics', 'pvalue', 'padj']].astype('float'))
-        res['correction'] = scores['correction']
+        res['correction'] = 'Greenhouse-Geisser correction' 
     else:
         res = scores
         res["log2FC"] = np.nan
 
     res = res.reset_index()
     res['rejected'] = res['padj'] < alpha
-    res['rejected'] = res['rejected']
     res['-log10 pvalue'] = res['padj'].apply(lambda x: - np.log10(x))
-    
     
     return res
 
-def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], subject='subject', group='group', paired=False, permutations=250):
+def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], subject='subject', group='group', correction='fdr_bh'):
     df = df.set_index([subject, group])
     df = df.drop(drop_cols, axis = 1)
-    #tdf = df.loc[[condition1, condition2],:].T
-    #columns = ['identifier', 't-statistics', 'pvalue', '-log10 pvalue', 'mean(group1)', 'mean(group2)', 'log2FC']
     scores = None
     for col in df.columns:
-        ttest = calculate_pairwise_ttest(df[col].reset_index(), col, subject=subject, group=group, correction='fdr_bh')
+        ttest = calculate_pairwise_ttest(df.reset_index(), col, subject=subject, group=group, correction='fdr_bh')
         if scores is None:
             scores = ttest
         else:
@@ -749,21 +661,9 @@ def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], su
 
     #Hedge's g
     #scores["hedges_g"] = tdf.apply(func = hedges_g, axis = 1, args =(condition1, condition2, 1))
-    max_perm = get_max_permutations(df)
-    #FDR correction
-    if permutations > 0 and max_perm>=10:
-        if max_perm < permutations:
-            permutations = max_perm
-        observed_pvalues = scores.pvalue
-        count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=alpha, permutations=permutations)
-        scores= scores.join(count)
-        scores['correction'] = 'permutation FDR ({} perm)'.format(permutations)
-    else:
-        rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'indep')
-        scores['correction'] = 'FDR correction BH'
-        scores['padj'] = padj
-        scores['rejected'] = rejected
-        scores['rejected'] = scores['rejected']
+    scores['pvalue'] = np.nan
+    scores['correction'] = 'FDR correction BH'
+    scores['rejected'] = scores['padj'] <= alpha
     scores['group1'] = condition1
     scores['group2'] = condition2
     scores['FC'] = scores['log2FC'].apply(lambda x: np.power(2,np.abs(x)) * -1 if x < 0 else np.power(2,np.abs(x)))
@@ -1019,9 +919,11 @@ def get_network_communities(graph, args):
     return communities
 
 def get_publications_abstracts(data, publication_col="publication", join_by=['publication','Proteins','Diseases'], index="PMID"):
-    abstracts = utils.getMedlineAbstracts(list(data.reset_index()[publication_col].unique()))
-    abstracts = abstracts.set_index(index)
-    abstracts = abstracts.join(data.reset_index()[join_by].set_index(publication_col)).reset_index()
+    abstract = pd.DataFrame()
+    if not data.empty:
+        abstracts = utils.getMedlineAbstracts(list(data.reset_index()[publication_col].unique()))
+        abstracts = abstracts.set_index(index)
+        abstracts = abstracts.join(data.reset_index()[join_by].set_index(publication_col)).reset_index()
 
     return abstracts
 

@@ -228,7 +228,7 @@ class Project:
         project_df = self.to_dataframe()
         identifier = "Project info"
         title = "Project: {} information".format(self.name)
-        plot = [figure.getBasicTable(project_df, identifier, title)]
+        plot = [figure.get_table(project_df, identifier, title)]
         report.plots = {("Project info","Project Information"): plot}
 
         return report

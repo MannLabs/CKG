@@ -222,6 +222,8 @@ data exploration:
                 columns: identifiers
             height: 700
             width: 900
+            stopwords: 
+                - 'BACKGGROUND:'
             max_words: 400
             max_font_size: 100
             margin: 1
