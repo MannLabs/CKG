@@ -20,7 +20,7 @@ extract_projectID:
         MATCH (p:Project)
         WHERE p.internal_id = "INTERNALID"
         RETURN p.id;
-pearson_measure:
+similarity:
     name: pearson_similarity
     description: The Pearson Similarity function computes the similarity of two given projects based on the proteins identified.
     involved_nodes:
@@ -29,11 +29,12 @@ pearson_measure:
     involved_rels:
         - HAS_QUANTIFIED_PROTEIN
     query: >
-        MATCH (project1:Project{id:'PROJECT1'})-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) WHERE toBoolean(r.is_razor)
+        MATCH (project1:Project{id:'PROJECTID'})-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
+        WHERE toBoolean(r.is_razor)
         WITH project1, algo.similarity.asVector(protein, r.value) AS p1Vector
-        MATCH (project2:Project{id:'PROJECT2'})-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) WHERE toBoolean(r.is_razor)
+        MATCH (project2:Project)-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) WHERE toBoolean(r.is_razor) AND project1 <> project2
         WITH project1, project2, p1Vector, algo.similarity.asVector(protein, r.value) AS p2Vector
-        RETURN project1.name AS from, project2.name AS to, algo.similarity.pearson(p1Vector, p2Vector, {vectorType: "maps"}) AS similarity
+        RETURN project1.name AS from, project2.name AS to, project2.description AS description, project2.responsible AS responsible, algo.similarity.pearson(p1Vector, p2Vector, {vectorType: "maps"}) AS similarity ORDER BY similarity DESC
 overlap_measure:
     name: overlap_similarity
     description: Get overlap of entities between projects i.e. ENTITY = Biological_process, RELATIONSHIP = ASSOCIATED_WITH

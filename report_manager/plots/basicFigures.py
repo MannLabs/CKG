@@ -781,7 +781,7 @@ def get_pca_plot(data, identifier, args):
     return  dcc.Graph(id = identifier, figure = figure)
 
 
-def getSankeyPlot(data, identifier, args={'source':'source', 'target':'target', 'weight':'weight','source_colors':'source_colors', 'target_colors':'target_colors', 'orientation': 'h', 'valueformat': '.0f', 'width':800, 'height':800, 'font':12, 'title':'Sankey plot'}):
+def get_sankey_plot(data, identifier, args={'source':'source', 'target':'target', 'weight':'weight','source_colors':'source_colors', 'target_colors':'target_colors', 'orientation': 'h', 'valueformat': '.0f', 'width':800, 'height':800, 'font':12, 'title':'Sankey plot'}):
     """
     This function generates a Sankey plot in Plotly.
     
@@ -808,14 +808,14 @@ def getSankeyPlot(data, identifier, args={'source':'source', 'target':'target', 
     if 'source_colors' in args:
         node_colors = dict(zip(data[args['source']],data[args['source_colors']]))
     else:
-        scolors = ['blue']*len(data['source'].tolist())
+        scolors = ['#045a8d']*len(data[args['source']].tolist())
         node_colors = dict(zip(data[args['source']],scolors))
         args['source_colors'] = 'source_colors'
         data['source_colors'] = scolors
     if 'target_colors' in args:
         node_colors.update(dict(zip(data[args['target']],data[args['target_colors']])))
     else:
-        node_colors.update(dict(zip(data[args['target']],['red']*len(data['target'].tolist()))))
+        node_colors.update(dict(zip(data[args['target']],['#a6bddb']*len(data[args['target']].tolist()))))
     data_trace = dict(type='sankey',
                         #domain = dict(x =  [0,1], y =  [0,1]),
                         orientation = 'h' if 'orientation' not in args else args['orientation'],
@@ -890,8 +890,13 @@ def get_table(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = 
                                             },
                                             ],
                                         n_fixed_rows=1,
-                                        sorting=True,
-                                        filtering='be'
+                                        filtering='fe',
+                                        pagination_settings={
+                                            'current_page': 0,
+                                            'page_size': 25
+                                            },
+                                        pagination_mode='fe',
+                                        sorting='be',
                                         )
 
     return html.Div([html.H2(title),data_trace])

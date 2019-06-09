@@ -37,6 +37,7 @@ class Project:
         self._description = None
         self._status = None
         self._num_subjects = None
+        self._similarities = None
         if self._datasets is None:
             self._datasets = {}
             self.build_project()
@@ -125,6 +126,14 @@ class Project:
     def report(self, report):
         self._report = report
 
+    @property
+    def similarities(self):
+        return self._similarities
+
+    @similarities.setter
+    def similarities(self, similarity_matrix):
+        self._similarities = similarity_matrix
+
     def get_dataset(self, dataset):
         if dataset in self.datasets:
             return self.datasets[dataset]
@@ -204,6 +213,7 @@ class Project:
     def build_project(self):
         project_info = self.query_data()
         self.set_attributes(project_info)
+        self.get_similar_projects(project_info)
         for data_type in self.data_types:
             if data_type == "proteomics":
                 dataset = ProteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
@@ -222,13 +232,23 @@ class Project:
                 self.update_dataset({'multiomics':dataset})
                 self.append_data_type('multiomics')
 
+    def get_similar_projects(self, project_info):
+        if 'similarity' in project_info:
+            self.similarities = project_info['similarity']
+            self.similarities = self.similarities[self.similarities['similarity'] > 0.5]
 
     def generate_project_info_report(self):
         report = rp.Report(identifier="project_info")
         project_df = self.to_dataframe()
+
         identifier = "Project info"
         title = "Project: {} information".format(self.name)
         plot = [figure.get_table(project_df, identifier, title)]
+
+        identifier = "Similarities"
+        title = "Similarities to other Projects"
+        plot.append(figure.get_table(self.similarities, identifier+' table', title+' table'))
+        plot.append(figure.get_sankey_plot(self.similarities, identifier, args={'source':'from', 'target':'to', 'weight':'similarity', 'orientation': 'h', 'valueformat': '.0f', 'width':800, 'height':800, 'font':12, 'title':title}))
         report.plots = {("Project info","Project Information"): plot}
 
         return report

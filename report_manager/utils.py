@@ -5,6 +5,7 @@ from Bio import Entrez
 Entrez.email = 'alberto.santos@cpr.ku.dk'
 from Bio import Medline
 import pandas as pd
+from dask import dataframe as dd
 import plotly.plotly as py
 import base64
 from xhtml2pdf import pisa
@@ -143,3 +144,14 @@ def convert_html_to_pdf(source_html, output_filename):
 
     # return True on success and False on errors
     return pisa_status.err
+
+def expand_dataframe_cell(data, col, sep):
+    '''
+        data: pandas dataframe
+        col: column/s you need to expand
+        sep: separator in col
+    '''
+    ddata = dd.from_pandas(data, 6)
+    ddata = ddata.map_partitions(lambda df: df.drop(col, axis=1).join(df[col].str.split(';', expand=True).stack().reset_index(drop=True, level=1).rename(col))).compute()
+    
+    return ddata

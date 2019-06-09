@@ -453,7 +453,6 @@ def run_efficient_correlation(data, method='pearson'):
     p[np.tril_indices(p.shape[0], -1)] = pf
     p[np.diag_indices(p.shape[0])] = np.ones(p.shape[0])
 
-    print("Done with the analysis")
     return r, p
 
 def calculate_paired_ttest(df, condition1, condition2):
@@ -714,6 +713,8 @@ def run_enrichment(data, foreground, background, foreground_pop, background_pop,
     terms = []
     ids = []
     pvalues = []
+    fnum = []
+    bnum = []
     countsdf = df.groupby([annotation_col,group_col]).agg(['count'])[(identifier_col,'count')].reset_index()
     countsdf.columns = [annotation_col, group_col, 'count']
     for annotation in countsdf[countsdf[group_col] == foreground][annotation_col].unique().tolist():
@@ -729,12 +730,14 @@ def run_enrichment(data, foreground, background, foreground_pop, background_pop,
             num_background=0
         if method == 'fisher':
             odds, pvalue = run_fisher([num_foreground, foreground_pop-num_foreground],[num_background, background_pop-num_background])
+        fnum.append(num_foreground)
+        bnum.append(num_background)
         terms.append(annotation)
         pvalues.append(pvalue)
         ids.append(",".join(df.loc[(df[annotation_col]==annotation) & (df[group_col] == foreground), identifier_col].tolist()))
     if len(pvalues) > 1:
         rejected,padj = apply_pvalue_fdrcorrection(pvalues, alpha=0.05, method='indep')
-        result = pd.DataFrame({'terms':terms, 'identifiers':ids, 'padj':padj, 'rejected':rejected})
+        result = pd.DataFrame({'terms':terms, 'identifiers':ids, 'foreground':fnum, 'background':bnum, 'pvalue':pvalues, 'padj':padj, 'rejected':rejected})
         #result = result[result.rejected]
     return result
 
@@ -940,7 +943,4 @@ def get_publications_abstracts(data, publication_col="publication", join_by=['pu
         abstracts = abstracts.set_index(index)
         abstracts = abstracts.join(data.reset_index()[join_by].set_index(publication_col)).reset_index()
 
-    return abstracts
-
-    
-    
+    return abstracts 
