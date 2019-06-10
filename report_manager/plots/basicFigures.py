@@ -693,11 +693,7 @@ def get_network(data, identifier, args):
         args['stylesheet'] = stylesheet
         args['layout'] = layout
         
-        cy_graph = json_graph.cytoscape_data(graph)
-        cy_nodes = cy_graph['elements']['nodes']
-        cy_edges = cy_graph['elements']['edges']
-        cy_elements = cy_nodes
-        cy_elements.extend(cy_edges)
+        cy_elements = utils.networkx_to_cytoscape(graph)
 
         net = {"notebook":notebook_net, "app":get_cytoscape_network(cy_elements, identifier, args), "net_tables":(nodes_fig_table, edges_fig_table)}
     return net
@@ -1055,19 +1051,28 @@ def get_2_venn_diagram(data, identifier, cond1, cond2, args):
     total = len(set(data[cond1].dropna().index).union(set(data[cond2].dropna().index)))
     unique1 = len(set(data[cond1].dropna().index).difference(data[cond2].dropna().index))#/total
     unique2 = len(set(data[cond2].dropna().index).difference(data[cond1].dropna().index))#/total
-    intersection12 = len(set(data[cond1].dropna().index).intersection(data[cond2].dropna().index))#/total
+    intersection = len(set(data[cond1].dropna().index).intersection(data[cond2].dropna().index))#/total
+
+    return plot_2_venn_diagram(unique1, unique2, intersection, identifier, args)
+
+def plot_2_venn_diagram(cond1, cond2, unique1, unique2, intersection, identifier, args):
+    figure = {}
+    figure["data"] = []
 
     figure["data"] = [go.Scatter(
         x=[1, 1.75, 2.5],
         y=[1, 1, 1],
-        text=[cond1+": "+str(unique1), str(intersection12), cond2+": "+str(unique2)],
+        text=[str(unique1), str(intersection), str(unique2)],
         mode='text',
         textfont=dict(
             color='black',
-            size=18,
+            size=14,
             family='Arial',
         )
     )]
+
+    if 'colors' not in args:
+        args['colors'] = {cond1:'#a6bddb', cond2:'#045a8d'}
 
 
     figure["layout"] = {
@@ -1118,6 +1123,7 @@ def get_2_venn_diagram(data, identifier, cond1, cond2, args):
         },
         'height': 600,
         'width': 800,
+        'title':args['title']
     }
 
     return dcc.Graph(id = identifier, figure=figure)

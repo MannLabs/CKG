@@ -495,7 +495,7 @@ def calculate_ttest(df, condition1, condition2):
 
 def calculate_THSD(df):
     col = df.name
-    result = pairwise_tukeyhsd(df, list(df.index))
+    result = pairwise_tukeyhsd(df.values, list(df.index))
     df_results = pd.DataFrame(data=result._results_table.data[1:], columns=result._results_table.data[0])
     df_results.columns = ['group1', 'group2', 'log2FC', 'lower', 'upper', 'rejected']
     df_results['identifier'] = col
@@ -528,7 +528,7 @@ def complement_posthoc(posthoc, identifier):
 
 def calculate_anova(df, group='group'):
     col = df.name
-    group_values = df.groupby(group).apply(list).tolist()
+    group_values = df.groupby(group).apply(np.array).values
     t, pvalue = stats.f_oneway(*group_values)
     return (col, t, pvalue)
 

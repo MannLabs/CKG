@@ -10,7 +10,8 @@ import ckg_utils
 import config.ckg_config as ckg_config
 from report_manager.dataset import ProteomicsDataset, ClinicalDataset, DNAseqDataset, RNAseqDataset, LongitudinalProteomicsDataset, MultiOmicsDataset
 from report_manager.plots import basicFigures as figure
-from report_manager import report as rp
+from report_manager import report as rp, utils
+from report_manager.queries import query_utils
 from graphdb_connector import connector
 import logging
 import logging.config
@@ -28,6 +29,7 @@ class Project:
 
     def __init__(self, identifier, datasets=None, report={}):
         self._identifier = identifier
+        self._queries_file = 'queries/project_cypher.yml'
         self._datasets = datasets
         self._report = report
         self._name = None
@@ -37,7 +39,8 @@ class Project:
         self._description = None
         self._status = None
         self._num_subjects = None
-        self._similarities = None
+        self._similar_projects = None
+        self._overlap = None
         if self._datasets is None:
             self._datasets = {}
             self.build_project()
@@ -50,6 +53,14 @@ class Project:
     @identifier.setter
     def identifier(self, identifier):
         self._identifier = identifier
+
+    @property
+    def queries_file(self):
+        return self._queries_file
+
+    @queries_file.setter
+    def queries_file(self, queries_file):
+        self._queries_file = queries_file
 
     @property
     def name(self):
@@ -127,12 +138,20 @@ class Project:
         self._report = report
 
     @property
-    def similarities(self):
-        return self._similarities
+    def similar_projects(self):
+        return self._similar_projects
 
-    @similarities.setter
-    def similarities(self, similarity_matrix):
-        self._similarities = similarity_matrix
+    @similar_projects.setter
+    def similar_projects(self, similarity_matrix):
+        self._similar_projects = similarity_matrix
+
+    @property
+    def overlap(self):
+        return self._overlap
+
+    @overlap.setter
+    def overlap(self, overlap_matrix):
+        self._overlap = overlap_matrix
 
     def get_dataset(self, dataset):
         if dataset in self.datasets:
@@ -191,18 +210,21 @@ class Project:
 
     def query_data(self):
         data = {}
-        driver = connector.getGraphDatabaseConnectionConfiguration()
-        replace = [("PROJECTID", self.identifier)]
-        try:
+        try:            
             cwd = os.path.abspath(os.path.dirname(__file__))
-            queries_path = "queries/project_cypher.yml"
-            project_cypher = ckg_utils.get_queries(os.path.join(cwd, queries_path))
+            queries_path = os.path.join(cwd, self.queries_file)
+            project_cypher = query_utils.read_queries(queries_path)
+            
+            driver = connector.getGraphDatabaseConnectionConfiguration()
+            replace = [("PROJECTID", self.identifier)]
             for query_name in project_cypher:
                 title = query_name.lower().replace('_',' ')
                 query = project_cypher[query_name]['query']
+                query_type = project_cypher[query_name]['query_type']
                 for r,by in replace:
                     query = query.replace(r,by)
-                data[title] = connector.getCursorData(driver, query)
+                if query_type == "pre":
+                    data[title] = connector.getCursorData(driver, query)
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -214,6 +236,7 @@ class Project:
         project_info = self.query_data()
         self.set_attributes(project_info)
         self.get_similar_projects(project_info)
+        self.get_projects_overlap(project_info)
         for data_type in self.data_types:
             if data_type == "proteomics":
                 dataset = ProteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
@@ -232,24 +255,111 @@ class Project:
                 self.update_dataset({'multiomics':dataset})
                 self.append_data_type('multiomics')
 
+    
+    def get_projects_overlap(self, project_info):
+        overlap = None
+        if 'overlap' in project_info:
+            self.overlap = project_info['overlap']
+            self.overlap = self.overlap[(self.overlap['from']==self.identifier) | (self.overlap['to']==self.identifier)]
+
     def get_similar_projects(self, project_info):
         if 'similarity' in project_info:
-            self.similarities = project_info['similarity']
-            self.similarities = self.similarities[self.similarities['similarity'] > 0.5]
-
-    def generate_project_info_report(self):
-        report = rp.Report(identifier="project_info")
+            self.similar_projects = project_info['similarity']
+            self.similar_projects = self.similar_projects[self.similar_projects['similarity_pearson'] > 0.5]
+        
+    def generate_project_attributes_plot(self):
         project_df = self.to_dataframe()
-
+        
         identifier = "Project info"
         title = "Project: {} information".format(self.name)
         plot = [figure.get_table(project_df, identifier, title)]
 
+        return plot
+
+    def generate_project_similarity_plots(self):
+        plots = []
         identifier = "Similarities"
         title = "Similarities to other Projects"
-        plot.append(figure.get_table(self.similarities, identifier+' table', title+' table'))
-        plot.append(figure.get_sankey_plot(self.similarities, identifier, args={'source':'from', 'target':'to', 'weight':'similarity', 'orientation': 'h', 'valueformat': '.0f', 'width':800, 'height':800, 'font':12, 'title':title}))
-        report.plots = {("Project info","Project Information"): plot}
+        plots.append(figure.get_table(self.similar_projects, identifier+' table', title+' table'))
+        plots.append(figure.get_sankey_plot(self.similar_projects, identifier, args={'source':'current', 'target':'other', 'weight':'similarity_pearson', 'orientation': 'h', 'valueformat': '.0f', 'width':800, 'height':800, 'font':12, 'title':title}))
+
+        plots.append(self.get_similarity_network())
+        
+        return plots
+
+    def generate_overalp_plots(self):
+        plots = []
+        identifier = "Overlap"
+        title = "Protein Identification Overlap"
+        plots.append(figure.get_table(self.overlap, identifier+' table', title+' table'))
+        for i, row in self.overlap.iterrows():
+            ntitle = title + ":\n" + row['project1_name'] +" - "+ row['project2_name'] +"(overlap similarity: " + str(row['similarity']) +")"
+            plot = figure.plot_2_venn_diagram(row['from'], row['to'], row['project1_unique'], row['project2_unique'], row['intersection'], identifier=identifier+str(i), args={'title':ntitle})
+            plots.append(plot)
+
+        return plots
+
+    def get_similarity_network_style(self):
+        #color_selector = "{'selector': '[name = \"KEY\"]', 'style': {'background-color': 'VALUE'}}"
+        stylesheet=[{'selector': 'node', 'style': {'label': 'data(name)'}},{'selector':'edge','style':{'label':'data(name)', 'curve-style': 'bezier'}}]
+        layout = {'name': 'cose',
+                'idealEdgeLength': 100,
+                'nodeOverlap': 20,
+                'refresh': 20,
+                #'fit': True,
+                #'padding': 30,
+                'randomize': False,
+                'componentSpacing': 100,
+                'nodeRepulsion': 400000,
+                'edgeElasticity': 100,
+                'nestingFactor': 5,
+                'gravity': 80,
+                'numIter': 1000,
+                'initialTemp': 200,
+                'coolingFactor': 0.95,
+                'minTemp': 1.0}
+        #for k,v in node_colors.items():
+        #    stylesheet.append(ast.literal_eval(color_selector.replace("KEY", k).replace("VALUE",v)))
+        
+        return stylesheet, layout
+
+    def get_similarity_network(self):
+        plot = None
+        try:
+            cwd = os.path.abspath(os.path.dirname(__file__))
+            query_path = os.path.join(cwd, self.queries_file)
+            project_cypher = query_utils.read_queries(query_path)
+            query = query_utils.get_query(project_cypher, query_id="projects_subgraph")
+
+            driver = connector.getGraphDatabaseConnectionConfiguration()
+            list_projects = self.similar_projects["other_id"].values.tolist()
+            list_projects.append(self.identifier)
+            list_projects = ",".join(['"{}"'.format(i) for i in list_projects])
+            query = query.replace("LIST_PROJECTS",list_projects)
+            path = connector.sendQuery(driver, query, parameters={}).data()
+            G = utils.neoj_path_to_networkx(path, key='path')
+            args = {}
+            style, layout = self.get_similarity_network_style()
+            args['stylesheet'] = style
+            args['layout'] = layout
+            args['title'] = "Projects subgraph"
+            plot = figure.get_cytoscape_network(utils.networkx_to_cytoscape(G), "projects_subgraph", args)
+        
+        except Exception as err:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            logger.error("Reading queries from file {}: {}, file: {},line: {}".format(query_path, sys.exc_info(), fname, exc_tb.tb_lineno))
+
+        return plot
+
+    def generate_project_info_report(self):
+        report = rp.Report(identifier="project_info")
+
+        plots = self.generate_project_attributes_plot()
+        plots.extend(self.generate_project_similarity_plots())
+        plots.extend(self.generate_overalp_plots())
+               
+        report.plots = {("Project info","Project Information"): plots}
 
         return report
 

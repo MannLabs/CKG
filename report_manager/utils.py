@@ -4,12 +4,45 @@ import random
 from Bio import Entrez
 Entrez.email = 'alberto.santos@cpr.ku.dk'
 from Bio import Medline
+import re
 import pandas as pd
 from dask import dataframe as dd
+import networkx as nx
+from networkx.readwrite import json_graph
 import plotly.plotly as py
 import base64
 from xhtml2pdf import pisa
 import requests, json
+
+def neoj_path_to_networkx(paths, key='path'):
+    regex = r"\((.+)\)\-\[\:(.+)\s\{.?\}\]\-\>\((.+)\)"
+    nodes = set()
+    rels = set()
+    for r in paths:
+        path = str(r[key])
+        matches = re.search(regex, path)
+        if matches:
+            source = matches.group(1)
+            relationship = matches.group(2)
+            target = matches.group(3)
+            nodes.update([source, target])
+            rels.add((source, target, relationship))
+    G = nx.Graph()
+    G.add_nodes_from(nodes)
+    for s,t,label in rels:
+        G.add_edge(s,t,label=label)
+
+    return G
+
+def networkx_to_cytoscape(graph):
+    cy_graph = json_graph.cytoscape_data(graph)
+    cy_nodes = cy_graph['elements']['nodes']
+    cy_edges = cy_graph['elements']['edges']
+    cy_elements = cy_nodes
+    cy_elements.extend(cy_edges)
+
+    return cy_elements
+
 
 def get_clustergrammer_link(net, filename=None):
     try:
@@ -33,7 +66,6 @@ def get_clustergrammer_link(net, filename=None):
         
     link = r.text
     
-    print(link)
     
     return link
 

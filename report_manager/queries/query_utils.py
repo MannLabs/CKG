@@ -25,11 +25,18 @@ def find_queries_involving_relationships(queries, rels):
 
     return valid_queries
 
-def get_description(querie):
-    return querie['description']
+def get_query(queries, query_id):
+    query = None
+    if query_id in queries:
+        if "query" in queries[query_id]:
+            query = queries[query_id]["query"]
+    return query
 
-def get_nodes(querie):
-    return querie['involved_nodes']
+def get_description(query):
+    return query['description']
 
-def get_relationships(querie):
-    return querie['involved_rels']
+def get_nodes(query):
+    return query['involved_nodes']
+
+def get_relationships(query):
+    return query['involved_rels']
