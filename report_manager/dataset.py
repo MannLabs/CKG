@@ -215,10 +215,12 @@ class Dataset:
                     nodes.append({'data':{'id':i+1, 'label':at},'classes': 'analysis'})
                     edges.append({'data':{'source':j, 'target':i+1}})
                     i += 1
-                for a in arguments:
-                    nodes.append({'data':{'id':i+1, 'label':a+':'+str(arguments[a])},'classes': 'argument'})
-                    edges.append({'data':{'source':j, 'target':i+1}})
-                    i += 1
+                    f = i
+                if len(analysis_types):
+                    for a in arguments:
+                        nodes.append({'data':{'id':i+1, 'label':a+':'+str(arguments[a])},'classes': 'argument'})
+                        edges.append({'data':{'source':f, 'target':i+1}})
+                        i += 1
         config_stylesheet = [
                         # Group selectors
                         {

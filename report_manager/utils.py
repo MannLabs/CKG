@@ -141,22 +141,26 @@ def get_hex_colors(n):
 def getMedlineAbstracts(idList):
     fields = {"TI":"title", "AU":"authors", "JT":"journal", "DP":"date", "MH":"keywords", "AB":"abstract", "PMID":"PMID"}
     pubmedUrl = "https://www.ncbi.nlm.nih.gov/pubmed/"
-    handle = Entrez.efetch(db="pubmed", id=idList, rettype="medline", retmode="json")
-    records = Medline.parse(handle)
-    results = []
-    for record in records:
-        aux = {}
-        for field in fields:
-            if field in record:
-                aux[fields[field]] = record[field]
-        if "PMID" in aux:
-            aux["url"] = pubmedUrl + aux["PMID"]
-        else:
-            aux["url"] = ""
-        
-        results.append(aux)
+    abstracts = pd.DataFrame()
+    try:
+        handle = Entrez.efetch(db="pubmed", id=idList, rettype="medline", retmode="json")
+        records = Medline.parse(handle)
+        results = []
+        for record in records:
+            aux = {}
+            for field in fields:
+                if field in record:
+                    aux[fields[field]] = record[field]
+            if "PMID" in aux:
+                aux["url"] = pubmedUrl + aux["PMID"]
+            else:
+                aux["url"] = ""
+            
+            results.append(aux)
 
-    abstracts = pd.DataFrame.from_dict(results)
+        abstracts = pd.DataFrame.from_dict(results)
+    except HTTPError:
+        print("Request to Bio.Entrez failed")
 
     return abstracts
 
