@@ -18,7 +18,7 @@ log_config = ckg_config.graphdb_builder_log
 logger = builder_utils.setup_logging(log_config, key="database_controller")
 
 try:
-    dbconfig = ckg_utils.get_configuration(ckg_config.databases_config_file)
+    dbconfig = builder_utils.setup_config('databases')
 except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
 

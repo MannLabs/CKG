@@ -43,10 +43,10 @@ def getPlotTraces(data, key='full', type = 'lines', div_factor=float(10^10000), 
         List of traces.
     """
     if type == 'lines':
-        traces = [go.Scatter(x=data.index, y=data[col], name = col+' '+key, mode='markers+lines') for col in data.columns]
+        traces = [go.Scattergl(x=data.index, y=data[col], name = col+' '+key, mode='markers+lines') for col in data.columns]
 
     elif type == 'scaled markers':
-        traces = [go.Scatter(x = data.index, y = data[col], name = col+' '+key, mode = 'markers', marker = dict(size = data[col].values/div_factor, sizemode = 'area')) for col in data.columns]
+        traces = [go.Scattergl(x = data.index, y = data[col], name = col+' '+key, mode = 'markers', marker = dict(size = data[col].values/div_factor, sizemode = 'area')) for col in data.columns]
 
     elif type == 'bars':
         traces = [go.Bar(x = data.index, y = data[col], orientation = 'v', name = col+' '+key) for col in data.columns]
@@ -314,7 +314,7 @@ def get_simple_scatterplot(data, identifier, args):
                             'ax': 55, 
                             'ay': -1,
                             'font': dict(size = 8)})
-    figure['data'] = [go.Scatter(x = data.x,
+    figure['data'] = [go.Scattergl(x = data.x,
                                 y = data.y,
                                 text = text,
                                 mode = 'markers',
@@ -366,7 +366,7 @@ def get_scatterplot(data, identifier, args):
         if 'colors' in args:
             if name in args['colors']:
                 m.update({'color' : args['colors'][name]})
-        figure["data"].append(go.Scatter(x = data.loc[data["name"] == name, "x"],
+        figure["data"].append(go.Scattergl(x = data.loc[data["name"] == name, "x"],
                                         y = data.loc[data['name'] == name, "y"],
                                         text = name,
                                         mode = 'markers',
@@ -741,7 +741,7 @@ def get_pca_plot(data, identifier, args):
         y = loadings.loc[index, 'y'] * 5
         value = loadings.loc[index, 'value']
 
-        trace = go.Scatter(x= [0,x],
+        trace = go.Scattergl(x= [0,x],
                         y = [0,y],
                         mode='markers+lines',
                         text=index+" loading: {0:.2f}".format(value),
@@ -843,6 +843,9 @@ def get_sankey_plot(data, identifier, args={'source':'source', 'target':'target'
     return dcc.Graph(id = identifier, figure = figure)
 
 def get_table(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':2500, 'font':12}, subplot = False):
+    if data.empty:
+        return None
+
     if subset is not None:
         data = data[subset]
 
@@ -1059,7 +1062,7 @@ def plot_2_venn_diagram(cond1, cond2, unique1, unique2, intersection, identifier
     figure = {}
     figure["data"] = []
 
-    figure["data"] = [go.Scatter(
+    figure["data"] = [go.Scattergl(
         x=[1, 1.75, 2.5],
         y=[1, 1, 1],
         text=[str(unique1), str(intersection), str(unique2)],
@@ -1129,6 +1132,8 @@ def plot_2_venn_diagram(cond1, cond2, unique1, unique2, intersection, identifier
     return dcc.Graph(id = identifier, figure=figure)
 
 def get_wordcloud(data, identifier, args={'stopwords':[], 'max_words': 400, 'max_font_size': 100, 'width':700, 'height':700, 'margin': 1}):
+    if data.empty:
+        return None
     sw = set(stopwords.words('english')).union(set(STOPWORDS))
     if 'stopwords' in args:
         sw = sw.union(args['stopwords'])
@@ -1178,7 +1183,7 @@ def get_wordcloud(data, identifier, args={'stopwords':[], 'max_words': 400, 'max
         new_freq_list.append(i*70)
     new_freq_list
 
-    trace = go.Scatter(x=x,
+    trace = go.Scattergl(x=x,
                        y=y,
                        textfont = dict(size=new_freq_list,
                                        color=color_list),

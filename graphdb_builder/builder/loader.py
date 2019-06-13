@@ -26,8 +26,8 @@ log_config = ckg_config.graphdb_builder_log
 logger = builder_utils.setup_logging(log_config, key="grapher")
 START_TIME = datetime.now()
 
-try:
-    config = ckg_utils.get_configuration(ckg_config.builder_config_file)
+try:    
+    config = builder_utils.setup_config('builder')
 except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
 

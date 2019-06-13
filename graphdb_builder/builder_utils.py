@@ -38,12 +38,22 @@ def write_entities(entities, header, outputfile):
     except csv.Error as err:
         raise csv.Error("Error writing etities to file: {}.\n {}".format(outputfile, err))
 
-def setup_db_config():
+def setup_config(data_type="databases"):
     try:
-        dirname = os.path.abspath(os.path.dirname(__file__)) 
-        dbconfig = ckg_utils.get_configuration(os.path.join(dirname, ckg_config.databases_config_file))
+        dirname = os.path.abspath(os.path.dirname(__file__))
+        if data_type == 'databases':
+            config = ckg_utils.get_configuration(os.path.join(dirname, ckg_config.databases_config_file))
+        elif data_type == 'ontologies':
+            config = ckg_utils.get_configuration(os.path.join(dirname, ckg_config.ontologies_config_file))
+        elif data_type == "experiments":
+            config = ckg_utils.get_configuration(os.path.join(dirname, ckg_config.experiments_config_file))
+        elif data_type == 'builder':
+            config = ckg_utils.get_configuration(os.path.join(dirname, ckg_config.builder_config_file))
+
     except Exception as err:
-        raise Exception("Reading configuration > {}.".format(err))
+        raise Exception("builder_utils - Reading configuration > {}.".format(err))
+
+    return config
 
 def setup_logging(path='log.config', key=None):
     """Setup logging configuration"""

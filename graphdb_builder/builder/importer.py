@@ -24,12 +24,14 @@ log_config = ckg_config.graphdb_builder_log
 logger = builder_utils.setup_logging(log_config, key="importer")
 
 try:
-    config = ckg_utils.get_configuration(ckg_config.builder_config_file)
-    oconfig = ckg_utils.get_configuration(ckg_config.ontologies_config_file)
-    dbconfig = ckg_utils.get_configuration(ckg_config.databases_config_file)
-    econfig = ckg_utils.get_configuration(ckg_config.experiments_config_file)
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    config = builder_utils.setup_config('builder')
+    oconfig = builder_utils.setup_config('ontologies')
+    dbconfig = builder_utils.setup_config('databases')
+    econfig = builder_utils.setup_config('experiments')
 except Exception as err:
-    logger.error("Reading configuration > {}.".format(err))
+    print("Error")
+    logger.error("importer - Reading configuration > {}.".format(err))
 
 START_TIME = datetime.now()
 

@@ -21,11 +21,11 @@ log_config = ckg_config.graphdb_builder_log
 logger = builder_utils.setup_logging(log_config, key="builder")
 
 try:
-    config = ckg_utils.get_configuration(ckg_config.builder_config_file)
-    dbconfig = ckg_utils.get_configuration(ckg_config.databases_config_file)
-    oconfig = ckg_utils.get_configuration(ckg_config.ontologies_config_file)
+    config = builder_utils.setup_config('builder')
+    dbconfig = builder_utils.setup_config('databases')
+    oconfig = builder_utils.setup_config('ontologies')
 except Exception as err:
-    logger.error("Reading configuration > {}.".format(err))
+    logger.error("builder - Reading configuration > {}.".format(err))
 
 def set_arguments():
     parser = argparse.ArgumentParser()

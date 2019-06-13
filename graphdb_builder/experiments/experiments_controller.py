@@ -16,7 +16,7 @@ log_config = ckg_config.graphdb_builder_log
 logger = builder_utils.setup_logging(log_config, key="experiments_controller")
 
 try:
-    config = ckg_utils.get_configuration(ckg_config.experiments_config_file)
+    config = builder_utils.setup_config('experiments')
 except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
 
@@ -81,7 +81,8 @@ def extractAttributes(data, attributes):
         else:
             auxAttr_col = auxAttr_col.join(data[attributes[ctype]])
             cCols = [c.replace(' ','_').replace('-','') for c in attributes[ctype]]
-
+    auxAttr_reg = auxAttr_reg.drop_duplicates()
+    auxAttr_col = auxAttr_col.drop_duplicates()
     return (auxAttr_col,cCols), (auxAttr_reg,regexCols)
 
 def mergeRegexAttributes(data, attributes, index):
@@ -97,7 +98,11 @@ def mergeRegexAttributes(data, attributes, index):
 def mergeColAttributes(data, attributes, index):
     if not attributes.empty:
         data = data.set_index(index)
-        data = data.join(attributes)
+        data = dd.from_pandas(data, 1000)
+        attributes = dd.from_pandas(attributes, 1000)
+        data = data.merge(attributes, left_index=True, right_index=True)
+        del(attributes)
+        data = data.compute()
         data = data.reset_index()
 
     return data
@@ -141,25 +146,22 @@ def parseClinicalDataset(projectId, configuration, dataDir, key='project'):
 
 ########### Proteomics Datasets ############
 def parseProteomicsDataset(projectId, configuration, dataDir):
-    datasets = {}
-    for ftype in configuration:
-        if ftype == "directory":
-            continue
-        datasetConfig = configuration[ftype]
-        dfile = datasetConfig['file']
-        filepath = os.path.join(dataDir, dfile)
-        if os.path.isfile(filepath):
-            data, regex = loadProteomicsDataset(filepath, datasetConfig)
-            data = data.sort_index()
-            log = datasetConfig['log']
-            subjectDict = extractSubjectReplicates(data, regex)
-            delCols = []
-            for subject in subjectDict:
-                delCols.extend(subjectDict[subject])
-                aux = data[subjectDict[subject]]
-                data[subject] = calculateMedianReplicates(aux, log)
-            datasets[ftype] = data.drop(delCols, 1)
-    return datasets
+    dataset = None
+    dfile = configuration['file']
+    filepath = os.path.join(dataDir, dfile)
+    print(filepath)
+    if os.path.isfile(filepath):
+        data, regex = loadProteomicsDataset(filepath, configuration)
+        data = data.sort_index()
+        log = configuration['log']
+        subjectDict = extractSubjectReplicates(data, regex)
+        delCols = []
+        for subject in subjectDict:
+            delCols.extend(subjectDict[subject])
+            aux = data[subjectDict[subject]]
+            data[subject] = calculateMedianReplicates(aux, log)
+        dataset = data.drop(delCols, 1)
+    return dataset
 
 ########### Genomics Datasets ############
 def parseWESDataset(projectId, configuration, dataDir):
@@ -412,36 +414,33 @@ def extractProteinModificationSubjectRelationships(data, configuration):
     proteinCol = configuration["proteinCol"]
     cols = [proteinCol]
     cols.extend(positionCols)
-    aux = data.copy()
-    aux = aux.reset_index()
-    aux["END_ID"] = aux[proteinCol].map(str) + "_" + aux[positionCols[1]].map(str) + aux[positionCols[0]].map(str) + '-' +configuration["mod_acronym"]
-    aux = aux.set_index("END_ID")
-    newIndexdf = aux.copy()
-    aux = aux.drop(cols, axis=1)
-    aux =  aux.filter(regex = configuration["valueCol"].replace("\\\\","\\"))
-    aux.columns = [c.split(" ")[1] for c in aux.columns]
-    aux = aux.stack()
-    aux = aux.reset_index()
-    aux.columns = ["c"+str(i) for i in range(len(aux.columns))]
+    data = data.reset_index()
+    data["END_ID"] = data[proteinCol].map(str) + "_" + data[positionCols[1]].map(str) + data[positionCols[0]].map(str) + '-' +configuration["mod_acronym"]
+    data = data.set_index("END_ID")
+    newIndexdf = data.copy()
+    data = data.drop(cols, axis=1)
+    data =  data.filter(regex = configuration["valueCol"].replace("\\\\","\\"))
+    data.columns = [c.split(" ")[1] for c in data.columns]
+    data = data.stack()
+    data = data.reset_index()
+    data.columns = ["c"+str(i) for i in range(len(data.columns))]
     columns = ['END_ID', 'START_ID',"value"]
-
     attributes = configuration["attributes"]
     (cAttributes,cCols), (rAttributes,regexCols) = extractAttributes(newIndexdf, attributes)
     if not rAttributes.empty:
-        aux = mergeRegexAttributes(aux, rAttributes, ["c0","c1"])
+        data = mergeRegexAttributes(data, rAttributes, ["c0","c1"])
         columns.extend(regexCols)
     if not cAttributes.empty:
-        aux = mergeColAttributes(aux, cAttributes, "c0")
+        data = mergeColAttributes(data, cAttributes, "c0")
         columns.extend(cCols)
 
-
-    aux['TYPE'] = "HAS_QUANTIFIED_MODIFIED_PROTEIN"
+    data['TYPE'] = "HAS_QUANTIFIED_MODIFIED_PROTEIN"
     columns.append("TYPE")
-    aux.columns = columns
-    aux = aux[['START_ID', 'END_ID', 'TYPE', "value"] + regexCols + cCols]
-    aux = aux.drop_duplicates()
+    data.columns = columns
+    data = data[['START_ID', 'END_ID', 'TYPE', "value"] + regexCols + cCols]
+    data = data.drop_duplicates()
 
-    return aux
+    return data
 
 def extractProteinProteinModificationRelationships(data, configuration):
     positionCols = configuration["positionCols"]
@@ -648,31 +647,29 @@ def loadProteomicsDataset(uri, configuration):
 
     #Read the data from file
     data = readDataset(uri)
-
     #Apply filters
     data = data[data[filters].isnull().all(1)]
     data = data.drop(filters, axis=1)
     data = expand_groups(data, configuration)
     columns = set(columns).difference(filters)
     columns.remove(indexCol)
-
+    
     #Get columns using regex
     for regex in regexCols:
         r = re.compile(regex)
         columns.update(set(filter(r.match, data.columns)))
     #Add simple and regex columns into a single DataFrame
     data = data[list(columns)]
-
+    
     return data, regexCols
 
 def expand_groups(data, configuration):
-    ddata = dd.from_pandas(data, 6)
+    ddata = dd.from_pandas(data, 100)
     ddata = ddata.map_partitions(lambda df: df.drop(configuration["proteinCol"], axis=1).join(df[configuration["proteinCol"]].str.split(';', expand=True).stack().reset_index(drop=True, level=1).rename(configuration["proteinCol"])))
     if "multipositions" in configuration:
         ddata = ddata.map_partitions(lambda df: df.drop(configuration["multipositions"], axis=1).join(df[configuration["multipositions"]].str.split(';', expand=True).stack().reset_index(drop=True, level=1).rename(configuration["multipositions"])))
-    ddata = ddata.compute()
-    ddata["is_razor"] = ~ ddata[group_col].duplicated()
-
+    data = ddata.compute()
+    data["is_razor"] = ~ data[configuration["groupCol"]].duplicated()
     data = data.set_index(configuration["indexCol"])
 
     return data
@@ -769,31 +766,34 @@ def generateDatasetImports(projectId, dataType):
                         if dataRows is not None:
                             generateGraphFiles(dataRows,'disease', projectId, stats, d = dataType)
                 elif dataType == "proteomics":
-                    data = parseProteomicsDataset(projectId, configuration, dataDir)
-                    if data is not None:
-                        for dtype in data:
+                    for dtype in configuration:
+                        if dtype == "directory":
+                            continue
+                        datasetConfig = configuration[dtype]
+                        df = parseProteomicsDataset(projectId, datasetConfig, dataDir)
+                        if df is not None:
                             if dtype == "proteins":
-                                dataRows = extractProteinSubjectRelationships(data[dtype], configuration[dtype])
+                                dataRows = extractProteinSubjectRelationships(df, datasetConfig)
                                 generateGraphFiles(dataRows,dtype, projectId, stats)
                             elif dtype == "peptides":
-                                dataRows = extractPeptideSubjectRelationships(data[dtype], configuration[dtype])
+                                dataRows = extractPeptideSubjectRelationships(df, datasetConfig)
                                 generateGraphFiles(dataRows, "subject_peptide", projectId, stats)
-                                dataRows = extractPeptideProteinRelationships(data[dtype], configuration[dtype])
+                                dataRows = extractPeptideProteinRelationships(df, datasetConfig)
                                 generateGraphFiles(dataRows,"peptide_protein", projectId, stats)
-                                dataRows = extractPeptides(data[dtype], configuration[dtype])
+                                dataRows = extractPeptides(df, datasetConfig)
                                 generateGraphFiles(dataRows, dtype, projectId, stats)
                             else:
                                 #dataRows = extractModificationProteinRelationships(data[dtype], configuration[dtype])
                                 #generateGraphFiles(dataRows,"protein_modification", projectId, ot = 'a')
-                                dataRows = extractProteinModificationSubjectRelationships(data[dtype], configuration[dtype])
+                                dataRows = extractProteinModificationSubjectRelationships(df, datasetConfig)
                                 generateGraphFiles(dataRows, "modifiedprotein_subject", projectId, stats, ot = 'a')
-                                dataRows = extractProteinProteinModificationRelationships(data[dtype], configuration[dtype])
+                                dataRows = extractProteinProteinModificationRelationships(df,datasetConfig)
                                 generateGraphFiles(dataRows, "modifiedprotein_protein", projectId, stats, ot = 'a')
-                                dataRows = extractPeptideProteinModificationRelationships(data[dtype], configuration[dtype])
+                                dataRows = extractPeptideProteinModificationRelationships(df,datasetConfig)
                                 generateGraphFiles(dataRows, "modifiedprotein_peptide", projectId, stats, ot = 'a')
-                                dataRows = extractProteinModifications(data[dtype], configuration[dtype])
+                                dataRows = extractProteinModifications(df,datasetConfig)
                                 generateGraphFiles(dataRows, "modifiedprotein", projectId, stats, ot = 'a')
-                                dataRows = extractProteinModificationsModification(data[dtype], configuration[dtype])
+                                dataRows = extractProteinModificationsModification(df, datasetConfig)
                                 generateGraphFiles(dataRows, "modifiedprotein_modification", projectId, stats, ot = 'a')
                 elif dataType == "wes":
                     data = parseWESDataset(projectId, configuration, dataDir)

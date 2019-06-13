@@ -377,32 +377,33 @@ def convertToEdgeList(data, cols):
 
     return edge_list
 
+@jit(nopython=False, parallel=True)
 def run_correlation(df, alpha=0.05, subject='subject', group='group', method='pearson', correction=('fdr', 'indep')):
     calculated = set()
     correlation = pd.DataFrame()
-    #if check_is_paired(df, subject, group):
-    #    if len(df[subject].unique()) > 1:
-    #        correlation = run_rm_correlation(df, alpha=alpha, subject=subject, correction=correction)
-    #else:
-    df = df.dropna()._get_numeric_data()
-    if not df.empty:
-        r, p = run_efficient_correlation(df, method=method)
-        rdf = pd.DataFrame(r, index=df.columns, columns=df.columns)
-        pdf = pd.DataFrame(p, index=df.columns, columns=df.columns)
-        rdf.values[[np.arange(len(rdf))]*2] = np.nan
-        pdf.values[[np.arange(len(pdf))]*2] = np.nan
-        
-        correlation = convertToEdgeList(rdf, ["node1", "node2", "weight"])
-        pvalues = convertToEdgeList(pdf, ["node1", "node2", "pvalue"])
+    if check_is_paired(df, subject, group):
+        if len(df[subject].unique()) > 2:
+            correlation = run_rm_correlation(df, alpha=alpha, subject=subject, correction=correction)
+    else:
+        df = df.dropna()._get_numeric_data()
+        if not df.empty:
+            r, p = run_efficient_correlation(df, method=method)
+            print("Hola")
+            rdf = pd.DataFrame(r, index=df.columns, columns=df.columns)
+            pdf = pd.DataFrame(p, index=df.columns, columns=df.columns)
+            rdf.values[[np.arange(len(rdf))]*2] = np.nan
+            pdf.values[[np.arange(len(pdf))]*2] = np.nan
+            correlation = convertToEdgeList(rdf, ["node1", "node2", "weight"])
+            pvalues = convertToEdgeList(pdf, ["node1", "node2", "pvalue"])
 
-        if correction[0] == 'fdr':
-            rejected, padj = apply_pvalue_fdrcorrection(pvalues["pvalue"].tolist(), alpha=alpha, method=correction[1])
-        elif correction[0] == '2fdr':
-            rejected, padj = apply_pvalue_twostage_fdrcorrection(pvalues["pvalue"].tolist(), alpha=alpha, method=correction[1])
+            if correction[0] == 'fdr':
+                rejected, padj = apply_pvalue_fdrcorrection(pvalues["pvalue"].tolist(), alpha=alpha, method=correction[1])
+            elif correction[0] == '2fdr':
+                rejected, padj = apply_pvalue_twostage_fdrcorrection(pvalues["pvalue"].tolist(), alpha=alpha, method=correction[1])
 
-        correlation["padj"] = padj
-        correlation["rejected"] = rejected
-        correlation = correlation[correlation.rejected]
+            correlation["padj"] = padj
+            correlation["rejected"] = rejected
+            correlation = correlation[correlation.rejected]
     return correlation
 
 def calculate_rm_correlation(df, x, y, subject):
@@ -410,7 +411,9 @@ def calculate_rm_correlation(df, x, y, subject):
     
     return (x, y, r, pvalue, dof, ci, power)
 
+@jit(nopython=False, parallel=True)
 def run_rm_correlation(df, alpha=0.05, subject='subject', correction=('fdr', 'indep')):
+    print("STARTING CORRELATION")
     calculated = set()
     rows = []
     #df = df.dropna()._get_numeric_data()
@@ -433,7 +436,7 @@ def run_rm_correlation(df, alpha=0.05, subject='subject', correction=('fdr', 'in
         correlation["padj"] = padj
         correlation["rejected"] = rejected
         correlation = correlation[correlation.rejected]
-
+    print("DONE")
     return correlation
 
 @jit(nopython=False, parallel=True)
@@ -456,23 +459,15 @@ def run_efficient_correlation(data, method='pearson'):
     return r, p
 
 def calculate_paired_ttest(df, condition1, condition2):
-    group1 = df[condition1]
-    group2 = df[condition2]
-    if isinstance(group1, np.float):
-        group1 = np.array(group1)
-    else:
-        group1 = group1.values
-    if isinstance(group2, np.float):
-        group2 = np.array(group2)
-    else:
-        group2 = group2.values
+    group1 = df[[condition1]].values
+    group2 = df[[condition2]].values
     
     mean1 = group1.mean() 
     mean2 = group2.mean()
     log2fc = mean1 - mean2
     t, pvalue = stats.ttest_rel(group1, group2, nan_policy='omit')
 
-    return (df.name, t, pvalue, mean1, mean2, log2fc)
+    return (t, pvalue, mean1, mean2, log2fc)
 
 def calculate_ttest(df, condition1, condition2):
     group1 = df[condition1]
@@ -491,7 +486,7 @@ def calculate_ttest(df, condition1, condition2):
     log2fc = mean1 - mean2
     t, pvalue = stats.ttest_ind(group1, group2, nan_policy='omit')
 
-    return (df.name, t, pvalue, mean1, mean2, log2fc)
+    return (t, pvalue, mean1, mean2, log2fc)
 
 def calculate_THSD(df):
     col = df.name
@@ -511,7 +506,7 @@ def calculate_pairwise_ttest(df, column, subject='subject', group='group', corre
         valid_cols = ['group1', 'group2', 'mean(group1)', 'std(group1)', 'mean(group2)', 'std(group2)', 'Paired','Parametric', 'T', 'dof', 'BF10', 'efsize', 'eftype']
     else:
         valid_cols = posthoc_columns
-    posthoc = df.pairwise_ttests(dv=column, between=group, subject=subject, effsize='hedges', return_desc=True, padjust=correction)
+    posthoc = pg.pairwise_ttests(data=df, dv=column, between=group, subject=subject, effsize='hedges', return_desc=True, padjust=correction)
     posthoc.columns =  posthoc_columns
     posthoc = posthoc[valid_cols]
     posthoc = complement_posthoc(posthoc, column)
@@ -533,7 +528,7 @@ def calculate_anova(df, group='group'):
     return (col, t, pvalue)
 
 def calculate_repeated_measures_anova(df, column, subject='subject', group='group', alpha=0.05):
-    aov_result = df.rm_anova(dv=column, within=group,subject=subject, detailed=True, correction=True)
+    aov_result = pg.rm_anova(data=df, dv=column, within=group,subject=subject, detailed=True, correction=True)
     aov_result.columns = ['Source', 'SS', 'DF', 'MS', 'F', 'pvalue', 'padj', 'np2', 'eps', 'sphericity', 'Mauchlys sphericity', 'p-spher']
     t, pvalue, padj = aov_result.loc[0, ['F', 'pvalue', 'padj']].values 
 
@@ -560,7 +555,7 @@ def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject',
         groups = df[group].unique()
         drop_cols = [d for d in drop_cols if d != subject]
         if len(groups) == 2:
-            res = run_ttest(df, groups[0], groups[1], alpha = alpha, drop_cols=drop_cols, subject=subject, group=group, correction='fdr_bh')
+            res = run_ttest(df, groups[0], groups[1], alpha = alpha, drop_cols=drop_cols, subject=subject, group=group, paired=False, correction='fdr_bh')
         else:
             
             res = run_repeated_measurements_anova(df, alpha=alpha, drop_cols=drop_cols, subject=subject, group=group, permutations=0)
@@ -639,36 +634,45 @@ def run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subjec
     
     return res
 
-def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], subject='subject', group='group', correction='fdr_bh'):
-    df = df.set_index([subject, group])
+def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], subject='subject', group='group', paired=False, correction='fdr_bh'):
+    columns = ['T-statistics', 'pvalue', 'mean_group1', 'mean_group2', 'log2FC']
+    df = df.set_index([group, subject])
     df = df.drop(drop_cols, axis = 1)
-    scores = None
-    for col in df.columns:
-        ttest = calculate_pairwise_ttest(df.reset_index(), col, subject=subject, group=group, correction='fdr_bh')
-        if scores is None:
-            scores = ttest
-        else:
-            scores = pd.concat([scores, ttest], axis=0)
-    #if paired:
-    #    scores = tdf.apply(func = calculate_paired_ttest, axis = 1, result_type='expand', args =(condition1, condition2))
-    #else:
-    #    scores = tdf.apply(func = calculate_ttest, axis = 1, result_type='expand', args =(condition1, condition2))
-    #scores.columns = columns
-    #scores = scores.dropna(how="all")
+    cols = df.columns
+    #df = df.T #.reset_index()
+    #scores = None
+    #for col in cols:
+    #    ttest = calculate_pairwise_ttest(df, col, subject=subject, group=group, correction='fdr_bh')
+    #    if scores is None:
+    #        scores = ttest
+    #    else:
+    #        aux = pd.concat([scores, ttest], axis=0)
+    #        scores = aux
+    if paired:
+        scores = df.T.apply(func = calculate_paired_ttest, axis=1, result_type='expand', args =(condition1, condition2))
+    else:
+        scores = df.T.apply(func = calculate_ttest, axis=1, result_type='expand', args =(condition1, condition2))
+    scores.columns = columns
+    scores = scores.dropna(how="all")
 
     #Cohen's d
     #scores["cohen_d"] = tdf.apply(func = cohen_d, axis = 1, args =(condition1, condition2, 1))
 
     #Hedge's g
     #scores["hedges_g"] = tdf.apply(func = hedges_g, axis = 1, args =(condition1, condition2, 1))
-    scores['pvalue'] = np.nan
+    rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'indep')
+    #scores['pvalue'] = np.nan
     scores['correction'] = 'FDR correction BH'
-    scores['rejected'] = scores['padj'] <= alpha
+    scores['padj'] = padj
+    scores['rejected'] = rejected
+
+    #scores['rejected'] = scores['padj'] <= alpha
     scores['group1'] = condition1
     scores['group2'] = condition2
-    scores['FC'] = scores['log2FC'].apply(lambda x: np.power(2,np.abs(x)) * -1 if x < 0 else np.power(2,np.abs(x)))
-    scores['-log10 pvalue'] = scores['padj'].apply(lambda x: - np.log10(x))
+    scores['FC'] = [np.power(2,np.abs(x)) * -1 if x < 0 else np.power(2,np.abs(x)) for x in scores['log2FC'].values]
+    scores['-log10 pvalue'] = [- np.log10(x) for x in scores['padj'].values]
     scores = scores.reset_index() 
+    print(scores)
 
     return scores
 
@@ -937,7 +941,7 @@ def get_network_communities(graph, args):
     return communities
 
 def get_publications_abstracts(data, publication_col="publication", join_by=['publication','Proteins','Diseases'], index="PMID"):
-    abstract = pd.DataFrame()
+    abstracts = pd.DataFrame()
     if not data.empty:
         abstracts = utils.getMedlineAbstracts(list(data.reset_index()[publication_col].unique()))
         abstracts = abstracts.set_index(index)

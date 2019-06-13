@@ -441,9 +441,10 @@ class AnalysisResult:
                 input_data = self.data
                 wgcna_data = self.result
                 dfs = wgcna.get_data(input_data, drop_cols_exp=self.args['drop_cols_exp'], drop_cols_cli=self.args['drop_cols_cli'])
-                data['wgcna'] = {**dfs, **wgcna_data['wgcna']}
-                for id in data:
-                    plot.extend(figure.get_WGCNAPlots(data[id], identifier))
+                if 'wgcna' in data and 'wgcna' in wgcna_data:
+                    data['wgcna'] = {**dfs, **wgcna_data['wgcna']}
+                    for id in data:
+                        plot.extend(figure.get_WGCNAPlots(data[id], identifier))
             elif name == 'ranking':
                 for id in self.result:
                     plot.append(figure.get_ranking_plot(self.result[id], identifier, self.args))

@@ -8,10 +8,10 @@ import re
 import gzip
 
 try:
-    oconfig = ckg_utils.get_configuration(ckg_config.ontologies_config_file)
-    dbconfig = ckg_utils.get_configuration(ckg_config.databases_config_file)
+    oconfig = builder_utils.setup_config('ontologies')
+    dbconfig = builder_utils.setup_config('databases')
 except Exception as err:
-    raise Exception("Reading configuration > {}.".format(err))
+    raise Exception("mapping - Reading configuration > {}.".format(err))
 
 
 def getMappingFromOntology(ontology, source = None):

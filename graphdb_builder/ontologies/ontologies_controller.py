@@ -18,7 +18,7 @@ log_config = graph_config.graphdb_builder_log
 logger = builder_utils.setup_logging(log_config, key="ontologies_controller")
 
 try:
-    config = ckg_utils.get_configuration(ckg_config.ontologies_config_file)
+    config = builder_utils.setup_config('ontologies')
 except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
 
