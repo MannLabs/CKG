@@ -1,6 +1,6 @@
 args:
     imputation: True
-    imputation_method: distribution 
+    imputation_method: mixed 
 overview: #section
     peptides:
         data: number of peptides
