@@ -3,6 +3,7 @@ import sys
 import argparse
 import pandas as pd
 import numpy as np
+from datetime import datetime, timedelta
 import ckg_utils
 import config.ckg_config as ckg_config
 from graphdb_connector import connector
@@ -12,7 +13,7 @@ log_config = ckg_config.graphdb_builder_log
 logger = builder_utils.setup_logging(log_config, key='user_creation')
 
 try:
-    config = ckg_utils.get_configuration(ckg_config.builder_config_file)
+    config = builder_utils.setup_config('builder')
 except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
 
@@ -64,10 +65,9 @@ def create_user_db(driver, args):
 	try:
 		cypher = get_user_creation_queries()
 		query = cypher[query_name_add]['query'] + cypher[query_name_role]['query']
-		arguments = {'username':args.username, 'password':args.username, 'rolename':'reader'}
 		for q in query.split(';')[0:-1]:
 			if '$' in q:
-				result = connector.getCursorData(driver, q+';', parameters=arguments)
+				result = connector.getCursorData(driver, q+';', parameters=args)
 			else:
 				result = connector.getCursorData(driver, q+';')
 	except Exception as err:
@@ -76,20 +76,44 @@ def create_user_db(driver, args):
 		logger.error("Reading query {}: {}, file: {},line: {}".format(query_name_add, sys.exc_info(), fname, exc_tb.tb_lineno))
 	return 'Done'
 
-def create_user_node(driver, args):
+def create_user_from_command_line(driver, args, expiration=365):
 	query_name = 'create_user_node'
+	date = datetime.today() + timedelta(days=expiration)
 	try:
-		user_id = get_new_user_identifier(driver)
 		data = vars(args)
-		data['ID'] = user_id
-		data['acronym'] = ''.join([c for c in data['name'] if c.isupper()])
-		user_creation_cypher = get_user_creation_queries()
-		query = user_creation_cypher[query_name]['query']
-		for q in query.split(';')[0:-1]:
-			if '$' in q:
-				result = connector.getCursorData(driver, q+';', parameters=data)
+		username = check_if_node_exists(driver, 'username', data['username'])
+		name = check_if_node_exists(driver, 'name', data['name'])
+		email = check_if_node_exists(driver, 'email', data['email'])
+
+		if username.size == 0 and name.size == 0 and email.size == 0:
+			user_id = get_new_user_identifier(driver)
+			if user_id is None:
+				user_id = 'U1'
 			else:
-				result = connector.getCursorData(driver, q+';')
+				pass
+			data['ID'] = user_id
+			data['acronym'] = ''.join([c for c in data['name'] if c.isupper()])
+			data['password'] = data['username']
+			data['rolename'] = 'reader'
+			data['expiration_date'] = date.strftime('%Y-%m-%d')
+
+			create_user_db(driver, data)
+			user_creation_cypher = get_user_creation_queries()
+			query = user_creation_cypher[query_name]['query']
+			for q in query.split(';')[0:-1]:
+				if '$' in q:
+					result = connector.getCursorData(driver, q+';', parameters=data)
+				else:
+					result = connector.getCursorData(driver, q+';')
+		if username.size != 0:
+			print('A user with the same username "{}" already exists. Modify username.'.format(data['username']))
+			pass
+		if name.size != 0:
+			print('A user with the same name "{}" already exists. Modify name.'.format(data['name']))
+			pass
+		if email.size != 0:
+			print('A user with the same email "{}" already exists. Modify email.'.format(data['email']))
+			pass
 	except Exception as err:
 		exc_type, exc_obj, exc_tb = sys.exc_info()
 		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -99,7 +123,7 @@ def create_user_node(driver, args):
 	usersDir = os.path.join(os.getcwd(),config["usersDirectory"])
 	file = os.path.join(usersDir, 'CKG_users.csv')
 	data = pd.DataFrame.from_dict(data, orient='index').T
-	data = data[['ID', 'acronym', 'name', 'username', 'email', 'second_email', 'phone', 'affiliation']]
+	data = data[['ID', 'acronym', 'name', 'username', 'email', 'second_email', 'phone', 'affiliation', 'expiration_date', 'rolename', 'image']]
 	with open(file, 'a') as f:
 		data.to_csv(path_or_buf = f,
                     header=False, index=False, quotechar='"',
@@ -107,30 +131,34 @@ def create_user_node(driver, args):
 	return result
 
 
-def create_user_from_file(driver, args):
+def create_user_from_file(driver, args, expiration=365):
 	query_name_add = 'create_user'
 	query_name_role = 'add_role_to_user'
 	query_name_node = 'create_user_node'
+
+	date = datetime.today() + timedelta(days=expiration)
 	df = []
 	done = 0
 	try:
 		data = pd.read_excel(args.file).applymap(str)
 		cypher = get_user_creation_queries()
 		query = cypher[query_name_add]['query'] + cypher[query_name_role]['query'] + cypher[query_name_node]['query']
-		for index, row in data.iterrows():
-			user_id = get_new_user_identifier(driver)
-			if user_id is None:
-				user_id = 'U1'
-			else:
-				pass
+		for index, row in data.iterrows():		
 			username = check_if_node_exists(driver, 'username', row['username'])
 			name = check_if_node_exists(driver, 'name', row['name'])
 			email = check_if_node_exists(driver, 'email', row['email'])
+			
 			if username.size == 0 and name.size == 0 and email.size == 0:
+				user_id = get_new_user_identifier(driver)
+				if user_id is None:
+					user_id = 'U1'
+				else:
+					pass
 				row['ID'] = user_id
 				row['acronym'] = ''.join([c for c in row['name'] if c.isupper()])
 				row['password'] = row['username']
 				row['rolename'] = 'reader'
+				row['expiration_date'] = date.strftime('%Y-%m-%d')
 				for q in query.split(';')[0:-1]:
 					if '$' in q:			
 						result = connector.getCursorData(driver, q+';', parameters=row.to_dict())
@@ -156,15 +184,12 @@ def create_user_from_file(driver, args):
 	usersDir = os.path.join(os.getcwd(),config["usersDirectory"])
 	file = os.path.join(usersDir, 'CKG_users.csv')
 	data = pd.DataFrame(df)
-	data = data[['ID', 'acronym', 'name', 'username', 'email', 'second_email', 'phone', 'affiliation', 'rolename']]
+	data = data[['ID', 'acronym', 'name', 'username', 'email', 'second_email', 'phone', 'affiliation', 'expiration_date', 'rolename', 'image']]
 	with open(file, 'a') as f:
 		data.to_csv(path_or_buf = f,
                     header=False, index=False, quotechar='"',
                     line_terminator='\n', escapechar='\\')
 	return done
-
-
-
 
 
 def set_arguments():
@@ -176,8 +201,7 @@ def set_arguments():
 	parser.add_argument('-s', '--second_email', help='define an alternative email for the user', type=str, required=False)
 	parser.add_argument('-p', '--phone', help='define a phone number where the user can be reached', type=str, required=False)
 	parser.add_argument('-a', '--affiliation', help="define the user's affiliation (University, Group)", type=str, required=False)
-	# # parser.add_argument('-d', '--expiration_date', help='define the email of the user being created', type=str, required=True)
-	# parser.add_argument('-i', '--image', help='define path to a picture of the user', type=str, required=True)
+	parser.add_argument('-i', '--image', help='define path to a picture of the user', type=str, required=False)
 
 	return parser
 
@@ -191,29 +215,14 @@ if __name__ == "__main__":
 	if args.file != None:
 		logger.info('Creating users, from file, in the database')
 		print('Creating users, from file, in the database')
-		print(create_user_from_file(driver, args))
+		create_user_from_file(driver, args, expiration=365)
 		print('Done')
 
 	if args.file is None and args.username != None:
-		username = check_if_node_exists(driver, 'username', args.username)
-		name = check_if_node_exists(driver, 'name', args.name)
-		email = check_if_node_exists(driver, 'email', args.email)
-
-		if username.size != 0:
-			print('A user with the same username already exists. Modify username.')
-			pass
-		if name.size != 0:
-			print('A user with the same name already exists. Modify name.')
-			pass
-		if email.size != 0:
-			print('A user with the same email already exists. Modify email.')
-			pass
-		if username.size == 0 and name.size == 0 and email.size == 0:
-			logger.info('Creating user in the database')
-			print('Creating user in the database')
-			create_user_db(driver, args)
-			create_user_node(driver, args)
-			print('Done')
+		logger.info('Creating user in the database')
+		print('Creating user in the database')
+		create_user_from_command_line(driver, args, expiration=365)
+		print('Done')
 
 
 
