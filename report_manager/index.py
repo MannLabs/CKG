@@ -7,8 +7,10 @@ from datetime import datetime
 import base64
 import qrcode
 #import barcode
+from natsort import natsorted
 import flask
 import urllib.parse
+from urllib.parse import quote as urlquote
 from IPython.display import HTML
 
 import dash_core_components as dcc
@@ -27,10 +29,10 @@ import config.ckg_config as ckg_config
 from worker import create_new_project
 from graphdb_connector import connector
 
-# from celery.result import AsyncResult
-# from task import app
-
 driver = connector.getGraphDatabaseConnectionConfiguration()
+cwd = os.path.abspath(os.path.dirname(__file__))
+templateDir = os.path.join(cwd, 'apps/templates')
+
 
 
 app.layout = html.Div([
@@ -69,20 +71,17 @@ def display_page(pathname):
 def image_formatter(im):
     return f'<img src="data:image/jpeg;base64,{image_base64(im)}">'
 
+def add_internal_identifiers_to_excel(driver, external_id):
+    subject_ids = projectCreation.get_subjects_in_project(driver, external_id)
+    subject_ids = natsorted([item for sublist in subject_ids for item in sublist], reverse=False)
+    filename = os.path.join(templateDir, 'ClinicalData_template.xlsx')
+    outputfile = os.path.join(templateDir, 'ClinicalData_{}.xlsx'.format(external_id))
+    template = pd.read_excel(filename)
+    template.insert(loc=0, column='subject id', value=subject_ids)
+    writer = pd.ExcelWriter(outputfile)
+    template.to_excel(writer, 'Sheet1', index=False)
+    writer.save()
 
-@app.callback(Output('download_link', 'href'),
-             [Input('download_button', 'n_clicks')])
-def update_download_link(n_clicks=0):
-    relative_filename = os.path.join('apps/templates', 'ClinicalData_template.xlsx')
-    absolute_filename = os.path.join(os.getcwd(), relative_filename)
-    if n_clicks is not None and n_clicks > 0:
-        return '/{}'.format(relative_filename)
-
-
-@app.server.route('/apps/templates/<path:path>')
-def serve_static(path):
-    root_dir = os.getcwd()
-    return flask.send_from_directory(os.path.join(root_dir, 'apps/templates'), path)
 
 
 @app.callback(Output('dum-div', 'children'),
@@ -161,12 +160,15 @@ def update_dropdown(n_clicks, value):
                State('date-picker-start', 'date'),
                State('date-picker-end', 'date')])
 def create_project(n_clicks, name, acronym, responsible, participant, datatype, timepoints, disease, tissue, intervention, number_subjects, description, start_date, end_date):
-    if n_clicks != None:
+    if n_clicks != None and any(elem is None for elem in [name, number_subjects, datatype, disease, tissue, responsible]) == True:
+        response = "Insufficient information to create project. Refresh page."
+        return response, None, {'display': 'inline-block'}
+
+    if n_clicks != None and any(elem is None for elem in [name, number_subjects, datatype, disease, tissue, responsible]) == False:
         # Get project data from filled-in fields
         projectData = pd.DataFrame([name, acronym, description, number_subjects, datatype, timepoints, disease, tissue, intervention, responsible, participant, start_date, end_date]).T
         projectData.columns = ['name', 'acronym', 'description', 'subjects', 'datatypes', 'timepoints', 'disease', 'tissue', 'intervention', 'responsible', 'participant', 'start_date', 'end_date']
         projectData['status'] = ''
-        # projectData = projectData.astype({'subjects': int})
 
         # Generate project internal identifier bsed on timestamp
         # Excel file is saved in folder with internal id name
@@ -177,19 +179,54 @@ def create_project(n_clicks, name, acronym, responsible, participant, datatype, 
        
         result = create_new_project.apply_async(args=[internal_id, projectData.to_json()], task_id='project_creation_'+internal_id)
         result_output = result.get(timeout=10, propagate=False)
+        external_id = list(result_output.keys())[0]
+
+        add_internal_identifiers_to_excel(driver, external_id)
 
         if result is not None:
-            response = "Project successfully submitted."
+            response = "Project successfully submitted. Download Clinical Data template."
         else:
-            response = "There was a problem when creating the project"
+            response = "There was a problem when creating the project."
 
-        return response, '- '+list(result_output.keys())[0], {'display': 'inline-block'}
+        return response, '- '+external_id, {'display': 'inline-block'}
+    
+
+@app.callback(Output('download_link', 'href'),
+             [Input('download_button', 'n_clicks')],
+             [State('update_project_id', 'children')])
+def update_download_link(n_clicks, project_id):
+    if n_clicks is not None and n_clicks > 0:
+        project_id = project_id.split()[-1]
+        print('/apps/templates?value=ClinicalData_{}.xlsx'.format(project_id))
+        return '/apps/templates?value=ClinicalData_{}.xlsx'.format(project_id)
+
+
+@app.server.route('/apps/templates')
+def serve_static():
+    file = flask.request.args.get('value')
+    project_id = file.split('_')[-1].split('.')[0]
+    df = pd.read_excel('apps/templates/{}'.format(file))
+    str_io = io.StringIO()
+    df.to_csv(str_io)
+    mem = io.BytesIO()
+    mem.write(str_io.getvalue().encode('utf-8'))
+    mem.seek(0)
+    str_io.close()
+    return flask.send_file(mem,
+                           mimetype='text/csv',
+                           attachment_filename='ClinicalData_{}.csv'.format(project_id),
+                           as_attachment=True,
+                           cache_timeout=0)
+
 
 @app.callback(Output('project_button', 'disabled'),
              [Input('project_button', 'n_clicks')])
 def disable_submit_button(n_clicks):
     if n_clicks > 0:
         return True
+
+
+
 
 
 ###Callbacks for data upload app
@@ -216,18 +253,6 @@ def export_contents(data, dataDir, filename):
     elif file == 'xlsx' or file == 'xls':
         csv_string = data.to_excel(os.path.join(dataDir, filename), index=False, encoding='utf-8')   
     return csv_string
-
-def attribute_internal_ids(data, column, first_id):
-    prefix = re.split(r'(^[^\d]+)', first_id)[1]
-    id_value = int(re.split(r'(^[^\d]+)', first_id)[-1])
-    
-    mapping = {}
-    for i in data[column].unique():
-        new_id = prefix+str(id_value)
-        mapping[i] = new_id
-        id_value += 1
-    
-    return mapping
 
 
 @app.callback([Output('clinical-table', 'data'),
@@ -299,21 +324,26 @@ def update_table_download_link(n_clicks, columns, rows, filename, path_name, dat
         cols = [d['id'] for d in columns]
         data = pd.DataFrame(rows, columns=cols)
 
-        project_external_id = path_name.split('/')[-1]
+        project_id = path_name.split('/')[-1]
         
         # #Retrieve identifiers from database
         # project_id, subject_id, biosample_id, anasample_id = IDRetriver.retrieve_identifiers_from_database(driver, project_external_id)
 
-        if data_type == 'clinical':
-            #Add subject, biosample and anasample id columns to data
-            data.insert(loc=0, column='subject id', value=data['subject external id'].map(attribute_internal_ids(data, 'subject external id', subject_id).get))
-            data.insert(loc=1, column='biological_sample id', value=data['biological_sample external id'].map(attribute_internal_ids(data, 'biological_sample external id', biosample_id).get))
-            data.insert(loc=2, column='analytical_sample id', value=data['analytical_sample external id'].map(attribute_internal_ids(data, 'analytical_sample external id', anasample_id).get))
-        else:
-          pass
+        # if data_type == 'clinical':
+        #     #Add subject, biosample and anasample id columns to data
+        #     data.insert(loc=0, column='subject id', value=data['subject external id'].map(attribute_internal_ids(data, 'subject external id', subject_id).get))
+        #     data.insert(loc=1, column='biological_sample id', value=data['biological_sample external id'].map(attribute_internal_ids(data, 'biological_sample external id', biosample_id).get))
+        #     data.insert(loc=2, column='analytical_sample id', value=data['analytical_sample external id'].map(attribute_internal_ids(data, 'analytical_sample external id', anasample_id).get))
+        # else:
+        #   pass
+
+
+
+
+
 
         # # Path to new local folder
-        dataDir = '../../data/imports/experiments/PROJECTID/DATATYPE/'.replace('PROJECTID', project_external_id).replace('DATATYPE', data_type)
+        dataDir = '../../data/imports/experiments/PROJECTID/DATATYPE/'.replace('PROJECTID', project_id).replace('DATATYPE', data_type)
         
         # # Check/create folders based on local
         ckg_utils.checkDirectory(dataDir)
@@ -326,10 +356,6 @@ def update_table_download_link(n_clicks, columns, rows, filename, path_name, dat
 
 
 
-# @app.server.route('/apps/downloads/<path:path>')
-# def export_excel_file(path):
-#     root_dir = os.getcwd()
-#     return flask.send_from_directory(os.path.join(root_dir, 'apps/downloads'), path)
 
 
 #############

@@ -54,6 +54,25 @@ def get_new_subject_identifier(driver, projectId):
     
     return subject_identifier
 
+
+def get_subjects_in_project(driver, projectId):
+    query_name = 'extract_project_subjects'
+    try:
+        project_creation_cypher = get_project_creation_queries()
+        query = project_creation_cypher[query_name]['query']
+        for q in query.split(';')[0:-1]:
+            if '$' in q:
+                result = connector.getCursorData(driver, q+';', parameters={'external_id': str(projectId)})
+            else:
+                result = connector.getCursorData(driver, q+';')
+    except Exception as err:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        logger.error("Reading query {}: {}, file: {},line: {}".format(query_name, sys.exc_info(), fname, exc_tb.tb_lineno))
+
+    return result.values
+
+
 def create_new_project(driver, projectId, data):
     query_name = 'create_project'
     external_identifier='No Identifier Assigned'
@@ -63,6 +82,7 @@ def create_new_project(driver, projectId, data):
         data['external_id'] = external_identifier
         project_creation_cypher = get_project_creation_queries()
         query = project_creation_cypher[query_name]['query']
+        
         for q in query.split(';')[0:-1]:
             if '$' in q:
                 for parameters in data.to_dict(orient='records'):
@@ -72,23 +92,23 @@ def create_new_project(driver, projectId, data):
 
         subjects = create_new_subject(driver, external_identifier, data['subjects'][0])
 
-        if data['timepoints'][0] == '':
+        if pd.isnull(data['timepoints'][0]):
             pass
         else:
             timepoints = create_new_timepoint(driver, external_identifier, data['timepoints'][0])
-
-        if data['intervention'][0] == '':
+        
+        if pd.isnull(data['intervention'][0]):
             pass
         else:
             intervention_rel = create_intervention_relationship(driver, external_identifier, data['intervention'][0])
-
+    
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         logger.error("Reading query {}: {}, file: {},line: {}".format(query_name, sys.exc_info(), fname, exc_tb.tb_lineno))
     
-
-    store_new_project_as_file(external_identifier, data, '')
+    store_new_project_as_file(external_identifier, data, '', 'csv')
+    store_new_project_as_file(external_identifier, data, '', 'xlsx')
     store_project_relationships_as_file(external_identifier, data['responsible'][0].split(','), [external_identifier], 'IS_RESPONSIBLE', '_responsibles')
     store_project_relationships_as_file(external_identifier, data['participant'][0].split(','), [external_identifier], 'PARTICIPATES_IN', '_participants')
     store_project_relationships_as_file(external_identifier, [external_identifier], data['disease'][0].split(','), 'STUDIES_DISEASE', '_studies_disease')
@@ -131,7 +151,7 @@ def create_new_subject(driver, projectId, subjects):
     data.insert(loc=0, column='', value=projectId)
     data.columns = ['START_ID', 'END_ID']
     data['TYPE'] = 'HAS_ENROLLED'
-    store_new_project_as_file(projectId, data, '_project')
+    store_new_project_as_file(projectId, data, '_project', 'csv')
 
     return done
 
@@ -162,7 +182,7 @@ def create_new_timepoint(driver, projectId, timepoints):
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         logger.error("Reading query {}: {}, file: {},line: {}".format(query_name, sys.exc_info(), fname, exc_tb.tb_lineno))
     
-    store_new_project_as_file(projectId, data, '_timepoint')
+    store_new_project_as_file(projectId, data, '_timepoint', 'csv')
 
     return done
 
@@ -188,15 +208,20 @@ def create_intervention_relationship(driver, projectId, intervention):
     return result.values[0][0]
 
 
-def store_new_project_as_file(identifier, data, name):
+def store_new_project_as_file(identifier, data, name, file_format):
     if data is not None:
         importDir = os.path.join(os.path.join(cwd, '../../../data/imports/experiments'), os.path.join(identifier,'clinical'))
         ckg_utils.checkDirectory(importDir)
-        outputfile = os.path.join(importDir, identifier+name+".csv")
-        with open(outputfile, 'w') as f:
-            data.to_csv(path_or_buf = f,
-                        header=True, index=False, quotechar='"',
-                        line_terminator='\n', escapechar='\\')
+        outputfile = os.path.join(importDir, identifier+name+'.{}'.format(file_format))
+        if file_format == 'csv':
+            with open(outputfile, 'w') as f:
+                data.to_csv(path_or_buf = f,
+                            header=True, index=False, quotechar='"',
+                            line_terminator='\n', escapechar='\\')
+        if file_format == 'xlsx':
+            with pd.ExcelWriter(outputfile, mode='w') as e:
+                data.to_excel(e, index=False)
+        
 
 
 def store_project_relationships_as_file(projectId, start_node_list, end_node_list, relationship, filename):
@@ -209,29 +234,6 @@ def store_project_relationships_as_file(projectId, start_node_list, end_node_lis
         data['END_ID'] = end_node_list
     else: data['END_ID'] = end_node_list[0]
     data['TYPE'] = relationship 
-    store_new_project_as_file(projectId, data, filename)
+    store_new_project_as_file(projectId, data, filename, 'csv')
 
-
-
-# def retrieve_identifiers_from_database(driver, projectId):
-#     #Queries
-#     project_identifier = "MATCH (p:Project) WHERE p.id = 'EXTERNALID' RETURN p.internal_id AS result"
-#     subject_identifier = "MATCH (s:Subject) WITH max(toInteger(SPLIT(s.id, 'S')[1]))+1 as new_id RETURN SUBSTRING('S',0,1) + new_id AS result"
-#     biosample_identifier = "MATCH (b:Biological_sample) WITH max(toInteger(SPLIT(b.id, 'BS')[1]))+1 as new_id RETURN SUBSTRING('BS',0,2) + new_id AS result"
-#     anasample_identifier = "MATCH (a:Analytical_sample) WITH max(toInteger(SPLIT(a.id, 'AS')[1]))+1 as new_id RETURN SUBSTRING('AS',0,2) + new_id AS result"
-
-#     #Get external id from database
-#     project_id = connector.sendQuery(driver, project_identifier.replace('EXTERNALID', projectId))
-#     project_id = [record['result'] for record in project_id][0]
-        
-#     subject_id = connector.sendQuery(driver, subject_identifier)
-#     subject_id = [record['result'] for record in subject_id][0]
-
-#     biosample_id = connector.sendQuery(driver, biosample_identifier)
-#     biosample_id = [record['result'] for record in biosample_id][0]
-
-#     anasample_id = connector.sendQuery(driver, anasample_identifier)
-#     anasample_id = [record['result'] for record in anasample_id][0]
-
-#     return project_id, subject_id, biosample_id, anasample_id
 
