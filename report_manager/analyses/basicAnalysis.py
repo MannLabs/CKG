@@ -111,12 +111,14 @@ def imputation_mixed_norm_KNN(data, index_cols=['group', 'sample', 'subject'], s
     return df
 
 def imputation_normal_distribution(data, index=['group', 'sample', 'subject'], shift = 1.8, nstd = 0.3):
+    print("IN")
     np.random.seed(112736)
     df = data.copy()
     if index is not None:
         df = df.set_index(index)
     data_imputed = df.T
     null_columns = data_imputed.columns[data_imputed.isnull().any()]
+    print(null_columns)
     for c in null_columns:
         missing = data_imputed[data_imputed[c].isnull()].index.tolist()
         std = data_imputed[c].std()
@@ -197,7 +199,6 @@ def get_proteomics_measurements_ready(df, index=['group', 'sample', 'subject'], 
     df[index] = df["index"].apply(pd.Series)
     df = df.drop(["index"], axis=1)
     aux = index
-
     if missing_method == 'at_least_x_per_group':
         aux.extend(extract_number_missing(df, missing_max, drop_cols, group=None))
     elif missing_method == 'percentage':
@@ -634,7 +635,7 @@ def run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subjec
     
     return res
 
-def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], subject='subject', group='group', paired=False, correction='fdr_bh'):
+def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], subject='subject', group='group', paired=False, correction='fdr_bh', permutations=150):
     columns = ['T-statistics', 'pvalue', 'mean_group1', 'mean_group2', 'log2FC']
     df = df.set_index([group, subject])
     df = df.drop(drop_cols, axis = 1)
@@ -655,24 +656,27 @@ def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], su
     scores.columns = columns
     scores = scores.dropna(how="all")
 
-    #Cohen's d
-    #scores["cohen_d"] = tdf.apply(func = cohen_d, axis = 1, args =(condition1, condition2, 1))
-
-    #Hedge's g
-    #scores["hedges_g"] = tdf.apply(func = hedges_g, axis = 1, args =(condition1, condition2, 1))
-    rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'indep')
-    #scores['pvalue'] = np.nan
-    scores['correction'] = 'FDR correction BH'
-    scores['padj'] = padj
-    scores['rejected'] = rejected
-
+    max_perm = get_max_permutations(df, group=group)
+    #FDR correction
+    if permutations > 0 and max_perm > 10:
+        if max_perm < permutations:
+            permutations = max_perm
+        observed_pvalues = scores.pvalue
+        count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=alpha, permutations=permutations)
+        scores= scores.join(count)
+        scores['correction'] = 'permutation FDR ({} perm)'.format(permutations)
+    else:
+        rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'indep')
+        scores['correction'] = 'FDR correction BH'
+        scores['padj'] = padj
+        scores['rejected'] = rejected
     #scores['rejected'] = scores['padj'] <= alpha
     scores['group1'] = condition1
     scores['group2'] = condition2
     scores['FC'] = [np.power(2,np.abs(x)) * -1 if x < 0 else np.power(2,np.abs(x)) for x in scores['log2FC'].values]
     scores['-log10 pvalue'] = [- np.log10(x) for x in scores['padj'].values]
     scores = scores.reset_index() 
-    print(scores)
+    print(scores.shape)
 
     return scores
 

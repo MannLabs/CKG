@@ -81,8 +81,12 @@ def extractAttributes(data, attributes):
         else:
             auxAttr_col = auxAttr_col.join(data[attributes[ctype]])
             cCols = [c.replace(' ','_').replace('-','') for c in attributes[ctype]]
-    auxAttr_reg = auxAttr_reg.drop_duplicates()
-    auxAttr_col = auxAttr_col.drop_duplicates()
+    
+    reg_attr_index = auxAttr_reg.index.name
+    col_attr_index = auxAttr_col.index.name
+    auxAttr_reg = auxAttr_reg.reset_index().drop_duplicates().set_index(reg_attr_index)
+    auxAttr_col = auxAttr_col.reset_index().drop_duplicates().set_index(col_attr_index)
+    
     return (auxAttr_col,cCols), (auxAttr_reg,regexCols)
 
 def mergeRegexAttributes(data, attributes, index):
