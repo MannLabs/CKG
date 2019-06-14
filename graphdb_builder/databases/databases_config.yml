@@ -1,5 +1,5 @@
 #Database directory
-databasesDir : "../../../../data/databases/"
+databasesDir : "../../../data/databases/"
 databasesImportDir : "databases"
 #Databases
 databases : 

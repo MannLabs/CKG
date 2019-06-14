@@ -25,12 +25,8 @@ def parser(databases_directory, import_directory, download=True):
     stats.update(print_multiple_relationships_files(relationships, relationships_header, import_directory, is_first=True))
 
     #Variants
-    entities, relationships = parseUniProtVariants(config, databases_directory, download)
-    entities_header = config['variants_header']
-    output_file = os.path.join(import_directory, "Known_variant.tsv")
-    stats.update(print_single_file(entities, entities_header, output_file, "entity", "Known_variant", is_first=True))
-    stats.update(print_multiple_relationships_files(relationships, relationships_header, import_directory, is_first=True))
-
+    stats.update(parseUniProtVariants(config, databases_directory, download))
+    
     #Gene ontology annotation
     relationships = parseUniProtAnnotations(config, databases_directory, download)
     relationships_header = config['go_header']
@@ -197,7 +193,7 @@ def addUniProtTexts(textsFile, proteins):
             if protein in proteins:
                 proteins[protein].update({"description":function})
 
-def parseUniProtVariants(config, databases_directory, download=True):
+def parseUniProtVariants(config, databases_directory, import_directory, download=True):
     data = defaultdict()
     variant_regex = r"(g\.\w+>\w)"
     chromosome_regex = r"(\w+)[p|q]"
@@ -210,50 +206,67 @@ def parseUniProtVariants(config, databases_directory, download=True):
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
         builder_utils.downloadDB(url, directory)
-    with gzip.open(fileName, 'r') as f:
-        din = False
-        i = 0
-        for line in f:
-            line = line.decode('utf-8')
-            if not line.startswith('#') and not din:
-                continue
-            elif i<=2:
-                din = True
-                i += 1
-                continue
-            data = line.rstrip("\r\n").split("\t")
-            if len(data) > 9:
-                gene = data[0]
-                protein = data[1]
-                pvariant = data[2]
-                externalID = data[3]
-                impact = data[4]
-                clin_relevance = data[5]
-                disease = data[6]
-                chromosome_coord = data[8]
-                original_source = data[13]
-                ref = pvariant[2:5]
-                pos = pvariant[5:-3]
-                alt = pvariant[-3:]
-                var_matches = re.search(variant_regex, data[9])
-                chr_matches = re.search(chromosome_regex, chromosome_coord)
-                if var_matches and chr_matches:
-                    chromosome = 'chr'+chr_matches.group(1)
-                    ident = chromosome+":"+var_matches.group(1)
-                    consequence = data[4]
-                    altName = [externalID, data[5], pvariant, chromosome_coord]
-                    if ref in aa and alt in aa:
-                        altName.append(aa[ref]+pos+aa[alt])
-                    pvariant = protein+"_"+pvariant
-                    entities.add((ident, "Known_variant", pvariant, ",".join(altName), impact, clin_relevance, disease, original_source, "UniProt"))
-                    if chromosome != 'chr-':
-                        relationships[('Chromosome','known_variant_found_in_chromosome')].add((ident, chromosome.replace('chr',''), "VARIANT_FOUND_IN_CHROMOSOME","UniProt"))
-                    if gene != "":
-                        relationships[('Gene','known_variant_found_in_gene')].add((ident, gene, "VARIANT_FOUND_IN_GENE", "UniProt"))
-                    if protein !="":
-                        relationships[('Protein','known_variant_found_in_protein')].add((ident, protein, "VARIANT_FOUND_IN_PROTEIN", "UniProt"))
 
-    return entities, relationships
+    vf = builder_utils.read_gzipped_file(fileName)
+    din = False
+    i = 0
+    stats = set()
+    is_first = True
+    for line in vf:
+        line = line.decode('utf-8')
+        if not line.startswith('#') and not din:
+            continue
+        elif i<=2:
+            din = True
+            i += 1
+            continue
+        data = line.rstrip("\r\n").split("\t")
+        if len(data) > 9:
+            gene = data[0]
+            protein = data[1]
+            pvariant = data[2]
+            externalID = data[3]
+            impact = data[4]
+            clin_relevance = data[5]
+            disease = data[6]
+            chromosome_coord = data[8]
+            original_source = data[13]
+            ref = pvariant[2:5]
+            pos = pvariant[5:-3]
+            alt = pvariant[-3:]
+            var_matches = re.search(variant_regex, data[9])
+            chr_matches = re.search(chromosome_regex, chromosome_coord)
+            if var_matches and chr_matches:
+                chromosome = 'chr'+chr_matches.group(1)
+                ident = chromosome+":"+var_matches.group(1)
+                consequence = data[4]
+                altName = [externalID, data[5], pvariant, chromosome_coord]
+                if ref in aa and alt in aa:
+                    altName.append(aa[ref]+pos+aa[alt])
+                pvariant = protein+"_"+pvariant
+                entities.add((ident, "Known_variant", pvariant, ",".join(altName), impact, clin_relevance, disease, original_source, "UniProt"))
+                if chromosome != 'chr-':
+                    relationships[('Chromosome','known_variant_found_in_chromosome')].add((ident, chromosome.replace('chr',''), "VARIANT_FOUND_IN_CHROMOSOME","UniProt"))
+                if gene != "":
+                    relationships[('Gene','known_variant_found_in_gene')].add((ident, gene, "VARIANT_FOUND_IN_GENE", "UniProt"))
+                if protein !="":
+                    relationships[('Protein','known_variant_found_in_protein')].add((ident, protein, "VARIANT_FOUND_IN_PROTEIN", "UniProt"))
+
+                if len(entities) >= 1000:
+                    stats.update(print_single_file(entities, config['variants_header'], "Known_variant.tsv", "entity", "Known_variant", is_first))
+                    stats.update(print_multiple_relationships_files(relationships, config['relationships_header'], import_directory, is_first))
+                    entities = set()
+                    relationships = defaultdict(set)
+
+                    first = False
+
+    if len(entities) > 0:
+        stats.update(print_single_file(entities, config['variants_header'], "Known_variant.tsv", "entity", "Known_variant", is_first))
+        stats.update(print_multiple_relationships_files(relationships, config['relationships_header'], import_directory, is_first))
+        del(entities)
+        del(relationships)
+
+    return stats
 
 def parseUniProtAnnotations(config, databases_directory, download=True):
     roots = {'F':'Molecular_function', 'C':'Cellular_component', 'P':'Biological_process'}
@@ -264,19 +277,20 @@ def parseUniProtAnnotations(config, databases_directory, download=True):
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
         builder_utils.downloadDB(url, directory)
-    with gzip.open(fileName, 'r') as f:
-        for line in f:
-            line = line.decode('utf-8')
-            if line.startswith('!'):
-                continue
-            data = line.rstrip("\r\n").split("\t")
-            identifier = data[1]
-            go = data[4]
-            evidence = data[6]
-            root = data[8]
-            if root in roots:
-                root = roots[root]
-                relationships[(root,'associated_with')].add((identifier, go, "ASSOCIATED_WITH", evidence, 5, "UniProt"))
+
+    af = builder_utils.read_gzipped_file(fileName)
+    for line in af:
+        line = line.decode('utf-8')
+        if line.startswith('!'):
+            continue
+        data = line.rstrip("\r\n").split("\t")
+        identifier = data[1]
+        go = data[4]
+        evidence = data[6]
+        root = data[8]
+        if root in roots:
+            root = roots[root]
+            relationships[(root,'associated_with')].add((identifier, go, "ASSOCIATED_WITH", evidence, 5, "UniProt"))
 
     return relationships
 

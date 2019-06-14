@@ -122,7 +122,7 @@ class Dataset:
         except Exception as err:
             logger.error("Error: {} reading configuration file: {}.".format(err, config_path))
 
-    def get_dataset_data_directory(self, directory="../../data/reports"):
+    def get_dataset_data_directory(self, directory="../../../data/reports"):
         ckg_utils.checkDirectory(directory)
         id_directory = os.path.join(directory, self.identifier)
         ckg_utils.checkDirectory(id_directory)

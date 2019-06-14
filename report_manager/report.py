@@ -43,19 +43,26 @@ class Report:
     def save_report(self, directory):
         dt = h5.special_dtype(vlen=str)
         with h5.File(os.path.join(directory, "report.h5"), "w") as f:
-            for plot_id in self._plots:
-                name = "-".join(plot_id)
-                for plot in self._plots[plot_id]:
-                    grp = f.create_group(name)
-                    if hasattr(plot, 'figure'):
+            for plot_id in self.plots:
+                name = "~".join(plot_id)
+                grp = f.create_group(name)
+                for plot in self._plots[plot_id]:       
+                    figure_id = None
+                    if isinstance(plot, dict):
+                        if 'net_json' in plot:
+                            figure_json = plot['net_json']
+                            figure_id = name+'~'+'net'
+                    elif hasattr(plot, 'figure'):
                         figure_json = json.dumps(plot.figure, cls=plotly.utils.PlotlyJSONEncoder)
+                        figure_id = plot.id
                     elif hasattr(plot, 'data'):
                         figure_json = plot.data
+                        figure_id = 'dataset'
                     else:
                         continue
-                    fig_set = grp.create_dataset("figure", (1,), dtype=dt)
+                    fig_set = grp.create_dataset(figure_id, (1,), dtype=dt)
                     fig_set[:] = str(figure_json)
-                    fig_set.attrs['identifier'] = plot.id
+                    fig_set.attrs['identifier'] = figure_id
 
     #ToDo load Network data
     def read_report(self, directory):

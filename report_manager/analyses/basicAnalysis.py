@@ -111,7 +111,6 @@ def imputation_mixed_norm_KNN(data, index_cols=['group', 'sample', 'subject'], s
     return df
 
 def imputation_normal_distribution(data, index=['group', 'sample', 'subject'], shift = 1.8, nstd = 0.3):
-    print("IN")
     np.random.seed(112736)
     df = data.copy()
     if index is not None:
@@ -192,7 +191,7 @@ def get_coefficient_variation(data, drop_columns, group, columns):
 def get_proteomics_measurements_ready(df, index=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation = True, method = 'distribution', missing_method = 'percentage', missing_max = 0.3, value_col='LFQ_intensity'):
     df = df.set_index(index)
     if extra_identifier is not None and extra_identifier in df.columns:
-        df[identifier] = df[extra_identifier].map(str) + "-" + df[identifier].map(str)
+        df[identifier] = df[extra_identifier].map(str) + "~" + df[identifier].map(str)
     df = df.pivot_table(values=value_col, index=df.index, columns=identifier, aggfunc='first')
     df = df.reset_index()
     df[index] = df["index"].apply(pd.Series)
@@ -323,7 +322,7 @@ def calculate_correlations(x, y, method='pearson'):
 
     return (coefficient, pvalue)
 
-def apply_pvalue_fdrcorrection(pvalues, alpha=0.05, method='fdr_i'):
+def apply_pvalue_fdrcorrection(pvalues, alpha=0.05, method='fdr_bh'):
     #rejected, padj = multitest.fdrcorrection(pvalues, alpha, method)
     rejected, padj = multitest.multipletests(pvalues, alpha, method)[:2]
 
@@ -379,7 +378,7 @@ def convertToEdgeList(data, cols):
     return edge_list
 
 @jit(nopython=False, parallel=True)
-def run_correlation(df, alpha=0.05, subject='subject', group='group', method='pearson', correction=('fdr', 'fdr_i')):
+def run_correlation(df, alpha=0.05, subject='subject', group='group', method='pearson', correction=('fdr', 'fdr_bh')):
     calculated = set()
     correlation = pd.DataFrame()
     if check_is_paired(df, subject, group):
@@ -389,7 +388,6 @@ def run_correlation(df, alpha=0.05, subject='subject', group='group', method='pe
         df = df.dropna()._get_numeric_data()
         if not df.empty:
             r, p = run_efficient_correlation(df, method=method)
-            print("Hola")
             rdf = pd.DataFrame(r, index=df.columns, columns=df.columns)
             pdf = pd.DataFrame(p, index=df.columns, columns=df.columns)
             rdf.values[[np.arange(len(rdf))]*2] = np.nan
@@ -413,8 +411,7 @@ def calculate_rm_correlation(df, x, y, subject):
     return (x, y, r, pvalue, dof, ci, power)
 
 @jit(nopython=False, parallel=True)
-def run_rm_correlation(df, alpha=0.05, subject='subject', correction=('fdr', 'fdr_i')):
-    print("STARTING CORRELATION")
+def run_rm_correlation(df, alpha=0.05, subject='subject', correction=('fdr', 'fdr_bh')):
     calculated = set()
     rows = []
     #df = df.dropna()._get_numeric_data()
@@ -437,7 +434,6 @@ def run_rm_correlation(df, alpha=0.05, subject='subject', correction=('fdr', 'fd
         correlation["padj"] = padj
         correlation["rejected"] = rejected
         correlation = correlation[correlation.rejected]
-    print("DONE")
     return correlation
 
 @jit(nopython=False, parallel=True)
@@ -578,7 +574,7 @@ def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject',
             scores= scores.join(count)
             scores['correction'] = 'permutation FDR ({} perm)'.format(permutations)
         else:
-            rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'fdr_i')
+            rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'fdr_bh')
             scores['correction'] = 'FDR correction BH'
             scores['padj'] = padj
             scores['rejected'] = rejected
@@ -635,7 +631,7 @@ def run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subjec
     
     return res
 
-def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], subject='subject', group='group', paired=False, correction='fdr_i', permutations=150):
+def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], subject='subject', group='group', paired=False, correction='fdr_bh', permutations=150):
     columns = ['T-statistics', 'pvalue', 'mean_group1', 'mean_group2', 'log2FC']
     df = df.set_index([group, subject])
     df = df.drop(drop_cols, axis = 1)
@@ -657,7 +653,7 @@ def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], su
         scores= scores.join(count)
         scores['correction'] = 'permutation FDR ({} perm)'.format(permutations)
     else:
-        rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'fdr_i')
+        rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'fdr_bh')
         scores['correction'] = 'FDR correction BH'
         scores['padj'] = padj
         scores['rejected'] = rejected
@@ -667,7 +663,6 @@ def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], su
     scores['FC'] = [np.power(2,np.abs(x)) * -1 if x < 0 else np.power(2,np.abs(x)) for x in scores['log2FC'].values]
     scores['-log10 pvalue'] = [- np.log10(x) for x in scores['padj'].values]
     scores = scores.reset_index() 
-    print(scores.shape)
 
     return scores
 
@@ -735,7 +730,7 @@ def run_enrichment(data, foreground, background, foreground_pop, background_pop,
         pvalues.append(pvalue)
         ids.append(",".join(df.loc[(df[annotation_col]==annotation) & (df[group_col] == foreground), identifier_col].tolist()))
     if len(pvalues) > 1:
-        rejected, padj = apply_pvalue_fdrcorrection(pvalues, alpha=0.05, method='fdr_i')
+        rejected, padj = apply_pvalue_fdrcorrection(pvalues, alpha=0.05, method='fdr_bh')
         result = pd.DataFrame({'terms':terms, 'identifiers':ids, 'foreground':fnum, 'background':bnum, 'pvalue':pvalues, 'padj':padj, 'rejected':rejected})
         #result = result[result.rejected]
     return result

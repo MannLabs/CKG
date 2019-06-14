@@ -15,7 +15,6 @@ from scipy.spatial.distance import pdist, squareform
 from plotly.graph_objs import *
 from kmapper import plotlyviz
 import networkx as nx
-from clustergrammer2 import net as clustergrammer_net
 from pyvis.network import Network as visnet
 from webweb import Web
 from networkx.readwrite import json_graph
@@ -695,7 +694,7 @@ def get_network(data, identifier, args):
         
         cy_elements = utils.networkx_to_cytoscape(graph)
 
-        net = {"notebook":notebook_net, "app":get_cytoscape_network(cy_elements, identifier, args), "net_tables":(nodes_fig_table, edges_fig_table)}
+        net = {"notebook":notebook_net, "app":get_cytoscape_network(cy_elements, identifier, args), "net_tables":(nodes_fig_table, edges_fig_table), "net_json":json_graph.node_link_data(graph)}
     return net
 
 def get_network_style(node_colors, color_edges):
@@ -940,6 +939,7 @@ def create_violinplot(df, variable, group_col='group'):
 
 
 def get_clustergrammer_plot(df, identifier, args):
+    from clustergrammer2 import net as clustergrammer_net
     div = None
     if not df.empty:
         if 'format' in args:
