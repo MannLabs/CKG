@@ -1,11 +1,11 @@
 ###### UniProt Database ########
-ftp_url: 'ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/'
-uniprot_id_url: 'idmapping/idmapping.dat.gz'
+ftp_url: &ftp_url 'ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/'
+uniprot_id_url: 'ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping.dat.gz'
 uniprot_text_file: '../../../data/databases/UniProt/uniprot-human.tab' #### Downloaded manually from UniProt until we know url (organism:human AND reviewed:yes)
-uniprot_variant_file: 'variants/homo_sapiens_variation.txt.gz'
+uniprot_variant_file: 'ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/variants/homo_sapiens_variation.txt.gz'
 uniprot_peptides_files: 
-    - 'proteomics_mapping/UP000005640_9606_nonUniquePeptides.tsv'
-    - 'proteomics_mapping/UP000005640_9606_uniquePeptides.tsv'
+    -  'ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/proteomics_mapping/UP000005640_9606_nonUniquePeptides.tsv'
+    -  'ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/proteomics_mapping/UP000005640_9606_uniquePeptides.tsv'
 uniprot_go_annotations: 'http://geneontology.org/gene-associations/goa_human.gaf.gz'
 
 species: 
@@ -54,20 +54,6 @@ uniprot_synonyms:
     - 'Ensembl'
     - 'ChEMBL'
     - 'PDB'
-
-uniprot_protein_relationships: 
-    'RefSeq': 
-        - 'Transcript'
-        - 'TRANSLATED_INTO'
-    'Gene_Name':
-        - 'Gene'
-        - 'TRANSLATED_INTO'
-    'NCBI_TaxID':
-        - 'Protein'
-        - 'BELONGS_TO_TAXONOMY'
-    'PDB':
-        - 'Protein_structure'
-        - 'HAS_STRUCTURE'
 
 proteins_header: 
     - 'ID'

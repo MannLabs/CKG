@@ -68,7 +68,7 @@ def setup_logging(path='log.config', key=None):
     return logger
 
 def downloadDB(databaseURL, directory=None, file_name=None, user="", password=""):
-    setup_db_config()
+    dbconfig = setup_config()
     if directory is None:
         directory = dbconfig["databasesDir"]
     if file_name is None:

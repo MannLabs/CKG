@@ -94,7 +94,7 @@ proteomics:
             MATCH (project:Project)-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein)-[rp:ASSOCIATED_WITH]->(go:Biological_process) 
             WHERE toBoolean(r.is_razor)
             RETURN DISTINCT protein.name+"-"+protein.id AS identifier,go.name AS annotation,rp.source AS source
-    DATASET:
+    ORIGINAL:
         name: 'get dataset from project'
         description: 'Extracts the dataset matrix of quantified proteins in a given Project. Requires: Project.id'
         involved_nodes:
@@ -192,7 +192,7 @@ clinical:
             WHERE project.id="PROJECTID"
             MATCH (subject)<-[:BELONGS_TO_SUBJECT]-(bs:Biological_sample)-[r:HAS_QUANTIFIED_CLINICAL]->(clinvar:Clinical_variable)
             RETURN subject.id AS subject, disease.id AS disease_id, disease.name AS disease_name, disease.description AS disease_description, clinvar.id AS clinvar_id, clinvar.name AS clinical_variable, clinvar.description AS clinical_variable_description ORDER BY subject    
-    DATASET:
+    ORIGINAL:
         name: 'get all the measurements for clinical variables'
         description: 'Extracts the list of clinical variables measured in a project. Requires: Project.id'
         involved_nodes:

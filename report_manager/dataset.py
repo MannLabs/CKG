@@ -410,7 +410,7 @@ class ProteomicsDataset(Dataset):
 
     def processing(self):
         processed_data = None
-        data = self.get_dataframe("dataset")
+        data = self.get_dataframe("original")
         if data is not None:
             imputation = True
             method = "mixed"
@@ -457,7 +457,7 @@ class ClinicalDataset(Dataset):
 
     def processing(self):
         processed_data = None
-        data = self.get_dataframe("dataset")
+        data = self.get_dataframe("original")
         if data is not None:
             subject_id = 'subject'
             sample_id = 'biological_sample'

@@ -640,15 +640,6 @@ def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], su
     df = df.set_index([group, subject])
     df = df.drop(drop_cols, axis = 1)
     cols = df.columns
-    #df = df.T #.reset_index()
-    #scores = None
-    #for col in cols:
-    #    ttest = calculate_pairwise_ttest(df, col, subject=subject, group=group, correction='fdr_i')
-    #    if scores is None:
-    #        scores = ttest
-    #    else:
-    #        aux = pd.concat([scores, ttest], axis=0)
-    #        scores = aux
     if paired:
         scores = df.T.apply(func = calculate_paired_ttest, axis=1, result_type='expand', args =(condition1, condition2))
     else:
@@ -658,7 +649,7 @@ def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], su
 
     max_perm = get_max_permutations(df, group=group)
     #FDR correction
-    if permutations > 0 and max_perm > 10:
+    if permutations > 0:
         if max_perm < permutations:
             permutations = max_perm
         observed_pvalues = scores.pvalue

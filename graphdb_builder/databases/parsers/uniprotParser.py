@@ -13,53 +13,37 @@ from graphdb_builder import builder_utils
 def parser(databases_directory, import_directory, download=True):
     result = {"Protein":None, "Known_variant":None, "Peptide":None}
     config = ckg_utils.get_configuration('../databases/config/uniprotConfig.yml')
-    uniprot_texts_file = config['uniprot_text_file']
     relationships_header = config['relationships_header']
-    proteins, relationships = parseUniProtDatabase(config, databases_directory, download=download)
-    addUniProtTexts(uniprot_texts_file, proteins)
-    entities_header = config['proteins_header']
-    entities = set()
-    for protein in proteins:
-        accession = ""
-        name = ""
-        synonyms = []
-        taxid = 9606
-        description = ""
-        if "UniProtKB-ID" in proteins[protein]:
-            accession  = proteins[protein]["UniProtKB-ID"]
-        if "Gene_Name" in proteins[protein]:
-            name = proteins[protein]["Gene_Name"]
-        if "synonyms" in proteins[protein]:
-            synonyms = proteins[protein]["synonyms"]
-        if "NCBI_TaxID" in proteins[protein]:
-            taxid = int(proteins[protein]["NCBI_TaxID"])
-        if "description" in proteins[protein]:
-            description = proteins[protein]["description"]
-        entities.add((protein, "Protein", accession , name, ",".join(synonyms), description, taxid))
-    
-    stats = print_out_file(entities, entities_header, relationships, relationships_header, "Protein", import_directory)
-    
+    #Proteins
+    stats = parse_idmapping_file(databases_directory, config, import_directory, download=download)
+
     #Peptides
     entities, relationships = parseUniProtPeptides(config, databases_directory, download)
     entities_header = config['peptides_header']
-    stats.update(print_out_file(entities, entities_header, relationships, relationships_header, "Pepetide", import_directory))
+    output_file = os.path.join(import_directory, "Peptide.tsv")
+    stats.update(print_single_file(entities, entities_header, output_file, "entity", "Peptide", is_first=True))
+    stats.update(print_multiple_relationships_files(relationships, relationships_header, import_directory, is_first=True))
 
     #Variants
     entities, relationships = parseUniProtVariants(config, databases_directory, download)
     entities_header = config['variants_header']
-    stats.update(print_out_file(entities, entities_header, relationships, relationships_header, "Known_variant", import_directory))
-    
+    output_file = os.path.join(import_directory, "Known_variant.tsv")
+    stats.update(print_single_file(entities, entities_header, output_file, "entity", "Known_variant", is_first=True))
+    stats.update(print_multiple_relationships_files(relationships, relationships_header, import_directory, is_first=True))
+
     #Gene ontology annotation
-    entities = None
-    entities_header = None
     relationships = parseUniProtAnnotations(config, databases_directory, download)
     relationships_header = config['go_header']
-    stats.update(print_out_file(entities, entities_header, relationships, relationships_header, "go", import_directory))
+    stats.update(print_multiple_relationships_files(relationships, relationships_header, import_directory, is_first=True))
 
     return stats 
 
-def parse_id_mapping_file(config, databases_directory, import_directory, download=False):
+def parse_idmapping_file(databases_directory, config, import_directory, download=False):
+    regex_transcript = r"(-\d$)"
     taxids = config['species']
+
+    proteins_output_file = os.path.join(import_directory, "Proteins.tsv")
+    pdbs_output_file = os.path.join(import_directory, "Protein_structures.tsv")
     proteins = {}
 
     url = config['uniprot_id_url']
@@ -68,150 +52,137 @@ def parse_id_mapping_file(config, databases_directory, import_directory, downloa
     file_name = os.path.join(directory, url.split('/')[-1])
     mapping_file = os.path.join(directory, 'mapping.tsv')
     if download:
-        print("Downloading")
         builder_utils.downloadDB(url, directory)
 
     fields = config['uniprot_ids']
     synonymFields = config['uniprot_synonyms']
+
     identifier = None
     transcripts = set()
     skip = set()
-    print("Reading file")
     is_first = True
     uf = builder_utils.read_gzipped_file(file_name)
     aux = {}
-    with open(mapping_file, 'w') as mf:
-        for line in uf:
-            data = line.decode('utf-8').rstrip("\r\n").split("\t")
-            iid = data[0]
-            field = data[1]
-            alias = data[2]
-            
-            if iid not in skip:
-                skip = set()
-                if '-' in iid:
-                    transcripts.add(iid)
-                if iid not in aux and iid.split('-')[0] not in aux:
-                    if identifier is not None:
-                        prot_info["synonyms"] = synonyms
-                        aux[identifier].update(prot_info)
-                        if "UniProtKB-ID" in aux[identifier] and "NCBI_TaxID" in aux[identifier]:
-                            proteins[identifier] = aux[identifier]
-                            for t in transcripts:
-                                proteins[t] = aux[identifier]
+    stats = set()
+    for line in uf:
+        data = line.decode('utf-8').rstrip("\r\n").split("\t")
+        iid = data[0]
+        field = data[1]
+        alias = data[2]
+        
+        if iid not in skip:
+            skip = set()
+            if re.search(regex_transcript,iid):
+                transcripts.add(iid)
+            if iid not in aux and iid.split('-')[0] not in aux:
+                if identifier is not None:
+                    prot_info["synonyms"] = synonyms
+                    aux[identifier].update(prot_info)
+                    if "UniProtKB-ID" in aux[identifier] and "NCBI_TaxID" in aux[identifier]:
+                        proteins[identifier] = aux[identifier]
+                        for t in transcripts:
+                            proteins[t] = aux[identifier]
+                        if len(transcripts) > 0:
+                            proteins[identifier].update({"isoforms":transcripts})
                             transcripts = set()
-                            aux.pop(identifier, None)
-                            if len(proteins) >= 1000:
-                                entities, relationships, pdb_ent, pdb_rel = format_output(proteins)
-                                print_files(entities, relationships, pdb_entities, is_first)
-                                is_first = False
-                                proteins = {}
-                    identifier = iid
-                    transcripts = set()
-                    aux[identifier] = {}
-                    prot_info = {}
-                    synonyms = []
-                if field in fields:
-                    if field == 'NCBI_TaxID':
-                        if int(alias) not in taxids:
-                            skip.add(identifier)
-                            aux.pop(identifier, None)
-                            identifier = None
-                    if field in synonymFields:
-                        synonyms.append(alias)
-                        mf.write(identifier+"\t"+alias+"\n")
-                    prot_info.setdefault(field, [])
-                    prot_info[field].append(alias)
+                        aux.pop(identifier, None)
+                        if len(proteins) >= 1000:
+                            entities, relationships, pdb_entities = format_output(proteins)
+                            stats.update(print_single_file(entities, config['proteins_header'], proteins_output_file, "entity", "Protein", is_first))
+                            stats.update(print_single_file(pdb_entities, config['pdb_header'], pdbs_output_file, "entity", "Protein_structure", is_first))
+                            stats.update(print_multiple_relationships_files(relationships, config['relationships_header'], import_directory, is_first))
+                            is_first = False
+                            proteins = {}
+                identifier = iid
+                transcripts = set()
+                aux[identifier] = {}
+                prot_info = {}
+                synonyms = []
+            if field in fields:
+                if field == 'NCBI_TaxID':
+                    if int(alias) not in taxids:
+                        skip.add(identifier)
+                        aux.pop(identifier, None)
+                        identifier = None
+                if field in synonymFields:
+                    synonyms.append(alias)
+                prot_info.setdefault(field, [])
+                prot_info[field].append(alias)
 
     uf.close()
-    print("Done reading")
 
-    
     if len(proteins)>0:
-        entities, relationships, pdb_ent, pdb_rel = format_output(proteins)
-        print_files(entities, relationships, pdb_ent, pdb_rel, is_first)
+        entities, relationships, pdb_entities = format_output(proteins)
+        stats.update(print_single_file(entities, config['proteins_header'], proteins_output_file, "entity", "Protein", is_first))
+        stats.update(print_single_file(pdb_entities, config['pdb_header'], pdbs_output_file, "entity", "Protein_structure", is_first))
+        stats.update(print_multiple_relationships_files(relationships, config['relationships_header'], import_directory, is_first))
     
-    print("Done")
+
+    return stats
 
 
 def format_output(proteins):
     entities = set()
-    relationships = defaultdict(set())
+    relationships = defaultdict(set)
     pdb_entities = set()
     for protein in proteins:
-        accession = []
-        name = []
+        accession = ""
+        name = ""
         synonyms = []
-        description = []
-        taxid = []
+        description = ""
+        taxid = None
         pdb = []
         if "UniProtKB-ID" in proteins[protein]:
-            accession  = proteins[protein]["UniProtKB-ID"]
+            accession  = proteins[protein]["UniProtKB-ID"][0]
         if "Gene_Name" in proteins[protein]:
-            name = proteins[protein]["Gene_Name"]
+            name = proteins[protein]["Gene_Name"][0]
+            for i in proteins[protein]["Gene_Name"]:
+                relationships[("Protein","GENE_TRANSLATED_INTO")].add((i, protein, "GENE_TRANSLATED_INTO", 'UniProt'))
+        if "RefSeq" in proteins[protein]:
+            for i in proteins[protein]["RefSeq"]:
+                relationships[("Protein","TRANSCRIPT_TRANSLATED_INTO")].add((i, protein, "TRANSCRIPT_TRANSLATED_INTO", 'UniProt'))
         if "synonyms" in proteins[protein]:
             synonyms = proteins[protein]["synonyms"]
         if "NCBI_TaxID" in proteins[protein]:
-            taxid = proteins[protein]["NCBI_TaxID"]
-            relationships[('Protein','BELONGS_TO_TAXONOMY')].add((protein, int(",".join(taxid)), "BELONGS_TO_TAXONOMY", 'UniProt'))
+            taxid = proteins[protein]["NCBI_TaxID"][0]
+            relationships[("Protein", "BELONGS_TO_TAXONOMY")].add((protein, int(taxid), "BELONGS_TO_TAXONOMY", 'UniProt'))
         if 'PDB' in proteins[protein]:
             pdb = proteins[protein]['PDB']
             for i in pdb:
-                pdb_ent.add((i, 'Protein_structure', 'Uniprot', 'http://www.rcsb.org/structure/{}'.format(i)))
-                relationships[('Protein','HAS_STRUCTURE')].add((protein, i, "HAS_STRUCTURE", 'UniProt'))
+                pdb_entities.add((i, 'Protein_structure', 'Uniprot', 'http://www.rcsb.org/structure/{}'.format(i)))
+                relationships[("Protein","HAS_STRUCTURE")].add((protein, i, "HAS_STRUCTURE", 'UniProt'))
         if "description" in proteins[protein]:
             description = proteins[protein]["description"]
-        entities.add((protein, "Protein", ",".join(accession), ",".join(name), ",".join(synonyms), ",".join(description), int(",".join(taxid))))
+        if "isoforms" in proteins[protein]:
+            for i in proteins[protein]['isoforms']:
+                relationships[('Transcript','IS_ISOFORM')].add((i, protein, 'IS_ISOFORM', 'UniProt'))
+        
+        entities.add((protein, "Protein", accession, name, ",".join(synonyms), description, int(taxid)))
+        
             
     return entities, relationships, pdb_entities
 
-def print_files(entities, relationships, pdb_ent, pdb_rel, is_first):
-    entities_header = ['ID', ':LABEL', 'accession', 'name', 'synonyms', 'description', 'taxid'] 
-    rel_header = ['START_ID', 'END_ID', 'TYPE', 'source']
-    pdb_ent_header = ['ID', ':LABEL', 'source', 'link']
-    pdb_rel_header = ['START_ID', 'END_ID', 'TYPE', 'source']
-    
-    entities_outputfile = '../../data/imports/Proteins.tsv'
-    rel_outputfile = '../../data/imports/Protein_belongs_to_taxonomy.tsv'
-    pdb_ent_outputfile = '../../data/imports/Protein_structures.tsv'
-    pdb_rel_outputfile = '../../data/imports/Protein_has_structure.tsv'
-    
-    edf = pd.DataFrame(list(entities), columns=entities_header)
-    rdf = pd.DataFrame(list(relationships), columns=rel_header)
-    pedf = pd.DataFrame(list(pdb_ent), columns=pdb_ent_header)
-    prdf = pd.DataFrame(list(pdb_rel), columns=pdb_rel_header)
-    
-    header = is_first
-    with open(entities_outputfile, 'a') as ef:
-        edf.to_csv(path_or_buf=ef, sep='\t',
-                header=is_first, index=False, quotechar='"', 
-                line_terminator='\n', escapechar='\\')
-    with open(rel_outputfile, 'a') as rf:
-        rdf.to_csv(path_or_buf=rf, sep='\t',
-                header=is_first, index=False, quotechar='"', 
-                line_terminator='\n', escapechar='\\')
-    with open(pdb_ent_outputfile, 'a') as pef:
-        pedf.to_csv(path_or_buf=pef, sep='\t',
-                header=is_first, index=False, quotechar='"', 
-                line_terminator='\n', escapechar='\\')
-    with open(pdb_rel_outputfile, 'a') as prf:
-        prdf.to_csv(path_or_buf=prf, sep='\t',
-                header=is_first, index=False, quotechar='"', 
-                line_terminator='\n', escapechar='\\')
-
-
-def print_out_file(entities, entities_header, relationships, relationship_header, dataset, import_directory):
+def print_single_file(data, header, output_file, data_type, data_object, is_first):
     stats = set()
-    if entities is not None:
-        outputfile = os.path.join(import_directory, dataset+".csv")
-        builder_utils.write_entities(entities, entities_header, outputfile)
-        #logger.info("Database {} - Number of {} entities: {}".format(database, dataset, len(entities)))
-        stats.add(builder_utils.buildStats(len(entities), "entity", dataset, "UniProt", outputfile))
-        for entity, rel in relationships:
-            outputfile = os.path.join(import_directory, "uniprot_"+entity.lower()+"_"+rel.lower()+".csv")
-            builder_utils.write_relationships(relationships[(entity,rel)], relationship_header, outputfile)
-            #logger.info("Database {} - Number of {} relationships: {}".format(database, rel, len(relationships[(entity,rel)])))
-            stats.add(builder_utils.buildStats(len(relationships[(entity,rel)]), "relationships", rel, "UniProt", outputfile))
+    df = pd.DataFrame(list(data), columns=header)
+    stats.add(builder_utils.buildStats(len(data), data_type, data_object, "UniProt", output_file))
+    with open(output_file, 'a') as ef:
+        df.to_csv(path_or_buf=ef, sep='\t',
+                header=is_first, index=False, quotechar='"', 
+                line_terminator='\n', escapechar='\\')
+
+    return stats
+
+def print_multiple_relationships_files(data, header, output_dir, is_first):
+    stats = set()
+    for entity, relationship in data:
+        df = pd.DataFrame(list(data[(entity, relationship)]), columns=header)
+        output_file = os.path.join(output_dir, entity+"_"+relationship.lower()+".tsv")
+        stats.add(builder_utils.buildStats(len(data[(entity,relationship)]), 'relationships', relationship, "UniProt", output_file))
+        with open(output_file, 'a') as ef:
+            df.to_csv(path_or_buf=ef, sep='\t',
+            header=is_first, index=False, quotechar='"', 
+            line_terminator='\n', escapechar='\\')
 
     return stats
 
