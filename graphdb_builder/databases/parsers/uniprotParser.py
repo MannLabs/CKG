@@ -16,7 +16,6 @@ def parser(databases_directory, import_directory, download=True):
     relationships_header = config['relationships_header']
     #Proteins
     stats = parse_idmapping_file(databases_directory, config, import_directory, download=download)
-
     #Peptides
     entities, relationships = parseUniProtPeptides(config, databases_directory, download)
     entities_header = config['peptides_header']
@@ -25,7 +24,7 @@ def parser(databases_directory, import_directory, download=True):
     stats.update(print_multiple_relationships_files(relationships, relationships_header, import_directory, is_first=True))
 
     #Variants
-    stats.update(parseUniProtVariants(config, databases_directory, download))
+    stats.update(parseUniProtVariants(config, databases_directory, import_directory, download))
     
     #Gene ontology annotation
     relationships = parseUniProtAnnotations(config, databases_directory, download)

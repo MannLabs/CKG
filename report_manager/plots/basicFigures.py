@@ -116,7 +116,8 @@ def get_barplot(data, identifier, args):
                             yaxis={"title":args["y_title"]},
                             height = args['height'],
                             width = args['width'],
-                            annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')]
+                            annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')],
+                            template='plotly_white'
                         )
 
     return dcc.Graph(id= identifier, figure = figure)
@@ -135,7 +136,8 @@ def get_facet_grid_plot(data, identifier, args):
     figure['layout'] = dict(title = args['title'].title(),
                             paper_bgcolor = None,
                             legend = None,
-                            annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')])
+                            annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')],
+                            template='plotly_white')
 
     return dcc.Graph(id= identifier, figure = figure)
 
@@ -192,7 +194,8 @@ def get_ranking_plot(data, identifier, args):
                                 width=args['width'],  
                                 title=args['title'], 
                                 xaxis= {"title": args['x_title'], 'autorange':True}, 
-                                yaxis= {"title": args['y_title'], 'range':range_y}))
+                                yaxis= {"title": args['y_title'], 'range':range_y},
+                                template='plotly_white'))
         fig['layout'].annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')] + layouts 
     else:
         fig = get_simple_scatterplot(data, identifier+'_'+group, args).figure
@@ -228,7 +231,8 @@ def get_scatterplot_matrix(data, identifier, args):
                             width=args['width'],  
                             title=args['title'], 
                             xaxis= {"title": args['x_title'], 'autorange':True}, 
-                            yaxis= {"title": args['y_title'], 'range':range_y}))
+                            yaxis= {"title": args['y_title'], 'range':range_y},
+                            template='plotly_white'))
 
     fig['layout'].annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')] 
     
@@ -283,7 +287,8 @@ def get_scatterplot_matrix_old(data, identifier, args):
                             autosize=True,
                             hovermode='closest',
                             plot_bgcolor='rgba(240,240,240, 0.95)',
-                            annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')]
+                            annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')],
+                            template='plotly_white'
                             )
 
     return dcc.Graph(id=identifier, figure=figure)
@@ -330,7 +335,8 @@ def get_simple_scatterplot(data, identifier, args):
                                 height=args['height'],
                                 width=args['width'],
                                 annotations = annots + [dict(xref='paper', yref='paper', showarrow=False, text='')],
-                                showlegend=False
+                                showlegend=False,
+                                template='plotly_white'
                                 )
     
     return dcc.Graph(id= identifier, figure = figure)
@@ -358,7 +364,8 @@ def get_scatterplot(data, identifier, args):
                                 hovermode='closest',
                                 height=args['height'],
                                 width=args['width'],
-                                annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')]
+                                annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')],
+                                template='plotly_white'
                                 )
     for name in data.name.unique():
         m = {'size': 25, 'line': {'width': 0.5, 'color': 'grey'}}
@@ -437,6 +444,7 @@ def get_volcanoplot(results, args):
                                                     }
                                                 ],
                                         annotations = result['annotations']+[dict(xref='paper', yref='paper', showarrow=False, text='')],
+                                        template='plotly_white',
                                         showlegend=False)
 
         figures.append(dcc.Graph(id= identifier, figure = figure))
@@ -533,7 +541,8 @@ def get_heatmapplot(data, identifier, args):
     figure["layout"] = {"title":args['title'],
                         "height": 500,
                         "width": 700,
-                        "annotations" : [dict(xref='paper', yref='paper', showarrow=False, text='')]}
+                        "annotations" : [dict(xref='paper', yref='paper', showarrow=False, text='')],
+                        "template":'plotly_white'}
     figure['data'].append(go.Heatmap(z=df.values.tolist(),
                                     x = list(df.columns),
                                     y = list(df.index)))
@@ -588,6 +597,7 @@ def get_complex_heatmapplot(data, identifier, args):
 
     figure['layout'].update({'width':800, 'height':800,
                              'showlegend':False, 'hovermode': 'closest',
+                             "template":'plotly_white'
                              })
     figure['layout']['xaxis'].update({'domain': [.15, 1],
                                       'mirror': False,
@@ -735,6 +745,7 @@ def get_pca_plot(data, identifier, args):
     sct = get_scatterplot(pca_data, identifier, args).figure
     traces.extend(sct['data'])
     figure['layout'] = sct['layout']
+    figure['layout'].template='plotly_white'
     for index in list(loadings.index)[0:args['loadings']]:
         x = loadings.loc[index,'x'] * 5 
         y = loadings.loc[index, 'y'] * 5
@@ -834,8 +845,9 @@ def get_sankey_plot(data, identifier, args={'source':'source', 'target':'target'
         annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')],
         font = dict(
             size = 12 if 'font' not in args else args['font'],
+        ),
+        template='plotly_white'
         )
-    )
 
     figure = dict(data=[data_trace], layout=layout)
 
@@ -910,6 +922,7 @@ def get_violinplot(data, identifier, args):
                     "layout":{
                             "title": "Violinplot per group for variable: "+c,
                             "annotations": [dict(xref='paper', yref='paper', showarrow=False, text='')],
+                            "template":'plotly_white',
                             "yaxis": {
                                 "zeroline":False,
                                 }
@@ -981,7 +994,8 @@ def get_parallel_plot(data, identifier, args):
     
     layout = go.Layout(
         plot_bgcolor = '#E5E5E5',
-        paper_bgcolor = '#E5E5E5'
+        paper_bgcolor = '#E5E5E5',
+        template='plotly_white'
         )
     
     fig = go.Figure(data = data, layout = layout)
@@ -1126,7 +1140,8 @@ def plot_2_venn_diagram(cond1, cond2, unique1, unique2, intersection, identifier
         },
         'height': 600,
         'width': 800,
-        'title':args['title']
+        'title':args['title'],
+        "template":'plotly_white'
     }
 
     return dcc.Graph(id = identifier, figure=figure)
@@ -1206,6 +1221,7 @@ def get_wordcloud(data, identifier, args={'stopwords':[], 'max_words': 400, 'max
                       height=args['height'],
                       title=args['title'],
                       annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')],
+                      template='plotly_white'
                       )
 
     figure = go.Figure(data=[trace], layout=layout)

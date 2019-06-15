@@ -1,4 +1,5 @@
 import pandas as pd
+import dask.dataframe as dd
 import itertools
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
@@ -333,8 +334,9 @@ def apply_pvalue_twostage_fdrcorrection(pvalues, alpha=0.05, method='bh'):
 
     return (rejected, padj)
 
-def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, permutations=250):
+def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, permutations=50):
     initial_seed = 176782
+    permutations = 1
     i = permutations
     df_index = df.index.values
     columns = ['identifier']
@@ -356,6 +358,7 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, per
             else:
                 rand_pvalues = rand_pvalues.join(rand_scores)
             i -= 1
+    
     count = observed_pvalues.to_frame().apply(func=get_counts_permutation_fdr, result_type='expand', axis=1, args=(rand_pvalues, observed_pvalues, permutations, alpha))
     count.columns = ['padj', 'rejected']
     #count = count.set_index('identifier')
@@ -372,7 +375,8 @@ def get_counts_permutation_fdr(value, random, observed, n, alpha):
 
 def convertToEdgeList(data, cols):
     data.index.name = None
-    edge_list = data.stack().reset_index()
+    data = dd.from_pandas(data, npartitions=10)
+    edge_list = data.stack().compute().reset_index()
     edge_list.columns = cols
 
     return edge_list
@@ -527,9 +531,9 @@ def calculate_anova(df, group='group'):
 def calculate_repeated_measures_anova(df, column, subject='subject', group='group', alpha=0.05):
     aov_result = pg.rm_anova(data=df, dv=column, within=group,subject=subject, detailed=True, correction=True)
     aov_result.columns = ['Source', 'SS', 'DF', 'MS', 'F', 'pvalue', 'padj', 'np2', 'eps', 'sphericity', 'Mauchlys sphericity', 'p-spher']
-    t, pvalue, padj = aov_result.loc[0, ['F', 'pvalue', 'padj']].values 
+    t, pvalue, padj = aov_result.loc[0, ['F', 'pvalue']].values 
 
-    return (column, t, pvalue, padj)
+    return (column, t, pvalue)
 
 def get_max_permutations(df, group='group'):
     num_groups = len(list(df.index))
@@ -546,7 +550,7 @@ def check_is_paired(df, subject, group):
 
     return is_pair
 
-def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', group='group', permutations=250):
+def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', group='group', permutations=50):
     columns = ['identifier', 'F-statistics', 'pvalue']
     if subject is not None and check_is_paired(df, subject, group):
         groups = df[group].unique()
@@ -598,7 +602,7 @@ def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject',
     
     return res
 
-def run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subject='subject', group='group', permutations=150):
+def run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subject='subject', group='group', permutations=50):
     df = df.set_index([subject,group])
     df = df.drop(drop_cols, axis=1)
     aov_result = []
@@ -606,11 +610,25 @@ def run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subjec
         aov = calculate_repeated_measures_anova(df.reset_index(), column=col, subject=subject, group=group, alpha=alpha)
         aov_result.append(aov)
 
-    scores = pd.DataFrame(aov_result, columns = ['identifier','F-statistics', 'pvalue', 'padj'])
+    scores = pd.DataFrame(aov_result, columns = ['identifier','F-statistics', 'pvalue'])
     scores = scores.set_index('identifier')
-
-    scores['correction'] = 'Greenhouse-Geisser correction'
     
+    max_perm = get_max_permutations(df)
+    #FDR correction
+    if permutations > 0 and max_perm>=10:
+        if max_perm < permutations:
+            permutations = max_perm
+        observed_pvalues = scores.pvalue
+        count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=alpha, permutations=permutations)
+        scores= scores.join(count)
+        scores['correction'] = 'permutation FDR ({} perm)'.format(permutations)
+    else:
+        rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'indep')
+        scores['correction'] = 'FDR correction BH'
+        scores['padj'] = padj
+        scores['rejected'] = rejected
+        scores['rejected'] = scores['rejected']
+
     res = None
     for col in df.columns:
         pairwise = calculate_pairwise_ttest(df[col].reset_index(), column=col, subject=subject, group=group)
@@ -631,7 +649,7 @@ def run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subjec
     
     return res
 
-def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], subject='subject', group='group', paired=False, correction='fdr_bh', permutations=150):
+def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], subject='subject', group='group', paired=False, correction='fdr_bh', permutations=50):
     columns = ['T-statistics', 'pvalue', 'mean_group1', 'mean_group2', 'log2FC']
     df = df.set_index([group, subject])
     df = df.drop(drop_cols, axis = 1)

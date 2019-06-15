@@ -6,13 +6,81 @@ Entrez.email = 'alberto.santos@cpr.ku.dk'
 from Bio import Medline
 import re
 import pandas as pd
+import numpy as np
 from dask import dataframe as dd
+import bs4 as bs
+import dash_html_components as html
 import networkx as nx
 from networkx.readwrite import json_graph
 import plotly.plotly as py
 import base64
 from xhtml2pdf import pisa
 import requests, json
+
+def convert_html_to_dash(el,style = None):
+    if type(el) == bs.element.NavigableString:
+        return str(el)
+    else:
+        name = el.name
+        style = extract_style(el) if style is None else style
+        contents = [convert_html_to_dash(x) for x in el.contents]
+        return getattr(html,name.title())(contents,style = style)
+
+def extract_style(el):
+    return {k.strip():v.strip() for k,v in [x.split(": ") for x in el.attrs["style"].split(";")]}
+
+def is_jsonable(x):
+    try:
+        json.dumps(x)
+        return True
+    except:
+        return False
+
+def convert_dash_to_json(dash_object):
+    dash_json = dash_object.to_plotly_json()
+    print("------------")
+    print(dash_json)
+    print("------------")
+    for key in dash_json:
+        if isinstance(dash_json[key], dict):
+            for element in dash_json[key]:
+                children = dash_json[key][element]
+                ch = {element:[]}
+                if is_jsonable(children) or isinstance(children, np.ndarray): 
+                    ch[element] = children
+                elif isinstance(children, dict):
+                    ch[element] = {}
+                    for c in children:
+                        print("key", c)
+                        ch[element].update({c:[]})
+                        if isinstance(children[c], list):
+                            for f in children[c]:
+                                print("Value", f)
+                                print(type(f))
+                                if is_jsonable(f) or isinstance(f, np.ndarray):
+                                    ch[element][c].append(f)
+                                else:
+                                    ch[element][c].append(convert_dash_to_json(f))
+                        else:
+                            print("Value", children[c])
+                            print(type(children[c]))
+                            if is_jsonable(children[c]) or isinstance(children[c], np.ndarray):
+                                ch[element][c] = children[c]
+                            else:
+                                ch[element][c] = convert_dash_to_json(children[c])
+                elif isinstance(children, list): 
+                    for c in children: 
+                        if is_jsonable(c) or isinstance(c, np.ndarray):
+                            ch[element].append(c)
+                        else: 
+                            ch[element].append(convert_dash_to_json(c))
+                else:
+                    ch[element] = convert_dash_to_json(children)
+                dash_json[key].update(ch)
+    print(">?>?>?><><><>?<>?<>?<?><>?<>?<?><?<>?<")
+    print(dash_json)
+    print(">?>?>?><><><>?<>?<>?<?><>?<>?<?><?<>?<")
+    return dash_json 
 
 def neoj_path_to_networkx(paths, key='path'):
     regex = r"\((.+)\)\-\[\:(.+)\s\{.?\}\]\-\>\((.+)\)"
@@ -191,3 +259,9 @@ def expand_dataframe_cell(data, col, sep):
     ddata = ddata.map_partitions(lambda df: df.drop(col, axis=1).join(df[col].str.split(';', expand=True).stack().reset_index(drop=True, level=1).rename(col))).compute()
     
     return ddata
+
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
