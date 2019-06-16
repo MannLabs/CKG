@@ -72,7 +72,7 @@ def get_distplot(data, identifier, args):
         group_labels = df.columns.unique().tolist()
         # Create distplot with custom bin_size
         fig = FF.create_distplot(hist_data, group_labels, bin_size=.5, curve_type='normal')
-        fig['layout'].update(height=600, width=1000, title='Distribution plot '+i, annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')])
+        fig['layout'].update(height=600, width=1000, title='Distribution plot '+i, annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')], template='plotly_white')
         graphs.append(dcc.Graph(id=identifier+"_"+i, figure=fig))
 
     return graphs
@@ -936,8 +936,8 @@ def create_violinplot(df, variable, group_col='group'):
     traces = []
     for group in np.unique(df[group_col].values):
         violin = {"type": 'violin',
-                    "x": df[group_col][df[group_col] == group],
-                    "y": df[variable][df[group_col] == group],
+                    "x": df[group_col][df[group_col] == group].values,
+                    "y": df[variable][df[group_col] == group].values,
                     "name": group,
                     "box": {
                         "visible": True

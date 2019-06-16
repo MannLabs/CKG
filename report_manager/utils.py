@@ -37,49 +37,43 @@ def is_jsonable(x):
         return False
 
 def convert_dash_to_json(dash_object):
-    dash_json = dash_object.to_plotly_json()
-    print("------------")
-    print(dash_json)
-    print("------------")
-    for key in dash_json:
-        if isinstance(dash_json[key], dict):
-            for element in dash_json[key]:
-                children = dash_json[key][element]
-                ch = {element:[]}
-                if is_jsonable(children) or isinstance(children, np.ndarray): 
-                    ch[element] = children
-                elif isinstance(children, dict):
-                    ch[element] = {}
-                    for c in children:
-                        print("key", c)
-                        ch[element].update({c:[]})
-                        if isinstance(children[c], list):
-                            for f in children[c]:
-                                print("Value", f)
-                                print(type(f))
-                                if is_jsonable(f) or isinstance(f, np.ndarray):
-                                    ch[element][c].append(f)
-                                else:
-                                    ch[element][c].append(convert_dash_to_json(f))
-                        else:
-                            print("Value", children[c])
-                            print(type(children[c]))
-                            if is_jsonable(children[c]) or isinstance(children[c], np.ndarray):
-                                ch[element][c] = children[c]
+    if not hasattr(dash_object, 'to_plotly_json'):
+        dash_json = dash_object
+        print(dash_json)
+        print(type(dash_json))
+    else:
+        dash_json = dash_object.to_plotly_json()
+        for key in dash_json:
+            if isinstance(dash_json[key], dict):
+                for element in dash_json[key]:
+                    children = dash_json[key][element]
+                    ch = {element:[]}
+                    if is_jsonable(children) or isinstance(children, np.ndarray): 
+                        ch[element] = children
+                    elif isinstance(children, dict):
+                        ch[element] = {}
+                        for c in children:
+                            ch[element].update({c:[]})
+                            if isinstance(children[c], list):
+                                for f in children[c]:
+                                    if is_jsonable(f) or isinstance(f, np.ndarray):
+                                        ch[element][c].append(f)
+                                    else:
+                                        ch[element][c].append(convert_dash_to_json(f))
                             else:
-                                ch[element][c] = convert_dash_to_json(children[c])
-                elif isinstance(children, list): 
-                    for c in children: 
-                        if is_jsonable(c) or isinstance(c, np.ndarray):
-                            ch[element].append(c)
-                        else: 
-                            ch[element].append(convert_dash_to_json(c))
-                else:
-                    ch[element] = convert_dash_to_json(children)
-                dash_json[key].update(ch)
-    print(">?>?>?><><><>?<>?<>?<?><>?<>?<?><?<>?<")
-    print(dash_json)
-    print(">?>?>?><><><>?<>?<>?<?><>?<>?<?><?<>?<")
+                                if is_jsonable(children[c]) or isinstance(children[c], np.ndarray):
+                                    ch[element][c] = children[c]
+                                else:
+                                    ch[element][c] = convert_dash_to_json(children[c])
+                    elif isinstance(children, list): 
+                        for c in children: 
+                            if is_jsonable(c) or isinstance(c, np.ndarray):
+                                ch[element].append(c)
+                            else: 
+                                ch[element].append(convert_dash_to_json(c))
+                    else:
+                        ch[element] = convert_dash_to_json(children)
+                    dash_json[key].update(ch)
     return dash_json 
 
 def neoj_path_to_networkx(paths, key='path'):

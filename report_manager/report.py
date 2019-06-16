@@ -48,10 +48,13 @@ class Report:
         dt = h5.special_dtype(vlen=str)
         with h5.File(os.path.join(directory, "report.h5"), "w") as f:
             for plot_id in self.plots:
+                print(plot_id)
                 name = "~".join(plot_id)
                 grp = f.create_group(name)
                 i = 0
+                print(self._plots[plot_id])
                 for plot in self._plots[plot_id]:       
+                    print(type(plot))
                     figure_id = None
                     if isinstance(plot, dict):
                         if 'net_json' in plot:

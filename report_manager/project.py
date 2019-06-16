@@ -377,7 +377,7 @@ class Project:
     def empty_report(self):
         self.report = {}
 
-    def show_report_old(self, environment):
+    def show_report(self, environment):
         app_plots = defaultdict(list)
         for data_type in self.report:
             r = self.report[data_type]
@@ -413,7 +413,7 @@ class Project:
 
         return app_plots
 
-    def show_report(self, environment):
+    def show_report_new(self, environment):
         r = rp.Report('my_new_report',{})
         r.read_report('../../data/reports/P0000001/proteomics/')
         return r.plots
