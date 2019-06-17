@@ -336,7 +336,6 @@ def apply_pvalue_twostage_fdrcorrection(pvalues, alpha=0.05, method='bh'):
 
 def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, permutations=50):
     initial_seed = 176782
-    #permutations = 1
     i = permutations
     df_index = df.index.values
     columns = ['identifier']
@@ -375,8 +374,7 @@ def get_counts_permutation_fdr(value, random, observed, n, alpha):
 
 def convertToEdgeList(data, cols):
     data.index.name = None
-    data = dd.from_pandas(data, npartitions=10)
-    edge_list = data.stack().compute().reset_index()
+    edge_list = data.stack().reset_index()
     edge_list.columns = cols
 
     return edge_list

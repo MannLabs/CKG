@@ -633,7 +633,11 @@ def get_complex_heatmapplot(data, identifier, args):
 
     return dcc.Graph(id=identifier, figure=figure)
 
-def get_notebook_network_pyvis(graph, args):
+def get_notebook_network_pyvis(graph, args={}):
+    if 'width' not in args:
+        args['width'] = 800
+    if 'height' not in args:
+        args['height'] = 850 
     notebook_net = visnet(args['width'], args['height'], notebook=True)
     notebook_net.barnes_hut(overlap=0.8)
     notebook_net.from_nx(graph)

@@ -81,6 +81,9 @@ class Dataset:
     def report(self, report):
         self._report = report
 
+    def generate_dataset(self):
+        pass
+        
     def update_report(self, report):
         self._report.update(report)
 
@@ -290,6 +293,7 @@ class Dataset:
 
     def generate_report(self):
         self.report = rp.Report(identifier=self.dataset_type.capitalize(), plots={})
+        order = 1
         for section in self.configuration:
             if section == "args":
                 continue
@@ -334,7 +338,8 @@ class Dataset:
                                     self.update_data({subsection+"_"+analysis_type: result.result[analysis_type]})
                             for plot_type in plot_types:
                                 plots = result.get_plot(plot_type, subsection+"_"+analysis_type+"_"+plot_type)
-                                self.report.update_plots({(subsection+"_"+analysis_type, plot_type):plots})
+                                self.report.update_plots({(str(order), subsection+"_"+analysis_type, plot_type):plots})
+                                order +=1
                     else:
                         if result is None:
                             dictresult = {}
@@ -343,33 +348,40 @@ class Dataset:
                             self.update_analyses(result.result)
                         for plot_type in plot_types:
                             plots = result.get_plot(plot_type, "_".join(subsection.split(' '))+"_"+plot_type)
-                            self.report.update_plots({("_".join(subsection.split(' ')), plot_type): plots})
+                            self.report.update_plots({(str(order), "_".join(subsection.split(' ')), plot_type): plots})
+                            order += 1
         
         self.add_configuration_to_report()
-        #self.save_dataset()
-        #self.save_dataset_report()
 
 
-    def save_dataset(self):
-        dataset_directory = self.get_dataset_data_directory()
-        store = pd.HDFStore(os.path.join(dataset_directory, self.dataset_type+".h5"))
+    def save_dataset(self, dataset_directory):
+        if not os.path.isdir(dataset_directory):
+            os.makedirs(dataset_directory)
+
+        store = pd.HDFStore(os.path.join(dataset_directory, self.dataset_type+"_dataset.h5"))
         for data in self.data:
-            name = data.replace(" ", "-")
+            name = data.replace(" ", "_")
             store.put(name, self.data[data], format='table')
         store.close()
 
-    def save_dataset_report(self):
-        dataset_directory = self.get_dataset_data_directory()
+    def save_dataset_to_file(self, dataset_directory):
+        if not os.path.isdir(dataset_directory):
+            os.makedirs(dataset_directory)
+
+        for data in self.data:
+            name = data.replace(" ", "_") + ".tsv"
+            data.to_csv(os.path.join(dataset_directory,name), sep='\t', header=True, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
+
+    def save_dataset_report(self, dataset_directory):
         self.report.save_report(directory=dataset_directory)
 
-    def load_dataset(self):
+    def load_dataset(self, dataset_directory):
         data = {}
-        dataset_directory = self.get_dataset_data_directory()
-        dataset_store = os.path.join(dataset_directory, self.dataset_type+".h5")
+        dataset_store = os.path.join(dataset_directory, self.dataset_type+"_dataset.h5")
         if os.path.isfile(dataset_store):
-            f = h5py.File(filename, 'r')
+            f = h5py.File(dataset_store, 'r')
             for key in list(f.keys()):
-                data[key] = pd.read_hdf(filename, key)
+                data[key.replace("_", " ")] = pd.read_hdf(dataset_store, key)
 
         return data
 
@@ -394,14 +406,25 @@ class MultiOmicsDataset(Dataset):
 
         return data
 
+    def save_dataset(self, dataset_directory):
+        if not os.path.isdir(dataset_directory):
+            os.makedirs(dataset_directory)
+
+        store = pd.HDFStore(os.path.join(dataset_directory, self.dataset_type+"_dataset.h5"))
+        for data in self.data:
+            name = data.replace(" ", "_")
+            if isinstance(data, pd.DataFrame):
+                store.put(name, self.data[data], format='table')
+        store.close()
+
 class ProteomicsDataset(Dataset):
     def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
         config_file = "proteomics.yml"
         Dataset.__init__(self, identifier, "proteomics", data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
         self.set_configuration_from_file(config_file)
-        if len(data) == 0:
-            self._data = self.query_data()
 
+    def generate_dataset(self):
+        self._data = self.query_data()
         self.process_dataset()
 
     def process_dataset(self):
@@ -446,9 +469,9 @@ class ClinicalDataset(Dataset):
         config_file = "clinical.yml"
         Dataset.__init__(self, identifier, "clinical", data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
         self.set_configuration_from_file(config_file)
-        if len(data) == 0:
-            self._data = self.query_data()
 
+    def generate_dataset(self):
+        self._data = self.query_data()
         self.process_dataset()
 
     def process_dataset(self):
@@ -494,13 +517,15 @@ class DNAseqDataset(Dataset):
         config_file = "DNAseq.yml"
         Dataset.__init__(self, identifier, dataset_type=dataset_type, data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
         self.set_configuration_from_file(config_file)
-        if len(data) == 0:
-            self._data = self.query_data()
+
+    def generate_dataset(self):
+        self._data = self.query_data()
 
 class RNAseqDataset(Dataset):
     def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
         config_file = "RNAseq.yml"
         Dataset.__init__(self, identifier, "RNAseq", data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
         self.set_configuration_from_file(config_file)
-        if len(data) == 0:
-            self._data = self.query_data()
+
+    def generate_dataset(self):
+        self._data = self.query_data()

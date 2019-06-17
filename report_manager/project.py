@@ -8,7 +8,7 @@ from json import dumps
 import pandas as pd
 import ckg_utils
 import config.ckg_config as ckg_config
-from report_manager.dataset import ProteomicsDataset, ClinicalDataset, DNAseqDataset, RNAseqDataset, LongitudinalProteomicsDataset, MultiOmicsDataset
+from report_manager.dataset import Dataset, ProteomicsDataset, ClinicalDataset, DNAseqDataset, RNAseqDataset, LongitudinalProteomicsDataset, MultiOmicsDataset
 from report_manager.plots import basicFigures as figure
 from report_manager import report as rp, utils
 from report_manager.queries import query_utils
@@ -45,7 +45,6 @@ class Project:
             self._datasets = {}
             self.build_project()
             self.generate_report()
-            #self.show_report(environment='app')
 
     @property
     def identifier(self):
@@ -165,6 +164,21 @@ class Project:
     def update_report(self, new):
         self.report.update(new)
 
+
+    def get_report_directory(self):
+        reports_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),"../../data/reports/"), self.identifier)
+        if not os.path.isdir(reports_dir):
+            os.makedirs(reports_dir)
+            
+        return reports_dir
+
+    def get_downloads_directory(self):
+        downloads_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),"../../data/downloads/"), self.identifier)
+        if not os.path.isdir(downloads_dir):
+            os.makedirs(downloads_dir)
+            
+        return downloads_dir
+
     def set_attributes(self, project_info):
         if "attributes" in project_info:
             attributes = project_info["attributes"].to_dict('r')[0]
@@ -233,29 +247,76 @@ class Project:
 
         return data
 
-    def build_project(self):
-        project_info = self.query_data()
-        self.set_attributes(project_info)
-        self.get_similar_projects(project_info)
-        self.get_projects_overlap(project_info)
-        for data_type in self.data_types:
-            if data_type == "proteomics":
-                dataset = ProteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
-                self.update_dataset({data_type:dataset})
-            elif data_type == "clinical":
-                dataset = ClinicalDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
-                self.update_dataset({data_type:dataset})
-            elif data_type == "wes" or data_type == "wgs":
-                dataset = DNAseqDataset(self.identifier, dataset_type=data_type, data={}, analyses={}, analysis_queries={}, report=None)
-                self.update_dataset({data_type:dataset})
-            elif data_type == "longitudinal_proteomics":
-                dataset = LongitudinalProteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
-                self.update_dataset({data_type:dataset})
-        if len(self.data_types) > 1:
-                dataset = MultiOmicsDataset(self.identifier, data=self.datasets, analyses={}, report=None)
-                self.update_dataset({'multiomics':dataset})
-                self.append_data_type('multiomics')
+    def check_report_exists(self):
+        exists = True
+        report_dir = os .path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),"../../data/reports/"), self.identifier)
+        if not os.path.isdir(report_dir):
+            return False
+        for dataset in self.report:
+            if os.path.isdir(os.path.join(report_dir, dataset)):
+                continue
+            exists = False
+        
+        return exists
 
+    def load_project_report(self):
+        project_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),"../../data/reports/"), self.identifier)
+        self.report = {}
+        for root, data_types, files in os.walk(project_dir):
+            for data_type in data_types:
+                r = rp.Report(data_type,{})
+                r.read_report(os.path.join(root, data_type))
+                self.update_report({data_type:r})
+
+    def load_project_data(self):
+        project_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),"../../data/reports/"), self.identifier)
+        for root, data_types, files in os.walk(project_dir):
+            for data_type in data_types:
+                dataset = None
+                if data_type == "proteomics":
+                    dataset = ProteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
+                elif data_type == "clinical":
+                    dataset = ClinicalDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
+                elif data_type == "wes" or data_type == "wgs":
+                    dataset = DNAseqDataset(self.identifier, dataset_type=data_type, data={}, analyses={}, analysis_queries={}, report=None)
+                elif data_type == "longitudinal_proteomics":
+                    dataset = LongitudinalProteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
+                elif data_type == "multiomics":
+                    dataset = MultiOmicsDataset(self.identifier, data={}, analyses={}, report=None)
+                if dataset is not None:
+                    data = dataset.load_dataset(os.path.join(root,data_type))
+                    self.update_dataset({data_type:dataset})
+            
+    def build_project(self):
+        if self.check_report_exists():
+            self.load_project_report()
+            self.load_project_data()
+        if len(self.report) == 0 or len(self.datasets) == 0:
+            project_info = self.query_data()
+            self.set_attributes(project_info)
+            self.get_similar_projects(project_info)
+            self.get_projects_overlap(project_info)
+            for data_type in self.data_types:
+                if data_type == "proteomics":
+                    dataset = ProteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
+                    dataset.generate_dataset()
+                    self.update_dataset({data_type:dataset})
+                elif data_type == "clinical":
+                    dataset = ClinicalDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
+                    dataset.generate_dataset()
+                    self.update_dataset({data_type:dataset})
+                elif data_type == "wes" or data_type == "wgs":
+                    dataset = DNAseqDataset(self.identifier, dataset_type=data_type, data={}, analyses={}, analysis_queries={}, report=None)
+                    dataset.generate_dataset()
+                    self.update_dataset({data_type:dataset})
+                elif data_type == "longitudinal_proteomics":
+                    dataset = LongitudinalProteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
+                    dataset.generate_dataset()
+                    self.update_dataset({data_type:dataset})
+            if len(self.data_types) > 1:
+                    dataset = MultiOmicsDataset(self.identifier, data=self.datasets, analyses={}, report=None)
+                    self.update_dataset({'multiomics':dataset})
+                    self.append_data_type('multiomics')
     
     def get_projects_overlap(self, project_info):
         overlap = None
@@ -373,11 +434,68 @@ class Project:
                 if dataset is not None:
                     dataset.generate_report()
                     self.update_report({dataset.dataset_type:dataset.report})
+            self.save_project_report()
+            self.save_project_datasets()
 
     def empty_report(self):
         self.report = {}
 
+    def save_project_report(self):
+        directory = self.get_report_directory()
+        for dataset in self.report:
+            report = self.report[dataset]
+            dataset_dir = os.path.join(directory, dataset)
+            if not os.path.exists(dataset_dir):
+                os.makedirs(dataset_dir)
+            report.save_report(dataset_dir)
+
+    def save_project_datasets(self):
+        directory = self.get_report_directory()
+        for dataset_type in self.datasets:
+            dataset = self.datasets[dataset_type]
+            dataset_directory = os.path.join(directory, dataset_type)
+            if isinstance(dataset, Dataset):
+                dataset.save_dataset(dataset_directory)
+
     def show_report(self, environment):
+        types = ["Project information", "clinical", "proteomics", "longitudinal proteomics", "wes", "wgs", "rnaseq", "multiomics"]
+        app_plots = defaultdict(list)
+
+        for dataset in types:
+            if dataset in self.report:
+                report = self.report[dataset]
+                app_plots[dataset.upper()] = report.visualize_report(environment)
+        
+        return app_plots
+
+    def download_project(self):
+        directory = self.get_downloads_directory()
+        self.download_project_report()
+        self.download_project_datasets()
+        compress_directory(self.identifier+".zip", directory, compression_format='zip')
+        
+        return os.path.join(directory, self.identifier+".zip")
+
+
+    def download_project_report(self):
+        directory = self.get_downloads_directory()
+        for dataset in self.report:
+            report = self.report[dataset]
+            dataset_dir = os.path.join(directory, dataset)
+            if not os.path.exists(dataset_dir):
+                os.makedirs(dataset_dir)
+            report.download_report(dataset_dir)
+
+    def download_project_datasets(self):
+        directory = self.get_downloads_directory()
+
+        for dataset_type in self.datasets:
+            dataset = self.datasets[dataset_type]
+            dataset_directory = os.path.join(directory, dataset_type)
+            if isinstance(dataset, Dataset):
+                dataset.save_dataset_to_file(dataset_directory)
+                  
+    def show_report_old(self, environment):
         app_plots = defaultdict(list)
         for data_type in self.report:
             r = self.report[data_type]
@@ -412,8 +530,3 @@ class Project:
                             app_plots[identifier].append(plot)
 
         return app_plots
-
-    def show_report_new(self, environment):
-        r = rp.Report('my_new_report',{})
-        r.read_report('../../data/reports/P0000001/proteomics/')
-        return r.plots

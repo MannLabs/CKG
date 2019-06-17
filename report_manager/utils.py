@@ -1,4 +1,6 @@
 import dash_html_components as html
+import dash_core_components as dcc
+from datetime import date
 import bs4 as bs
 import random
 from Bio import Entrez
@@ -16,6 +18,18 @@ import plotly.plotly as py
 import base64
 from xhtml2pdf import pisa
 import requests, json
+import shutil
+
+
+def compress_directory(name, directory, compression_format='zip'):
+    shutil.make_archive(name, compression_format, directory)
+
+def get_markdown_date():
+    today = date.today()
+    current_date = today.strftime("%B %d, %Y")
+    markdown = dcc.Markdown('#### *Create: {}* ####'.format(current_date))
+    
+    return current_date
 
 def convert_html_to_dash(el,style = None):
     if type(el) == bs.element.NavigableString:
@@ -39,8 +53,6 @@ def is_jsonable(x):
 def convert_dash_to_json(dash_object):
     if not hasattr(dash_object, 'to_plotly_json'):
         dash_json = dash_object
-        print(dash_json)
-        print(type(dash_json))
     else:
         dash_json = dash_object.to_plotly_json()
         for key in dash_json:

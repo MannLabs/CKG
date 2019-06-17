@@ -2,11 +2,15 @@ import os.path
 import plotly.io as pio
 import h5py as h5
 import json
+import natsort
 import plotly.utils
 from plotly.offline import iplot
 from collections import defaultdict
+from IPython.display import IFrame, display
+import tempfile
 from networkx.readwrite import json_graph
 from report_manager import utils
+from report_manager.plots import basicFigures
 
 class Report:
     def __init__(self, identifier, plots={}):
@@ -47,27 +51,43 @@ class Report:
     def save_report(self, directory):
         dt = h5.special_dtype(vlen=str)
         with h5.File(os.path.join(directory, "report.h5"), "w") as f:
+            order = 0
+            markdown = utils.convert_dash_to_json(utils.get_markdown_date())
+            figure_json = json.dumps(markdown, cls=utils.NumpyEncoder)
+            figure_id = str(order) +"_date"
+            grp = f.create_group(str(order) +"_date")
+            fig_set = grp.create_dataset(figure_id, (1,), dtype=dt)
+            fig_set[:] = str(figure_json)
+            fig_set.attrs['identifier'] = figure_id
+
             for plot_id in self.plots:
-                print(plot_id)
                 name = "~".join(plot_id)
                 grp = f.create_group(name)
                 i = 0
-                print(self._plots[plot_id])
                 for plot in self._plots[plot_id]:       
-                    print(type(plot))
                     figure_id = None
                     if isinstance(plot, dict):
+                        figure_json = {}
                         if 'net_json' in plot:
-                            figure_json = json.dumps(plot['net_json'])
-                            figure_id = 'net_'+str(i)
+                            figure_json['notebook'] = plot['net_json']
+                        if 'app' in plot:
+                            json_str = utils.convert_dash_to_json(plot['app'])
+                            figure_json['app'] = json_str
+                        if 'net_tables' in plot:
+                            json_str_nodes = utils.convert_dash_to_json(plot['net_tables'][0])
+                            json_str_edges = utils.convert_dash_to_json(plot['net_tables'][1])
+                            figure_json["net_tables"] = (json_str_nodes,json_str_edges)
+                        figure_json = json.dumps(figure_json, cls=utils.NumpyEncoder)
+                        figure_id = str(i)+'_net'
                     else:
                         json_str = utils.convert_dash_to_json(plot)
                         figure_json = json.dumps(json_str, cls=utils.NumpyEncoder)
-                        figure_id = 'figure_' + str(i)
+                        figure_id = str(i) + '_figure' 
                     i += 1
                     fig_set = grp.create_dataset(figure_id, (1,), dtype=dt)
                     fig_set[:] = str(figure_json)
                     fig_set.attrs['identifier'] = figure_id
+                order += 1
 
     #ToDo load Network data
     def read_report(self, directory):
@@ -81,20 +101,23 @@ class Report:
                 for figure_id in f[name]:
                     figure_json = f[name+"/"+figure_id][0]
                     identifier = f[name+"/"+figure_id].attrs["identifier"]
-                    if identifier == name+'~net':
-                        continue
-                        json_graph = json.loads(figure_json)
-                        net = json_graph.node_link_graph(json.loads(json_graph))
-                        cy_elements = utils.networkx_to_cytoscape(net)
+                    if 'net' in identifier:
+                        figure = {}
+                        net_json = json.loads(figure_json)
+                        if 'notebook' in net_json:
+                            figure['net_json'] = net_json['notebook']
+                            netx = json_graph.node_link_graph(figure['net_json'])
+                            figure['notebook'] = basicFigures.get_notebook_network_pyvis(netx)
+                        if 'app' in net_json:
+                            figure['app'] = net_json['app']
                     else:
                         figure = json.loads(figure_json)
                     report_plots[name].append(figure)
         self.plots = report_plots
 
     def visualize_report(self, environment):
-        report_plots = defaultdict(list)
-        
-        for plot_type in self.plots:
+        report_plots = []
+        for plot_type in natsort.natsorted(self.plots):
             print(plot_type)
             for plot in self.plots[plot_type]:
                 if environment == "notebook":
@@ -102,13 +125,10 @@ class Report:
                         net = plot['notebook']
                         if not os.path.isdir('./tmp'):
                             os.makedirs('./tmp')
-                            fnet = tempfile.NamedTemporaryFile(suffix=".html", delete=False, dir='tmp/')
-                            with open(fnet.name, 'w') as f:
-                                f.write(net.html)
-                            display(IFrame(os.path.relpath(fnet.name),width=1400, height=1400))
-                            if hasattr(plot["net_tables"][0], 'figure') and hasattr(plot["net_tables"][1], 'figure'):
-                                iplot(plot["net_tables"][0].figure)
-                                iplot(plot["net_tables"][1].figure)
+                        fnet = tempfile.NamedTemporaryFile(suffix=".html", delete=False, dir='tmp/')
+                        with open(fnet.name, 'w') as f:
+                            f.write(net.html)
+                        display(IFrame(os.path.relpath(fnet.name),width=800, height=850))
                     else:
                         if 'props' in plot:
                             if 'figure' in plot['props']:
@@ -116,7 +136,32 @@ class Report:
                                     iplot(plot['props']['figure'])
                                 except:
                                     pass
+                         
                 else:
-                    report_plots[identifier].append(plot)
+                    if isinstance(plot, dict):
+                        if "app" in plot:
+                            plot = plot["app"]
+                        if 'net_tables' in plot:
+                            tables = plot['net_tables']
+                            app_plots.append(tables[0])
+                            app_plots.append(tables[1])
+
+                    report_plots.append(plot)
 
         return report_plots
+
+    def download_report(self, directory):
+        report_plots = []
+        for plot_type in natsort.natsorted(self.plots):
+            for plot in self.plots[plot_type]:
+                if isinstance(plot, dict):
+                    if "app" in plot:
+                        plot = plot["app"]
+                    if "net_json" in plot:
+                        graph = json_graph.node_link_graph(plot["net_json"])
+                        nx.write_gml(graph, os.path.join(directory, "_".join(plot_type)+".gml"))
+                        continue
+                basicFigures.save_DASH_plot(plot, name="_".join(plot_type), plot_format='svg', directory=directory)
+                
+        return report_plots
+        
