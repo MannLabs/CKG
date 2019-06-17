@@ -418,7 +418,7 @@ def calculate_ModuleMembership(data, MEs):
     nSamples=len(data.index)
     
     data_r = data.copy()
-    data_r.columns = data_r.columns.str.replace('-', 'dash')
+    data_r.columns = data_r.columns.str.replace('~', 'dash')
 
     modLabels = [i[2:] for i in list(MEs.colnames)]
     FeatureModuleMembership = base.as_data_frame(WGCNA.cor(data_r, MEs, use='p', verbose=0))
@@ -429,8 +429,8 @@ def calculate_ModuleMembership(data, MEs):
 
     FeatureModuleMembership = R2Py.R_matrix2Py_matrix(FeatureModuleMembership, FeatureModuleMembership.rownames, FeatureModuleMembership.colnames)
     MMPvalue = R2Py.R_matrix2Py_matrix(MMPvalue, MMPvalue.rownames, MMPvalue.colnames)
-    FeatureModuleMembership.index = FeatureModuleMembership.index.str.replace('dash', '-')
-    MMPvalue.index = MMPvalue.index.str.replace('dash', '-')
+    FeatureModuleMembership.index = FeatureModuleMembership.index.str.replace('dash', '~')
+    MMPvalue.index = MMPvalue.index.str.replace('dash', '~')
 
     return FeatureModuleMembership, MMPvalue
 
@@ -448,7 +448,7 @@ def calculate_FeatureTraitSignificance(df_exp, df_traits):
     nSamples=len(df_exp.index)
 
     df_exp_r = df_exp.copy()
-    df_exp_r.columns = df_exp_r.columns.str.replace('-', 'dash')
+    df_exp_r.columns = df_exp_r.columns.str.replace('~', 'dash')
     df_cli_r = df_traits.copy()
     df_cli_r.columns = df_cli_r.columns.str.replace(' ', 'space')
     df_cli_r.columns = df_cli_r.columns.str.replace('(', 'parentheses1')
@@ -466,11 +466,11 @@ def calculate_FeatureTraitSignificance(df_exp, df_traits):
     FeatureTraitSignificance.columns = FeatureTraitSignificance.columns.str.replace('space', ' ')
     FeatureTraitSignificance.columns = FeatureTraitSignificance.columns.str.replace('parentheses1', '(')
     FeatureTraitSignificance.columns = FeatureTraitSignificance.columns.str.replace('parentheses2', ')')
-    FeatureTraitSignificance.index = FeatureTraitSignificance.index.str.replace('dash', '-')
+    FeatureTraitSignificance.index = FeatureTraitSignificance.index.str.replace('dash', '~')
     FSPvalue.columns = FSPvalue.columns.str.replace('space', ' ')
     FSPvalue.columns = FSPvalue.columns.str.replace('parentheses1', '(')
     FSPvalue.columns = FSPvalue.columns.str.replace('parentheses2', ')')
-    FSPvalue.index = FSPvalue.index.str.replace('dash', '-')
+    FSPvalue.index = FSPvalue.index.str.replace('dash', '~')
 
     return FeatureTraitSignificance, FSPvalue
 

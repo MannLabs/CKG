@@ -216,6 +216,14 @@ def plot_intramodular_correlation(MM, FS, feature_module_df, title, width=1000, 
     Returns:
         Plotly object figure.
     """
+    # print(MM)
+
+    # print(FS)
+
+    # print(feature_module_df)
+
+
+
     MM['modColor'] = MM.index.map(feature_module_df.set_index('name')['modColor'].get)
 
     figure = tls.make_subplots(rows=len(FS.columns), cols=len(MM.columns), shared_xaxes=True, shared_yaxes=True, vertical_spacing = 0.01, horizontal_spacing = 0.01, print_grid=False)
