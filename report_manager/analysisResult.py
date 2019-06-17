@@ -444,8 +444,6 @@ class AnalysisResult:
                 if 'wgcna' in wgcna_data:
                     data['wgcna'] = {**dfs, **wgcna_data['wgcna']}
                     for id in data:
-                        print(id)
-                        print(data[id])
                         plot.extend(figure.get_WGCNAPlots(data[id], identifier))
             elif name == 'ranking':
                 for id in self.result:

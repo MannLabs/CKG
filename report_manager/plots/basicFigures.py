@@ -854,62 +854,64 @@ def get_sankey_plot(data, identifier, args={'source':'source', 'target':'target'
     return dcc.Graph(id = identifier, figure = figure)
 
 def get_table(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':2500, 'font':12}, subplot = False):
-    if data.empty:
-        return None
-
-    if subset is not None:
-        data = data[subset]
-
-    #booleanDictionary = {True: 'TRUE', False: 'FALSE'}
-    #if 'rejected' in data.columns:
-    #    data['rejected'] = data['rejected'].replace(booleanDictionary)
-
-    list_cols = data.applymap(lambda x: isinstance(x, list)).all()
-    list_cols = list_cols.index[list_cols].tolist()
     
-    for c in list_cols:
-        data[c] = data[c].apply(lambda x: ";".join(x))
+    if data is not None and not data.empty:
+        if subset is not None:
+            data = data[subset]
 
-    data_trace = dash_table.DataTable(id='table_'+identifier,
-                                        data=data.to_dict("rows"),
-                                        columns=[{"name": i.replace('_', ' ').title(), "id": i} for i in data.columns],
-                                        css=[{
-                                            'selector': '.dash-cell div.dash-cell-value',
-                                            'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
-                                        }],
-                                        style_data={'whiteSpace': 'normal'},
-                                        style_cell={
-                                            'minWidth': '50px', 'maxWidth': '180px',
-                                            'textAlign': 'left', 'padding': '1px', 'vertical-align': 'top'
-                                        },
-                                        style_table={
-                                            'maxHeight': '800',
-                                            'overflowY': 'scroll',
-                                            'overflowX': 'scroll'
-                                        },
-                                        style_header={
-                                            'backgroundColor': '#2b8cbe',
-                                            'fontWeight': 'bold',
-                                            'position': 'sticky'
-                                        },
-                                        style_data_conditional=[{
-                                            "if": 
-                                                {"column_id": "rejected", "filter": 'rejected eq "TRUE"'},
-                                                "backgroundColor": "#3B8861",
-                                                'color': 'white'
-                                            },
-                                            ],
-                                        n_fixed_rows=1,
-                                        filtering='fe',
-                                        pagination_settings={
-                                            'current_page': 0,
-                                            'page_size': 25
-                                            },
-                                        pagination_mode='fe',
-                                        sorting='be',
-                                        )
+        #booleanDictionary = {True: 'TRUE', False: 'FALSE'}
+        #if 'rejected' in data.columns:
+        #    data['rejected'] = data['rejected'].replace(booleanDictionary)
 
-    return html.Div([html.H2(title),data_trace])
+        list_cols = data.applymap(lambda x: isinstance(x, list)).all()
+        list_cols = list_cols.index[list_cols].tolist()
+        
+        for c in list_cols:
+            data[c] = data[c].apply(lambda x: ";".join(x))
+
+        data_trace = dash_table.DataTable(id='table_'+identifier,
+                                            data=data.to_dict("rows"),
+                                            columns=[{"name": i.replace('_', ' ').title(), "id": i} for i in data.columns],
+                                            css=[{
+                                                'selector': '.dash-cell div.dash-cell-value',
+                                                'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                                            }],
+                                            style_data={'whiteSpace': 'normal'},
+                                            style_cell={
+                                                'minWidth': '50px', 'maxWidth': '180px',
+                                                'textAlign': 'left', 'padding': '1px', 'vertical-align': 'top'
+                                            },
+                                            style_table={
+                                                'maxHeight': '800',
+                                                'overflowY': 'scroll',
+                                                'overflowX': 'scroll'
+                                            },
+                                            style_header={
+                                                'backgroundColor': '#2b8cbe',
+                                                'fontWeight': 'bold',
+                                                'position': 'sticky'
+                                            },
+                                            style_data_conditional=[{
+                                                "if": 
+                                                    {"column_id": "rejected", "filter": 'rejected eq "TRUE"'},
+                                                    "backgroundColor": "#3B8861",
+                                                    'color': 'white'
+                                                },
+                                                ],
+                                            n_fixed_rows=1,
+                                            filtering='fe',
+                                            pagination_settings={
+                                                'current_page': 0,
+                                                'page_size': 25
+                                                },
+                                            pagination_mode='fe',
+                                            sorting='be',
+                                            )
+        table = [html.H2(title),data_trace]
+    else:
+        table = [html.H2(title), html.H3("Empty table.")]
+
+    return html.Div(table)
 
 def get_violinplot(data, identifier, args):
     df = data.copy()
@@ -1147,84 +1149,84 @@ def plot_2_venn_diagram(cond1, cond2, unique1, unique2, intersection, identifier
     return dcc.Graph(id = identifier, figure=figure)
 
 def get_wordcloud(data, identifier, args={'stopwords':[], 'max_words': 400, 'max_font_size': 100, 'width':700, 'height':700, 'margin': 1}):
-    if data.empty:
-        return None
-    sw = set(stopwords.words('english')).union(set(STOPWORDS))
-    if 'stopwords' in args:
-        sw = sw.union(args['stopwords'])
+    figure=None
+    if data is not None and not data.empty:
+        sw = set(stopwords.words('english')).union(set(STOPWORDS))
+        if 'stopwords' in args:
+            sw = sw.union(args['stopwords'])
 
-    if isinstance(data, pd.DataFrame):
-        if "text_col" in args:
-            text = ''.join(str(a) for a in data[args["text_col"]].unique().tolist())
+        if isinstance(data, pd.DataFrame):
+            if "text_col" in args:
+                text = ''.join(str(a) for a in data[args["text_col"]].unique().tolist())
+            else:
+                return None
         else:
-            return None
-    else:
-        text = data
+            text = data
 
-    wc = WordCloud(stopwords = sw,
-                   max_words = args['max_words'],
-                   max_font_size = args['max_font_size'],
-                   background_color='white',
-                   margin=args['margin'])
-    wc.generate(text)
+        wc = WordCloud(stopwords = sw,
+                       max_words = args['max_words'],
+                       max_font_size = args['max_font_size'],
+                       background_color='white',
+                       margin=args['margin'])
+        wc.generate(text)
 
-    word_list=[]
-    freq_list=[]
-    fontsize_list=[]
-    position_list=[]
-    orientation_list=[]
-    color_list=[]
+        word_list=[]
+        freq_list=[]
+        fontsize_list=[]
+        position_list=[]
+        orientation_list=[]
+        color_list=[]
 
-    for (word, freq), fontsize, position, orientation, color in wc.layout_:
-        word_list.append(word)
-        freq_list.append(freq)
-        fontsize_list.append(fontsize)
-        position_list.append(position)
-        orientation_list.append(orientation)
-        color_list.append(color)
+        for (word, freq), fontsize, position, orientation, color in wc.layout_:
+            word_list.append(word)
+            freq_list.append(freq)
+            fontsize_list.append(fontsize)
+            position_list.append(position)
+            orientation_list.append(orientation)
+            color_list.append(color)
 
-    # get the positions
-    x=[]
-    y=[]
-    j = 0
-    for i in position_list:
-        x.append(i[1]+fontsize_list[j]+10)
-        y.append(i[0]+5)
-        j += 1
+        # get the positions
+        x=[]
+        y=[]
+        j = 0
+        for i in position_list:
+            x.append(i[1]+fontsize_list[j]+10)
+            y.append(i[0]+5)
+            j += 1
 
-    # get the relative occurence frequencies
-    new_freq_list = []
-    for i in freq_list:
-        new_freq_list.append(i*70)
-    new_freq_list
+        # get the relative occurence frequencies
+        new_freq_list = []
+        for i in freq_list:
+            new_freq_list.append(i*70)
+        new_freq_list
 
-    trace = go.Scattergl(x=x,
-                       y=y,
-                       textfont = dict(size=new_freq_list,
-                                       color=color_list),
-                       hoverinfo='text',
-                       hovertext=['{0} freq: {1}'.format(w, f) for w, f in zip(word_list, freq_list)],
-                       mode="text",
-                       text=word_list
-                      )
+        trace = go.Scattergl(x=x,
+                           y=y,
+                           textfont = dict(size=new_freq_list,
+                                           color=color_list),
+                           hoverinfo='text',
+                           hovertext=['{0} freq: {1}'.format(w, f) for w, f in zip(word_list, freq_list)],
+                           mode="text",
+                           text=word_list
+                          )
 
-    layout = go.Layout(
-                       xaxis=dict(showgrid=False,
-                                  showticklabels=False,
-                                  zeroline=False,
-                                  automargin=True),
-                       yaxis=dict(showgrid=False,
-                                  showticklabels=False,
-                                  zeroline=False,
-                                  automargin=True),
-                      width=args['width'],
-                      height=args['height'],
-                      title=args['title'],
-                      annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')],
-                      template='plotly_white'
-                      )
+        layout = go.Layout(
+                           xaxis=dict(showgrid=False,
+                                      showticklabels=False,
+                                      zeroline=False,
+                                      automargin=True),
+                           yaxis=dict(showgrid=False,
+                                      showticklabels=False,
+                                      zeroline=False,
+                                      automargin=True),
+                          width=args['width'],
+                          height=args['height'],
+                          title=args['title'],
+                          annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')],
+                          template='plotly_white'
+                          )
 
-    figure = go.Figure(data=[trace], layout=layout)
+        figure = go.Figure(data=[trace], layout=layout)
 
     return dcc.Graph(id = identifier, figure=figure)
 
