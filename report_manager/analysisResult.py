@@ -158,7 +158,7 @@ class AnalysisResult:
         elif self.analysis_type  == "correlation":
             alpha = 0.05
             method = 'pearson'
-            correction = ('fdr', 'fdr_bh')
+            correction = ('fdr', 'indep')
             cutoff = 0.5
             subject='subject'
             group='group'
@@ -179,7 +179,7 @@ class AnalysisResult:
         elif self.analysis_type  == "repeated_measurements_correlation":
             alpha = 0.05
             method = 'pearson'
-            correction = ('fdr', 'fdr_bh')
+            correction = ('fdr', 'indep')
             cutoff = 0.5
             subject='subject'
             if 'subject' in self.args:

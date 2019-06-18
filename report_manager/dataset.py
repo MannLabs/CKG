@@ -463,7 +463,7 @@ class ProteomicsDataset(Dataset):
 
 class LongitudinalProteomicsDataset(ProteomicsDataset):
     def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
-        config_file = "longitudinal_proteomics.yml"
+        config_file = "proteomics.yml"
         ProteomicsDataset.__init__(self, identifier, data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
         self.set_configuration_from_file(config_file)
 

@@ -86,7 +86,7 @@ class Report:
                         figure_json = json.dumps(json_str, cls=utils.NumpyEncoder)
                         figure_id = str(i) + '_figure' 
                     i += 1
-                    fig_set = grp.create_dataset(figure_id, (1,), dtype=dt)
+                    fig_set = grp.create_dataset(figure_id, (1,), dtype=dt, compression="gzip")
                     fig_set[:] = str(figure_json)
                     fig_set.attrs['identifier'] = figure_id
                 order += 1

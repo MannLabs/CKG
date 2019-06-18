@@ -22,7 +22,10 @@ class ProjectApp(basicApp.BasicApp):
 
     def build_page(self):
         p = project.Project(self.project_id, datasets=None, report={})
-        self.title = "Project: {}".format(p.name)
+        if p.name is not None:
+            self.title = "Project: {}".format(p.name)
+        else:
+            self.title = ''
         self.add_basic_layout()
         plots = p.show_report("app")
         tabs = []

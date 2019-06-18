@@ -19,7 +19,20 @@ import base64
 from xhtml2pdf import pisa
 import requests, json
 import shutil
+import smtplib
+from email.message import EmailMessage
 
+
+def send_email(message, subject, message_from, message_to):
+    msg = EmailMessage()    
+    msg.set_content(message)
+    msg['Subject'] = subject
+    msg['From'] = message_from
+    msg['to'] = message_to
+
+    s = smtplib.SMTP('localhost:1025') 
+    s.send_message(msg)
+    s.quit()
 
 def compress_directory(name, directory, compression_format='zip'):
     shutil.make_archive(name, compression_format, directory)
@@ -27,7 +40,7 @@ def compress_directory(name, directory, compression_format='zip'):
 def get_markdown_date(extra_text):
     today = date.today()
     current_date = today.strftime("%B %d, %Y")
-    markdown =  html.Div([dcc.Markdown('### *{} {}* ###'.format(extra_text,current_date))])
+    markdown =  html.Div([dcc.Markdown('### *{} {}* ###'.format(extra_text,current_date))],style={'color': '#6a51a3'})
     return markdown
 
 def convert_html_to_dash(el,style = None):

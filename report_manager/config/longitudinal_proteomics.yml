@@ -140,9 +140,9 @@ overview: #section
             name: name
             title: 'Differential regulation ANOVA'
     correlation:
-        data: processed
+        data: regulated 
         analyses:
-            - correlation
+            - repeated_measurements_correlation
         plots:
             - network
             - heatmap
