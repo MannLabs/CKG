@@ -158,7 +158,7 @@ class Report:
             for plot in self.plots[plot_type]:
                 if "net_json" in plot:
                     with open(os.path.join(directory, name+'.json'), 'w') as out:
-                        out.write(plot["net_json"])
+                        out.write(json.dumps(plot["net_json"]))
                     
                     graph = json_graph.node_link_graph(plot["net_json"])
                     try:

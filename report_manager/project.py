@@ -487,7 +487,6 @@ class Project:
 
     def download_project_datasets(self):
         directory = self.get_downloads_directory()
-
         for dataset_type in self.datasets:
             dataset = self.datasets[dataset_type]
             dataset_directory = os.path.join(directory, dataset_type)

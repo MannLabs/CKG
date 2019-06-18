@@ -370,7 +370,10 @@ class Dataset:
 
         for data in self.data:
             name = data.replace(" ", "_") + ".tsv"
-            data.to_csv(os.path.join(dataset_directory,name), sep='\t', header=True, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
+            if isinstance(self.data[data], pd.DataFrame):
+                self.data[data].to_csv(os.path.join(dataset_directory,name), sep='\t', header=True, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
+            else:
+                print(name, data)
 
     def save_dataset_report(self, dataset_directory):
         self.report.save_report(directory=dataset_directory)

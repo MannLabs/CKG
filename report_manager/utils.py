@@ -28,7 +28,7 @@ def get_markdown_date(extra_text):
     today = date.today()
     current_date = today.strftime("%B %d, %Y")
     markdown =  html.Div([dcc.Markdown('### *{} {}* ###'.format(extra_text,current_date))])
-    return current_date
+    return markdown
 
 def convert_html_to_dash(el,style = None):
     if type(el) == bs.element.NavigableString:

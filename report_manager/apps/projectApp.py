@@ -1,3 +1,4 @@
+import os
 from apps import basicApp
 from report_manager import project
 import dash_html_components as html
@@ -25,7 +26,14 @@ class ProjectApp(basicApp.BasicApp):
         self.add_basic_layout()
         plots = p.show_report("app")
         tabs = []
-        self.add_to_layout(html.Div(html.Button('Download project', id='download-button', value=self.project_id)))
+        button = html.Div([html.A('Download Project',
+                                id='download-zip',
+                                href="",
+                                target="_blank",
+                                n_clicks = 0
+                                )
+                            ])
+        self.add_to_layout(button)
         for data_type in plots:
             tab = dcc.Tab(label=data_type, children=[html.Div(plots[data_type])])
             tabs.append(tab)

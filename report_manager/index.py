@@ -66,21 +66,18 @@ def display_page(pathname):
             return '404'
 
 ###Callbacks for download project
-@app.callback(Output('download-button', 'href'),
-             [Input('download-button', 'n_clicks'),
-             Input('download-button', 'value')])
-def update_download_link(n_clicks, value):
-    if n_clicks is not None and n_clicks > 0:
-        project_id = value
-        uri = '/downloads/{}.zip'.format(project_id)
-        return uri
-
-@app.server.route('/downloads')
-def serve_download():
-    value = flask.request.args.get('value')
-    downloadable = '../../data/downloads/'+value
+@app.callback(
+    Output('download-zip', 'href'),
+    [Input('download-zip', 'n_clicks')],[State('url', 'pathname')])
+def generate_report_url(n_clicks, pathname):
+    project_id = pathname.split('/')[-1]
     
-    return flask.send_file(downloadable, attachment_filename = value, as_attachment = True)
+    return '/downloads/{}'.format(project_id)
+    
+@app.server.route('/downloads/<value>')
+def generate_report_url(value):
+    uri = os.path.join(os.getcwd(),"../../data/downloads/"+value+'.zip')
+    return flask.send_file(uri, attachment_filename = value+'.zip', as_attachment = True)
 
 ###Callbacks for project creation app
 def image_formatter(im):
