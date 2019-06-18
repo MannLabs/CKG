@@ -336,6 +336,7 @@ def apply_pvalue_twostage_fdrcorrection(pvalues, alpha=0.05, method='bh'):
 
 def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, permutations=50):
     initial_seed = 176782
+    #permutations=1
     i = permutations
     df_index = df.index.values
     columns = ['identifier']

@@ -126,7 +126,7 @@ class AnalysisResult:
             alpha = 0.05
             drop_cols = []
             group = 'group'
-            permutations = 50
+            permutations = 150
             if "alpha" in self.args:
                 alpha = self.args["alpha"]
             if "drop_cols" in self.args:
@@ -142,7 +142,7 @@ class AnalysisResult:
             drop_cols = []
             group = 'group'
             subject = 'subject'
-            permutations = 50
+            permutations = 150
             if "alpha" in self.args:
                 alpha = self.args["alpha"]
             if "drop_cols" in self.args:

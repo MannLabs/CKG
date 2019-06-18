@@ -436,6 +436,7 @@ class Project:
                     self.update_report({dataset.dataset_type:dataset.report})
             self.save_project_report()
             self.save_project_datasets()
+            self.download_project()
 
     def empty_report(self):
         self.report = {}
@@ -472,10 +473,8 @@ class Project:
         directory = self.get_downloads_directory()
         self.download_project_report()
         self.download_project_datasets()
-        compress_directory(self.identifier+".zip", directory, compression_format='zip')
+        utils.compress_directory(directory, directory, compression_format='zip')
         
-        return os.path.join(directory, self.identifier+".zip")
-
 
     def download_project_report(self):
         directory = self.get_downloads_directory()

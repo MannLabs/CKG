@@ -682,8 +682,8 @@ def get_network(data, identifier, args):
         if data.shape[0] < 100:
             betweenness = nx.betweenness_centrality(graph, weight='width')
             ev_centrality = nx.eigenvector_centrality_numpy(graph)
-            nx.set_node_attributes(graph, betweenness, 'betweenness centrality')
-            nx.set_node_attributes(graph, ev_centrality, 'eigenvector centrality')
+            nx.set_node_attributes(graph, betweenness, 'betweenness')
+            nx.set_node_attributes(graph, ev_centrality, 'eigenvector')
 
         if args['node_size'] == 'betweenness' and betweeness is not None:
             nx.set_node_attributes(graph, betweenness, 'radius')

@@ -24,11 +24,10 @@ import shutil
 def compress_directory(name, directory, compression_format='zip'):
     shutil.make_archive(name, compression_format, directory)
 
-def get_markdown_date():
+def get_markdown_date(extra_text):
     today = date.today()
     current_date = today.strftime("%B %d, %Y")
-    markdown = dcc.Markdown('#### *Create: {}* ####'.format(current_date))
-    
+    markdown =  html.Div([dcc.Markdown('### *{} {}* ###'.format(extra_text,current_date))])
     return current_date
 
 def convert_html_to_dash(el,style = None):

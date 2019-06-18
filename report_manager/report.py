@@ -4,10 +4,12 @@ import h5py as h5
 import json
 import natsort
 import plotly.utils
+import plotly.graph_objs as go
 from plotly.offline import iplot
 from collections import defaultdict
 from IPython.display import IFrame, display
 import tempfile
+import networkx as nx
 from networkx.readwrite import json_graph
 from report_manager import utils
 from report_manager.plots import basicFigures
@@ -52,7 +54,7 @@ class Report:
         dt = h5.special_dtype(vlen=str)
         with h5.File(os.path.join(directory, "report.h5"), "w") as f:
             order = 0
-            markdown = utils.convert_dash_to_json(utils.get_markdown_date())
+            markdown = utils.convert_dash_to_json(utils.get_markdown_date("Report created on:"))
             figure_json = json.dumps(markdown, cls=utils.NumpyEncoder)
             figure_id = str(order) +"_date"
             grp = f.create_group(str(order) +"_date")
@@ -118,7 +120,6 @@ class Report:
     def visualize_report(self, environment):
         report_plots = []
         for plot_type in natsort.natsorted(self.plots):
-            print(plot_type)
             for plot in self.plots[plot_type]:
                 if environment == "notebook":
                     if "notebook" in plot:
@@ -151,17 +152,29 @@ class Report:
         return report_plots
 
     def download_report(self, directory):
-        report_plots = []
         for plot_type in natsort.natsorted(self.plots):
+            name = "_".join(plot_type) if isinstance(plot_type, tuple) else plot_type
+            print(name)
             for plot in self.plots[plot_type]:
-                if isinstance(plot, dict):
+                if "net_json" in plot:
+                    with open(os.path.join(directory, name+'.json'), 'w') as out:
+                        out.write(plot["net_json"])
+                    
+                    graph = json_graph.node_link_graph(plot["net_json"])
+                    try:
+                        nx.write_gml(graph, os.path.join(directory, name+".gml"))
+                    except: 
+                        pass
                     if "app" in plot:
                         plot = plot["app"]
-                    if "net_json" in plot:
-                        graph = json_graph.node_link_graph(plot["net_json"])
-                        nx.write_gml(graph, os.path.join(directory, "_".join(plot_type)+".gml"))
-                        continue
-                basicFigures.save_DASH_plot(plot, name="_".join(plot_type), plot_format='svg', directory=directory)
-                
-        return report_plots
-        
+                if 'props' in plot:
+                    if 'figure' in plot['props']:
+                        try:
+                            basicFigures.save_DASH_plot(plot['props']['figure'], name=name, plot_format='svg', directory=directory)
+                        except:
+                            pass
+                else:
+                    try:
+                        basicFigures.save_DASH_plot(plot.figure, name=name, plot_format='svg', directory=directory)
+                    except:
+                        pass
