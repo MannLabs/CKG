@@ -25,8 +25,11 @@ driver = connector.getGraphDatabaseConnectionConfiguration()
 DataTypes = ['proteomics', 'clinical', 'wes', 'longitudinal_proteomics', 'longitudinal_clinical']
 Tissues = [(t['name']) for t in driver.nodes.match("Tissue")]
 Diseases = [(d['name']) for d in driver.nodes.match("Disease")]
-#ClinicalVariables = [(c['name']) for c in driver.nodes.match("Clinical_variable")]
-ClinicalVariables = pd.read_csv('./apps/templates/tmp_data/clinicalvariables.csv')
+
+query = 'MATCH (n:Clinical_variable) RETURN n.name,n.id LIMIT 20'
+df = pd.DataFrame(connector.getCursorData(driver, query).values)
+df[0] = ['({0})'.format(i) for i in df[0].tolist()]
+ClinicalVariables = df[[1, 0]].apply(lambda x: ' '.join(x),axis=1).tolist()
 
 # template_cols = pd.read_excel(os.path.join(os.getcwd(), 'apps/templates/ClinicalData_template.xlsx'))
 # template_cols = template_cols.columns.tolist()
@@ -75,7 +78,7 @@ class DataUploadApp(basicApp.BasicApp):
                 			html.Div([
                     				  html.Div(children=[html.A(children=html.Button('Export Table', id='data_download_button', style={'height':36, 'maxWidth':'200px'}), id='data_download_link', download='downloaded_ClinicalData.csv')],
                                       					 style={'marginTop':'0%', 'marginLeft': '91.4%', 'horizontalAlign':'right', 'verticalAlign':'top', 'display':'inline-block'}),
-                    				  html.Div(children=[dcc.Dropdown(id='clinical-variables-picker', placeholder='Select clinical variables...', options=[{'label':i, 'value':i} for i in ClinicalVariables['n.name']], value=['', ''], multi=True, style={})],
+                    				  html.Div(children=[dcc.Dropdown(id='clinical-variables-picker', placeholder='Select clinical variables...', options=[{'label':i, 'value':i} for i in ClinicalVariables], value=['', ''], multi=True, style={})],
                              							 style={'marginTop':'1%', 'width':'25%', 'verticalAlign':'top', 'display':'inline-block'}),
                     				  html.Div(children=[html.Button('Add Column', id='editing-columns-button', n_clicks=0, style={'height':36, 'width':100})],
                              							 style={'marginTop':'1%', 'marginLeft': 5, 'verticalAlign':'top', 'display':'inline-block'}),

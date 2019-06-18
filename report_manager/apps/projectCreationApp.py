@@ -15,8 +15,11 @@ DataTypes = ['proteomics', 'clinical', 'wes', 'longitudinal_proteomics', 'longit
 Users = [(u['name']) for u in driver.nodes.match("User")]
 Tissues = [(t['name']) for t in driver.nodes.match("Tissue")]
 Diseases = [(d['name']) for d in driver.nodes.match("Disease")]
-#ClinicalVariables = [(c['name']) for c in driver.nodes.match("Clinical_variable")]
-ClinicalVariables = pd.read_csv(os.path.join(os.getcwd(), 'apps/templates/tmp_data/clinicalvariables.csv'))
+
+query = 'MATCH (n:Clinical_variable) RETURN n.name,n.id LIMIT 20'
+df = pd.DataFrame(connector.getCursorData(driver, query).values)
+df[0] = ['({0})'.format(i) for i in df[0].tolist()]
+ClinicalVariables = df[[1, 0]].apply(lambda x: ' '.join(x),axis=1).tolist()
 
 template_cols = pd.read_excel(os.path.join(os.getcwd(), 'apps/templates/ClinicalData_template.xlsx'))
 template_cols = template_cols.columns.tolist()

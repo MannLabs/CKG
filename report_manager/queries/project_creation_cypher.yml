@@ -22,9 +22,9 @@ create_project:
         CREATE CONSTRAINT ON (p:Project) ASSERT p.id IS UNIQUE;
         CREATE CONSTRAINT ON (p:Project) ASSERT p.internal_id IS UNIQUE;
         CREATE CONSTRAINT ON (p:Project) ASSERT p.name IS UNIQUE;
-        MERGE (p:Project {internal_id:$internal_id}) 
-        ON CREATE SET p.id=$external_id,p.name=$name,p.acronym=$acronym,p.description=$description,p.subjects=$subjects,p.type=$datatypes,p.timepoints=$timepoints,p.disease=$disease,p.tissue=$tissue,p.intervention=$intervention,p.responsible=$responsible,p.participant=$participant,p.start_date=$start_date,p.end_date=$end_date,p.status=$status 
-        WITH p, SPLIT(p.responsible, ",") AS responsibles, SPLIT(p.participant, ",") AS participants, SPLIT(p.disease, ",") AS diseases, SPLIT(p.tissue, ",") AS tissues
+        MERGE (p:Project {internal_id:$internal_id})
+        ON CREATE SET p.id=$external_id,p.name=$name,p.acronym=$acronym,p.description=$description,p.subjects=$subjects,p.type=$datatypes,p.timepoints=$timepoints,p.disease=$disease,p.tissue=$tissue,p.intervention=$intervention,p.responsible=$responsible,p.participant=$participant,p.start_date=$start_date,p.end_date=$end_date,p.status=$status
+        WITH p, SPLIT(p.responsible, "|") AS responsibles, SPLIT(p.participant, "|") AS participants, SPLIT(p.disease, "|") AS diseases, SPLIT(p.tissue, "|") AS tissues
         MATCH (p)
         UNWIND responsibles AS user_mentioned
         MATCH (mentioned:User {name:user_mentioned})

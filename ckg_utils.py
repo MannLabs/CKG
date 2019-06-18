@@ -1,6 +1,7 @@
+import os
+import sys
 import yaml
 import json
-import os
 from os.path import isfile, join
 import logging
 
@@ -63,6 +64,7 @@ def listDirectoryFolders(directory):
 def checkDirectory(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
+    
 
 
 #Add QR code creation

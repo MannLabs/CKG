@@ -1,4 +1,7 @@
+import os
+import sys
 import ckg_utils
+from graphdb_connector import connector
 
 def read_queries(queries_file):
     queries = ckg_utils.get_queries(queries_file)
@@ -40,3 +43,13 @@ def get_nodes(query):
 
 def get_relationships(query):
     return query['involved_rels']
+
+def map_node_name_to_id(driver, node, value):
+    query_name = 'map_node_name'
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    queries_path = "project_cypher.yml"
+    cypher = read_queries(os.path.join(cwd, queries_path))
+    query = cypher[query_name]['query'].replace('NODE', node)
+    identifier = connector.getCursorData(driver, query, parameters={'name':str(value)}).values[0][0]
+    return identifier
+

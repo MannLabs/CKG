@@ -2,6 +2,7 @@ import io
 import os
 import re
 import pandas as pd
+import numpy as np
 import time
 from datetime import datetime
 import base64
@@ -32,7 +33,7 @@ from graphdb_connector import connector
 driver = connector.getGraphDatabaseConnectionConfiguration()
 cwd = os.path.abspath(os.path.dirname(__file__))
 templateDir = os.path.join(cwd, 'apps/templates')
-
+separator = '|'
 
 
 app.layout = html.Div([
@@ -116,42 +117,42 @@ def update_input(responsible, participant, datatype, timepoints, disease, tissue
              [State('responsible-picker','value')])
 def update_dropdown(n_clicks, value):
     if n_clicks != None:
-        return ','.join(value)
+        return separator.join(value)
 
 @app.callback(Output('participant', 'value'),
              [Input('add_participant', 'n_clicks')],
              [State('participant-picker','value')])
 def update_dropdown(n_clicks, value):
     if n_clicks != None:
-        return ','.join(value)
+        return separator.join(value)
 
 @app.callback(Output('data-types', 'value'),
              [Input('add_datatype', 'n_clicks')],
              [State('data-types-picker','value')])
 def update_dropdown(n_clicks, value):
     if n_clicks != None:
-        return ','.join(value)
+        return separator.join(value)
 
 @app.callback(Output('disease', 'value'),
              [Input('add_disease', 'n_clicks')],
              [State('disease-picker','value')])
 def update_dropdown(n_clicks, value):
     if n_clicks != None:
-        return ','.join(value)
+        return separator.join(value)
 
 @app.callback(Output('tissue', 'value'),
              [Input('add_tissue', 'n_clicks')],
              [State('tissue-picker','value')])
 def update_dropdown(n_clicks, value):
     if n_clicks != None:
-        return ','.join(value)
+        return separator.join(value)
 
 @app.callback(Output('intervention', 'value'),
              [Input('add_intervention', 'n_clicks')],
              [State('intervention-picker','value')])
 def update_dropdown(n_clicks, value):
     if n_clicks != None:
-        return ','.join(value)
+        return separator.join(value)
 
 
 @app.callback([Output('project-creation', 'children'),
@@ -181,6 +182,7 @@ def create_project(n_clicks, name, acronym, responsible, participant, datatype, 
         projectData = pd.DataFrame([name, acronym, description, number_subjects, datatype, timepoints, disease, tissue, intervention, responsible, participant, start_date, end_date]).T
         projectData.columns = ['name', 'acronym', 'description', 'subjects', 'datatypes', 'timepoints', 'disease', 'tissue', 'intervention', 'responsible', 'participant', 'start_date', 'end_date']
         projectData['status'] = ''
+        projectData = projectData.fillna('')
 
         # Generate project internal identifier bsed on timestamp
         # Excel file is saved in folder with internal id name
@@ -189,7 +191,7 @@ def create_project(n_clicks, name, acronym, responsible, participant, datatype, 
         
         projectData.insert(loc=0, column='internal_id', value=internal_id)
        
-        result = create_new_project.apply_async(args=[internal_id, projectData.to_json()], task_id='project_creation_'+internal_id)
+        result = create_new_project.apply_async(args=[internal_id, projectData.to_json(), separator], task_id='project_creation_'+internal_id)
         result_output = result.get(timeout=10, propagate=False)
         external_id = list(result_output.keys())[0]
 
@@ -209,7 +211,6 @@ def create_project(n_clicks, name, acronym, responsible, participant, datatype, 
 def update_download_link(n_clicks, project_id):
     if n_clicks is not None and n_clicks > 0:
         project_id = project_id.split()[-1]
-        print('/apps/templates?value=ClinicalData_{}.xlsx'.format(project_id))
         return '/apps/templates?value=ClinicalData_{}.xlsx'.format(project_id)
 
 
@@ -338,16 +339,13 @@ def update_table_download_link(n_clicks, columns, rows, filename, path_name, dat
 
         project_id = path_name.split('/')[-1]
         
-        # #Retrieve identifiers from database
-        # project_id, subject_id, biosample_id, anasample_id = IDRetriver.retrieve_identifiers_from_database(driver, project_external_id)
+        # Extract all relationahips and nodes and save as csv files
 
-        # if data_type == 'clinical':
-        #     #Add subject, biosample and anasample id columns to data
-        #     data.insert(loc=0, column='subject id', value=data['subject external id'].map(attribute_internal_ids(data, 'subject external id', subject_id).get))
-        #     data.insert(loc=1, column='biological_sample id', value=data['biological_sample external id'].map(attribute_internal_ids(data, 'biological_sample external id', biosample_id).get))
-        #     data.insert(loc=2, column='analytical_sample id', value=data['analytical_sample external id'].map(attribute_internal_ids(data, 'analytical_sample external id', anasample_id).get))
-        # else:
-        #   pass
+        # data = dataUpload.create_new_biosamples(driver, project_id, data)
+        # data = dataUpload.create_new_ansamples(driver, project_id, data)
+        # dataUpload.create_clinical_data_csv_files(project_id, data)
+        data = dataUpload.create_csv(driver, project_id, data)
+        print(data)
 
 
 

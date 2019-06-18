@@ -1,0 +1,110 @@
+increment_biosample_id:
+    name:  create new biosample internal identifier 
+    description: 'Returns a new Biological_sample identifier based on the existing ones in the database (sequential identifier)'
+    involved_nodes:
+        - Biological_sample
+    involved_rels:
+    query: >
+        MATCH (b:Biological_sample) 
+        WITH max(toInteger(SPLIT(b.id, 'BS')[1]))+1 as new_id
+        RETURN SUBSTRING('BS',0,2) + new_id AS result;
+create_biosample:
+    name: create biosamples from app
+    description: 'Creates Biological_sample nodes and links them to Subject nodes, directly from dataUploadApp (web app).'
+    involved_nodes:
+        - Subject
+        - Biological_sample
+    involved_rels:
+        - BELONGS_TO_SUBJECT
+    query: >
+        CREATE CONSTRAINT ON (b:Biological_sample) ASSERT b.id IS UNIQUE;
+        MERGE (b:Biological_sample {id:$biosample_id})
+        ON CREATE SET b.external_id=$bio_external_id
+        WITH b
+        MATCH (s:Subject {id:$subject_id})
+        SET s.external_id = $sub_external_id
+        WITH b, s
+        MATCH (b)
+        MERGE (b)-[r:BELONGS_TO_SUBJECT]->(s)
+        RETURN COUNT(b) AS PROJECTID_biosample, COUNT(r) AS PROJECTID_biosample_belongs_to_subject;
+increment_analytical_sample_id:
+    name:  create new analytical sample internal identifier 
+    description: 'Returns a new Analytical_sample identifier based on the existing ones in the database (sequential identifier)'
+    involved_nodes:
+        - Analytical_sample
+    involved_rels:
+    query: >
+        MATCH (a:Analytical_sample) 
+        WITH max(toInteger(SPLIT(a.id, 'AS')[1]))+1 as new_id
+        RETURN SUBSTRING('AS',0,2) + new_id AS result;
+create_analytical_sample:
+    name: create analytical sample from app
+    description: 'Creates Analytical_sample nodes and links them to Biological_sample nodes, directly from dataUploadApp (web app).'
+    involved_nodes:
+        - Biological_sample
+        - Analytical_sample
+    involved_rels:
+        - SPLITTED_INTO
+    query: >
+        CREATE CONSTRAINT ON (a:Analytical_sample) ASSERT a.id IS UNIQUE;
+        MERGE (a:Analytical_sample {id:$ansample_id})
+        ON CREATE SET a.external_id=$an_external_id,a.group=$group
+        WITH a
+        MATCH (b:Biological_sample {id:$biosample_id})
+        MATCH (a) 
+        MERGE (b)-[r:SPLITTED_INTO]->(a)
+        RETURN COUNT(a) AS PROJECTID_analytical_sample, COUNT(r) AS PROJECTID_biosample_splitted_into_ansample;
+map_node_name:
+    name:
+    description:
+    involved_nodes:
+        - Disease
+        - Tissue
+        - Clinical_variable
+    involved_rels:
+    query: >
+        MATCH (n:NODE {name:$name})
+        RETURN n.id;
+
+
+
+
+# extract_project_biosamples:
+#     name: project biosamples
+#     description: 'Extracts Biological_sample ids from specific project id.'
+#     involved_nodes:
+#         - Project
+#         - Subject
+#         - Biological_sample
+#     involved_rels:
+#         - HAS_ENROLLED
+#     query: >
+#         MATCH (p:Project)-[]-(s:Subject)-[]-(b:Biological_sample)
+#         WHERE p.id=$project_id
+#         RETURN b.id;
+
+
+
+
+
+# create_samples:
+#     name: create biological and analytical samples from app
+#     description: ''
+#     involved_nodes:
+#         - Subject
+#         - Biological_sample
+#         - Analytical_sample
+#     involved_rels:
+#         - BELONGS_TO_SUBJECT
+#         - SPLITTED_INTO
+#     query: >
+#         CREATE CONSTRAINT ON (b:Biological_sample) ASSERT b.id IS UNIQUE;
+#         CREATE CONSTRAINT ON (a:Analytical_sample) ASSERT a.id IS UNIQUE;
+#         MERGE (b:Biological_sample {id:$biosample_id})
+#         MERGE (a:Analytical_sample {id:$ansample_id})
+#         WITH b, a
+#         MATCH (s:Subject {id:$subject_id})
+#         MATCH (b)
+#         MATCH (a)
+#         MERGE (s)<-[r:BELONGS_TO_SUBJECT]-(b)-[r2:SPLITTED_INTO]->(a)
+#         RETURN COUNT(b) AS PROJECTID_biosample, OUNT(a) AS PROJECTID_analytical_sample, COUNT(r) AS PROJECTID_biosample_belongs_to_subject, COUNT(r2) AS PROJECTID_biosample_splitted_into_ansample;

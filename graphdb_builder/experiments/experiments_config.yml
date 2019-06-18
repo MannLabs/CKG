@@ -132,8 +132,8 @@ p : &var_p
 dataTypes :
     'clinical':
         'directory': *var_clinicalDirectory
-        'file_cli': 'ClinicalData.xlsx'
-        'file_pro': 'ProjectData.xlsx'
+        'file_cli': 'ClinicalData_PROJECTID.xlsx'
+        'file_pro': 'ProjectData_PROJECTID.xlsx'
     'proteomics':
         'directory': *var_proteomicsDirectory
         'proteins':
