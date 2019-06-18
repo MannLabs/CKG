@@ -7,7 +7,7 @@ import config.ckg_config as ckg_config
 import ckg_utils
 from graphdb_connector import connector
 from graphdb_builder import builder_utils
-from report_manager import queries
+from report_manager.queries import query_utils
 import logging
 import logging.config
 
@@ -73,16 +73,18 @@ def get_subjects_in_project(driver, projectId):
     return result.values
 
 
-def create_new_project(driver, projectId, data):
+def create_new_project(driver, projectId, data, separator='|'):
     query_name = 'create_project'
     external_identifier='No Identifier Assigned'
+    disease_ids = []
+    tissue_ids = []
+    intervention_ids = []
 
     try:
         external_identifier = get_new_project_identifier(driver, projectId)
         data['external_id'] = external_identifier
         project_creation_cypher = get_project_creation_queries()
         query = project_creation_cypher[query_name]['query']
-        
         for q in query.split(';')[0:-1]:
             if '$' in q:
                 for parameters in data.to_dict(orient='records'):
@@ -95,59 +97,67 @@ def create_new_project(driver, projectId, data):
         if pd.isnull(data['timepoints'][0]):
             pass
         else:
-            timepoints = create_new_timepoint(driver, external_identifier, data['timepoints'][0])
+            timepoints = create_new_timepoint(driver, external_identifier, data['timepoints'][0], separator)
         
         if pd.isnull(data['intervention'][0]):
             pass
         else:
-            intervention_rel = create_intervention_relationship(driver, external_identifier, data['intervention'][0])
+            intervention_rel = create_intervention_relationship(driver, external_identifier, data['intervention'][0], separator)
     
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         logger.error("Reading query {}: {}, file: {},line: {}".format(query_name, sys.exc_info(), fname, exc_tb.tb_lineno))
     
-    store_new_project_as_file(external_identifier, data, '', 'csv')
-    store_new_project_as_file(external_identifier, data, '', 'xlsx')
-    store_project_relationships_as_file(external_identifier, data['responsible'][0].split(','), [external_identifier], 'IS_RESPONSIBLE', '_responsibles')
-    store_project_relationships_as_file(external_identifier, data['participant'][0].split(','), [external_identifier], 'PARTICIPATES_IN', '_participants')
-    store_project_relationships_as_file(external_identifier, [external_identifier], data['disease'][0].split(','), 'STUDIES_DISEASE', '_studies_disease')
-    store_project_relationships_as_file(external_identifier, [external_identifier], data['tissue'][0].split(','), 'STUDIES_TISSUE', '_studies_tissue')
-    store_project_relationships_as_file(external_identifier, [external_identifier], data['intervention'][0].split(','), 'STUDIES_INTERVENTION', '_studies_intervention')
+    for disease in data['disease'][0].split(separator):
+        disease_ids.append(query_utils.map_node_name_to_id(driver, 'Disease', str(disease)))
+    for tissue in data['tissue'][0].split(separator):
+        tissue_ids.append(query_utils.map_node_name_to_id(driver, 'Tissue', str(tissue)))
+    for intervention in data['intervention'][0].split(separator):
+        intervention_ids.append(query_utils.map_node_name_to_id(driver, 'Clinical_variable', str(intervention)))
+
+    store_new_project(external_identifier, data, 'csv')
+    store_new_project(external_identifier, data, 'xlsx')
+    store_new_relationships(external_identifier, data['responsible'][0].split(separator), [external_identifier], 'IS_RESPONSIBLE', '_responsibles')
+    store_new_relationships(external_identifier, data['participant'][0].split(separator), [external_identifier], 'PARTICIPATES_IN', '_participants')
+    store_new_relationships(external_identifier, [external_identifier], disease_ids, 'STUDIES_DISEASE', '_studies_disease')
+    store_new_relationships(external_identifier, [external_identifier], tissue_ids, 'STUDIES_TISSUE', '_studies_tissue')
+    store_new_relationships(external_identifier, [external_identifier], intervention_ids, 'STUDIES_INTERVENTION', '_studies_intervention')
 
     return result.values[0], external_identifier
 
 
 def create_new_subject(driver, projectId, subjects):
-    data = pd.DataFrame(index=np.arange(1), columns=np.arange(subjects))
     query_name = 'create_subjects'
     subject_identifier='No Identifier Assigned'
+    subject_ids = []
     try:
-        subject_identifier = get_new_subject_identifier(driver, projectId)
-        #Creates dataframe with sequential subject numbers
-        number = int(subject_identifier.split('S')[1])
-        for i in data.columns:
-            data[i] = number
-            number += 1
-        data = data.T
-        data[0] = 'S' + data[0].astype(str)
-
         project_creation_cypher = get_project_creation_queries()
         query = project_creation_cypher[query_name]['query']
-        for q in query.split(';')[0:-1]:
-            if '$' in q:
-                done = 0
-                for index, row in data.iterrows():
-                    result = connector.getCursorData(driver, q+';', parameters={'subject_id': str(row[0]), 'external_id': str(projectId)})
-                    done += 1
-            else:
-                result = connector.getCursorData(driver, q+';')
+        for subject in list(np.arange(subjects)):
+            done = 0
+            subject_identifier = get_new_subject_identifier(driver, projectId)
+        # #Creates dataframe with sequential subject numbers
+        # number = int(subject_identifier.split('S')[1])
+        # for i in data.columns:
+        #     data[i] = number
+        #     number += 1
+        # data = data.T
+        # data[0] = 'S' + data[0].astype(str)
+            for q in query.split(';')[0:-1]:
+                if '$' in q:
+                    result = connector.getCursorData(driver, q+';', parameters={'subject_id': str(subject_identifier), 'external_id': str(projectId)})
+                else:
+                    result = connector.getCursorData(driver, q+';')
+            subject_ids.append(subject_identifier)
+            done += 1
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         logger.error("Reading query {}: {}, file: {},line: {}".format(query_name, sys.exc_info(), fname, exc_tb.tb_lineno))
     
-    #Add node and relationship type to dataframe and store as csv file
+    # Add node and relationship type to dataframe and store as csv file
+    data = pd.DataFrame(subject_ids)
     data.insert(loc=0, column='', value=projectId)
     data.columns = ['START_ID', 'END_ID']
     data['TYPE'] = 'HAS_ENROLLED'
@@ -155,9 +165,9 @@ def create_new_subject(driver, projectId, subjects):
 
     return done
 
-def create_new_timepoint(driver, projectId, timepoints):
+def create_new_timepoint(driver, projectId, timepoints, separator='|'):
     query_name = 'create_timepoint'
-    timepoints = timepoints.replace(' ', '').split(',')
+    timepoints = timepoints.replace(' ', '').split(separator)
     data = []
     for i in timepoints:
         value = int(''.join(filter(str.isdigit, i)))
@@ -187,9 +197,9 @@ def create_new_timepoint(driver, projectId, timepoints):
     return done
 
 
-def create_intervention_relationship(driver, projectId, intervention):
+def create_intervention_relationship(driver, projectId, intervention, separator='|'):
     query_name = 'create_intervention_relationship'
-    interventions = intervention.split(',')
+    interventions = intervention.split(separator)
     
     try:
         project_creation_cypher = get_project_creation_queries()
@@ -207,12 +217,8 @@ def create_intervention_relationship(driver, projectId, intervention):
 
     return result.values[0][0]
 
-
-def store_new_project_as_file(identifier, data, name, file_format):
+def store_as_file(data, outputfile, file_format):
     if data is not None:
-        importDir = os.path.join(os.path.join(cwd, '../../../data/imports/experiments'), os.path.join(identifier,'clinical'))
-        ckg_utils.checkDirectory(importDir)
-        outputfile = os.path.join(importDir, identifier+name+'.{}'.format(file_format))
         if file_format == 'csv':
             with open(outputfile, 'w') as f:
                 data.to_csv(path_or_buf = f,
@@ -221,10 +227,18 @@ def store_new_project_as_file(identifier, data, name, file_format):
         if file_format == 'xlsx':
             with pd.ExcelWriter(outputfile, mode='w') as e:
                 data.to_excel(e, index=False)
+
+
+def store_new_project(identifier, data, file_format):
+    if data is not None:
+        importDir = os.path.join(os.path.join(cwd, '../../../data/imports/experiments'), os.path.join(identifier,'clinical'))
+        ckg_utils.checkDirectory(importDir)
+        outputfile = os.path.join(importDir, 'ProjectData_{}.{}'.format(identifier, file_format))
+        store_as_file(data, outputfile, file_format)
         
 
 
-def store_project_relationships_as_file(projectId, start_node_list, end_node_list, relationship, filename):
+def store_new_relationships(identifier, start_node_list, end_node_list, relationship, filename):
     length = int(len(max([start_node_list, end_node_list], key=len)))
     data = pd.DataFrame(index=np.arange(length), columns=['START_ID', 'END_ID', 'TYPE'])
     if len(start_node_list) == len(data.index):
@@ -233,7 +247,21 @@ def store_project_relationships_as_file(projectId, start_node_list, end_node_lis
     if len(end_node_list) == len(data.index):
         data['END_ID'] = end_node_list
     else: data['END_ID'] = end_node_list[0]
-    data['TYPE'] = relationship 
-    store_new_project_as_file(projectId, data, filename, 'csv')
+    data['TYPE'] = relationship
+    
+    importDir = os.path.join(os.path.join(cwd, '../../../data/imports/experiments'), os.path.join(identifier,'clinical'))
+    ckg_utils.checkDirectory(importDir)
+    outputfile = os.path.join(importDir, identifier+'_{}.{}'.format(filename, file_format))
+    store_as_file(data, outputfile, file_format)
+
+
+
+
+
+
+
+
+
+
 
 

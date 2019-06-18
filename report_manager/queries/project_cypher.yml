@@ -71,3 +71,17 @@ projects_subgraph:
     query_type: post
     query: >
         MATCH path=(p:Project)-[:STUDIES_DISEASE|:STUDIES_TISSUE|:STUDIES_INTERVENTION]-() WHERE p.id IN [LIST_PROJECTS] RETURN path
+map_node_name:
+    name:
+    description:
+    involved_nodes:
+        - Disease
+        - Tissue
+        - Clinical_variable
+    involved_rels:
+    query: >
+        MATCH (n:NODE {name:$name})
+        RETURN n.id;
+test:
+    query: >
+        MATCH (n:Clinical_variable) WHERE n.name='Body weight' RETURN n.name,n.id
