@@ -82,6 +82,3 @@ map_node_name:
     query: >
         MATCH (n:NODE {name:$name})
         RETURN n.id;
-test:
-    query: >
-        MATCH (n:Clinical_variable) WHERE n.name='Body weight' RETURN n.name,n.id

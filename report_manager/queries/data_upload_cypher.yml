@@ -54,57 +54,12 @@ create_analytical_sample:
         MATCH (a) 
         MERGE (b)-[r:SPLITTED_INTO]->(a)
         RETURN COUNT(a) AS PROJECTID_analytical_sample, COUNT(r) AS PROJECTID_biosample_splitted_into_ansample;
-map_node_name:
+subject_number:
     name:
     description:
     involved_nodes:
-        - Disease
-        - Tissue
-        - Clinical_variable
+        - Project
     involved_rels:
     query: >
-        MATCH (n:NODE {name:$name})
-        RETURN n.id;
-
-
-
-
-# extract_project_biosamples:
-#     name: project biosamples
-#     description: 'Extracts Biological_sample ids from specific project id.'
-#     involved_nodes:
-#         - Project
-#         - Subject
-#         - Biological_sample
-#     involved_rels:
-#         - HAS_ENROLLED
-#     query: >
-#         MATCH (p:Project)-[]-(s:Subject)-[]-(b:Biological_sample)
-#         WHERE p.id=$project_id
-#         RETURN b.id;
-
-
-
-
-
-# create_samples:
-#     name: create biological and analytical samples from app
-#     description: ''
-#     involved_nodes:
-#         - Subject
-#         - Biological_sample
-#         - Analytical_sample
-#     involved_rels:
-#         - BELONGS_TO_SUBJECT
-#         - SPLITTED_INTO
-#     query: >
-#         CREATE CONSTRAINT ON (b:Biological_sample) ASSERT b.id IS UNIQUE;
-#         CREATE CONSTRAINT ON (a:Analytical_sample) ASSERT a.id IS UNIQUE;
-#         MERGE (b:Biological_sample {id:$biosample_id})
-#         MERGE (a:Analytical_sample {id:$ansample_id})
-#         WITH b, a
-#         MATCH (s:Subject {id:$subject_id})
-#         MATCH (b)
-#         MATCH (a)
-#         MERGE (s)<-[r:BELONGS_TO_SUBJECT]-(b)-[r2:SPLITTED_INTO]->(a)
-#         RETURN COUNT(b) AS PROJECTID_biosample, OUNT(a) AS PROJECTID_analytical_sample, COUNT(r) AS PROJECTID_biosample_belongs_to_subject, COUNT(r2) AS PROJECTID_biosample_splitted_into_ansample;
+        MATCH (p:Project {id:$external_id})
+        RETURN p.subjects

@@ -84,7 +84,7 @@ class ProjectCreationApp(basicApp.BasicApp):
                                                  style={'width':'20%', 'marginLeft': '0%', 'verticalAlign':'top', 'display':'inline-block'}),
                               html.Div(children=[html.Button('Add', id='add_tissue', style={'height':'35px'})],
                                                  style={'width':'10%', 'marginLeft': '0.4%', 'verticalAlign':'top', 'display':'inline-block'}),
-                              html.Div(children=[dcc.Dropdown(id='intervention-picker', options=[{'label':i, 'value':i} for i in ClinicalVariables['n.name']], value=['',''], multi=True, searchable=True, style={'width':'100%'})],
+                              html.Div(children=[dcc.Dropdown(id='intervention-picker', options=[{'label':i, 'value':i} for i in ClinicalVariables], value=['',''], multi=True, searchable=True, style={'width':'100%'})],
                                                  style={'width':'20%', 'marginLeft': '20.6%', 'verticalAlign':'top', 'display':'inline-block'}),
                               html.Div(children=[html.Button('Add', id='add_intervention', style={'height':'35px'})],
                                                  style={'width':'10%', 'marginLeft': '0.4%', 'verticalAlign':'top', 'display':'inline-block'}),

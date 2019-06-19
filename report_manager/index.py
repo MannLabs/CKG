@@ -20,7 +20,8 @@ from dash.dependencies import Input, Output, State
 from dash_network import Network
 
 from app import app
-from apps import initialApp, projectApp, importsApp, projectCreationApp, dataUploadApp, projectCreation
+from apps import initialApp, projectApp, importsApp, projectCreationApp, dataUploadApp
+from apps import projectCreation, dataUpload
 from graphdb_builder import builder_utils
 from graphdb_builder.builder import loader
 from graphdb_builder.experiments import experiments_controller as eh
@@ -66,13 +67,13 @@ def display_page(pathname):
         else:
             return '404'
 
+
 ###Callbacks for download project
 @app.callback(
     Output('download-zip', 'href'),
     [Input('download-zip', 'n_clicks')],[State('url', 'pathname')])
 def generate_report_url(n_clicks, pathname):
     project_id = pathname.split('/')[-1]
-    
     return '/downloads/{}'.format(project_id)
     
 @app.server.route('/downloads/<value>')
@@ -80,22 +81,16 @@ def generate_report_url(value):
     uri = os.path.join(os.getcwd(),"../../data/downloads/"+value+'.zip')
     return flask.send_file(uri, attachment_filename = value+'.zip', as_attachment = True)
 
+
 ###Callbacks for project creation app
 def image_formatter(im):
     return f'<img src="data:image/jpeg;base64,{image_base64(im)}">'
 
-def add_internal_identifiers_to_excel(driver, external_id):
+def add_internal_identifiers_to_excel(driver, external_id, data):
     subject_ids = projectCreation.get_subjects_in_project(driver, external_id)
     subject_ids = natsorted([item for sublist in subject_ids for item in sublist], reverse=False)
-    filename = os.path.join(templateDir, 'ClinicalData_template.xlsx')
-    outputfile = os.path.join(templateDir, 'ClinicalData_{}.xlsx'.format(external_id))
-    template = pd.read_excel(filename)
-    template.insert(loc=0, column='subject id', value=subject_ids)
-    writer = pd.ExcelWriter(outputfile)
-    template.to_excel(writer, 'Sheet1', index=False)
-    writer.save()
-
-
+    data.insert(loc=0, column='subject id', value=subject_ids)
+    return data
 
 @app.callback(Output('dum-div', 'children'),
              [Input('responsible', 'value'),
@@ -110,7 +105,6 @@ def add_internal_identifiers_to_excel(driver, external_id):
               Input('update_project_id', 'value')])
 def update_input(responsible, participant, datatype, timepoints, disease, tissue, intervention, upload_dt, project_id):
     return responsible, participant, datatype, timepoints, disease, tissue, intervention, upload_dt, project_id
-
 
 @app.callback(Output('responsible', 'value'),
              [Input('add_responsible', 'n_clicks')],
@@ -154,7 +148,6 @@ def update_dropdown(n_clicks, value):
     if n_clicks != None:
         return separator.join(value)
 
-
 @app.callback([Output('project-creation', 'children'),
                Output('update_project_id','children'),
                Output('update_project_id','style')],
@@ -176,70 +169,59 @@ def create_project(n_clicks, name, acronym, responsible, participant, datatype, 
     if n_clicks != None and any(elem is None for elem in [name, number_subjects, datatype, disease, tissue, responsible]) == True:
         response = "Insufficient information to create project. Refresh page."
         return response, None, {'display': 'inline-block'}
-
     if n_clicks != None and any(elem is None for elem in [name, number_subjects, datatype, disease, tissue, responsible]) == False:
         # Get project data from filled-in fields
         projectData = pd.DataFrame([name, acronym, description, number_subjects, datatype, timepoints, disease, tissue, intervention, responsible, participant, start_date, end_date]).T
         projectData.columns = ['name', 'acronym', 'description', 'subjects', 'datatypes', 'timepoints', 'disease', 'tissue', 'intervention', 'responsible', 'participant', 'start_date', 'end_date']
         projectData['status'] = ''
         projectData = projectData.fillna('')
-
         # Generate project internal identifier bsed on timestamp
         # Excel file is saved in folder with internal id name
         epoch = time.time()
         internal_id = "%s%d" % ("CP", epoch)
-        
         projectData.insert(loc=0, column='internal_id', value=internal_id)
        
         result = create_new_project.apply_async(args=[internal_id, projectData.to_json(), separator], task_id='project_creation_'+internal_id)
         result_output = result.get(timeout=10, propagate=False)
         external_id = list(result_output.keys())[0]
 
-        add_internal_identifiers_to_excel(driver, external_id)
-
         if result is not None:
             response = "Project successfully submitted. Download Clinical Data template."
         else:
             response = "There was a problem when creating the project."
-
         return response, '- '+external_id, {'display': 'inline-block'}
-    
 
 @app.callback(Output('download_link', 'href'),
              [Input('download_button', 'n_clicks')],
              [State('update_project_id', 'children')])
-def update_download_link(n_clicks, project_id):
-    if n_clicks is not None and n_clicks > 0:
-        project_id = project_id.split()[-1]
-        return '/apps/templates?value=ClinicalData_{}.xlsx'.format(project_id)
-
+def update_download_link(n_clicks, pathname):
+  project_id = pathname.split()[-1]
+  return '/apps/templates?value=ClinicalData_template_{}.xlsx'.format(project_id)
 
 @app.server.route('/apps/templates')
 def serve_static():
     file = flask.request.args.get('value')
+    filename = '_'.join(file.split('_')[:-1])+'.xlsx'
     project_id = file.split('_')[-1].split('.')[0]
-    df = pd.read_excel('apps/templates/{}'.format(file))
+    df = pd.read_excel('apps/templates/{}'.format(filename))
+    df = add_internal_identifiers_to_excel(driver, project_id, df)
     str_io = io.StringIO()
-    df.to_csv(str_io)
+    df.to_csv(str_io, sep='\t', index=False)
     mem = io.BytesIO()
     mem.write(str_io.getvalue().encode('utf-8'))
     mem.seek(0)
     str_io.close()
     return flask.send_file(mem,
                            mimetype='text/csv',
-                           attachment_filename='ClinicalData_{}.csv'.format(project_id),
+                           attachment_filename='ClinicalData_{}.tsv'.format(project_id),
                            as_attachment=True,
                            cache_timeout=0)
-
 
 @app.callback(Output('project_button', 'disabled'),
              [Input('project_button', 'n_clicks')])
 def disable_submit_button(n_clicks):
     if n_clicks > 0:
         return True
-
-
-
 
 
 ###Callbacks for data upload app
@@ -267,7 +249,6 @@ def export_contents(data, dataDir, filename):
         csv_string = data.to_excel(os.path.join(dataDir, filename), index=False, encoding='utf-8')   
     return csv_string
 
-
 @app.callback([Output('clinical-table', 'data'),
                Output('clinical-table', 'columns')],
               [Input('upload-data', 'contents'),
@@ -288,18 +269,14 @@ def update_data(contents, filename, n_clicks, value, existing_columns):
             for i in df.columns:
                 columns.append({'id': i, 'name': i,
                                          'editable_name': False, 'deletable': True})
-
         if n_clicks is not None and n_clicks > 0:
             for j in value:
                 columns.append({'id': j, 'name': j,
                                      'editable_name': False, 'deletable': True})
-
         empty_cols = [i for i, d in enumerate(columns) if d['id']=='']
         for i in empty_cols:
             del columns[i]
-
         return data, columns
-
 
 @app.callback(Output('upload-data-type', 'value'),
              [Input('add_upload_datatype', 'n_clicks')],
@@ -307,7 +284,6 @@ def update_data(contents, filename, n_clicks, value, existing_columns):
 def update_dropdown(n_clicks, value):
     if n_clicks != None:
         return value
-
 
 @app.callback([Output('data_download_link', 'href'),
                Output('data_download_link', 'download')],
@@ -323,7 +299,6 @@ def update_table_download_link(n_clicks, columns, rows, data_type):
         csv_string = "data:text/csv;charset=utf-8," + urllib.parse.quote(csv_string)
         return csv_string, 'downloaded_DATATYPE_DataUpload.csv'.replace('DATATYPE', data_type)
 
-
 @app.callback(Output('data-upload', 'children'),
              [Input('submit_button', 'n_clicks')],
              [State('clinical-table', 'columns'),
@@ -336,32 +311,15 @@ def update_table_download_link(n_clicks, columns, rows, filename, path_name, dat
         # Get Clinical data from Uploaded and updated table
         cols = [d['id'] for d in columns]
         data = pd.DataFrame(rows, columns=cols)
-
         project_id = path_name.split('/')[-1]
-        
         # Extract all relationahips and nodes and save as csv files
-
-        # data = dataUpload.create_new_biosamples(driver, project_id, data)
-        # data = dataUpload.create_new_ansamples(driver, project_id, data)
-        # dataUpload.create_clinical_data_csv_files(project_id, data)
-        data = dataUpload.create_csv(driver, project_id, data)
-        print(data)
-
-
-
-
-
-
-        # # Path to new local folder
+        data = dataUpload.create_new_experiment_in_db(driver, project_id, data, separator=separator)
+        # Path to new local folder
         dataDir = '../../data/imports/experiments/PROJECTID/DATATYPE/'.replace('PROJECTID', project_id).replace('DATATYPE', data_type)
-        
-        # # Check/create folders based on local
+        # Check/create folders based on local
         ckg_utils.checkDirectory(dataDir)
-
         csv_string = export_contents(data, dataDir, filename)
-        
         message = 'FILE successfully uploaded.'.replace('FILE', '"'+filename+'"')
-
         return message
 
 
