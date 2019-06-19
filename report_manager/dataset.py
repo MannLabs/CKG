@@ -421,9 +421,9 @@ class MultiOmicsDataset(Dataset):
         store.close()
 
 class ProteomicsDataset(Dataset):
-    def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
+    def __init__(self, identifier, dataset_type="proteomics", data={}, analyses={}, analysis_queries={}, report=None):
         config_file = "proteomics.yml"
-        Dataset.__init__(self, identifier, "proteomics", data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
+        Dataset.__init__(self, identifier, dataset_type, data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
         self.set_configuration_from_file(config_file)
 
     def generate_dataset(self):
@@ -465,6 +465,7 @@ class LongitudinalProteomicsDataset(ProteomicsDataset):
     def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
         config_file = "proteomics.yml"
         ProteomicsDataset.__init__(self, identifier, data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
+        #self.dataset_type = "longitudinal_proteomics"
         self.set_configuration_from_file(config_file)
 
 class ClinicalDataset(Dataset):

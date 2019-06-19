@@ -94,27 +94,28 @@ class Report:
     #ToDo load Network data
     def read_report(self, directory):
         report_plots = defaultdict(list)
-        with h5.File(os.path.join(directory, "report.h5"), 'r') as f:
-            for name in f:
-                plot_id = name.split('~')
-                if len(plot_id) >1:
-                    analysis = plot_id[0]
-                    plot_type = plot_id[1]
-                for figure_id in f[name]:
-                    figure_json = f[name+"/"+figure_id][0]
-                    identifier = f[name+"/"+figure_id].attrs["identifier"]
-                    if 'net' in identifier:
-                        figure = {}
-                        net_json = json.loads(figure_json)
-                        if 'notebook' in net_json:
-                            figure['net_json'] = net_json['notebook']
-                            netx = json_graph.node_link_graph(figure['net_json'])
-                            figure['notebook'] = basicFigures.get_notebook_network_pyvis(netx)
-                        if 'app' in net_json:
-                            figure['app'] = net_json['app']
-                    else:
-                        figure = json.loads(figure_json)
-                    report_plots[name].append(figure)
+        if os.path.exists(os.path.join(directory, "report.h5")):
+            with h5.File(os.path.join(directory, "report.h5"), 'r') as f:
+                for name in f:
+                    plot_id = name.split('~')
+                    if len(plot_id) >1:
+                        analysis = plot_id[0]
+                        plot_type = plot_id[1]
+                    for figure_id in f[name]:
+                        figure_json = f[name+"/"+figure_id][0]
+                        identifier = f[name+"/"+figure_id].attrs["identifier"]
+                        if 'net' in identifier:
+                            figure = {}
+                            net_json = json.loads(figure_json)
+                            if 'notebook' in net_json:
+                                figure['net_json'] = net_json['notebook']
+                                netx = json_graph.node_link_graph(figure['net_json'])
+                                figure['notebook'] = basicFigures.get_notebook_network_pyvis(netx)
+                            if 'app' in net_json:
+                                figure['app'] = net_json['app']
+                        else:
+                            figure = json.loads(figure_json)
+                        report_plots[name].append(figure)
         self.plots = report_plots
 
     def visualize_report(self, environment):

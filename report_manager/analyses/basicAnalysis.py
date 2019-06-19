@@ -408,11 +408,30 @@ def run_correlation(df, alpha=0.05, subject='subject', group='group', method='pe
     return correlation
 
 def calculate_rm_correlation(df, x, y, subject):
-    r, dof, pvalue, ci, power = pg.rm_corr(data=df, x=x, y=y, subject=subject)
-    
-    return (x, y, r, pvalue, dof, ci, power)
+    # ANCOVA model
+    cols = ["col0","col1", subject]
+    a = "col0"
+    b = "col1"
+    df.columns = cols
 
-@jit(nopython=False, parallel=True)
+    formula = b + ' ~ ' + 'C(' + subject + ') + ' + a
+    model = ols(formula, data=df).fit()
+    table = sm.stats.anova_lm(model, typ=3)
+    # Extract the sign of the correlation and dof
+    sign = np.sign(model.params[a])
+    dof = int(table.loc['Residual', 'df'])
+    # Extract correlation coefficient from sum of squares
+    ssfactor = table.loc[a, 'sum_sq']
+    sserror = table.loc['Residual', 'sum_sq']
+    rm = sign * np.sqrt(ssfactor / (ssfactor + sserror))
+    # Extract p-value
+    pvalue = table.loc[a, 'PR(>F)']
+    pvalue *= 0.5
+    
+    #r, dof, pvalue, ci, power = pg.rm_corr(data=df, x=x, y=y, subject=subject)
+    
+    return (x, y, rm, pvalue, dof)
+
 def run_rm_correlation(df, alpha=0.05, subject='subject', correction=('fdr', 'indep')):
     calculated = set()
     rows = []
@@ -423,10 +442,11 @@ def run_rm_correlation(df, alpha=0.05, subject='subject', correction=('fdr', 'in
         combinations = itertools.combinations(df.columns, 2)
         df = df.reset_index()
         for x, y in combinations:
-            row = calculate_rm_correlation(df, x, y, subject)
+            subset = df[[x,y, subject]]
+            row = calculate_rm_correlation(subset, x, y, subject)
             rows.append(row)
         end = time.time()
-        correlation = pd.DataFrame(rows, columns=["node1", "node2", "weight", "pvalue", "dof", "CI95%", "power"])
+        correlation = pd.DataFrame(rows, columns=["node1", "node2", "weight", "pvalue", "dof"])
         
         if correction[0] == 'fdr':
             rejected, padj = apply_pvalue_fdrcorrection(correlation["pvalue"].tolist(), alpha=alpha, method=correction[1])
@@ -553,8 +573,8 @@ def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject',
     if subject is not None and check_is_paired(df, subject, group):
         groups = df[group].unique()
         drop_cols = [d for d in drop_cols if d != subject]
-        if len(groups) == 2:
-            res = run_ttest(df, groups[0], groups[1], alpha = alpha, drop_cols=drop_cols, subject=subject, group=group, paired=True, correction='indep')
+        if len(df[subject].unique()) == 1:
+            res = run_ttest(df, groups[0], groups[1], alpha = alpha, drop_cols=drop_cols, subject=subject, group=group, paired=True, correction='indep', permutations=permutations)
         else:
             
             res = run_repeated_measurements_anova(df, alpha=alpha, drop_cols=drop_cols, subject=subject, group=group, permutations=0)
