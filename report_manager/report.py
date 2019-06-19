@@ -158,31 +158,32 @@ class Report:
             name = "_".join(plot_type) if isinstance(plot_type, tuple) else plot_type
             i = 0
             for plot in self.plots[plot_type]:
-                figure_name = name
-                if name in saved:
-                    figure_name = name +"_"+str(i)
-                    i += 1
-                if "net_json" in plot:
-                    with open(os.path.join(directory, name+'.json'), 'w') as out:
-                        out.write(json.dumps(plot["net_json"]))
-                    
-                    graph = json_graph.node_link_graph(plot["net_json"])
-                    try:
-                        nx.write_gml(graph, os.path.join(directory, name+".gml"))
-                    except: 
-                        pass
-                    if "app" in plot:
-                        plot = plot["app"]
-                if 'props' in plot:
-                    if 'figure' in plot['props']:
+                if plot is not None:
+                    figure_name = name
+                    if name in saved:
+                        figure_name = name +"_"+str(i)
+                        i += 1
+                    if "net_json" in plot:
+                        with open(os.path.join(directory, name+'.json'), 'w') as out:
+                            out.write(json.dumps(plot["net_json"]))
+                        
+                        graph = json_graph.node_link_graph(plot["net_json"])
                         try:
-                            basicFigures.save_DASH_plot(plot['props']['figure'], name=figure_name, plot_format='svg', directory=directory)
+                            nx.write_gml(graph, os.path.join(directory, name+".gml"))
+                        except: 
+                            pass
+                        if "app" in plot:
+                            plot = plot["app"]
+                    if 'props' in plot:
+                        if 'figure' in plot['props']:
+                            try:
+                                basicFigures.save_DASH_plot(plot['props']['figure'], name=figure_name, plot_format='svg', directory=directory)
+                                saved.add(figure_name)
+                            except:
+                                pass
+                    else:
+                        try:
+                            basicFigures.save_DASH_plot(plot.figure, name=figure_name, plot_format='svg', directory=directory)
                             saved.add(figure_name)
                         except:
                             pass
-                else:
-                    try:
-                        basicFigures.save_DASH_plot(plot.figure, name=figure_name, plot_format='svg', directory=directory)
-                        saved.add(figure_name)
-                    except:
-                        pass

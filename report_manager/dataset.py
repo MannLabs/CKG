@@ -1,7 +1,7 @@
 import os
 import sys
 import pandas as pd
-import h5py
+import h5py as h5
 import ckg_utils
 import config.ckg_config as ckg_config
 from report_manager import analysisResult as ar, report as rp
@@ -357,12 +357,14 @@ class Dataset:
     def save_dataset(self, dataset_directory):
         if not os.path.isdir(dataset_directory):
             os.makedirs(dataset_directory)
-
-        store = pd.HDFStore(os.path.join(dataset_directory, self.dataset_type+"_dataset.h5"))
-        for data in self.data:
-            name = data.replace(" ", "_")
-            store.put(name, self.data[data], format='table')
-        store.close()
+        if len(self.data) > 0:
+            dt = h5.special_dtype(vlen=str) 
+            with h5.File(os.path.join(dataset_directory, self.dataset_type+"_dataset.h5"), "w") as f:
+                grp = f.create_group(self.dataset_type)
+                for data in self.data:
+                    name = data.replace(" ", "_")
+                    df_set = grp.create_dataset(name, (1,), dtype=dt, compression="gzip")
+                    df_set[:] = str(self.data[data].to_json(orient='records'))
 
     def save_dataset_to_file(self, dataset_directory):
         if not os.path.isdir(dataset_directory):
@@ -382,9 +384,10 @@ class Dataset:
         data = {}
         dataset_store = os.path.join(dataset_directory, self.dataset_type+"_dataset.h5")
         if os.path.isfile(dataset_store):
-            f = h5py.File(dataset_store, 'r')
-            for key in list(f.keys()):
-                data[key.replace("_", " ")] = pd.read_hdf(dataset_store, key)
+            with h5.File(dataset_store, 'r') as f:
+                if self.dataset_type in f:
+                    for name in f[self.dataset_type]:
+                        data[name.replace("_", " ")] = pd.read_json(f[self.dataset_type+"/"+name][0], orient='records')
 
         return data
 
