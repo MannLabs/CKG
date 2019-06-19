@@ -84,7 +84,7 @@ create_intervention_relationship:
     involved_rels:
     query: >
         MATCH (p:Project {id:$external_id})
-        MATCH (c:Clinical_variable {name:$intervention}) 
+        MATCH (c:Clinical_variable {id:$intervention_id}) 
         MERGE (p)-[r:STUDIES_INTERVENTION]->(c)
         RETURN COUNT(r) AS PROJECTID_studies_intervention;
 extract_project_subjects:

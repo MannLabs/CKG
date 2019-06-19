@@ -31,9 +31,6 @@ df = pd.DataFrame(connector.getCursorData(driver, query).values)
 df[0] = ['({0})'.format(i) for i in df[0].tolist()]
 ClinicalVariables = df[[1, 0]].apply(lambda x: ' '.join(x),axis=1).tolist()
 
-# template_cols = pd.read_excel(os.path.join(os.getcwd(), 'apps/templates/ClinicalData_template.xlsx'))
-# template_cols = template_cols.columns.tolist()
-
 
 class DataUploadApp(basicApp.BasicApp):
     def __init__(self, projectId, title, subtitle, description, layout = [], logo = None, footer = None):
@@ -96,6 +93,5 @@ class DataUploadApp(basicApp.BasicApp):
                              							 style={'marginTop':'5%', 'fontSize':'22px', 'minWidth':'500px', 'marginLeft':'89%'})]),
                             html.Div(id='data-upload', style={'fontSize':'20px', 'marginLeft':'70%'}),
                 			html.Hr()])]
-
 
         self.extend_layout(layout)

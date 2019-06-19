@@ -197,7 +197,7 @@ def extractResponsibleRelationships(project_data, separator='|'):
     if pd.isna(data['responsible'][0]):
         return None
     else:
-        df = pd.DataFrame(data.responsible.str.split('|').tolist()).T.rename(columns={0:'START_ID'})
+        df = pd.DataFrame(data.responsible.str.split(separator).tolist()).T.rename(columns={0:'START_ID'})
         df['END_ID'] = data['external_id'][0]
         df['TYPE'] = 'IS_RESPONSIBLE'
         return df
@@ -207,7 +207,7 @@ def extractParticipantRelationships(project_data, separator='|'):
     if pd.isna(data['participant'][0]):
         return None
     else:
-        df = pd.DataFrame(data.participant.str.split('|').tolist()).T.rename(columns={0:'START_ID'})
+        df = pd.DataFrame(data.participant.str.split(separator).tolist()).T.rename(columns={0:'START_ID'})
         df['END_ID'] = data['external_id'][0]
         df['TYPE'] = 'PARTICIPATES_IN'
         return df
@@ -238,15 +238,14 @@ def extractProjectDiseaseRelationships(driver, project_data, separator='|'):
         df['TYPE'] = 'STUDIES_DISEASE'
         return df
 
-def extractProjectInterventionRelationships(driver, project_data, separator='|'):
+def extractProjectInterventionRelationships(project_data, separator='|'):
     data = project_data.copy()
-    intervention_ids = []
     if pd.isna(data['intervention'][0]):
         return None
     else:
-        for intervention in data['intervention'][0].split(separator):
-            intervention_ids.append(query_utils.map_node_name_to_id(driver, 'Clinical_variable', str(intervention)))
-        df = pd.DataFrame(intervention_ids, columns=['END_ID'])
+        interventions = data['intervention'][0].split(separator)
+        ids = [re.search('\(([^)]+)',x).group(1) for x in interventions]
+        df = pd.DataFrame(ids, columns=['END_ID'])
         df.insert(loc=0, column='START_ID', value=data['external_id'][0])
         df['TYPE'] = 'STUDIES_INTERVENTION'
         return df
@@ -256,7 +255,7 @@ def extractTimepoints(project_data, separator='|'):
     if pd.isna(data['timepoints'][0]):
         return None
     else:
-        df = pd.DataFrame(data['timepoints'][0].replace(' ','').split(','))
+        df = pd.DataFrame(data['timepoints'][0].replace(' ','').split(separator))
         df = df[0].str.extract('(\d+\d*)([a-zA-Z]+)', expand=True)
         df.columns = ['ID', 'units']
         df['type'] = 'Timepoint'
@@ -277,11 +276,11 @@ def extractSubjectIds(project_data, clinical_data):
     if pd.isna(data['subject external_id']).any():
         return None
     else:
-        df = df[['subject external_id']].dropna(axis=0).reset_index()
+        df = data[['subject external_id']].dropna(axis=0).reset_index()
         df = df.drop_duplicates(keep='first').reset_index(drop=True)
         df.columns = ['ID', 'external_id']
         if int(project_data['subjects'][0]) != len(df['ID']):
-            df = []
+            df = None
         return df
 
 def extractBiologicalSampleSubjectRelationships(clinical_data):
@@ -289,7 +288,7 @@ def extractBiologicalSampleSubjectRelationships(clinical_data):
     if pd.isna(data['biological_sample id']).any():
         return None
     else:
-        df = df[['biological_sample id', 'subject id']].drop_duplicates(keep='first').reset_index(drop=True)
+        df = data[['biological_sample id', 'subject id']].drop_duplicates(keep='first').reset_index(drop=True)
         df.columns = ['START_ID', 'END_ID']
         df['TYPE'] = 'BELONGS_TO_SUBJECT'
         return df
@@ -329,7 +328,7 @@ def extractBiologicalSampleAnalyticalSampleRelationships(clinical_data):
         return df
 
 def extractBiologicalSampleTimepointRelationships(clinical_data):
-    df = clinical_data.copy()
+    data = clinical_data.copy()
     if pd.isna(data['timepoint']).all():
         return None
     else:
@@ -344,16 +343,17 @@ def extractBiologicalSampleTissueRelationships(clinical_data):
         return None
     else:
         df = data[['biological_sample id', 'tissue id']]
+        df.columns = ['START_ID', 'END_ID']
         df['TYPE'] = 'FROM_TISSUE'
         return df
 
-def extractSubjectDiseaseRelationships(clinical_data):
+def extractSubjectDiseaseRelationships(clinical_data, separator='|'):
     data = clinical_data.copy()
     if pd.isna(data['disease id']).all():
         return None
     else:
         data = data.astype(str)
-        df = pd.DataFrame(data['disease id'].str.split('|').tolist(), index=data['subject id']).stack()
+        df = pd.DataFrame(data['disease id'].str.split(separator).tolist(), index=data['subject id']).stack()
         df = df.reset_index([0, 'subject id']).replace('nan', np.nan).dropna().drop_duplicates(keep='first')
         df.columns = ['START_ID', 'END_ID']
         df['TYPE'] = 'HAS_DISEASE'
@@ -776,15 +776,6 @@ def generateDatasetImports(projectId, dataType):
                         dataRows = extractProjectSubjectRelationships(project_data, clinical_data)
                         if dataRows is not None:
                             generateGraphFiles(dataRows,'project', projectId, stats, d = dataType)
-
-
-
-
-
-
-
-
-                            
                         dataRows = extractSubjectIds(project_data, clinical_data)
                         if dataRows is not None:
                             generateGraphFiles(dataRows,'subjects', projectId, stats, d = dataType)
@@ -806,7 +797,7 @@ def generateDatasetImports(projectId, dataType):
                         dataRows = extractBiologicalSampleTissueRelationships(clinical_data)
                         if dataRows is not None:
                             generateGraphFiles(dataRows,'biosample_tissue', projectId, stats, d = dataType)
-                        dataRows = extractSubjectDiseaseRelationships(clinical_data)
+                        dataRows = extractSubjectDiseaseRelationships(clinical_data, separator='|')
                         if dataRows is not None:
                             generateGraphFiles(dataRows,'disease', projectId, stats, d = dataType)
                         dataRows = extractBiologicalSampleGroupRelationships(clinical_data)
