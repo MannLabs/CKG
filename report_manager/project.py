@@ -217,6 +217,12 @@ class Project:
 
         return df
 
+    def list_datasets(self):
+        datasets = None
+        if self.datasets is not None:
+            datasets = self.datasets.keys()
+        return datasets
+
     def to_json(self):
         d = self.to_dict()
         djson = dumps(d)
@@ -259,14 +265,18 @@ class Project:
         
         return exists
 
-    def load_project_report(self):
+    def load_project(self):
+        self.load_project_data()
         project_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),"../../data/reports/"), self.identifier)
         self.report = {}
         for root, data_types, files in os.walk(project_dir):
             for data_type in data_types:
                 r = rp.Report(data_type,{})
                 r.read_report(os.path.join(root, data_type))
-                self.update_report({data_type:r})
+                if data_type in self.datasets:
+                    self.datasets[data_type].report = r
+                else:
+                    self.update_report({data_type:r})
 
     def load_project_data(self):
         project_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),"../../data/reports/"), self.identifier)
@@ -285,13 +295,12 @@ class Project:
                     dataset = MultiOmicsDataset(self.identifier, data={}, analyses={}, report=None)
                 
                 if dataset is not None:
-                    data = dataset.load_dataset(os.path.join(root,data_type))
+                    dataset.load_dataset(os.path.join(root,data_type))
                     self.update_dataset({data_type:dataset})
             
     def build_project(self):
         if self.check_report_exists():
-            self.load_project_report()
-            self.load_project_data()
+            self.load_project()
         if len(self.report) == 0 or len(self.datasets) == 0:
             project_info = self.query_data()
             self.set_attributes(project_info)
@@ -433,7 +442,7 @@ class Project:
                 dataset = self.get_dataset(dataset_type)
                 if dataset is not None:
                     dataset.generate_report()
-                    self.update_report({dataset.dataset_type:dataset.report})
+                    #self.update_report({dataset.dataset_type:dataset.report})
             self.save_project_report()
             self.save_project_datasets()
             self.download_project()
@@ -451,16 +460,29 @@ class Project:
     def empty_report(self):
         self.report = {}
 
+    def save_project(self):
+        self.save_project_report()
+        self.save_project_datasets_reports()
+
     def save_project_report(self):
         directory = self.get_report_directory()
-        for dataset in self.report:
-            report = self.report[dataset]
-            dataset_dir = os.path.join(directory, dataset)
+        for report_name in self.report:
+            report = self.report[report_name]
+            dataset_dir = os.path.join(directory, report_name)
             if not os.path.exists(dataset_dir):
                 os.makedirs(dataset_dir)
             report.save_report(dataset_dir)
+        
+        self.save_project_datasets_reports()
 
-    def save_project_datasets(self):
+    def save_project_datasets_reports(self):
+        for dataset_type in self.datasets:
+            dataset = self.datasets[dataset_type]
+            dataset_directory = os.path.join(directory, dataset_type)
+            if isinstance(dataset, Dataset):
+                dataset.save_report(dataset_directory)
+
+    def save_project_datasets_data(self):
         directory = self.get_report_directory()
         for dataset_type in self.datasets:
             dataset = self.datasets[dataset_type]

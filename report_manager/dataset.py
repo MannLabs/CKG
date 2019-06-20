@@ -377,19 +377,16 @@ class Dataset:
             else:
                 print(name, data)
 
-    def save_dataset_report(self, dataset_directory):
+    def save_report(self, dataset_directory):
         self.report.save_report(directory=dataset_directory)
 
     def load_dataset(self, dataset_directory):
-        data = {}
         dataset_store = os.path.join(dataset_directory, self.dataset_type+"_dataset.h5")
         if os.path.isfile(dataset_store):
             with h5.File(dataset_store, 'r') as f:
                 if self.dataset_type in f:
                     for name in f[self.dataset_type]:
-                        data[name.replace("_", " ")] = pd.read_json(f[self.dataset_type+"/"+name][0], orient='records')
-
-        return data
+                        self.data[name.replace("_", " ")] = pd.read_json(f[self.dataset_type+"/"+name][0], orient='records')
 
     def load_dataset_report(self):
         dataset_directory = self.get_dataset_data_directory()

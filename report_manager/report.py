@@ -43,6 +43,13 @@ class Report:
     def update_plots(self, plot):
         self._plots.update(plot)
 
+    def list_plots(self):
+        plots = []
+        if self.plots is not None:
+            plots = self.plots.keys()
+
+        return plots
+
     def print_report(self, directory, plot_format='pdf'):
         for plot_id in self._plots:
             name = "_".join(plot_id)

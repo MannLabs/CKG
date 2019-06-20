@@ -155,6 +155,21 @@ class AnalysisResult:
                 permutations = self.args["permutations"]
             anova_result = analyses.run_repeated_measurements_anova(self.data, drop_cols=drop_cols, subject=subject, group=group, alpha=alpha, permutations=permutations)
             self.result[self.analysis_type] = anova_result
+        elif self.analysis_type == "dabest":
+            drop_cols = []
+            group = 'group'
+            subject = 'subject'
+            test = 'mean_diff'
+            if "drop_cols" in self.args:
+                drop_cols = self.args['drop_cols']
+            if "group" in self.args:
+                group = self.args["group"]
+            if "subject" in self.args:
+                subject = self.args["subject"]
+            if "test" in self.args:
+                test = self.args["test"]
+            dabest_result = analyses.run_dabest(self.data, drop_cols=drop_cols, subject=subject, group=group, test=test)
+            self.result[self.analysis_type] = dabest_result
         elif self.analysis_type  == "correlation":
             alpha = 0.05
             method = 'pearson'
