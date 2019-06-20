@@ -212,10 +212,10 @@ def serve_static():
     mem.seek(0)
     str_io.close()
     return flask.send_file(mem,
-                           mimetype='text/csv',
-                           attachment_filename='ClinicalData_{}.tsv'.format(project_id),
-                           as_attachment=True,
-                           cache_timeout=0)
+                          mimetype='text/csv',
+                          attachment_filename='ClinicalData_{}.tsv'.format(project_id),
+                          as_attachment=True,
+                          cache_timeout=0)
 
 @app.callback(Output('project_button', 'disabled'),
              [Input('project_button', 'n_clicks')])
@@ -241,7 +241,7 @@ def parse_contents(contents, filename):
 def export_contents(data, dataDir, filename):
     file = filename.split('.')[-1]
     
-    if file == 'txt':
+    if file == 'txt' or file == 'tsv':
         csv_string = data.to_csv(os.path.join(dataDir, filename), sep='\t', index=False, encoding='utf-8')
     elif file == 'csv':
         csv_string = data.to_csv(os.path.join(dataDir, filename), sep=',', index=False, encoding='utf-8')
@@ -261,7 +261,7 @@ def update_data(contents, filename, n_clicks, value, existing_columns):
         columns = []
         df = parse_contents(contents, filename)
         if len(df.columns) > 100 and len(df.index) > 1000:
-          df = df.iloc[:100,:100]
+            df = df.iloc[:100,:100]
 
         data = None
         if df is not None:
@@ -313,9 +313,13 @@ def update_table_download_link(n_clicks, columns, rows, filename, path_name, dat
         data = pd.DataFrame(rows, columns=cols)
         project_id = path_name.split('/')[-1]
         # Extract all relationahips and nodes and save as csv files
-        data = dataUpload.create_new_experiment_in_db(driver, project_id, data, separator=separator)
+        if data_type == 'clinical':
+            data = dataUpload.create_new_experiment_in_db(driver, project_id, data, separator=separator)
+            loader.partialUpdate(imports='project')
+        else:
+            pass
         # Path to new local folder
-        dataDir = '../../data/imports/experiments/PROJECTID/DATATYPE/'.replace('PROJECTID', project_id).replace('DATATYPE', data_type)
+        dataDir = '../../data/experiments/PROJECTID/DATATYPE/'.replace('PROJECTID', project_id).replace('DATATYPE', data_type)
         # Check/create folders based on local
         ckg_utils.checkDirectory(dataDir)
         csv_string = export_contents(data, dataDir, filename)
