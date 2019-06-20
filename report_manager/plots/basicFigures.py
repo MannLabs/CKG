@@ -13,6 +13,7 @@ from plotly import tools
 import plotly.io as pio
 from scipy.spatial.distance import pdist, squareform
 from plotly.graph_objs import *
+from scipy.stats import zscore
 from kmapper import plotlyviz
 import networkx as nx
 from pyvis.network import Network as visnet
@@ -697,7 +698,7 @@ def get_network(data, identifier, args):
         colors = {n:col[clusters[n]] for n in clusters}
         nx.set_node_attributes(graph, colors, 'color')
         nx.set_node_attributes(graph, clusters, 'cluster')
-        notebook_net = get_notebook_network_pyvis(graph, args)
+        #notebook_net = get_notebook_network_pyvis(graph, args)
         nodes_table, edges_table = network_to_tables(graph)
         nodes_fig_table = get_table(nodes_table, identifier=identifier+"_nodes_table", title=args['title']+" nodes table")
         edges_fig_table = get_table(edges_table, identifier=identifier+"_edges_table", title=args['title']+" edges table")
@@ -708,7 +709,7 @@ def get_network(data, identifier, args):
         
         cy_elements = utils.networkx_to_cytoscape(graph)
 
-        net = {"notebook":notebook_net, "app":get_cytoscape_network(cy_elements, identifier, args), "net_tables":(nodes_fig_table, edges_fig_table), "net_json":json_graph.node_link_data(graph)}
+        net = {"notebook":[cy_elements, stylesheet,layout], "app":get_cytoscape_network(cy_elements, identifier, args), "net_tables":(nodes_fig_table, edges_fig_table), "net_json":json_graph.node_link_data(graph)}
     return net
 
 def get_network_style(node_colors, color_edges):
@@ -974,38 +975,37 @@ def get_clustergrammer_plot(df, identifier, args):
     return div
 
 def get_parallel_plot(data, identifier, args):
-    lines = []
-    for col in data:
-        for group in data[col]:
-
-            pass
-
-
-    trace = [go.Parcoords(
-                line = dict(color = df[args['group']],
-                #colorscale = [[0,'#D7C16B'],[0.5,'#23D8C3'],[1,'#F3F10F']]),
-                dimensions = list([
-                    dict(range = [0,8],
-                        constraintrange = [4,8],
-                        label = 'Sepal Length', values = df['sepal_length']),
-                    dict(range = [0,8],
-                        label = 'Sepal Width', values = df['sepal_width']),
-                    dict(range = [0,8],
-                        label = 'Petal Length', values = df['petal_length']),
-                    dict(range = [0,8],
-                        label = 'Petal Width', values = df['petal_width'])        
-                    ])
-                ))
-    ]
-    
-    layout = go.Layout(
-        plot_bgcolor = '#E5E5E5',
-        paper_bgcolor = '#E5E5E5',
-        template='plotly_white'
+    if 'group' in args:
+        group = args['group']
+        if 'zscore' in args:
+            if args['zscore']:
+                data = data.set_index(group).appy(zscore)
+        color = '#de77ae'
+        if 'color' in args:
+            color = args['color']
+        min_val = data._get_numeric_data().min().min().round()
+        max_val = data._get_numeric_data().max().max().round()
+        df = data.reset_index().groupby(group)
+        dims = []
+        for i in df.groups:
+            values = df.get_group(i).values.tolist()[0][1:]
+            
+            dim = dict(label=i, range=[min_val, max_val], values=values)
+            dims.append(dim)
+        
+        fig_data = [ 
+                go.Parcoords(
+                    line = dict(color = color),
+                    dimensions = dims)
+                ]
+        layout = go.Layout(
+            title=args['title'],
+            annotations= [dict(xref='paper', yref='paper', showarrow=False, text='')],
+            template='plotly_white'
         )
+        
+        fig = go.Figure(data = fig_data, layout = layout)
     
-    fig = go.Figure(data = data, layout = layout)
-
     return dcc.Graph(id=identifier, figure=fig)
 
 def get_WGCNAPlots(data, identifier):

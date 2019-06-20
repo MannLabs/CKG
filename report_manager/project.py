@@ -325,7 +325,6 @@ class Project:
                     dataset = MultiOmicsDataset(self.identifier, data=self.datasets, analyses={}, report=None)
                     self.update_dataset({'multiomics':dataset})
                     self.append_data_type('multiomics')
-            print(self.datasets)
     
     def get_projects_overlap(self, project_info):
         overlap = None
@@ -444,7 +443,7 @@ class Project:
                     dataset.generate_report()
                     #self.update_report({dataset.dataset_type:dataset.report})
             self.save_project_report()
-            self.save_project_datasets()
+            self.save_project_datasets_data()
             self.download_project()
             self.notify_project_ready()
 
@@ -476,6 +475,7 @@ class Project:
         self.save_project_datasets_reports()
 
     def save_project_datasets_reports(self):
+        directory = self.get_report_directory()
         for dataset_type in self.datasets:
             dataset = self.datasets[dataset_type]
             dataset_directory = os.path.join(directory, dataset_type)

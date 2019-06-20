@@ -8,6 +8,7 @@ import plotly.graph_objs as go
 from plotly.offline import iplot
 from collections import defaultdict
 from IPython.display import IFrame, display
+from cyjupyter import Cytoscape
 import tempfile
 import networkx as nx
 from networkx.readwrite import json_graph
@@ -78,7 +79,9 @@ class Report:
                     if isinstance(plot, dict):
                         figure_json = {}
                         if 'net_json' in plot:
-                            figure_json['notebook'] = plot['net_json']
+                            figure_json['net_json'] = plot['net_json']
+                        if 'notebook' in plot:
+                            figure_json['notebook'] = plot['notebook']
                         if 'app' in plot:
                             json_str = utils.convert_dash_to_json(plot['app'])
                             figure_json['app'] = json_str
@@ -114,12 +117,8 @@ class Report:
                         if 'net' in identifier:
                             figure = {}
                             net_json = json.loads(figure_json)
-                            if 'notebook' in net_json:
-                                figure['net_json'] = net_json['notebook']
-                                netx = json_graph.node_link_graph(figure['net_json'])
-                                figure['notebook'] = basicFigures.get_notebook_network_pyvis(netx)
-                            if 'app' in net_json:
-                                figure['app'] = net_json['app']
+                            for key in net_json:
+                                figure[key] = net_json[key]
                         else:
                             figure = json.loads(figure_json)
                         report_plots[name].append(figure)
@@ -132,12 +131,7 @@ class Report:
                 if environment == "notebook":
                     if "notebook" in plot:
                         net = plot['notebook']
-                        if not os.path.isdir('./tmp'):
-                            os.makedirs('./tmp')
-                        fnet = tempfile.NamedTemporaryFile(suffix=".html", delete=False, dir='tmp/')
-                        with open(fnet.name, 'w') as f:
-                            f.write(net.html)
-                        display(IFrame(os.path.relpath(fnet.name),width=800, height=850))
+                        report_plots.append(Cytoscape(data={'elements':net[0]}, visual_style=net[1], layout={'width':'100%', 'height':'700px'}))
                     else:
                         if 'props' in plot:
                             if 'figure' in plot['props']:
@@ -156,6 +150,34 @@ class Report:
                             app_plots.append(tables[1])
 
                     report_plots.append(plot)
+
+        return report_plots
+
+    def visualize_plot(self, environment, plot_type):
+        report_plots = []
+        for plot in self.plots[plot_type]:
+            if environment == "notebook":
+                if "notebook" in plot:
+                    net = plot['notebook']
+                    report_plots = Cytoscape(data={'elements':net[0]}, visual_style=net[1], layout={'width':'100%', 'height':'700px'})
+                else:
+                    if 'props' in plot:
+                        if 'figure' in plot['props']:
+                            try:
+                                iplot(plot['props']['figure'])
+                            except:
+                                pass
+                     
+            else:
+                if isinstance(plot, dict):
+                    if "app" in plot:
+                        plot = plot["app"]
+                    if 'net_tables' in plot:
+                        tables = plot['net_tables']
+                        app_plots.append(tables[0])
+                        app_plots.append(tables[1])
+
+                report_plots.append(plot)
 
         return report_plots
 

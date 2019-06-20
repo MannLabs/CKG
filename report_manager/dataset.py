@@ -378,6 +378,8 @@ class Dataset:
                 print(name, data)
 
     def save_report(self, dataset_directory):
+        if not os.path.exists(dataset_directory):
+                os.makedirs(dataset_directory)
         self.report.save_report(directory=dataset_directory)
 
     def load_dataset(self, dataset_directory):
