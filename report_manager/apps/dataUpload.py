@@ -77,12 +77,15 @@ def create_new_biosamples(driver, projectId, data):
 	try:
 		cypher = get_data_upload_queries()
 		query = cypher[query_name]['query']
-		for subject, sub_external_id, bio_external_id in zip(data['subject id'], data['subject external_id'], data['biological_sample external_id'].unique()):
+		df = data[[i for i in data.columns if str(i).startswith('biological_sample')]]
+		df.columns=[col.replace('biological_sample ', '') for col in df.columns]
+		for bio_external_id in data['biological_sample external_id'].unique():
 			biosample_id = get_new_biosample_identifier(driver)
 			biosample_dict[bio_external_id] = biosample_id
 			for q in query.split(';')[0:-1]:
 				if '$' in q:
-					result = connector.getCursorData(driver, q+';', parameters={'biosample_id': str(biosample_id), 'bio_external_id': str(bio_external_id), 'subject_id': str(subject), 'sub_external_id': str(sub_external_id)})
+					for parameters in df.to_dict(orient='records'):
+						result = connector.getCursorData(driver, q+';', parameters=parameters)
 				else:
 					result = connector.getCursorData(driver, q+';')
 			done += 1
@@ -101,12 +104,17 @@ def create_new_ansamples(driver, projectId, data):
 	try:
 		cypher = get_data_upload_queries()
 		query = cypher[query_name]['query']
-		for biosample_id, an_external_id, group in zip(data['biological_sample id'], data['analytical_sample external_id'].unique(), data['grouping1']):
+		df = data[[i for i in data.columns if str(i).startswith('analytical_sample')]]
+		df.columns=[col.replace('analytical_sample ', '') for col in df.columns]
+		df['group'] = data['grouping1']
+		df['secondary_group'] = data['grouping2']
+		for an_external_id in data['analytical_sample external_id'].unique():
 			ansample_id = get_new_analytical_sample_identifier(driver)
 			ansample_dict[an_external_id] = ansample_id
 			for q in query.split(';')[0:-1]:
 				if '$' in q:
-					result = connector.getCursorData(driver, q+';', parameters={'ansample_id': str(ansample_id), 'an_external_id': str(an_external_id), 'group': str(group), 'biosample_id': str(biosample_id)})
+					for parameters in df.to_dict(orient='records'):
+						result = connector.getCursorData(driver, q+';', parameters=parameters)
 				else:
 					result = connector.getCursorData(driver, q+';')
 			done += 1
@@ -121,6 +129,7 @@ def create_new_ansamples(driver, projectId, data):
 def create_new_experiment_in_db(driver, projectId, data, separator='|'):
 	tissue_dict = {}
 	disease_dict = {}
+	intervention_dict = {}
 
 	for disease in data['disease'].dropna().unique():
 		if len(disease.split(separator)) > 1:
@@ -137,7 +146,11 @@ def create_new_experiment_in_db(driver, projectId, data, separator='|'):
 		tissue_id = query_utils.map_node_name_to_id(driver, 'Tissue', str(tissue))
 		tissue_dict[tissue] = tissue_id
 
-	data.insert(1, 'intervention id', data['intervention'].str.extract('.*\((.*)\).*')[0].tolist())
+	for interventions in data['intervention'].dropna().unique():
+		for intervention in interventions.split('|'):
+			intervention_dict[intervention] = re.search('\(([^)]+)', intervention.split()[-1]).group(1)
+
+	data.insert(1, 'intervention id', data['intervention'].map(intervention_dict))
 	data.insert(1, 'disease id', data['disease'].map(disease_dict))
 	data.insert(1, 'tissue id', data['tissue'].map(tissue_dict))
 
@@ -166,7 +179,7 @@ def create_new_experiment_in_db(driver, projectId, data, separator='|'):
 		generateGraphFiles(dataRows,'biosample_analytical', projectId, d='clinical')
 	dataRows = eh.extractBiologicalSampleTimepointRelationships(df2)
 	if dataRows is not None:
-		generateGraphFiles(dataRows,'biological_sample_sample_at_timepoint', projectId, d='clinical')
+		generateGraphFiles(dataRows,'biological_sample_at_timepoint', projectId, d='clinical')
 	dataRows = eh.extractBiologicalSampleTissueRelationships(df2)
 	if dataRows is not None:
 		generateGraphFiles(dataRows,'biosample_tissue', projectId, d='clinical')
@@ -186,9 +199,9 @@ def create_new_experiment_in_db(driver, projectId, data, separator='|'):
 def generateGraphFiles(data, dataType, projectId, ot = 'w', d = 'proteomics'):
 	importDir = os.path.join('../../data/imports/experiments', os.path.join(projectId,d))
 	ckg_utils.checkDirectory(importDir)
-	outputfile = os.path.join(importDir, projectId+"_"+dataType.lower()+".csv")
+	outputfile = os.path.join(importDir, projectId+"_"+dataType.lower()+".tsv")
 	with open(outputfile, ot) as f:
-		data.to_csv(path_or_buf = f,
+		data.to_csv(path_or_buf = f, sep='\t',
 					header=True, index=False, quotechar='"',
 					line_terminator='\n', escapechar='\\')
 	logger.info("Experiment {} - Number of {} relationships: {}".format(projectId, dataType, data.shape[0]))

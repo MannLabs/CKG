@@ -98,7 +98,7 @@ class ProjectCreationApp(basicApp.BasicApp):
                                                  style={'width':'49%', 'marginLeft':'2%', 'verticalAlign':'top', 'display':'inline-block'}),
                               html.Div(children=[dcc.Input(id='number_subjects', placeholder='E.g. 77 (each unique patient counts as 1 subject)', type='text', style={'width':'100%', 'height':'35px'})],
                                                  style={'width':'49%', 'marginLeft':'0%', 'verticalAlign':'top', 'display':'inline-block'}),                              
-                              html.Div(children=[dcc.Input(id='number_timepoints', placeholder='E.g. 2 months, 15 days, 24 hours...', type='text', style={'width':'100%', 'height':'35px'})],
+                              html.Div(children=[dcc.Input(id='number_timepoints', placeholder='E.g. 2 months|15 days|24 hours...', type='text', style={'width':'100%', 'height':'35px'})],
                                                  style={'width':'49%', 'marginLeft':'2%', 'verticalAlign':'top', 'display':'inline-block'}),            
                               html.Div(children=[html.Label('Project Description:', style={'marginTop':15}),
                                                  dcc.Textarea(id='project description', placeholder='Enter description...', style={'width':'100%', 'height':'100px'})]),

@@ -244,7 +244,7 @@ def extractProjectInterventionRelationships(project_data, separator='|'):
         return pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE'])
     else:
         interventions = data['intervention'][0].split(separator)
-        ids = [re.search('\(([^)]+)',x).group(1) for x in interventions]
+        ids = [re.search('\(([^)]+)',x.split()[-1]).group(1) for x in interventions]
         df = pd.DataFrame(ids, columns=['END_ID'])
         df.insert(loc=0, column='START_ID', value=data['external_id'][0])
         df['TYPE'] = 'STUDIES_INTERVENTION'
@@ -253,10 +253,10 @@ def extractProjectInterventionRelationships(project_data, separator='|'):
 def extractTimepoints(project_data, separator='|'):
     data = project_data.copy()
     if pd.isna(data['timepoints'][0]):
-        return pd.DataFrame(columns=['ID', 'units', 'Timepoint'])
+        return pd.DataFrame(columns=['ID', 'units', 'type'])
     else:
         df = pd.DataFrame(data['timepoints'][0].replace(' ','').split(separator))
-        df = df[0].str.extract('(\d+\d*)([a-zA-Z]+)', expand=True)
+        df = df[0].str.extract('([\-\d]+)([a-zA-Z]+)', expand=True)
         df.columns = ['ID', 'units']
         df['type'] = 'Timepoint'
         return df
@@ -333,6 +333,7 @@ def extractBiologicalSampleTimepointRelationships(clinical_data):
         return pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE','timepoint_units', 'intervention'])
     else:
         df = data[['biological_sample id', 'timepoint', 'timepoint units', 'intervention id']].drop_duplicates(keep='first').reset_index(drop=True)
+        df['intervention id'] = df['intervention id'].replace(np.nan, 0).astype('int64').astype('str').replace('0', np.nan)
         df.columns = ['START_ID', 'END_ID', 'timepoint_units', 'intervention']
         df.insert(loc=2, column='TYPE', value='SAMPLE_AT_TIMEPOINT')
         return df
@@ -342,7 +343,7 @@ def extractBiologicalSampleTissueRelationships(clinical_data):
     if pd.isna(data['tissue id']).all():
         return None
     else:
-        df = data[['biological_sample id', 'tissue id']]
+        df = data[['biological_sample id', 'tissue id']].drop_duplicates(keep='first').reset_index(drop=True)
         df.columns = ['START_ID', 'END_ID']
         df['TYPE'] = 'FROM_TISSUE'
         return df
@@ -382,12 +383,19 @@ def extractBiologicalSampleClinicalVariablesRelationships(clinical_data):
     df.columns = df.columns.str.extract('.*\((.*)\).*')[0].tolist()
     df_quant = df._get_numeric_data()
     df_state = df.loc[:,~df.columns.isin(df_quant.columns.tolist())]
-    df_state = df_state.stack().reset_index().drop_duplicates(keep='first').dropna()
-    df_state.columns = ['START_ID', 'END_ID', 'value']
-    df_state.insert(loc=2, column='TYPE', value='HAS_CLINICAL_STATE')
-    df_quant = df_quant.stack().reset_index().drop_duplicates(keep='first').dropna()
-    df_quant.columns = ['START_ID', 'END_ID', 'value']
-    df_quant.insert(loc=2, column='TYPE', value='HAS_QUANTIFIED_CLINICAL')
+    if df_quant.empty:
+        df_quant = pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE','value'])
+    else:
+        df_quant = df_quant.stack().reset_index().drop_duplicates(keep='first').dropna()
+        df_quant.columns = ['START_ID', 'END_ID', 'value']
+        df_quant.insert(loc=2, column='TYPE', value='HAS_QUANTIFIED_CLINICAL')
+    if df_state.empty:
+        df_state = pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE','value'])
+    else:
+        df_state = df_state.stack().reset_index().drop_duplicates(keep='first').dropna()
+        df_state.columns = ['START_ID', 'END_ID', 'value']
+        df_state.insert(loc=2, column='TYPE', value='HAS_CLINICAL_STATE')
+    
     return df_state, df_quant
 
 # def extractSubjectClinicalVariablesRelationships(data):
@@ -768,7 +776,7 @@ def generateDatasetImports(projectId, dataType):
                         dataRows = extractProjectDiseaseRelationships(driver, project_data, separator=separator)
                         if dataRows is not None:
                             generateGraphFiles(dataRows,'studies_disease', projectId, stats, d = dataType)
-                        dataRows = extractProjectInterventionRelationships(driver, project_data, separator=separator)
+                        dataRows = extractProjectInterventionRelationships(project_data, separator=separator)
                         if dataRows is not None:
                             generateGraphFiles(dataRows,'studies_intervention', projectId, stats, d = dataType)
                         dataRows = extractTimepoints(project_data, separator=separator)
@@ -794,7 +802,7 @@ def generateDatasetImports(projectId, dataType):
                             generateGraphFiles(dataRows,'biosample_analytical', projectId, stats, d = dataType)
                         dataRows = extractBiologicalSampleTimepointRelationships(clinical_data)
                         if dataRows is not None:
-                            generateGraphFiles(dataRows,'biological_sample_sample_at_timepoint', projectId, stats, d = dataType)
+                            generateGraphFiles(dataRows,'biological_sample_at_timepoint', projectId, stats, d = dataType)
                         dataRows = extractBiologicalSampleTissueRelationships(clinical_data)
                         if dataRows is not None:
                             generateGraphFiles(dataRows,'biosample_tissue', projectId, stats, d = dataType)
@@ -865,11 +873,11 @@ def generateGraphFiles(data, dataType, projectId, stats, ot = 'w', d = 'proteomi
     importDir = os.path.join(config["experimentsImportDirectory"], os.path.join(projectId,d))
     ckg_utils.checkDirectory(importDir)
     if dataType.lower() == '':
-        outputfile = os.path.join(importDir, projectId+dataType.lower()+".csv")
+        outputfile = os.path.join(importDir, projectId+dataType.lower()+".tsv")
     else:
-        outputfile = os.path.join(importDir, projectId+"_"+dataType.lower()+".csv")
+        outputfile = os.path.join(importDir, projectId+"_"+dataType.lower()+".tsv")
     with open(outputfile, ot) as f:
-        data.to_csv(path_or_buf = f,
+        data.to_csv(path_or_buf = f, sep='\t',
             header=True, index=False, quotechar='"',
             line_terminator='\n', escapechar='\\')
     logger.info("Experiment {} - Number of {} relationships: {}".format(projectId, dataType, data.shape[0]))
