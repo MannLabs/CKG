@@ -241,7 +241,7 @@ def extractProjectDiseaseRelationships(driver, project_data, separator='|'):
 def extractProjectInterventionRelationships(project_data, separator='|'):
     data = project_data.copy()
     if pd.isna(data['intervention'][0]):
-        return None
+        return pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE'])
     else:
         interventions = data['intervention'][0].split(separator)
         ids = [re.search('\(([^)]+)',x).group(1) for x in interventions]
@@ -253,7 +253,7 @@ def extractProjectInterventionRelationships(project_data, separator='|'):
 def extractTimepoints(project_data, separator='|'):
     data = project_data.copy()
     if pd.isna(data['timepoints'][0]):
-        return None
+        return pd.DataFrame(columns=['ID', 'units', 'Timepoint'])
     else:
         df = pd.DataFrame(data['timepoints'][0].replace(' ','').split(separator))
         df = df[0].str.extract('(\d+\d*)([a-zA-Z]+)', expand=True)
@@ -330,7 +330,7 @@ def extractBiologicalSampleAnalyticalSampleRelationships(clinical_data):
 def extractBiologicalSampleTimepointRelationships(clinical_data):
     data = clinical_data.copy()
     if pd.isna(data['timepoint']).all():
-        return None
+        return pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE','timepoint_units', 'intervention'])
     else:
         df = data[['biological_sample id', 'timepoint', 'timepoint units', 'intervention id']].drop_duplicates(keep='first').reset_index(drop=True)
         df.columns = ['START_ID', 'END_ID', 'timepoint_units', 'intervention']
@@ -749,28 +749,29 @@ def generateDatasetImports(projectId, dataType):
                 dataDir = config["dataTypes"][dataType]["directory"].replace("PROJECTID", projectId)
                 configuration = config["dataTypes"][dataType]
                 if dataType == "clinical":
+                    separator = configuration["separator"]
                     project_data = parseClinicalDataset(projectId, configuration, dataDir, key='project')
                     clinical_data = parseClinicalDataset(projectId, configuration, dataDir, key='clinical')
                     if project_data is not None and clinical_data is not None:
                         dataRows = extractProjectInfo(project_data)
                         if dataRows is not None:
                             generateGraphFiles(dataRows,'', projectId, stats, d = dataType)
-                        dataRows = extractResponsibleRelationships(project_data, separator='|')
+                        dataRows = extractResponsibleRelationships(project_data, separator=separator)
                         if dataRows is not None:
                             generateGraphFiles(dataRows,'responsibles', projectId, stats, d = dataType)
-                        dataRows = extractParticipantRelationships(project_data, separator='|')
+                        dataRows = extractParticipantRelationships(project_data, separator=separator)
                         if dataRows is not None:
                             generateGraphFiles(dataRows,'participants', projectId, stats, d = dataType)
-                        dataRows = extractProjectTissueRelationships(driver, project_data, separator='|')
+                        dataRows = extractProjectTissueRelationships(driver, project_data, separator=separator)
                         if dataRows is not None:
                             generateGraphFiles(dataRows,'studies_tissue', projectId, stats, d = dataType)
-                        dataRows = extractProjectDiseaseRelationships(driver, project_data, separator='|')
+                        dataRows = extractProjectDiseaseRelationships(driver, project_data, separator=separator)
                         if dataRows is not None:
                             generateGraphFiles(dataRows,'studies_disease', projectId, stats, d = dataType)
-                        dataRows = extractProjectInterventionRelationships(driver, project_data, separator='|')
+                        dataRows = extractProjectInterventionRelationships(driver, project_data, separator=separator)
                         if dataRows is not None:
                             generateGraphFiles(dataRows,'studies_intervention', projectId, stats, d = dataType)
-                        dataRows = extractTimepoints(project_data, separator='|')
+                        dataRows = extractTimepoints(project_data, separator=separator)
                         if dataRows is not None:
                             generateGraphFiles(dataRows,'timepoint', projectId, stats, d = dataType)
                         dataRows = extractProjectSubjectRelationships(project_data, clinical_data)
@@ -797,7 +798,7 @@ def generateDatasetImports(projectId, dataType):
                         dataRows = extractBiologicalSampleTissueRelationships(clinical_data)
                         if dataRows is not None:
                             generateGraphFiles(dataRows,'biosample_tissue', projectId, stats, d = dataType)
-                        dataRows = extractSubjectDiseaseRelationships(clinical_data, separator='|')
+                        dataRows = extractSubjectDiseaseRelationships(clinical_data, separator=separator)
                         if dataRows is not None:
                             generateGraphFiles(dataRows,'disease', projectId, stats, d = dataType)
                         dataRows = extractBiologicalSampleGroupRelationships(clinical_data)

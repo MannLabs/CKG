@@ -865,11 +865,11 @@ CREATE_TIMEPOINT: &create_timepoint
     'name': 'create timepoint'
     'description': 'Creates Timepoint nodes and links them to the Biological_sample nodes of origin. Timepoints are defined by the users and a unit must be given (e.g. days, hours).'
     'query': >
-        CREATE CONSTRAINT ON (t:Timepoint) ASSERT t.id IS UNIQUE;
+        CREATE CONSTRAINT ON (t:timepoint) ASSERT t.id IS UNIQUE;
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_timepoint.tsv" AS line
         FIELDTERMINATOR '\t'
-        MERGE (t:Timepoint {id:line.ID})
+        MERGE (t:timepoint {id:line.ID})
         ON CREATE SET t.units=line.units
         RETURN COUNT(t) AS PROJECTID_timepoint;
         USING PERIODIC COMMIT 10000
