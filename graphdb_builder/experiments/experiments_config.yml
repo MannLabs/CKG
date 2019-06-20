@@ -134,6 +134,7 @@ dataTypes :
         'directory': *var_clinicalDirectory
         'file_cli': 'ClinicalData_PROJECTID.xlsx'
         'file_pro': 'ProjectData_PROJECTID.xlsx'
+        'separator': '|'
     'proteomics':
         'directory': *var_proteomicsDirectory
         'proteins':
