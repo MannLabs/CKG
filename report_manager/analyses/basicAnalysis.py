@@ -392,8 +392,6 @@ def run_correlation(df, alpha=0.05, subject='subject', group='group', method='pe
             r, p = run_efficient_correlation(df, method=method)
             rdf = pd.DataFrame(r, index=df.columns, columns=df.columns)
             pdf = pd.DataFrame(p, index=df.columns, columns=df.columns)
-            rdf.values[[np.arange(len(rdf))]*2] = np.nan
-            pdf.values[[np.arange(len(pdf))]*2] = np.nan
             correlation = convertToEdgeList(rdf, ["node1", "node2", "weight"])
             pvalues = convertToEdgeList(pdf, ["node1", "node2", "pvalue"])
 
@@ -435,7 +433,6 @@ def calculate_rm_correlation(df, x, y, subject):
 def run_rm_correlation(df, alpha=0.05, subject='subject', correction=('fdr', 'indep')):
     calculated = set()
     rows = []
-    #df = df.dropna()._get_numeric_data()
     if not df.empty:
         df = df.set_index(subject)._get_numeric_data()
         start = time.time()
@@ -466,7 +463,8 @@ def run_efficient_correlation(data, method='pearson'):
     elif method == 'spearman':
         r, p = stats.spearmanr(matrix, axis=0)
 
-    rf = r[np.triu_indices(r.shape[0], 1)]
+    diagonal = np.triu_indices(r.shape[0],1)
+    rf = r[diagonal]
     df = matrix.shape[1] - 2
     ts = rf * rf * (df / (1 - rf * rf))
     pf = betainc(0.5 * df, 0.5, df / (df + ts))
@@ -474,6 +472,9 @@ def run_efficient_correlation(data, method='pearson'):
     p[np.triu_indices(p.shape[0], 1)] = pf
     p[np.tril_indices(p.shape[0], -1)] = pf
     p[np.diag_indices(p.shape[0])] = np.ones(p.shape[0])
+    
+    r[diagonal] = np.nan 
+    p[diagonal] = np.nan
 
     return r, p
 
