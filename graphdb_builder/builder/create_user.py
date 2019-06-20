@@ -23,7 +23,7 @@ driver = connector.getGraphDatabaseConnectionConfiguration()
 
 def get_user_creation_queries():
 	try:
-		queries_path = '../queries/user_creation_cypher.yml'
+		queries_path = 'user_creation_cypher.yml'
 		user_creation_cypher = ckg_utils.get_queries(os.path.join(cwd, queries_path))
 	except Exception as err:
 		exc_type, exc_obj, exc_tb = sys.exc_info()

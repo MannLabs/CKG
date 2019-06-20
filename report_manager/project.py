@@ -283,6 +283,7 @@ class Project:
                     dataset = LongitudinalProteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
                 elif data_type == "multiomics":
                     dataset = MultiOmicsDataset(self.identifier, data={}, analyses={}, report=None)
+                
                 if dataset is not None:
                     data = dataset.load_dataset(os.path.join(root,data_type))
                     self.update_dataset({data_type:dataset})
@@ -297,26 +298,25 @@ class Project:
             self.get_similar_projects(project_info)
             self.get_projects_overlap(project_info)
             for data_type in self.data_types:
+                dataset = None
                 if data_type == "proteomics":
                     dataset = ProteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
-                    dataset.generate_dataset()
-                    self.update_dataset({data_type:dataset})
                 elif data_type == "clinical":
                     dataset = ClinicalDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
-                    dataset.generate_dataset()
-                    self.update_dataset({data_type:dataset})
                 elif data_type == "wes" or data_type == "wgs":
                     dataset = DNAseqDataset(self.identifier, dataset_type=data_type, data={}, analyses={}, analysis_queries={}, report=None)
-                    dataset.generate_dataset()
-                    self.update_dataset({data_type:dataset})
                 elif data_type == "longitudinal_proteomics":
                     dataset = LongitudinalProteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
+            
+                if dataset is not None:
                     dataset.generate_dataset()
                     self.update_dataset({data_type:dataset})
-            if len(self.data_types) > 1:
+            
+            if len(self.datasets) > 1:
                     dataset = MultiOmicsDataset(self.identifier, data=self.datasets, analyses={}, report=None)
                     self.update_dataset({'multiomics':dataset})
                     self.append_data_type('multiomics')
+            print(self.datasets)
     
     def get_projects_overlap(self, project_info):
         overlap = None
@@ -408,7 +408,7 @@ class Project:
             plot = figure.get_cytoscape_network(utils.networkx_to_cytoscape(G), "projects_subgraph", args)
         
         except Exception as err:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
+            exc_type, exc_obj, exc_tb = sys.exc_INFO()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             logger.error("Reading queries from file {}: {}, file: {},line: {}".format(query_path, sys.exc_info(), fname, exc_tb.tb_lineno))
 
@@ -437,7 +437,7 @@ class Project:
             self.save_project_report()
             self.save_project_datasets()
             self.download_project()
-        self.notify_project_ready()
+            self.notify_project_ready()
 
     def notify_project_ready(self):
         message = "Report for project "+str(self.name)+" is ready: check it out at http://localhost:5000/apps/project/"+str(self.identifier)
@@ -502,39 +502,3 @@ class Project:
             dataset_directory = os.path.join(directory, dataset_type)
             if isinstance(dataset, Dataset):
                 dataset.save_dataset_to_file(dataset_directory)
-                  
-    def show_report_old(self, environment):
-        app_plots = defaultdict(list)
-        for data_type in self.report:
-            r = self.report[data_type]
-            plots = r.plots
-            identifier = r.identifier
-            for plot_type in plots:
-                for plot in plots[plot_type]:
-                    if environment == "notebook":
-                        if hasattr(plot, 'figure'):
-                            iplot(plot.figure)
-                        elif isinstance(plot, dict):
-                            if "notebook" in plot:
-                                net = plot['notebook']
-                                if not os.path.isdir('./tmp'):
-                                    os.makedirs('./tmp')
-                                fnet = tempfile.NamedTemporaryFile(suffix=".html", delete=False, dir='tmp/')
-                                with open(fnet.name, 'w') as f:
-                                    f.write(net.html)
-                                display(IFrame(os.path.relpath(fnet.name),width=1400, height=1400))
-                                if hasattr(plot["net_tables"][0], 'figure') and hasattr(plot["net_tables"][1], 'figure'):
-                                    iplot(plot["net_tables"][0].figure)
-                                    iplot(plot["net_tables"][1].figure)
-                    else:
-                        if isinstance(plot, dict):
-                            if 'app' in plot:
-                                app_plots[identifier].append(plot['app'])
-                            if 'net_tables' in plot:
-                                tables = plot['net_tables']
-                                app_plots[identifier].append(tables[0])
-                                app_plots[identifier].append(tables[1])
-                        else:
-                            app_plots[identifier].append(plot)
-
-        return app_plots

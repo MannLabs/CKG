@@ -94,27 +94,28 @@ class Report:
     #ToDo load Network data
     def read_report(self, directory):
         report_plots = defaultdict(list)
-        with h5.File(os.path.join(directory, "report.h5"), 'r') as f:
-            for name in f:
-                plot_id = name.split('~')
-                if len(plot_id) >1:
-                    analysis = plot_id[0]
-                    plot_type = plot_id[1]
-                for figure_id in f[name]:
-                    figure_json = f[name+"/"+figure_id][0]
-                    identifier = f[name+"/"+figure_id].attrs["identifier"]
-                    if 'net' in identifier:
-                        figure = {}
-                        net_json = json.loads(figure_json)
-                        if 'notebook' in net_json:
-                            figure['net_json'] = net_json['notebook']
-                            netx = json_graph.node_link_graph(figure['net_json'])
-                            figure['notebook'] = basicFigures.get_notebook_network_pyvis(netx)
-                        if 'app' in net_json:
-                            figure['app'] = net_json['app']
-                    else:
-                        figure = json.loads(figure_json)
-                    report_plots[name].append(figure)
+        if os.path.exists(os.path.join(directory, "report.h5")):
+            with h5.File(os.path.join(directory, "report.h5"), 'r') as f:
+                for name in f:
+                    plot_id = name.split('~')
+                    if len(plot_id) >1:
+                        analysis = plot_id[0]
+                        plot_type = plot_id[1]
+                    for figure_id in f[name]:
+                        figure_json = f[name+"/"+figure_id][0]
+                        identifier = f[name+"/"+figure_id].attrs["identifier"]
+                        if 'net' in identifier:
+                            figure = {}
+                            net_json = json.loads(figure_json)
+                            if 'notebook' in net_json:
+                                figure['net_json'] = net_json['notebook']
+                                netx = json_graph.node_link_graph(figure['net_json'])
+                                figure['notebook'] = basicFigures.get_notebook_network_pyvis(netx)
+                            if 'app' in net_json:
+                                figure['app'] = net_json['app']
+                        else:
+                            figure = json.loads(figure_json)
+                        report_plots[name].append(figure)
         self.plots = report_plots
 
     def visualize_report(self, environment):
@@ -157,31 +158,32 @@ class Report:
             name = "_".join(plot_type) if isinstance(plot_type, tuple) else plot_type
             i = 0
             for plot in self.plots[plot_type]:
-                figure_name = name
-                if name in saved:
-                    figure_name = name +"_"+str(i)
-                    i += 1
-                if "net_json" in plot:
-                    with open(os.path.join(directory, name+'.json'), 'w') as out:
-                        out.write(json.dumps(plot["net_json"]))
-                    
-                    graph = json_graph.node_link_graph(plot["net_json"])
-                    try:
-                        nx.write_gml(graph, os.path.join(directory, name+".gml"))
-                    except: 
-                        pass
-                    if "app" in plot:
-                        plot = plot["app"]
-                if 'props' in plot:
-                    if 'figure' in plot['props']:
+                if plot is not None:
+                    figure_name = name
+                    if name in saved:
+                        figure_name = name +"_"+str(i)
+                        i += 1
+                    if "net_json" in plot:
+                        with open(os.path.join(directory, name+'.json'), 'w') as out:
+                            out.write(json.dumps(plot["net_json"]))
+                        
+                        graph = json_graph.node_link_graph(plot["net_json"])
                         try:
-                            basicFigures.save_DASH_plot(plot['props']['figure'], name=figure_name, plot_format='svg', directory=directory)
+                            nx.write_gml(graph, os.path.join(directory, name+".gml"))
+                        except: 
+                            pass
+                        if "app" in plot:
+                            plot = plot["app"]
+                    if 'props' in plot:
+                        if 'figure' in plot['props']:
+                            try:
+                                basicFigures.save_DASH_plot(plot['props']['figure'], name=figure_name, plot_format='svg', directory=directory)
+                                saved.add(figure_name)
+                            except:
+                                pass
+                    else:
+                        try:
+                            basicFigures.save_DASH_plot(plot.figure, name=figure_name, plot_format='svg', directory=directory)
                             saved.add(figure_name)
                         except:
                             pass
-                else:
-                    try:
-                        basicFigures.save_DASH_plot(plot.figure, name=figure_name, plot_format='svg', directory=directory)
-                        saved.add(figure_name)
-                    except:
-                        pass
