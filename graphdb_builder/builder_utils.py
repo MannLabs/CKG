@@ -55,6 +55,21 @@ def setup_config(data_type="databases"):
 
     return config
 
+def list_ftp_directory(ftp_url, user='', password=''):
+    try:
+        domain = ftp_url.split('/')[2]
+        if len(ftp_url.split('/')) > 3:
+            ftp_dir = '/'.join(ftp_url.split('/')[3:])
+        else:
+            ftp_dir = ''
+        with ftplib.FTP(domain) as ftp:
+            ftp.login(user=user, passwd=password)
+            files = ftp.nlst(ftp_dir)
+    except ftplib.error_perm as err:
+        raise Exception("builder_utils - Problem listing file at {} ftp directory > {}.".format(ftp_dir, err))
+
+    return files
+
 def setup_logging(path='log.config', key=None):
     """Setup logging configuration"""
     if os.path.exists(path):
@@ -191,8 +206,6 @@ def listDirectoryFolders(directory):
 def checkDirectory(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
-
-
 
 def flatten(t):
     """

@@ -65,6 +65,7 @@ urls:
 
 files:
     '-40': 
+        - 'SNOMED-CT/Full/Terminology/sct2_Concept_Full_INT_20170731.txt'
         - 'SNOMED-CT/Full/Terminology/sct2_Description_Full-en_INT_20170731.txt'
         - 'SNOMED-CT/Full/Terminology/sct2_Relationship_Full_INT_20170731.txt' 
         - 'SNOMED-CT/Full/Terminology/sct2_TextDefinition_Full-en_INT_20170731.txt'

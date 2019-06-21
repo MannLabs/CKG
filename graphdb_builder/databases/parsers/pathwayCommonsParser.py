@@ -34,7 +34,7 @@ def parser(databases_directory, download = True):
         else:
             continue
         
-        entities.add((code, "Pathway", name, name, source, linkout))
+        entities.add((code, "Pathway", name, name, ptw_dict["organism"], source, linkout))
         for protein in proteins:
             relationships.add((protein, code, "ANNOTATED_IN_PATHWAY", linkout, "PathwayCommons: "+source))
 

@@ -92,19 +92,20 @@ def generate_graphFiles(import_directory, ontologies=None, download=True):
             for namespace in terms:
                 if namespace in config["entities"]:
                     name = config["entities"][namespace]
-                entity_outputfile = os.path.join(import_directory, name+".csv")
+                entity_outputfile = os.path.join(import_directory, name+".tsv")
                 with open(entity_outputfile, 'w') as csvfile:
-                    writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
+                    writer = csv.writer(csvfile, delimiter='\t', escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
                     writer.writerow(['ID', ':LABEL', 'name', 'description', 'type', 'synonyms'])
                     for term in terms[namespace]:
                         writer.writerow([term, entity, list(terms[namespace][term])[0], definitions[term], ontologyType, ",".join(terms[namespace][term])])
                 logger.info("Ontology {} - Number of {} entities: {}".format(ontology, name, len(terms[namespace])))
                 stats.add(builder_utils.buildStats(len(terms[namespace]), "entity", name, ontology, entity_outputfile))
                 if namespace in relationships:
-                    relationships_outputfile = os.path.join(import_directory, name+"_has_parent.csv")
+                    relationships_outputfile = os.path.join(import_directory, name+"_has_parent.tsv")
                     relationshipsDf = pd.DataFrame(list(relationships[namespace]))
                     relationshipsDf.columns = ['START_ID', 'END_ID', 'TYPE']
                     relationshipsDf.to_csv(path_or_buf=relationships_outputfile,
+                                                sep='\t',
                                                 header=True, index=False, quotechar='"',
                                                 quoting=csv.QUOTE_ALL,
                                                 line_terminator='\n', escapechar='\\')

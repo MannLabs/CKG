@@ -18,10 +18,27 @@ import plotly.plotly as py
 import base64
 from xhtml2pdf import pisa
 import requests, json
+from urllib import request, parse
 import shutil
 import smtplib
 from email.message import EmailMessage
 
+
+def send_message_to_slack_webhook(message, message_to):
+    webhook_file = "../config/wh.txt"
+    with open(webhook_file, 'r') as hf:
+        webhook_url = hf.read()
+ 
+    post = {"text": "@{} : {}".format(message_to, message), "username":"albsantosdel", "icon_url": "https://slack.com/img/icons/app-57.png"}
+ 
+    try:
+        json_data = json.dumps(post)
+        req = request.Request(webhook_url,
+                              data=json_data.encode('ascii'),
+                              headers={'Content-Type': 'application/json'}) 
+        resp = request.urlopen(req)
+    except Exception as em:
+        print("EXCEPTION: " + str(em))
 
 def send_email(message, subject, message_from, message_to):
     msg = EmailMessage()    

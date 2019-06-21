@@ -22,7 +22,7 @@ def parser(databases_directory, importDirectory, drug_source = None, download = 
         evidences = ["experimental", "prediction", "database","textmining", "score"]
         relationship = "COMPILED_INTERACTS_WITH"
         url = config['STITCH_url']
-        outputfile = os.path.join(importDirectory, "stitch_associated_with.csv")
+        outputfile = os.path.join(importDirectory, "stitch_associated_with.tsv")
 
         drugmapping_url = config['STITCH_mapping_url']
         drugmapping = mp.getSTRINGMapping(drugmapping_url, source = drug_source, download = False, db = db)
@@ -30,7 +30,7 @@ def parser(databases_directory, importDirectory, drug_source = None, download = 
     elif db == "STRING":
         evidences = ["Neighborhood in the Genome", "Gene fusions", "Co-ocurrence across genomes","Co-expression", "Experimental/biochemical data", "Association in curated databases", "Text-mining"]
         relationship = "COMPILED_TARGETS"
-        outputfile = os.path.join(importDirectory, "string_interacts_with.csv")
+        outputfile = os.path.join(importDirectory, "string_interacts_with.tsv")
         url = config['STRING_url']
     directory = os.path.join(databases_directory, db)
     builder_utils.checkDirectory(directory)
@@ -43,7 +43,7 @@ def parser(databases_directory, importDirectory, drug_source = None, download = 
     associations = gzip.open(f, 'r')
     first = True
     with open(outputfile, 'w') as csvfile:
-        writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
+        writer = csv.writer(csvfile, delimiter='\t', escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
         writer.writerow(header)
         for line in associations:
             if first:
@@ -87,10 +87,10 @@ def parseActions(databases_directory, importDirectory, proteinMapping, drugMappi
     stored = set()
     if db == "STRING":
         url = config['STRING_actions_url']
-        outputfile = os.path.join(importDirectory, "string_protein_acts_on_protein.csv")
+        outputfile = os.path.join(importDirectory, "string_protein_acts_on_protein.tsv")
     elif db == "STITCH":
         url = config['STITCH_actions_url']
-        outputfile = os.path.join(importDirectory, "stitch_drug_acts_on_protein.csv")
+        outputfile = os.path.join(importDirectory, "stitch_drug_acts_on_protein.tsv")
     
     directory = os.path.join(databases_directory, db)
     builder_utils.checkDirectory(directory)
@@ -102,7 +102,7 @@ def parseActions(databases_directory, importDirectory, proteinMapping, drugMappi
     associations = gzip.open(f, 'r')
     first = True
     with open(outputfile, 'w') as csvfile:
-        writer = csv.writer(csvfile, escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
+        writer = csv.writer(csvfile, delimiter='\t', escapechar='\\', quotechar='"', quoting=csv.QUOTE_ALL)
         writer.writerow(header)
         for line in associations:
             if first:

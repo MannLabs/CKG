@@ -9,7 +9,8 @@ from graphdb_builder import builder_utils
 #       Drug Bank       #
 #########################
 def parser(databases_directory):
-    config = ckg_utils.get_configuration('../databases/config/drugBankConfig.yml')
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    config = ckg_utils.get_configuration(os.path.join(cwd,'../config/drugBankConfig.yml'))
     drugs = extract_drugs(config, databases_directory)
     build_DrugBank_dictionary(config, databases_directory, drugs)
     relationships = build_relationships_from_DrugBank(config, drugs)
@@ -116,7 +117,7 @@ def build_drug_entity(config, drugs):
     entities = set()
     attributes = config['DrugBank_attributes']
     properties = config['DrugBank_exp_prop']
-    allAttr = attributes + [p.replace(' ','_').replace('-','_').replace('(','').replace(')','') for p in properties]
+    allAttr = attributes[:-1] + [p.replace(' ','_').replace('-','_').replace('(','').replace(')','') for p in properties]
     for did in drugs:
         entity = []
         entity.append(did)
@@ -154,3 +155,7 @@ def build_DrugBank_dictionary(config, databases_directory, drugs):
             if "synonyms" in drugs[did]:
                 for synonym in drugs[did]["synonyms"]:
                     out.write(did+"\t"+synonym.lower()+"\n")    
+
+
+if __name__ == "__main__":
+    parser("../../../../data/databases/")
