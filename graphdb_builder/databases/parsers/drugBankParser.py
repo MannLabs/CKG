@@ -3,7 +3,7 @@ import ckg_utils
 from collections import defaultdict
 from lxml import etree
 import zipfile
-from graphdb_builder import builder_utils
+from graphdb_builder import mapping as mp, builder_utils
 
 #########################
 #       Drug Bank       #
