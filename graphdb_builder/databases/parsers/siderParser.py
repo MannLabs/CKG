@@ -11,8 +11,10 @@ def parser(databases_directory, drug_source, download=True):
     config = ckg_utils.get_configuration('../databases/config/siderConfig.yml')
     url = config['SIDER_url']
     header = config['header']
-    outputfileName = config['outputfileName']
-    
+
+    output_file = 'sider_has_side_effect.tsv'
+
+    outputfileName = ''    
     drugmapping = mp.getSTRINGMapping(config['SIDER_mapping'], source = drug_source, download = False, db = "STITCH")
     phenotypemapping = mp.getMappingFromOntology(ontology="Phenotype", source = config['SIDER_source'])
     
@@ -33,14 +35,14 @@ def parser(databases_directory, drug_source, download=True):
                 relationships.add((d, p, "HAS_SIDE_EFFECT", "SIDER", se))
     associations.close()
 
-    return (relationships, header, outputfileName, drugmapping, phenotypemapping)
+    return (relationships, header, output_file, drugmapping, phenotypemapping)
 
 
 def parserIndications(databases_directory, drugMapping, phenotypeMapping, download=True):
     config = ckg_utils.get_configuration('../databases/config/siderConfig.yml')
     url = config['SIDER_indications']
     header = config['indications_header']
-    outputfileName = config['indications_outputfileName']
+    output_file = 'sider_is_indicated_for.tsv'
 
     relationships = set()
     directory = os.path.join(databases_directory,"SIDER")
@@ -61,4 +63,4 @@ def parserIndications(databases_directory, drugMapping, phenotypeMapping, downlo
     
     associations.close()
     
-    return (relationships, header, outputfileName)
+    return (relationships, header, output_file)

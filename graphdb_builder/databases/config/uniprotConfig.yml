@@ -1,7 +1,6 @@
 ###### UniProt Database ########
 ftp_url: &ftp_url 'ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/'
 uniprot_id_url: 'ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping.dat.gz'
-uniprot_text_file: '../../../data/databases/UniProt/uniprot-human.tab' #### Downloaded manually from UniProt until we know url (organism:human AND reviewed:yes)
 uniprot_variant_file: 'ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/variants/homo_sapiens_variation.txt.gz'
 uniprot_peptides_files: 
     -  'ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/proteomics_mapping/UP000005640_9606_nonUniquePeptides.tsv'

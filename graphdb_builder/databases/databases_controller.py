@@ -64,6 +64,9 @@ def parseDatabase(importDirectory, database, download=True):
         elif database.lower() == "uniprot":
             #UniProt
             stats.update(uniprotParser.parser(dbconfig["databasesDir"], importDirectory, download))
+        elif database.lower() == "pfam":
+            #UniProt
+            stats.update(pfamParser.parser(dbconfig["databasesDir"], importDirectory, download))
         elif database.lower() == "intact":
             #IntAct
             relationships, header, outputfileName = intactParser.parser(dbconfig["databasesDir"], download)

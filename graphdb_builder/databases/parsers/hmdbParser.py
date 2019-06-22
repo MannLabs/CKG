@@ -106,7 +106,7 @@ def build_HMDB_dictionary(databases_directory, metabolites):
     directory = os.path.join(databases_directory,"HMDB")
     filename = "mapping.tsv"
     outputfile = os.path.join(directory, filename)
-    
+    mp.reset_mapping(entity="Metabolite")
     with open(outputfile, 'w') as out:
         for metid in metabolites:
             if "name" in metabolites[metid]:
@@ -118,4 +118,6 @@ def build_HMDB_dictionary(databases_directory, metabolites):
             if "chebi_id" in metabolites[metid]:
                 chebi_id = metabolites[metid]["chebi_id"]
                 out.write(metid+"\t"+chebi_id+"\n")
+
+    mp.mark_complete_mapping(entity="Metabolite")
 

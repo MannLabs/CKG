@@ -5,14 +5,15 @@ import pandas as pd
 import re
 import time
 import ckg_utils
-from graphdb_builder import builder_utils
+from graphdb_builder import mapping as mp, builder_utils
 
 #########################
 #       UniProt         # 
 #########################
 def parser(databases_directory, import_directory, download=True):
     result = {"Protein":None, "Known_variant":None, "Peptide":None}
-    config = ckg_utils.get_configuration('../databases/config/uniprotConfig.yml')
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    config = ckg_utils.get_configuration(os.path.join(cwd,'../config/uniprotConfig.yml'))
     relationships_header = config['relationships_header']
     #Proteins
     stats = parse_idmapping_file(databases_directory, config, import_directory, download=download)
@@ -37,7 +38,7 @@ def parse_idmapping_file(databases_directory, config, import_directory, download
     regex_transcript = r"(-\d$)"
     taxids = config['species']
 
-    proteins_output_file = os.path.join(import_directory, "Proteins.tsv")
+    proteins_output_file = os.path.join(import_directory, "Protein.tsv")
     pdbs_output_file = os.path.join(import_directory, "Protein_structures.tsv")
     proteins = {}
 
@@ -59,52 +60,58 @@ def parse_idmapping_file(databases_directory, config, import_directory, download
     uf = builder_utils.read_gzipped_file(file_name)
     aux = {}
     stats = set()
-    for line in uf:
-        data = line.decode('utf-8').rstrip("\r\n").split("\t")
-        iid = data[0]
-        field = data[1]
-        alias = data[2]
-        
-        if iid not in skip:
-            skip = set()
-            if re.search(regex_transcript,iid):
-                transcripts.add(iid)
-            if iid not in aux and iid.split('-')[0] not in aux:
-                if identifier is not None:
-                    prot_info["synonyms"] = synonyms
-                    aux[identifier].update(prot_info)
-                    if "UniProtKB-ID" in aux[identifier] and "NCBI_TaxID" in aux[identifier]:
-                        proteins[identifier] = aux[identifier]
-                        for t in transcripts:
-                            proteins[t] = aux[identifier]
-                        if len(transcripts) > 0:
-                            proteins[identifier].update({"isoforms":transcripts})
-                            transcripts = set()
-                        aux.pop(identifier, None)
-                        if len(proteins) >= 1000:
-                            entities, relationships, pdb_entities = format_output(proteins)
-                            stats.update(print_single_file(entities, config['proteins_header'], proteins_output_file, "entity", "Protein", is_first))
-                            stats.update(print_single_file(pdb_entities, config['pdb_header'], pdbs_output_file, "entity", "Protein_structure", is_first))
-                            stats.update(print_multiple_relationships_files(relationships, config['relationships_header'], import_directory, is_first))
-                            is_first = False
-                            proteins = {}
-                identifier = iid
-                transcripts = set()
-                aux[identifier] = {}
-                prot_info = {}
-                synonyms = []
-            if field in fields:
-                if field == 'NCBI_TaxID':
-                    if int(alias) not in taxids:
-                        skip.add(identifier)
-                        aux.pop(identifier, None)
-                        identifier = None
-                if field in synonymFields:
-                    synonyms.append(alias)
-                prot_info.setdefault(field, [])
-                prot_info[field].append(alias)
+    mp.reset_mapping(entity="Protein")
+    with open(mapping_file, 'w') as out:
+        for line in uf:
+            data = line.decode('utf-8').rstrip("\r\n").split("\t")
+            iid = data[0]
+            field = data[1]
+            alias = data[2]                
+            
+            if iid not in skip:
+                skip = set()
+                if re.search(regex_transcript,iid):
+                    transcripts.add(iid)
+                if iid not in aux and iid.split('-')[0] not in aux:
+                    if identifier is not None:
+                        prot_info["synonyms"] = synonyms
+                        aux[identifier].update(prot_info)
+                        if "UniProtKB-ID" in aux[identifier] and "NCBI_TaxID" in aux[identifier]:
+                            for synonym in synonyms:
+                                out.write(identifier+"\t"+synonym+"\n")
+                            proteins[identifier] = aux[identifier]
+                            for t in transcripts:
+                                proteins[t] = aux[identifier]
+                                for synonym in synonyms:
+                                    out.write(t+"\t"+synonym+"\n")
+                            if len(transcripts) > 0:
+                                proteins[identifier].update({"isoforms":transcripts})
+                                transcripts = set()
+                            aux.pop(identifier, None)
+                            if len(proteins) >= 1000:
+                                entities, relationships, pdb_entities = format_output(proteins)
+                                stats.update(print_single_file(entities, config['proteins_header'], proteins_output_file, "entity", "Protein", is_first))
+                                stats.update(print_single_file(pdb_entities, config['pdb_header'], pdbs_output_file, "entity", "Protein_structure", is_first))
+                                stats.update(print_multiple_relationships_files(relationships, config['relationships_header'], import_directory, is_first))
+                                is_first = False
+                                proteins = {}
+                    identifier = iid
+                    transcripts = set()
+                    aux[identifier] = {}
+                    prot_info = {}
+                    synonyms = []
+                if field in fields:
+                    if field == 'NCBI_TaxID':
+                        if int(alias) not in taxids:
+                            skip.add(identifier)
+                            aux.pop(identifier, None)
+                            identifier = None
+                    if field in synonymFields:
+                        synonyms.append(alias)
+                    prot_info.setdefault(field, [])
+                    prot_info[field].append(alias)
 
-    uf.close()
+        uf.close()
 
     if len(proteins)>0:
         entities, relationships, pdb_entities = format_output(proteins)
@@ -112,6 +119,7 @@ def parse_idmapping_file(databases_directory, config, import_directory, download
         stats.update(print_single_file(pdb_entities, config['pdb_header'], pdbs_output_file, "entity", "Protein_structure", is_first))
         stats.update(print_multiple_relationships_files(relationships, config['relationships_header'], import_directory, is_first))
     
+    mp.mark_complete_mapping(entity="Protein")
 
     return stats
 
@@ -322,4 +330,4 @@ def parseUniProtPeptides(config, databases_directory, download=True):
     return entities, relationships
     
 if __name__ == "__main__":
-    pass
+    parser(databases_directory="../../../../data/databases", import_directory="../../../../data/imports/databases", download=False)

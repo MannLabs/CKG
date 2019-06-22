@@ -45,6 +45,8 @@ def parsePathways(config, databases_directory, fhandler):
     url = config['linkout_url']
     directory = os.path.join(databases_directory, "Reactome")
     mapping_file = os.path.join(directory, "mapping.tsv")
+
+    mp.reset_mapping(entity="Pathway")
     with open(mapping_file, 'w') as mf:
         for line in fhandler:
             data = line.rstrip("\r\n").split("\t")
@@ -56,7 +58,9 @@ def parsePathways(config, databases_directory, fhandler):
                 organism = organisms[organism]
                 entities.add((identifier, "Pathway", name, name, organism, linkout, "Reactome"))
                 mf.write(identifier+"\t"+name+"\n")
-                
+    
+    mp.mark_complete_mapping(entity="Pathway")
+
     return entities
 
 def parsePathwayHierarchy(fhandler):

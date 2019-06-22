@@ -17,7 +17,7 @@ def parser(databases_directory, download = True):
     directory = os.path.join(databases_directory,"disgenet")
     builder_utils.checkDirectory(directory)
     header = config['disgenet_header']
-    outputfileName = config['outputfileName']
+    output_file = 'Protein_disgenet_associated_with.tsv'
 
     if download:
         for f in files:
@@ -58,7 +58,7 @@ def parser(databases_directory, download = True):
                 continue
         associations.close()
 
-    return (relationships,header,outputfileName)
+    return (relationships,header,output_file)
     
 def readDisGeNetProteinMapping(config, databases_directory):
     files = config['disgenet_mapping_files']

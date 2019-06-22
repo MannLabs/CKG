@@ -16,7 +16,7 @@ def parser(databases_directory, download=True):
     for qtype in config['internal_db_types']:
         relationships = parseInternalDatabasePairs(config, databases_directory, qtype, string_mapping)
         entity1, entity2 = config['internal_db_types'][qtype]
-        outputfileName =  entity1+"_"+entity2+"_associated_with_integrated.csv"
+        outputfileName =  entity1+"_"+entity2+"_associated_with_integrated.tsv"
         header = config['header']
         result[qtype] = (relationships, header, outputfileName)
     
@@ -35,7 +35,7 @@ def read_valid_pubs(organisms, organisms_file):
 def parserMentions(databases_directory, importDirectory, download=True):
     config = ckg_utils.get_configuration('../databases/config/internalDBsConfig.yml')
     entities, header = parsePMClist(config, databases_directory, download)
-    outputfileName = "Publications.csv"
+    outputfileName = "Publications.tsv"
     url = config['internal_db_url']
     ifile = config['organisms_file']
     organisms = config['organisms']
@@ -118,14 +118,14 @@ def parseInternalDatabaseMentions(config, databases_directory, qtype, importDire
     if qtype in config['internal_db_mentions_filters']:
         filters = config['internal_db_mentions_filters'][qtype]
     entity1, entity2 = config['internal_db_mentions_types'][qtype]
-    outputfile = os.path.join(importDirectory, entity1+"_"+entity2+"_mentioned_in_publication.csv")
+    outputfile = os.path.join(importDirectory, entity1+"_"+entity2+"_mentioned_in_publication.tsv")
     relationships = pd.DataFrame()
     directory = os.path.join(databases_directory, "InternalDatabases")
     if download:
         builder_utils.downloadDB(url.replace("FILE", ifile), os.path.join(directory,"textmining"))
     ifile = os.path.join(directory,os.path.join("textmining",ifile))
     with open(outputfile,'w') as f:
-        f.write("START_ID,END_ID,TYPE\n")
+        f.write("START_ID\tEND_ID\tTYPE\n")
         with open(ifile, 'r') as idbf:
             for line in idbf:
                 data = line.rstrip("\r\n").split('\t')
@@ -148,5 +148,5 @@ def parseInternalDatabaseMentions(config, databases_directory, qtype, importDire
                         aux = pd.DataFrame(data = {"Pubmedids":pubmedids})
                         aux["START_ID"] = i
                         aux["TYPE"] = "MENTIONED_IN_PUBLICATION"
-                        aux.to_csv(path_or_buf=f, header=False, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
+                        aux.to_csv(path_or_buf=f, sep='\t', header=False, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
 

@@ -1,26 +1,26 @@
 ########################
-dataDirectory : '../../../data'
+dataDirectory: '../../../data'
 #Import directory
-importDirectory : '../../../data/imports'
+import_directory: '../../../data/imports'
 #Archive directory
-archiveDirectory : '../../../data/archive'
+archive_directory: '../../../data/archive'
 #Stats directory
-statsDirectory : '../../../data/imports/stats'
+stats_directory: '../../../data/imports/stats'
 #experiments import directory
-experimentsDirectory : '../../../data/imports/experiments'
+experiments_directory: '../../../data/imports/experiments'
 #databases import diretory
-databasesDirectory : '../../../data/imports/databases'
+databases_directory: '../../../data/imports/databases'
 #ontologies import diretory
-ontologiesDirectory : '../../../data/imports/ontologies'
+ontologies_directory: '../../../data/imports/ontologies'
 #users directory
-usersDirectory : '../../../data/imports/users'
+users_directory: '../../../data/imports/users'
 
 download: True
 
 cypher_queries_file: 'cypher.yml'
 
-statsFile : 'stats.hdf'
-statsCols : 
+statsFile: 'stats.hdf'
+statsCols: 
     - 'date'
     - 'time'
     - 'dataset'
@@ -31,7 +31,7 @@ statsCols :
     - 'name'
 
 #Full Graph
-graph : 
+graph: 
     - ontologies
     - chromosomes
     - genes
@@ -49,6 +49,7 @@ graph :
     - pathology_expression
     - mentions
     - internal
+    - functional_regions
     - side effects
     - metabolite
     - food
@@ -61,7 +62,7 @@ graph :
     - protein_structure
 
 #Imports 
-ontology_entities : 
+ontology_entities: 
     - 'Disease'
     - 'Tissue'
     - 'Biological_process'
@@ -73,65 +74,65 @@ ontology_entities :
     - 'Experiment'
 #Database resources
 #Modified proteins
-modified_proteins_resources :
+modified_proteins_resources:
     - 'psp'
 #Protein complexes
-complexes_resources :
+complexes_resources:
     - 'CORUM'
 #Protein-protein interactions
-curated_PPI_resources :
+curated_PPI_resources:
     - 'IntAct'
-compiled_PPI_resources :
+compiled_PPI_resources:
     - 'STRING'
-PPI_action_resources :
+PPI_action_resources:
     - 'STRING'
 #Disease associations
-disease_resources : 
+disease_resources: 
     - ['Protein','DisGEnet']
 #Pathology Expression
-pathology_expression_resources : 
+pathology_expression_resources: 
     - 'HPA'
 #Drug associations, indications and actions
-curated_drug_resources :
+curated_drug_resources:
     - 'DGIdb'
     - 'CGI'
     - 'OncoKB'
-compiled_drug_resources :
+compiled_drug_resources:
     - 'STITCH'
-drug_action_resources :
+drug_action_resources:
     - 'STITCH'
-side_effects_resources :
+side_effects_resources:
     - 'SIDER'
 
 #Variants
-clinical_variant_resources :
+clinical_variant_resources:
     - 'CGI'
     - 'OncoKB'
 
 #Pathways
-pathway_resources :
+pathway_resources:
     - 'Reactome'
     - 'SMPDB'
 
 #Metabolites
-metabolite_resources :
+metabolite_resources:
     - 'hmdb'
 
 #Food
-food_resources :
+food_resources:
     - 'FooDB'
 
 #Internal Databases entities
-internalEntities :
+internalEntities:
     - ['Protein','Disease']
     - ['Protein', 'Tissue']
     - ['Protein','Cellular_component']
 
 #Mentions entities
-mentionEntities : 
+mentionEntities: 
     - 'Disease'
     - 'Tissue'
     - 'Protein'
     - 'Drug'
-publicationEntities :
+publicationEntities:
     - 'GWAS_study'

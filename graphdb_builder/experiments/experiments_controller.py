@@ -157,7 +157,6 @@ def parseProteomicsDataset(projectId, configuration, dataDir):
     dataset = None
     dfile = configuration['file']
     filepath = os.path.join(dataDir, dfile)
-    print(filepath)
     if os.path.isfile(filepath):
         data, regex = loadProteomicsDataset(filepath, configuration)
         data = data.sort_index()

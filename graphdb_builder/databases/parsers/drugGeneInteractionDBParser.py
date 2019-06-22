@@ -11,7 +11,7 @@ def parser(databases_directory, download = True):
 
     url = config['DGIdb_url']
     header = config['header']
-    outputfileName = config['outputfileName']
+    output_file = "dgidb_targets.tsv"
     drugmapping = mp.getMappingForEntity("Drug")
 
     relationships = set()
@@ -42,4 +42,4 @@ def parser(databases_directory, download = True):
                     drug = drugmapping[drug]
                     relationships.add((drug, gene, "TARGETS", "NA", "NA", "NA", interactionType, "DGIdb: "+source))
 
-    return (relationships, header, outputfileName)
+    return (relationships, header, output_file)

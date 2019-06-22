@@ -146,7 +146,7 @@ def build_DrugBank_dictionary(config, databases_directory, drugs):
     directory = os.path.join(databases_directory,"DrugBank")
     filename = config['DrugBank_dictionary_file']
     outputfile = os.path.join(directory, filename)
-    
+    mp.reset_mapping(entity="Drug") 
     with open(outputfile, 'w') as out:
         for did in drugs:
             if "name" in drugs[did]:
@@ -156,6 +156,7 @@ def build_DrugBank_dictionary(config, databases_directory, drugs):
                 for synonym in drugs[did]["synonyms"]:
                     out.write(did+"\t"+synonym.lower()+"\n")    
 
+    mp.mark_complete_mapping(entity="Drug")
 
 if __name__ == "__main__":
     parser("../../../../data/databases/")
