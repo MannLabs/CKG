@@ -8,7 +8,8 @@ from graphdb_builder import mapping as mp, builder_utils
 #              SIDER database               # 
 #############################################
 def parser(databases_directory, drug_source, download=True):
-    config = ckg_utils.get_configuration('../databases/config/siderConfig.yml')
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    config = ckg_utils.get_configuration(os.path.join(cwd, '../config/siderConfig.yml'))
     url = config['SIDER_url']
     header = config['header']
 

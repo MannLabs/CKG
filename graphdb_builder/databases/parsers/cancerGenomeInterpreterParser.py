@@ -11,8 +11,8 @@ import re
 def parser(databases_directory, download = True):
     variant_regex = r"(\D\d+\D)$"
     regex = r"(chr\d+)\:g\.(\d+)(\w)>(\w)"
-    
-    config = ckg_utils.get_configuration('../databases/config/cancerGenomeInterpreterConfig.yml')
+    cwd = os.path.abspath(os.path.dirname(__file__)) 
+    config = ckg_utils.get_configuration(os.path.join(cwd,'../config/cancerGenomeInterpreterConfig.yml'))
     url = config['cancerBiomarkers_url']
     entities_header = config['entities_header']
     relationships_headers = config['relationships_headers']

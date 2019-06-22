@@ -7,7 +7,8 @@ from graphdb_builder import builder_utils
 #   GWAS Catalog EBI    #
 #########################
 def parser(databases_directory, download= True):
-    config = ckg_utils.get_configuration('../databases/config/gwasCatalogConfig.yml')
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    config = ckg_utils.get_configuration(os.path.join(cwd, '../config/gwasCatalogConfig.yml'))
     url = config['GWASCat_url']
     entities_header = config['entities_header']
     relationships_header = config['relationships_header']

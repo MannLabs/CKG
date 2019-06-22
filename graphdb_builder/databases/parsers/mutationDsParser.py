@@ -9,7 +9,8 @@ from graphdb_builder import builder_utils
 ############################
 def parser(databases_directory, download = True):
     relationships = set()
-    config = ckg_utils.get_configuration('../databases/config/mutationDsConfig.yml')
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    config = ckg_utils.get_configuration(os.path.join(cwd, '../config/mutationDsConfig.yml'))
     header = config['header']
     output_file_name = "mutation_curated_affects_interaction_with.tsv"
     regex = r":(\w+)\("

@@ -14,8 +14,8 @@ def parser(databases_directory, download=True):
     relationships = defaultdict(set)
     directory = os.path.join(databases_directory,"FooDB")
     builder_utils.checkDirectory(directory)
-    
-    config = ckg_utils.get_configuration('../databases/config/foodbConfig.yml')
+    cwd = os.path.abspath(os.path.dirname(__file__)) 
+    config = ckg_utils.get_configuration(os.path.join(cwd, '../config/foodbConfig.yml'))
 
     database_url = config['database_url']
     entities_header = config['entities_header']

@@ -10,7 +10,8 @@ from graphdb_builder import mapping as mp, builder_utils
 #   Human Protein Atlas (pathology)      # 
 ##########################################
 def parser(databases_directory, download = True):
-    config = ckg_utils.get_configuration('../databases/config/hpaConfig.yml')
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    config = ckg_utils.get_configuration(os.path.join(cwd,'../config/hpaConfig.yml'))
     url = config['hpa_pathology_url']
     disease_mapping = mp.getMappingFromOntology(ontology = "Disease", source = None)
     protein_mapping = mp.getMultipleMappingForEntity("Protein")

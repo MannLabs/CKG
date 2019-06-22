@@ -12,7 +12,8 @@ from graphdb_builder import mapping as mp, builder_utils
 def parser(databases_directory):
     directory = os.path.join(databases_directory,"PhosphoSitePlus")
     builder_utils.checkDirectory(directory)
-    config = ckg_utils.get_configuration('../databases/config/pspConfig.yml')
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    config = ckg_utils.get_configuration(os.path.join(cwd,'../config/pspConfig.yml'))
     modifications = config['modifications']
     annotation_files = config['annotation_files']
     entities_header = config['entities_header']

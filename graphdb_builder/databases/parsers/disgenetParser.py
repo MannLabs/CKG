@@ -10,7 +10,8 @@ from graphdb_builder import builder_utils
 def parser(databases_directory, download = True):
     relationships = defaultdict(set)
     
-    config = ckg_utils.get_configuration('../databases/config/disgenetConfig.yml')
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    config = ckg_utils.get_configuration(os.path.join(cwd,'../config/disgenetConfig.yml'))
 
     files = config['disgenet_files']
     url = config['disgenet_url']

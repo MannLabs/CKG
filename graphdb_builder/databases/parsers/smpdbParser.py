@@ -9,7 +9,8 @@ from graphdb_builder import mapping as mp, builder_utils
 #     SMPDB database    #
 #########################
 def parser(databases_directory, download=True):
-    config = ckg_utils.get_configuration('../databases/config/smpdbConfig.yml')
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    config = ckg_utils.get_configuration(os.path.join(cwd, '../config/smpdbConfig.yml'))
     urls = config['smpdb_urls']
     entities = set()
     relationships = defaultdict(set)

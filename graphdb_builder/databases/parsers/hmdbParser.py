@@ -9,7 +9,8 @@ from graphdb_builder import mapping as mp, builder_utils
 #   Human Metabolome Database   # 
 #################################
 def parser(databases_directory, download = True):
-    config = ckg_utils.get_configuration('../databases/config/hmdbConfig.yml')
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    config = ckg_utils.get_configuration(os.path.join(cwd,'../config/hmdbConfig.yml'))
     metabolites = extract_metabolites(config, databases_directory, download)
     mapping = mp.getMappingFromOntology(ontology = "Disease", source = config['HMDB_DO_source'])
     mapping.update(mp.getMappingFromOntology(ontology = "Tissue", source = None))

@@ -9,7 +9,8 @@ from graphdb_builder import mapping as mp, builder_utils
 
 def parser(databases_directory, download=True):
     result = {}
-    config = ckg_utils.get_configuration('../databases/config/internalDBsConfig.yml')
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    config = ckg_utils.get_configuration(os.path.join(cwd, '../config/internalDBsConfig.yml'))
     string_url = config['string_url']
     string_mapping = mp.getSTRINGMapping(string_url, download=download)
     

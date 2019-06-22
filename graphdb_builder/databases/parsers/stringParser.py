@@ -10,7 +10,8 @@ from graphdb_builder import mapping as mp, builder_utils
 #   STRING like DBs     #
 #########################
 def parser(databases_directory, importDirectory, drug_source = None, download = True, db="STRING"):
-    config = ckg_utils.get_configuration('../databases/config/stringConfig.yml')
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    config = ckg_utils.get_configuration(os.path.join(cwd, '../config/stringConfig.yml'))
     mapping_url = config['STRING_mapping_url']
     mapping = mp.getSTRINGMapping(mapping_url, download = False)
     stored = set()

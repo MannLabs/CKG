@@ -14,7 +14,8 @@ def parser(databases_directory, download=True):
     relationships = defaultdict(set)
     directory = os.path.join(databases_directory,"ExposomeExplorer")
     builder_utils.checkDirectory(directory)
-    config = ckg_utils.get_configuration('../databases/config/exposomeConfig.yml')
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    config = ckg_utils.get_configuration(os.path.join(cwd,'../config/exposomeConfig.yml'))
     database_urls = config['database_urls']
     relationships_header = config['relationships_header']
     mapping = mp.getMappingForEntity("Food")
