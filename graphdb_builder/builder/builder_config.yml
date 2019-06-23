@@ -1,7 +1,7 @@
 ########################
 dataDirectory: '../../../data'
 #Import directory
-import_directory: '../../../data/imports'
+importDirectory: '../../../data/imports'
 #Archive directory
 archiveDirectory: '../../../data/archive'
 #Stats directory
