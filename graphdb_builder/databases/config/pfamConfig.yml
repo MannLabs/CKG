@@ -1,0 +1,26 @@
+###### Pfam Database ########
+ftp_url: 'ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/'
+full_uniprot_file: 'Pfam-A.full.uniprot.gz'
+
+
+entity_header:
+  - ID
+  - TYPE
+  - name
+  - description
+  - source
+
+relationship_headers:
+    found_in_protein:
+        - START_ID
+        - END_ID
+        - TYPE
+        - start
+        - end
+        - sequence
+        - source
+    mentioned_in_publication:
+        - START_ID
+        - END_ID
+        - TYPE
+        - source

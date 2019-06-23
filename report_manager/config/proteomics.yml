@@ -181,6 +181,20 @@ data exploration:
             communities_algorithm: louvain
             width: 1600
             height: 1600
+    proteomics_profiles:
+        data:
+            - correlation_clusters
+            - processed
+        analysis:
+            - z_normalize
+        args:
+            use:
+                columns: identifiers
+            group: 'group'
+            drop_cols:
+                - sample
+                - subject
+            title: 'Parallel profile correlated clusters'
     interaction_network:
         data: regulated
         analyses: []
