@@ -33,13 +33,20 @@ def getMappingFromOntology(ontology, source = None):
     mapping = {}
     ont = oconfig["ontologies"][ontology]
     dirFile = os.path.join(oconfig["ontologies_directory"],ont)
-    dataFile = os.path.join(dirFile,"complete_mapping.tsv")
-    with open(dataFile, 'r') as f:
-        for line in f:
-            data = line.rstrip("\r\n").split("\t")
-            if data[1] == source or source is None:
-                mapping[data[2].lower()] = data[0]
-    
+    mapping_file = os.path.join(dirFile,"complete_mapping.tsv")
+    max_wait = 0
+    while not os.path.isfile(mapping_file) and max_wait < 5000:
+        time.sleep(5)
+        max_wait += 1
+
+    try:
+        with open(mapping_file, 'r') as f:
+            for line in f:
+                data = line.rstrip("\r\n").split("\t")
+                if data[1] == source or source is None:
+                    mapping[data[2].lower()] = data[0]
+    except:
+        raise Exception("mapping - No mapping file {} for entity {}".format(mapping_file, ontology))
 
 
     return mapping
@@ -61,7 +68,7 @@ def getMappingForEntity(entity):
                         alias = data[1]
                         mapping[alias] = ident
         except:
-            raise Exception("mapping - No mapping file for entity {}".format(entity))
+            raise Exception("mapping - No mapping file {} for entity {}".format(mapping_file, entity))
 
     return mapping
 
@@ -83,7 +90,7 @@ def getMultipleMappingForEntity(entity):
                         alias = data[1]
                         mapping[alias].add(ident)
         except:
-            raise Exception("mapping - No mapping file for entity {}".format(entity))
+            raise Exception("mapping - No mapping file {} for entity {}".format(mapping, entity))
             
     return mapping
 
