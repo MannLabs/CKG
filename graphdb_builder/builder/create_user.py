@@ -28,7 +28,7 @@ def get_user_creation_queries():
 	except Exception as err:
 		exc_type, exc_obj, exc_tb = sys.exc_info()
 		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-		logger.error("Reading queries from file {}: {}, file: {},line: {}".format(queries_path, sys.exc_info(), fname, exc_tb.tb_lineno))
+		logger.error("Reading queries from file {}: {}, file: {},line: {}, error: {}".format(queries_path, sys.exc_info(), fname, exc_tb.tb_lineno, err))
 	return user_creation_cypher
 
 def get_new_user_identifier(driver):
@@ -40,7 +40,7 @@ def get_new_user_identifier(driver):
 	except Exception as err:
 		exc_type, exc_obj, exc_tb = sys.exc_info()
 		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-		logger.error("Reading query {}: {}, file: {},line: {}".format(query_name, sys.exc_info(), fname, exc_tb.tb_lineno))
+		logger.error("Reading query {}: {}, file: {},line: {}, error: {}".format(query, sys.exc_info(), fname, exc_tb.tb_lineno, err))
 	return user_identifier
 
 def check_if_node_exists(driver, node_property, value):
@@ -56,7 +56,7 @@ def check_if_node_exists(driver, node_property, value):
 	except Exception as err:
 		exc_type, exc_obj, exc_tb = sys.exc_info()
 		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-		logger.error("Reading query {}: {}, file: {},line: {}".format(query_name, sys.exc_info(), fname, exc_tb.tb_lineno))
+		logger.error("Reading query {}: {}, file: {},line: {}, error: {}".format(query_name, sys.exc_info(), fname, exc_tb.tb_lineno, err))
 	return result
 
 def create_user_db(driver, args):
@@ -73,7 +73,7 @@ def create_user_db(driver, args):
 	except Exception as err:
 		exc_type, exc_obj, exc_tb = sys.exc_info()
 		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-		logger.error("Reading query {}: {}, file: {},line: {}".format(query_name_add, sys.exc_info(), fname, exc_tb.tb_lineno))
+		logger.error("Reading query {}: {}, file: {},line: {}, error: {}".format(query_name_add, sys.exc_info(), fname, exc_tb.tb_lineno, err))
 	return 'Done'
 
 def create_user_from_command_line(driver, args, expiration=365):
@@ -117,7 +117,7 @@ def create_user_from_command_line(driver, args, expiration=365):
 	except Exception as err:
 		exc_type, exc_obj, exc_tb = sys.exc_info()
 		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-		logger.error("Reading query {}: {}, file: {},line: {}".format(query_name, sys.exc_info(), fname, exc_tb.tb_lineno))
+		logger.error("Reading query {}: {}, file: {},line: {}, error: {}".format(query_name, sys.exc_info(), fname, exc_tb.tb_lineno, err))
 
 	#Save new user to file
 	usersDir = os.path.join(os.getcwd(),config["usersDirectory"])
@@ -178,7 +178,7 @@ def create_user_from_file(driver, args, expiration=365):
 	except Exception as err:
 		exc_type, exc_obj, exc_tb = sys.exc_info()
 		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-		logger.error("Reading query {}: {}, file: {},line: {}".format(query_name_add, sys.exc_info(), fname, exc_tb.tb_lineno))
+		logger.error("Reading query {}: {}, file: {},line: {}, error: {}".format(query_name_add, sys.exc_info(), fname, exc_tb.tb_lineno, err))
 
 	#Save new user to file
 	usersDir = os.path.join(os.getcwd(),config["usersDirectory"])

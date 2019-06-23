@@ -127,39 +127,6 @@ def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True, db = "ST
         
     return mapping
 
-def updateMappingFileWithSTRING(mappingFile, mapping, db = "STRING"):
-    directory = os.path.join(dbconfig["databasesDir"], db)
-    file_name = os.path.join(directory, url.split('/')[-1])
-
-    if download:
-        builder_utils.downloadDB(url, db)
-    
-    f = os.path.join(directory, file_name)
-    mf = gzip.open(f, 'r')
-    first = True
-    with open(mappingFile, 'a') as mf:
-        for line in mf:
-            if first:
-                first = False
-                continue
-            data = line.decode('utf-8').rstrip("\r\n").split("\t")
-            if db == "STRING":
-                stringID = data[0]
-                alias = data[1]
-                sources = data[2].split(' ')
-            else:
-                stringID = data[0]
-                alias = data[2]
-                sources = data[3].split(' ')
-                if not alias.startswith('DB'):
-                    continue
-            
-            if stringID in mapping:
-                for ident in mapping[stringID]:
-                    mf.write(ident+"\t"+stringID)
-                    for alias in allAlias[stringID]:
-                        mf.write(ident+"\t"+alias)
-
 def buildMappingFromOBO(oboFile, ontology):
     outputDir = os.path.join(oconfig["ontologies_directory"], ontology)
     cmapping_file = os.path.join(outputDir, "complete_mapping.tsv")
