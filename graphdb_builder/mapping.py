@@ -33,7 +33,7 @@ def getMappingFromOntology(ontology, source = None):
     mapping = {}
     ont = oconfig["ontologies"][ontology]
     dirFile = os.path.join(oconfig["ontologies_directory"],ont)
-    dataFile = os.path.join(dirFile,"mapping.tsv")
+    dataFile = os.path.join(dirFile,"complete_mapping.tsv")
     with open(dataFile, 'r') as f:
         for line in f:
             data = line.rstrip("\r\n").split("\t")

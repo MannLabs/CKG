@@ -127,7 +127,7 @@ def fullImport():
     """
     try:
         download = config["download"]
-        importDirectory = config["import_directory"]
+        importDirectory = config["importDirectory"]
         builder_utils.checkDirectory(importDirectory)
         setupStats(import_type='full')
         logger.info("Full import: importing all Ontologies")
@@ -174,7 +174,7 @@ def setupStats(import_type):
     Creates a stats object that will collect all the statistics collected from
     each import.
     """
-    statsDirectory = config["stats_directory"]
+    statsDirectory = config["statsDirectory"]
     statsFile = os.path.join(statsDirectory, config["statsFile"])
     statsCols = config["statsCols"]
     statsName = getStatsName(import_type)
@@ -231,7 +231,7 @@ def writeStats(statsDf, import_type, stats_name=None):
         statsName (string): If the statistics should be stored with a
                             specific name
     """
-    stats_directory = config["stats_directory"]
+    stats_directory = config["statsDirectory"]
     stats_file = os.path.join(stats_directory, config["statsFile"])
     try: 
         if stats_name is None:

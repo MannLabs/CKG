@@ -76,11 +76,11 @@ def updateDB(driver, imports=None):
         queries = []
         logger.info("Loading {} into the database".format(i))
         try:
-            import_dir = os.path.join(os.getcwd(),config["databases_directory"])
+            import_dir = os.path.join(os.getcwd(),config["databasesDirectory"])
             #Ontologies
             if i== "ontologies":
                 entities = config["ontology_entities"]
-                import_dir = os.path.join(os.getcwd(), config["ontologies_directory"])
+                import_dir = os.path.join(os.getcwd(), config["ontologiesDirectory"])
                 ontologyDataImportCode = cypher_queries['IMPORT_ONTOLOGY_DATA']['query']
                 for entity in entities:
                     queries.extend(ontologyDataImportCode.replace("ENTITY", entity).replace("IMPORTDIR", import_dir).split(';')[0:-1])
@@ -162,7 +162,6 @@ def updateDB(driver, imports=None):
                     queries.extend(code.replace("IMPORTDIR", import_dir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
                 code = cypher_queries['IMPORT_DRUG_ACTS_ON']['query']
                 for resource in config["drug_action_resources"]:
-                    print(resource)
                     queries.extend(code.replace("IMPORTDIR", import_dir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
             #Side effects
             elif i == "side effects":
@@ -216,15 +215,15 @@ def updateDB(driver, imports=None):
                     queries.extend(code.replace("IMPORTDIR", import_dir).replace("ENTITY", entity).split(';')[0:-1])
             #Users
             elif i == "user":
-                usersDir = os.path.join(os.getcwd(),config["users_directory"])
+                usersDir = os.path.join(os.getcwd(),config["usersDirectory"])
                 user_cypher = cypher_queries['CREATE_USER_NODE']
                 code = user_cypher['query']
                 queries.extend(code.replace("IMPORTDIR", usersDir).split(';')[0:-1])
 
             #Projects
             elif i == "project":
-                import_dir = os.path.join(os.getcwd(),config["experiments_directory"])
-                projects = builder_utils.list_directoryFolders(import_dir)
+                import_dir = os.path.join(os.getcwd(),config["experimentsDirectory"])
+                projects = builder_utils.listDirectoryFolders(import_dir)
                 project_cypher = cypher_queries['IMPORT_PROJECT']
                 for project in projects:
                     projectDir = os.path.join(import_dir, project)
@@ -234,12 +233,12 @@ def updateDB(driver, imports=None):
                         queries.extend(code.replace("IMPORTDIR", projectDir).replace('PROJECTID', project).split(';')[0:-1])
             #Datasets
             elif i == "experiment":
-                import_dir = os.path.join(os.getcwd(),config["experiments_directory"])
+                import_dir = os.path.join(os.getcwd(),config["experimentsDirectory"])
                 datasets_cypher = cypher_queries['IMPORT_DATASETS']
-                projects = builder_utils.list_directoryFolders(import_dir)
+                projects = builder_utils.listDirectoryFolders(import_dir)
                 for project in projects:
                     projectDir = os.path.join(import_dir, project)
-                    datasetTypes = builder_utils.list_directoryFolders(projectDir)
+                    datasetTypes = builder_utils.listDirectoryFolders(projectDir)
                     for dtype in datasetTypes:
                         datasetDir = os.path.join(projectDir, dtype)
                         dataset = datasets_cypher[dtype]
@@ -267,7 +266,7 @@ def fullUpdate():
     updateDB(driver, imports)
     logger.info("Full update of the database - Update took: {}".format(datetime.now() - START_TIME))
     logger.info("Full update of the database - Archiving imports folder")
-    archiveImport_directory(archive_type="full")
+    archiveImportDirectory(archive_type="full")
     logger.info("Full update of the database - Archiving took: {}".format(datetime.now() - START_TIME))
 
 def partialUpdate(imports):
@@ -285,10 +284,10 @@ def partialUpdate(imports):
     updateDB(driver, imports)
     logger.info("Partial update of the database - Update took: {}".format(datetime.now() - START_TIME))
     logger.info("Partial update of the database - Archiving imports folder")
-    #archiveImport_directory(archive_type="partial")
+    #archiveImportDirectory(archive_type="partial")
     logger.info("Partial update of the database - Archiving {} took: {}".format(",".join(imports), datetime.now() - START_TIME))
     
-def archiveImport_directory(archive_type="full"):
+def archiveImportDirectory(archive_type="full"):
     """
     This function creates the compressed backup imports folder with either the whole folder
     (full update) or with only the files uploaded (partial update). The folder or files are
@@ -297,8 +296,8 @@ def archiveImport_directory(archive_type="full"):
     Args:
         archive_type (string): whether it is a full update or a partial update
     """
-    dest_folder = config["archive_directory"]
-    builder_utils.check_directory(dest_folder)
+    dest_folder = config["archiveDirectory"]
+    builder_utils.checkDirectory(dest_folder)
     folder_to_backup = config["import_directory"]
     date, time = builder_utils.getCurrentTime()
     file_name = "{}_{}_{}".format(archive_type, date.replace('-', ''), time.replace(':', ''))

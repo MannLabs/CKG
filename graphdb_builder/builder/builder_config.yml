@@ -3,17 +3,17 @@ dataDirectory: '../../../data'
 #Import directory
 import_directory: '../../../data/imports'
 #Archive directory
-archive_directory: '../../../data/archive'
+archiveDirectory: '../../../data/archive'
 #Stats directory
-stats_directory: '../../../data/imports/stats'
+statsDirectory: '../../../data/imports/stats'
 #experiments import directory
-experiments_directory: '../../../data/imports/experiments'
+experimentsDirectory: '../../../data/imports/experiments'
 #databases import diretory
-databases_directory: '../../../data/imports/databases'
+databasesDirectory: '../../../data/imports/databases'
 #ontologies import diretory
-ontologies_directory: '../../../data/imports/ontologies'
+ontologiesDirectory: '../../../data/imports/ontologies'
 #users directory
-users_directory: '../../../data/imports/users'
+usersDirectory: '../../../data/imports/users'
 
 download: True
 
