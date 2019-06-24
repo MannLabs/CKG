@@ -18,7 +18,7 @@ def parser(databases_directory, download = True):
     directory = os.path.join(databases_directory,"disgenet")
     builder_utils.checkDirectory(directory)
     header = config['disgenet_header']
-    output_file = 'Protein_disgenet_associated_with.tsv'
+    output_file = 'disgenet_associated_with.tsv'
 
     if download:
         for f in files:

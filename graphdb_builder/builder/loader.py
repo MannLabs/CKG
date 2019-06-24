@@ -298,7 +298,7 @@ def archiveImportDirectory(archive_type="full"):
     """
     dest_folder = config["archiveDirectory"]
     builder_utils.checkDirectory(dest_folder)
-    folder_to_backup = config["import_directory"]
+    folder_to_backup = config["importDirectory"]
     date, time = builder_utils.getCurrentTime()
     file_name = "{}_{}_{}".format(archive_type, date.replace('-', ''), time.replace(':', ''))
     logger.info("Archiving {} to file: {}".format(folder_to_backup, file_name))

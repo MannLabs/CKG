@@ -2,7 +2,7 @@ import os.path
 import tarfile
 from collections import defaultdict
 import ckg_utils
-from graphdb_builder import builder_utils
+from graphdb_builder import mapping as mp, builder_utils
 import pandas as pd
 import numpy as np
 
@@ -44,11 +44,14 @@ def parser(databases_directory, download=True):
         if compound_id in compounds:
             compound_code = compounds[compound_id].replace("HMDB","HMDB00")
             relationships[("food", "has_content")].add((food_id, compound_code, "HAS_CONTENT") + contents[(food_id, compound_id)])
+    mp.reset_mapping(entity="Food")
     with open(os.path.join(directory, "mapping.tsv"), 'w') as out:
         for food_id in mapping:
             for alias in mapping[food_id]:
                 out.write(str(food_id)+"\t"+str(alias)+"\n")
-
+    
+    mp.mark_complete_mapping(entity="Food")
+    
     return food, relationships, entities_header, relationships_headers
 
 def parseContents(fhandler):
