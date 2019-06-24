@@ -114,8 +114,6 @@ def downloadDB(databaseURL, directory=None, file_name=None, user="", password=""
         raise urllib3.exceptions.SecurityWarning("Security warning when downloading. {}.\nURL:{}".format(err,databaseURL))
     except urllib3.exceptions.ProtocolError:
         raise urllib3.exceptions.ProtocolError("Protocol error when downloading. {}.\nURL:{}".format(err,databaseURL))
-    except urllib3.exceptions.HTTPError as err:
-        raise urllib3.exceptions.HTTPError("The site could not be reached. {}.\nURL:{}".format(err,databaseURL))
     except ftplib.error_reply as err:
         raise ftplib.error_reply("Exception raised when an unexpected reply is received from the server. {}.\nURL:{}".format(err,databaseURL))
     except ftplib.error_temp as err:
@@ -135,23 +133,30 @@ def searchPubmed(searchFields, sortby = 'relevance', num ="10", resultsFormat = 
         query = searchFields[0] +" [MeSH Terms] AND"
     try:
         url = pubmedQueryUrl.replace('TERMS',query).replace('NUM', num)
-        response = urllib3.urlopen(urllib.quote_plus(url))
+        http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
+        response = http.request("GET", urllib.parse.quote(url))
         jsonResponse = response.read()
         resultDict = json.loads(jsonResponse)
-    except urllib3.exceptions.HTTPError as err:
-        raise urllib3.exceptions.HTTPError("The site could not be reached. {}.\nURL:{}".format(err,databaseURL))
     except urllib3.exceptions.InvalidHeader:
-        raise urllib3.exceptions.InvalidHeader("Invalid HTTP header provided. {}.\nURL:{}".format(err,databaseURL))
+        raise urllib3.exceptions.InvalidHeader("Invalid HTTP header provided. {}.\nURL:{}".format(err,url))
     except urllib3.exceptions.ConnectTimeoutError:
-        raise urllib3.exceptions.ConnectTimeoutError("Connection timeout requesting URL. {}.\nURL:{}".format(err,databaseURL))
+        raise urllib3.exceptions.ConnectTimeoutError("Connection timeout requesting URL. {}.\nURL:{}".format(err,url))
     except urllib3.exceptions.ConnectionError:
-        raise urllib3.exceptions.ConnectionError("Protocol error when downloading. {}.\nURL:{}".format(err,databaseURL))
+        raise urllib3.exceptions.ConnectionError("Protocol error when downloading. {}.\nURL:{}".format(err,url))
     except urllib3.exceptions.DecodeError:
-        raise urllib3.exceptions.DecodeError("Decoder error when downloading. {}.\nURL:{}".format(err,databaseURL))
+        raise urllib3.exceptions.DecodeError("Decoder error when downloading. {}.\nURL:{}".format(err,url))
     except urllib3.exceptions.SecurityWarning:
-        raise urllib3.exceptions.SecurityWarning("Security warning when downloading. {}.\nURL:{}".format(err,databaseURL))
+        raise urllib3.exceptions.SecurityWarning("Security warning when downloading. {}.\nURL:{}".format(err,url))
     except urllib3.exceptions.ProtocolError:
-        raise urllib3.exceptions.ProtocolError("Protocol error when downloading. {}.\nURL:{}".format(err,databaseURL))
+        raise urllib3.exceptions.ProtocolError("Protocol error when downloading. {}.\nURL:{}".format(err,url))
+    except ftplib.error_reply as err:
+        raise ftplib.error_reply("Exception raised when an unexpected reply is received from the server. {}.\nURL:{}".format(err,databaseURL))
+    except ftplib.error_temp as err:
+        raise ftplib.error_temp("Exception raised when an error code signifying a temporary error. {}.\nURL:{}".format(err,databaseURL))
+    except ftplib.error_perm as err:
+        raise ftplib.error_perm("Exception raised when an error code signifying a permanent error. {}.\nURL:{}".format(err,databaseURL))
+    except ftplib.error_proto:
+        raise ftplib.error_proto("Exception raised when a reply is received from the server that does not fit the response specifications of the File Transfer Protocol. {}.\nURL:{}".format(err,databaseURL))
     except Exception as err:
         raise Exception("Something went wrong. {}.\nURL:{}".format(err,databaseURL))
 

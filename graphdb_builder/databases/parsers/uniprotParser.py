@@ -260,7 +260,7 @@ def parseUniProtVariants(config, databases_directory, import_directory, download
                     relationships[('Protein','known_variant_found_in_protein')].add((ident, protein, "VARIANT_FOUND_IN_PROTEIN", "UniProt"))
 
                 if len(entities) >= 1000:
-                    stats.update(print_single_file(entities, config['variants_header'], "Known_variant.tsv", "entity", "Known_variant", is_first))
+                    stats.update(print_single_file(entities, config['variants_header'], os.path.join(import_directory, "Known_variant.tsv"), "entity", "Known_variant", is_first))
                     stats.update(print_multiple_relationships_files(relationships, config['relationships_header'], import_directory, is_first))
                     entities = set()
                     relationships = defaultdict(set)
@@ -268,7 +268,7 @@ def parseUniProtVariants(config, databases_directory, import_directory, download
                     first = False
 
     if len(entities) > 0:
-        stats.update(print_single_file(entities, config['variants_header'], "Known_variant.tsv", "entity", "Known_variant", is_first))
+        stats.update(print_single_file(entities, config['variants_header'], os.path.join(import_directory, "Known_variant.tsv"), "entity", "Known_variant", is_first))
         stats.update(print_multiple_relationships_files(relationships, config['relationships_header'], import_directory, is_first))
         del(entities)
         del(relationships)
