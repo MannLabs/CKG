@@ -161,7 +161,9 @@ def updateDB(driver, imports=None):
                 for resource in config["compiled_drug_resources"]:
                     queries.extend(code.replace("IMPORTDIR", import_dir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
                 code = cypher_queries['IMPORT_DRUG_ACTS_ON']['query']
+                print(code)
                 for resource in config["drug_action_resources"]:
+                    print(resource)
                     queries.extend(code.replace("IMPORTDIR", import_dir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
             #Side effects
             elif i == "side effects":
@@ -215,7 +217,7 @@ def updateDB(driver, imports=None):
                     queries.extend(code.replace("IMPORTDIR", import_dir).replace("ENTITY", entity).split(';')[0:-1])
             #Users
             elif i == "user":
-                usersDir = os.path.join(os.getcwd(),config["usersDirectory"])
+                usersDir = os.path.join(os.getcwd(),config["usersDirectory"])   
                 user_cypher = cypher_queries['CREATE_USER_NODE']
                 code = user_cypher['query']
                 queries.extend(code.replace("IMPORTDIR", usersDir).split(';')[0:-1])

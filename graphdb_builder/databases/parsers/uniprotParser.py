@@ -320,7 +320,7 @@ def parseUniProtPeptides(config, databases_directory, download=True):
     
                 data = line.rstrip("\r\n").split("\t")
                 peptide = data[0]
-                accs = data[5].split(",")
+                accs = data[6].split(",")
                 is_unique = True
                 if len(accs) > 1:
                     is_unique = False

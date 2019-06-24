@@ -25,7 +25,7 @@ def parser(databases_directory, download = True):
             builder_utils.downloadDB(url+files[f], directory)
 
     proteinMapping = readDisGeNetProteinMapping(config, databases_directory) 
-    diseaseMapping, diseaseSynonyms = readDisGeNetDiseaseMapping(config, databases_directory)
+    diseaseMapping = readDisGeNetDiseaseMapping(config, databases_directory)
     for f in files:
         first = True
         associations = gzip.open(os.path.join(directory,files[f]), 'r')
@@ -43,8 +43,8 @@ def parser(databases_directory, download = True):
             try:
                 data = line.decode('utf-8').rstrip("\r\n").split("\t")
                 geneId = str(int(data[0]))
-                disease_specificity_index =  data[2]
-                disease_pleiotropy_index = data[3]
+                #disease_specificity_index =  data[2]
+                #disease_pleiotropy_index = data[3]
                 diseaseId = data[4]
                 score = float(data[scorePos])
                 pmids = data[12]
@@ -85,7 +85,6 @@ def readDisGeNetDiseaseMapping(config, databases_directory):
     directory =  os.path.join(databases_directory,"disgenet")
     first = True
     mapping = defaultdict(set)
-    synonyms = defaultdict(set)
     if "disease_mapping" in files:
         mappingFile = files["disease_mapping"]
         with gzip.open(os.path.join(directory,mappingFile), 'r') as f:
@@ -99,6 +98,4 @@ def readDisGeNetDiseaseMapping(config, databases_directory):
                 code = data[3]
                 if vocabulary == "DO":
                     mapping[identifier].add(code)
-                else:
-                    synonyms[identifier].add(code)
-    return mapping, synonyms
+    return mapping

@@ -139,6 +139,8 @@ def fullImport():
         logger.info("Full import: importing all Experiments")
         experimentsImport(n_jobs=4, import_type='full')
         logger.info("Full import: Experiments import took {}".format(datetime.now() - START_TIME))
+    except FileNotFoundError as err:
+        logger.error("Full import > {}.".format(err))
     except EOFError as err:
         logger.error("Full import > {}.".format(err))
     except IOError as err:
@@ -148,10 +150,6 @@ def fullImport():
     except KeyError as err:
         logger.error("Full import > {}.".format(err))
     except MemoryError as err:
-        logger.error("Full import > {}.".format(err))
-    except OSError as err:
-        logger.error("Full import > {}.".format(err))
-    except FileNotFoundError as err:
         logger.error("Full import > {}.".format(err))
     except Exception as err:
         logger.error("Full import > {}.".format(err))

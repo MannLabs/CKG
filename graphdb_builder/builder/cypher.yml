@@ -73,15 +73,15 @@ IMPORT_PROTEIN_DATA:
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Protein_gene_translated_into.tsv" AS line
         FIELDTERMINATOR '\t'
-        MATCH (p:Protein {id:line.START_ID})
-        MATCH (g:Gene {id:line.END_ID})
+        MATCH (g:Gene {id:line.START_ID})
+        MATCH (p:Protein {id:line.END_ID})
         MERGE (g)-[r:TRANSLATED_INTO]->(p)
         RETURN COUNT(r) AS gene_translated_into_protein;
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Protein_transcript_translated_into.tsv" AS line
         FIELDTERMINATOR '\t'
-        MATCH (p:Protein {id:line.START_ID})
-        MATCH (t:Transcript {id:line.END_ID})
+        MATCH (t:Transcript {id:line.START_ID})
+        MATCH (p:Protein {id:line.END_ID})
         MERGE (t)-[r:TRANSLATED_INTO]->(p)
         RETURN COUNT(r) AS transcript_translated_into;
 
@@ -778,7 +778,7 @@ CREATE_USER_NODE:
         CREATE CONSTRAINT ON (u:User) ASSERT u.id IS UNIQUE;
         CREATE INDEX ON :User(name);
         USING PERIODIC COMMIT 10000
-        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/users/users.tsv" AS line
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/users.tsv" AS line
         FIELDTERMINATOR '\t'
         MERGE (u:User {id:line.ID})
         ON CREATE SET u.acroym=line.acronym,u.name=line.name,u.username=line.username,u.email=line.email

@@ -10,7 +10,6 @@ import numpy as np
 #       FooDB     # 
 ###################
 def parser(databases_directory, download=True):
-    entities = set()
     relationships = defaultdict(set)
     directory = os.path.join(databases_directory,"FooDB")
     builder_utils.checkDirectory(directory)
@@ -24,7 +23,6 @@ def parser(databases_directory, download=True):
     tar_dir = database_url.split('/')[-1].split('.')[0]
     if download:
         builder_utils.downloadDB(database_url, directory)
-    first = True
     contents = {}
     food = set()
     compounds = {}
