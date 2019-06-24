@@ -100,17 +100,15 @@ def mergeRegexAttributes(data, attributes, index):
         attributes = attributes.reset_index()
         attributes.columns = ["c"+str(i) for i in range(len(attributes.columns))]
         data = pd.merge(data, attributes, on = index)
+        del(attributes)
 
     return data
 
 def mergeColAttributes(data, attributes, index):
     if not attributes.empty:
-        data = data.set_index(index)
-        data = dd.from_pandas(data, 1000)
-        attributes = dd.from_pandas(attributes, 1000)
-        data = data.merge(attributes, left_index=True, right_index=True)
+        attributes = attributes.reset_index()
+        data = pd.merge(data, attributes, on=index)
         del(attributes)
-        data = data.compute()
         data = data.reset_index()
 
     return data
@@ -243,7 +241,7 @@ def extractProjectInterventionRelationships(project_data, separator='|'):
         return pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE'])
     else:
         interventions = data['intervention'][0].split(separator)
-        ids = [re.search('\(([^)]+)',x.split()[-1]).group(1) for x in interventions]
+        ids = [re.search(r'\(([^)]+)',x.split()[-1]).group(1) for x in interventions]
         df = pd.DataFrame(ids, columns=['END_ID'])
         df.insert(loc=0, column='START_ID', value=data['external_id'][0])
         df['TYPE'] = 'STUDIES_INTERVENTION'
@@ -255,7 +253,7 @@ def extractTimepoints(project_data, separator='|'):
         return pd.DataFrame(columns=['ID', 'units', 'type'])
     else:
         df = pd.DataFrame(data['timepoints'][0].replace(' ','').split(separator))
-        df = df[0].str.extract('([\-\d]+)([a-zA-Z]+)', expand=True)
+        df = df[0].str.extract(r'([\-\d]+)([a-zA-Z]+)', expand=True)
         df.columns = ['ID', 'units']
         df['type'] = 'Timepoint'
         return df
@@ -379,7 +377,7 @@ def extractBiologicalSampleClinicalVariablesRelationships(clinical_data):
     # df['biological_sample id'] = data['biological_sample id']
     # df = df.set_index('biological_sample id')
     df.columns = [i.split()[-1] for i in df.columns]
-    df.columns = df.columns.str.extract('.*\((.*)\).*')[0].tolist()
+    df.columns = df.columns.str.extract(r'.*\((.*)\).*')[0].tolist()
     df_quant = df._get_numeric_data()
     df_state = df.loc[:,~df.columns.isin(df_quant.columns.tolist())]
     if df_quant.empty:
@@ -618,18 +616,21 @@ def extractProteinSubjectRelationships(data, configuration):
     aux = aux.reset_index()
     aux.columns = ["c"+str(i) for i in range(len(aux.columns))]
     columns = ['END_ID', 'START_ID',"value"]
-
+    
     (cAttributes,cCols), (rAttributes,regexCols) = extractAttributes(data, attributes)
+    
     if not rAttributes.empty:
         aux = mergeRegexAttributes(aux, rAttributes, ["c0","c1"])
         columns.extend(regexCols)
     if not cAttributes.empty:
         aux = mergeColAttributes(aux, cAttributes, "c0")
         columns.extend(cCols)
+    
     aux['TYPE'] = "HAS_QUANTIFIED_PROTEIN"
     columns.append("TYPE")
     aux.columns = columns
     aux = aux[['START_ID', 'END_ID', 'TYPE', "value"] + regexCols + cCols]
+    
     return aux
 
 ############ Whole Exome Sequencing Datasets ##############
@@ -676,7 +677,6 @@ def loadProteomicsDataset(uri, configuration):
     ''' This function gets the molecular data from a proteomics experiment.
         Input: uri of the processed file resulting from MQ
         Output: pandas DataFrame with the columns and filters defined in config.py '''
-    aux = None
     #Get the columns from config and divide them into simple or regex columns
     columns = configuration["columns"]
     regexCols = [c.replace("\\\\","\\") for c in columns if '+' in c]
@@ -684,12 +684,8 @@ def loadProteomicsDataset(uri, configuration):
 
     #Read the filters defined in config, i.e. reverse, contaminant, etc.
     filters = configuration["filters"]
-    proteinCol = configuration["proteinCol"]
     indexCol = configuration["indexCol"]
-    groupCol = configuration["groupCol"]
-    if "geneCol" in configuration:
-        geneCol = configuration["geneCol"]
-
+    
     #Read the data from file
     data = readDataset(uri)
     #Apply filters
@@ -709,7 +705,7 @@ def loadProteomicsDataset(uri, configuration):
     return data, regexCols
 
 def expand_groups(data, configuration):
-    ddata = dd.from_pandas(data, 100)
+    ddata = dd.from_pandas(data, 10)
     ddata = ddata.map_partitions(lambda df: df.drop(configuration["proteinCol"], axis=1).join(df[configuration["proteinCol"]].str.split(';', expand=True).stack().reset_index(drop=True, level=1).rename(configuration["proteinCol"])))
     if "multipositions" in configuration:
         ddata = ddata.map_partitions(lambda df: df.drop(configuration["multipositions"], axis=1).join(df[configuration["multipositions"]].str.split(';', expand=True).stack().reset_index(drop=True, level=1).rename(configuration["multipositions"])))
@@ -755,7 +751,7 @@ def generateDatasetImports(projectId, dataType):
             if "directory" in config["dataTypes"][dataType]:
                 dataDir = config["dataTypes"][dataType]["directory"].replace("PROJECTID", projectId)
                 configuration = config["dataTypes"][dataType]
-                if dataType == "clinical":
+                if dataType == "clinicaly":
                     separator = configuration["separator"]
                     project_data = parseClinicalDataset(projectId, configuration, dataDir, key='project')
                     clinical_data = parseClinicalDataset(projectId, configuration, dataDir, key='clinical')
@@ -875,10 +871,12 @@ def generateGraphFiles(data, dataType, projectId, stats, ot = 'w', d = 'proteomi
         outputfile = os.path.join(importDir, projectId+dataType.lower()+".tsv")
     else:
         outputfile = os.path.join(importDir, projectId+"_"+dataType.lower()+".tsv")
+    
     with open(outputfile, ot) as f:
         data.to_csv(path_or_buf = f, sep='\t',
             header=True, index=False, quotechar='"',
             line_terminator='\n', escapechar='\\')
+    
     logger.info("Experiment {} - Number of {} relationships: {}".format(projectId, dataType, data.shape[0]))
     stats.add(builder_utils.buildStats(data.shape[0], "relationships", dataType, "Experiment", outputfile))
 

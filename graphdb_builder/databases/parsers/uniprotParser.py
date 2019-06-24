@@ -11,7 +11,6 @@ from graphdb_builder import mapping as mp, builder_utils
 #       UniProt         # 
 #########################
 def parser(databases_directory, import_directory, download=True):
-    result = {"Protein":None, "Known_variant":None, "Peptide":None}
     cwd = os.path.abspath(os.path.dirname(__file__))
     config = ckg_utils.get_configuration(os.path.join(cwd,'../config/uniprotConfig.yml'))
     relationships_header = config['relationships_header']
@@ -246,7 +245,7 @@ def parseUniProtVariants(config, databases_directory, import_directory, download
             if var_matches and chr_matches:
                 chromosome = 'chr'+chr_matches.group(1)
                 ident = chromosome+":"+var_matches.group(1)
-                consequence = data[4]
+                #consequence = data[4]
                 altName = [externalID, data[5], pvariant, chromosome_coord]
                 if ref in aa and alt in aa:
                     altName.append(aa[ref]+pos+aa[alt])

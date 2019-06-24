@@ -150,15 +150,15 @@ def searchPubmed(searchFields, sortby = 'relevance', num ="10", resultsFormat = 
     except urllib3.exceptions.ProtocolError:
         raise urllib3.exceptions.ProtocolError("Protocol error when downloading. {}.\nURL:{}".format(err,url))
     except ftplib.error_reply as err:
-        raise ftplib.error_reply("Exception raised when an unexpected reply is received from the server. {}.\nURL:{}".format(err,databaseURL))
+        raise ftplib.error_reply("Exception raised when an unexpected reply is received from the server. {}.\nURL:{}".format(err,url))
     except ftplib.error_temp as err:
-        raise ftplib.error_temp("Exception raised when an error code signifying a temporary error. {}.\nURL:{}".format(err,databaseURL))
+        raise ftplib.error_temp("Exception raised when an error code signifying a temporary error. {}.\nURL:{}".format(err,url))
     except ftplib.error_perm as err:
-        raise ftplib.error_perm("Exception raised when an error code signifying a permanent error. {}.\nURL:{}".format(err,databaseURL))
+        raise ftplib.error_perm("Exception raised when an error code signifying a permanent error. {}.\nURL:{}".format(err,url))
     except ftplib.error_proto:
-        raise ftplib.error_proto("Exception raised when a reply is received from the server that does not fit the response specifications of the File Transfer Protocol. {}.\nURL:{}".format(err,databaseURL))
+        raise ftplib.error_proto("Exception raised when a reply is received from the server that does not fit the response specifications of the File Transfer Protocol. {}.\nURL:{}".format(err,url))
     except Exception as err:
-        raise Exception("Something went wrong. {}.\nURL:{}".format(err,databaseURL))
+        raise Exception("Something went wrong. {}.\nURL:{}".format(err,url))
 
     result = []
     if 'esearchresult' in resultDict:
