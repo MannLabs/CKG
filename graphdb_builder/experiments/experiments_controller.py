@@ -106,8 +106,8 @@ def mergeRegexAttributes(data, attributes, index):
 
 def mergeColAttributes(data, attributes, index):
     if not attributes.empty:
-        attributes = attributes.reset_index()
-        data = pd.merge(data, attributes, on=index)
+        data = data.set_index(index)
+        data = data.join(attributes)
         del(attributes)
         data = data.reset_index()
 
@@ -395,47 +395,6 @@ def extractBiologicalSampleClinicalVariablesRelationships(clinical_data):
     
     return df_state, df_quant
 
-# def extractSubjectClinicalVariablesRelationships(data):
-#     df = data.copy()
-#     intervention = None
-#     if 'intervention id' in df.columns and df['intervention id'].dropna().empty != True:
-#         intervention = df['intervention id'].to_frame()
-#         intervention = intervention.reset_index()
-#         intervention.columns = ['START_ID', 'END_ID']
-#         intervention['END_ID'] = intervention['END_ID'].astype('int64')
-#         intervention['value'] = True
-#     df = df.set_index('subject id')
-#     df = df.drop([i for i in df.columns if str(i).endswith(' id')], axis=1)
-#     df = df.stack()
-#     df = df.reset_index()
-#     df.columns = ['START_ID', 'END_ID', "value"]
-#     if intervention is not None:
-#         df = df.append(intervention, sort=True)
-#     df['TYPE'] = "HAS_CLINICAL_STATE"
-#     df = df[['START_ID', 'END_ID','TYPE', 'value']]
-#     df['END_ID'] = df['END_ID'].apply(lambda x: int(x) if isinstance(x,float) else x)
-#     df = df[df['value'].apply(lambda x: isinstance(x, str))]
-#     df = df.drop_duplicates(keep='first').dropna()
-
-#     return df
-
-# def extractBiologicalSampleClinicalVariablesRelationships(clinical_data):
-#     df = clinical_data.copy()
-#     if 'biological_sample id' in df.columns:
-#         df = df.set_index('biological_sample id')
-#         df = df._get_numeric_data()
-#         cols = [i for i in df.columns if str(i).endswith(' id')]
-#         df = df.drop(cols, axis=1)
-#         df = df.stack().reset_index()
-#         df.columns = ['START_ID', 'END_ID', 'value']
-#         df.insert(loc=2, column='TYPE', value='HAS_QUANTIFIED_CLINICAL')
-#         df['END_ID'] = df['END_ID'].apply(lambda x: int(x) if isinstance(x,float) else x)
-#         df = df.drop_duplicates(keep='first').dropna()
-#         return df
-#     else:
-#         return None
-
-
 ########### Proteomics Datasets ############
 ############## ProteinModification entity ####################
 def extractModificationProteinRelationships(data, configuration):
@@ -705,14 +664,17 @@ def loadProteomicsDataset(uri, configuration):
     return data, regexCols
 
 def expand_groups(data, configuration):
-    ddata = dd.from_pandas(data, 10)
-    ddata = ddata.map_partitions(lambda df: df.drop(configuration["proteinCol"], axis=1).join(df[configuration["proteinCol"]].str.split(';', expand=True).stack().reset_index(drop=True, level=1).rename(configuration["proteinCol"])))
+    s = data[configuration["proteinCol"]].str.split(';').apply(pd.Series, 1).stack().reset_index(level=1, drop=True)
+    del data[configuration["proteinCol"]]
+    pdf = s.to_frame(configuration["proteinCol"])
     if "multipositions" in configuration:
-        ddata = ddata.map_partitions(lambda df: df.drop(configuration["multipositions"], axis=1).join(df[configuration["multipositions"]].str.split(';', expand=True).stack().reset_index(drop=True, level=1).rename(configuration["multipositions"])))
-    data = ddata.compute()
+        s2 = data[configuration["multipositions"]].str.split(';').apply(pd.Series, 1).stack().reset_index(level=1, drop=True)
+        del data[configuration["multipositions"]]
+        pdf = pd.concat([s,s2], axis=1, keys=[configuration["proteinCol"],configuration["multipositions"]])
+    data = data.join(pdf)
     data["is_razor"] = ~ data[configuration["groupCol"]].duplicated()
     data = data.set_index(configuration["indexCol"])
-
+    
     return data
 
 ############ Whole Exome Sequencing #############
