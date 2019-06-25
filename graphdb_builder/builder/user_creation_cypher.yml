@@ -34,7 +34,7 @@ create_user_node:
         CREATE CONSTRAINT ON (u:User) ASSERT u.username IS UNIQUE;
         CREATE CONSTRAINT ON (u:User) ASSERT u.email IS UNIQUE;
         MERGE (u:User {id:$ID})
-        ON CREATE SET u.acronym=$acronym,u.name=$name,u.username=$username,u.email=$email,u.secondary_email=$second_email,u.phone_number=$phone,u.affiliation=$affiliation,u.expiration_date=$expiration_date,u.image=$image
+        ON CREATE SET u.acronym=$acronym,u.name=$name,u.username=$username,u.email=$email,u.secondary_email=$secondary_email,u.phone_number=$phone_number,u.affiliation=$affiliation,u.expiration_date=$expiration_date,u.rolename=$rolename,u.image=$image
         RETURN COUNT(u) AS User_nodes;
 find_user:
     name: find user node

@@ -96,6 +96,7 @@ def create_user_from_command_line(driver, args, expiration=365):
 			data['password'] = data['username']
 			data['rolename'] = 'reader'
 			data['expiration_date'] = date.strftime('%Y-%m-%d')
+			data['image'] = ''
 
 			create_user_db(driver, data)
 			user_creation_cypher = get_user_creation_queries()
@@ -121,26 +122,28 @@ def create_user_from_command_line(driver, args, expiration=365):
 
 	#Save new user to file
 	usersDir = os.path.join(os.getcwd(),config["usersDirectory"])
-	file = os.path.join(usersDir, 'CKG_users.csv')
+	file = os.path.join(usersDir, 'users.tsv')
 	data = pd.DataFrame.from_dict(data, orient='index').T
-	data = data[['ID', 'acronym', 'name', 'username', 'email', 'second_email', 'phone', 'affiliation', 'expiration_date', 'rolename', 'image']]
+	data = data[['ID', 'acronym', 'name', 'username', 'email', 'secondary_email', 'phone_number', 'affiliation', 'expiration_date', 'rolename', 'image']]
 	with open(file, 'a') as f:
-		data.to_csv(path_or_buf = f,
+		data.to_csv(path_or_buf = f, sep='\t',
                     header=False, index=False, quotechar='"',
                     line_terminator='\n', escapechar='\\')
 	return result
 
 
-def create_user_from_file(driver, args, expiration=365):
+def create_user_from_file(filepath, expiration=365):
 	query_name_add = 'create_user'
 	query_name_role = 'add_role_to_user'
 	query_name_node = 'create_user_node'
+
+	driver = connector.getGraphDatabaseConnectionConfiguration()
 
 	date = datetime.today() + timedelta(days=expiration)
 	df = []
 	done = 0
 	try:
-		data = pd.read_excel(args.file).applymap(str)
+		data = pd.read_excel(filepath).applymap(str)
 		cypher = get_user_creation_queries()
 		query = cypher[query_name_add]['query'] + cypher[query_name_role]['query'] + cypher[query_name_node]['query']
 		for index, row in data.iterrows():		
@@ -159,6 +162,7 @@ def create_user_from_file(driver, args, expiration=365):
 				row['password'] = row['username']
 				row['rolename'] = 'reader'
 				row['expiration_date'] = date.strftime('%Y-%m-%d')
+
 				for q in query.split(';')[0:-1]:
 					if '$' in q:			
 						result = connector.getCursorData(driver, q+';', parameters=row.to_dict())
@@ -166,6 +170,7 @@ def create_user_from_file(driver, args, expiration=365):
 						result = connector.getCursorData(driver, q+';')
 					done += 1
 				df.append(row)
+				
 			if username.size != 0:
 				print('A user with the same username "{}" already exists. Modify username.'.format(row['username']))
 				continue
@@ -182,11 +187,11 @@ def create_user_from_file(driver, args, expiration=365):
 
 	#Save new user to file
 	usersDir = os.path.join(os.getcwd(),config["usersDirectory"])
-	file = os.path.join(usersDir, 'CKG_users.csv')
+	file = os.path.join(usersDir, 'users.tsv')
 	data = pd.DataFrame(df)
-	data = data[['ID', 'acronym', 'name', 'username', 'email', 'second_email', 'phone', 'affiliation', 'expiration_date', 'rolename', 'image']]
+	data = data[['ID', 'acronym', 'name', 'username', 'email', 'secondary_email', 'phone_number', 'affiliation', 'expiration_date', 'rolename', 'image']]
 	with open(file, 'a') as f:
-		data.to_csv(path_or_buf = f,
+		data.to_csv(path_or_buf = f, sep='\t',
                     header=False, index=False, quotechar='"',
                     line_terminator='\n', escapechar='\\')
 	return done
@@ -215,7 +220,7 @@ if __name__ == "__main__":
 	if args.file != None:
 		logger.info('Creating users, from file, in the database')
 		print('Creating users, from file, in the database')
-		create_user_from_file(driver, args, expiration=365)
+		create_user_from_file(args.file, expiration=365)
 		print('Done')
 
 	if args.file is None and args.username != None:

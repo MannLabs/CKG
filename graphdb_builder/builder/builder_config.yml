@@ -19,6 +19,8 @@ download: True
 
 cypher_queries_file: 'cypher.yml'
 
+usersFile: 'CKG_users.xlsx'
+
 statsFile: 'stats.hdf'
 statsCols: 
     - 'date'
