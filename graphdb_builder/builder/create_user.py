@@ -162,6 +162,7 @@ def create_user_from_file(filepath, expiration=365):
 				row['password'] = row['username']
 				row['rolename'] = 'reader'
 				row['expiration_date'] = date.strftime('%Y-%m-%d')
+				row['image'] = ''
 
 				for q in query.split(';')[0:-1]:
 					if '$' in q:			
@@ -186,14 +187,21 @@ def create_user_from_file(filepath, expiration=365):
 		logger.error("Reading query {}: {}, file: {},line: {}, error: {}".format(query_name_add, sys.exc_info(), fname, exc_tb.tb_lineno, err))
 
 	#Save new user to file
-	usersDir = os.path.join(os.getcwd(),config["usersDirectory"])
+	usersDir = os.path.join(cwd,'../../../data/imports/users')
 	file = os.path.join(usersDir, 'users.tsv')
 	data = pd.DataFrame(df)
 	data = data[['ID', 'acronym', 'name', 'username', 'email', 'secondary_email', 'phone_number', 'affiliation', 'expiration_date', 'rolename', 'image']]
-	with open(file, 'a') as f:
-		data.to_csv(path_or_buf = f, sep='\t',
-                    header=False, index=False, quotechar='"',
-                    line_terminator='\n', escapechar='\\')
+	
+	if os.path.exists(file):
+		with open(file, 'a') as f:
+			data.to_csv(path_or_buf = f, sep='\t',
+            	        header=False, index=False, quotechar='"',
+                	    line_terminator='\n', escapechar='\\')
+	else:
+		with open(file, 'w') as f:
+			data.to_csv(path_or_buf = f, sep='\t',
+            	        header=True, index=False, quotechar='"',
+                	    line_terminator='\n', escapechar='\\')
 	return done
 
 

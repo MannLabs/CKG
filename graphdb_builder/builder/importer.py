@@ -13,6 +13,7 @@ import pandas as pd
 from joblib import Parallel, delayed
 import config.ckg_config as ckg_config
 import ckg_utils
+import create_user as uh
 from graphdb_builder.ontologies import ontologies_controller as oh
 from graphdb_builder.databases import databases_controller as dh
 from graphdb_builder.experiments import experiments_controller as eh
@@ -132,7 +133,7 @@ def usersImport(import_type='partial'):
     usersPath = config['usersDirectory']
     filename = config['usersFile']
     builder_utils.checkDirectory(usersPath)
-    create_user_from_file(os.path.join(usersPath, filename), expiration=365)    
+    uh.create_user_from_file(os.path.join(usersPath, filename), expiration=365)    
 
 
 def fullImport():

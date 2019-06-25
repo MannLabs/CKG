@@ -13,7 +13,8 @@ databasesDirectory: '../../../data/imports/databases'
 #ontologies import diretory
 ontologiesDirectory: '../../../data/imports/ontologies'
 #users directory
-usersDirectory: '../../../data/imports/users'
+usersDirectory: '../../../data/users'
+usersImportDirectory: '../../../data/imports/users'
 
 download: True
 

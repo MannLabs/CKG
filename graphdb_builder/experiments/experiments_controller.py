@@ -713,7 +713,7 @@ def generateDatasetImports(projectId, dataType):
             if "directory" in config["dataTypes"][dataType]:
                 dataDir = config["dataTypes"][dataType]["directory"].replace("PROJECTID", projectId)
                 configuration = config["dataTypes"][dataType]
-                if dataType == "clinicaly":
+                if dataType == "clinical":
                     separator = configuration["separator"]
                     project_data = parseClinicalDataset(projectId, configuration, dataDir, key='project')
                     clinical_data = parseClinicalDataset(projectId, configuration, dataDir, key='clinical')

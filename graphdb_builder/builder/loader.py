@@ -195,7 +195,6 @@ def updateDB(driver, imports=None):
             elif i == "clinical variants":
                 code = cypher_queries['IMPORT_CLINICALLY_RELEVANT_VARIANT_DATA']['query']
                 for resource in config["clinical_variant_resources"]:
-                    print(code.replace("IMPORTDIR", import_dir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
                     queries.extend(code.replace("IMPORTDIR", import_dir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
             #Internal
             elif i == "internal":
@@ -216,7 +215,7 @@ def updateDB(driver, imports=None):
                     queries.extend(code.replace("IMPORTDIR", import_dir).replace("ENTITY", entity).split(';')[0:-1])
             #Users
             elif i == "user":
-                usersDir = os.path.join(os.getcwd(),config["usersDirectory"])   
+                usersDir = os.path.join(os.getcwd(),config["usersImportDirectory"])   
                 user_cypher = cypher_queries['CREATE_USER_NODE']
                 code = user_cypher['query']
                 queries.extend(code.replace("IMPORTDIR", usersDir).split(';')[0:-1])

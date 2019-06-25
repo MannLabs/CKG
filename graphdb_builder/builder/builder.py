@@ -30,7 +30,7 @@ except Exception as err:
 def set_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("-b", "--build_type", help="define the type of build you want (import, load or both)", type=str, choices=['import', 'load', 'full'], default='full')
-    parser.add_argument("-i", "--import_types", help="define which data types (ontologies, experiments, databases) you want to import (partial import)", nargs='+', default=None, choices=['experiments', 'databases', 'ontologies'])
+    parser.add_argument("-i", "--import_types", help="define which data types (ontologies, experiments, databases) you want to import (partial import)", nargs='+', default=None, choices=['experiments', 'databases', 'ontologies', 'users'])
     parser.add_argument("-l", "--load_entities",  help="define which entities you want to load into the database (partial load)",  nargs='+', default=config["graph"])
     parser.add_argument("-d", "--data", help="define which ontology/ies, experiment/s or database/s you want to import",  nargs='+', default=None)
     parser.add_argument("-n", "--n_jobs", help="define number of cores used when importing data", type=int, default=4)
@@ -58,6 +58,8 @@ if __name__ == '__main__':
                     logger.info("Importing {}: {}".format(import_type, "".join(args.data)))
                     if import_type.lower() == 'experiments' or import_type.lower() == 'experiment':
                         importer.experimentsImport(projects=args.data, n_jobs=1)
+                    elif import_type.lower() == 'users' or import_type.lower() == 'user':
+                        importer.usersImport()
                     elif import_type.lower() == 'databases' or import_type.lower() == 'database':
                         databases = [d.lower() for d in dbconfig['databases']]
                         valid_entities = [x.lower() for x in args.data if x.lower() in databases]

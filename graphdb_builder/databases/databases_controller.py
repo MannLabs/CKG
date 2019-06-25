@@ -125,7 +125,7 @@ def parseDatabase(importDirectory, database, download=True):
             builder_utils.write_entities(entities, entities_header, entity_outputfile)
             stats.add(builder_utils.buildStats(len(entities), "entity", "Pathway", database, entity_outputfile))
             for entity,relationship in relationships:
-                smpdb_outputfile = os.path.join(importDirectory, database+"_"+entity.lower()+"_"+relationship.lower()+".tsv")
+                smpdb_outputfile = os.path.join(importDirectory, database.lower()+"_"+entity.lower()+"_"+relationship.lower()+".tsv")
                 builder_utils.write_relationships(relationships[(entity, relationship)], relationships_header[entity], smpdb_outputfile)
                 logger.info("Database {} - Number of {} {} relationships: {}".format(database, entity, relationship, len(relationships[(entity,relationship)])))
                 stats.add(builder_utils.buildStats(len(relationships[(entity,relationship)]), "relationships", relationship, database, smpdb_outputfile))
@@ -232,7 +232,7 @@ def parseDatabase(importDirectory, database, download=True):
             logger.info("Database {} - Number of {} entities: {}".format(database, "Complex", len(entities)))
             stats.add(builder_utils.buildStats(len(entities), "entity", "Complex", database, entity_outputfile))
             for entity, relationship in relationships:
-                corum_outputfile = os.path.join(importDirectory, database+"_"+entity.lower()+"_"+relationship.lower()+".tsv")
+                corum_outputfile = os.path.join(importDirectory, database.lower()+"_"+entity.lower()+"_"+relationship.lower()+".tsv")
                 builder_utils.write_relationships(relationships[(entity,relationship)], relationships_headers[entity], corum_outputfile)
                 logger.info("Database {} - Number of {} relationships: {}".format(database, relationship, len(relationships[(entity,relationship)])))
                 stats.add(builder_utils.buildStats(len(relationships[(entity,relationship)]), "relationships", relationship, database, corum_outputfile))

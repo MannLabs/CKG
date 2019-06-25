@@ -782,8 +782,8 @@ CREATE_USER_NODE:
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/users.tsv" AS line
         FIELDTERMINATOR '\t'
-        MERGE (u:User {id:$line.ID})
-        ON CREATE SET u.acronym=line.acronym,u.name=line.name,u.username=line.username,u.email=line.email,u.secondary_email=line.secondary_email,u.phone_number=line.phone_number,u.affiliation=line.affiliation,u.expiration_date=line.expiration_date,u.role=line.rolename,u.image=$image
+        MERGE (u:User {id:line.ID})
+        ON CREATE SET u.acronym=line.acronym,u.name=line.name,u.username=line.username,u.email=line.email,u.secondary_email=line.secondary_email,u.phone_number=line.phone_number,u.affiliation=line.affiliation,u.expiration_date=line.expiration_date,u.role=line.rolename,u.image=line.image
         RETURN COUNT(u) AS Users_in_the_system;
 
 CREATE_PROJECT: &create_project 
