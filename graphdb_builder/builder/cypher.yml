@@ -776,12 +776,14 @@ CREATE_USER_NODE:
     'description': ''
     'query': >
         CREATE CONSTRAINT ON (u:User) ASSERT u.id IS UNIQUE;
-        CREATE INDEX ON :User(name);
+        CREATE CONSTRAINT ON (u:User) ASSERT u.name IS UNIQUE;
+        CREATE CONSTRAINT ON (u:User) ASSERT u.username IS UNIQUE;
+        CREATE CONSTRAINT ON (u:User) ASSERT u.email IS UNIQUE;
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/users.tsv" AS line
         FIELDTERMINATOR '\t'
-        MERGE (u:User {id:line.ID})
-        ON CREATE SET u.acroym=line.acronym,u.name=line.name,u.username=line.username,u.email=line.email
+        MERGE (u:User {id:$line.ID})
+        ON CREATE SET u.acronym=line.acronym,u.name=line.name,u.username=line.username,u.email=line.email,u.secondary_email=line.secondary_email,u.phone_number=line.phone_number,u.affiliation=line.affiliation,u.expiration_date=line.expiration_date,u.role=line.rolename,u.image=$image
         RETURN COUNT(u) AS Users_in_the_system;
 
 CREATE_PROJECT: &create_project 
@@ -912,11 +914,11 @@ CREATE_TIMEPOINT: &create_timepoint
     'name': 'create timepoint'
     'description': 'Creates Timepoint nodes and links them to the Biological_sample nodes of origin. Timepoints are defined by the users and a unit must be given (e.g. days, hours).'
     'query': >
-        CREATE CONSTRAINT ON (t:timepoint) ASSERT t.id IS UNIQUE;
+        CREATE CONSTRAINT ON (t:Timepoint) ASSERT t.id IS UNIQUE;
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_timepoint.tsv" AS line
         FIELDTERMINATOR '\t'
-        MERGE (t:timepoint {id:line.ID})
+        MERGE (t:Timepoint {id:line.ID})
         ON CREATE SET t.units=line.units
         RETURN COUNT(t) AS PROJECTID_timepoint;
         USING PERIODIC COMMIT 10000

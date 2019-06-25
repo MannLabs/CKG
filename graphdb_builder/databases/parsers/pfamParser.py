@@ -131,5 +131,5 @@ def print_files(data, header, outputfile, is_first, filter_for=None):
                     line_terminator='\n', escapechar='\\')
 
 if __name__ == "__main__":
-    parser(databases_directory='../../../../data/databases', import_directory='../../../../data/imports', download=True)
+    parser(databases_directory='../../../../data/databases', import_directory='../../../../data/imports', download=False)
 

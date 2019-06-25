@@ -161,9 +161,7 @@ def updateDB(driver, imports=None):
                 for resource in config["compiled_drug_resources"]:
                     queries.extend(code.replace("IMPORTDIR", import_dir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
                 code = cypher_queries['IMPORT_DRUG_ACTS_ON']['query']
-                print(code)
                 for resource in config["drug_action_resources"]:
-                    print(resource)
                     queries.extend(code.replace("IMPORTDIR", import_dir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
             #Side effects
             elif i == "side effects":
@@ -191,12 +189,13 @@ def updateDB(driver, imports=None):
                 queries = code.replace("IMPORTDIR", import_dir).split(';')[0:-1]
             #Known variants
             elif i == "known_variants":
-                codev = cypher_queries['IMPORT_KNOWN_VARIANT_DATA']['query']
+                code = cypher_queries['IMPORT_KNOWN_VARIANT_DATA']['query']
                 queries = code.replace("IMPORTDIR", import_dir).split(';')[0:-1]
             #Clinically_relevant_variants
             elif i == "clinical variants":
                 code = cypher_queries['IMPORT_CLINICALLY_RELEVANT_VARIANT_DATA']['query']
                 for resource in config["clinical_variant_resources"]:
+                    print(code.replace("IMPORTDIR", import_dir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
                     queries.extend(code.replace("IMPORTDIR", import_dir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
             #Internal
             elif i == "internal":

@@ -114,7 +114,7 @@ def parseDatabase(importDirectory, database, download=True):
             builder_utils.write_entities(entities, entities_header, entity_outputfile)
             stats.add(builder_utils.buildStats(len(entities), "entity", "Pathway", database, entity_outputfile))
             for entity,relationship in relationships:
-                reactome_outputfile = os.path.join(importDirectory, database+"_"+entity.lower()+"_"+relationship.lower()+".tsv")
+                reactome_outputfile = os.path.join(importDirectory, database.lower()+"_"+entity.lower()+"_"+relationship.lower()+".tsv")
                 builder_utils.write_relationships(relationships[(entity, relationship)], relationships_header[entity], reactome_outputfile)
                 logger.info("Database {} - Number of {} {} relationships: {}".format(database, entity, relationship, len(relationships[(entity,relationship)])))
                 stats.add(builder_utils.buildStats(len(relationships[(entity,relationship)]), "relationships", relationship, database, reactome_outputfile))

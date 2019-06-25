@@ -119,6 +119,22 @@ def experimentImport(importDirectory, experimentsDirectory, project):
         builder_utils.checkDirectory(datasetPath)
         eh.generateDatasetImports(project, dataset)
 
+def usersImport(import_type='partial'):
+    """
+    Generates User entities from excel file.
+    Args:
+        importDirectory (string): path to the directory where all the import
+                        files are generated
+        experimentDirectory (string): path to the directory where all the
+                        experiments are located
+        project (string): Identifier of the project to be imported
+    """
+    usersPath = config['usersDirectory']
+    filename = config['usersFile']
+    builder_utils.checkDirectory(usersPath)
+    create_user_from_file(os.path.join(usersPath, filename), expiration=365)    
+
+
 def fullImport():
     """
     Calls the different importer functions: Ontologies, databases,
@@ -139,6 +155,8 @@ def fullImport():
         logger.info("Full import: importing all Experiments")
         experimentsImport(n_jobs=4, import_type='full')
         logger.info("Full import: Experiments import took {}".format(datetime.now() - START_TIME))
+        usersImport(import_type='full')
+        logger.info("Full import: Users import took {}".format(datetime.now() - START_TIME))
     except FileNotFoundError as err:
         logger.error("Full import > {}.".format(err))
     except EOFError as err:
