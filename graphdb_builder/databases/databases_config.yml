@@ -28,7 +28,7 @@ databases :
     - "HPA"
     - "Reactome"
     - "SMPDB"
-    #- "Pfam"
+    - "Pfam"
 
 sources : 
     "Drug": "DrugBank"
