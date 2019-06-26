@@ -168,8 +168,8 @@ class Dataset:
 
     def extract_configuration(self, configuration):
         data_name = None
-        analysis_types = None
-        plot_types = None
+        analysis_types = []
+        plot_types = []
         store_analysis = False
         args = None
         if "data" in configuration:
@@ -375,7 +375,7 @@ class Dataset:
             if isinstance(self.data[data], pd.DataFrame):
                 self.data[data].to_csv(os.path.join(dataset_directory,name), sep='\t', header=True, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
             else:
-                print(name, data)
+                print(name, data, type(self.data[data]))
 
     def save_report(self, dataset_directory):
         if not os.path.exists(dataset_directory):

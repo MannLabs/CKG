@@ -200,9 +200,9 @@ def get_proteomics_measurements_ready(df, index=['group', 'sample', 'subject'], 
     df = df.drop(["index"], axis=1)
     aux = index
     if missing_method == 'at_least_x_per_group':
-        aux.extend(extract_number_missing(df, missing_max, drop_cols, group=None))
+        aux.extend(extract_number_missing(df, missing_max, drop_cols, group=group))
     elif missing_method == 'percentage':
-        aux.extend(extract_percentage_missing(df,  missing_max, drop_cols, group=None))
+        aux.extend(extract_percentage_missing(df,  missing_max, drop_cols, group=group))
 
     df = df[list(set(aux))]
     if imputation:

@@ -189,9 +189,9 @@ class Project:
             if "description" in attributes:
                 self.description = attributes["description"]
             if "data_types" in attributes:
-                self.data_types = [i.strip(' ') for i in attributes["data_types"].split(',')]
+                self.data_types = [i.strip(' ') for i in attributes["data_types"].split('|')]
             if "responsible" in attributes:
-                self.responsible = [i.strip(' ') for i in attributes["responsible"].split(',')]
+                self.responsible = [i.strip(' ') for i in attributes["responsible"].split('|')]
             if "status" in attributes:
                 self.status = attributes["status"]
             if "number_subjects" in attributes:
@@ -267,13 +267,16 @@ class Project:
 
     def load_project(self):
         self.load_project_data()
+        print(self.datasets)
         project_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),"../../data/reports/"), self.identifier)
         self.report = {}
         for root, data_types, files in os.walk(project_dir):
             for data_type in data_types:
+                print(data_type)
                 r = rp.Report(data_type,{})
                 r.read_report(os.path.join(root, data_type))
                 if data_type in self.datasets:
+                    print("IN", data_type)
                     self.datasets[data_type].report = r
                 else:
                     self.update_report({data_type:r})
@@ -449,7 +452,7 @@ class Project:
             self.notify_project_ready()
 
     def notify_project_ready(self, message_type='slack'):
-        message = "Report for project "+str(self.name)+" is ready: check it out at http://localhost:5000/apps/project/"+str(self.identifier)
+        message = "Report for project "+str(self.name)+" is ready: check it out at http://127.0.0.1:5000/apps/project/"+str(self.identifier)
         subject = 'Report ready '+self.identifier 
         message_from = "alsantosdel"
         message_to = "albsantosdel" #self.responsible_email
@@ -496,11 +499,16 @@ class Project:
     def show_report(self, environment):
         types = ["Project information", "clinical", "proteomics", "longitudinal proteomics", "wes", "wgs", "rnaseq", "multiomics"]
         app_plots = defaultdict(list)
-
+        print(self.report)
         for dataset in types:
             if dataset in self.report:
+                print(dataset)
                 report = self.report[dataset]
                 app_plots[dataset.upper()] = report.visualize_report(environment)
+            else:
+                if dataset in self.datasets:
+                    report = self.datasets[dataset].report
+                    app_plots[dataset.upper()] = report.visualize_report(environment)
         
         return app_plots
 

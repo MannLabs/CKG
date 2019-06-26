@@ -140,21 +140,6 @@ data exploration:
                 - subject
             name: name
             title: 'Differential regulation ANOVA'
-    bootstrap-coupled estimation:
-        data: processed
-        analyses:
-            - dabest
-        plots:
-            - basicTable
-        store_analysis: True
-        args:
-            group: 'group'
-            subject: subject
-            test: mean_diff
-            drop_cols:
-                - sample
-            name: name
-            title: 'Data Analysis using Bootstrap-Coupled ESTimation DABEST'
     correlation:
         data: processed
         analyses:
@@ -181,20 +166,6 @@ data exploration:
             communities_algorithm: louvain
             width: 1600
             height: 1600
-    proteomics_profiles:
-        data:
-            - correlation_clusters
-            - processed
-        analysis:
-            - z_normalize
-        args:
-            use:
-                columns: identifiers
-            group: 'group'
-            drop_cols:
-                - sample
-                - subject
-            title: 'Parallel profile correlated clusters'
     interaction_network:
         data: regulated
         analyses: []

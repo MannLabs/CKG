@@ -885,11 +885,14 @@ def get_table(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = 
                                             }],
                                             style_data={'whiteSpace': 'normal'},
                                             style_cell={
-                                                'minWidth': '50px', 'maxWidth': '180px',
+                                                'minWidth': '50px', 'maxWidth': '180px', 'width': '220px',
                                                 'textAlign': 'left', 'padding': '1px', 'vertical-align': 'top'
                                             },
                                             style_table={
-                                                'maxHeight': '800',
+                                                "height": "fit-content", 
+                                                "max-height": "500px",
+                                                "width": "800px",
+                                                "max-width": "1200px",
                                                 'overflowY': 'scroll',
                                                 'overflowX': 'scroll'
                                             },
@@ -900,23 +903,21 @@ def get_table(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = 
                                             },
                                             style_data_conditional=[{
                                                 "if": 
-                                                    {"column_id": "rejected", "filter": 'rejected eq "TRUE"'},
+                                                    {"column_id": "rejected", "filter_query": 'rejected eq "TRUE"'},
                                                     "backgroundColor": "#3B8861",
                                                     'color': 'white'
                                                 },
                                                 ],
-                                            n_fixed_rows=1,
-                                            filtering='fe',
-                                            pagination_settings={
-                                                'current_page': 0,
-                                                'page_size': 25
-                                                },
-                                            pagination_mode='fe',
-                                            sorting='be',
+                                            fixed_rows={ 'headers': True },
+                                            filter_action='native',
+                                            page_current= 0,
+                                            page_size = 25,
+                                            page_action='native',
+                                            sort_action='custom',
                                             )
         table = [html.H2(title),data_trace]
     else:
-        table = [html.H2(title), html.H3("Empty table.")]
+        table = None
 
     return html.Div(table)
 

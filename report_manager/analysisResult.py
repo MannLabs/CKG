@@ -28,7 +28,7 @@ class AnalysisResult:
         return self._analysis_type
 
     @analysis_type.setter
-    def identifier(self, analysis_type):
+    def analysis_type(self, analysis_type):
         self._analysis_type = analysis_type
 
     @property
