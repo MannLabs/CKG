@@ -815,46 +815,48 @@ def get_sankey_plot(data, identifier, args={'source':'source', 'target':'target'
     Returns:
         dcc.Graph.
     """
-    nodes = list(set(data[args['source']].tolist() + data[args['target']].tolist()))
-    if 'source_colors' in args:
-        node_colors = dict(zip(data[args['source']],data[args['source_colors']]))
-    else:
-        scolors = ['#045a8d']*len(data[args['source']].tolist())
-        node_colors = dict(zip(data[args['source']],scolors))
-        args['source_colors'] = 'source_colors'
-        data['source_colors'] = scolors
-    if 'target_colors' in args:
-        node_colors.update(dict(zip(data[args['target']],data[args['target_colors']])))
-    else:
-        node_colors.update(dict(zip(data[args['target']],['#a6bddb']*len(data[args['target']].tolist()))))
-    data_trace = dict(type='sankey',
-                        #domain = dict(x =  [0,1], y =  [0,1]),
-                        orientation = 'h' if 'orientation' not in args else args['orientation'],
-                        valueformat = ".0f" if 'valueformat' not in args else args['valueformat'],
-                        arrangement = 'freeform',
-                        node = dict(pad = 25 if 'pad' not in args else args['pad'],
-                                    thickness = 25 if 'thickness' not in args else args['thickness'],
-                                    line = dict(color = "black", width = 0.3),
-                                    label =  nodes,
-                                    color =  ["rgba"+str(utils.hex2rgb(node_colors[c])) if node_colors[c].startswith('#') else node_colors[c] for c in nodes]
-                                    ),
-                        link = dict(source = [list(nodes).index(i) for i in data[args['source']].tolist()],
-                                    target = [list(nodes).index(i) for i in data[args['target']].tolist()],
-                                    value =  data[args['weight']].tolist(),
-                                    color = ["rgba"+str(utils.hex2rgb(c)) if c.startswith('#') else c for c in data[args['source_colors']].tolist()]
-                                    ))
-    layout =  dict(
-        width= 800 if 'width' not in args else args['width'],
-        height= 800 if 'height' not in args else args['height'],
-        title = args['title'],
-        annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')],
-        font = dict(
-            size = 12 if 'font' not in args else args['font'],
-        ),
-        template='plotly_white'
-        )
+    figure = {}
+    if not data.empty:
+        nodes = list(set(data[args['source']].tolist() + data[args['target']].tolist()))
+        if 'source_colors' in args:
+            node_colors = dict(zip(data[args['source']],data[args['source_colors']]))
+        else:
+            scolors = ['#045a8d']*len(data[args['source']].tolist())
+            node_colors = dict(zip(data[args['source']],scolors))
+            args['source_colors'] = 'source_colors'
+            data['source_colors'] = scolors
+        if 'target_colors' in args:
+            node_colors.update(dict(zip(data[args['target']],data[args['target_colors']])))
+        else:
+            node_colors.update(dict(zip(data[args['target']],['#a6bddb']*len(data[args['target']].tolist()))))
+        data_trace = dict(type='sankey',
+                            #domain = dict(x =  [0,1], y =  [0,1]),
+                            orientation = 'h' if 'orientation' not in args else args['orientation'],
+                            valueformat = ".0f" if 'valueformat' not in args else args['valueformat'],
+                            arrangement = 'freeform',
+                            node = dict(pad = 25 if 'pad' not in args else args['pad'],
+                                        thickness = 25 if 'thickness' not in args else args['thickness'],
+                                        line = dict(color = "black", width = 0.3),
+                                        label =  nodes,
+                                        color =  ["rgba"+str(utils.hex2rgb(node_colors[c])) if node_colors[c].startswith('#') else node_colors[c] for c in nodes]
+                                        ),
+                            link = dict(source = [list(nodes).index(i) for i in data[args['source']].tolist()],
+                                        target = [list(nodes).index(i) for i in data[args['target']].tolist()],
+                                        value =  data[args['weight']].tolist(),
+                                        color = ["rgba"+str(utils.hex2rgb(c)) if c.startswith('#') else c for c in data[args['source_colors']].tolist()]
+                                        ))
+        layout =  dict(
+            width= 800 if 'width' not in args else args['width'],
+            height= 800 if 'height' not in args else args['height'],
+            title = args['title'],
+            annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')],
+            font = dict(
+                size = 12 if 'font' not in args else args['font'],
+            ),
+            template='plotly_white'
+            )
 
-    figure = dict(data=[data_trace], layout=layout)
+        figure = dict(data=[data_trace], layout=layout)
 
     return dcc.Graph(id = identifier, figure = figure)
 

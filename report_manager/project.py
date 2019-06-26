@@ -327,15 +327,16 @@ class Project:
                     self.append_data_type('multiomics')
     
     def get_projects_overlap(self, project_info):
-        overlap = None
         if 'overlap' in project_info:
             self.overlap = project_info['overlap']
-            self.overlap = self.overlap[(self.overlap['from']==self.identifier) | (self.overlap['to']==self.identifier)]
+            if 'from' in self.overlap and 'to' in self.overlap:
+                self.overlap = self.overlap[(self.overlap['from']==self.identifier) | (self.overlap['to']==self.identifier)]
 
     def get_similar_projects(self, project_info):
         if 'similarity' in project_info:
             self.similar_projects = project_info['similarity']
-            self.similar_projects = self.similar_projects[self.similar_projects['similarity_pearson'] > 0.5]
+            if 'similarity_pearson' in self.similar_projects:
+                self.similar_projects = self.similar_projects[self.similar_projects['similarity_pearson'] > 0.5]
         
     def generate_project_attributes_plot(self):
         project_df = self.to_dataframe()
@@ -416,7 +417,7 @@ class Project:
             plot = figure.get_cytoscape_network(utils.networkx_to_cytoscape(G), "projects_subgraph", args)
         
         except Exception as err:
-            exc_type, exc_obj, exc_tb = sys.exc_INFO()
+            exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             logger.error("Reading queries from file {}: {}, file: {},line: {}".format(query_path, sys.exc_info(), fname, exc_tb.tb_lineno))
 

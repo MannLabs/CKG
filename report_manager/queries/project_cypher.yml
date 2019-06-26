@@ -79,6 +79,7 @@ map_node_name:
         - Tissue
         - Clinical_variable
     involved_rels:
+    query_type: pre
     query: >
         MATCH (n:NODE {name:$name})
         RETURN n.id;
