@@ -44,6 +44,7 @@ def get_module_color_annotation(map_list, col_annotation=False, row_annotation=F
 
     #Use if color annotation is for experimental features in dendrogram
     if bygene == True:
+        module_colors = [i.lower().replace(' ', '') for i in module_colors]
         gene_colors = dict(zip(map_list, module_colors))
 
         for i in map_list:
@@ -258,7 +259,7 @@ def plot_intramodular_correlation(MM, FS, feature_module_df, title, width=1000, 
                                            opacity=0.7,
                                            marker={'size': 7,
                                                    'color': 'white',
-                                                   'line': {'width': 1.5, 'color': j[2:]}}), a+1, i+1)
+                                                   'line': {'width': 1.5, 'color': j[2:]i.lower().replace(' ', '')}}), a+1, i+1)
 
             figure.append_trace(go.Scatter(x = x, y = line, mode = 'lines', marker={'color': 'black'}), a+1, i+1)
 
