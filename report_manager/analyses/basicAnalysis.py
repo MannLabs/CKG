@@ -1012,4 +1012,46 @@ def get_publications_abstracts(data, publication_col="publication", join_by=['pu
         abstracts = abstracts.set_index(index)
         abstracts = abstracts.join(data.reset_index()[join_by].set_index(publication_col)).reset_index()
 
-    return abstracts 
+    return abstracts
+
+
+def run_two_way_anova(data, variables=variables, drop_cols=drop_cols, subject=subject, alpha=alpha):
+    df = data.copy()
+    factor_A, factor_B = variables
+    df[variables] = df['group'].str.split('+',expand=True)
+    df = df.set_index([subject]+variables)
+    df = df.drop(drop_cols, axis=1)
+             
+    models = []
+    aov_result = []
+    tmp = df.copy()
+    tmp.columns = tmp.columns.str.replace(r"-", "_")
+
+    #OLS model
+    for col in tmp.columns:
+        model = ols('{} ~ C({})*C({})'.format(col, factor_A, factor_B), tmp[col].reset_index().sort_values(variables, ascending=[True, False])).fit()
+        models.append((col, model, model.f_pvalue))
+
+    models_df = pd.DataFrame(models)
+
+    #FDR correction
+    reject, padj = multi.fdrcorrection([x[-1] for x in models], alpha=alpha, method='indep')
+    models_df['model_padj'] = padj
+    models_df['rejected'] = reject
+    
+    #Anova
+    for protein in models_df[models_df['model_padj']<0.05][0].unique():
+        model = models_df.loc[models_df[0] == protein, 1].values[0]
+        aov = sm.stats.anova_lm(model, typ=2)
+        aov.columns = ['SS', 'DF', 'F', 'pvalue']
+        for i in aov.index:
+            if i != 'Residual':
+                t, p = aov.loc[i, ['F', 'pvalue']]
+                aov_result.append((protein, i, t, p))
+
+    scores = pd.DataFrame(aov_result, columns = ['identifier','source', 'F-statistics', 'pvalue'])
+    scores = scores.set_index('identifier')
+    scores = scores.dropna(how="all")
+    
+    return scores
+

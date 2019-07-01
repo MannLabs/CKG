@@ -137,6 +137,21 @@ class AnalysisResult:
                 permutations = self.args["permutations"]
             anova_result = analyses.run_anova(self.data, drop_cols=drop_cols, group=group, alpha=alpha, permutations=permutations)
             self.result[self.analysis_type] = anova_result
+         elif self.analysis_type  == '2-way anova':
+            alpha = 0.05
+            drop_cols = []
+            variables = ['factor A', 'factor B']
+            subject = 'subject'
+            if "alpha" in self.args:
+                alpha = self.args["alpha"]
+            if "drop_cols" in self.args:
+                drop_cols = self.args['drop_cols']
+            if "subject" in self.args:
+                subject = self.args["subject"]
+            if "variables" in self.args:
+                variables = self.args["variables"]
+            2way_anova_result = analyses.run_two_way_anova(self.data, variables=variables, drop_cols=drop_cols, subject=subject, alpha=alpha)
+            self.result[self.analysis_type] = 2way_anova_result
         elif self.analysis_type == "repeated_measurements_anova":
             alpha = 0.05
             drop_cols = []
