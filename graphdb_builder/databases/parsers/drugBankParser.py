@@ -9,8 +9,7 @@ from graphdb_builder import mapping as mp, builder_utils
 #       Drug Bank       #
 #########################
 def parser(databases_directory):
-    cwd = os.path.abspath(os.path.dirname(__file__))
-    config = ckg_utils.get_configuration(os.path.join(cwd,'../config/drugBankConfig.yml'))
+    config = builder_utils.get_config(config_name="drugBankConfig.yml", data_type='databases')
     drugs = extract_drugs(config, databases_directory)
     build_DrugBank_dictionary(config, databases_directory, drugs)
     relationships = build_relationships_from_DrugBank(config, drugs)
@@ -23,7 +22,6 @@ def parser(databases_directory):
 def extract_drugs(config, databases_directory):
     drugs = {}
     prefix = '{http://www.drugbank.ca}'
-    relationships = set()
     url = config['DrugBank_url']
     directory = os.path.join(databases_directory,"DrugBank")
     builder_utils.checkDirectory(directory)
@@ -32,7 +30,6 @@ def extract_drugs(config, databases_directory):
     parentFields = config['DrugBank_parentFields']
     structuredFields = config['DrugBank_structures']
     vocabulary = parseDrugBankVocabulary(config, databases_directory)
-    i = 1
     with zipfile.ZipFile(fileName, 'r') as zipped:
         for f in zipped.namelist():
             data = zipped.read(f) 

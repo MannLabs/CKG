@@ -11,8 +11,7 @@ def parser(databases_directory, download = True):
     intact_dictionary = defaultdict()
     stored = set()
     relationships = set()
-    cwd = os.path.abspath(os.path.dirname(__file__))
-    config = ckg_utils.get_configuration(os.path.join(cwd, '../config/intactConfig.yml'))
+    config = builder_utils.get_config(config_name="intactConfig.yml", data_type='databases')
     header = config['header']
     outputfileName = "intact_interacts_with.tsv"
     regex = r"\((.*)\)"

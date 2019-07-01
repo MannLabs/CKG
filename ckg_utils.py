@@ -9,7 +9,7 @@ def read_yaml(yaml_file):
     content = None
     with open(yaml_file, 'r') as stream:
         try:
-            content = yaml.load(stream)
+            content = yaml.safe_load(stream)
         except yaml.YAMLError as err:
             raise yaml.YAMLError("The yaml file {} could not be parsed. {}".format(yaml_file, err))
     return content

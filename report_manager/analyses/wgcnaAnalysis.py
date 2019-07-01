@@ -196,7 +196,7 @@ def get_miss_values_df(data):
     df = df.replace(0, np.nan)
     return df
 
-def paste_matrices(matrix1, matrix2):
+def paste_matrices(matrix1, matrix2, rows, cols):
     """ 
     Takes two R matrices with analog shapes and concatenates each value in matrix 1 with corresponding one in matrix 2, returning a single pandas dataframe.
 
@@ -207,16 +207,17 @@ def paste_matrices(matrix1, matrix2):
     Returns:
         Pandas dataframe.
     """
-    a = pandas2ri.ri2py(matrix1)
-    b = pandas2ri.ri2py(matrix2)
+    #a = pandas2ri.ri2py(matrix1)
+    #b = pandas2ri.ri2py(matrix2)
+    
     text = []
-    for i, j in zip(a, b):
+    for i, j in zip(matrix1, matrix2):
         for x, y in zip(i, j):
             text.append(('{:0.2}<br>{:.0e}'.format(x, y)))
     
     text = np.array(text)
-    text.shape = (len(matrix1.rownames), len(matrix1.colnames))
-    textMatrix = pd.DataFrame(text, index=matrix1.rownames, columns=matrix1.colnames)
+    text.shape = (matrix1.shape[0], matrix1.shape[1])
+    textMatrix = pd.DataFrame(text, index=rows, columns=cols)
     return textMatrix
 
 def cutreeDynamic(distmatrix, linkagefun='average', minModuleSize=30, method='hybrid', deepSplit=2, pamRespectsDendro=False, distfun=None):
@@ -235,16 +236,16 @@ def cutreeDynamic(distmatrix, linkagefun='average', minModuleSize=30, method='hy
     Returns:
         Numpy array of numerical labels giving assignment of objects to modules. Unassigned objects are labeled 0, the largest module has label 1, next largest 2 etc.
     """
-    if distfun is None:
-        dist = stats.as_dist(distmatrix)
-    else:
-        dist = stats.dist(distmatrix, method = distfun)
+    #if distfun is None:
+    #    dist = stats.as_dist(distmatrix)
+    #else:
+    #    dist = stats.dist(distmatrix, method = distfun)
           
-    R_function = R(''' clusters <- function(dist, distmatrix, linkagefun, minModuleSize, method, deepSplit, pamRespectsDendro) {
-                                        cutreeDynamic(dendro=hclust(dist, method = linkagefun), method=method, distM=distmatrix, 
+    R_function = R(''' clusters <- function(distmatrix, linkagefun, minModuleSize, method, deepSplit, pamRespectsDendro) {
+                                        cutreeDynamic(dendro=hclust(as.dist(distmatrix), method = linkagefun), method=method, distM=distmatrix, 
                                         deepSplit=deepSplit, pamRespectsDendro= pamRespectsDendro, minClusterSize= minModuleSize)} ''')
-        
-    cutree = R_function(dist, distmatrix, linkagefun=linkagefun, minModuleSize=minModuleSize, method=method, deepSplit=deepSplit, pamRespectsDendro=pamRespectsDendro)
+    
+    cutree = R_function(distmatrix, linkagefun=linkagefun, minModuleSize=minModuleSize, method=method, deepSplit=deepSplit, pamRespectsDendro=pamRespectsDendro)
     
     return np.array(cutree)
 
@@ -384,13 +385,12 @@ def calculate_ModuleTrait_correlation(df_exp, df_traits, MEs):
     df_traits_r.columns = df_traits_r.columns.str.replace(' ', 'space')
     df_traits_r.columns = df_traits_r.columns.str.replace('(', 'parentheses1')
     df_traits_r.columns = df_traits_r.columns.str.replace(')', 'parentheses2')
-
     moduleTraitCor_r = WGCNA.cor(MEs, df_traits_r, use='p', verbose=0)
     moduleTraitPvalue_r = WGCNA.corPvalueStudent(moduleTraitCor_r, nSamples)
-    textMatrix = paste_matrices(moduleTraitCor_r, moduleTraitPvalue_r)
+    textMatrix = paste_matrices(moduleTraitCor_r, moduleTraitPvalue_r, MEs.columns, df_traits_r.columns)
     
-    moduleTraitCor = R2Py.R_matrix2Py_matrix(moduleTraitCor_r, moduleTraitCor_r.rownames, moduleTraitCor_r.colnames)
-    moduleTraitPvalue = R2Py.R_matrix2Py_matrix(moduleTraitPvalue_r, moduleTraitPvalue_r.rownames, moduleTraitPvalue_r.colnames)
+    moduleTraitCor = pd.DataFrame(moduleTraitCor_r, index=MEs.columns, columns=df_traits_r.columns)
+    moduleTraitPvalue = pd.DataFrame(moduleTraitPvalue_r, index=MEs.columns, columns=df_traits_r.columns)
 
     moduleTraitCor.columns = moduleTraitCor.columns.str.replace('space', ' ')
     moduleTraitPvalue.columns = moduleTraitPvalue.columns.str.replace('space', ' ')
@@ -420,16 +420,16 @@ def calculate_ModuleMembership(data, MEs):
     data_r = data.copy()
     data_r.columns = data_r.columns.str.replace('~', 'dash')
 
-    modLabels = [i[2:] for i in list(MEs.colnames)]
+    modLabels = [i[2:] for i in list(MEs.columns)]
     FeatureModuleMembership = base.as_data_frame(WGCNA.cor(data_r, MEs, use='p', verbose=0))
     MMPvalue = base.as_data_frame(WGCNA.corPvalueStudent(base.as_matrix(FeatureModuleMembership), nSamples))
 
-    FeatureModuleMembership.colnames = ['MM'+str(col) for col in modLabels]
-    MMPvalue.colnames = ['p.MM'+str(col) for col in modLabels]
+    FeatureModuleMembership.columns = ['MM'+str(col) for col in modLabels]
+    MMPvalue.columns = ['p.MM'+str(col) for col in modLabels]
 
-    FeatureModuleMembership = R2Py.R_matrix2Py_matrix(FeatureModuleMembership, FeatureModuleMembership.rownames, FeatureModuleMembership.colnames)
-    MMPvalue = R2Py.R_matrix2Py_matrix(MMPvalue, MMPvalue.rownames, MMPvalue.colnames)
-    FeatureModuleMembership.index = FeatureModuleMembership.index.str.replace('dash', '~')
+    #FeatureModuleMembership = R2Py.R_matrix2Py_matrix(FeatureModuleMembership, FeatureModuleMembership.index, FeatureModuleMembership.columns)
+    #MMPvalue = R2Py.R_matrix2Py_matrix(MMPvalue, MMPvalue.rownames, MMPvalue.colnames)
+    FeatureModuleMembership.index = data_r.columns.str.replace('dash', '~')
     MMPvalue.index = MMPvalue.index.str.replace('dash', '~')
 
     return FeatureModuleMembership, MMPvalue
@@ -457,20 +457,20 @@ def calculate_FeatureTraitSignificance(df_exp, df_traits):
     FeatureTraitSignificance = base.as_data_frame(WGCNA.cor(df_exp_r, df_cli_r, use='p', verbose=0))
     FSPvalue = base.as_data_frame(WGCNA.corPvalueStudent(base.as_matrix(FeatureTraitSignificance), nSamples))
 
-    FeatureTraitSignificance.colnames = ['GS.'+str(col) for col in FeatureTraitSignificance.colnames]
-    FSPvalue.colnames = ['p.GS.'+str(col) for col in FSPvalue.colnames]
+    FeatureTraitSignificance.columns = ['GS.'+str(col) for col in df_cli_r.columns]
+    FSPvalue.columns = ['p.GS.'+str(col) for col in df_cli_r.columns]
 
-    FeatureTraitSignificance = R2Py.R_matrix2Py_matrix(FeatureTraitSignificance, FeatureTraitSignificance.rownames, FeatureTraitSignificance.colnames)
-    FSPvalue = R2Py.R_matrix2Py_matrix(FSPvalue, FSPvalue.rownames, FSPvalue.colnames)
+    #FeatureTraitSignificance = R2Py.R_matrix2Py_matrix(FeatureTraitSignificance, FeatureTraitSignificance.rownames, FeatureTraitSignificance.colnames)
+    #FSPvalue = R2Py.R_matrix2Py_matrix(FSPvalue, FSPvalue.rownames, FSPvalue.colnames)
 
     FeatureTraitSignificance.columns = FeatureTraitSignificance.columns.str.replace('space', ' ')
     FeatureTraitSignificance.columns = FeatureTraitSignificance.columns.str.replace('parentheses1', '(')
     FeatureTraitSignificance.columns = FeatureTraitSignificance.columns.str.replace('parentheses2', ')')
-    FeatureTraitSignificance.index = FeatureTraitSignificance.index.str.replace('dash', '~')
-    FSPvalue.columns = FSPvalue.columns.str.replace('space', ' ')
+    FeatureTraitSignificance.index = df_exp_r.columns.str.replace('dash', '~')
+    FSPvalue.columns = df_cli_r.columns.str.replace('space', ' ')
     FSPvalue.columns = FSPvalue.columns.str.replace('parentheses1', '(')
     FSPvalue.columns = FSPvalue.columns.str.replace('parentheses2', ')')
-    FSPvalue.index = FSPvalue.index.str.replace('dash', '~')
+    FSPvalue.index = df_exp_r.columns.str.replace('dash', '~')
 
     return FeatureTraitSignificance, FSPvalue
 
@@ -532,10 +532,11 @@ def get_EigengenesTrait_correlation(MEs, data):
     df_traits_r.columns = df_traits_r.columns.str.replace('(', 'parentheses1')
     df_traits_r.columns = df_traits_r.columns.str.replace(')', 'parentheses2')
     df_traits_r.columns = df_traits_r.columns.str.replace('/', 'slash')
-
+    
+    
     MET = WGCNA.orderMEs(base.cbind(MEs, df_traits_r), verbose=0)
     METcor = WGCNA.cor(MET, use='p', verbose=0)
-    METcor = R2Py.R_matrix2Py_matrix(METcor, METcor.rownames, METcor.colnames)
+    METcor = pd.DataFrame(METcor, MET.columns, MET.columns)
 
     METcor.columns = METcor.columns.str.replace('space', ' ')
     METcor.columns = METcor.columns.str.replace('parentheses1', '(')

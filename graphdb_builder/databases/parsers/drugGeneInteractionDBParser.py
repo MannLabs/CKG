@@ -6,9 +6,7 @@ from graphdb_builder import mapping as mp, builder_utils
 #   The Drug Gene Interaction Database     # 
 ############################################
 def parser(databases_directory, download = True):
-    
-    config = ckg_utils.get_configuration('../databases/config/drugGeneInteractionDBConfig.yml')
-
+    config = builder_utils.get_config(config_name="drugGeneInteractionDBConfig.yml", data_type='databases')
     url = config['DGIdb_url']
     header = config['header']
     output_file = "dgidb_targets.tsv"

@@ -267,16 +267,13 @@ class Project:
 
     def load_project(self):
         self.load_project_data()
-        print(self.datasets)
         project_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),"../../data/reports/"), self.identifier)
         self.report = {}
         for root, data_types, files in os.walk(project_dir):
             for data_type in data_types:
-                print(data_type)
                 r = rp.Report(data_type,{})
                 r.read_report(os.path.join(root, data_type))
                 if data_type in self.datasets:
-                    print("IN", data_type)
                     self.datasets[data_type].report = r
                 else:
                     self.update_report({data_type:r})
@@ -499,10 +496,8 @@ class Project:
     def show_report(self, environment):
         types = ["Project information", "clinical", "proteomics", "longitudinal proteomics", "wes", "wgs", "rnaseq", "multiomics"]
         app_plots = defaultdict(list)
-        print(self.report)
         for dataset in types:
             if dataset in self.report:
-                print(dataset)
                 report = self.report[dataset]
                 app_plots[dataset.upper()] = report.visualize_report(environment)
             else:
@@ -527,7 +522,14 @@ class Project:
             if not os.path.exists(dataset_dir):
                 os.makedirs(dataset_dir)
             report.download_report(dataset_dir)
-
+        for dataset in self.datasets:
+            if isinstance(self.datasets[dataset], Dataset):
+                report = self.datasets[dataset].report
+                dataset_dir = os.path.join(directory, dataset)
+                if not os.path.exists(dataset_dir):
+                    os.makedirs(dataset_dir)
+                report.download_report(dataset_dir)
+            
     def download_project_datasets(self):
         directory = self.get_downloads_directory()
         for dataset_type in self.datasets:

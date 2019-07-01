@@ -38,6 +38,12 @@ def write_entities(entities, header, outputfile):
     except csv.Error as err:
         raise csv.Error("Error writing etities to file: {}.\n {}".format(outputfile, err))
 
+def get_config(config_name, data_type='databases'):
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    config = ckg_utils.get_configuration(os.path.join(cwd, '{}/config/{}'.format(data_type, config_name)))
+    
+    return config
+
 def setup_config(data_type="databases"):
     try:
         dirname = os.path.abspath(os.path.dirname(__file__))
@@ -75,7 +81,10 @@ def setup_logging(path='log.config', key=None):
     if os.path.exists(path):
         with open(path, 'rt') as f:
             config = json.load(f)
-        logging.config.dictConfig(config)
+        try:
+            logging.config.dictConfig(config)
+        except:
+            logging.basicConfig(level=logging.DEBUG)        
     else:
         logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger(key)

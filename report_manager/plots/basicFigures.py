@@ -13,13 +13,13 @@ from plotly import tools
 import plotly.io as pio
 from scipy.spatial.distance import pdist, squareform
 from plotly.graph_objs import *
+import dash_bio as dashbio
 from scipy.stats import zscore
 from kmapper import plotlyviz
 import networkx as nx
 from pyvis.network import Network as visnet
 from webweb import Web
 from networkx.readwrite import json_graph
-from dash_network import Network
 from report_manager import utils, analyses
 from wordcloud import WordCloud, STOPWORDS
 from nltk.corpus import stopwords
@@ -360,7 +360,7 @@ def get_scatterplot(data, identifier, args):
     figure["layout"] = go.Layout(title = args['title'],
                                 xaxis= {"title": args['x_title']},
                                 yaxis= {"title": args['y_title']},
-                                margin={'l': 40, 'b': 40, 't': 30, 'r': 10},
+                                #margin={'l': 40, 'b': 40, 't': 30, 'r': 10},
                                 legend={'x': -.4, 'y': 1.2},
                                 hovermode='closest',
                                 height=args['height'],
@@ -550,14 +550,33 @@ def get_heatmapplot(data, identifier, args):
 
     return dcc.Graph(id = identifier, figure = figure)
 
-def get_complex_heatmapplot(data, identifier, args):
+def get_complex_heatmapplot(df, identifier, args):
+    figure = {}
+    if args['format'] == "edgelist":
+        df = df.set_index(args['source'])
+        df = df.pivot_table(values=args['values'], index=df.index, columns=args['target'], aggfunc='first')
+        df = df.dropna(how='all', axis=1)
+        df = df.fillna(0)
+        
+    figure = dashbio.Clustergram(width=1600,
+                                 color_threshold={'row': 150, 'col': 700},
+                                 color_map='BuPu',
+                                 data=df.values,
+                                 row_labels=list(df.index),
+                                 column_labels=list(df.columns.values),
+                                 hide_labels=['row'],
+                                 height=1800)
+    
+    return dcc.Graph(id=identifier, figure=figure)
+def get_complex_heatmapplot_old(data, identifier, args):
     df = data.copy()
+    
     figure = {'data':[], 'layout':{}}
     if args['format'] == "edgelist":
         df = df.set_index(args['source'])
         df = df.pivot_table(values=args['values'], index=df.index, columns=args['target'], aggfunc='first')
         df = df.fillna(0)
-
+    print(df.head())
     dendro_up = FF.create_dendrogram(df.values, orientation='bottom', labels=df.columns)
     for i in range(len(dendro_up['data'])):
         dendro_up['data'][i]['yaxis'] = 'y2'
@@ -788,6 +807,7 @@ def get_pca_plot(data, identifier, args):
 
     figure['data'] = traces   
     figure['layout'].annotations = annotations
+    figure['layout']['template'] = 'plotly_white'
 
     return  dcc.Graph(id = identifier, figure = figure)
 
@@ -885,14 +905,14 @@ def get_table(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = 
                                             }],
                                             style_data={'whiteSpace': 'normal'},
                                             style_cell={
-                                                'minWidth': '50px', 'maxWidth': '180px', 'width': '220px',
+                                                'minWidth': '50px', 'maxWidth': '500px', 
                                                 'textAlign': 'left', 'padding': '1px', 'vertical-align': 'top'
                                             },
                                             style_table={
                                                 "height": "fit-content", 
                                                 "max-height": "500px",
-                                                "width": "800px",
-                                                "max-width": "1200px",
+                                                "width": "1200px",
+                                                "max-width": "2000px",
                                                 'overflowY': 'scroll',
                                                 'overflowX': 'scroll'
                                             },
@@ -986,8 +1006,8 @@ def get_parallel_plot(data, identifier, args):
         color = '#de77ae'
         if 'color' in args:
             color = args['color']
-        min_val = data._get_numeric_data().min().min().round()
-        max_val = data._get_numeric_data().max().max().round()
+        min_val = round(data._get_numeric_data().min().min())
+        max_val = round(data._get_numeric_data().max().max())
         df = data.reset_index().groupby(group)
         dims = []
         for i in df.groups:
@@ -1158,14 +1178,17 @@ def plot_2_venn_diagram(cond1, cond2, unique1, unique2, intersection, identifier
 
 def get_wordcloud(data, identifier, args={'stopwords':[], 'max_words': 400, 'max_font_size': 100, 'width':700, 'height':700, 'margin': 1}):
     figure=None
-    if data is not None and not data.empty:
+    if data is not None:
         sw = set(stopwords.words('english')).union(set(STOPWORDS))
         if 'stopwords' in args:
             sw = sw.union(args['stopwords'])
 
         if isinstance(data, pd.DataFrame):
-            if "text_col" in args:
-                text = ''.join(str(a) for a in data[args["text_col"]].unique().tolist())
+            if not data.empty:
+                if "text_col" in args:
+                    text = ''.join(str(a) for a in data[args["text_col"]].unique().tolist())
+                else:
+                    return None
             else:
                 return None
         else:

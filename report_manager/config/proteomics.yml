@@ -146,7 +146,7 @@ data exploration:
             - correlation
         plots:
             - network
-            - heatmap
+            #- heatmap
         store_analysis: True
         args:
             source: node1

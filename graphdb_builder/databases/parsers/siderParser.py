@@ -8,14 +8,12 @@ from graphdb_builder import mapping as mp, builder_utils
 #              SIDER database               # 
 #############################################
 def parser(databases_directory, drug_source, download=True):
-    cwd = os.path.abspath(os.path.dirname(__file__))
-    config = ckg_utils.get_configuration(os.path.join(cwd, '../config/siderConfig.yml'))
+    config = builder_utils.get_config(config_name="siderConfig.yml", data_type='databases')
     url = config['SIDER_url']
     header = config['header']
 
     output_file = 'sider_has_side_effect.tsv'
 
-    outputfileName = ''    
     drugmapping = mp.getSTRINGMapping(config['SIDER_mapping'], source = drug_source, download = False, db = "STITCH")
     phenotypemapping = mp.getMappingFromOntology(ontology="Phenotype", source = config['SIDER_source'])
     
@@ -40,7 +38,7 @@ def parser(databases_directory, drug_source, download=True):
 
 
 def parserIndications(databases_directory, drugMapping, phenotypeMapping, download=True):
-    config = ckg_utils.get_configuration('../databases/config/siderConfig.yml')
+    config = builder_utils.get_config(config_name="siderConfig.yml", data_type='databases')
     url = config['SIDER_indications']
     header = config['indications_header']
     output_file = 'sider_is_indicated_for.tsv'

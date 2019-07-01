@@ -23,7 +23,7 @@ import logging
 import logging.config
 
 log_config = ckg_config.graphdb_builder_log
-logger = builder_utils.setup_logging(log_config, key="grapher")
+logger = builder_utils.setup_logging(log_config, key="loader")
 START_TIME = datetime.now()
 
 try:    

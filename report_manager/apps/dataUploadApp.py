@@ -86,7 +86,7 @@ class DataUploadApp(basicApp.BasicApp):
                     				  html.Div(children=[dcc.Dropdown(id='intervention-finder', placeholder='Search for intervention name...', options=[{'label':i, 'value':i} for i in Diseases], value=[''], multi=True, clearable=False)],
                              							 style={'marginTop':'1%', 'width':'15%', 'marginLeft': 5, 'verticalAlign':'top', 'display':'inline-block'}),
                     				  html.Div([dash_table.DataTable(id='clinical-table', columns=[{"name": '', "id": '', 'editable_name':False, 'deletable':True} for i in range(5)],
-                                      		                         data=[{j: ''} for j in range(10)], n_fixed_rows=1, editable=True, style_cell={'minWidth': '220px', 'width': '220px','maxWidth': '220px', 'whiteSpace': 'normal'},
+                                      		                         data=[{j: ''} for j in range(10)], fixed_rows={"header":True}, editable=True, style_cell={'minWidth': '220px', 'width': '220px','maxWidth': '220px', 'whiteSpace': 'normal'},
                                                                      css=[{'selector': '.dash-cell div.dash-cell-value', 'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'}])],
                              					style={'marginTop':'1%', 'maxHeight': 800, 'overflowY': 'scroll', 'overflowX': 'scroll'}),
                 					  html.Div(children=[html.Button('Upload Data', id='submit_button')],

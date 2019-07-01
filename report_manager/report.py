@@ -146,8 +146,8 @@ class Report:
                             plot = plot["app"]
                         if 'net_tables' in plot:
                             tables = plot['net_tables']
-                            app_plots.append(tables[0])
-                            app_plots.append(tables[1])
+                            report_plots.append(tables[0])
+                            report_plots.append(tables[1])
 
                     report_plots.append(plot)
 
@@ -174,8 +174,8 @@ class Report:
                         plot = plot["app"]
                     if 'net_tables' in plot:
                         tables = plot['net_tables']
-                        app_plots.append(tables[0])
-                        app_plots.append(tables[1])
+                        report_plots.append(tables[0])
+                        report_plots.append(tables[1])
 
                 report_plots.append(plot)
 

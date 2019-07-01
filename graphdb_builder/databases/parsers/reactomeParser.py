@@ -8,8 +8,7 @@ from graphdb_builder import mapping as mp, builder_utils
 #   Reactome database   #
 #########################
 def parser(databases_directory, download=True):
-    cwd = os.path.abspath(os.path.dirname(__file__))
-    config = ckg_utils.get_configuration(os.path.join(cwd, '../config/reactomeConfig.yml'))
+    config = builder_utils.get_config(config_name="reactomeConfig.yml", data_type='databases')
     urls = config['reactome_urls']
     entities = set()
     relationships = defaultdict(set)
@@ -18,7 +17,7 @@ def parser(databases_directory, download=True):
     directory = os.path.join(databases_directory, "Reactome")
     builder_utils.checkDirectory(directory)
     metabolite_mapping = mp.getMappingForEntity("Metabolite")
-    drug_mapping = mp.getMappingForEntity("Drug")
+    #drug_mapping = mp.getMappingForEntity("Drug")
     
     for dataset in urls:
         url = urls[dataset]
@@ -35,8 +34,8 @@ def parser(databases_directory, download=True):
                 relationships[(dataset, "annotated_to_pathway")] = parsePathwayRelationships(config, rf)
             elif dataset == "metabolite":
                 relationships[(dataset, "annotated_to_pathway")] = parsePathwayRelationships(config, rf, metabolite_mapping)
-            elif dataset == "drug":
-                relationships[(dataset, "annotated_to_pathway")] = set()
+            #elif dataset == "drug":
+                #relationships[(dataset, "annotated_to_pathway")] = set()
     
     return entities, relationships, entities_header, relationships_headers
         

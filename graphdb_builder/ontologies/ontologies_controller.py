@@ -9,12 +9,11 @@ import pandas as pd
 import csv
 import obonet
 import re
-import config.ckg_config as graph_config
 import logging
 import logging.config
 import sys
 
-log_config = graph_config.graphdb_builder_log
+log_config = ckg_config.graphdb_builder_log
 logger = builder_utils.setup_logging(log_config, key="ontologies_controller")
 
 try:
@@ -119,4 +118,4 @@ def generate_graphFiles(import_directory, ontologies=None, download=True):
     return stats
 
 if __name__ == "__main__":
-    generate_graphFiles(import_directory, download=True) 
+    generate_graphFiles(import_directory='../../../data/imports', download=True) 

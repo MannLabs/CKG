@@ -16,8 +16,7 @@ def parser(databases_directory, download=True):
     builder_utils.checkDirectory(directory)
     
     try:
-        cwd = os.path.abspath(os.path.dirname(__file__))
-        config = ckg_utils.get_configuration(os.path.join(cwd,'../config/corumConfig.yml'))
+        config = builder_utils.get_config(config_name="corumConfig.yml", data_type='databases')
     except Exception as err:
         raise Exception("Reading configuration > {}.".format(err))
 

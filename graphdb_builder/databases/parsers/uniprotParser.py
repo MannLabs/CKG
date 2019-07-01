@@ -11,8 +11,7 @@ from graphdb_builder import mapping as mp, builder_utils
 #       UniProt         # 
 #########################
 def parser(databases_directory, import_directory, download=True):
-    cwd = os.path.abspath(os.path.dirname(__file__))
-    config = ckg_utils.get_configuration(os.path.join(cwd,'../config/uniprotConfig.yml'))
+    config = builder_utils.get_config(config_name="uniprotConfig.yml", data_type='databases')
     relationships_header = config['relationships_header']
     #Proteins
     stats = parse_idmapping_file(databases_directory, config, import_directory, download=download)
@@ -264,7 +263,7 @@ def parseUniProtVariants(config, databases_directory, import_directory, download
                     entities = set()
                     relationships = defaultdict(set)
 
-                    first = False
+                    is_first = False
 
     if len(entities) > 0:
         stats.update(print_single_file(entities, config['variants_header'], os.path.join(import_directory, "Known_variant.tsv"), "entity", "Known_variant", is_first))

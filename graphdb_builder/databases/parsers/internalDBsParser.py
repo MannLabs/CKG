@@ -9,8 +9,7 @@ from graphdb_builder import mapping as mp, builder_utils
 
 def parser(databases_directory, download=True):
     result = {}
-    cwd = os.path.abspath(os.path.dirname(__file__))
-    config = ckg_utils.get_configuration(os.path.join(cwd, '../config/internalDBsConfig.yml'))
+    config = builder_utils.get_config(config_name="internalDBsConfig.yml", data_type='databases')
     string_url = config['string_url']
     string_mapping = mp.getSTRINGMapping(string_url, download=download)
     
@@ -29,12 +28,12 @@ def read_valid_pubs(organisms, organisms_file):
         for line in idbf:
             data = line.rstrip('\r\n').split('\t')
             if str(data[0]) in organisms:
-                pubs.update(set(data[1]).split(" "))
+                pubs.update(set(data[1].split(" ")))
     return pubs
     
 
 def parserMentions(databases_directory, importDirectory, download=True):
-    config = ckg_utils.get_configuration('../databases/config/internalDBsConfig.yml')
+    config = builder_utils.get_config(config_name="internalDBsConfig.yml", data_type='databases')
     entities, header = parsePMClist(config, databases_directory, download)
     outputfileName = "Publications.tsv"
     url = config['internal_db_url']

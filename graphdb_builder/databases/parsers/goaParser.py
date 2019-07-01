@@ -1,27 +1,26 @@
+import os
 import pandas as pd
 import gzip
 from collections import defaultdict
-from graphdb_builder import builder_utils
-import mapping as mp
+from graphdb_builder import mapping as mp, builder_utils
 
-def parser(database_dir, download=True):
-    cwd = os.path.abspath(os.path.dirname(__file__))
-    config = ckg_utils.get_configuration(os.path.join(cwd, '../config/goaConfig.yml'))
+def parser(databases_dir, download=True):
+    config = builder_utils.get_config(config_name="goaConfig.yml", data_type='databases')
     url = config['url']
     rel_header = config['header']
     
     protein_mapping = mp.getMappingForEntity(entity="Protein")    
     valid_proteins = list(set(protein_mapping.values))
 
-    directory = os.path.join(databases_directory,"GOA")
+    directory = os.path.join(databases_dir,"GOA")
     builder_utils.checkDirectory(directory)
     file_name = os.path.join(directory, url.split('/')[-1])
     if download:
         builder_utils.downloadDB(url, directory)
 
-    annotations = parse_annotations_with_panda(file_name, valid_proteins)
+    annotations = parse_annotations_with_pandas(file_name, valid_proteins)
 
-    return annotations, header
+    return annotations, rel_header
 
 def parse_annotations_with_pandas(annotation_file, valid_proteins=None):
     roots = {'F':'Molecular_function', 'C':'Cellular_component', 'P':'Biological_process'}
@@ -47,7 +46,5 @@ def parse_annotations_with_pandas(annotation_file, valid_proteins=None):
     return annotations
             
 if __name__ == '__main__':
-    annotation_file = '../../data/databases/GOA/goa_uniprot_all.gaf.gz'
-
-    annotations, header = parse_annotations_with_pandas(annotation_file, valid_proteins=proteins)
+    parser(databases_dir='../../data/databases', download=True)
 

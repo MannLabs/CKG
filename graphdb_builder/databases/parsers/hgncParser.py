@@ -6,11 +6,9 @@ from graphdb_builder import builder_utils
 #          HUGO Gene Nomenclature       # 
 #########################################
 def parser(databases_directory, download = True):
-    cwd = os.path.abspath(os.path.dirname(__file__))
-    config = ckg_utils.get_configuration(os.path.join(cwd, '../config/hgncConfig.yml'))
+    config = builder_utils.get_config(config_name="hgncConfig.yml", data_type='databases')
     url = config['hgnc_url']
     entities = set()
-    relationships = set()
     directory = os.path.join(databases_directory,"HGNC")
     builder_utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])

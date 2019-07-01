@@ -19,8 +19,7 @@ from graphdb_builder import mapping as mp
 #########################
 
 def parser(databases_directory, import_directory, download=False):
-    cwd = os.path.abspath(os.path.dirname(__file__))
-    config = ckg_utils.get_configuration(os.path.join(cwd,'../config/pfamConfig.yml'))
+    config = builder_utils.get_config(config_name="pfamConfig.yml", data_type='databases')
     
     entity_header = config['entity_header']
     relationship_headers = config['relationship_headers']

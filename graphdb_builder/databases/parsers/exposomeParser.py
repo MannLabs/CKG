@@ -10,12 +10,9 @@ import re
 #       Exposome Explorer     # 
 ###############################
 def parser(databases_directory, download=True):
-    entities = set()
-    relationships = defaultdict(set)
     directory = os.path.join(databases_directory,"ExposomeExplorer")
     builder_utils.checkDirectory(directory)
-    cwd = os.path.abspath(os.path.dirname(__file__))
-    config = ckg_utils.get_configuration(os.path.join(cwd,'../config/exposomeConfig.yml'))
+    config = builder_utils.get_config(config_name="exposomeConfig.yml", data_type='databases')
     database_urls = config['database_urls']
     relationships_header = config['relationships_header']
     mapping = mp.getMappingForEntity("Food")
@@ -69,7 +66,7 @@ def parseCorrelationsFile(fhandler, file_name, biomarkers, mapping):
             intake_units = row[16]
             biosample = row[19]
             method = row[20]
-            corr_method = row[29]
+            #corr_method = row[29]
             corr = float(row[30])
             ci_low = row[31]
             ci_high = row[32]

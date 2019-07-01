@@ -38,10 +38,10 @@ def connectToDB(host="localhost", port=7687, user="neo4j", password="password"):
         raise py2neo.database.DatabaseError("Database failed to service the request. {}".format(err))
     except py2neo.database.ClientError as err:
         raise py2neo.ClientError("The client sent a bad request. {}".format(err))
-    except py2neo.GraphError as err:
-        raise py2neo.GraphError("{}".format(err))
     except py2neo.database.TransientError as err:
         raise py2neo.TransientError("Database cannot service the request right now. {}".format(err))
+    except py2neo.GraphError as err:
+        raise py2neo.GraphError("{}".format(err))
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]

@@ -216,11 +216,11 @@ def plot_intramodular_correlation(MM, FS, feature_module_df, title, width=1000, 
     Returns:
         Plotly object figure.
     """
-    # print(MM)
+    #print(MM)
 
-    # print(FS)
+    #print(FS)
 
-    # print(feature_module_df)
+    #print(feature_module_df)
 
 
 
@@ -248,7 +248,6 @@ def plot_intramodular_correlation(MM, FS, feature_module_df, title, width=1000, 
             name = MM[MM['modColor'] == j[2:]].index
             x = abs(MM[MM['modColor'] == j[2:]][j].values)
             y = abs(FS[FS.index.isin(name)][b].values)
-
             slope, intercept, r_value, p_value, std_err = scp.stats.linregress(x, y)
             line = slope*x+intercept
 

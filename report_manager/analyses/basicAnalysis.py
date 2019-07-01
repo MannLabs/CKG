@@ -82,7 +82,7 @@ def extract_percentage_missing(data, missing_max, drop_cols=['sample'], group='g
     else:
         groups = data.copy()
         groups = groups.drop(drop_cols, axis = 1)
-        groups = data.set_index(group)
+        groups = groups.set_index(group)
         groups = groups.isnull().groupby(level=0).mean()
         groups = groups[groups<=missing_max]
         groups = groups.dropna(how='all', axis=1).columns
@@ -380,7 +380,6 @@ def convertToEdgeList(data, cols):
 
     return edge_list
 
-@jit(nopython=False, parallel=True)
 def run_correlation(df, alpha=0.05, subject='subject', group='group', method='pearson', correction=('fdr', 'indep')):
     calculated = set()
     correlation = pd.DataFrame()
@@ -456,7 +455,6 @@ def run_rm_correlation(df, alpha=0.05, subject='subject', correction=('fdr', 'in
         correlation = correlation[correlation.rejected]
     return correlation
 
-@jit(nopython=False, parallel=True)
 def run_efficient_correlation(data, method='pearson'):
     matrix = data.values
     if method == 'pearson':
@@ -505,7 +503,7 @@ def calculate_THSD(df):
     col = df.name
     result = pairwise_tukeyhsd(df.values, list(df.index))
     df_results = pd.DataFrame(data=result._results_table.data[1:], columns=result._results_table.data[0])
-    df_results.columns = ['group1', 'group2', 'log2FC', 'lower', 'upper', 'rejected']
+    df_results.columns = ['group1', 'group2', 'log2FC', 'padj_THSD', 'lower', 'upper', 'rejected']
     df_results['identifier'] = col
     df_results = df_results.set_index('identifier')
     df_results['FC'] = df_results['log2FC'].apply(lambda x: np.power(2,np.abs(x)) * -1 if x < 0 else np.power(2,np.abs(x)))
