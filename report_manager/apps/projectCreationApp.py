@@ -90,7 +90,7 @@ class ProjectCreationApp(basicApp.BasicApp):
                                                  style={'width':'10%', 'marginLeft': '0.4%', 'verticalAlign':'top', 'display':'inline-block'}),
                               html.Div(children=[dcc.Input(id='tissue', value='', type='text', disabled=True, style={'width':'100%', 'height':'35px', 'marginTop':5})],
                                                  style={'width':'49%', 'marginLeft':'0%', 'verticalAlign':'top', 'display':'inline-block'}),
-                              html.Div(children=[dcc.Input(id='intervention', value='', type='text', disabled=False, style={'width':'100%', 'height':'35px', 'marginTop':5})],
+                              html.Div(children=[dcc.Input(id='intervention', value=None, type='text', disabled=False, style={'width':'100%', 'height':'35px', 'marginTop':5})],
                                                  style={'width':'49%', 'marginLeft':'2%', 'verticalAlign':'top', 'display':'inline-block'}),
                               html.Div(children=[html.Label('Number of subjects:*', style={'marginTop':15})],
                                                  style={'width':'49%', 'marginLeft':'0%', 'verticalAlign':'top', 'display':'inline-block'}),

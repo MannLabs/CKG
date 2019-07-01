@@ -22,7 +22,7 @@ create_biosample:
         ON CREATE SET b.external_id=$external_id,b.quantity=$quantity,b.quantity_units=$quantity_units,b.source=$source,b.collection_date=$collection_date,b.conservation_conditions=$conservation_conditions,b.storage=$storage,b.status=$status
         WITH b
         MATCH (s:Subject {id:$subject_id})
-        SET s.external_id = $sub_external_id
+        SET s.external_id = $subject_external_id
         WITH b, s
         MATCH (b)
         MERGE (b)-[r:BELONGS_TO_SUBJECT]->(s)

@@ -94,11 +94,11 @@ def create_new_project(driver, projectId, data, separator='|'):
         logger.error("Reading query {}: {}, file: {},line: {}".format(query_name, sys.exc_info(), fname, exc_tb.tb_lineno))
 
     subjects = create_new_subject(driver, external_identifier, data['subjects'][0])
-    if pd.isnull(data['timepoints'][0]):
+    if data['timepoints'][0] is None:
         pass
     else:
         timepoints = create_new_timepoint(driver, external_identifier, data, separator)
-    if pd.isnull(data['intervention'][0]):
+    if data['intervention'][0] is None:
         pass
     else:
         interventions = create_intervention_relationship(driver, external_identifier, data, separator)

@@ -17,6 +17,7 @@ import logging.config
 log_config = ckg_config.graphdb_builder_log
 logger = builder_utils.setup_logging(log_config, key="data_upload")
 
+
 try:
 	cwd = os.path.abspath(os.path.dirname(__file__))
 	config = builder_utils.setup_config('experiments')
@@ -75,17 +76,20 @@ def create_new_biosamples(driver, projectId, data):
 	biosample_dict = {}
 	done = 0
 	try:
+		df = data[[i for i in data.columns if str(i).startswith('biological_sample') or str(i).startswith('subject')]]
+		df.columns=[col.replace('biological_sample ', '').replace(' ','_') for col in df.columns]
 		cypher = get_data_upload_queries()
 		query = cypher[query_name]['query']
-		df = data[[i for i in data.columns if str(i).startswith('biological_sample')]]
-		df.columns=[col.replace('biological_sample ', '') for col in df.columns]
 		for bio_external_id in data['biological_sample external_id'].unique():
 			biosample_id = get_new_biosample_identifier(driver)
 			biosample_dict[bio_external_id] = biosample_id
+
+			mask = df[df['external_id'] == bio_external_id]
+			parameters = mask.to_dict(orient='records')[0]
+			parameters['biosample_id'] = str(biosample_id)
 			for q in query.split(';')[0:-1]:
 				if '$' in q:
-					for parameters in df.to_dict(orient='records'):
-						result = connector.getCursorData(driver, q+';', parameters=parameters)
+					result = connector.getCursorData(driver, q+';', parameters=parameters)
 				else:
 					result = connector.getCursorData(driver, q+';')
 			done += 1
@@ -102,19 +106,23 @@ def create_new_ansamples(driver, projectId, data):
 	ansample_dict = {}
 	done = 0
 	try:
-		cypher = get_data_upload_queries()
-		query = cypher[query_name]['query']
 		df = data[[i for i in data.columns if str(i).startswith('analytical_sample')]]
-		df.columns=[col.replace('analytical_sample ', '') for col in df.columns]
+		df.columns=[col.replace('analytical_sample ', '').replace(' ','_') for col in df.columns]
+		df['biosample_id'] = data['biological_sample id']
 		df['group'] = data['grouping1']
 		df['secondary_group'] = data['grouping2']
+		cypher = get_data_upload_queries()
+		query = cypher[query_name]['query']
 		for an_external_id in data['analytical_sample external_id'].unique():
 			ansample_id = get_new_analytical_sample_identifier(driver)
 			ansample_dict[an_external_id] = ansample_id
+			
+			mask = df[df['external_id'] == an_external_id]
+			parameters = mask.to_dict(orient='records')[0]
+			parameters['ansample_id'] = str(ansample_id)
 			for q in query.split(';')[0:-1]:
 				if '$' in q:
-					for parameters in df.to_dict(orient='records'):
-						result = connector.getCursorData(driver, q+';', parameters=parameters)
+					result = connector.getCursorData(driver, q+';', parameters=parameters)
 				else:
 					result = connector.getCursorData(driver, q+';')
 			done += 1

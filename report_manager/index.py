@@ -174,7 +174,6 @@ def create_project(n_clicks, name, acronym, responsible, participant, datatype, 
         projectData = pd.DataFrame([name, acronym, description, number_subjects, datatype, timepoints, disease, tissue, intervention, responsible, participant, start_date, end_date]).T
         projectData.columns = ['name', 'acronym', 'description', 'subjects', 'datatypes', 'timepoints', 'disease', 'tissue', 'intervention', 'responsible', 'participant', 'start_date', 'end_date']
         projectData['status'] = ''
-        projectData = projectData.fillna('')
         # Generate project internal identifier bsed on timestamp
         # Excel file is saved in folder with internal id name
         epoch = time.time()
@@ -311,11 +310,12 @@ def update_table_download_link(n_clicks, columns, rows, filename, path_name, dat
         # Get Clinical data from Uploaded and updated table
         cols = [d['id'] for d in columns]
         data = pd.DataFrame(rows, columns=cols)
+        data.fillna(value=pd.np.nan, inplace=True)
         project_id = path_name.split('/')[-1]
         # Extract all relationahips and nodes and save as csv files
         if data_type == 'clinical':
             data = dataUpload.create_new_experiment_in_db(driver, project_id, data, separator=separator)
-            loader.partialUpdate(imports='project')
+            loader.partialUpdate(imports=['project', 'experiment']) #This will run loader for clinical only. To run for proteomics, etc, move to after 'else: pass'
         else:
             pass
         # Path to new local folder
