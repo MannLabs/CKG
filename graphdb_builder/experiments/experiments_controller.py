@@ -7,7 +7,7 @@ import pandas as pd
 from dask import dataframe as dd
 import numpy as np
 from collections import defaultdict
-from report_manager.queries import query_utils
+# from report_manager.queries import query_utils
 from graphdb_connector import connector
 import config.ckg_config as ckg_config
 import ckg_utils
@@ -211,26 +211,28 @@ def extractParticipantRelationships(project_data, separator='|'):
     
 def extractProjectTissueRelationships(driver, project_data, separator='|'):
     data = project_data.copy()
-    tissue_ids = []
+    # tissue_ids = []
     if pd.isna(data['tissue'][0]):
         return None
     else:
-        for tissue in data['tissue'][0].split(separator):
-            tissue_ids.append(query_utils.map_node_name_to_id(driver, 'Tissue', str(tissue)))
-        df = pd.DataFrame(tissue_ids, columns=['END_ID'])
+        # for tissue in data['tissue'][0].split(separator):
+        #     tissue_ids.append(query_utils.map_node_name_to_id(driver, 'Tissue', str(tissue)))
+        tissues = data['tissue'][0].split(separator)
+        df = pd.DataFrame(tissues, columns=['END_ID'])
         df.insert(loc=0, column='START_ID', value=data['external_id'][0])
         df['TYPE'] = 'STUDIES_TISSUE'
         return df
     
 def extractProjectDiseaseRelationships(driver, project_data, separator='|'):
     data = project_data.copy()
-    disease_ids = []
+    # disease_ids = []
     if pd.isna(data['disease'][0]):
         return None
     else:
-        for disease in data['disease'][0].split(separator):
-            disease_ids.append(query_utils.map_node_name_to_id(driver, 'Disease', str(disease)))
-        df = pd.DataFrame(disease_ids, columns=['END_ID'])
+        # for disease in data['disease'][0].split(separator):
+        #     disease_ids.append(query_utils.map_node_name_to_id(driver, 'Disease', str(disease)))
+        diseases = data['disease'][0].split(separator)
+        df = pd.DataFrame(diseases, columns=['END_ID'])
         df.insert(loc=0, column='START_ID', value=data['external_id'][0])
         df['TYPE'] = 'STUDIES_DISEASE'
         return df

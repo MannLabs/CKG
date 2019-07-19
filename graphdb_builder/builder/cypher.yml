@@ -800,7 +800,7 @@ CREATE_PROJECT: &create_project
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_studies_disease.tsv" AS line 
         FIELDTERMINATOR '\t'
         MATCH (p:Project {id:line.START_ID})
-        MATCH (d:Disease {id:line.END_ID}) 
+        MATCH (d:Disease {name:line.END_ID}) 
         MERGE (p)-[r:STUDIES_DISEASE]->(d)
         RETURN COUNT(r) AS PROJECTID_studies_disease;
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_studies_intervention.tsv" AS line
@@ -812,7 +812,7 @@ CREATE_PROJECT: &create_project
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_studies_tissue.tsv" AS line
         FIELDTERMINATOR '\t'
         MATCH (p:Project {id:line.START_ID})
-        MATCH (t:Tissue {id:line.END_ID}) 
+        MATCH (t:Tissue {name:line.END_ID}) 
         MERGE (p)-[r:STUDIES_TISSUE]->(t)
         RETURN COUNT(r) AS PROJECTID_studies_tissue;
 
