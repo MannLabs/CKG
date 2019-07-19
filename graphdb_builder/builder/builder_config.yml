@@ -59,8 +59,8 @@ graph:
     - gwas
     - pathway
     - published
-    - project
     - user
+    - project
     - experiment
     - protein_structure
 
