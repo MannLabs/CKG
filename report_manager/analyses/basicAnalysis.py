@@ -1015,7 +1015,7 @@ def get_publications_abstracts(data, publication_col="publication", join_by=['pu
     return abstracts
 
 
-def run_two_way_anova(data, variables=variables, drop_cols=drop_cols, subject=subject, alpha=alpha):
+def run_two_way_anova(data, variables, drop_cols=[], subject="subject", alpha=0.05):
     df = data.copy()
     factor_A, factor_B = variables
     df[variables] = df['group'].str.split('+',expand=True)
