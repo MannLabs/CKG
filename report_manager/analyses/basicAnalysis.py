@@ -499,15 +499,14 @@ def calculate_ttest(df, condition1, condition2):
 
     return (t, pvalue, mean1, mean2, log2fc)
 
-def calculate_THSD(df):
+def calculate_THSD(df, group='group', alpha=0.05):
     col = df.name
-    result = pairwise_tukeyhsd(df.values, list(df.index))
-    df_results = pd.DataFrame(data=result._results_table.data[1:], columns=result._results_table.data[0])
-    df_results.columns = ['group1', 'group2', 'log2FC', 'padj_THSD', 'lower', 'upper', 'rejected']
+    df_results = pg.pairwise_tukey(dv=col, between=group, data=pd.DataFrame(df).reset_index(), alpha=alpha, tail='two-sided')
+    df_results.columns = ['group1', 'group2', 'mean(group1)', 'mean(group2)', 'log2FC', 'std_error', 'tail', 't-statistics', 'padj_THSD', 'effsize', 'efftype']
     df_results['identifier'] = col
     df_results = df_results.set_index('identifier')
     df_results['FC'] = df_results['log2FC'].apply(lambda x: np.power(2,np.abs(x)) * -1 if x < 0 else np.power(2,np.abs(x)))
-    df_results['rejected'] = df_results['rejected']
+    df_results['rejected'] = df_results['padj_THSD'].apply(lambda x: True if x < alpha else False)
 
     return df_results
 
@@ -943,14 +942,20 @@ def run_WGCNA(data, drop_cols_exp, drop_cols_cli, RsquaredCut=0.8, networkType='
         data_exp = dfs[data_exp]   #Extract experimental data
 
         softPower = wgcna.pick_softThreshold(data_exp, RsquaredCut=RsquaredCut, networkType=networkType, verbose=verbose)
+        
         dissTOM, moduleColors = wgcna.build_network(data_exp, softPower=softPower, networkType=networkType, minModuleSize=minModuleSize, deepSplit=deepSplit,
                                               pamRespectsDendro=pamRespectsDendro, merge_modules=merge_modules, MEDissThres=MEDissThres, verbose=verbose)
 
         Features_per_Module = wgcna.get_FeaturesPerModule(data_exp, moduleColors, mode='dataframe')
+
         MEs = wgcna.calculate_module_eigengenes(data_exp, moduleColors, softPower=softPower, dissimilarity=False)
+
         moduleTraitCor, textMatrix = wgcna.calculate_ModuleTrait_correlation(data_exp, data_cli, MEs)
+
         MM, MMPvalue = wgcna.calculate_ModuleMembership(data_exp, MEs)
+
         FS, FSPvalue = wgcna.calculate_FeatureTraitSignificance(data_exp, data_cli)
+
         METDiss, METcor = wgcna.get_EigengenesTrait_correlation(MEs, data_cli)
 
         result['dissTOM'] = dissTOM
@@ -1022,36 +1027,36 @@ def run_two_way_anova(data, variables, drop_cols=[], subject="subject", alpha=0.
     df = df.set_index([subject]+variables)
     df = df.drop(drop_cols, axis=1)
              
-    models = []
-    aov_result = []
-    tmp = df.copy()
-    tmp.columns = tmp.columns.str.replace(r"-", "_")
+#     models = []
+#     aov_result = []
+#     tmp = df.copy()
+#     tmp.columns = tmp.columns.str.replace(r"-", "_")
 
-    #OLS model
-    for col in tmp.columns:
-        model = ols('{} ~ C({})*C({})'.format(col, factor_A, factor_B), tmp[col].reset_index().sort_values(variables, ascending=[True, False])).fit()
-        models.append((col, model, model.f_pvalue))
+#     #OLS model
+#     for col in tmp.columns:
+#         model = ols('{} ~ C({})*C({})'.format(col, factor_A, factor_B), tmp[col].reset_index().sort_values(variables, ascending=[True, False])).fit()
+#         models.append((col, model, model.f_pvalue))
 
-    models_df = pd.DataFrame(models)
+#     models_df = pd.DataFrame(models)
 
-    #FDR correction
-    reject, padj = multi.fdrcorrection([x[-1] for x in models], alpha=alpha, method='indep')
-    models_df['model_padj'] = padj
-    models_df['rejected'] = reject
+#     #FDR correction
+#     reject, padj = multi.fdrcorrection([x[-1] for x in models], alpha=alpha, method='indep')
+#     models_df['model_padj'] = padj
+#     models_df['rejected'] = reject
     
-    #Anova
-    for protein in models_df[models_df['model_padj']<0.05][0].unique():
-        model = models_df.loc[models_df[0] == protein, 1].values[0]
-        aov = sm.stats.anova_lm(model, typ=2)
-        aov.columns = ['SS', 'DF', 'F', 'pvalue']
-        for i in aov.index:
-            if i != 'Residual':
-                t, p = aov.loc[i, ['F', 'pvalue']]
-                aov_result.append((protein, i, t, p))
+#     #Anova
+#     for protein in models_df[models_df['model_padj']<0.05][0].unique():
+#         model = models_df.loc[models_df[0] == protein, 1].values[0]
+#         aov = sm.stats.anova_lm(model, typ=2)
+#         aov.columns = ['SS', 'DF', 'F', 'pvalue']
+#         for i in aov.index:
+#             if i != 'Residual':
+#                 t, p = aov.loc[i, ['F', 'pvalue']]
+#                 aov_result.append((protein, i, t, p))
 
-    scores = pd.DataFrame(aov_result, columns = ['identifier','source', 'F-statistics', 'pvalue'])
-    scores = scores.set_index('identifier')
-    scores = scores.dropna(how="all")
+#     scores = pd.DataFrame(aov_result, columns = ['identifier','source', 'F-statistics', 'pvalue'])
+#     scores = scores.set_index('identifier')
+#     scores = scores.dropna(how="all")
     
-    return scores
+#     return scores
 

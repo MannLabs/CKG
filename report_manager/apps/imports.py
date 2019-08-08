@@ -5,11 +5,11 @@ import dash_core_components as dcc
 import dash_html_components as html
 
 #Plotly imports
-import plotly.plotly as py
+import chart_studio.plotly as py
 from IPython.display import display
 import plotly.graph_objs as go
 from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
-from plotly import tools
+import plotly.subplots as tools
 
 #Data manipulation imports
 import pandas as pd

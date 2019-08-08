@@ -358,7 +358,7 @@ class Project:
         
         return plots
 
-    def generate_overalp_plots(self):
+    def generate_overlap_plots(self):
         plots = []
         identifier = "Overlap"
         title = "Protein Identification Overlap"
@@ -428,7 +428,7 @@ class Project:
 
         plots = self.generate_project_attributes_plot()
         plots.extend(self.generate_project_similarity_plots())
-        plots.extend(self.generate_overalp_plots())
+        plots.extend(self.generate_overlap_plots())
                
         report.plots = {("Project info","Project Information"): plots}
 
@@ -446,7 +446,7 @@ class Project:
             self.save_project_report()
             self.save_project_datasets_data()
             self.download_project()
-            self.notify_project_ready()
+            # self.notify_project_ready()
 
     def notify_project_ready(self, message_type='slack'):
         message = "Report for project "+str(self.name)+" is ready: check it out at http://127.0.0.1:5000/apps/project/"+str(self.identifier)

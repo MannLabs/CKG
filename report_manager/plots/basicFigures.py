@@ -9,11 +9,11 @@ import plotly.figure_factory as FF
 import math
 import random
 import dash_table
-from plotly import tools
+import plotly.subplots as tools
 import plotly.io as pio
 from scipy.spatial.distance import pdist, squareform
 from plotly.graph_objs import *
-import dash_bio as dashbio
+# import dash_bio as dashbio
 from scipy.stats import zscore
 from kmapper import plotlyviz
 import networkx as nx
@@ -550,24 +550,25 @@ def get_heatmapplot(data, identifier, args):
 
     return dcc.Graph(id = identifier, figure = figure)
 
-def get_complex_heatmapplot(df, identifier, args):
-    figure = {}
-    if args['format'] == "edgelist":
-        df = df.set_index(args['source'])
-        df = df.pivot_table(values=args['values'], index=df.index, columns=args['target'], aggfunc='first')
-        df = df.dropna(how='all', axis=1)
-        df = df.fillna(0)
+# def get_complex_heatmapplot(df, identifier, args):
+#     figure = {}
+#     if args['format'] == "edgelist":
+#         df = df.set_index(args['source'])
+#         df = df.pivot_table(values=args['values'], index=df.index, columns=args['target'], aggfunc='first')
+#         df = df.dropna(how='all', axis=1)
+#         df = df.fillna(0)
         
-    figure = dashbio.Clustergram(width=1600,
-                                 color_threshold={'row': 150, 'col': 700},
-                                 color_map='BuPu',
-                                 data=df.values,
-                                 row_labels=list(df.index),
-                                 column_labels=list(df.columns.values),
-                                 hide_labels=['row'],
-                                 height=1800)
+#     figure = dashbio.Clustergram(width=1600,
+#                                  color_threshold={'row': 150, 'col': 700},
+#                                  color_map='BuPu',
+#                                  data=df.values,
+#                                  row_labels=list(df.index),
+#                                  column_labels=list(df.columns.values),
+#                                  hide_labels=['row'],
+#                                  height=1800)
     
-    return dcc.Graph(id=identifier, figure=figure)
+#     return dcc.Graph(id=identifier, figure=figure)
+
 def get_complex_heatmapplot_old(data, identifier, args):
     df = data.copy()
     
@@ -576,7 +577,6 @@ def get_complex_heatmapplot_old(data, identifier, args):
         df = df.set_index(args['source'])
         df = df.pivot_table(values=args['values'], index=df.index, columns=args['target'], aggfunc='first')
         df = df.fillna(0)
-    print(df.head())
     dendro_up = FF.create_dendrogram(df.values, orientation='bottom', labels=df.columns)
     for i in range(len(dendro_up['data'])):
         dendro_up['data'][i]['yaxis'] = 'y2'
@@ -693,7 +693,6 @@ def get_network(data, identifier, args):
         edge_prop_columns = [c for c in data.columns if c not in [args['source'], args['target']]]
         edge_properties = [str(d) for d in data.to_dict(orient='index').values()]
         graph = nx.from_pandas_edgelist(data, args['source'], args['target'], edge_attr=True)
-        
 
         degrees = dict(graph.degree())
         nx.set_node_attributes(graph, degrees, 'degree')
@@ -1049,16 +1048,21 @@ def get_WGCNAPlots(data, identifier):
         data_exp, data_cli, dissTOM, moduleColors, Features_per_Module, MEs,\
         moduleTraitCor, textMatrix, MM, MMPvalue, FS, FSPvalue, METDiss, METcor = data
         plots = []
-        #plot: sample dendrogram and clinical variables heatmap; input: data_exp, data_cli
+        # plot: sample dendrogram and clinical variables heatmap; input: data_exp, data_cli
         plots.append(wgcnaFigures.plot_complex_dendrogram(data_exp, data_cli, title='Clinical variables variation by sample', dendro_labels=data_exp.index, distfun='euclidean', linkagefun='average', hang=40, subplot='heatmap', color_missingvals=True, width=1000, height=800))
-        #plot: gene tree dendrogram and module colors; input: dissTOM, moduleColors
+
+        # plot: gene tree dendrogram and module colors; input: dissTOM, moduleColors
         plots.append(wgcnaFigures.plot_complex_dendrogram(dissTOM, moduleColors, title='Co-expression: dendrogram and module colors', dendro_labels=dissTOM.columns, distfun=None, linkagefun='average', hang=0.1, subplot='module colors', col_annotation=True, width=1000, height=800))
-        #plot: table with features per module; input: df
+
+        # plot: table with features per module; input: df
         plots.append(get_table(Features_per_Module, identifier='', title='Proteins/Genes module color', colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':1500, 'font':12}, subplot = False))
+
         #plot: module-traits correlation with annotations; input: moduleTraitCor, textMatrix
         plots.append(wgcnaFigures.plot_labeled_heatmap(moduleTraitCor, textMatrix, title='Module-Clinical variable relationships', colorscale=[[0,'#67a9cf'],[0.5,'#f7f7f7'],[1,'#ef8a62']], row_annotation=True, width=1000, height=800))
+
         #plot: FS vs. MM correlation per trait/module scatter matrix; input: MM, FS, Features_per_Module
         plots.append(wgcnaFigures.plot_intramodular_correlation(MM, FS, Features_per_Module, title='Intramodular analysis: Feature Significance vs. Module Membership', width=1500, height=4000))
+
         #input: METDiss, METcor
         plots.append(wgcnaFigures.plot_complex_dendrogram(METDiss, METcor, title='Eigengene network and clinical data associations', dendro_labels=METDiss.index, distfun=None, linkagefun='average', hang=0.9,
                                  subplot='heatmap', subplot_colorscale=[[0,'#67a9cf'],[0.5,'#f7f7f7'],[1,'#ef8a62']],
