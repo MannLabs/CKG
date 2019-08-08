@@ -491,12 +491,14 @@ class Project:
         print('save dataset report', time.time() - start)
 
     def save_project_datasets_data(self):
+        start = time.time()
         directory = self.get_report_directory()
         for dataset_type in self.datasets:
             dataset = self.datasets[dataset_type]
             dataset_directory = os.path.join(directory, dataset_type)
             if isinstance(dataset, Dataset):
                 dataset.save_dataset(dataset_directory)
+        print('save datasets', time.time() - start)
 
     def show_report(self, environment):
         types = ["Project information", "clinical", "proteomics", "longitudinal proteomics", "wes", "wgs", "rnaseq", "multiomics"]

@@ -715,7 +715,6 @@ def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], su
     columns = ['T-statistics', 'pvalue', 'mean_group1', 'mean_group2', 'log2FC']
     df = df.set_index([group, subject])
     df = df.drop(drop_cols, axis = 1)
-    cols = df.columns
     if paired:
         scores = df.T.apply(func = calculate_paired_ttest, axis=1, result_type='expand', args =(condition1, condition2))
     else:

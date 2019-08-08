@@ -219,8 +219,6 @@ def plot_intramodular_correlation(MM, FS, feature_module_df, title, width=1000, 
         Plotly object figure.
     """
 
-    colors_dict = color_list.make_color_dict()
-
     MM['modColor'] = MM.index.map(feature_module_df.set_index('name')['modColor'].get)
 
     figure = tools.make_subplots(rows=len(FS.columns), cols=len(MM.columns), shared_xaxes=True, shared_yaxes=True, vertical_spacing = 0.01, horizontal_spacing = 0.01, print_grid=False)
@@ -248,7 +246,7 @@ def plot_intramodular_correlation(MM, FS, feature_module_df, title, width=1000, 
             slope, intercept, r_value, p_value, std_err = scp.stats.linregress(x, y)
             line = slope*x+intercept
 
-            figure.append_trace(go.Scatter(x = x,
+            figure.append_trace(go.Scattergl(x = x,
                                            y = y,
                                            text = name,
                                            mode = 'markers',
