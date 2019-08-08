@@ -22,12 +22,15 @@ class ProjectApp(basicApp.BasicApp):
 
     def build_page(self):
         p = project.Project(self.project_id, datasets=None, report={})
+
         if p.name is not None:
             self.title = "Project: {}".format(p.name)
         else:
             self.title = ''
         self.add_basic_layout()
+        
         plots = p.show_report("app")
+        
         tabs = []
         button = html.Div([html.A('Download Project',
                                 id='download-zip',

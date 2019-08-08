@@ -1,4 +1,5 @@
 import os
+import sys
 import numpy as np
 import pandas as pd
 import scipy as scp
@@ -10,9 +11,9 @@ import urllib.request
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
 import matplotlib.colors
-import plotly.plotly as py
+import chart_studio.plotly as py
 import plotly.graph_objs as go
-import plotly.tools as tls
+import plotly.subplots as tls
 
 from rpy2 import robjects as ro
 from rpy2.robjects import pandas2ri
@@ -21,6 +22,7 @@ from rpy2.robjects.vectors import StrVector, FloatVector
 import rpy2.robjects.packages as rpacks
 from report_manager import R2Py
 pandas2ri.activate()
+# sys.setrecursionlimit(10000)
 
 #Call R
 R = ro.r
@@ -33,9 +35,10 @@ R('options(stringsAsFactors = FALSE)')
 base = R2Py.call_Rpackage("package", "base")
 stats = R2Py.call_Rpackage("package", "stats")
 WGCNA = R2Py.call_Rpackage("package", "WGCNA")
+flashClust = R2Py.call_Rpackage('package', 'flashClust')
 
 
-def get_data(data, drop_cols_exp=['group', 'sample'], drop_cols_cli=['group', 'biological_sample', 'index']):
+def get_data(data, drop_cols_exp=['subject', 'group', 'sample', 'index'], drop_cols_cli=['subject', 'group', 'biological_sample', 'index']):
     """ 
     This function cleanes up and formats experimental and clinical data into similarly shaped dataframes.
     
@@ -46,19 +49,22 @@ def get_data(data, drop_cols_exp=['group', 'sample'], drop_cols_cli=['group', 'b
     
     Returns:
         Dictionary with experimental and clinical dataframes (keys are the same as in the input dictionary).  
-    """
+    """   
     wgcna_data = {}
     for i in data:
         df = data[i]
         if i == 'clinical':
             df.drop_duplicates(keep='first', inplace=True)
             df = df.reset_index()
-            df.set_index(['subject'], inplace=True)
+            df['rows'] = df[['subject', 'group']].apply(lambda x: '_'.join(x), axis=1)
+            df.set_index(['rows'], inplace=True)
             df = df.reindex(index=natsorted(df.index))
             df = df.drop(drop_cols_cli, axis=1)
+
         else:
             df = df.reset_index()
-            df.set_index(['subject'], inplace=True)
+            df['rows'] = df[['subject', 'group']].apply(lambda x: '_'.join(x), axis=1)
+            df.set_index(['rows'], inplace=True)
             df = df.reindex(index=natsorted(df.index))
             df = df.drop(drop_cols_exp, axis=1)
 
@@ -67,7 +73,7 @@ def get_data(data, drop_cols_exp=['group', 'sample'], drop_cols_cli=['group', 'b
     return wgcna_data
 
 
-def get_dendrogram(df, labels, distfun='euclidean', linkagefun='average', div_clusters=False, fcluster_method='distance', fcluster_cutoff=15):
+def get_dendrogram(df, labels, distfun='euclidean', linkagefun='ward', div_clusters=False, fcluster_method='distance', fcluster_cutoff=15):
     """ 
     This function calculates the distance matrix and performs hierarchical cluster analysis on a set of dissimilarities and methods for analyzing it.
    
@@ -83,12 +89,14 @@ def get_dendrogram(df, labels, distfun='euclidean', linkagefun='average', div_cl
     Returns:
         Dictionary of data structures computed to render the dendrogram. Keys: 'icoords', 'dcoords', 'ivl' and 'leaves'. If div_clusters is used, it will also return a dictionary of each cluster and respective leaves.
     """
+
     if distfun is None:
         dist = np.asarray(stats.as_dist(df))
     else:
         dist = np.asarray(stats.dist(df, method = distfun))
 
     Z = linkage(dist, method = linkagefun)
+
     Z_dendrogram = dendrogram(Z, no_plot = True, labels = labels)
 
     if div_clusters == True:
@@ -241,16 +249,17 @@ def cutreeDynamic(distmatrix, linkagefun='average', minModuleSize=30, method='hy
     #else:
     #    dist = stats.dist(distmatrix, method = distfun)
           
-    R_function = R(''' clusters <- function(distmatrix, linkagefun, minModuleSize, method, deepSplit, pamRespectsDendro) {
-                                        cutreeDynamic(dendro=hclust(as.dist(distmatrix), method = linkagefun), method=method, distM=distmatrix, 
-                                        deepSplit=deepSplit, pamRespectsDendro= pamRespectsDendro, minClusterSize= minModuleSize)} ''')
+    R_function = R(''' clusters <- function(distmatrix, linkagefun, method, minModuleSize, deepSplit, pamRespectsDendro) {
+                                        cutreeDynamic(dendro=flashClust(as.dist(distmatrix),method=linkagefun),
+                                                        distM=distmatrix, method=method, deepSplit=deepSplit,
+                                                        pamRespectsDendro=pamRespectsDendro, minClusterSize=minModuleSize)} ''')       
     
-    cutree = R_function(distmatrix, linkagefun=linkagefun, minModuleSize=minModuleSize, method=method, deepSplit=deepSplit, pamRespectsDendro=pamRespectsDendro)
+    cutree = R_function(distmatrix, linkagefun=linkagefun, method=method, minModuleSize=minModuleSize, deepSplit=deepSplit, pamRespectsDendro=pamRespectsDendro)
     
     return np.array(cutree)
 
 
-def build_network(data, softPower=6, networkType='unsigned', minModuleSize=30, method='hybrid', deepSplit=2, pamRespectsDendro=False, merge_modules=True, MEDissThres=0.25, verbose=0):
+def build_network(data, softPower=6, networkType='unsigned', linkagefun='average', method='hybrid', minModuleSize=30, deepSplit=2, pamRespectsDendro=False, merge_modules=True, MEDissThres=0.25, verbose=0):
     """ 
     Weighted gene network construction and module detection. Calculates co-expression similarity and adjacency, topological overlap matrix (TOM) and clusters features in modules.
 
@@ -258,6 +267,8 @@ def build_network(data, softPower=6, networkType='unsigned', minModuleSize=30, m
         data: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.
         softPower: soft-thresholding power.
         networkType: network type ('unsigned', 'signed', 'signed hybrid', 'distance').
+        linkagefun: hierarchical/agglomeration method to be used ('single', 'complete', 'average', 'weighted', 'centroid', 'median' or 'ward').
+        method: method to use ('hybrid' or 'tree').
         minModuleSize: minimum module size.
         deepSplit: provides a rough control over sensitivity to cluster splitting, the higher the value (with 'hybrid' method) or if True (with 'tree' method), the more and smaller modules.
         pamRespectsDendro: only used for method 'hybrid'. Objects and small modules will only be assigned to modules that belong to the same branch in the dendrogram structure.
@@ -268,24 +279,25 @@ def build_network(data, softPower=6, networkType='unsigned', minModuleSize=30, m
     Returns:
          Tuple with TOM dissimilarity pandas dataframe, and R/rpy2 vector array with module colors per experimental feature.
     """
-
     #Calculate adjacencies
     adjacency = WGCNA.adjacency(data, power=softPower, type=networkType)
 
     #Transforms the adjacency into topological overlap matrix (TOM)
     TOM = WGCNA.TOMsimilarity(adjacency, verbose = verbose)
+
     #Calculates the corresponding dissimilarity matrix
     dissTOM = pd.DataFrame(R("1") - TOM)
     dissTOM.columns = data.columns
     dissTOM.index = data.columns
 
     #Identify co-expression modules
-    moduleColors = identify_module_colors(dissTOM, minModuleSize=minModuleSize, method=method, deepSplit=deepSplit, pamRespectsDendro=pamRespectsDendro)
+    moduleColors = identify_module_colors(dissTOM, linkagefun=linkagefun, method=method, minModuleSize=minModuleSize, deepSplit=deepSplit, pamRespectsDendro=pamRespectsDendro)
 
     #Merge modules whose expression profiles are very similar
     if merge_modules == True:
         MEs, moduleColors = merge_similar_modules(data, moduleColors, MEDissThres=MEDissThres, verbose=verbose)
     else: pass
+
 
     return dissTOM, moduleColors
 
@@ -307,7 +319,7 @@ def pick_softThreshold(data, RsquaredCut=0.8, networkType='unsigned', verbose=0)
     softPower = sft.rx2('powerEstimate')[0]
     return softPower
 
-def identify_module_colors(matrix, minModuleSize=30, method='hybrid', deepSplit=2, pamRespectsDendro=False):
+def identify_module_colors(matrix, linkagefun='average', method='hybrid', minModuleSize=30, deepSplit=2, pamRespectsDendro=False):
     """
     Identifies co-expression modules and converts the numeric labels into colors.
     
@@ -320,8 +332,10 @@ def identify_module_colors(matrix, minModuleSize=30, method='hybrid', deepSplit=
     Returns:
         Numpy array of strings with module color of each experimental feature.
     """
-    dynamicMods = cutreeDynamic(matrix, distfun=None, linkagefun="average", minModuleSize=minModuleSize, method=method, deepSplit=deepSplit, pamRespectsDendro=pamRespectsDendro)
+    dynamicMods = cutreeDynamic(matrix, linkagefun=linkagefun, method=method, minModuleSize=minModuleSize, deepSplit=deepSplit, pamRespectsDendro=pamRespectsDendro)
+
     dynamicColors= np.array(WGCNA.labels2colors(dynamicMods))
+
     return dynamicColors
 
 def calculate_module_eigengenes(data, modColors, softPower=6, dissimilarity=True):
@@ -385,8 +399,10 @@ def calculate_ModuleTrait_correlation(df_exp, df_traits, MEs):
     df_traits_r.columns = df_traits_r.columns.str.replace(' ', 'space')
     df_traits_r.columns = df_traits_r.columns.str.replace('(', 'parentheses1')
     df_traits_r.columns = df_traits_r.columns.str.replace(')', 'parentheses2')
+
     moduleTraitCor_r = WGCNA.cor(MEs, df_traits_r, use='p', verbose=0)
     moduleTraitPvalue_r = WGCNA.corPvalueStudent(moduleTraitCor_r, nSamples)
+
     textMatrix = paste_matrices(moduleTraitCor_r, moduleTraitPvalue_r, MEs.columns, df_traits_r.columns)
     
     moduleTraitCor = pd.DataFrame(moduleTraitCor_r, index=MEs.columns, columns=df_traits_r.columns)
@@ -425,7 +441,9 @@ def calculate_ModuleMembership(data, MEs):
     MMPvalue = base.as_data_frame(WGCNA.corPvalueStudent(base.as_matrix(FeatureModuleMembership), nSamples))
 
     FeatureModuleMembership.columns = ['MM'+str(col) for col in modLabels]
+    FeatureModuleMembership.index = data_r.columns
     MMPvalue.columns = ['p.MM'+str(col) for col in modLabels]
+    MMPvalue.index = data_r.columns
 
     #FeatureModuleMembership = R2Py.R_matrix2Py_matrix(FeatureModuleMembership, FeatureModuleMembership.index, FeatureModuleMembership.columns)
     #MMPvalue = R2Py.R_matrix2Py_matrix(MMPvalue, MMPvalue.rownames, MMPvalue.colnames)
@@ -458,7 +476,9 @@ def calculate_FeatureTraitSignificance(df_exp, df_traits):
     FSPvalue = base.as_data_frame(WGCNA.corPvalueStudent(base.as_matrix(FeatureTraitSignificance), nSamples))
 
     FeatureTraitSignificance.columns = ['GS.'+str(col) for col in df_cli_r.columns]
+    FeatureTraitSignificance.index = df_exp_r.columns
     FSPvalue.columns = ['p.GS.'+str(col) for col in df_cli_r.columns]
+    FSPvalue.index = df_exp_r.columns
 
     #FeatureTraitSignificance = R2Py.R_matrix2Py_matrix(FeatureTraitSignificance, FeatureTraitSignificance.rownames, FeatureTraitSignificance.colnames)
     #FSPvalue = R2Py.R_matrix2Py_matrix(FSPvalue, FSPvalue.rownames, FSPvalue.colnames)
@@ -466,11 +486,11 @@ def calculate_FeatureTraitSignificance(df_exp, df_traits):
     FeatureTraitSignificance.columns = FeatureTraitSignificance.columns.str.replace('space', ' ')
     FeatureTraitSignificance.columns = FeatureTraitSignificance.columns.str.replace('parentheses1', '(')
     FeatureTraitSignificance.columns = FeatureTraitSignificance.columns.str.replace('parentheses2', ')')
-    FeatureTraitSignificance.index = df_exp_r.columns.str.replace('dash', '~')
+    FeatureTraitSignificance.index = FeatureTraitSignificance.index.str.replace('dash', '~')
     FSPvalue.columns = df_cli_r.columns.str.replace('space', ' ')
     FSPvalue.columns = FSPvalue.columns.str.replace('parentheses1', '(')
     FSPvalue.columns = FSPvalue.columns.str.replace('parentheses2', ')')
-    FSPvalue.index = df_exp_r.columns.str.replace('dash', '~')
+    FSPvalue.index = FSPvalue.index.str.replace('dash', '~')
 
     return FeatureTraitSignificance, FSPvalue
 

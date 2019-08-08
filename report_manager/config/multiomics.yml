@@ -10,10 +10,13 @@ data exploration:
         store_analysis: True
         args:
             drop_cols_exp:
+                - subject
                 - group
                 - sample
+                - index
             drop_cols_cli:
                 - index
+                - subject
                 - group
                 - biological_sample
             RsquaredCut: 0.8
