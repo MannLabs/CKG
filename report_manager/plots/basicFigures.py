@@ -662,7 +662,7 @@ def get_notebook_network_pyvis(graph, args={}):
     notebook_net.barnes_hut(overlap=0.8)
     notebook_net.from_nx(graph)
     notebook_net.show_buttons(['nodes', 'edges', 'physics'])
-    notebook_net.generate_html(notebook=True)
+    utils.generate_html(notebook_net)
 
     return notebook_net
 
@@ -1002,7 +1002,7 @@ def get_parallel_plot(data, identifier, args):
         group = args['group']
         if 'zscore' in args:
             if args['zscore']:
-                data = data.set_index(group).appy(zscore)
+                data = data.set_index(group).apply(zscore)
         color = '#de77ae'
         if 'color' in args:
             color = args['color']

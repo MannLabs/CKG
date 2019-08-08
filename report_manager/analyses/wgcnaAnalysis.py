@@ -7,13 +7,6 @@ from collections import OrderedDict, defaultdict
 from natsort import natsorted, index_natsorted, order_by_index
 import urllib.request
 
-import matplotlib.pyplot as plt
-from matplotlib.pyplot import figure
-import matplotlib.colors
-import plotly.plotly as py
-import plotly.graph_objs as go
-import plotly.tools as tls
-
 from rpy2 import robjects as ro
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.packages import importr

@@ -11,7 +11,7 @@ import urllib.request
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
 import matplotlib.colors
-import plotly.plotly as py
+import chart_studio.plotly as py
 import plotly.graph_objs as go
 import plotly.tools as tls
 from report_manager.plots import Dendrogram
@@ -259,7 +259,7 @@ def plot_intramodular_correlation(MM, FS, feature_module_df, title, width=1000, 
                                            opacity=0.7,
                                            marker={'size': 7,
                                                    'color': 'white',
-                                                   'line': {'width': 1.5, 'color': j[2:]i.lower().replace(' ', '')}}), a+1, i+1)
+                                                   'line': {'width': 1.5, 'color': j[2:]}}), a+1, i+1)
 
             figure.append_trace(go.Scatter(x = x, y = line, mode = 'lines', marker={'color': 'black'}), a+1, i+1)
 

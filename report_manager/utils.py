@@ -14,7 +14,7 @@ import bs4 as bs
 import dash_html_components as html
 import networkx as nx
 from networkx.readwrite import json_graph
-import plotly.plotly as py
+import chart_studio.plotly as py
 import base64
 from xhtml2pdf import pisa
 import requests, json
@@ -23,6 +23,40 @@ import shutil
 import smtplib
 from email.message import EmailMessage
 
+def generate_html(network):
+        """
+        This method gets the data structures supporting the nodes, edges,
+        and options and updates the pyvis html template holding the visualization.
+
+        :type name_html: str
+        """
+        # here, check if an href is present in the hover data
+        use_link_template = False
+        for n in network.nodes:
+            title = n.get("title", None)
+            if title:
+                if "href" in title:
+                    """
+                    this tells the template to override default hover
+                    mechanic, as the tooltip would move with the mouse
+                    cursor which made interacting with hover data useless.
+                    """
+                    use_link_template = True
+                    break
+        template = network.template
+
+        nodes, edges, height, width, options = network.get_network_data()
+        network.html = template.render(height=height,
+                                    width=width,
+                                    nodes=nodes,
+                                    edges=edges,
+                                    options=options,
+                                    use_DOT=network.use_DOT,
+                                    dot_lang=network.dot_lang,
+                                    widget=network.widget,
+                                    bgcolor=network.bgcolor,
+                                    conf=network.conf,
+                                    tooltip_link=use_link_template)
 
 def send_message_to_slack_webhook(message, message_to):
     webhook_file = "../config/wh.txt"
@@ -118,7 +152,7 @@ def convert_dash_to_json(dash_object):
     return dash_json 
 
 def neoj_path_to_networkx(paths, key='path'):
-    regex = r"\((.+)\)\-\[\:(.+)\s\{.?\}\]\-\>\((.+)\)"
+    regex = r"\(?(.+)\)\<?\-\>?\[\:(.+)\s\{.*\}\]\<?\-\>?\((.+)\)?"
     nodes = set()
     rels = set()
     for r in paths:
@@ -126,6 +160,14 @@ def neoj_path_to_networkx(paths, key='path'):
         matches = re.search(regex, path)
         if matches:
             source = matches.group(1)
+            source_match = re.search(regex, source)
+            if source_match:
+                source = source_match.group(1)
+                relationship = source_match.group(2)
+                target = source_match.group(3)
+                nodes.update([source, target])
+                rels.add((source, target, relationship))
+                source = target
             relationship = matches.group(2)
             target = matches.group(3)
             nodes.update([source, target])

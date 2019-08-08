@@ -1,8 +1,5 @@
-import sys
-import io
 import os.path
 import gzip
-import shutil
 from collections import defaultdict
 import pandas as pd
 import re
@@ -53,102 +50,68 @@ def parse_idmapping_file(databases_directory, config, import_directory, download
 
     fields = config['uniprot_ids']
     synonymFields = config['uniprot_synonyms']
-    uf = builder_utils.read_gzipped_file(file_name)
-    with gzip.open('.'.join(file_name.split('.')[:-2])+'_new.dat.gz', 'wb') as nf:
-        with io.TextIOWrapper(nf, encoding='utf-8') as encode:
-            for line in uf:
-                data = line.decode('utf-8').rstrip("\r\n").split("\t")
-                iid = data[0]
-                field = data[1]
-                alias = data[2]
-                # encode.write(line.decode('utf-8'))
-                try:
-                    if field != 'UniParc':
-                        encode.write(line.decode('utf-8'))
-                    # nextLine = next(uf)
-                    # nextdata = nextLine.decode('utf-8').rstrip("\r\n").split("\t")
-                    # nextiid = nextdata[0]
-                    # nextfield = nextdata[1]
-                    # if nextiid.split('-')[0] == iid.split('-')[0] or nextiid.split('-')[0] != iid.split('-')[0] and nextfield == 'UniProtKB-ID':
-                    #     encode.write(nextLine.decode('utf-8'))
-                except Exception:
-                    print('Reached end of file.')
-                    continue
-        uf.close()
 
     identifier = None
     transcripts = set()
     skip = set()
     is_first = True
-    ufn = builder_utils.read_gzipped_file('.'.join(file_name.split('.')[:-2])+'_new.dat.gz')
+    uf = builder_utils.read_gzipped_file(file_name)
     aux = {}
-    prot_info = {}
-    synonyms = []
     stats = set()
     mp.reset_mapping(entity="Protein")
     with open(mapping_file, 'w') as out:
-        for line in ufn:
+        for line in uf:
+            if 'UniParc' in line:
+                continue
             data = line.decode('utf-8').rstrip("\r\n").split("\t")
             iid = data[0]
             field = data[1]
-            alias = data[2]
-
-            if re.search(regex_transcript,iid):
-                    transcripts.add(iid)
-
-            identifier = iid.split('-')[0]
-            if identifier not in aux:
-                aux[identifier] = {}
-                prot_info = {}
-                synonyms = []
-                    
-                if field in fields:
-                    if field == 'NCBI_TaxID':
-                        if int(alias) not in taxids:
-                            skip.add(identifier)
-                            aux.pop(identifier, None)
-                            identifier = None
-                    if field in synonymFields:
-                        synonyms.append(alias)
-                    prot_info.setdefault(field, [])
-                    prot_info[field].append(alias)
-            else:
-                if field in fields:
-                    if field == 'NCBI_TaxID':
-                        if int(alias) not in taxids:
-                            skip.add(identifier)
-                            aux.pop(identifier, None)
-                            identifier = None
-                    if field in synonymFields:
-                        synonyms.append(alias)
-                    prot_info.setdefault(field, [])
-                    prot_info[field].append(alias)
+            alias = data[2]                
             
-            prot_info["synonyms"] = synonyms 
-            aux[identifier].update(prot_info)
+            if iid not in skip:
+                skip = set()
+                if re.search(regex_transcript,iid):
+                    transcripts.add(iid)
+                if iid not in aux and iid.split('-')[0] not in aux:
+                    if identifier is not None:
+                        prot_info["synonyms"] = synonyms
+                        aux[identifier].update(prot_info)
+                        if "UniProtKB-ID" in aux[identifier] and "NCBI_TaxID" in aux[identifier]:
+                            for synonym in synonyms:
+                                out.write(identifier+"\t"+synonym+"\n")
+                            proteins[identifier] = aux[identifier]
+                            for t in transcripts:
+                                proteins[t] = aux[identifier]
+                                for synonym in synonyms:
+                                    out.write(t+"\t"+synonym+"\n")
+                            if len(transcripts) > 0:
+                                proteins[identifier].update({"isoforms":transcripts})
+                                transcripts = set()
+                            aux.pop(identifier, None)
+                            if len(proteins) >= 1000:
+                                entities, relationships, pdb_entities = format_output(proteins)
+                                stats.update(print_single_file(entities, config['proteins_header'], proteins_output_file, "entity", "Protein", is_first))
+                                stats.update(print_single_file(pdb_entities, config['pdb_header'], pdbs_output_file, "entity", "Protein_structure", is_first))
+                                stats.update(print_multiple_relationships_files(relationships, config['relationships_header'], import_directory, is_first))
+                                is_first = False
+                                proteins = {}
+                    identifier = iid
+                    transcripts = set()
+                    aux[identifier] = {}
+                    prot_info = {}
+                    synonyms = []
+                if field in fields:
+                    if field == 'NCBI_TaxID':
+                        if int(alias) not in taxids:
+                            skip.add(identifier)
+                            aux.pop(identifier, None)
+                            identifier = None
+                    if field in synonymFields:
+                        synonyms.append(alias)
+                    prot_info.setdefault(field, [])
+                    prot_info[field].append(alias)
 
-            if field == 'CRC64':
-                if "UniProtKB-ID" in aux[identifier] and "NCBI_TaxID" in aux[identifier]:
-                    for synonym in synonyms:
-                        out.write(identifier+"\t"+synonym+"\n")
-                    proteins[identifier] = aux[identifier]
-                    for t in transcripts:
-                        proteins[t] = aux[t.split('-')[0]]
-                        for synonym in synonyms:
-                            out.write(t+"\t"+synonym+"\n")
-                    if len(transcripts) > 0:
-                        proteins[identifier].update({"isoforms":transcripts})
-                        transcripts = set()
-                    aux.pop(identifier, None)
-                    if len(proteins) >= 1000:
-                        entities, relationships, pdb_entities = format_output(proteins)
-                        stats.update(print_single_file(entities, config['proteins_header'], proteins_output_file, "entity", "Protein", is_first))
-                        stats.update(print_single_file(pdb_entities, config['pdb_header'], pdbs_output_file, "entity", "Protein_structure", is_first))
-                        stats.update(print_multiple_relationships_files(relationships, config['relationships_header'], import_directory, is_first))
-                        is_first = False
-                        proteins = {}
-
-        ufn.close()
+        uf.close()
 
     if len(proteins)>0:
         entities, relationships, pdb_entities = format_output(proteins)
@@ -196,7 +159,7 @@ def format_output(proteins):
         if "isoforms" in proteins[protein]:
             for i in proteins[protein]['isoforms']:
                 relationships[('Transcript','IS_ISOFORM')].add((i, protein, 'IS_ISOFORM', 'UniProt'))
-
+        
         entities.add((protein, "Protein", accession, name, ",".join(synonyms), description, int(taxid)))
         
             
