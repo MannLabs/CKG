@@ -3,6 +3,7 @@ import report_manager.analyses.basicAnalysis as analyses
 from report_manager.plots import basicFigures as figure
 import pandas as pd
 import itertools
+import time
 
 class AnalysisResult:
     def __init__(self, identifier, analysis_type, args, data, result=None):
@@ -123,6 +124,7 @@ class AnalysisResult:
                 ttest_result = analyses.run_ttest(self.data, pair[0], pair[1], alpha = 0.05)
                 self.result[pair] = ttest_result
         elif self.analysis_type  == 'anova':
+            start = time.time()
             alpha = 0.05
             drop_cols = []
             group = 'group'
@@ -137,6 +139,7 @@ class AnalysisResult:
                 permutations = self.args["permutations"]
             anova_result = analyses.run_anova(self.data, drop_cols=drop_cols, group=group, alpha=alpha, permutations=permutations)
             self.result[self.analysis_type] = anova_result
+            print('ANOVA', time.time() - start)
         elif self.analysis_type  == '2-way anova':
             alpha = 0.05
             drop_cols = []
@@ -153,6 +156,7 @@ class AnalysisResult:
             two_way_anova_result = analyses.run_two_way_anova(self.data, variables=variables, drop_cols=drop_cols, subject=subject, alpha=alpha)
             self.result[self.analysis_type] = two_way_anova_result
         elif self.analysis_type == "repeated_measurements_anova":
+            start = time.time()
             alpha = 0.05
             drop_cols = []
             group = 'group'
@@ -170,6 +174,7 @@ class AnalysisResult:
                 permutations = self.args["permutations"]
             anova_result = analyses.run_repeated_measurements_anova(self.data, drop_cols=drop_cols, subject=subject, group=group, alpha=alpha, permutations=permutations)
             self.result[self.analysis_type] = anova_result
+            print('repeated-ANOVA', time.time() - start)
         elif self.analysis_type == "dabest":
             drop_cols = []
             group = 'group'
@@ -186,6 +191,7 @@ class AnalysisResult:
             dabest_result = analyses.run_dabest(self.data, drop_cols=drop_cols, subject=subject, group=group, test=test)
             self.result[self.analysis_type] = dabest_result
         elif self.analysis_type  == "correlation":
+            start = time.time()
             alpha = 0.05
             method = 'pearson'
             correction = ('fdr', 'indep')
@@ -206,7 +212,9 @@ class AnalysisResult:
             if "cutoff" in self.args:
                 cutoff = self.args['cutoff']
             self.result[self.analysis_type] = analyses.run_correlation(self.data, alpha=alpha, subject=subject, group=group, method=method, correction=correction)
+            print('Correlation', time.time() - start)
         elif self.analysis_type  == "repeated_measurements_correlation":
+            start = time.time()
             alpha = 0.05
             method = 'pearson'
             correction = ('fdr', 'indep')
@@ -223,7 +231,9 @@ class AnalysisResult:
             if "cutoff" in self.args:
                 cutoff = self.args['cutoff']
             self.result[self.analysis_type] = analyses.run_rm_correlation(self.data, alpha=alpha, subject=subject, correction=correction)
+            print('repeated-Correlation', time.time() - start)
         elif self.analysis_type == "regulation_enrichment":
+            start = time.time()
             identifier='identifier'
             groups=['group1', 'group2']
             annotation_col='annotation'
@@ -246,9 +256,11 @@ class AnalysisResult:
             if 'regulation_data' in self.args and 'annotation' in self.args:
                 if self.args['regulation_data'] in self.data and self.args['annotation'] in self.data:
                     self.result[annotation_type+"_"+self.analysis_type] = analyses.run_regulation_enrichment(self.data[self.args['regulation_data']], self.data[self.args['annotation']], identifier=identifier, groups=groups, annotation_col=annotation_col, reject_col=reject_col, method=method)
+            print('Enrichment', time.time() - start)
         elif self.analysis_type == 'long_format':
             self.result[self.analysis_type] = analyses.transform_into_long_format(self.data, drop_columns=self.args['drop_columns'], group=self.args['group'], columns=self.args['columns'])
         elif self.analysis_type == 'ranking_with_markers':
+            start = time.time()
             list_markers = []
             annotations = {}
             marker_col = 'identifier'
@@ -268,11 +280,13 @@ class AnalysisResult:
             if 'data' in self.args:
                 if self.args['data'] in self.data:
                     self.result[self.analysis_type] = analyses.get_ranking_with_markers(self.data[self.args['data']], drop_columns=self.args['drop_columns'], group=self.args['group'], columns=self.args['columns'], list_markers=list_markers, annotation = annotations)
+            print('Ranking', time.time() - start)
         elif self.analysis_type == 'coefficient_of_variation':
             self.result[self.analysis_type] = analyses.get_coefficient_variation(self.data, drop_columns=self.args['drop_columns'], group=self.args['group'], columns=self.args['columns'])
         elif self.analysis_type == 'publications_abstracts':
             self.result[self.analysis_type] = analyses.get_publications_abstracts(self.data, publication_col="publication", join_by=['publication','Proteins','Diseases'], index="PMID")
         elif self.analysis_type == "wgcna":
+            start = time.time()
             drop_cols_exp = []
             drop_cols_cli = []
             RsquaredCut = 0.8
@@ -303,9 +317,10 @@ class AnalysisResult:
                 MEDissThres = self.args["MEDissThres"]
             if "verbose" in self.args:
                 verbose = self.args["verbose"]
-            self.result[self.analysis_type] = analyses.run_WGCNA(self.data, drop_cols_exp, drop_cols_cli, RsquaredCut=0.8, networkType=networkType, 
+            self.result[self.analysis_type] = analyses.run_WGCNA(self.data, drop_cols_exp, drop_cols_cli, RsquaredCut=RsquaredCut, networkType=networkType, 
                                                             minModuleSize=minModuleSize, deepSplit=deepSplit, pamRespectsDendro=pamRespectsDendro, merge_modules=merge_modules,
                                                             MEDissThres=MEDissThres, verbose=verbose)
+            print('WGCNA', time.time() - start)
 
     def get_plot(self, name, identifier):
         plot = []
@@ -467,6 +482,7 @@ class AnalysisResult:
                     self.args["title"] = figure_title
                     plot.extend(figure.get_violinplot(self.result[id], identifier, self.args))
             elif name == "wgcnaplots":
+                start = time.time()
                 data = {}
                 input_data = self.data
                 wgcna_data = self.result
@@ -475,6 +491,7 @@ class AnalysisResult:
                     data['wgcna'] = {**dfs, **wgcna_data['wgcna']}
                     for id in data:
                         plot.extend(figure.get_WGCNAPlots(data[id], identifier))
+                print('WGCNA-plot', time.time() - start)
             elif name == 'ranking':
                 for id in self.result:
                     plot.append(figure.get_ranking_plot(self.result[id], identifier, self.args))

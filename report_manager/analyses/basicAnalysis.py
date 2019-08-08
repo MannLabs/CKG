@@ -334,7 +334,7 @@ def apply_pvalue_twostage_fdrcorrection(pvalues, alpha=0.05, method='bh'):
 
     return (rejected, padj)
 
-def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, permutations=50):
+def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, group, alpha=0.05, permutations=50):
     initial_seed = 176782
     #permutations=1
     i = permutations
@@ -345,11 +345,14 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=0.05, per
         df_index = shuffle(df_index, random_state=int(initial_seed + i))
         df_random = df.reset_index(drop=True)
         df_random.index = df_index
-        df_random.index.name = 'group'
+        df_random.index.name = group
         columns = ['identifier', 'F-statistics', 'pvalue_'+str(i)]
         if list(df_random.index) != list(df.index):
-            rand_scores = df_random.apply(func=calculate_anova, axis=0, result_type='expand').T
-            rand_scores.columns = columns
+            aov_results = []
+            for col in df_random.columns:
+                rows = df_random[col]
+                aov_results.append((col,)+calculate_anova(rows, group=group))
+            rand_scores = pd.DataFrame(aov_results, columns=columns)
             rand_scores = rand_scores.set_index("identifier")
             rand_scores = rand_scores.dropna(how="all")
             rand_scores = rand_scores['pvalue_'+str(i)]
@@ -557,10 +560,10 @@ def calculate_dabest(df, idx, x, y, paired=False, id_col=None, test='mean_diff')
     return result
 
 def calculate_anova(df, group='group'):
-    col = df.name
     group_values = df.groupby(group).apply(np.array).values
     t, pvalue = stats.f_oneway(*group_values)
-    return (col, t, pvalue)
+    
+    return (t, pvalue)
 
 def calculate_repeated_measures_anova(df, column, subject='subject', group='group', alpha=0.05):
     aov_result = pg.rm_anova(data=df, dv=column, within=group,subject=subject, detailed=True, correction=True)
@@ -619,8 +622,11 @@ def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject',
     else:
         df = df.set_index([group])
         df = df.drop(drop_cols, axis=1)
-        scores = df.apply(func = calculate_anova, axis=0, result_type='expand', group=group).T
-        scores.columns = columns
+        aov_results = []
+        for col in df.columns:
+            rows = df[col]
+            aov_results.append((col,) + calculate_anova(rows, group=group))
+        scores = pd.DataFrame(aov_results, columns = columns)
         scores = scores.set_index("identifier")
         scores = scores.dropna(how="all")
 
@@ -630,7 +636,7 @@ def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject',
             if max_perm < permutations:
                 permutations = max_perm
             observed_pvalues = scores.pvalue
-            count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=alpha, permutations=permutations)
+            count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, group=group, alpha=alpha, permutations=permutations)
             scores= scores.join(count)
             scores['correction'] = 'permutation FDR ({} perm)'.format(permutations)
         else:
@@ -675,7 +681,7 @@ def run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subjec
         if max_perm < permutations:
             permutations = max_perm
         observed_pvalues = scores.pvalue
-        count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=alpha, permutations=permutations)
+        count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, group=group, alpha=alpha, permutations=permutations)
         scores= scores.join(count)
         scores['correction'] = 'permutation FDR ({} perm)'.format(permutations)
     else:
@@ -723,7 +729,7 @@ def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], su
         if max_perm < permutations:
             permutations = max_perm
         observed_pvalues = scores.pvalue
-        count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, alpha=alpha, permutations=permutations)
+        count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, group=group, alpha=alpha, permutations=permutations)
         scores= scores.join(count)
         scores['correction'] = 'permutation FDR ({} perm)'.format(permutations)
     else:
@@ -1026,7 +1032,7 @@ def run_two_way_anova(data, variables, drop_cols=[], subject="subject", alpha=0.
     df[variables] = df['group'].str.split('+',expand=True)
     df = df.set_index([subject]+variables)
     df = df.drop(drop_cols, axis=1)
-             
+    return None
 #     models = []
 #     aov_result = []
 #     tmp = df.copy()

@@ -1,5 +1,6 @@
 import sys
 import os
+import time
 from collections import defaultdict
 from plotly.offline import iplot
 from IPython.display import IFrame, display
@@ -467,6 +468,7 @@ class Project:
         self.save_project_datasets_reports()
 
     def save_project_report(self):
+        start = time.time()
         directory = self.get_report_directory()
         for report_name in self.report:
             report = self.report[report_name]
@@ -476,14 +478,17 @@ class Project:
             report.save_report(dataset_dir)
         
         self.save_project_datasets_reports()
+        print('save report', time.time() - start)
 
     def save_project_datasets_reports(self):
+        start = time.time()
         directory = self.get_report_directory()
         for dataset_type in self.datasets:
             dataset = self.datasets[dataset_type]
             dataset_directory = os.path.join(directory, dataset_type)
             if isinstance(dataset, Dataset):
                 dataset.save_report(dataset_directory)
+        print('save dataset report', time.time() - start)
 
     def save_project_datasets_data(self):
         directory = self.get_report_directory()

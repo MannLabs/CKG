@@ -140,23 +140,6 @@ data exploration:
                 - subject
             name: name
             title: 'Differential regulation ANOVA'
-    regulation_model:
-        data: processed
-        analyses:
-            - 2-way anova
-        plots:
-            - basicTable
-        store_analysis: True
-        args:
-            alpha: 0.05
-            variables:
-                - factor A
-                - factor B
-            subject: subject
-            drop_cols:
-                - sample
-                - group
-            title: 'Differential regulation Two-way ANOVA'
     correlation:
         data: processed
         analyses:
