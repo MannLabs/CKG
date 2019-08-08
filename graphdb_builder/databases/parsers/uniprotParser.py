@@ -61,7 +61,7 @@ def parse_idmapping_file(databases_directory, config, import_directory, download
     mp.reset_mapping(entity="Protein")
     with open(mapping_file, 'w') as out:
         for line in uf:
-            if 'UniParc' in line:
+            if 'UniParc' in line.decode('utf-8'):
                 continue
             data = line.decode('utf-8').rstrip("\r\n").split("\t")
             iid = data[0]

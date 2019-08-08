@@ -66,11 +66,11 @@ def get_ranking_with_markers(data, drop_columns, group, columns, list_markers, a
 
 def extract_number_missing(df, missing_max, drop_cols=['sample'], group='group'):
     if group is None:
-        groups = data.loc[:, data.notnull().sum(axis = 1) >= missing_max]
+        groups = df.loc[:, df.notnull().sum(axis = 1) >= missing_max]
     else:
-        groups = data.copy()
+        groups = df.copy()
         groups = groups.drop(["sample"], axis = 1)
-        groups = data.set_index("group").notnull().groupby(level=0).sum(axis = 1)
+        groups = groups.set_index("group").notnull().groupby(level=0).sum(axis = 1)
         groups = groups[groups>=missing_max]
 
     groups = groups.dropna(how='all', axis=1)
