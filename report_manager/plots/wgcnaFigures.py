@@ -114,6 +114,7 @@ def get_heatmap(df, colorscale=None , color_missing=True):
         colors = [[0, 'rgb(255,255,255)'], [1, 'rgb(255,51,0)']]
 
     figure = go.Figure()
+    figure.layout.template = 'plotly_white'
     figure.add_trace(go.Heatmap(z=df.values.tolist(),
                                      y=list(df.index),
                                      x=list(df.columns),
@@ -164,6 +165,7 @@ def plot_labeled_heatmap(df, textmatrix, title, colorscale=[[0,'rgb(0,255,0)'],[
                        yaxis2=dict(autorange='reversed', showgrid=False, zeroline=False, showline=False, ticks='', showticklabels=True, automargin=True, anchor='x2'))
 
     figure['layout'] = layout
+    figure.layout.template = 'plotly_white'
     figure['layout'].update(annotations=annotations)
 
 
@@ -221,48 +223,60 @@ def plot_intramodular_correlation(MM, FS, feature_module_df, title, width=1000, 
 
     MM['modColor'] = MM.index.map(feature_module_df.set_index('name')['modColor'].get)
 
-    figure = tools.make_subplots(rows=len(FS.columns), cols=len(MM.columns), shared_xaxes=True, shared_yaxes=True, vertical_spacing = 0.01, horizontal_spacing = 0.01, print_grid=False)
-
+    figure = tools.make_subplots(rows=len(FS.columns), cols=len(MM.columns)-1, shared_xaxes=False, shared_yaxes=False, vertical_spacing = 0.015, horizontal_spacing = 0.1, print_grid=False)
+    
+    figure.layout.template = 'plotly_white'
     layout = go.Layout(width=width, height=height, showlegend=False, title=title)
     figure.layout.update(layout)
 
-    axis_dict = {}
+    axis_dict = {} 
     for i, j in enumerate(MM.columns[MM.columns.str.startswith('MM')]):
-        axis_dict['xaxis{}'.format(i+1)] = dict(title = j, titlefont = dict(size=13))
+        n_p = len(FS.columns) * (len(MM.columns)-1)-len(MM.columns[MM.columns.str.startswith('MM')])
+        axis_dict['xaxis{}'.format(n_p+i+1)] = dict(title = j, titlefont = dict(size=13))
+
+    n = 1
     for a, b in enumerate(FS.columns):
         name = b.split(' ')
         if len(name) > 1:
-            #label = [' '.join(name[i:i+2]) for i in range(0, len(name), 2)]
             label = ['<br>'.join(name[i:i+3]) for i in range(0, len(name), 3)][0]
-        else: label = name[0]
-        axis_dict['yaxis{}'.format(a+1)] = dict(title = label, titlefont = dict(size=13))
+        else:
+            label = name[0]
+        axis_dict['yaxis{}'.format(a+n)] = dict(title = label, titlefont = dict(size=13))
+        n += len(MM.columns[MM.columns.str.startswith('MM')])-1
+    
 
     annotation = []
+    x_axis = 1
+    y_axis = 1
     for a, b in enumerate(FS.columns):
         for i, j in enumerate(MM.columns[MM.columns.str.startswith('MM')]):
             name = MM[MM['modColor'] == j[2:]].index
             x = abs(MM[MM['modColor'] == j[2:]][j].values)
             y = abs(FS[FS.index.isin(name)][b].values)
+        
             slope, intercept, r_value, p_value, std_err = scp.stats.linregress(x, y)
             line = slope*x+intercept
 
-            figure.append_trace(go.Scattergl(x = x,
-                                           y = y,
-                                           text = name,
-                                           mode = 'markers',
-                                           opacity=0.7,
-                                           marker={'size': 7,
-                                                   'color': 'white',
-                                                   'line': {'width': 1.5, 'color': j[2:].lower().replace(' ', '')}}), a+1, i+1)
-
-            figure.append_trace(go.Scatter(x = x, y = line, mode = 'lines', marker={'color': 'black'}), a+1, i+1)
-
+            figure.append_trace(go.Scatter(x = x,
+                                            y = y,
+                                            text = name,
+                                            mode = 'markers',                                    
+                                            opacity=0.7,
+                                            marker={'size': 7,
+                                                       'color': 'white',
+                                                       'line': {'width': 1.5, 'color': j[2:]}}), a+1, i+1)
+        
+            figure.append_trace(go.Scatter(x = x, y = line, mode = 'lines', marker={'color': 'black'}), a+1, i+1)               
+        
             annot = dict(x = 0.7, y = 0.7,
-                         xref = 'x{}'.format(i+1), yref = 'y{}'.format(a+1),
-                         text = 'R={:0.2}, p={:.0e}'.format(r_value, p_value),
-                         showarrow = False)
+                        xref = 'x{}'.format(x_axis), yref = 'y{}'.format(y_axis),
+                        text = 'R={:0.2}, p={:.0e}'.format(r_value, p_value),
+                        showarrow = False)
             annotation.append(annot)
+            x_axis += 1
+            y_axis += 1
 
+    
     figure.layout.update(axis_dict)
     figure.layout.update(annotations = annotation)
 
@@ -312,6 +326,7 @@ def plot_complex_dendrogram(dendro_df, subplot_df, title, dendro_labels=[], dist
         moduleColors = get_module_color_annotation(dendro_labels, col_annotation=col_annotation, bygene=True, module_colors=subplot_df, dendrogram=dendrogram)
         figure.append_trace(moduleColors, 2, 1)
         figure['layout'] = layout
+        figure.layout.template = 'plotly_white'
         figure['layout'].update({'shapes':shapes,
                               'xaxis':dict(showticklabels=False),
                               'yaxis':dict(domain=[0.2, 1]),
@@ -341,6 +356,7 @@ def plot_complex_dendrogram(dendro_df, subplot_df, title, dendro_labels=[], dist
             figure.append_trace(c_annot, 3, 1)
             
             figure['layout'] = layout
+            figure.layout.template = 'plotly_white'
             figure['layout'].update({'xaxis':dict(ticks='', showticklabels=False, anchor='y'),
                                      'xaxis2':dict(domain=[0, 0.01], ticks='', showticklabels=False, automargin=True, anchor='y2'),
                                      'xaxis3':dict(domain=[0.015, 1], ticks='', showticklabels=False, automargin=True, anchor='y3'),
@@ -361,6 +377,7 @@ def plot_complex_dendrogram(dendro_df, subplot_df, title, dendro_labels=[], dist
                 figure.append_trace(j, 2, 1)
         
             figure['layout'] = layout
+            figure.layout.template = 'plotly_white'
             figure.layout.update({'xaxis':dict(ticktext=np.array(dendrogram.layout.xaxis.ticktext), tickvals=list(dendrogram.layout.xaxis.tickvals)),
                               'yaxis2':dict(autorange='reversed')})
         
@@ -376,6 +393,7 @@ def plot_complex_dendrogram(dendro_df, subplot_df, title, dendro_labels=[], dist
             figure.append_trace(r_annot, 2, 1)
 
             figure['layout'] = layout
+            figure.layout.template = 'plotly_white'
             figure['layout'].update({'xaxis':dict(domain=[0.015, 1], ticktext=np.array(dendrogram.layout.xaxis.ticktext), tickvals=list(dendrogram.layout.xaxis.tickvals), automargin=True, anchor='y'),
                                      'xaxis2':dict(domain=[0, 0.010], ticks='', showticklabels=False, automargin=True, anchor='y2'),
                                      'xaxis3':dict(domain=[0.015, 1], ticks='', showticklabels=False, automargin=True, anchor='y3'),
@@ -395,6 +413,7 @@ def plot_complex_dendrogram(dendro_df, subplot_df, title, dendro_labels=[], dist
             figure.append_trace(c_annot, 2, 1)
             
             figure['layout'] = layout
+            figure.layout.template = 'plotly_white'
             figure['layout'].update({'xaxis':dict(ticktext=np.array(dendrogram.layout.xaxis.ticktext), tickvals=list(dendrogram.layout.xaxis.tickvals), automargin=True, anchor='y'),
                                      'xaxis2':dict(ticks='', showticklabels=False, automargin=True, anchor='y2'),
                                      'xaxis3':dict(domain=[0, 1], ticks='', showticklabels=False, automargin=True, anchor='y3'),

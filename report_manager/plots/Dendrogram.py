@@ -11,7 +11,10 @@ def plot_dendrogram(Z_dendrogram, cutoff_line=True, value=15, orientation='botto
     if cutoff_line == True:
         dendrogram.layout.update(add_line(dendrogram, value))
 
-    return go.Figure(data=dendrogram.data, layout=dendrogram.layout)
+    figure = go.Figure(data=dendrogram.data, layout=dendrogram.layout)
+    figure.layout.template = 'plotly_white'
+
+    return figure
 
 def add_line(plotly_fig, value):
     plotly_fig.layout.update({'shapes':[{'type':'line',
