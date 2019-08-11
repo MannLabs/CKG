@@ -646,7 +646,7 @@ def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject',
             scores['rejected'] = rejected
         res = None
         for col in df.columns:
-            pairwise = calculate_THSD(df[col])
+            pairwise = calculate_THSD(df[col], group=group)
             if res is None:
                 res = pairwise
             else:
@@ -772,8 +772,8 @@ def run_regulation_enrichment(regulation_data, annotation, identifier='identifie
             grouping.append('background')
         else:
             grouping.append(np.nan)
-    annotation['group'] = grouping
-    annotation = annotation.dropna(subset=['group'])
+    annotation[group_col] = grouping
+    annotation = annotation.dropna(subset=[group_col])
 
     result = run_enrichment(annotation, foreground='foreground', background='background', foreground_pop=len(foreground_list), background_pop=len(background_list), annotation_col=annotation_col, group_col=group_col, identifier_col=identifier, method=method)
     
@@ -1025,10 +1025,10 @@ def get_publications_abstracts(data, publication_col="publication", join_by=['pu
     return abstracts
 
 
-def run_two_way_anova(data, variables, drop_cols=[], subject="subject", alpha=0.05):
+def run_two_way_anova(data, variables, drop_cols=[], subject="subject", group='group', alpha=0.05):
     df = data.copy()
     factor_A, factor_B = variables
-    df[variables] = df['group'].str.split('+',expand=True)
+    df[variables] = df[group].str.split('+',expand=True)
     df = df.set_index([subject]+variables)
     df = df.drop(drop_cols, axis=1)
     return None

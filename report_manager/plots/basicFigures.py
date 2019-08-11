@@ -157,6 +157,7 @@ def get_ranking_plot(data, identifier, args):
         r = 1
         c = 1
         range_y = [data['y'].min(), data['y'].max()+1]
+        i = 0
         for index in data.index.unique():
             gdata = data.loc[index, :].dropna().groupby('name', as_index=False).mean().sort_values(by='y', ascending=False)
             gdata = gdata.reset_index().reset_index()
@@ -166,12 +167,12 @@ def get_ranking_plot(data, identifier, args):
             gfig = get_simple_scatterplot(gdata, identifier+'_'+str(index), args)
             trace = gfig.figure['data'].pop()
             glayout = gfig.figure['layout']['annotations']
-
+        
             for l in glayout:
                 nlayout = dict(x = l.x,
                             y = l.y,
-                            xref = 'x'+str(c),
-                            yref = 'y'+str(r),
+                            xref = 'x'+str(i+1),
+                            yref = 'y'+str(i+1),
                             text = l.text,
                             showarrow = True,
                             ax = l.ax,
@@ -185,12 +186,13 @@ def get_ranking_plot(data, identifier, args):
                 layouts.append(nlayout)
             trace.name = index
             fig.append_trace(trace, r, c)
-            
+                        
             if c >= num_cols:
                 r += 1
                 c = 1
             else:
                 c += 1
+            i += 1
         fig['layout'].update(dict(height = args['height'], 
                                 width=args['width'],  
                                 title=args['title'], 
@@ -651,7 +653,7 @@ def get_complex_heatmapplot_old(data, identifier, args):
                                        })
 
 
-    return dcc.Graph(id=identifier, figure=figure)
+    return dcc.Graph(id=identifier, figure=figure,)
 
 def get_notebook_network_pyvis(graph, args={}):
     if 'width' not in args:
@@ -1026,7 +1028,7 @@ def get_parallel_plot(data, identifier, args):
             template='plotly_white'
         )
         
-        fig = go.Figure(data = fig_data, layout = layout)
+        fig = dict(data = fig_data, layout = layout)
     
     return dcc.Graph(id=identifier, figure=fig)
 
@@ -1261,7 +1263,7 @@ def get_wordcloud(data, identifier, args={'stopwords':[], 'max_words': 400, 'max
                           template='plotly_white'
                           )
 
-        figure = go.Figure(data=[trace], layout=layout)
+        figure = dict(data=[trace], layout=layout)
 
     return dcc.Graph(id = identifier, figure=figure)
 

@@ -37,10 +37,11 @@ templateDir = os.path.join(cwd, 'apps/templates')
 separator = '|'
 
 
-app.layout = html.Div([
-    dcc.Location(id='url', refresh=True),
+app.layout = dcc.Loading(
+    children=[html.Div([
+    dcc.Location(id='url', refresh=False),
     html.Div(id='page-content', style={'padding-top':50}),
-])
+])])
 
 
 @app.callback(Output('page-content', 'children'),

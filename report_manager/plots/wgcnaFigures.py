@@ -83,17 +83,19 @@ def get_module_color_annotation(map_list, col_annotation=False, row_annotation=F
         df = pd.DataFrame([map_list, y], index=['labels', 'y']).T
         df['vals'] = df['labels'].map(dict(vals))
 
-    if row_annotation == True and col_annotation == True:
+    if row_annotation and col_annotation:
         r_annot = go.Heatmap(z=df.vals, x=df.y, y=df.labels, showscale=False, colorscale=colors, xaxis='x', yaxis='y')
         c_annot = go.Heatmap(z=df.vals, x=df.labels, y=df.y, showscale=False, colorscale=colors, xaxis='x2', yaxis='y2')
         return r_annot, c_annot
-    elif row_annotation == True:
+    elif row_annotation:
         r_annot = go.Heatmap(z=df.vals, x=df.y, y=df.labels, showscale=False, colorscale=colors, xaxis='x2', yaxis='y2')
         return r_annot
-    elif col_annotation == True:
+    elif col_annotation:
         c_annot = go.Heatmap(z=df.vals, x=df.labels, y=df.y, showscale=False, colorscale=colors, xaxis='x2', yaxis='y2')
         return c_annot
-    else: pass
+    
+    return None
+        
 
 
 def get_heatmap(df, colorscale=None , color_missing=True):
@@ -113,17 +115,17 @@ def get_heatmap(df, colorscale=None , color_missing=True):
     else:
         colors = [[0, 'rgb(255,255,255)'], [1, 'rgb(255,51,0)']]
 
-    figure = go.Figure()
-    figure.layout.template = 'plotly_white'
-    figure.add_trace(go.Heatmap(z=df.values.tolist(),
+    figure = {'layout':{'template':None}, 'data':[]}
+    figure['layout']['template'] = 'plotly_white'
+    figure['data'].append(go.Heatmap(z=df.values.tolist(),
                                      y=list(df.index),
                                      x=list(df.columns),
                                      colorscale=colors,
                                      showscale=True,
                                      colorbar=dict(x=1, y=0, xanchor='left', yanchor='bottom', len=0.35, thickness=15)))
-    if color_missing == True:
+    if color_missing:
         df_missing = wgcnaAnalysis.get_miss_values_df(df)
-        figure.add_trace(go.Heatmap(z=df_missing.values.tolist(),
+        figure['data'].append(go.Heatmap(z=df_missing.values.tolist(),
                                       y=list(df.index),
                                       x=list(df.columns),
                                       colorscale=[[0, 'rgb(201,201,201)'], [1, 'rgb(201,201,201)']],
@@ -150,7 +152,7 @@ def plot_labeled_heatmap(df, textmatrix, title, colorscale=[[0,'rgb(0,255,0)'],[
         Plotly object figure.
     """
     figure = get_heatmap(df, colorscale=colorscale, color_missing=False)
-    figure.add_trace(get_module_color_annotation(list(df.index), row_annotation=row_annotation, col_annotation=col_annotation, bygene=False))
+    figure['data'].append(get_module_color_annotation(list(df.index), row_annotation=row_annotation, col_annotation=col_annotation, bygene=False))
 
     annotations = []
     for n, row in enumerate(textmatrix.values):
@@ -165,7 +167,7 @@ def plot_labeled_heatmap(df, textmatrix, title, colorscale=[[0,'rgb(0,255,0)'],[
                        yaxis2=dict(autorange='reversed', showgrid=False, zeroline=False, showline=False, ticks='', showticklabels=True, automargin=True, anchor='x2'))
 
     figure['layout'] = layout
-    figure.layout.template = 'plotly_white'
+    figure['layout']['template'] = 'plotly_white'
     figure['layout'].update(annotations=annotations)
 
 
@@ -257,7 +259,7 @@ def plot_intramodular_correlation(MM, FS, feature_module_df, title, width=1000, 
             slope, intercept, r_value, p_value, std_err = scp.stats.linregress(x, y)
             line = slope*x+intercept
 
-            figure.append_trace(go.Scatter(x = x,
+            figure.append_trace(go.Scattergl(x = x,
                                             y = y,
                                             text = name,
                                             mode = 'markers',                                    
@@ -266,7 +268,7 @@ def plot_intramodular_correlation(MM, FS, feature_module_df, title, width=1000, 
                                                        'color': 'white',
                                                        'line': {'width': 1.5, 'color': j[2:]}}), a+1, i+1)
         
-            figure.append_trace(go.Scatter(x = x, y = line, mode = 'lines', marker={'color': 'black'}), a+1, i+1)               
+            figure.append_trace(go.Scattergl(x = x, y = line, mode = 'lines', marker={'color': 'black'}), a+1, i+1)               
         
             annot = dict(x = 0.7, y = 0.7,
                         xref = 'x{}'.format(x_axis), yref = 'y{}'.format(y_axis),
@@ -348,7 +350,7 @@ def plot_complex_dendrogram(dendro_df, subplot_df, title, dendro_labels=[], dist
                                                               [{'colspan':2}, None]], print_grid=False)
             for i in list(dendrogram.data):
                 figure.append_trace(i, 1, 1)
-            for j in list(heatmap.data):
+            for j in list(heatmap['data']):
                 figure.append_trace(j, 2, 2)
             
             r_annot, c_annot = get_module_color_annotation(list(df.index), row_annotation=row_annotation, col_annotation=col_annotation, bygene=False)
@@ -373,7 +375,7 @@ def plot_complex_dendrogram(dendro_df, subplot_df, title, dendro_labels=[], dist
         
             for i in list(dendrogram.data):
                 figure.append_trace(i, 1, 1)
-            for j in list(heatmap.data):
+            for j in list(heatmap['data']):
                 figure.append_trace(j, 2, 1)
         
             figure['layout'] = layout
@@ -386,7 +388,7 @@ def plot_complex_dendrogram(dendro_df, subplot_df, title, dendro_labels=[], dist
                                                               [{}, {}]], print_grid=False)          
             for i in list(dendrogram.data):
                 figure.append_trace(i, 1, 1)
-            for j in list(heatmap.data):
+            for j in list(heatmap['data']):
                 figure.append_trace(j, 2, 2)
             
             r_annot = get_module_color_annotation(list(df.index), row_annotation=row_annotation, col_annotation=col_annotation, bygene=False)
@@ -406,7 +408,7 @@ def plot_complex_dendrogram(dendro_df, subplot_df, title, dendro_labels=[], dist
             
             for i in list(dendrogram.data):
                 figure.append_trace(i, 1, 1)
-            for j in list(heatmap.data):
+            for j in list(heatmap['data']):
                 figure.append_trace(j, 3, 1)
             
             c_annot = get_module_color_annotation(list(df.index), row_annotation=row_annotation, col_annotation=col_annotation, bygene=False)

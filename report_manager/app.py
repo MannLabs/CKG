@@ -8,6 +8,7 @@ import dash_cytoscape as cyto
 server = flask.Flask('app')
 server.secret_key = os.environ.get('secret_key', 'secret')
 
+
 app = dash.Dash('auth', server=server)
 
 # Keep this out of source code repository - save in a file or a database
@@ -27,7 +28,7 @@ with open("app_template.html", 'r') as f:
 
 
 app.index_string = template
-
+app.scripts.config.serve_locally = True
 app.config.suppress_callback_exceptions = True
 # Dash CSS
 external_css = ["https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css",
