@@ -26,7 +26,10 @@ from nltk.corpus import stopwords
 import nltk
 nltk.download('stopwords')
 
+from report_manager.analyses import wgcnaAnalysis
+from report_manager.plots import basicFigures
 from report_manager.plots import wgcnaFigures
+from report_manager.plots import Dendrogram
 import dash_cytoscape as cyto
 
 def getPlotTraces(data, key='full', type = 'lines', div_factor=float(10^10000), horizontal=False):
@@ -1066,9 +1069,42 @@ def get_WGCNAPlots(data, identifier):
         plots.append(wgcnaFigures.plot_intramodular_correlation(MM, FS, Features_per_Module, title='Intramodular analysis: Feature Significance vs. Module Membership', width=1000, height=2000))
 
         #input: METDiss, METcor
-        plots.append(wgcnaFigures.plot_complex_dendrogram(METDiss, METcor, title='Eigengene network and clinical data associations', dendro_labels=METDiss.index, distfun=None, linkagefun='average', hang=0.9,
-                                 subplot='heatmap', subplot_colorscale=[[0,'#67a9cf'],[0.5,'#f7f7f7'],[1,'#ef8a62']],
-                                 color_missingvals=False, row_annotation=True, col_annotation=True, width=1000, height=800))
+        # plots.append(wgcnaFigures.plot_complex_dendrogram(METDiss, METcor, title='Eigengene network and clinical data associations', dendro_labels=METDiss.index, distfun=None, linkagefun='average', hang=0.9,
+        #                          subplot='heatmap', subplot_colorscale=[[0,'#67a9cf'],[0.5,'#f7f7f7'],[1,'#ef8a62']],
+        #                          color_missingvals=False, row_annotation=True, col_annotation=True, width=1000, height=800))
+
+        dendro_tree = wgcnaAnalysis.get_dendrogram(METDiss, METDiss.index, distfun=None, linkagefun='average', div_clusters=False)
+        dendrogram = Dendrogram.plot_dendrogram(dendro_tree, hang=0.9, cutoff_line=False)
+
+        layout = go.Layout(width=900, height=900, showlegend=False, title='',
+                            xaxis=dict(domain=[0, 1], range=[np.min(dendrogram['layout']['xaxis']['tickvals'])-6,np.max(dendrogram['layout']['xaxis']['tickvals'])+4], showgrid=False,
+                                        zeroline=True, ticks='', automargin=True, anchor='y'),
+                            yaxis=dict(domain=[0.7, 1], autorange=True, showgrid=False, zeroline=False, ticks='outside', title='Height', automargin=True, anchor='x'),
+                            xaxis2=dict(domain=[0, 1], autorange=True, showgrid=True, zeroline=False, ticks='', showticklabels=False, automargin=True, anchor='y2'),
+                            yaxis2=dict(domain=[0, 0.64], autorange=True, showgrid=False, zeroline=False, automargin=True, anchor='x2'))
+
+        if all(list(METcor.columns.map(lambda x: METcor[x].between(-1,1, inclusive=True).all()))) != True:
+            df = wgcnaAnalysis.get_percentiles_heatmap(METcor, dendro_tree, bydendro=True, bycols=False).T
+        else:
+            df = wgcnaAnalysis.df_sort_by_dendrogram(wgcnaAnalysis.df_sort_by_dendrogram(METcor, dendro_tree).T, dendro_tree)
+
+        heatmap = wgcnaFigures.get_heatmap(df, colorscale=[[0,'#67a9cf'],[0.5,'#f7f7f7'],[1,'#ef8a62']], color_missing=False)
+
+        figure = tools.make_subplots(rows=2, cols=1, print_grid=False)
+
+        for i in list(dendrogram['data']):
+            figure.append_trace(i, 1, 1)
+        for j in list(heatmap['data']):
+            figure.append_trace(j, 2, 1)
+
+        figure['layout'] = layout
+        figure['layout']['template'] = 'plotly_white'
+        figure['layout'].update({'xaxis':dict(domain=[0, 1], ticks='', showticklabels=False, anchor='y'),
+                                 'xaxis2':dict(domain=[0, 1], ticks='', showticklabels=True, anchor='y2'),
+                                 'yaxis':dict(domain=[0.635, 1], anchor='x'),
+                                 'yaxis2':dict(domain=[0., 0.635], ticks='', showticklabels=True, anchor='x2')})
+
+        plots.append(figure)
 
         graphs = []
         for i, j in enumerate(plots):
