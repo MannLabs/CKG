@@ -51,7 +51,7 @@ overlap:
         WITH {item:id(project), name:project.id, categories: collect(DISTINCT id(protein))} as projectData
         WITH collect(projectData) as data
         WITH data, [value in data WHERE value.name IN ["PROJECTID"] | value.item ] AS sourceIds, [value in data WHERE NOT value.name IN ["PROJECTID"] | value.item ] AS targetIds
-        CALL algo.similarity.overlap.stream(data, {sourceIds:sourceIds, targetIds: targetIds})
+        CALL algo.similarity.jaccard.stream(data, {sourceIds:sourceIds, targetIds: targetIds, similarityCutoff:0.2})
         YIELD item1, item2, count1, count2, intersection, similarity
         RETURN algo.getNodeById(item1).name AS project1_name, algo.getNodeById(item2).name AS project2_name, 
         algo.getNodeById(item1).id AS from, algo.getNodeById(item2).id AS to, count1 AS project1_total, count2 AS project2_total, count1-intersection AS project1_unique, 

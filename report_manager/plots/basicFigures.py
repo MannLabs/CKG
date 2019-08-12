@@ -909,14 +909,14 @@ def get_table(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = 
                                                 'minWidth': '50px', 'maxWidth': '500px', 
                                                 'textAlign': 'left', 'padding': '1px', 'vertical-align': 'top'
                                             },
-                                            style_table={
-                                                "height": "fit-content", 
-                                                "max-height": "500px",
-                                                "width": "fit-content",
-                                                "max-width": "1500px",
-                                                'overflowY': 'scroll',
-                                                'overflowX': 'scroll'
-                                            },
+                                            #style_table={
+                                            #    "height": "fit-content", 
+                                            #    "max-height": "500px",
+                                            #    "width": "fit-content",
+                                            #    "max-width": "1500px",
+                                            #    'overflowY': 'scroll',
+                                            #    'overflowX': 'scroll'
+                                            #},
                                             style_header={
                                                 'backgroundColor': '#2b8cbe',
                                                 'fontWeight': 'bold',
