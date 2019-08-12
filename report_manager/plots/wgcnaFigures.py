@@ -55,7 +55,7 @@ def get_module_color_annotation(map_list, col_annotation=False, row_annotation=F
             vals.append((i, round(n,4)))
             number = n+val
 
-        labels = list(dendrogram.layout.xaxis.ticktext)
+        labels = list(dendrogram['layout']['xaxis']['ticktext'])
         y = [1]*len(labels)
 
         df = pd.DataFrame([labels, y], index=['labels', 'y']).T
@@ -185,7 +185,7 @@ def plot_dendrogram_guidelines(Z_tree, dendrogram):
     Returns:
         List of dictionaries.
     """    
-    tickvals = list(dendrogram.layout.xaxis.tickvals)
+    tickvals = list(dendrogram['layout']['xaxis']['tickvals'])
     maximum = len(tickvals)
     step = int(maximum/8)
     minimum = int(0+step)
@@ -311,7 +311,7 @@ def plot_complex_dendrogram(dendro_df, subplot_df, title, dendro_labels=[], dist
     dendrogram = Dendrogram.plot_dendrogram(dendro_tree, hang=hang, cutoff_line=False)
 
     layout = go.Layout(width=width, height=height, showlegend=False, title=title,
-                       xaxis=dict(domain=[0, 1], range=[np.min(dendrogram.layout.xaxis.tickvals)-6,np.max(dendrogram.layout.xaxis.tickvals)+4], showgrid=False,
+                       xaxis=dict(domain=[0, 1], range=[np.min(dendrogram['layout']['xaxis']['tickvals'])-6,np.max(dendrogram['layout']['xaxis']['tickvals'])+4], showgrid=False,
                                   zeroline=True, ticks='', automargin=True, anchor='y'),
                        yaxis=dict(domain=[0.7, 1], autorange=True, showgrid=False, zeroline=False, ticks='outside', title='Height', automargin=True, anchor='x'),
                        xaxis2=dict(domain=[0, 1], autorange=True, showgrid=True, zeroline=False, ticks='', showticklabels=False, automargin=True, anchor='y2'),
@@ -321,7 +321,7 @@ def plot_complex_dendrogram(dendro_df, subplot_df, title, dendro_labels=[], dist
     if subplot == 'module colors':
         figure = tools.make_subplots(rows=2, cols=1, print_grid=False)
     
-        for i in list(dendrogram.data):
+        for i in list(dendrogram['data']):
             figure.append_trace(i, 1, 1)
         
         shapes = plot_dendrogram_guidelines(dendro_tree, dendrogram)
@@ -348,7 +348,7 @@ def plot_complex_dendrogram(dendro_df, subplot_df, title, dendro_labels=[], dist
             figure = tools.make_subplots(rows=3, cols=2, specs=[[{'colspan':2}, None],
                                                               [{}, {}],
                                                               [{'colspan':2}, None]], print_grid=False)
-            for i in list(dendrogram.data):
+            for i in list(dendrogram['data']):
                 figure.append_trace(i, 1, 1)
             for j in list(heatmap['data']):
                 figure.append_trace(j, 2, 2)
@@ -373,20 +373,20 @@ def plot_complex_dendrogram(dendro_df, subplot_df, title, dendro_labels=[], dist
         elif row_annotation == False and col_annotation == False:
             figure = tools.make_subplots(rows=2, cols=1, print_grid=False)
         
-            for i in list(dendrogram.data):
+            for i in list(dendrogram['data']):
                 figure.append_trace(i, 1, 1)
             for j in list(heatmap['data']):
                 figure.append_trace(j, 2, 1)
         
             figure['layout'] = layout
             figure.layout.template = 'plotly_white'
-            figure.layout.update({'xaxis':dict(ticktext=np.array(dendrogram.layout.xaxis.ticktext), tickvals=list(dendrogram.layout.xaxis.tickvals)),
+            figure.layout.update({'xaxis':dict(ticktext=np.array(dendrogram['layout']['xaxis']['ticktext']), tickvals=list(dendrogram['layout']['xaxis']['tickvals'])),
                               'yaxis2':dict(autorange='reversed')})
         
         elif row_annotation == True:# and (col_annotation == False):
             figure = tools.make_subplots(rows=2, cols=2, specs=[[{'colspan':2}, None],
                                                               [{}, {}]], print_grid=False)          
-            for i in list(dendrogram.data):
+            for i in list(dendrogram['data']):
                 figure.append_trace(i, 1, 1)
             for j in list(heatmap['data']):
                 figure.append_trace(j, 2, 2)
@@ -396,7 +396,7 @@ def plot_complex_dendrogram(dendro_df, subplot_df, title, dendro_labels=[], dist
 
             figure['layout'] = layout
             figure.layout.template = 'plotly_white'
-            figure['layout'].update({'xaxis':dict(domain=[0.015, 1], ticktext=np.array(dendrogram.layout.xaxis.ticktext), tickvals=list(dendrogram.layout.xaxis.tickvals), automargin=True, anchor='y'),
+            figure['layout'].update({'xaxis':dict(domain=[0.015, 1], ticktext=np.array(dendrogram['layout']['xaxis']['ticktext']), tickvals=list(dendrogram['layout']['xaxis']['tickvals']), automargin=True, anchor='y'),
                                      'xaxis2':dict(domain=[0, 0.010], ticks='', showticklabels=False, automargin=True, anchor='y2'),
                                      'xaxis3':dict(domain=[0.015, 1], ticks='', showticklabels=False, automargin=True, anchor='y3'),
                                      'yaxis':dict(automargin=True, anchor='x'),
@@ -406,7 +406,7 @@ def plot_complex_dendrogram(dendro_df, subplot_df, title, dendro_labels=[], dist
         elif col_annotation == True:
             figure = tools.make_subplots(rows=3, cols=1, specs=[[{}], [{}], [{}]], print_grid=False)
             
-            for i in list(dendrogram.data):
+            for i in list(dendrogram['data']):
                 figure.append_trace(i, 1, 1)
             for j in list(heatmap['data']):
                 figure.append_trace(j, 3, 1)
@@ -416,7 +416,7 @@ def plot_complex_dendrogram(dendro_df, subplot_df, title, dendro_labels=[], dist
             
             figure['layout'] = layout
             figure.layout.template = 'plotly_white'
-            figure['layout'].update({'xaxis':dict(ticktext=np.array(dendrogram.layout.xaxis.ticktext), tickvals=list(dendrogram.layout.xaxis.tickvals), automargin=True, anchor='y'),
+            figure['layout'].update({'xaxis':dict(ticktext=np.array(dendrogram['layout']['xaxis']['ticktext']), tickvals=list(dendrogram['layout']['xaxis']['tickvals']), automargin=True, anchor='y'),
                                      'xaxis2':dict(ticks='', showticklabels=False, automargin=True, anchor='y2'),
                                      'xaxis3':dict(domain=[0, 1], ticks='', showticklabels=False, automargin=True, anchor='y3'),
                                      'yaxis':dict(domain=[0.70, 1], automargin=True, anchor='x'),

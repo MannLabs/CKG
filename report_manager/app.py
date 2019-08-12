@@ -9,7 +9,7 @@ server = flask.Flask('app')
 server.secret_key = os.environ.get('secret_key', 'secret')
 
 
-app = dash.Dash('auth', server=server)
+app = dash.Dash('auth', server=server, meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}])
 
 # Keep this out of source code repository - save in a file or a database
 VALID_USERNAME_PASSWORD_PAIRS = [
@@ -32,6 +32,7 @@ app.scripts.config.serve_locally = True
 app.config.suppress_callback_exceptions = True
 # Dash CSS
 external_css = ["https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css",
+                "https://codepen.io/chriddyp/pen/bWLwgP.css",
                 "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"]
 
 for css in external_css:

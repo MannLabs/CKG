@@ -912,8 +912,8 @@ def get_table(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = 
                                             style_table={
                                                 "height": "fit-content", 
                                                 "max-height": "500px",
-                                                "width": "1200px",
-                                                "max-width": "2000px",
+                                                "width": "fit-content",
+                                                "max-width": "1500px",
                                                 'overflowY': 'scroll',
                                                 'overflowX': 'scroll'
                                             },
@@ -1095,7 +1095,7 @@ def getMapperFigure(data, identifier, title, labels):
     figure = plotlyviz.plotlyviz(data, title=title, colorscale=pl_brewer, color_function_name="Group",factor_size=7, edge_linewidth=2.5,
                         node_linecolor="rgb(200,200,200)", width=1200, height=1200, bgcolor="rgba(240, 240, 240, 0.95)",
                         left=50, bottom=50, summary_height=300, summary_width=400, summary_left=20, summary_right=20,
-                        hist_left=25, hist_right=25, member_textbox_width=800, custom_tooltips=labels)
+                        hist_left=25, hist_right=25, member_textbox_width=800)
     return  dcc.Graph(id = identifier, figure=figure)
 
 def get_2_venn_diagram(data, identifier, cond1, cond2, args):
@@ -1106,7 +1106,7 @@ def get_2_venn_diagram(data, identifier, cond1, cond2, args):
     unique2 = len(set(data[cond2].dropna().index).difference(data[cond1].dropna().index))#/total
     intersection = len(set(data[cond1].dropna().index).intersection(data[cond2].dropna().index))#/total
 
-    return plot_2_venn_diagram(unique1, unique2, intersection, identifier, args)
+    return plot_2_venn_diagram(cond1, cond2, unique1, unique2, intersection, identifier, args)
 
 def plot_2_venn_diagram(cond1, cond2, unique1, unique2, intersection, identifier, args):
     figure = {}

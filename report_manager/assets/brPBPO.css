@@ -1,3 +1,16 @@
+#project ._dash-loading-callback {
+  margin-top: -60px;
+  margin-bottom: -60px;
+  text-align:center;
+  display: inline-block;
+  position: fixed;
+  top: 50%;
+  left: 45%;
+  opacity: 100;
+  content:"Loading...";
+ }
+
+
 @keyframes fadein {
     from { opacity: 0; }
     to   { opacity: 1; }

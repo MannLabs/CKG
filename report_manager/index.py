@@ -41,8 +41,13 @@ app.layout = dcc.Loading(
     children=[html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content', style={'padding-top':50}),
-])])
+])], style={'text-align':'center','width':'25px', 'height':'25px','margin-top':'-60px','margin-bottom':'-60px','position':'absolute','top':'50%','left':'45%'}, type='cube')
 
+@app.callback(Output('project-tabs-content', 'children'),
+              [Input('project-tabs', 'value'), Input('project-tabs', 'content')])
+def render_content(tab, content):
+    print(tab)
+    return content
 
 @app.callback(Output('page-content', 'children'),
               [Input('url', 'pathname')])

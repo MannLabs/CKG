@@ -11,8 +11,8 @@ def plot_dendrogram(Z_dendrogram, cutoff_line=True, value=15, orientation='botto
     if cutoff_line == True:
         dendrogram.layout.update(add_line(dendrogram, value))
 
-    figure = go.Figure(data=dendrogram.data, layout=dendrogram.layout)
-    figure.layout.template = 'plotly_white'
+    figure = dict(data=dendrogram.data, layout=dendrogram.layout)
+    figure['layout']['template'] = 'plotly_white'
 
     return figure
 
@@ -208,7 +208,7 @@ class Dendrogram(object):
                 y_coord.append(y)
 
             trace = dict(
-                type='scatter',
+                type='scattergl',
                 x=np.multiply(self.sign[self.xaxis], x_coord),
                 y=np.multiply(self.sign[self.yaxis], y_coord),
                 mode='lines',
