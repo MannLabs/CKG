@@ -124,29 +124,6 @@ data exploration:
             height: 700
             loadings: 15
             title: 'Sample stratification'
-    regulation:
-        data: processed
-        analyses:
-            - anova
-        plots:
-            - basicTable
-            - volcanoplot
-        store_analysis: True
-        args:
-            alpha: 0.05
-            fc: 2.0
-            group: 'group'
-            subject: subject
-            colorscale: 'Blues'
-            showscale: False
-            marker_size: 10
-            x_title: logFC
-            y_title: -log(pvalue)
-            drop_cols:
-                - sample
-                - subject
-            name: name
-            title: 'Differential regulation ANOVA'
     interaction_network:
         data: regulated
         analyses: []

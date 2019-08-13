@@ -38,7 +38,7 @@ data exploration:
             - network
         store_analysis: True
         args:
-            on: 
+            on_cols: 
                 - subject
                 - group
             source: node1

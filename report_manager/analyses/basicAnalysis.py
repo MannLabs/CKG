@@ -392,7 +392,7 @@ def run_correlation(df, alpha=0.05, subject='subject', group='group', method='pe
         if len(df[subject].unique()) > 2:
             correlation = run_rm_correlation(df, alpha=alpha, subject=subject, correction=correction)
     else:
-        df = df.dropna()._get_numeric_data()
+        df = df.dropna(axis=1)._get_numeric_data()
         if not df.empty:
             r, p = run_efficient_correlation(df, method=method)
             rdf = pd.DataFrame(r, index=df.columns, columns=df.columns)
@@ -413,15 +413,11 @@ def run_correlation(df, alpha=0.05, subject='subject', group='group', method='pe
 def run_multi_correlation(df, alpha=0.05, subject='subject', on=['subject', 'biological_sample'] , group='group', method='pearson', correction=('fdr', 'indep')):
     multidf = pd.DataFrame()
     for dtype in df:
-        print(dtype)
         if multidf.empty:
             multidf = df[dtype]
-            print(multidf.head())
         else:
-            print(dtype, df[dtype].head())
             multidf = pd.merge(multidf, df[dtype], how='inner', on=on)
-            print(multidf.head())
-            
+    
     correlation = run_correlation(multidf, alpha=0.05, subject=subject, group=group, method=method, correction=correction)
     
     return correlation
@@ -601,8 +597,8 @@ def check_is_paired(df, subject, group):
     is_pair = False
     if subject is not None:
         count_subject_groups = df.groupby(subject)[group].count()
-        is_pair = (count_subject_groups > 1).all()
-
+        is_pair = (count_subject_groups > 1).any()
+        
     return is_pair
 
 
