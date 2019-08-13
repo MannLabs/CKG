@@ -41,7 +41,8 @@ class ProjectApp(basicApp.BasicApp):
                             ])
         self.add_to_layout(button)
         for data_type in plots:
-            tab = dcc.Tab(label=data_type, children=[html.Div(plots[data_type])])
-            tabs.append(tab)
+            if len(plots[data_type]) >=1:
+                tab = dcc.Tab(label=data_type, children=[html.Div(plots[data_type])])
+                tabs.append(tab)
         lc = dcc.Tabs(id="tabs", children=tabs)
         self.add_to_layout(lc)

@@ -195,10 +195,8 @@ class AnalysisResult:
             alpha = 0.05
             method = 'pearson'
             correction = ('fdr', 'indep')
-            cutoff = 0.5
             subject='subject'
             group='group'
-            color_weight = False
             if 'group' in self.args:
                 group = self.args['group']
             if 'subject' in self.args:
@@ -209,8 +207,6 @@ class AnalysisResult:
                 method = self.args["method"]
             if "correction" in self.args:
                 correction = self.args["correction"]
-            if "cutoff" in self.args:
-                cutoff = self.args['cutoff']
             self.result[self.analysis_type] = analyses.run_correlation(self.data, alpha=alpha, subject=subject, group=group, method=method, correction=correction)
             print('Correlation', time.time() - start)
         elif self.analysis_type  == "repeated_measurements_correlation":
@@ -321,6 +317,29 @@ class AnalysisResult:
                                                             minModuleSize=minModuleSize, deepSplit=deepSplit, pamRespectsDendro=pamRespectsDendro, merge_modules=merge_modules,
                                                             MEDissThres=MEDissThres, verbose=verbose)
             print('WGCNA', time.time() - start)
+        elif self.analysis_type == 'multi_correlation':
+            start = time.time()
+            alpha = 0.05
+            method = 'pearson'
+            correction = ('fdr', 'indep')
+            subject='subject'
+            group='group'
+            on=['subject', 'group']
+            if 'on' in self.args:
+                on = self.args['on']
+            if 'group' in self.args:
+                group = self.args['group']
+            if 'subject' in self.args:
+                subject= self.args['subject']
+            if "alpha" in self.args:
+                alpha = self.args["args"]
+            if "method" in self.args:
+                method = self.args["method"]
+            if "correction" in self.args:
+                correction = self.args["correction"]
+            self.result[self.analysis_type] = analyses.run_multi_correlation(self.data, alpha=alpha, subject=subject, group=group, on=on, method=method, correction=correction)
+            print('multi-correlation', time.time() - start)
+            
 
     def get_plot(self, name, identifier):
         plot = []

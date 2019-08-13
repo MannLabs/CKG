@@ -2,7 +2,6 @@ data exploration:
     wgcna:
         data:
             proteomics: processed
-            longitudinal_proteomics: processed
             rnaseq: processed
             clinical: processed
         analyses:
@@ -29,3 +28,33 @@ data exploration:
             merge_modules: True
             MEDissThres: 0.25
             verbose: 0
+    clinical_correlation:
+        data: 
+            longitudinal_proteomics: processed
+            clinical: processed
+        analyses:
+            - multi_correlation
+        plots:
+            - network
+        store_analysis: True
+        args:
+            on: 
+                - subject
+                - group
+            source: node1
+            target: node2
+            title: 'Clinical-Proteomics correlation network'
+            format: edgelist
+            values: weight
+            dist: False
+            node_properties: {}
+            maxLinkWidth: 6
+            maxRadius: 20
+            node_size: 'degree'
+            cutoff: 0.5
+            subject: subject
+            cutoff_abs: True
+            color_weight: True
+            communities_algorithm: louvain
+            width: 1600
+            height: 1600

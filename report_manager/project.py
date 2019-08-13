@@ -323,7 +323,6 @@ class Project:
                     self.update_dataset({data_type:dataset})
             
             if len(self.datasets) > 1:
-                print(self.datasets)            
                 dataset = MultiOmicsDataset(self.identifier, data=self.datasets, analyses={}, report=None)
                 self.update_dataset({'multiomics':dataset})
                 self.append_data_type('multiomics')

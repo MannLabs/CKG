@@ -194,120 +194,128 @@ class Dataset:
         
         return data_name, analysis_types, plot_types, store_analysis, args
 
-    def add_configuration_to_report(self):
+    def add_configuration_to_report(self, report_traces):
         nodes = []
         edges = []
         args = {}
-        root = self.dataset_type.title() + " default analysis pipeline"
-        nodes.append({'data':{'id':0, 'label':root}, 'classes': 'root'})
-        i = 0
-        for section in self.configuration:
-            if section == "args":
-                continue
-            nodes.append({'data':{'id':i+1, 'label':section.title()}, 'classes': 'section'})
-            edges.append({'data':{'source':0, 'target':i+1}})
-            i += 1
-            k = i
-            for subsection in self.configuration[section]:
-                nodes.append({'data':{'id':i+1, 'label':subsection.title()}, 'classes': 'subsection'})
-                edges.append({'data':{'source':k, 'target':i+1}})
+        if len(report_traces) >=1:
+            root = self.dataset_type.title() + " default analysis pipeline"
+            nodes.append({'data':{'id':0, 'label':root}, 'classes': 'root'})
+            i = 0
+            for section in report_traces:
+                if section == "args":
+                    continue
+                nodes.append({'data':{'id':i+1, 'label':section.title()}, 'classes': 'section'})
+                edges.append({'data':{'source':0, 'target':i+1}})
                 i += 1
-                j = i
-                data_names, analysis_types, plot_types, store_analysis, arguments = self.extract_configuration(self.configuration[section][subsection])
-                if isinstance(data_names, dict):
-                    for d in data_names:
-                        nodes.append({'data':{'id':i+1, 'label':d+':'+data_names[d]}, 'classes': 'data'})
+                k = i
+                for subsection in report_traces[section]:
+                    nodes.append({'data':{'id':i+1, 'label':subsection.title()}, 'classes': 'subsection'})
+                    edges.append({'data':{'source':k, 'target':i+1}})
+                    i += 1
+                    j = i
+                    conf = report_traces[section][subsection]
+                    data_names = conf['data']
+                    analysis_types = conf['analyses']
+                    arguments = conf['args']
+                    if isinstance(data_names, dict):
+                        for d in data_names:
+                            nodes.append({'data':{'id':i+1, 'label':d+':'+data_names[d]}, 'classes': 'data'})
+                            edges.append({'data':{'source':j, 'target':i+1}})
+                            i += 1
+                    else:
+                        nodes.append({'data':{'id':i+1, 'label':data_names}, 'classes': 'data'})
                         edges.append({'data':{'source':j, 'target':i+1}})
                         i += 1
-                else:
-                    nodes.append({'data':{'id':i+1, 'label':data_names}, 'classes': 'data'})
-                    edges.append({'data':{'source':j, 'target':i+1}})
-                    i += 1
-                for at in analysis_types:
-                    nodes.append({'data':{'id':i+1, 'label':at},'classes': 'analysis'})
-                    edges.append({'data':{'source':j, 'target':i+1}})
-                    i += 1
-                    f = i
-                if len(analysis_types):
-                    for a in arguments:
-                        nodes.append({'data':{'id':i+1, 'label':a+':'+str(arguments[a])},'classes': 'argument'})
-                        edges.append({'data':{'source':f, 'target':i+1}})
+                    for at in analysis_types:
+                        nodes.append({'data':{'id':i+1, 'label':at},'classes': 'analysis'})
+                        edges.append({'data':{'source':j, 'target':i+1}})
                         i += 1
-        config_stylesheet = [
-                        # Group selectors
-                        {
-                            'selector': 'node',
-                            'style': {
-                                'content': 'data(label)'
+                        f = i
+                    if len(analysis_types):
+                        for a in arguments:
+                            nodes.append({'data':{'id':i+1, 'label':a+':'+str(arguments[a])},'classes': 'argument'})
+                            edges.append({'data':{'source':f, 'target':i+1}})
+                            i += 1
+            config_stylesheet = [
+                            # Group selectors
+                            {
+                                'selector': 'node',
+                                'style': {
+                                    'content': 'data(label)'
+                                    }
+                            },
+                            # Class selectors
+                            {
+                                'selector': '.root',
+                                'style': {
+                                    'background-color': '#66c2a5',
+                                    'line-color': 'black',
+                                    'font-size': '14'
                                 }
-                        },
-                        # Class selectors
-                        {
-                            'selector': '.root',
-                            'style': {
-                                'background-color': '#66c2a5',
-                                'line-color': 'black',
-                                'font-size': '14'
-                            }
-                        },
-                        {
-                            'selector': '.section',
-                            'style': {
-                                'background-color': '#a6cee3',
-                                'line-color': 'black',
-                                'font-size': '12'
-                            }
-                        },
-                        {
-                            'selector': '.subsection',
-                            'style': {
-                                'background-color': '#1f78b4',
-                                'line-color': 'black',
-                                'font-size': '12'
-                            }
-                        },
-                        {
-                            'selector': '.data',
-                            'style': {
-                                'background-color': '#b2df8a',
-                                'line-color': 'black',
-                                'font-size': '12'
-                            }
-                        },
-                        {
-                            'selector': '.analysis',
-                            'style': {
-                                'background-color': '#33a02c',
-                                'line-color': 'black',
-                                'font-size': '12'
-                            }
-                        },
-                        {
-                            'selector': '.argument',
-                            'style': {
-                                'background-color': '#fb9a99',
-                                'line-color': 'black',
-                                'font-size': '12'
-                            }
-                        },
-                    ]
-        net = []
-        net.extend(nodes)
-        net.extend(edges)
-        arguments['stylesheet'] = config_stylesheet
-        arguments['title'] = 'Analysis Pipeline'
-        arguments['layout'] = {'name': 'breadthfirst', 'roots': '#0'}
-        conf_plot = basicFigures.get_cytoscape_network(net, self.dataset_type, arguments)
-        self.report.update_plots({(self.dataset_type+'_pipeline','cytoscape_network'):[conf_plot]})
+                            },
+                            {
+                                'selector': '.section',
+                                'style': {
+                                    'background-color': '#a6cee3',
+                                    'line-color': 'black',
+                                    'font-size': '12'
+                                }
+                            },
+                            {
+                                'selector': '.subsection',
+                                'style': {
+                                    'background-color': '#1f78b4',
+                                    'line-color': 'black',
+                                    'font-size': '12'
+                                }
+                            },
+                            {
+                                'selector': '.data',
+                                'style': {
+                                    'background-color': '#b2df8a',
+                                    'line-color': 'black',
+                                    'font-size': '12'
+                                }
+                            },
+                            {
+                                'selector': '.analysis',
+                                'style': {
+                                    'background-color': '#33a02c',
+                                    'line-color': 'black',
+                                    'font-size': '12'
+                                }
+                            },
+                            {
+                                'selector': '.argument',
+                                'style': {
+                                    'background-color': '#fb9a99',
+                                    'line-color': 'black',
+                                    'font-size': '12'
+                                }
+                            },
+                        ]
+            net = []
+            net.extend(nodes)
+            net.extend(edges)
+            args['stylesheet'] = config_stylesheet
+            args['title'] = 'Analysis Pipeline'
+            args['layout'] = {'name': 'breadthfirst', 'roots': '#0'}
+            conf_plot = basicFigures.get_cytoscape_network(net, self.dataset_type, args)
+            self.report.update_plots({('0', self.dataset_type+'_pipeline', 'cytoscape_network'):[conf_plot]})
 
     def generate_report(self):
         self.report = rp.Report(identifier=self.dataset_type.capitalize(), plots={})
         order = 1
+        report_pipeline = {}
         for section in self.configuration:
+            report_step = {}
+            report_step[section] = {}
             if section == "args":
                 continue
             for subsection in self.configuration[section]:
                 data_names, analysis_types, plot_types, store_analysis, args = self.extract_configuration(self.configuration[section][subsection])
+                report_step[section][subsection] = {'data' : data_names, 'analyses': [], 'args': {}}
                 if isinstance(data_names, dict) or isinstance(data_names, list):
                     data = self.get_dataframes(data_names)
                 else:
@@ -333,34 +341,39 @@ class Dataset:
                     if len(analysis_types) >= 1:
                         for analysis_type in analysis_types:
                             result = ar.AnalysisResult(self.identifier, analysis_type, args, data)
-                            self.update_analyses(result.result)
-                            if store_analysis:
-                                if subsection == "regulation":
-                                    reg_data = result.result[analysis_type]
-                                    if not reg_data.empty:
-                                        sig_hits = list(set(reg_data.loc[reg_data.rejected,"identifier"]))
-                                        sig_data = data[sig_hits]
-                                        sig_data.index = data['group'].tolist()
-                                        sig_data["sample"] = data["sample"].tolist()
-                                        self.update_data({"regulated":sig_data, "regulation table":reg_data})
-                                else:
-                                    self.update_data({subsection+"_"+analysis_type: result.result[analysis_type]})
-                            for plot_type in plot_types:
-                                plots = result.get_plot(plot_type, subsection+"_"+analysis_type+"_"+plot_type)
-                                self.report.update_plots({(str(order), subsection+"_"+analysis_type, plot_type):plots})
-                                order +=1
+                            if analysis_type in result.result and result.result[analysis_type] is not None and len(result.result[analysis_type]) >=1:
+                                report_step[section][subsection]['analyses'].append(analysis_type)
+                                report_step[section][subsection]['args'] = result.args
+                                report_pipeline.update(report_step)
+                                self.update_analyses(result.result)
+                                if store_analysis:
+                                    if subsection == "regulation":
+                                        reg_data = result.result[analysis_type]
+                                        if not reg_data.empty:
+                                            sig_hits = list(set(reg_data.loc[reg_data.rejected,"identifier"]))
+                                            sig_data = data[sig_hits]
+                                            sig_data.index = data['group'].tolist()
+                                            sig_data["sample"] = data["sample"].tolist()
+                                            self.update_data({"regulated":sig_data, "regulation table":reg_data})
+                                    else:
+                                        self.update_data({subsection+"_"+analysis_type: result.result[analysis_type]})
+                                for plot_type in plot_types:
+                                    plots = result.get_plot(plot_type, subsection+"_"+analysis_type+"_"+plot_type)
+                                    self.report.update_plots({(str(order), subsection+"_"+analysis_type, plot_type):plots})
+                                    order +=1
                     else:
                         if result is None:
                             dictresult = {}
                             dictresult["_".join(subsection.split(' '))] = data
                             result = ar.AnalysisResult(self.identifier,"_".join(subsection.split(' ')), args, data, result = dictresult)
+                            report_pipeline.update(report_step)
                             self.update_analyses(result.result)
                         for plot_type in plot_types:
                             plots = result.get_plot(plot_type, "_".join(subsection.split(' '))+"_"+plot_type)
                             self.report.update_plots({(str(order), "_".join(subsection.split(' ')), plot_type): plots})
                             order += 1
         
-        self.add_configuration_to_report()
+        self.add_configuration_to_report(report_pipeline)
 
 
     def save_dataset(self, dataset_directory):
@@ -480,7 +493,7 @@ class ProteomicsDataset(Dataset):
 
 class LongitudinalProteomicsDataset(ProteomicsDataset):
     def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
-        config_file = "logitudinal_proteomics.yml"
+        config_file = "longitudinal_proteomics.yml"
         ProteomicsDataset.__init__(self, identifier, data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
         #self.dataset_type = "longitudinal_proteomics"
         self.update_configuration_from_file(config_file)

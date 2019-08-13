@@ -10,7 +10,7 @@ import dabest
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 import scipy.stats
 from scipy.special import factorial, betainc
-import umap.umap_ as umap
+import umap
 from sklearn import preprocessing, ensemble, cluster
 from scipy import stats
 import pingouin as pg
@@ -210,12 +210,10 @@ def get_proteomics_measurements_ready(df, index=['group', 'sample', 'subject'], 
             df = imputation_KNN(df)
         elif method == "distribution":
             df = imputation_normal_distribution(df, shift = 1.8, nstd = 0.3)
-        elif method == 'group_median':
-            df = imputation_median_by_group(df)
         elif method == 'mixed':
             df = imputation_mixed_norm_KNN(df)
             
-    df = df.reset_index()
+        df = df.reset_index()
 
     return df
 
@@ -230,19 +228,19 @@ def get_clinical_measurements_ready(df, subject_id='subject', sample_id='biologi
             df = imputation_KNN(processed_df, drop_cols=drop_cols, group=group_id)
         elif imputation_method.lower() == "distribution":
             df = imputation_normal_distribution(processed_df, index=index)
-        elif imputation_method.lower() == 'group_median':
-            df = imputation_median_by_group(processed_df)
         elif imputation_method.lower() == 'mixed':
             df = imputation_mixed_norm_KNN(processed_df,index_cols=index, group=group_id)
     return df
 
 
-def run_pca(data, drop_cols=['sample', 'subject'], group='group', components=2):
+def run_pca(data, drop_cols=['sample', 'subject'], group='group', components=2, dropna=True):
     np.random.seed(112736)
     result = {}
     df = data.copy()
     df = df.drop(drop_cols, axis=1)
     df = df.set_index(group)
+    if dropna:
+        df = df.dropna(axis=1)
     X = df._get_numeric_data()
     y = df.index
     pca = PCA(n_components=components)
@@ -271,11 +269,13 @@ def run_pca(data, drop_cols=['sample', 'subject'], group='group', components=2):
     
     return result, args
 
-def run_tsne(data, drop_cols=['sample', 'subject'], group='group', components=2, perplexity=40, n_iter=1000, init='pca'):
+def run_tsne(data, drop_cols=['sample', 'subject'], group='group', components=2, perplexity=40, n_iter=1000, init='pca', dropna=True):
     result = {}
     df = data.copy()
     df = df.drop(drop_cols, axis=1)
     df = df.set_index(group)
+    if dropna:
+        df = df.dropna(axis=1)
     X = df._get_numeric_data()
     y = df.index
 
@@ -297,11 +297,13 @@ def run_tsne(data, drop_cols=['sample', 'subject'], group='group', components=2,
     result['tsne'] = resultDf
     return result, args
 
-def run_umap(data, drop_cols=['sample', 'subject'], group='group', n_neighbors=10, min_dist=0.3, metric='cosine'):
+def run_umap(data, drop_cols=['sample', 'subject'], group='group', n_neighbors=10, min_dist=0.3, metric='cosine', dropna=True):
     result = {}
     df = data.copy()
     df = df.drop(drop_cols, axis=1)
     df = df.set_index(group)
+    if dropna:
+        df = df.dropna(axis=1)
     X = df._get_numeric_data()
     y = df.index
 
@@ -408,6 +410,22 @@ def run_correlation(df, alpha=0.05, subject='subject', group='group', method='pe
             correlation = correlation[correlation.rejected]
     return correlation
 
+def run_multi_correlation(df, alpha=0.05, subject='subject', on=['subject', 'biological_sample'] , group='group', method='pearson', correction=('fdr', 'indep')):
+    multidf = pd.DataFrame()
+    for dtype in df:
+        print(dtype)
+        if multidf.empty:
+            multidf = df[dtype]
+            print(multidf.head())
+        else:
+            print(dtype, df[dtype].head())
+            multidf = pd.merge(multidf, df[dtype], how='inner', on=on)
+            print(multidf.head())
+            
+    correlation = run_correlation(multidf, alpha=0.05, subject=subject, group=group, method=method, correction=correction)
+    
+    return correlation
+    
 def calculate_rm_correlation(df, x, y, subject):
     # ANCOVA model
     cols = ["col0","col1", subject]
@@ -437,7 +455,7 @@ def run_rm_correlation(df, alpha=0.05, subject='subject', correction=('fdr', 'in
     calculated = set()
     rows = []
     if not df.empty:
-        df = df.set_index(subject)._get_numeric_data()
+        df = df.set_index(subject)._get_numeric_data().dropna(axis=1)
         start = time.time()
         combinations = itertools.combinations(df.columns, 2)
         df = df.reset_index()
@@ -666,7 +684,7 @@ def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject',
 
 def run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subject='subject', group='group', permutations=50):
     df = df.set_index([subject,group])
-    df = df.drop(drop_cols, axis=1)
+    df = df.drop(drop_cols, axis=1).dropna(axis=1)
     aov_result = []
     for col in df.columns:
         aov = calculate_repeated_measures_anova(df.reset_index(), column=col, subject=subject, group=group, alpha=alpha)
@@ -942,7 +960,7 @@ def run_WGCNA(data, drop_cols_exp, drop_cols_cli, RsquaredCut=0.8, networkType='
     if 'clinical' in dfs:
         data_cli = dfs['clinical']   #Extract clinical data
         for dtype in dfs:
-            if dtype in ['proteomics', 'longitudinal_proteomics', 'rnaseq']:
+            if dtype in ['proteomics', 'rnaseq']:
                 data_exp = dfs[dtype]   #Extract experimental data
                 dtype = 'wgcna-'+dtype
                 result[dtype] = {}

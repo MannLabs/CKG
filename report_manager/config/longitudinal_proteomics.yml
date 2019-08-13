@@ -1,0 +1,9 @@
+args:
+    imputation: False
+    missing_method: percentage
+    missing_max: 0.3
+    value_col: LFQ intensity
+    index:
+        - group
+        - sample
+        - subject
