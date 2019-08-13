@@ -2,6 +2,8 @@ data exploration:
     wgcna:
         data:
             proteomics: processed
+            longitudinal_proteomics: processed
+            rnaseq: processed
             clinical: processed
         analyses:
             - wgcna

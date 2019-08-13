@@ -124,6 +124,15 @@ class Dataset:
             self.configuration = ckg_utils.get_configuration(os.path.join(cwd, config_path))
         except Exception as err:
             logger.error("Error: {} reading configuration file: {}.".format(err, config_path))
+    
+    def update_configuration_from_file(self, configuration_file):
+        try:
+            cwd = os.path.abspath(os.path.dirname(__file__))
+            config_path = os.path.join("config/", configuration_file)
+            self.configuration.update(ckg_utils.get_configuration(os.path.join(cwd, config_path)))
+        except Exception as err:
+            logger.error("Error: {} reading configuration file: {}.".format(err, config_path))
+        
 
     def get_dataset_data_directory(self, directory="../../../data/reports"):
         ckg_utils.checkDirectory(directory)
@@ -374,8 +383,14 @@ class Dataset:
             name = data.replace(" ", "_") + ".tsv"
             if isinstance(self.data[data], pd.DataFrame):
                 self.data[data].to_csv(os.path.join(dataset_directory,name), sep='\t', header=True, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
+            elif isinstance(self.data[data], dict):
+                for dtype in self.data[data]:
+                    if isinstance(self.data[data][dtype], pd.DataFrame):
+                        name = dtype+"_"+name
+                        self.data[data][dtype].to_csv(os.path.join(dataset_directory,name), sep='\t', header=True, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
             else:
-                print(name, data, type(self.data[data]))
+                pass
+                #print(name, data, type(self.data[data]))
 
     def save_report(self, dataset_directory):
         if not os.path.exists(dataset_directory):
@@ -465,10 +480,10 @@ class ProteomicsDataset(Dataset):
 
 class LongitudinalProteomicsDataset(ProteomicsDataset):
     def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
-        config_file = "proteomics.yml"
+        config_file = "logitudinal_proteomics.yml"
         ProteomicsDataset.__init__(self, identifier, data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
         #self.dataset_type = "longitudinal_proteomics"
-        self.set_configuration_from_file(config_file)
+        self.update_configuration_from_file(config_file)
 
 class ClinicalDataset(Dataset):
     def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):

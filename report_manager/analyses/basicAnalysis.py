@@ -688,9 +688,7 @@ def run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subjec
         rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'indep')
         scores['correction'] = 'FDR correction BH'
         scores['padj'] = padj
-        scores['rejected'] = rejected
-        scores['rejected'] = scores['rejected']
-
+        
     res = None
     for col in df.columns:
         pairwise = calculate_pairwise_ttest(df[col].reset_index(), column=col, subject=subject, group=group)
@@ -700,7 +698,7 @@ def run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subjec
             res = pd.concat([res,pairwise], axis=0)
     if res is not None:
         res = res.join(scores[['F-statistics', 'pvalue', 'padj']].astype('float'))
-        res['correction'] = 'Greenhouse-Geisser correction' 
+        res['correction'] = scores['correction']
     else:
         res = scores
         res["log2FC"] = np.nan
@@ -943,38 +941,41 @@ def run_WGCNA(data, drop_cols_exp, drop_cols_cli, RsquaredCut=0.8, networkType='
     dfs = wgcna.get_data(data, drop_cols_exp=drop_cols_exp, drop_cols_cli=drop_cols_cli)
     if 'clinical' in dfs:
         data_cli = dfs['clinical']   #Extract clinical data
-        data_exp, = [i for i in dfs.keys() if i != 'clinical']   #Get dictionary key for experimental data
-        data_exp = dfs[data_exp]   #Extract experimental data
+        for dtype in dfs:
+            if dtype in ['proteomics', 'longitudinal_proteomics', 'rnaseq']:
+                data_exp = dfs[dtype]   #Extract experimental data
+                dtype = 'wgcna-'+dtype
+                result[dtype] = {}
 
-        softPower = wgcna.pick_softThreshold(data_exp, RsquaredCut=RsquaredCut, networkType=networkType, verbose=verbose)
-        
-        dissTOM, moduleColors = wgcna.build_network(data_exp, softPower=softPower, networkType=networkType, minModuleSize=minModuleSize, deepSplit=deepSplit,
-                                              pamRespectsDendro=pamRespectsDendro, merge_modules=merge_modules, MEDissThres=MEDissThres, verbose=verbose)
+                softPower = wgcna.pick_softThreshold(data_exp, RsquaredCut=RsquaredCut, networkType=networkType, verbose=verbose)
+                
+                dissTOM, moduleColors = wgcna.build_network(data_exp, softPower=softPower, networkType=networkType, minModuleSize=minModuleSize, deepSplit=deepSplit,
+                                                    pamRespectsDendro=pamRespectsDendro, merge_modules=merge_modules, MEDissThres=MEDissThres, verbose=verbose)
 
-        Features_per_Module = wgcna.get_FeaturesPerModule(data_exp, moduleColors, mode='dataframe')
+                Features_per_Module = wgcna.get_FeaturesPerModule(data_exp, moduleColors, mode='dataframe')
 
-        MEs = wgcna.calculate_module_eigengenes(data_exp, moduleColors, softPower=softPower, dissimilarity=False)
+                MEs = wgcna.calculate_module_eigengenes(data_exp, moduleColors, softPower=softPower, dissimilarity=False)
 
-        moduleTraitCor, textMatrix = wgcna.calculate_ModuleTrait_correlation(data_exp, data_cli, MEs)
+                moduleTraitCor, textMatrix = wgcna.calculate_ModuleTrait_correlation(data_exp, data_cli, MEs)
 
-        MM, MMPvalue = wgcna.calculate_ModuleMembership(data_exp, MEs)
+                MM, MMPvalue = wgcna.calculate_ModuleMembership(data_exp, MEs)
 
-        FS, FSPvalue = wgcna.calculate_FeatureTraitSignificance(data_exp, data_cli)
+                FS, FSPvalue = wgcna.calculate_FeatureTraitSignificance(data_exp, data_cli)
 
-        METDiss, METcor = wgcna.get_EigengenesTrait_correlation(MEs, data_cli)
+                METDiss, METcor = wgcna.get_EigengenesTrait_correlation(MEs, data_cli)
 
-        result['dissTOM'] = dissTOM
-        result['module_colors'] = moduleColors
-        result['features_per_module'] = Features_per_Module
-        result['MEs'] = MEs
-        result['module_trait_cor'] = moduleTraitCor
-        result['text_matrix'] = textMatrix
-        result['module_membership'] = MM
-        result['module_membership_pval'] = MMPvalue
-        result['feature_significance'] = FS
-        result['feature_significance_pval'] = FSPvalue
-        result['ME_trait_diss'] = METDiss
-        result['ME_trait_cor'] = METcor
+                result[dtype]['dissTOM'] = dissTOM
+                result[dtype]['module_colors'] = moduleColors
+                result[dtype]['features_per_module'] = Features_per_Module
+                result[dtype]['MEs'] = MEs
+                result[dtype]['module_trait_cor'] = moduleTraitCor
+                result[dtype]['text_matrix'] = textMatrix
+                result[dtype]['module_membership'] = MM
+                result[dtype]['module_membership_pval'] = MMPvalue
+                result[dtype]['feature_significance'] = FS
+                result[dtype]['feature_significance_pval'] = FSPvalue
+                result[dtype]['ME_trait_diss'] = METDiss
+                result[dtype]['ME_trait_cor'] = METcor
 
         return result
 

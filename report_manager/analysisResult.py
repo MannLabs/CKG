@@ -488,9 +488,9 @@ class AnalysisResult:
                 wgcna_data = self.result
                 dfs = wgcna.get_data(input_data, drop_cols_exp=self.args['drop_cols_exp'], drop_cols_cli=self.args['drop_cols_cli'])
                 if 'wgcna' in wgcna_data and wgcna_data['wgcna'] is not None and dfs is not None:
-                    data['wgcna'] = {**dfs, **wgcna_data['wgcna']}
-                    for id in data:
-                        plot.extend(figure.get_WGCNAPlots(data[id], identifier))
+                    for dtype in wgcna_data['wgcna']:
+                        data = {**dfs, **wgcna_data['wgcna'][dtype]}
+                        plot.extend(figure.get_WGCNAPlots(data, identifier+"-"+dtype))
                 print('WGCNA-plot', time.time() - start)
             elif name == 'ranking':
                 for id in self.result:

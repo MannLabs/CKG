@@ -140,32 +140,6 @@ data exploration:
                 - subject
             name: name
             title: 'Differential regulation ANOVA'
-    correlation:
-        data: processed
-        analyses:
-            - correlation
-        plots:
-            - network
-            #- heatmap
-        store_analysis: True
-        args:
-            source: node1
-            target: node2
-            title: 'Features correlation network'
-            format: edgelist
-            values: weight
-            dist: False
-            node_properties: {}
-            maxLinkWidth: 6
-            maxRadius: 20
-            node_size: 'degree'
-            cutoff: 0.5
-            subject: subject
-            cutoff_abs: True
-            color_weight: True
-            communities_algorithm: louvain
-            width: 1600
-            height: 1600
     interaction_network:
         data: regulated
         analyses: []

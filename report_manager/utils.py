@@ -1,3 +1,4 @@
+import os
 import dash_html_components as html
 import dash_core_components as dcc
 from datetime import date
@@ -18,7 +19,7 @@ import chart_studio.plotly as py
 import base64
 from xhtml2pdf import pisa
 import requests, json
-from urllib import request, parse
+from urllib import request, parse, error
 import shutil
 import smtplib
 from email.message import EmailMessage
@@ -86,7 +87,12 @@ def send_email(message, subject, message_from, message_to):
     s.quit()
 
 def compress_directory(name, directory, compression_format='zip'):
-    shutil.make_archive(name, compression_format, directory)
+    try:
+        if os.path.exists(directory) and os.path.isdir(directory):
+            shutil.make_archive(name, compression_format, directory)
+            shutil.rmtree(directory)
+    except Exception as err:
+        print("Could not compress file {} in directory {}. Error: {}".format(name, directory, err))
 
 def get_markdown_date(extra_text):
     today = date.today()
@@ -292,7 +298,7 @@ def getMedlineAbstracts(idList):
             results.append(aux)
 
         abstracts = pd.DataFrame.from_dict(results)
-    except HTTPError:
+    except error.HTTPError:
         print("Request to Bio.Entrez failed")
 
     return abstracts

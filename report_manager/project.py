@@ -250,7 +250,7 @@ class Project:
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            logger.error("Reading queries from file {}: {}, file: {},line: {}".format(queries_path, sys.exc_info(), fname, exc_tb.tb_lineno))
+            logger.error("Reading queries from file {}: {}, file: {},line: {}, error: {}".format(queries_path, sys.exc_info(), fname, exc_tb.tb_lineno, err))
 
         return data
 
@@ -323,10 +323,11 @@ class Project:
                     self.update_dataset({data_type:dataset})
             
             if len(self.datasets) > 1:
-                    dataset = MultiOmicsDataset(self.identifier, data=self.datasets, analyses={}, report=None)
-                    self.update_dataset({'multiomics':dataset})
-                    self.append_data_type('multiomics')
-    
+                print(self.datasets)            
+                dataset = MultiOmicsDataset(self.identifier, data=self.datasets, analyses={}, report=None)
+                self.update_dataset({'multiomics':dataset})
+                self.append_data_type('multiomics')
+
     def get_projects_overlap(self, project_info):
         if 'overlap' in project_info:
             self.overlap = project_info['overlap']
@@ -501,7 +502,7 @@ class Project:
         print('save datasets', time.time() - start)
 
     def show_report(self, environment):
-        types = ["Project information", "clinical", "proteomics", "longitudinal proteomics", "wes", "wgs", "rnaseq", "multiomics"]
+        types = ["Project information", "clinical", "proteomics", "longitudinal_proteomics", "wes", "wgs", "rnaseq", "multiomics"]
         app_plots = defaultdict(list)
         for dataset in types:
             if dataset in self.report:

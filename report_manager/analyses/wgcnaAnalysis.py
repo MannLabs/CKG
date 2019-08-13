@@ -385,15 +385,14 @@ def calculate_ModuleTrait_correlation(df_exp, df_traits, MEs):
     Returns:
         Tuple with two pandas datafames, first the correlation between all module eigengenes and all clinical traits, second a dataframe with concatenated correlation and p-value used for heatmap annotation.
     """
-    nFeatures = len(df_exp.columns)
     nSamples = len(df_exp.index)
 
     df_traits_r = df_traits.copy()
     df_traits_r.columns = df_traits_r.columns.str.replace(' ', 'space')
     df_traits_r.columns = df_traits_r.columns.str.replace('(', 'parentheses1')
     df_traits_r.columns = df_traits_r.columns.str.replace(')', 'parentheses2')
-
-    moduleTraitCor_r = WGCNA.cor(MEs, df_traits_r, use='p', verbose=0)
+    common = list(set(MEs.index).intersection(df_traits_r.index))
+    moduleTraitCor_r = WGCNA.cor(MEs.loc[common,:], df_traits_r.loc[common,:], use='p', verbose=0)
     moduleTraitPvalue_r = WGCNA.corPvalueStudent(moduleTraitCor_r, nSamples)
 
     textMatrix = paste_matrices(moduleTraitCor_r, moduleTraitPvalue_r, MEs.columns, df_traits_r.columns)
@@ -464,8 +463,8 @@ def calculate_FeatureTraitSignificance(df_exp, df_traits):
     df_cli_r.columns = df_cli_r.columns.str.replace(' ', 'space')
     df_cli_r.columns = df_cli_r.columns.str.replace('(', 'parentheses1')
     df_cli_r.columns = df_cli_r.columns.str.replace(')', 'parentheses2')
-
-    FeatureTraitSignificance = base.as_data_frame(WGCNA.cor(df_exp_r, df_cli_r, use='p', verbose=0))
+    common = list(set(df_exp_r.index).intersection(df_cli_r.index))
+    FeatureTraitSignificance = base.as_data_frame(WGCNA.cor(df_exp_r.loc[common,:], df_cli_r.loc[common,:], use='p', verbose=0))
     FSPvalue = base.as_data_frame(WGCNA.corPvalueStudent(base.as_matrix(FeatureTraitSignificance), nSamples))
 
     FeatureTraitSignificance.columns = ['GS.'+str(col) for col in df_cli_r.columns]
@@ -546,8 +545,8 @@ def get_EigengenesTrait_correlation(MEs, data):
     df_traits_r.columns = df_traits_r.columns.str.replace(')', 'parentheses2')
     df_traits_r.columns = df_traits_r.columns.str.replace('/', 'slash')
     
-    
-    MET = WGCNA.orderMEs(base.cbind(MEs, df_traits_r), verbose=0)
+    common = list(set(MEs.index).intersection(df_traits_r.index))
+    MET = WGCNA.orderMEs(base.cbind(MEs.loc[common,:], df_traits_r.loc[common,:]), verbose=0)
     METcor = WGCNA.cor(MET, use='p', verbose=0)
     METcor = pd.DataFrame(METcor, MET.columns, MET.columns)
 
