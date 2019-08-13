@@ -326,7 +326,7 @@ class AnalysisResult:
             group='group'
             on=['subject', 'group']
             if 'on_cols' in self.args:
-                on = self.args['on']
+                on = self.args['on_cols']
             if 'group' in self.args:
                 group = self.args['group']
             if 'subject' in self.args:

@@ -693,10 +693,8 @@ def get_network(data, identifier, args):
             if args['cutoff_abs']:
                 data = data[np.abs(data[args['values']]) > args['cutoff']]
             else:
-                data = data > arg['cutoff']
+                data = data > args['cutoff']
         data = data.rename(index=str, columns={args['values']: "width"})
-        edge_prop_columns = [c for c in data.columns if c not in [args['source'], args['target']]]
-        edge_properties = [str(d) for d in data.to_dict(orient='index').values()]
         graph = nx.from_pandas_edgelist(data, args['source'], args['target'], edge_attr=True)
 
         degrees = dict(graph.degree())

@@ -124,6 +124,56 @@ data exploration:
             height: 700
             loadings: 15
             title: 'Sample stratification'
+    regulation:
+        data: processed
+        analyses:
+            - anova
+        plots:
+            - basicTable
+            - volcanoplot
+        store_analysis: True
+        args:
+            alpha: 0.05
+            fc: 2.0
+            group: 'group'
+            subject: subject
+            colorscale: 'Blues'
+            showscale: False
+            marker_size: 10
+            x_title: logFC
+            y_title: -log(pvalue)
+            drop_cols:
+                - sample
+                - subject
+            name: name
+            title: 'Differential regulation ANOVA'
+    correlation:
+        data: processed
+        analyses:
+            - correlation
+        plots:
+            - network
+            #- heatmap
+        store_analysis: True
+        args:
+            source: node1
+            target: node2
+            title: 'Features correlation network'
+            format: edgelist
+            values: weight
+            dist: False
+            node_properties: {}
+            maxLinkWidth: 6
+            maxRadius: 20
+            node_size: 'degree'
+            cutoff: 0.5
+            subject: subject
+            cutoff_abs: True
+            color_weight: True
+            communities_algorithm: louvain
+            width: 1600
+            height: 1600
+data associations:
     interaction_network:
         data: regulated
         analyses: []
@@ -187,6 +237,7 @@ data exploration:
             margin: 1
             text_col: 'abstract'
             title: 'List of publications mentioning regulated proteins together with related diseases'
+enrichment:
     go_enrichment:
         data: 
             - regulation table
@@ -229,15 +280,3 @@ data exploration:
             reject_col: rejected
             method: fisher
             title: 'Pathway Enrichment'
-    #"topological data analysis":
-    #    data: regulated
-    #    analyses:
-    #        - mapper
-    #    plots:
-    #        - mapper
-    #    args:
-    #        n_cubes: 15
-    #        overlap: 0.5
-    #        n_clusters: 3
-    #        linkage: complete
-    #        affinity: correlation

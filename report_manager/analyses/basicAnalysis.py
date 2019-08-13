@@ -386,7 +386,6 @@ def convertToEdgeList(data, cols):
     return edge_list
 
 def run_correlation(df, alpha=0.05, subject='subject', group='group', method='pearson', correction=('fdr', 'indep')):
-    calculated = set()
     correlation = pd.DataFrame()
     if check_is_paired(df, subject, group):
         if len(df[subject].unique()) > 2:
@@ -412,13 +411,15 @@ def run_correlation(df, alpha=0.05, subject='subject', group='group', method='pe
 
 def run_multi_correlation(df, alpha=0.05, subject='subject', on=['subject', 'biological_sample'] , group='group', method='pearson', correction=('fdr', 'indep')):
     multidf = pd.DataFrame()
-    for dtype in df:
-        if multidf.empty:
-            multidf = df[dtype]
-        else:
-            multidf = pd.merge(multidf, df[dtype], how='inner', on=on)
-    
-    correlation = run_correlation(multidf, alpha=0.05, subject=subject, group=group, method=method, correction=correction)
+    correlation = None
+    if len(df) > 1:
+        for dtype in df:
+            if multidf.empty:
+                multidf = df[dtype]
+            else:
+                multidf = pd.merge(multidf, df[dtype], how='inner', on=on)
+        
+        correlation = run_correlation(multidf, alpha=0.05, subject=subject, group=group, method=method, correction=correction)
     
     return correlation
     
