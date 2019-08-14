@@ -78,7 +78,7 @@ def create_new_project(driver, projectId, data, separator='|'):
     disease_ids = []
     tissue_ids = []
     try:
-        external_identifier = get_new_project_identifier(driver, projectId)
+        external_identifier = get_new_project_identifier(driver, projectId)        
         data['external_id'] = external_identifier
         project_creation_cypher = get_project_creation_queries()
         query = project_creation_cypher[query_name]['query']
@@ -94,6 +94,7 @@ def create_new_project(driver, projectId, data, separator='|'):
         logger.error("Reading query {}: {}, file: {},line: {}".format(query_name, sys.exc_info(), fname, exc_tb.tb_lineno))
 
     subjects = create_new_subject(driver, external_identifier, data['subjects'][0])
+
     if data['timepoints'][0] is None:
         pass
     else:
@@ -114,6 +115,7 @@ def create_new_project(driver, projectId, data, separator='|'):
     store_new_relationships(external_identifier, data['participant'][0].split(separator), [external_identifier], 'PARTICIPATES_IN', '_participants', importDir, 'tsv')
     store_new_relationships(external_identifier, [external_identifier], disease_ids, 'STUDIES_DISEASE', '_studies_disease', importDir, 'tsv')
     store_new_relationships(external_identifier, [external_identifier], tissue_ids, 'STUDIES_TISSUE', '_studies_tissue', importDir, 'tsv')
+    
     return result.values[0], external_identifier
 
 

@@ -9,6 +9,7 @@ import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_resumable_upload
 import dash_table
 import flask
 
@@ -51,7 +52,9 @@ class DataUploadApp(basicApp.BasicApp):
         projectID = self.project_id
         self.add_basic_layout()
         layout = [html.Div([
-                            html.Div([html.H4('Upload Experiment file', style={'marginTop':30, 'marginBottom':20}),
+                            html.Div([dcc.Store(id='memory-original-data', storage_type='memory'),
+                                      # dcc.Store(id='memory-table-data', storage_type='memory'),
+                                      html.H4('Upload Experiment file', style={'marginTop':30, 'marginBottom':20}),
                                       dcc.Upload(id='upload-data', children=html.Div(['Drag and Drop or ', html.A('Select Files')]),
                                                  style={'width': '100%',
                                                         'height': '60px',
@@ -63,15 +66,16 @@ class DataUploadApp(basicApp.BasicApp):
                                                         'margin': '0px'},
                                                  multiple=False)]),
                             html.Br(),
-        					html.Div(children=[html.Label('Select upload data type:', style={'marginTop':10})],
+                            html.Div(children=[html.Label('Select upload data type:', style={'marginTop':10})],
                                                style={'width':'49%', 'marginLeft':'0%', 'verticalAlign':'top', 'fontSize':'18px'}),
-                            html.Div(id='dumm-div', style={'display':'none'}),
-							html.Div(children=[dcc.Dropdown(id='upload-data-type-picker', options=[{'label':i, 'value':i} for i in DataTypes], value='', multi=False, style={'width':'100%'})],
+                            html.Div(id='dumm-div'),
+                            html.Div(children=[dcc.Dropdown(id='upload-data-type-picker', options=[{'label':i, 'value':i} for i in DataTypes], value='', multi=False, style={'width':'100%'})],
                                                style={'width':'20%', 'marginLeft': '0%', 'verticalAlign':'top', 'display':'inline-block'}),
-                            html.Div(children=[html.Button('Add', id='add_upload_datatype', style={'height':'35px'})],
-                                               style={'width':'10%', 'marginLeft': '0.4%', 'verticalAlign':'top', 'display':'inline-block'}),
-							html.Div(children=[dcc.Input(id='upload-data-type', value='', type='text', style={'width':'100%', 'height':'35px', 'marginTop':5})],
-                                                 style={'width':'49%', 'marginLeft':'0%', 'verticalAlign':'top'}),
+                            # html.Div(children=[html.Button('Add', id='add_upload_datatype', style={'height':'35px'})],
+                            #                    style={'width':'10%', 'marginLeft': '0.4%', 'verticalAlign':'top', 'display':'inline-block'}),
+                            # html.Div(children=[dcc.Input(id='upload-data-type', value='', type='text', style={'width':'100%', 'height':'35px', 'marginTop':5})],
+                            #                      style={'width':'49%', 'marginLeft':'0%', 'verticalAlign':'top'}),
+                            # html.Div(id='error_msg', style={'fontSize':'15px', 'marginLeft':'0%'}),
                 			html.Div([
                     				  html.Div(children=[html.A(children=html.Button('Export Table', id='data_download_button', style={'height':36, 'maxWidth':'200px'}), id='data_download_link', download='downloaded_ClinicalData.csv')],
                                       					 style={'marginTop':'0%', 'marginLeft': '91.4%', 'horizontalAlign':'right', 'verticalAlign':'top', 'display':'inline-block'}),

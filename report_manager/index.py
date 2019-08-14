@@ -17,6 +17,7 @@ from IPython.display import HTML
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
+from dash.exceptions import PreventUpdate
 from dash_network import Network
 
 from app import app
@@ -248,85 +249,84 @@ def export_contents(data, dataDir, filename):
         csv_string = data.to_excel(os.path.join(dataDir, filename), index=False, encoding='utf-8')   
     return csv_string
 
+@app.callback(Output('memory-original-data', 'data'),
+              [Input('upload-data', 'contents'),
+               Input('upload-data', 'filename')])
+def store_original_data(contents, filename):
+    if contents is not None:
+        df = parse_contents(contents, filename)
+        return df.to_dict('records')
+    else:
+        raise PreventUpdate
+
 @app.callback([Output('clinical-table', 'data'),
                Output('clinical-table', 'columns')],
-              [Input('upload-data', 'contents'),
-               Input('upload-data', 'filename'),
+              [Input('memory-table-data', 'data'),
                Input('editing-columns-button', 'n_clicks')],
               [State('clinical-variables-picker', 'value'),
-               State('clinical-table', 'columns')])
-def update_data(contents, filename, n_clicks, value, existing_columns):
-    if contents is not None:
-        columns = []
-        df = parse_contents(contents, filename)
-        if len(df.columns) > 100 and len(df.index) > 1000:
-            df = df.iloc[:100,:100]
+               State('upload-data-type-picker', 'value')])
+def update_data(data, n_clicks, variables, dtype):
+    if data is None:
+        raise PreventUpdate
 
-        data = None
-        if df is not None:
-            data = df.to_dict('rows')
-            for i in df.columns:
-                columns.append({'id': i, 'name': i,
-                                         'editable_name': False, 'deletable': True})
-        if n_clicks is not None and n_clicks > 0:
-            for j in value:
-                columns.append({'id': j, 'name': j,
-                                     'editable_name': False, 'deletable': True})
-        empty_cols = [i for i, d in enumerate(columns) if d['id']=='']
-        for i in empty_cols:
-            del columns[i]
-        return data, columns
-
-@app.callback(Output('upload-data-type', 'value'),
-             [Input('add_upload_datatype', 'n_clicks')],
-             [State('upload-data-type-picker','value')])
-def update_dropdown(n_clicks, value):
-    if n_clicks != None:
-        return value
-
-@app.callback([Output('data_download_link', 'href'),
-               Output('data_download_link', 'download')],
-              [Input('data_download_button', 'n_clicks')],
-              [State('clinical-table', 'columns'),
-               State('clinical-table', 'data'),
-               State('upload-data-type', 'value')])
-def update_table_download_link(n_clicks, columns, rows, data_type):
-    if n_clicks != None:
-        cols = [d['id'] for d in columns]
-        df = pd.DataFrame(rows, columns=cols)
-        csv_string = df.to_csv(index=False, encoding='utf-8', sep=';') 
-        csv_string = "data:text/csv;charset=utf-8," + urllib.parse.quote(csv_string)
-        return csv_string, 'downloaded_DATATYPE_DataUpload.csv'.replace('DATATYPE', data_type)
+    columns= []
+    df = pd.DataFrame(data, columns=data[0].keys())
+    for i in df.columns:
+        columns.append({'id': i, 'name': i,
+                        'renamable': False, 'deletable': True})
+    df = df.to_dict('rows')
+    if n_clicks is not None:
+        for var in variables:
+            columns.append({'id': var, 'name': var,
+                            'renamable': False, 'deletable': True})        
+    columns = [d for d in columns if d.get('id') != '']
+    return df, columns
 
 @app.callback(Output('data-upload', 'children'),
              [Input('submit_button', 'n_clicks')],
-             [State('clinical-table', 'columns'),
-              State('clinical-table', 'data'),
+             [State('memory-original-data', 'data'),
               State('upload-data', 'filename'),
               State('url', 'pathname'),
-              State('upload-data-type', 'value')])
-def update_table_download_link(n_clicks, columns, rows, filename, path_name, data_type):
-    if n_clicks != None:
+              State('upload-data-type-picker', 'value')])
+def run_processing(n_clicks, data, filename, path_name, dtype):
+    if n_clicks is not None:
         # Get Clinical data from Uploaded and updated table
-        cols = [d['id'] for d in columns]
-        data = pd.DataFrame(rows, columns=cols)
-        data.fillna(value=pd.np.nan, inplace=True)
+        df = pd.DataFrame(data, columns=data[0].keys())
+        df.fillna(value=pd.np.nan, inplace=True)
         project_id = path_name.split('/')[-1]
         # Extract all relationahips and nodes and save as csv files
-        if data_type == 'clinical':
-            data = dataUpload.create_new_experiment_in_db(driver, project_id, data, separator=separator)
+        if dtype == 'clinical':
+            df = dataUpload.create_new_experiment_in_db(driver, project_id, df, separator=separator)
             loader.partialUpdate(imports=['project', 'experiment']) #This will run loader for clinical only. To run for proteomics, etc, move to after 'else: pass'
         else:
             pass
         # Path to new local folder
-        dataDir = '../../data/experiments/PROJECTID/DATATYPE/'.replace('PROJECTID', project_id).replace('DATATYPE', data_type)
+        dataDir = '../../data/experiments/PROJECTID/DATATYPE/'.replace('PROJECTID', project_id).replace('DATATYPE', dtype)
         # Check/create folders based on local
         ckg_utils.checkDirectory(dataDir)
-        csv_string = export_contents(data, dataDir, filename)
+        csv_string = export_contents(df, dataDir, filename)
         message = 'FILE successfully uploaded.'.replace('FILE', '"'+filename+'"')
         return message
 
+@app.callback([Output('memory-original-data', 'clear_data'),
+               Output('memory-table-data', 'clear_data')],
+              [Input('submit_button', 'n_clicks')])
+def clear_click(n_click_clear):
+    if n_click_clear is not None and n_click_clear > 0:
+        return True, True
+    return False, False
 
+@app.callback([Output('data_download_link', 'href'),
+               Output('data_download_link', 'download')],
+              [Input('data_download_button', 'n_clicks')],
+              [State('memory-original-data', 'data'),
+               State('upload-data-type-picker', 'value')])
+def update_table_download_link(n_clicks, data, data_type):
+    if n_clicks != None:
+        df = pd.DataFrame(data, columns=data[0].keys())
+        csv_string = df.to_csv(index=False, encoding='utf-8', sep=';') 
+        csv_string = "data:text/csv;charset=utf-8," + urllib.parse.quote(csv_string)
+        return csv_string, 'downloaded_DATATYPE_DataUpload.csv'.replace('DATATYPE', data_type)
 
 
 

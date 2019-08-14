@@ -87,6 +87,7 @@ def create_new_biosamples(driver, projectId, data):
 			mask = df[df['external_id'] == bio_external_id]
 			parameters = mask.to_dict(orient='records')[0]
 			parameters['biosample_id'] = str(biosample_id)
+
 			for q in query.split(';')[0:-1]:
 				if '$' in q:
 					result = connector.getCursorData(driver, q+';', parameters=parameters)
@@ -163,6 +164,7 @@ def create_new_experiment_in_db(driver, projectId, data, separator='|'):
 	data.insert(1, 'tissue id', data['tissue'].map(tissue_dict))
 
 	df = create_new_biosamples(driver, projectId, data)
+
 	df2 = create_new_ansamples(driver, projectId, df)
 
 	project_subjects = get_subject_number_in_project(driver, projectId)
