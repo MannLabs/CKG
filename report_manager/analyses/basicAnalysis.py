@@ -337,13 +337,15 @@ def apply_pvalue_twostage_fdrcorrection(pvalues, alpha=0.05, method='bh'):
     return (rejected, padj)
 
 def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, group, alpha=0.05, permutations=50):
+    print("starting correction")
     initial_seed = 176782
     #permutations=1
     i = permutations
     df_index = df.index.values
     columns = ['identifier']
-    rand_pvalues = None
+    rand_pvalues = []
     while i>0:
+        print(i)
         df_index = shuffle(df_index, random_state=int(initial_seed + i))
         df_random = df.reset_index(drop=True)
         df_random.index = df_index
@@ -357,17 +359,13 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, group, alpha=0.
             rand_scores = pd.DataFrame(aov_results, columns=columns)
             rand_scores = rand_scores.set_index("identifier")
             rand_scores = rand_scores.dropna(how="all")
-            rand_scores = rand_scores['pvalue_'+str(i)]
-            if rand_pvalues is None:
-                rand_pvalues = rand_scores.to_frame()
-            else:
-                rand_pvalues = rand_pvalues.join(rand_scores)
+            rand_scores = rand_scores[['pvalue_'+str(i)]]
+            rand_pvalues.append(rand_scores)
             i -= 1
-    
+    rand_pvalues = pd.concat(rand_pvalues, axis=1)
     count = observed_pvalues.to_frame().apply(func=get_counts_permutation_fdr, result_type='expand', axis=1, args=(rand_pvalues, observed_pvalues, permutations, alpha))
     count.columns = ['padj', 'rejected']
-    #count = count.set_index('identifier')
-
+    
     return count
 
 def get_counts_permutation_fdr(value, random, observed, n, alpha):
@@ -620,7 +618,6 @@ def run_dabest(df, drop_cols=['sample'], subject='subject', group='group', test=
     return scores
 
 def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', group='group', permutations=50):
-    columns = ['identifier', 'F-statistics', 'pvalue']
     if subject is not None and check_is_paired(df, subject, group):
         groups = df[group].unique()
         drop_cols = [d for d in drop_cols if d != subject]
@@ -633,69 +630,41 @@ def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject',
         df = df.set_index([group])
         df = df.drop(drop_cols, axis=1)
         aov_results = []
-        res = None
+        pairwise_results = []
         for col in df.columns:
             rows = df[col]
             aov_results.append((col,) + calculate_anova(rows, group=group))
-            pairwise = calculate_THSD(rows, group=group)
-            if res is None:
-                res = pairwise
-            else:
-                res = pd.concat([res,pairwise], axis=0)
-        scores = pd.DataFrame(aov_results, columns = columns)
-        scores = scores.set_index("identifier")
-        scores = scores.dropna(how="all")
-
+            pairwise_results.append(calculate_THSD(rows, group=group))
+            
         max_perm = get_max_permutations(df, group=group)
-        #FDR correction
-        if permutations > 0 and max_perm>=10:
-            if max_perm < permutations:
-                permutations = max_perm
-            observed_pvalues = scores.pvalue
-            count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, group=group, alpha=alpha, permutations=permutations)
-            scores= scores.join(count)
-            scores['correction'] = 'permutation FDR ({} perm)'.format(permutations)
-        else:
-            rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'indep')
-            scores['correction'] = 'FDR correction BH'
-            scores['padj'] = padj
-            scores['rejected'] = rejected
-        
-        if res is not None:
-            res = res.join(scores[['F-statistics', 'pvalue', 'padj']].astype('float'))
-            res['correction'] = scores['correction']
-        else:
-            res = scores
-            res["log2FC"] = np.nan
-
-        res = res.reset_index()
-        res['rejected'] = res['padj'] < alpha
-        res['-log10 pvalue'] = res['padj'].apply(lambda x: -np.log10(x))
+        res = format_anova_table(df, aov_results, pairwise_results,  group, permutations, alpha, max_perm)
     
     return res
 
 def run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subject='subject', group='group', permutations=50):
     df = df.set_index([subject,group])
     df = df.drop(drop_cols, axis=1).dropna(axis=1)
-    aov_result = []
-    res = None
+    aov_results = []
+    pairwise_results = []
     for col in df.columns:
         aov = calculate_repeated_measures_anova(df.reset_index(), column=col, subject=subject, group=group, alpha=alpha)
-        aov_result.append(aov)
-        pairwise = calculate_pairwise_ttest(df[col].reset_index(), column=col, subject=subject, group=group)
-        if res is None:
-            res = pairwise
-        else:
-            res = pd.concat([res,pairwise], axis=0)
-
-    scores = pd.DataFrame(aov_result, columns = ['identifier','F-statistics', 'pvalue'])
-    scores = scores.set_index('identifier')
+        aov_results.append(aov)
+        pairwise_results.append(calculate_pairwise_ttest(df[col].reset_index(), column=col, subject=subject, group=group)) 
+        
+    max_perm = get_max_permutations(df, group=group)
+    res = format_anova_table(df, aov_results, pairwise_results, group, permutations, alpha, max_perm)
     
-    max_perm = get_max_permutations(df)
+    return res
+
+def format_anova_table(df, aov_results, pairwise_results, group, permutations, alpha, max_permutations):
+    columns = ['identifier', 'F-statistics', 'pvalue']
+    scores = pd.DataFrame(aov_results, columns = columns)
+    scores = scores.set_index('identifier')
+       
     #FDR correction
-    if permutations > 0 and max_perm>=10:
-        if max_perm < permutations:
-            permutations = max_perm
+    if permutations > 0 and max_permutations>=10:
+        if max_permutations < permutations:
+            permutations = max_permutations
         observed_pvalues = scores.pvalue
         count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, group=group, alpha=alpha, permutations=permutations)
         scores= scores.join(count)
@@ -705,7 +674,8 @@ def run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subjec
         scores['correction'] = 'FDR correction BH'
         scores['padj'] = padj
     
-    if res is not None:
+    res = pd.concat(pairwise_results)
+    if not res.empty:
         res = res.join(scores[['F-statistics', 'pvalue', 'padj']].astype('float'))
         res['correction'] = scores['correction']
     else:
