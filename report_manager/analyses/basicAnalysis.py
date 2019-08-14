@@ -371,6 +371,8 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, group, alpha=0.
     return count
 
 def get_counts_permutation_fdr(value, random, observed, n, alpha):
+    print(observed)
+    print("values", value.values[0])
     a = (random <= value.values[0]).sum().sum()
     b = (observed <= value.values[0]).sum()
     qvalue = 1

@@ -683,6 +683,118 @@ def network_to_tables(graph):
 
     return nodes_table, edges_table
 
+def generate_configuration_tree(report_pipeline, dataset_type):
+    nodes = []
+    edges = []
+    args = {}
+    conf_plot = None
+    legend = None
+    if len(report_pipeline) >=1:
+        root = dataset_type.title() + " default analysis pipeline"
+        nodes.append({'data':{'id':0, 'label':root}, 'classes': 'root'})
+        i = 0
+        for section in report_pipeline:
+            if section == "args":
+                continue
+            nodes.append({'data':{'id':i+1, 'label':section.title()}, 'classes': 'section'})
+            edges.append({'data':{'source':0, 'target':i+1}})
+            i += 1
+            k = i
+            for subsection in report_pipeline[section]:
+                nodes.append({'data':{'id':i+1, 'label':subsection.title()}, 'classes': 'subsection'})
+                edges.append({'data':{'source':k, 'target':i+1}})
+                i += 1
+                j = i
+                conf = report_pipeline[section][subsection]
+                data_names = conf['data']
+                analysis_types = conf['analyses']
+                arguments = conf['args']
+                if isinstance(data_names, dict):
+                    for d in data_names:
+                        nodes.append({'data':{'id':i+1, 'label':d+':'+data_names[d]}, 'classes': 'data'})
+                        edges.append({'data':{'source':j, 'target':i+1}})
+                        i += 1
+                else:
+                    nodes.append({'data':{'id':i+1, 'label':data_names}, 'classes': 'data'})
+                    edges.append({'data':{'source':j, 'target':i+1}})
+                    i += 1
+                for at in analysis_types:
+                    nodes.append({'data':{'id':i+1, 'label':at},'classes': 'analysis'})
+                    edges.append({'data':{'source':j, 'target':i+1}})
+                    i += 1
+                    f = i
+                if len(analysis_types):
+                    for a in arguments:
+                        nodes.append({'data':{'id':i+1, 'label':a+':'+str(arguments[a])},'classes': 'argument'})
+                        edges.append({'data':{'source':f, 'target':i+1}})
+                        i += 1
+        config_stylesheet = [
+                        # Group selectors
+                        {
+                            'selector': 'node',
+                            'style': {
+                                'content': 'data(label)'
+                                }
+                        },
+                        # Class selectors
+                        {
+                            'selector': '.root',
+                            'style': {
+                                'background-color': '#66c2a5',
+                                'line-color': 'black',
+                                'font-size': '14'
+                            }
+                        },
+                        {
+                            'selector': '.section',
+                            'style': {
+                                'background-color': '#a6cee3',
+                                'line-color': 'black',
+                                'font-size': '12'
+                            }
+                        },
+                        {
+                            'selector': '.subsection',
+                            'style': {
+                                'background-color': '#1f78b4',
+                                'line-color': 'black',
+                                'font-size': '12'
+                            }
+                        },
+                        {
+                            'selector': '.data',
+                            'style': {
+                                'background-color': '#b2df8a',
+                                'line-color': 'black',
+                                'font-size': '12'
+                            }
+                        },
+                        {
+                            'selector': '.analysis',
+                            'style': {
+                                'background-color': '#33a02c',
+                                'line-color': 'black',
+                                'font-size': '12'
+                            }
+                        },
+                        {
+                            'selector': '.argument',
+                            'style': {
+                                'background-color': '#fb9a99',
+                                'line-color': 'black',
+                                'font-size': '12'
+                            }
+                        },
+                    ]
+        net = []
+        net.extend(nodes)
+        net.extend(edges)
+        args['stylesheet'] = config_stylesheet
+        args['title'] = 'Analysis Pipeline'
+        args['layout'] = {'name': 'breadthfirst', 'roots': '#0'}
+        conf_plot = basicFigures.get_cytoscape_network(net, dataset_type, args)
+               
+    return conf_plot
 
 def get_network(data, identifier, args):
     net = None
@@ -701,13 +813,13 @@ def get_network(data, identifier, args):
         nx.set_node_attributes(graph, degrees, 'degree')
         betweenness = None
         ev_centrality = None
-        if data.shape[0] < 100:
+        if data.shape[0] < 100 and data.shape[0] > 10:
             betweenness = nx.betweenness_centrality(graph, weight='width')
             ev_centrality = nx.eigenvector_centrality_numpy(graph)
             nx.set_node_attributes(graph, betweenness, 'betweenness')
             nx.set_node_attributes(graph, ev_centrality, 'eigenvector')
 
-        if args['node_size'] == 'betweenness' and betweeness is not None:
+        if args['node_size'] == 'betweenness' and betweenness is not None:
             nx.set_node_attributes(graph, betweenness, 'radius')
         elif args['node_size'] == 'ev_centrality' and ev_centrality is not None:
             nx.set_node_attributes(graph, ev_centrality, 'radius')
