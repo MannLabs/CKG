@@ -371,8 +371,6 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, group, alpha=0.
     return count
 
 def get_counts_permutation_fdr(value, random, observed, n, alpha):
-    print(observed)
-    print("values", value.values[0])
     a = (random <= value.values[0]).sum().sum()
     b = (observed <= value.values[0]).sum()
     qvalue = 1
@@ -451,18 +449,15 @@ def calculate_rm_correlation(df, x, y, subject):
     return (x, y, rm, pvalue, dof)
 
 def run_rm_correlation(df, alpha=0.05, subject='subject', correction=('fdr', 'indep')):
-    calculated = set()
     rows = []
     if not df.empty:
         df = df.set_index(subject)._get_numeric_data().dropna(axis=1)
-        start = time.time()
         combinations = itertools.combinations(df.columns, 2)
         df = df.reset_index()
         for x, y in combinations:
             subset = df[[x,y, subject]]
             row = calculate_rm_correlation(subset, x, y, subject)
             rows.append(row)
-        end = time.time()
         correlation = pd.DataFrame(rows, columns=["node1", "node2", "weight", "pvalue", "dof"])
         
         if correction[0] == 'fdr':
@@ -572,8 +567,6 @@ def calculate_dabest(df, idx, x, y, paired=False, id_col=None, test='mean_diff')
 
     result['identifier'] = y
 
-
-
     return result
 
 def calculate_anova(df, group='group'):
@@ -640,9 +633,15 @@ def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject',
         df = df.set_index([group])
         df = df.drop(drop_cols, axis=1)
         aov_results = []
+        res = None
         for col in df.columns:
             rows = df[col]
             aov_results.append((col,) + calculate_anova(rows, group=group))
+            pairwise = calculate_THSD(rows, group=group)
+            if res is None:
+                res = pairwise
+            else:
+                res = pd.concat([res,pairwise], axis=0)
         scores = pd.DataFrame(aov_results, columns = columns)
         scores = scores.set_index("identifier")
         scores = scores.dropna(how="all")
@@ -661,13 +660,7 @@ def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject',
             scores['correction'] = 'FDR correction BH'
             scores['padj'] = padj
             scores['rejected'] = rejected
-        res = None
-        for col in df.columns:
-            pairwise = calculate_THSD(df[col], group=group)
-            if res is None:
-                res = pairwise
-            else:
-                res = pd.concat([res,pairwise], axis=0)
+        
         if res is not None:
             res = res.join(scores[['F-statistics', 'pvalue', 'padj']].astype('float'))
             res['correction'] = scores['correction']
@@ -685,9 +678,15 @@ def run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subjec
     df = df.set_index([subject,group])
     df = df.drop(drop_cols, axis=1).dropna(axis=1)
     aov_result = []
+    res = None
     for col in df.columns:
         aov = calculate_repeated_measures_anova(df.reset_index(), column=col, subject=subject, group=group, alpha=alpha)
         aov_result.append(aov)
+        pairwise = calculate_pairwise_ttest(df[col].reset_index(), column=col, subject=subject, group=group)
+        if res is None:
+            res = pairwise
+        else:
+            res = pd.concat([res,pairwise], axis=0)
 
     scores = pd.DataFrame(aov_result, columns = ['identifier','F-statistics', 'pvalue'])
     scores = scores.set_index('identifier')
@@ -705,14 +704,7 @@ def run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subjec
         rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'indep')
         scores['correction'] = 'FDR correction BH'
         scores['padj'] = padj
-        
-    res = None
-    for col in df.columns:
-        pairwise = calculate_pairwise_ttest(df[col].reset_index(), column=col, subject=subject, group=group)
-        if res is None:
-            res = pairwise
-        else:
-            res = pd.concat([res,pairwise], axis=0)
+    
     if res is not None:
         res = res.join(scores[['F-statistics', 'pvalue', 'padj']].astype('float'))
         res['correction'] = scores['correction']
