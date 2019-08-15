@@ -10,7 +10,7 @@ import dabest
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 import scipy.stats
 from scipy.special import factorial, betainc
-import umap
+import umap.umap_ as umap
 from sklearn import preprocessing, ensemble, cluster
 from scipy import stats
 import pingouin as pg
@@ -208,10 +208,12 @@ def get_proteomics_measurements_ready(df, index=['group', 'sample', 'subject'], 
             df = imputation_KNN(df)
         elif method == "distribution":
             df = imputation_normal_distribution(df, shift = 1.8, nstd = 0.3)
+        elif method == 'group_median':
+            df = imputation_median_by_group(df)
         elif method == 'mixed':
             df = imputation_mixed_norm_KNN(df)
             
-        df = df.reset_index()
+    df = df.reset_index()
 
     return df
 
@@ -226,19 +228,19 @@ def get_clinical_measurements_ready(df, subject_id='subject', sample_id='biologi
             df = imputation_KNN(processed_df, drop_cols=drop_cols, group=group_id)
         elif imputation_method.lower() == "distribution":
             df = imputation_normal_distribution(processed_df, index=index)
+        elif imputation_method.lower() == 'group_median':
+            df = imputation_median_by_group(processed_df)
         elif imputation_method.lower() == 'mixed':
             df = imputation_mixed_norm_KNN(processed_df,index_cols=index, group=group_id)
     return df
 
 
-def run_pca(data, drop_cols=['sample', 'subject'], group='group', components=2, dropna=True):
+def run_pca(data, drop_cols=['sample', 'subject'], group='group', components=2):
     np.random.seed(112736)
     result = {}
     df = data.copy()
     df = df.drop(drop_cols, axis=1)
     df = df.set_index(group)
-    if dropna:
-        df = df.dropna(axis=1)
     X = df._get_numeric_data()
     y = df.index
     pca = PCA(n_components=components)
@@ -267,13 +269,11 @@ def run_pca(data, drop_cols=['sample', 'subject'], group='group', components=2, 
     
     return result, args
 
-def run_tsne(data, drop_cols=['sample', 'subject'], group='group', components=2, perplexity=40, n_iter=1000, init='pca', dropna=True):
+def run_tsne(data, drop_cols=['sample', 'subject'], group='group', components=2, perplexity=40, n_iter=1000, init='pca'):
     result = {}
     df = data.copy()
     df = df.drop(drop_cols, axis=1)
     df = df.set_index(group)
-    if dropna:
-        df = df.dropna(axis=1)
     X = df._get_numeric_data()
     y = df.index
 
@@ -295,13 +295,11 @@ def run_tsne(data, drop_cols=['sample', 'subject'], group='group', components=2,
     result['tsne'] = resultDf
     return result, args
 
-def run_umap(data, drop_cols=['sample', 'subject'], group='group', n_neighbors=10, min_dist=0.3, metric='cosine', dropna=True):
+def run_umap(data, drop_cols=['sample', 'subject'], group='group', n_neighbors=10, min_dist=0.3, metric='cosine'):
     result = {}
     df = data.copy()
     df = df.drop(drop_cols, axis=1)
     df = df.set_index(group)
-    if dropna:
-        df = df.dropna(axis=1)
     X = df._get_numeric_data()
     y = df.index
 
@@ -340,7 +338,7 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, group, alpha=0.
     df_index = df.index.values
     df_columns = df.columns.values
     columns = ['identifier']
-    rand_pvalues = []
+    rand_pvalues = None
     while i>0:
         df_index = shuffle(df_index, random_state=int(initial_seed + i))
         df_columns = shuffle(df_columns, random_state=int(initial_seed + i))
@@ -357,13 +355,17 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, group, alpha=0.
             rand_scores = pd.DataFrame(aov_results, columns=columns)
             rand_scores = rand_scores.set_index("identifier")
             rand_scores = rand_scores.dropna(how="all")
-            rand_scores = rand_scores[['pvalue_'+str(i)]]
-            rand_pvalues.append(rand_scores)
+            rand_scores = rand_scores['pvalue_'+str(i)]
+            if rand_pvalues is None:
+                rand_pvalues = rand_scores.to_frame()
+            else:
+                rand_pvalues = rand_pvalues.join(rand_scores)
             i -= 1
-    rand_pvalues = pd.concat(rand_pvalues, axis=1)
+    
     count = observed_pvalues.to_frame().apply(func=get_counts_permutation_fdr, result_type='expand', axis=1, args=(rand_pvalues, observed_pvalues, permutations, alpha))
     count.columns = ['padj', 'rejected']
-    
+    #count = count.set_index('identifier')
+
     return count
 
 def get_counts_permutation_fdr(value, random, observed, n, alpha):
@@ -381,12 +383,13 @@ def convertToEdgeList(data, cols):
     return edge_list
 
 def run_correlation(df, alpha=0.05, subject='subject', group='group', method='pearson', correction=('fdr', 'indep')):
+    calculated = set()
     correlation = pd.DataFrame()
     if check_is_paired(df, subject, group):
         if len(df[subject].unique()) > 2:
             correlation = run_rm_correlation(df, alpha=alpha, subject=subject, correction=correction)
     else:
-        df = df.dropna(axis=1)._get_numeric_data()
+        df = df.dropna()._get_numeric_data()
         if not df.empty:
             r, p = run_efficient_correlation(df, method=method)
             rdf = pd.DataFrame(r, index=df.columns, columns=df.columns)
@@ -404,20 +407,6 @@ def run_correlation(df, alpha=0.05, subject='subject', group='group', method='pe
             correlation = correlation[correlation.rejected]
     return correlation
 
-def run_multi_correlation(df, alpha=0.05, subject='subject', on=['subject', 'biological_sample'] , group='group', method='pearson', correction=('fdr', 'indep')):
-    multidf = pd.DataFrame()
-    correlation = None
-    if len(df) > 1:
-        for dtype in df:
-            if multidf.empty:
-                multidf = df[dtype]
-            else:
-                multidf = pd.merge(multidf, df[dtype], how='inner', on=on)
-        
-        correlation = run_correlation(multidf, alpha=0.05, subject=subject, group=group, method=method, correction=correction)
-    
-    return correlation
-    
 def calculate_rm_correlation(df, x, y, subject):
     # ANCOVA model
     cols = ["col0","col1", subject]
@@ -444,15 +433,18 @@ def calculate_rm_correlation(df, x, y, subject):
     return (x, y, rm, pvalue, dof)
 
 def run_rm_correlation(df, alpha=0.05, subject='subject', correction=('fdr', 'indep')):
+    calculated = set()
     rows = []
     if not df.empty:
-        df = df.set_index(subject)._get_numeric_data().dropna(axis=1)
+        df = df.set_index(subject)._get_numeric_data()
+        start = time.time()
         combinations = itertools.combinations(df.columns, 2)
         df = df.reset_index()
         for x, y in combinations:
             subset = df[[x,y, subject]]
             row = calculate_rm_correlation(subset, x, y, subject)
             rows.append(row)
+        end = time.time()
         correlation = pd.DataFrame(rows, columns=["node1", "node2", "weight", "pvalue", "dof"])
         
         if correction[0] == 'fdr':
@@ -562,6 +554,8 @@ def calculate_dabest(df, idx, x, y, paired=False, id_col=None, test='mean_diff')
 
     result['identifier'] = y
 
+
+
     return result
 
 def calculate_anova(df, group='group'):
@@ -588,8 +582,8 @@ def check_is_paired(df, subject, group):
     is_pair = False
     if subject is not None:
         count_subject_groups = df.groupby(subject)[group].count()
-        is_pair = (count_subject_groups > 1).any()
-        
+        is_pair = (count_subject_groups > 1).all()
+
     return is_pair
 
 
@@ -615,6 +609,7 @@ def run_dabest(df, drop_cols=['sample'], subject='subject', group='group', test=
     return scores
 
 def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', group='group', permutations=50):
+    columns = ['identifier', 'F-statistics', 'pvalue']
     if subject is not None and check_is_paired(df, subject, group):
         groups = df[group].unique()
         drop_cols = [d for d in drop_cols if d != subject]
@@ -627,41 +622,63 @@ def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject',
         df = df.set_index([group])
         df = df.drop(drop_cols, axis=1)
         aov_results = []
-        pairwise_results = []
         for col in df.columns:
             rows = df[col]
             aov_results.append((col,) + calculate_anova(rows, group=group))
-            pairwise_results.append(calculate_THSD(rows, group=group))
-            
+        scores = pd.DataFrame(aov_results, columns = columns)
+        scores = scores.set_index("identifier")
+        scores = scores.dropna(how="all")
+
         max_perm = get_max_permutations(df, group=group)
-        res = format_anova_table(df, aov_results, pairwise_results,  group, permutations, alpha, max_perm)
+        #FDR correction
+        if permutations > 0 and max_perm>=10:
+            if max_perm < permutations:
+                permutations = max_perm
+            observed_pvalues = scores.pvalue
+            count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, group=group, alpha=alpha, permutations=permutations)
+            scores= scores.join(count)
+            scores['correction'] = 'permutation FDR ({} perm)'.format(permutations)
+        else:
+            rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'indep')
+            scores['correction'] = 'FDR correction BH'
+            scores['padj'] = padj
+            scores['rejected'] = rejected
+        res = None
+        for col in df.columns:
+            pairwise = calculate_THSD(df[col])
+            if res is None:
+                res = pairwise
+            else:
+                res = pd.concat([res,pairwise], axis=0)
+        if res is not None:
+            res = res.join(scores[['F-statistics', 'pvalue', 'padj']].astype('float'))
+            res['correction'] = scores['correction']
+        else:
+            res = scores
+            res["log2FC"] = np.nan
+
+        res = res.reset_index()
+        res['rejected'] = res['padj'] < alpha
+        res['-log10 pvalue'] = res['padj'].apply(lambda x: -np.log10(x))
     
     return res
 
 def run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subject='subject', group='group', permutations=50):
     df = df.set_index([subject,group])
-    df = df.drop(drop_cols, axis=1).dropna(axis=1)
-    aov_results = []
-    pairwise_results = []
+    df = df.drop(drop_cols, axis=1)
+    aov_result = []
     for col in df.columns:
         aov = calculate_repeated_measures_anova(df.reset_index(), column=col, subject=subject, group=group, alpha=alpha)
-        aov_results.append(aov)
-        pairwise_results.append(calculate_pairwise_ttest(df[col].reset_index(), column=col, subject=subject, group=group)) 
-        
-    max_perm = get_max_permutations(df, group=group)
-    res = format_anova_table(df, aov_results, pairwise_results, group, permutations, alpha, max_perm)
-    
-    return res
+        aov_result.append(aov)
 
-def format_anova_table(df, aov_results, pairwise_results, group, permutations, alpha, max_permutations):
-    columns = ['identifier', 'F-statistics', 'pvalue']
-    scores = pd.DataFrame(aov_results, columns = columns)
+    scores = pd.DataFrame(aov_result, columns = ['identifier','F-statistics', 'pvalue'])
     scores = scores.set_index('identifier')
-       
+    
+    max_perm = get_max_permutations(df)
     #FDR correction
-    if permutations > 0 and max_permutations>=10:
-        if max_permutations < permutations:
-            permutations = max_permutations
+    if permutations > 0 and max_perm>=10:
+        if max_perm < permutations:
+            permutations = max_perm
         observed_pvalues = scores.pvalue
         count = apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, group=group, alpha=alpha, permutations=permutations)
         scores= scores.join(count)
@@ -670,11 +687,19 @@ def format_anova_table(df, aov_results, pairwise_results, group, permutations, a
         rejected, padj = apply_pvalue_fdrcorrection(scores["pvalue"].tolist(), alpha=alpha, method = 'indep')
         scores['correction'] = 'FDR correction BH'
         scores['padj'] = padj
-    
-    res = pd.concat(pairwise_results)
-    if not res.empty:
+        scores['rejected'] = rejected
+        scores['rejected'] = scores['rejected']
+
+    res = None
+    for col in df.columns:
+        pairwise = calculate_pairwise_ttest(df[col].reset_index(), column=col, subject=subject, group=group)
+        if res is None:
+            res = pairwise
+        else:
+            res = pd.concat([res,pairwise], axis=0)
+    if res is not None:
         res = res.join(scores[['F-statistics', 'pvalue', 'padj']].astype('float'))
-        res['correction'] = scores['correction']
+        res['correction'] = 'Greenhouse-Geisser correction' 
     else:
         res = scores
         res["log2FC"] = np.nan
@@ -746,8 +771,8 @@ def run_regulation_enrichment(regulation_data, annotation, identifier='identifie
             grouping.append('background')
         else:
             grouping.append(np.nan)
-    annotation[group_col] = grouping
-    annotation = annotation.dropna(subset=[group_col])
+    annotation['group'] = grouping
+    annotation = annotation.dropna(subset=['group'])
 
     result = run_enrichment(annotation, foreground='foreground', background='background', foreground_pop=len(foreground_list), background_pop=len(background_list), annotation_col=annotation_col, group_col=group_col, identifier_col=identifier, method=method)
     
@@ -917,41 +942,38 @@ def run_WGCNA(data, drop_cols_exp, drop_cols_cli, RsquaredCut=0.8, networkType='
     dfs = wgcna.get_data(data, drop_cols_exp=drop_cols_exp, drop_cols_cli=drop_cols_cli)
     if 'clinical' in dfs:
         data_cli = dfs['clinical']   #Extract clinical data
-        for dtype in dfs:
-            if dtype in ['proteomics', 'rnaseq']:
-                data_exp = dfs[dtype]   #Extract experimental data
-                dtype = 'wgcna-'+dtype
-                result[dtype] = {}
+        data_exp, = [i for i in dfs.keys() if i != 'clinical']   #Get dictionary key for experimental data
+        data_exp = dfs[data_exp]   #Extract experimental data
 
-                softPower = wgcna.pick_softThreshold(data_exp, RsquaredCut=RsquaredCut, networkType=networkType, verbose=verbose)
-                
-                dissTOM, moduleColors = wgcna.build_network(data_exp, softPower=softPower, networkType=networkType, minModuleSize=minModuleSize, deepSplit=deepSplit,
-                                                    pamRespectsDendro=pamRespectsDendro, merge_modules=merge_modules, MEDissThres=MEDissThres, verbose=verbose)
+        softPower = wgcna.pick_softThreshold(data_exp, RsquaredCut=RsquaredCut, networkType=networkType, verbose=verbose)
+        
+        dissTOM, moduleColors = wgcna.build_network(data_exp, softPower=softPower, networkType=networkType, minModuleSize=minModuleSize, deepSplit=deepSplit,
+                                              pamRespectsDendro=pamRespectsDendro, merge_modules=merge_modules, MEDissThres=MEDissThres, verbose=verbose)
 
-                Features_per_Module = wgcna.get_FeaturesPerModule(data_exp, moduleColors, mode='dataframe')
+        Features_per_Module = wgcna.get_FeaturesPerModule(data_exp, moduleColors, mode='dataframe')
 
-                MEs = wgcna.calculate_module_eigengenes(data_exp, moduleColors, softPower=softPower, dissimilarity=False)
+        MEs = wgcna.calculate_module_eigengenes(data_exp, moduleColors, softPower=softPower, dissimilarity=False)
 
-                moduleTraitCor, textMatrix = wgcna.calculate_ModuleTrait_correlation(data_exp, data_cli, MEs)
+        moduleTraitCor, textMatrix = wgcna.calculate_ModuleTrait_correlation(data_exp, data_cli, MEs)
 
-                MM, MMPvalue = wgcna.calculate_ModuleMembership(data_exp, MEs)
+        MM, MMPvalue = wgcna.calculate_ModuleMembership(data_exp, MEs)
 
-                FS, FSPvalue = wgcna.calculate_FeatureTraitSignificance(data_exp, data_cli)
+        FS, FSPvalue = wgcna.calculate_FeatureTraitSignificance(data_exp, data_cli)
 
-                METDiss, METcor = wgcna.get_EigengenesTrait_correlation(MEs, data_cli)
+        METDiss, METcor = wgcna.get_EigengenesTrait_correlation(MEs, data_cli)
 
-                result[dtype]['dissTOM'] = dissTOM
-                result[dtype]['module_colors'] = moduleColors
-                result[dtype]['features_per_module'] = Features_per_Module
-                result[dtype]['MEs'] = MEs
-                result[dtype]['module_trait_cor'] = moduleTraitCor
-                result[dtype]['text_matrix'] = textMatrix
-                result[dtype]['module_membership'] = MM
-                result[dtype]['module_membership_pval'] = MMPvalue
-                result[dtype]['feature_significance'] = FS
-                result[dtype]['feature_significance_pval'] = FSPvalue
-                result[dtype]['ME_trait_diss'] = METDiss
-                result[dtype]['ME_trait_cor'] = METcor
+        result['dissTOM'] = dissTOM
+        result['module_colors'] = moduleColors
+        result['features_per_module'] = Features_per_Module
+        result['MEs'] = MEs
+        result['module_trait_cor'] = moduleTraitCor
+        result['text_matrix'] = textMatrix
+        result['module_membership'] = MM
+        result['module_membership_pval'] = MMPvalue
+        result['feature_significance'] = FS
+        result['feature_significance_pval'] = FSPvalue
+        result['ME_trait_diss'] = METDiss
+        result['ME_trait_cor'] = METcor
 
         return result
 
@@ -996,49 +1018,58 @@ def get_publications_abstracts(data, publication_col="publication", join_by=['pu
     abstracts = pd.DataFrame()
     if not data.empty:
         abstracts = utils.getMedlineAbstracts(list(data.reset_index()[publication_col].unique()))
+        print('Abstracts')
+        print(abstracts)
         abstracts = abstracts.set_index(index)
         abstracts = abstracts.join(data.reset_index()[join_by].set_index(publication_col)).reset_index()
 
     return abstracts
 
+def eta_squared(aov):
+    aov['eta_sq'] = 'NaN'
+    aov['eta_sq'] = aov[:-1]['sum_sq']/sum(aov['sum_sq'])
+    return aov
 
-def run_two_way_anova(data, variables, drop_cols=[], subject="subject", group='group', alpha=0.05):
-    df = data.copy()
-    factor_A, factor_B = variables
-    df[variables] = df[group].str.split('+',expand=True)
-    df = df.set_index([subject]+variables)
-    df = df.drop(drop_cols, axis=1)
-    return None
-#     models = []
-#     aov_result = []
-#     tmp = df.copy()
-#     tmp.columns = tmp.columns.str.replace(r"-", "_")
+def omega_squared(aov):
+    mse = aov['sum_sq'][-1]/aov['df'][-1]
+    aov['omega_sq'] = 'NaN'
+    aov['omega_sq'] = (aov[:-1]['sum_sq']-(aov[:-1]['df']*mse))/(sum(aov['sum_sq'])+mse)
+    return aov
 
-#     #OLS model
-#     for col in tmp.columns:
-#         model = ols('{} ~ C({})*C({})'.format(col, factor_A, factor_B), tmp[col].reset_index().sort_values(variables, ascending=[True, False])).fit()
-#         models.append((col, model, model.f_pvalue))
+def run_two_way_anova(df, drop_cols=['sample'], subject='subject', group=['group', 'secondary_group']):
+    """ 
+    Run a 2-way ANOVA when data['secondary_group'] is not empty
 
-#     models_df = pd.DataFrame(models)
+    Args:
+        df: processed pandas dataframe with samples as rows, and proteins and groups as columns.
+        drop_cols: list of column names to drop from dataframe
+        subject:
+        group: list of column names corresponding to independent variable groups
 
-#     #FDR correction
-#     reject, padj = multi.fdrcorrection([x[-1] for x in models], alpha=alpha, method='indep')
-#     models_df['model_padj'] = padj
-#     models_df['rejected'] = reject
+    """ 
+
+    data = df.copy()
+    factorA, factorB = group
+    data = data.set_index([subject]+group)
+    data = data.drop(drop_cols, axis=1)
+    data.columns = data.columns.str.replace(r"-", "_")
+
+    aov_result = []
+    residuals = {}
+    for col in data.columns:
+        model = ols('{} ~ C({})*C({})'.format(col, factorA, factorB), data[col].reset_index().sort_values(group, ascending=[True, False])).fit()
+        aov_table = sm.stats.anova_lm(model, typ=2)
+        eta_squared(aov_table)
+        omega_squared(aov_table)
+        for i in aov_table.index:
+            if i != 'Residual':
+                t, p, eta, omega = aov_table.loc[i, ['F', 'PR(>F)', 'eta_sq', 'omega_sq']]
+                protein = col.replace('_', '-')
+                aov_result.append((protein, i, t, p, eta, omega))
+        residuals[col] = model.resid
+
+    anova_df = pd.DataFrame(aov_result, columns = ['identifier','source', 'F-statistics', 'pvalue', 'eta_sq', 'omega_sq'])
+    anova_df = anova_df.set_index('identifier')
+    anova_df = anova_df.dropna(how="all")
     
-#     #Anova
-#     for protein in models_df[models_df['model_padj']<0.05][0].unique():
-#         model = models_df.loc[models_df[0] == protein, 1].values[0]
-#         aov = sm.stats.anova_lm(model, typ=2)
-#         aov.columns = ['SS', 'DF', 'F', 'pvalue']
-#         for i in aov.index:
-#             if i != 'Residual':
-#                 t, p = aov.loc[i, ['F', 'pvalue']]
-#                 aov_result.append((protein, i, t, p))
-
-#     scores = pd.DataFrame(aov_result, columns = ['identifier','source', 'F-statistics', 'pvalue'])
-#     scores = scores.set_index('identifier')
-#     scores = scores.dropna(how="all")
-    
-#     return scores
-
+    return anova_df, residuals

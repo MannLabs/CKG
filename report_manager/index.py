@@ -261,7 +261,7 @@ def store_original_data(contents, filename):
 
 @app.callback([Output('clinical-table', 'data'),
                Output('clinical-table', 'columns')],
-              [Input('memory-table-data', 'data'),
+              [Input('memory-original-data', 'data'),
                Input('editing-columns-button', 'n_clicks')],
               [State('clinical-variables-picker', 'value'),
                State('upload-data-type-picker', 'value')])
@@ -308,13 +308,12 @@ def run_processing(n_clicks, data, filename, path_name, dtype):
         message = 'FILE successfully uploaded.'.replace('FILE', '"'+filename+'"')
         return message
 
-@app.callback([Output('memory-original-data', 'clear_data'),
-               Output('memory-table-data', 'clear_data')],
+@app.callback(Output('memory-original-data', 'clear_data'),
               [Input('submit_button', 'n_clicks')])
 def clear_click(n_click_clear):
     if n_click_clear is not None and n_click_clear > 0:
-        return True, True
-    return False, False
+        return True
+    return False
 
 @app.callback([Output('data_download_link', 'href'),
                Output('data_download_link', 'download')],
