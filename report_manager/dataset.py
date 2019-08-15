@@ -177,10 +177,13 @@ class Dataset:
 
     def extract_configuration(self, configuration):
         data_name = None
+        description = None
         analysis_types = []
         plot_types = []
         store_analysis = False
         args = None
+        if "description" in configuration:
+            description = configuration["description"]
         if "data" in configuration:
             data_name = configuration["data"]
         if "analyses" in configuration:
@@ -192,7 +195,7 @@ class Dataset:
         if "args" in configuration:
             args = configuration["args"]
         
-        return data_name, analysis_types, plot_types, store_analysis, args
+        return description, data_name, analysis_types, plot_types, store_analysis, args
 
     def add_configuration_to_report(self, report_pipeline):
         conf_plot = basicFigures.generate_configuration_tree(report_pipeline, self.dataset_type)
@@ -208,7 +211,9 @@ class Dataset:
             if section == "args":
                 continue
             for subsection in self.configuration[section]:
-                data_names, analysis_types, plot_types, store_analysis, args = self.extract_configuration(self.configuration[section][subsection])
+                description, data_names, analysis_types, plot_types, store_analysis, args = self.extract_configuration(self.configuration[section][subsection])
+                if description is not None:
+                    description = basicFigures.get_markdown(description, args={})
                 report_step[section][subsection] = {'data' : data_names, 'analyses': [], 'args': {}}
                 if isinstance(data_names, dict) or isinstance(data_names, list):
                     data = self.get_dataframes(data_names)
@@ -232,6 +237,10 @@ class Dataset:
                                 query = query.replace(rep_str,rep)
                             data = self.send_query(query)
                     result = None
+                    if description is not None:
+                        plots = [description]
+                    else:
+                        plots = []
                     if len(analysis_types) >= 1:
                         for analysis_type in analysis_types:
                             result = ar.AnalysisResult(self.identifier, analysis_type, args, data)
@@ -252,7 +261,7 @@ class Dataset:
                                     else:
                                         self.update_data({subsection+"_"+analysis_type: result.result[analysis_type]})
                                 for plot_type in plot_types:
-                                    plots = result.get_plot(plot_type, subsection+"_"+analysis_type+"_"+plot_type)
+                                    plots.extend(result.get_plot(plot_type, subsection+"_"+analysis_type+"_"+plot_type))
                                     self.report.update_plots({(str(order), subsection+"_"+analysis_type, plot_type):plots})
                                     order +=1
                     else:
@@ -263,7 +272,7 @@ class Dataset:
                             report_pipeline.update(report_step)
                             self.update_analyses(result.result)
                         for plot_type in plot_types:
-                            plots = result.get_plot(plot_type, "_".join(subsection.split(' '))+"_"+plot_type)
+                            plots.extend(result.get_plot(plot_type, "_".join(subsection.split(' '))+"_"+plot_type))
                             self.report.update_plots({(str(order), "_".join(subsection.split(' ')), plot_type): plots})
                             order += 1
         
@@ -280,7 +289,7 @@ class Dataset:
                 for data in self.data:
                     name = data.replace(" ", "_")
                     df_set = grp.create_dataset(name, (1,), dtype=dt, compression="gzip")
-                    df_set[:] = str(self.data[data].to_json(orient='records'))
+                    df_set[:] = str(self.data[data].apply(lambda x: [x.dropna()], axis=1).to_json(orient='records'))
 
     def save_dataset_to_file(self, dataset_directory):
         if not os.path.isdir(dataset_directory):

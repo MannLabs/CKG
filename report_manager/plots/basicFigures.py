@@ -12,7 +12,6 @@ import dash_table
 import plotly.subplots as tools
 import plotly.io as pio
 from scipy.spatial.distance import pdist, squareform
-from plotly.graph_objs import *
 # import dash_bio as dashbio
 from scipy.stats import zscore
 from kmapper import plotlyviz
@@ -60,6 +59,10 @@ def getPlotTraces(data, key='full', type = 'lines', div_factor=float(10^10000), 
 
     return traces
 
+def get_markdown(text, args={}):
+    mkdown = dcc.Markdown(text)
+    
+    return mkdown
 
 def get_distplot(data, identifier, args):
     df = data.copy()
@@ -210,7 +213,6 @@ def get_ranking_plot(data, identifier, args):
 def get_scatterplot_matrix(data, identifier, args):
     num_cols = 3
     fig = {}
-    layouts = []
     if 'group' in args:
         group=args['group']
 
@@ -401,7 +403,7 @@ def get_volcanoplot(results, args):
             range_y = [0,max(abs(result['y']))+0.8]
         else:
             range_y = args["range_y"]
-        trace = Scatter(x=result['x'],
+        trace = go.Scatter(x=result['x'],
                         y=result['y'],
                         mode='markers',
                         text=result['text'],
@@ -688,7 +690,6 @@ def generate_configuration_tree(report_pipeline, dataset_type):
     edges = []
     args = {}
     conf_plot = None
-    legend = None
     if len(report_pipeline) >=1:
         root = dataset_type.title() + " default analysis pipeline"
         nodes.append({'data':{'id':0, 'label':root}, 'classes': 'root'})
@@ -1247,7 +1248,6 @@ def getMapperFigure(data, identifier, title, labels):
 def get_2_venn_diagram(data, identifier, cond1, cond2, args):
     figure = {}
     figure["data"] = []
-    total = len(set(data[cond1].dropna().index).union(set(data[cond2].dropna().index)))
     unique1 = len(set(data[cond1].dropna().index).difference(data[cond2].dropna().index))#/total
     unique2 = len(set(data[cond2].dropna().index).difference(data[cond1].dropna().index))#/total
     intersection = len(set(data[cond1].dropna().index).intersection(data[cond2].dropna().index))#/total

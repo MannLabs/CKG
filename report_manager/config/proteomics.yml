@@ -1,9 +1,10 @@
 args:
     imputation: True
-    imputation_method: mixed 
+    imputation_method: distribution 
     missing_method: percentage
     missing_max: 0.3
     value_col: LFQ intensity
+    permutations: 0
     index:
         - group
         - sample
@@ -106,6 +107,15 @@ overview: #section
             title: 'Proteins %CV'
 data exploration:
     stratification:
+        description: > 
+                        ' #Principal Component Analysis
+                        
+                        **Principal component analysis (PCA)** is a statistical procedure that uses an orthogonal transformation to convert a set of observations 
+                        of possibly correlated variables (entities each of which takes on various numerical values) into a set of values of linearly uncorrelated 
+                        variables called principal components. This transformation is defined in such a way that the first principal component has the largest possible variance 
+                        (that is, accounts for as much of the variability in the data as possible), and each succeeding component in turn has the highest variance possible under 
+                        the constraint that it is orthogonal to the preceding components. The resulting vectors (each being a linear combination of the variables and containing n observations) 
+                        are an uncorrelated orthogonal basis set. PCA is sensitive to the relative scaling of the original variables. [Wikipedia](https://en.wikipedia.org/wiki/Principal_component_analysis)'
         data: processed
         analyses:
             - pca
@@ -125,6 +135,13 @@ data exploration:
             loadings: 15
             title: 'Sample stratification'
     regulation:
+        description: >
+                        ' #Regulation
+                        
+                        **Analysis of variance (ANOVA)** is a collection of statistical models and their associated estimation procedures (such as the "variation" among and between groups) 
+                        used to analyze the differences among group means in a sample. ANOVA was developed by statistician and evolutionary biologist Ronald Fisher. The ANOVA is based on the law of 
+                        total variance, where the observed variance in a particular variable is partitioned into components attributable to different sources of variation. In its simplest form, 
+                        ANOVA provides a statistical test of whether two or more population means are equal, and therefore generalizes the t-test beyond two means.[Wikipedia](https://en.wikipedia.org/wiki/Analysis_of_variance)'
         data: processed
         analyses:
             - anova

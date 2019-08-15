@@ -25,8 +25,6 @@ from report_manager.analyses import wgcnaAnalysis as wgcna
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
 import time
-from joblib import Parallel, delayed
-from numba import jit
 
 def transform_into_wide_format(data, index, columns, values, extra=[]):
     df = data.copy()
@@ -337,19 +335,19 @@ def apply_pvalue_twostage_fdrcorrection(pvalues, alpha=0.05, method='bh'):
     return (rejected, padj)
 
 def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, group, alpha=0.05, permutations=50):
-    print("starting correction")
     initial_seed = 176782
-    #permutations=1
     i = permutations
     df_index = df.index.values
+    df_columns = df.columns.values
     columns = ['identifier']
     rand_pvalues = []
     while i>0:
-        print(i)
         df_index = shuffle(df_index, random_state=int(initial_seed + i))
+        df_columns = shuffle(df_columns, random_state=int(initial_seed + i))
         df_random = df.reset_index(drop=True)
         df_random.index = df_index
         df_random.index.name = group
+        df_random.columns = df_columns
         columns = ['identifier', 'F-statistics', 'pvalue_'+str(i)]
         if list(df_random.index) != list(df.index):
             aov_results = []
@@ -369,11 +367,10 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, group, alpha=0.
     return count
 
 def get_counts_permutation_fdr(value, random, observed, n, alpha):
-    a = (random <= value.values[0]).sum().sum()
+    a = (random <= value.values[0]).sum().sum() + 0.01 #Offset in case of a = 0.0
     b = (observed <= value.values[0]).sum()
-    qvalue = 1
-    if a!=0 and b != 0:
-        qvalue = (a/b * 1/n)
+    qvalue = (a/b * 1/n)
+    
     return (qvalue, qvalue <= alpha)
 
 def convertToEdgeList(data, cols):

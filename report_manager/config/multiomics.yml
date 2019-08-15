@@ -1,33 +1,4 @@
 data exploration:
-    wgcna:
-        data:
-            proteomics: processed
-            rnaseq: processed
-            clinical: processed
-        analyses:
-            - wgcna
-        plots:
-            - wgcnaplots
-        store_analysis: True
-        args:
-            drop_cols_exp:
-                - subject
-                - group
-                - sample
-                - index
-            drop_cols_cli:
-                - index
-                - subject
-                - group
-                - biological_sample
-            RsquaredCut: 0.8
-            networkType: 'unsigned'
-            minModuleSize: 30
-            deepSplit: 2
-            pamRespectsDendro: False
-            merge_modules: True
-            MEDissThres: 0.25
-            verbose: 0
     clinical_correlation:
         data: 
             longitudinal_proteomics: processed
