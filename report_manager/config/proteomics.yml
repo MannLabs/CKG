@@ -4,7 +4,6 @@ args:
     missing_method: percentage
     missing_max: 0.3
     value_col: LFQ intensity
-    permutations: 0
     index:
         - group
         - sample
@@ -107,9 +106,8 @@ overview: #section
             title: 'Proteins %CV'
 data exploration:
     stratification:
-        description: > 
-                        ' #Principal Component Analysis
-                        
+        description: '# Principal Component Analysis
+        
                         **Principal component analysis (PCA)** is a statistical procedure that uses an orthogonal transformation to convert a set of observations 
                         of possibly correlated variables (entities each of which takes on various numerical values) into a set of values of linearly uncorrelated 
                         variables called principal components. This transformation is defined in such a way that the first principal component has the largest possible variance 
