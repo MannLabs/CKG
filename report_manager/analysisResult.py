@@ -141,19 +141,16 @@ class AnalysisResult:
             self.result[self.analysis_type] = anova_result
             print('ANOVA', time.time() - start)
         elif self.analysis_type  == '2-way anova':
-            alpha = 0.05
             drop_cols = []
-            variables = ['factor A', 'factor B']
             subject = 'subject'
-            if "alpha" in self.args:
-                alpha = self.args["alpha"]
+            group = ['group', 'secondary_group']
             if "drop_cols" in self.args:
                 drop_cols = self.args['drop_cols']
             if "subject" in self.args:
                 subject = self.args["subject"]
-            if "variables" in self.args:
-                variables = self.args["variables"]
-            two_way_anova_result = analyses.run_two_way_anova(self.data, variables=variables, drop_cols=drop_cols, subject=subject, alpha=alpha)
+            if "group" in self.args:
+                group = self.args["group"]
+            two_way_anova_result = analyses.run_two_way_anova(self.data, drop_cols=drop_cols, subject=subject, group=group)
             self.result[self.analysis_type] = two_way_anova_result
         elif self.analysis_type == "repeated_measurements_anova":
             start = time.time()
