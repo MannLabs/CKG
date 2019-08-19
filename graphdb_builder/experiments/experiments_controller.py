@@ -35,6 +35,7 @@ def readDataset(uri):
             data = readDataFromTXT(uri)
         else:
             data = readDataFromCSV(uri)
+    data = data.dropna(how='all')
 
     return data
 
@@ -69,6 +70,7 @@ def extractSubjectReplicates(data, regex):
                 timepoint = " " + fields[2]
             ident = value + " " + subject + timepoint
             subjectDict[ident].append(c)
+    
     return subjectDict
 
 
@@ -114,13 +116,15 @@ def mergeColAttributes(data, attributes, index):
     return data
 
 def calculateMedianReplicates(data, log = "log2"):
+    median=pd.DataFrame(index=data.index, columns=[0])
     if log == "log2":
-        data = data.applymap(lambda x:np.log2(x) if x > 0 else np.nan)
+        median = data.median(axis=1).to_frame().applymap(lambda x:np.log2(x) if x > 0 else np.nan)
     elif log == "log10":
-        data = data.applymap(lambda x:np.log10(x) if x > 0 else np.nan)
-    median = data.median(axis=1).sort_values(axis=0, ascending= True, na_position = 'first').to_frame()
-    median  = median.sort_index()[0]
-    return median
+        median = data.median(axis=1).to_frame().applymap(lambda x:np.log10(x) if x > 0 else np.nan)
+    else:
+        median = data.median(axis=1).to_frame()
+        
+    return median[0]
 
 def updateGroups(data, groups):
     #del groups.index.name
@@ -166,6 +170,8 @@ def parseProteomicsDataset(projectId, configuration, dataDir):
             aux = data[subjectDict[subject]]
             data[subject] = calculateMedianReplicates(aux, log)
         dataset = data.drop(delCols, 1)
+        dataset=dataset.dropna(how='all')
+    
     return dataset
 
 ########### Genomics Datasets ############
@@ -577,9 +583,7 @@ def extractProteinSubjectRelationships(data, configuration):
     aux = aux.reset_index()
     aux.columns = ["c"+str(i) for i in range(len(aux.columns))]
     columns = ['END_ID', 'START_ID',"value"]
-    
     (cAttributes,cCols), (rAttributes,regexCols) = extractAttributes(data, attributes)
-    
     if not rAttributes.empty:
         aux = mergeRegexAttributes(aux, rAttributes, ["c0","c1"])
         columns.extend(regexCols)
@@ -652,6 +656,7 @@ def loadProteomicsDataset(uri, configuration):
     #Apply filters
     data = data[data[filters].isnull().all(1)]
     data = data.drop(filters, axis=1)
+    data = data.dropna(subset=[configuration["proteinCol"]], axis=0)
     data = expand_groups(data, configuration)
     columns = set(columns).difference(filters)
     columns.remove(indexCol)
@@ -662,8 +667,16 @@ def loadProteomicsDataset(uri, configuration):
         columns.update(set(filter(r.match, data.columns)))
     #Add simple and regex columns into a single DataFrame
     data = data[list(columns)]
+    data = remove_contaminant_tag(data, column=configuration["proteinCol"] , tag=configuration['contaminant_tag'])
+    data = data.dropna(how='all', axis=0)
     
     return data, regexCols
+
+def remove_contaminant_tag(data, column, tag='CON__'):
+    if column in data.columns:
+        data[column] = data[column].apply(lambda x: x.replace(tag, 'CHANGED!_'))
+    
+    return data
 
 def expand_groups(data, configuration):
     s = data[configuration["proteinCol"]].str.split(';').apply(pd.Series, 1).stack().reset_index(level=1, drop=True)

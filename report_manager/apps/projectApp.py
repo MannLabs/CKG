@@ -21,8 +21,10 @@ class ProjectApp(basicApp.BasicApp):
         self._project_id = project_id
 
     def build_page(self):
-        p = project.Project(self.project_id, datasets=None, report={})
-
+        p = project.Project(self.project_id, datasets={}, report={})
+        p.build_project()
+        p.generate_report()
+        
         if p.name is not None:
             self.title = "Project: {}".format(p.name)
         else:

@@ -107,7 +107,7 @@ overview: #section
 data exploration:
     stratification:
         description: '# Principal Component Analysis
-        
+
                         **Principal component analysis (PCA)** is a statistical procedure that uses an orthogonal transformation to convert a set of observations 
                         of possibly correlated variables (entities each of which takes on various numerical values) into a set of values of linearly uncorrelated 
                         variables called principal components. This transformation is defined in such a way that the first principal component has the largest possible variance 
@@ -133,9 +133,8 @@ data exploration:
             loadings: 15
             title: 'Sample stratification'
     regulation:
-        description: >
-                        ' #Regulation
-                        
+        description: ' #Regulation
+        
                         **Analysis of variance (ANOVA)** is a collection of statistical models and their associated estimation procedures (such as the "variation" among and between groups) 
                         used to analyze the differences among group means in a sample. ANOVA was developed by statistician and evolutionary biologist Ronald Fisher. The ANOVA is based on the law of 
                         total variance, where the observed variance in a particular variable is partitioned into components attributable to different sources of variation. In its simplest form, 

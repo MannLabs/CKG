@@ -1,3 +1,30 @@
+remove_project:
+    name: remove project
+    description: Remove project and all its relationships (Subject, Biological sample, Analytical sample)
+    involved_nodes:
+        - Project
+        - Subject
+        - Biological_sample
+        - Analytical_sample
+    involved_rels:
+        - HAS_ENROLLED
+        - BELONGS_TO_SUBJECT
+        - SPLITTED_INTO
+    query_type: post
+    query: >
+            call apoc.periodic.iterate('MATCH (p:Project)-[:HAS_ENROLLED]-(s:Subject)-[:BELONGS_TO_SUBJECT]-(bio:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample) 
+                WHERE p.id="PROJECTID" RETURN a', 
+                "DETACH DELETE a", 
+                {batchSize:50}) yield batches, total return batches, total;
+            call apoc.periodic.iterate('MATCH (p:Project)-[:HAS_ENROLLED]-(s:Subject)-[:BELONGS_TO_SUBJECT]-(bio:Biological_sample) 
+                WHERE p.id="PROJECTID" RETURN bio', 
+                "DETACH DELETE bio", 
+                {batchSize:50}) yield batches, total return batches, total;
+            call apoc.periodic.iterate('MATCH (p:Project)-[:HAS_ENROLLED]-(s:Subject) 
+                WHERE p.id="PROJECTID" RETURN s', 
+                "DETACH DELETE s", 
+                {batchSize:50}) yield batches, total return batches, total;
+            MATCH (p:Project) WHERE p.id="PROJECTID" DETACH DELETE p;
 attributes:
     name: project information
     description: 'Gets all the attributes of a given Project. Requires: Project.id'

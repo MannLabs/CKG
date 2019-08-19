@@ -19,14 +19,12 @@ ox : &var_ox
         - 'Score'
         - 'Intensity \w+_AS\d+_?-?\d*'
         - 'Reverse'
-        - 'Potential contaminant'
         - 'Score'
         - 'Delta score'
         - 'Score for localization'
         - 'Localization prob'
     'filters':
         - 'Reverse'
-        - 'Potential contaminant'
     'attributes':
         'col':
             - 'Sequence window'
@@ -38,6 +36,7 @@ ox : &var_ox
     'indexCol': 'Proteins'
     'groupCol': 'id'
     'valueCol': 'Intensity'
+    'contaminant_tag': 'CON__'
     'multipositions': 'Positions within proteins'
     'positionCols':
         - 'Positions within proteins'
@@ -59,14 +58,12 @@ gly : &var_gly
         - 'Score'
         - 'Intensity \w+_AS\d+_?-?\d*'
         - 'Reverse'
-        - 'Potential contaminant'
         - 'Score'
         - 'Delta score'
         - 'Score for localization'
         - 'Localization prob'
     'filters':
         - 'Reverse'
-        - 'Potential contaminant'
     'attributes':
         'col':
             - 'Sequence window'
@@ -78,6 +75,7 @@ gly : &var_gly
     'indexCol': 'Proteins'
     'groupCol': 'id'
     'valueCol': 'Intensity'
+    'contaminant_tag': 'CON__'
     'multipositions': 'Positions within proteins'
     'positionCols':
         - 'Positions within proteins'
@@ -99,14 +97,12 @@ p : &var_p
         - 'Score'
         - 'Intensity \w+_AS\d+_?-?\d*'
         - 'Reverse'
-        - 'Potential contaminant'
         - 'Score'
         - 'Delta score'
         - 'Score for localization'
         - 'Localization prob'
     'filters':
         - 'Reverse'
-        - 'Potential contaminant'
     'attributes':
         'col':
             - 'Sequence window'
@@ -118,6 +114,7 @@ p : &var_p
     'indexCol': 'Proteins'
     'groupCol': 'id'
     'valueCol': 'Intensity'
+    'contaminant_tag': 'CON__'
     'multipositions': 'Positions within proteins'
     'positionCols':
         - 'Positions within proteins'
@@ -146,14 +143,13 @@ dataTypes :
                 - 'LFQ intensity \w+_AS\d+_?-?\d*'  #subject_replicate_timepoint
                 - 'Intensity \w+_AS\d+_?-?\d*'
                 - 'Reverse'
-                - 'Potential contaminant'
                 - 'Only identified by site'
                 - 'is_razor'
             'filters':
                 - 'Reverse'
-                - 'Potential contaminant'
                 - 'Only identified by site'
             'proteinCol': 'Majority protein IDs'
+            'contaminant_tag': 'CON__'
             'valueCol': 'LFQ intensity'
             'groupCol': 'id'
             'indexCol': 'Majority protein IDs'
@@ -185,15 +181,14 @@ dataTypes :
                 - 'Protein group IDs'
                 - 'Intensity \w+_AS\d+_?-?\d*'
                 - 'Reverse'
-                - 'Potential contaminant'
             'filters':
                 - 'Reverse'
-                - 'Potential contaminant'
             'attributes':
                 'col':
                     - 'Score'
                     - 'Protein group IDs'
             'proteinCol': 'Proteins'
+            'contaminant_tag': 'CON__'
             'valueCol': 'Intensity'
             'groupCol': 'id'
             'indexCol': 'Sequence'

@@ -28,7 +28,7 @@ class Project:
          >>> p.show_report(environment="notebook")
     '''
 
-    def __init__(self, identifier, datasets=None, report={}):
+    def __init__(self, identifier, datasets={}, report={}):
         self._identifier = identifier
         self._queries_file = 'queries/project_cypher.yml'
         self._datasets = datasets
@@ -42,11 +42,7 @@ class Project:
         self._num_subjects = None
         self._similar_projects = None
         self._overlap = None
-        if self._datasets is None:
-            self._datasets = {}
-            self.build_project()
-            self.generate_report()
-
+        
     @property
     def identifier(self):
         return self._identifier
@@ -164,7 +160,24 @@ class Project:
 
     def update_report(self, new):
         self.report.update(new)
-
+        
+    def remove_project(self, host="localhost", port=7687, user="neo4j", password="password"):
+        try:
+            cwd = os.path.abspath(os.path.dirname(__file__))
+            query_path = os.path.join(cwd, self.queries_file)
+            project_cypher = query_utils.read_queries(query_path)
+            query = query_utils.get_query(project_cypher, query_id="remove_project")
+            driver = connector.connectToDB(host, port, user, password)
+            queries = query.replace("PROJECTID",self.identifier)
+            for query in queries.split(';')[:-1]:
+                print(query)            
+                result = connector.sendQuery(driver, query+';', parameters={}).data()
+                print(result)   
+        except Exception as err:
+            print(err)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            logger.error("Error removing project {}. Query file: {},line: {}, error: {}".format(self.identifier, fname, exc_tb.tb_lineno, err))
 
     def get_report_directory(self):
         reports_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),"../../data/reports/"), self.identifier)
