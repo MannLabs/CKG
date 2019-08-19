@@ -170,11 +170,8 @@ class Project:
             driver = connector.connectToDB(host, port, user, password)
             queries = query.replace("PROJECTID",self.identifier)
             for query in queries.split(';')[:-1]:
-                print(query)            
                 result = connector.sendQuery(driver, query+';', parameters={}).data()
-                print(result)   
         except Exception as err:
-            print(err)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             logger.error("Error removing project {}. Query file: {},line: {}, error: {}".format(self.identifier, fname, exc_tb.tb_lineno, err))

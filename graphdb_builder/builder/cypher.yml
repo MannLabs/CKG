@@ -1,13 +1,3 @@
-CREATE_USER: 
-    'name': "create_user"
-    'description': "Creates a new user in the database"
-    'query': "CALL dbms.security.createUser(username, password, requirePasswordChange: False)"
-
-ADD_ROLE_TO_USER: 
-    'name': "add_role_to_user"
-    'description': "Add a new database role to the specified user"
-    'query': "CALL dbms.security.addRoleToUser(ROLENAME, USERNAME)"
-
 COUNT_RELATIONSHIPS: 
     'name': "count_relationships"
     'description': "Counts the number of relationships of a given type"

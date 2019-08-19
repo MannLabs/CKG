@@ -1,3 +1,4 @@
+import time
 import os
 import sys
 import pandas as pd
@@ -288,8 +289,13 @@ class Dataset:
                 grp = f.create_group(self.dataset_type)
                 for data in self.data:
                     name = data.replace(" ", "_")
+                    start = time.time()
                     df_set = grp.create_dataset(name, (1,), dtype=dt, compression="gzip")
+                    end = time.time()
+                    print(self.dataset_type, data, "Created dataset", end-start)
                     df_set[:] = str(self.data[data].apply(lambda x: [x.dropna()], axis=1).to_json(orient='records'))
+                    nend= time.time()
+                    print(self.dataset_type, data, "Dict transformed and saved", end-start)
 
     def save_dataset_to_file(self, dataset_directory):
         if not os.path.isdir(dataset_directory):

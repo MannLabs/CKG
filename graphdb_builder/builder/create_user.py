@@ -76,134 +76,85 @@ def create_user_db(driver, args):
 		logger.error("Reading query {}: {}, file: {},line: {}, error: {}".format(query_name_add, sys.exc_info(), fname, exc_tb.tb_lineno, err))
 	return 'Done'
 
-def create_user_from_command_line(driver, args, expiration=365):
-	query_name = 'create_user_node'
-	date = datetime.today() + timedelta(days=expiration)
-	try:
-		data = vars(args)
-		username = check_if_node_exists(driver, 'username', data['username'])
-		name = check_if_node_exists(driver, 'name', data['name'])
-		email = check_if_node_exists(driver, 'email', data['email'])
+def create_user_from_command_line(args, expiration=365):
+	data = vars(args)
+	result = create_user(data, expiration)
 
-		if username.size == 0 and name.size == 0 and email.size == 0:
-			user_id = get_new_user_identifier(driver)
-			if user_id is None:
-				user_id = 'U1'
-			else:
-				pass
-			data['ID'] = user_id
-			data['acronym'] = ''.join([c for c in data['name'] if c.isupper()])
-			data['password'] = data['username']
-			data['rolename'] = 'reader'
-			data['expiration_date'] = date.strftime('%Y-%m-%d')
-			data['image'] = ''
-
-			create_user_db(driver, data)
-			user_creation_cypher = get_user_creation_queries()
-			query = user_creation_cypher[query_name]['query']
-			for q in query.split(';')[0:-1]:
-				if '$' in q:
-					result = connector.getCursorData(driver, q+';', parameters=data)
-				else:
-					result = connector.getCursorData(driver, q+';')
-		if username.size != 0:
-			print('A user with the same username "{}" already exists. Modify username.'.format(data['username']))
-			pass
-		if name.size != 0:
-			print('A user with the same name "{}" already exists. Modify name.'.format(data['name']))
-			pass
-		if email.size != 0:
-			print('A user with the same email "{}" already exists. Modify email.'.format(data['email']))
-			pass
-	except Exception as err:
-		exc_type, exc_obj, exc_tb = sys.exc_info()
-		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-		logger.error("Reading query {}: {}, file: {},line: {}, error: {}".format(query_name, sys.exc_info(), fname, exc_tb.tb_lineno, err))
-
-	#Save new user to file
-	usersDir = os.path.join(os.getcwd(),config["usersDirectory"])
-	file = os.path.join(usersDir, 'users.tsv')
-	data = pd.DataFrame.from_dict(data, orient='index').T
-	data = data[['ID', 'acronym', 'name', 'username', 'email', 'secondary_email', 'phone_number', 'affiliation', 'expiration_date', 'rolename', 'image']]
-	with open(file, 'a') as f:
-		data.to_csv(path_or_buf = f, sep='\t',
-                    header=False, index=False, quotechar='"',
-                    line_terminator='\n', escapechar='\\')
 	return result
 
 
-def create_user_from_file(filepath, expiration=365):
-	query_name_add = 'create_user'
-	query_name_role = 'add_role_to_user'
+def create_user_from_file(filepath, expiration):
+    data = pd.read_excel(filepath).applymap(str)
+    result = create_user(data, expiration)
+    
+    return result
+
+def create_user(data, expiration=365):
+	query_name_add = 'create_db_user'
+	query_name_role = 'add_role_to_db_user'
 	query_name_node = 'create_user_node'
+	query_list_db_users =  'list_db_users'
 
 	driver = connector.getGraphDatabaseConnectionConfiguration()
-
 	date = datetime.today() + timedelta(days=expiration)
 	df = []
 	done = 0
+
 	try:
-		data = pd.read_excel(filepath).applymap(str)
 		cypher = get_user_creation_queries()
-		query = cypher[query_name_add]['query'] + cypher[query_name_role]['query'] + cypher[query_name_node]['query']
-		for index, row in data.iterrows():		
+		db_query = cypher[query_name_add]['query'] + cypher[query_name_role]['query']
+		for index, row in data.iterrows():
 			username = check_if_node_exists(driver, 'username', row['username'])
 			name = check_if_node_exists(driver, 'name', row['name'])
 			email = check_if_node_exists(driver, 'email', row['email'])
-			
-			if username.size == 0 and name.size == 0 and email.size == 0:
+			if len(username) == 0 and len(name) == 0 and len(email) == 0:
 				user_id = get_new_user_identifier(driver)
 				if user_id is None:
 					user_id = 'U1'
-				else:
-					pass
 				row['ID'] = user_id
 				row['acronym'] = ''.join([c for c in row['name'] if c.isupper()])
 				row['password'] = row['username']
 				row['rolename'] = 'reader'
 				row['expiration_date'] = date.strftime('%Y-%m-%d')
 				row['image'] = ''
-
-				for q in query.split(';')[0:-1]:
-					if '$' in q:			
-						result = connector.getCursorData(driver, q+';', parameters=row.to_dict())
-					else:
-						result = connector.getCursorData(driver, q+';')
-					done += 1
-				df.append(row)
 				
-			if username.size != 0:
-				print('A user with the same username "{}" already exists. Modify username.'.format(row['username']))
-				continue
-			if name.size != 0:
-				print('A user with the same name "{}" already exists. Modify name.'.format(row['name']))
-				continue
-			if email.size != 0:
-				print('A user with the same email "{}" already exists. Modify email.'.format(row['email']))
-				continue
+				for q in cypher[query_name_node]['query'].split(';')[0:-1]:
+					parameters = {}
+					if '$' in q:
+						parameters = row.to_dict()
+					result = connector.getCursorData(driver, q+';', parameters=parameters)
+				logger.info("New user created: {}. Result: {}".format(row['username'], result))
+				df.append(row)
+				done +=1
+				db_users = connector.getCursorData(driver, cypher[query_list_db_users]['query'],{})
+				if row['username'] not in db_users['username'].to_list() or db_users.empty:
+					print("IN")
+					for q in db_query.split(';')[0:-1]:
+						result = connector.getCursorData(driver, q+';', parameters=row.to_dict())
 	except Exception as err:
 		exc_type, exc_obj, exc_tb = sys.exc_info()
 		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 		logger.error("Reading query {}: {}, file: {},line: {}, error: {}".format(query_name_add, sys.exc_info(), fname, exc_tb.tb_lineno, err))
 
-	#Save new user to file
-	usersDir = os.path.join(cwd,'../../../data/imports/users')
-	file = os.path.join(usersDir, 'users.tsv')
-	data = pd.DataFrame(df)
-	data = data[['ID', 'acronym', 'name', 'username', 'email', 'secondary_email', 'phone_number', 'affiliation', 'expiration_date', 'rolename', 'image']]
-	
-	if os.path.exists(file):
-		with open(file, 'a') as f:
-			data.to_csv(path_or_buf = f, sep='\t',
-            	        header=False, index=False, quotechar='"',
-                	    line_terminator='\n', escapechar='\\')
-	else:
-		with open(file, 'w') as f:
-			data.to_csv(path_or_buf = f, sep='\t',
-            	        header=True, index=False, quotechar='"',
-                	    line_terminator='\n', escapechar='\\')
-	return done
+	if len(df) > 0:
+		#Save new user to file
+		usersDir = os.path.join(cwd,'../../../data/imports/users')
+		ifile = os.path.join(usersDir, 'users.tsv')
+		data = pd.DataFrame(df)
+		data = data[['ID', 'acronym', 'name', 'username', 'email', 'secondary_email', 'phone_number', 'affiliation', 'expiration_date', 'rolename', 'image']]
 
+		if os.path.exists(ifile):
+			with open(ifile, 'a') as f:
+				data.to_csv(path_or_buf = f, sep='\t',
+							header=False, index=False, quotechar='"',
+							line_terminator='\n', escapechar='\\')
+		else:
+			with open(ifile, 'w') as f:
+				data.to_csv(path_or_buf = f, sep='\t',
+							header=True, index=False, quotechar='"',
+							line_terminator='\n', escapechar='\\')
+	return done
+    
 
 def set_arguments():
 	parser = argparse.ArgumentParser('Use an excel file (multiple new users) or the function arguments (one new user at a time) to create new users in the database')

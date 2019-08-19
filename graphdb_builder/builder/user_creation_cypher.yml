@@ -1,11 +1,16 @@
-create_user: 
+list_db_users:
+    name: list database Users
+    description: Returns a list of database Users
+    query: "CALL dbms.security.listUsers() YIELD username RETURN username"
+
+create_db_user: 
     name: create system user
     description: 'Creates a new user in the database'
     involved_nodes:
     involved_rels:
     query: >
         CALL dbms.security.createUser($username, $password, false);
-add_role_to_user: 
+add_role_to_db_user: 
     name': add role to user
     description': 'Add a new database role to the specified user'
     involved_nodes:
