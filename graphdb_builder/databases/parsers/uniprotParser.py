@@ -33,7 +33,7 @@ def parser(databases_directory, import_directory, download=True):
     return stats 
 
 def parse_idmapping_file(databases_directory, config, import_directory, download=False):
-    regex_transcript = r"(-\d$)"
+    regex_transcript = r"(-\d+$)"
     taxids = config['species']
 
     proteins_output_file = os.path.join(import_directory, "Protein.tsv")
@@ -61,10 +61,14 @@ def parse_idmapping_file(databases_directory, config, import_directory, download
     mp.reset_mapping(entity="Protein")
     with open(mapping_file, 'w') as out:
         for line in uf:
-            if 'UniParc' in line.decode('utf-8'):
-                continue
             data = line.decode('utf-8').rstrip("\r\n").split("\t")
             iid = data[0]
+            if 'UniParc' in data:
+                if re.search(regex_transcript,iid):
+                    transcripts.add(iid)
+                continue
+            # data = line.decode('utf-8').rstrip("\r\n").split("\t")
+            # iid = data[0]
             field = data[1]
             alias = data[2]                
             
