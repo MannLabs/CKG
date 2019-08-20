@@ -118,9 +118,9 @@ def mergeColAttributes(data, attributes, index):
 def calculateMedianReplicates(data, log = "log2"):
     median=pd.DataFrame(index=data.index, columns=[0])
     if log == "log2":
-        median = data.median(axis=1).to_frame().applymap(lambda x:np.log2(x) if x > 0 else np.nan)
+        median = data.applymap(lambda x:np.log2(x) if x > 0 else np.nan).median(axis=1).to_frame()
     elif log == "log10":
-        median = data.median(axis=1).to_frame().applymap(lambda x:np.log10(x) if x > 0 else np.nan)
+        median = data.applymap(lambda x:np.log10(x) if x > 0 else np.nan).median(axis=1).to_frame()
     else:
         median = data.median(axis=1).to_frame()
         
