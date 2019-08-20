@@ -42,7 +42,7 @@ app.layout = dcc.Loading(
     children=[html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content', style={'padding-top':10}),
-])], style={'text-align':'center','width':'25px', 'height':'25px','margin-top':'-70px','margin-bottom':'-60px','position':'absolute','top':'50%','left':'45%'}, type='cube')
+])], style={'text-align':'center','width':'15px', 'height':'15px','margin-top':'-90px','margin-bottom':'-60px','position':'absolute','top':'50%','left':'45%'}, type='cube')
 
 @app.callback(Output('page-content', 'children'),
               [Input('url', 'pathname')])
@@ -50,7 +50,6 @@ def display_page(pathname):
     if pathname is not None:
         if pathname == '/apps/initial' or pathname == '/':
             return initialApp.layout
-
         elif pathname.startswith('/apps/projectCreation'):
             projectCreation = projectCreationApp.ProjectCreationApp("Project Creation", "", "", layout = [], logo = None, footer = None)
             return projectCreation.layout

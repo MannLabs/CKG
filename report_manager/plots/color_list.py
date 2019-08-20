@@ -712,8 +712,7 @@ def read_colors():
     color_dict = make_color_dict()
     rgbs = invert_dict(color_dict).items()
     rgbs.sort()
-    for rgb, names in rgbs:
-        names.sort()
+    
     return color_dict, rgbs
 
 
@@ -736,11 +735,11 @@ def invert_dict(d):
 
 if __name__ == '__main__':
     color_dict = make_color_dict()
-    for name, rgb in color_dict.iteritems():
+    for name, rgb in color_dict.items():
         print(name, rgb)
 
     color_dict, rgbs = read_colors()
-    for name, rgb in color_dict.iteritems():
+    for name, rgb in color_dict.items():
         print(name, rgb)
 
     for rgb, names in rgbs:

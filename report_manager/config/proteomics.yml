@@ -133,7 +133,7 @@ data exploration:
             loadings: 15
             title: 'Sample stratification'
     regulation:
-        description: ' #Regulation
+        description: '# Regulation
         
                         **Analysis of variance (ANOVA)** is a collection of statistical models and their associated estimation procedures (such as the "variation" among and between groups) 
                         used to analyze the differences among group means in a sample. ANOVA was developed by statistician and evolutionary biologist Ronald Fisher. The ANOVA is based on the law of 
@@ -154,6 +154,7 @@ data exploration:
             colorscale: 'Blues'
             showscale: False
             marker_size: 10
+            permutations: 75
             x_title: logFC
             y_title: -log(pvalue)
             drop_cols:
@@ -243,11 +244,17 @@ data associations:
             use:
                 columns: identifiers
             height: 700
-            width: 900
+            width: 1300
             stopwords: 
-                - 'BACKGGROUND:'
+                - BACKGROUND
+                - CONCLUSION
+                - RESULT
+                - METHOD
+                - CONCLUSIONS
+                - RESULTS
+                - METHODS
             max_words: 400
-            max_font_size: 100
+            max_font_size: 600
             margin: 1
             text_col: 'abstract'
             title: 'List of publications mentioning regulated proteins together with related diseases'

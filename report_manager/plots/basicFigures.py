@@ -23,7 +23,7 @@ from report_manager import utils, analyses
 from wordcloud import WordCloud, STOPWORDS
 from nltk.corpus import stopwords
 import nltk
-nltk.download('stopwords')
+
 
 from report_manager.analyses import wgcnaAnalysis
 from report_manager.plots import basicFigures
@@ -1331,6 +1331,7 @@ def plot_2_venn_diagram(cond1, cond2, unique1, unique2, intersection, identifier
 def get_wordcloud(data, identifier, args={'stopwords':[], 'max_words': 400, 'max_font_size': 100, 'width':700, 'height':700, 'margin': 1}):
     figure=None
     if data is not None:
+        nltk.download('stopwords')
         sw = set(stopwords.words('english')).union(set(STOPWORDS))
         if 'stopwords' in args:
             sw = sw.union(args['stopwords'])

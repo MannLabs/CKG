@@ -667,16 +667,14 @@ def loadProteomicsDataset(uri, configuration):
         columns.update(set(filter(r.match, data.columns)))
     #Add simple and regex columns into a single DataFrame
     data = data[list(columns)]
-    data = remove_contaminant_tag(data, column=configuration["proteinCol"] , tag=configuration['contaminant_tag'])
     data = data.dropna(how='all', axis=0)
     
     return data, regexCols
 
-def remove_contaminant_tag(data, column, tag='CON__'):
-    if column in data.columns:
-        data[column] = data[column].apply(lambda x: x.replace(tag, 'CHANGED!_'))
+def remove_contaminant_tag(column, tag='CON__'):
+    new_column = [c.replace(tag, '') for c in column]
     
-    return data
+    return new_column
 
 def expand_groups(data, configuration):
     s = data[configuration["proteinCol"]].str.split(';').apply(pd.Series, 1).stack().reset_index(level=1, drop=True)
@@ -687,6 +685,7 @@ def expand_groups(data, configuration):
         del data[configuration["multipositions"]]
         pdf = pd.concat([s,s2], axis=1, keys=[configuration["proteinCol"],configuration["multipositions"]])
     data = data.join(pdf)
+    data[configuration["proteinCol"]] = remove_contaminant_tag(column=data[configuration["proteinCol"]].tolist() , tag=configuration['contaminant_tag'])
     data["is_razor"] = ~ data[configuration["groupCol"]].duplicated()
     data = data.set_index(configuration["indexCol"])
     

@@ -239,12 +239,12 @@ class Dataset:
                             data = self.send_query(query)
                     result = None
                     if description is not None:
-                        plots = [description]
-                    else:
-                        plots = []
+                        self.report.update_plots({(str(order), subsection+"_description", 'description'):[description]})
+                        order +=1
                     if len(analysis_types) >= 1:
                         for analysis_type in analysis_types:
                             result = ar.AnalysisResult(self.identifier, analysis_type, args, data)
+                            analysis_type = result.analysis_type
                             if analysis_type in result.result and result.result[analysis_type] is not None and len(result.result[analysis_type]) >=1:
                                 report_step[section][subsection]['analyses'].append(analysis_type)
                                 report_step[section][subsection]['args'] = result.args
@@ -262,7 +262,7 @@ class Dataset:
                                     else:
                                         self.update_data({subsection+"_"+analysis_type: result.result[analysis_type]})
                                 for plot_type in plot_types:
-                                    plots.extend(result.get_plot(plot_type, subsection+"_"+analysis_type+"_"+plot_type))
+                                    plots = result.get_plot(plot_type, subsection+"_"+analysis_type+"_"+plot_type)
                                     self.report.update_plots({(str(order), subsection+"_"+analysis_type, plot_type):plots})
                                     order +=1
                     else:
@@ -273,7 +273,7 @@ class Dataset:
                             report_pipeline.update(report_step)
                             self.update_analyses(result.result)
                         for plot_type in plot_types:
-                            plots.extend(result.get_plot(plot_type, "_".join(subsection.split(' '))+"_"+plot_type))
+                            plots = result.get_plot(plot_type, "_".join(subsection.split(' '))+"_"+plot_type)
                             self.report.update_plots({(str(order), "_".join(subsection.split(' ')), plot_type): plots})
                             order += 1
         
@@ -290,12 +290,9 @@ class Dataset:
                 for data in self.data:
                     name = data.replace(" ", "_")
                     start = time.time()
-                    df_set = grp.create_dataset(name, (1,), dtype=dt, compression="gzip")
+                    df_set = grp.create_dataset(name, (1,), dtype=dt, compression="gzip", chunks=True, data=str(self.data[data].fillna('NA').to_json(orient='records')))
                     end = time.time()
                     print(self.dataset_type, data, "Created dataset", end-start)
-                    df_set[:] = str(self.data[data].apply(lambda x: [x.dropna()], axis=1).to_json(orient='records'))
-                    nend= time.time()
-                    print(self.dataset_type, data, "Dict transformed and saved", end-start)
 
     def save_dataset_to_file(self, dataset_directory):
         if not os.path.isdir(dataset_directory):
@@ -327,10 +324,12 @@ class Dataset:
                     for name in f[self.dataset_type]:
                         self.data[name.replace("_", " ")] = pd.read_json(f[self.dataset_type+"/"+name][0], orient='records')
 
-    def load_dataset_report(self):
-        dataset_directory = self.get_dataset_data_directory()
-        report = self.report.load_report(directory=dataset_directory)
-        self.update_report(report)
+    def load_dataset_report(self, report_dir):
+        self.load_dataset(report_dir)
+        dataset_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),report_dir), self.dataset_type)
+        r = rp.Report(self.dataset_type,{})
+        r.read_report(dataset_dir)
+        self.report = r
 
 class MultiOmicsDataset(Dataset):
     def __init__(self, identifier, data, analyses={}, report=None):

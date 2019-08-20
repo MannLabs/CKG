@@ -341,17 +341,19 @@ def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, group, alpha=0.
     i = permutations
     df_index = df.index.values
     df_columns = df.columns.values
+    seen = [''.join(df_index)+''.join(df_columns)]
     columns = ['identifier']
     rand_pvalues = []
     while i>0:
-        df_index = shuffle(df_index, random_state=int(initial_seed + i))
-        df_columns = shuffle(df_columns, random_state=int(initial_seed + i))
+        df_index = shuffle(df_index)
+        df_columns = shuffle(df_columns)
         df_random = df.reset_index(drop=True)
         df_random.index = df_index
         df_random.index.name = group
         df_random.columns = df_columns
         columns = ['identifier', 'F-statistics', 'pvalue_'+str(i)]
-        if list(df_random.index) != list(df.index):
+        if ''.join(list(df_random.index)) + ''.join(list(df_random.columns)) not in seen:
+            seen.append(''.join(list(df_random.index)) + ''.join(list(df_random.columns)))
             aov_results = []
             for col in df_random.columns:
                 rows = df_random[col]

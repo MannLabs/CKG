@@ -276,7 +276,7 @@ class Project:
         
         return exists
 
-    def load_project(self):
+    def load_project_report(self):
         self.load_project_data()
         project_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),"../../data/reports/"), self.identifier)
         self.report = {}
@@ -311,7 +311,7 @@ class Project:
             
     def build_project(self):
         if self.check_report_exists():
-            self.load_project()
+            self.load_project_report()
         if len(self.report) == 0 or len(self.datasets) == 0:
             project_info = self.query_data()
             self.set_attributes(project_info)
