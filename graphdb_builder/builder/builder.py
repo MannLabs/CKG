@@ -84,18 +84,18 @@ if __name__ == '__main__':
                                 Example: python builder.py --build_type import --import_types databases --data UniProt")
     elif args.build_type == 'load':
         logger.info("The build will load data into the database: {}".format("".join(args.load_entities)))
+        valid_entities = []
         if len(args.load_entities) > 0:
             valid_entities = [x.lower() for x in args.load_entities if x.lower() in config['graph']]
-
-            if len(valid_entities) > 0:
-                logger.info("These entities will be loaded into the database: {}".format(", ".join(valid_entities)))
-                print("These entities will be loaded into the database: {}".format(", ".join(valid_entities)))
-                loader.partialUpdate(imports=valid_entities)
-            else:
-                logger.error("The indicated entities (--load_entities) cannot be loaded: {}".format(args.load_entities))
-                print("The indicated entities (--load_entities) cannot be loaded into the database: {}".format(args.load_entities))
         else:
-            logger.error("The indicated entities (--load_entities) cannot be loaded into the database: {}".format(args.load_entities))
+            valid_entities = config['graph']
+            
+        if len(valid_entities) > 0:
+            logger.info("These entities will be loaded into the database: {}".format(", ".join(valid_entities)))
+            print("These entities will be loaded into the database: {}".format(", ".join(valid_entities)))
+            loader.partialUpdate(imports=valid_entities)
+        else:
+            logger.error("The indicated entities (--load_entities) cannot be loaded: {}".format(args.load_entities))
             print("The indicated entities (--load_entities) cannot be loaded into the database: {}".format(args.load_entities))
     else:
         print("Indicate the type of build you want to perform, either import (generate csv files to be loaded into the database), \

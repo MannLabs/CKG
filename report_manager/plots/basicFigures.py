@@ -475,7 +475,7 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
         signature = signature.sort_values(by="padj",ascending=True)
         for index, row in signature.iterrows():
             # Text
-            text.append('<b>'+str(row['identifier'])+": "+str(index)+'<br>Comparison: '+str(row['group2'])+' vs '+str(row['group1'])+'<br>log2FC = '+str(round(row['log2FC'], ndigits=2))+'<br>p = '+'{:.2e}'.format(row['pvalue'])+'<br>FDR = '+'{:.2e}'.format(row['padj']))
+            text.append('<b>'+str(row['identifier'])+": "+str(index)+'<br>Comparison: '+str(row['group1'])+' vs '+str(row['group2'])+'<br>log2FC = '+str(round(row['log2FC'], ndigits=2))+'<br>p = '+'{:.2e}'.format(row['pvalue'])+'<br>FDR = '+'{:.2e}'.format(row['padj']))
 
             # Color
             if row['padj'] <= args['alpha']:
