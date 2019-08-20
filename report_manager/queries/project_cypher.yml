@@ -12,6 +12,10 @@ remove_project:
         - SPLITTED_INTO
     query_type: post
     query: >
+            call apoc.periodic.iterate('MATCH (p:Project)-[:HAS_ENROLLED]-(s:Subject)-[:BELONGS_TO_SUBJECT]-(bio:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)-[]-() 
+                WHERE p.id="PROJECTID" RETURN a', 
+                "DETACH DELETE a", 
+                {batchSize:50}) yield batches, total return batches, total;
             call apoc.periodic.iterate('MATCH (p:Project)-[:HAS_ENROLLED]-(s:Subject)-[:BELONGS_TO_SUBJECT]-(bio:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample) 
                 WHERE p.id="PROJECTID" RETURN a', 
                 "DETACH DELETE a", 
