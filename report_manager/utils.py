@@ -191,9 +191,9 @@ def networkx_to_cytoscape(graph):
     cy_edges = cy_graph['elements']['edges']
     cy_elements = cy_nodes
     cy_elements.extend(cy_edges)
+    mouseover_node = dict(graph.nodes(data=True))
 
-    return cy_elements
-
+    return cy_elements, mouseover_node
 
 def get_clustergrammer_link(net, filename=None):
     try:

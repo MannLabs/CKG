@@ -1,6 +1,7 @@
 import time
 import os
 import sys
+import json
 import pandas as pd
 import h5py as h5
 import ckg_utils
@@ -290,9 +291,13 @@ class Dataset:
                 for data in self.data:
                     name = data.replace(" ", "_")
                     start = time.time()
-                    df_set = grp.create_dataset(name, (1,), dtype=dt, compression="gzip", chunks=True, data=str(self.data[data].fillna('NA').to_json(orient='records')))
-                    end = time.time()
-                    print(self.dataset_type, data, "Created dataset", end-start)
+                    #d = json.dumps([{'index':index, **row.dropna().to_dict()} for index,row in self.data[data].iterrows()])
+                    if self.data[data].memory_usage().sum()/1000000 < 20: #Only store if memory usage below 20Mb
+                        d = self.data[data].to_json(orient='records')
+                        df_set = grp.create_dataset(name, (1,), dtype=dt, compression="gzip", chunks=True, data=d)
+                        end = time.time()
+                    else:
+                        print("NOT SAVED!")
 
     def save_dataset_to_file(self, dataset_directory):
         if not os.path.isdir(dataset_directory):
@@ -307,9 +312,6 @@ class Dataset:
                     if isinstance(self.data[data][dtype], pd.DataFrame):
                         name = dtype+"_"+name
                         self.data[data][dtype].to_csv(os.path.join(dataset_directory,name), sep='\t', header=True, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
-            else:
-                pass
-                #print(name, data, type(self.data[data]))
 
     def save_report(self, dataset_directory):
         if not os.path.exists(dataset_directory):

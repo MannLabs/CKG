@@ -221,7 +221,7 @@ def paste_matrices(matrix1, matrix2, rows, cols):
     textMatrix = pd.DataFrame(text, index=rows, columns=cols)
     return textMatrix
 
-def cutreeDynamic(distmatrix, linkagefun='average', minModuleSize=30, method='hybrid', deepSplit=2, pamRespectsDendro=False, distfun=None):
+def cutreeDynamic(distmatrix, linkagefun='average', minModuleSize=50, method='hybrid', deepSplit=2, pamRespectsDendro=False, distfun=None):
     """
     This function implements the R cutreeDynamic wrapper in Python, provinding an access point for methods of adaptive branh pruning of hierarchical clustering dendrograms.
 
@@ -252,7 +252,7 @@ def cutreeDynamic(distmatrix, linkagefun='average', minModuleSize=30, method='hy
     return np.array(cutree)
 
 
-def build_network(data, softPower=6, networkType='unsigned', linkagefun='average', method='hybrid', minModuleSize=30, deepSplit=2, pamRespectsDendro=False, merge_modules=True, MEDissThres=0.25, verbose=0):
+def build_network(data, softPower=6, networkType='unsigned', linkagefun='average', method='hybrid', minModuleSize=50, deepSplit=2, pamRespectsDendro=False, merge_modules=True, MEDissThres=0.4, verbose=0):
     """ 
     Weighted gene network construction and module detection. Calculates co-expression similarity and adjacency, topological overlap matrix (TOM) and clusters features in modules.
 
@@ -355,7 +355,7 @@ def calculate_module_eigengenes(data, modColors, softPower=6, dissimilarity=True
     else:
         return MEs
 
-def merge_similar_modules(data, modColors, MEDissThres=0.25, verbose=0):
+def merge_similar_modules(data, modColors, MEDissThres=0.4, verbose=0):
     """ 
     Merges modules in co-expression network that are too close as measured by the correlation of their eigengenes.
 

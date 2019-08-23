@@ -120,6 +120,7 @@ def imputation_normal_distribution(data, index=['group', 'sample', 'subject'], s
     data_imputed = df.T.sort_index()
     null_columns = data_imputed.columns[data_imputed.isnull().any()]
     for c in null_columns:
+        print(c)
         missing = data_imputed[data_imputed[c].isnull()].index.tolist()
         std = data_imputed[c].std()
         mean = data_imputed[c].mean()
@@ -128,7 +129,7 @@ def imputation_normal_distribution(data, index=['group', 'sample', 'subject'], s
         value = 0.0
         if not math.isnan(std) and not math.isnan(mean) and not math.isnan(sigma) and not math.isnan(mu):
             value = np.random.normal(mu, sigma, size=len(missing))
-            value[value<0] = 0.0
+        
         data_imputed.loc[missing, c] = value
 
     return data_imputed.T
@@ -337,43 +338,45 @@ def apply_pvalue_twostage_fdrcorrection(pvalues, alpha=0.05, method='bh'):
     return (rejected, padj)
 
 def apply_pvalue_permutation_fdrcorrection(df, observed_pvalues, group, alpha=0.05, permutations=50):
-    initial_seed = 176782
+    #initial_seed = 176782
     i = permutations
     df_index = df.index.values
-    df_columns = df.columns.values
-    seen = [''.join(df_index)+''.join(df_columns)]
-    columns = ['identifier']
+    #df_columns = df.columns.values
+    seen = [''.join(df_index)]
+    #columns = ['identifier']
     rand_pvalues = []
     while i>0:
         df_index = shuffle(df_index)
-        df_columns = shuffle(df_columns)
+        #df_columns = shuffle(df_columns)
         df_random = df.reset_index(drop=True)
         df_random.index = df_index
         df_random.index.name = group
-        df_random.columns = df_columns
-        columns = ['identifier', 'F-statistics', 'pvalue_'+str(i)]
-        if ''.join(list(df_random.index)) + ''.join(list(df_random.columns)) not in seen:
-            seen.append(''.join(list(df_random.index)) + ''.join(list(df_random.columns)))
-            aov_results = []
+        #df_random.columns = df_columns
+        #columns = ['identifier', 'F-statistics', 'pvalue_'+str(i)]
+        if ''.join(list(df_random.index)) not in seen:
+            seen.append(''.join(list(df_random.index)))
+            #aov_results = []
             for col in df_random.columns:
                 rows = df_random[col]
-                aov_results.append((col,)+calculate_anova(rows, group=group))
-            rand_scores = pd.DataFrame(aov_results, columns=columns)
-            rand_scores = rand_scores.set_index("identifier")
-            rand_scores = rand_scores.dropna(how="all")
-            rand_scores = rand_scores[['pvalue_'+str(i)]]
-            rand_pvalues.append(rand_scores)
+                #aov_results.append((col,)+calculate_anova(rows, group=group))
+                rand_pvalues.append(calculate_anova(rows,group=group)[1])
+            #rand_scores = pd.DataFrame(aov_results, columns=columns)
+            #rand_scores = rand_scores.set_index("identifier")
+            #rand_scores = rand_scores.dropna(how="all")
+            #rand_scores = rand_scores[['pvalue_'+str(i)]]
+            #rand_pvalues.append(rand_scores)
             i -= 1
-    rand_pvalues = pd.concat(rand_pvalues, axis=1)
+    #rand_pvalues = pd.concat(rand_pvalues, axis=1)
+    rand_pvalues = np.array(rand_pvalues)
     count = observed_pvalues.to_frame().apply(func=get_counts_permutation_fdr, result_type='expand', axis=1, args=(rand_pvalues, observed_pvalues, permutations, alpha))
     count.columns = ['padj', 'rejected']
     
     return count
 
 def get_counts_permutation_fdr(value, random, observed, n, alpha):
-    a = (random <= value.values[0]).sum().sum() + 0.01 #Offset in case of a = 0.0
+    a = random[random <= value.values[0]].shape[0] + 0.01 #Offset in case of a = 0.0
     b = (observed <= value.values[0]).sum()
-    qvalue = (a/b * 1/n)
+    qvalue = (a/b * 1/float(n))
     
     return (qvalue, qvalue <= alpha)
 

@@ -2,6 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import ast
+from collections import defaultdict
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
@@ -26,7 +27,6 @@ import nltk
 
 
 from report_manager.analyses import wgcnaAnalysis
-from report_manager.plots import basicFigures
 from report_manager.plots import wgcnaFigures
 from report_manager.plots import Dendrogram
 import dash_cytoscape as cyto
@@ -470,7 +470,7 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
         annotations = []
         num_annotations = args['num_annotations'] if 'num_annotations' in args else 10
         gidentifier = identifier + "_".join(map(str,group))
-        title = 'Comparison: '+str(group[1])+' vs '+str(group[0])
+        title = 'Comparison: '+str(group[0])+' vs '+str(group[1])
         sig_pval = False
         signature = signature.sort_values(by="padj",ascending=True)
         for index, row in signature.iterrows():
@@ -793,7 +793,8 @@ def generate_configuration_tree(report_pipeline, dataset_type):
         args['stylesheet'] = config_stylesheet
         args['title'] = 'Analysis Pipeline'
         args['layout'] = {'name': 'breadthfirst', 'roots': '#0'}
-        conf_plot = basicFigures.get_cytoscape_network(net, dataset_type, args)
+        args['mouseover_node'] = {}
+        conf_plot = get_cytoscape_network(net, dataset_type, args)
                
     return conf_plot
 
@@ -807,9 +808,10 @@ def get_network(data, identifier, args):
                 data = data[np.abs(data[args['values']]) > args['cutoff']]
             else:
                 data = data > args['cutoff']
+                
         data = data.rename(index=str, columns={args['values']: "width"})
         graph = nx.from_pandas_edgelist(data, args['source'], args['target'], edge_attr=True)
-
+                  
         degrees = dict(graph.degree())
         nx.set_node_attributes(graph, degrees, 'degree')
         betweenness = None
@@ -832,7 +834,26 @@ def get_network(data, identifier, args):
         colors = {n:col[clusters[n]] for n in clusters}
         nx.set_node_attributes(graph, colors, 'color')
         nx.set_node_attributes(graph, clusters, 'cluster')
-        #notebook_net = get_notebook_network_pyvis(graph, args)
+                
+        vis_graph = graph
+        if len(vis_graph.edges()) > 500:
+            max_nodes = 100
+            cluster_members = defaultdict(list)
+            cluster_nums = {}
+            for n in clusters:
+                if clusters[n] not in cluster_nums:
+                    cluster_nums[clusters[n]] = 0
+                cluster_members[clusters[n]].append(n)
+                cluster_nums[clusters[n]] += 1              
+            valid_clusters = [c for c,n in sorted(cluster_nums.items() ,  key=lambda x: x[1])]
+            valid_nodes = []
+            for c in valid_clusters:
+                valid_nodes.extend(cluster_members[c])
+                if len(valid_nodes) >= max_nodes:
+                    valid_nodes = valid_nodes[0:max_nodes]
+                    break  
+            vis_graph = vis_graph.subgraph(valid_nodes)
+        
         nodes_table, edges_table = network_to_tables(graph)
         nodes_fig_table = get_table(nodes_table, identifier=identifier+"_nodes_table", title=args['title']+" nodes table")
         edges_fig_table = get_table(edges_table, identifier=identifier+"_edges_table", title=args['title']+" edges table")
@@ -841,7 +862,8 @@ def get_network(data, identifier, args):
         args['stylesheet'] = stylesheet
         args['layout'] = layout
         
-        cy_elements = utils.networkx_to_cytoscape(graph)
+        cy_elements, mouseover_node = utils.networkx_to_cytoscape(vis_graph)
+        args['mouseover_node'] = mouseover_node
 
         net = {"notebook":[cy_elements, stylesheet,layout], "app":get_cytoscape_network(cy_elements, identifier, args), "net_tables":(nodes_fig_table, edges_fig_table), "net_json":json_graph.node_link_data(graph)}
     return net
@@ -1165,7 +1187,7 @@ def get_WGCNAPlots(data, identifier):
         moduleTraitCor, textMatrix, MM, MMPvalue, FS, FSPvalue, METDiss, METcor = data
         plots = []
         # plot: sample dendrogram and clinical variables heatmap; input: data_exp, data_cli
-        plots.append(wgcnaFigures.plot_complex_dendrogram(data_exp, data_cli, title='Clinical variables variation by sample', dendro_labels=data_exp.index, distfun='euclidean', linkagefun='average', hang=40, subplot='heatmap', color_missingvals=True, width=1000, height=800))
+        #plots.append(wgcnaFigures.plot_complex_dendrogram(data_exp, data_cli, title='Clinical variables variation by sample', dendro_labels=data_exp.index, distfun='euclidean', linkagefun='average', hang=40, subplot='heatmap', color_missingvals=True, width=1000, height=800))
 
         # plot: gene tree dendrogram and module colors; input: dissTOM, moduleColors
         plots.append(wgcnaFigures.plot_complex_dendrogram(dissTOM, moduleColors, title='Co-expression: dendrogram and module colors', dendro_labels=dissTOM.columns, distfun=None, linkagefun='average', hang=0.1, subplot='module colors', col_annotation=True, width=1000, height=800))
@@ -1177,7 +1199,7 @@ def get_WGCNAPlots(data, identifier):
         plots.append(wgcnaFigures.plot_labeled_heatmap(moduleTraitCor, textMatrix, title='Module-Clinical variable relationships', colorscale=[[0,'#67a9cf'],[0.5,'#f7f7f7'],[1,'#ef8a62']], row_annotation=True, width=1000, height=800))
 
         #plot: FS vs. MM correlation per trait/module scatter matrix; input: MM, FS, Features_per_Module
-        plots.append(wgcnaFigures.plot_intramodular_correlation(MM, FS, Features_per_Module, title='Intramodular analysis: Feature Significance vs. Module Membership', width=1000, height=2000))
+        #plots.append(wgcnaFigures.plot_intramodular_correlation(MM, FS, Features_per_Module, title='Intramodular analysis: Feature Significance vs. Module Membership', width=1000, height=2000))
 
         #input: METDiss, METcor
         # plots.append(wgcnaFigures.plot_complex_dendrogram(METDiss, METcor, title='Eigengene network and clinical data associations', dendro_labels=METDiss.index, distfun=None, linkagefun='average', hang=0.9,
@@ -1422,6 +1444,7 @@ def get_cytoscape_network(net, identifier, args):
                                     layout=args['layout'],
                                     minZoom = 0.2,
                                     maxZoom = 1.5,
+                                    mouseoverNodeData=args['mouseover_node'],
                                     style={'width': '100%', 'height': '700px'}
                                     )
                     ])
