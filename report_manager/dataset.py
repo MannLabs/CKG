@@ -6,7 +6,7 @@ import pandas as pd
 import h5py as h5
 import ckg_utils
 import config.ckg_config as ckg_config
-from report_manager import analysisResult as ar, report as rp
+from report_manager import analysisResult as ar, report as rp, knowledge
 from report_manager.analyses import basicAnalysis
 from report_manager.plots import basicFigures
 from graphdb_connector import connector
@@ -302,16 +302,22 @@ class Dataset:
     def save_dataset_to_file(self, dataset_directory):
         if not os.path.isdir(dataset_directory):
             os.makedirs(dataset_directory)
-
+        print(self.dataset_type)
         for data in self.data:
             name = data.replace(" ", "_") + ".tsv"
             if isinstance(self.data[data], pd.DataFrame):
+                print("dataframe", data)
                 self.data[data].to_csv(os.path.join(dataset_directory,name), sep='\t', header=True, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
             elif isinstance(self.data[data], dict):
+                print("dict", data)
                 for dtype in self.data[data]:
                     if isinstance(self.data[data][dtype], pd.DataFrame):
                         name = dtype+"_"+name
                         self.data[data][dtype].to_csv(os.path.join(dataset_directory,name), sep='\t', header=True, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
+                    else:
+                        print("NOt a dataframe in dict", data, dtype, type(self.data[data][dtype]))
+            else:
+                print("NOt a dataframe in dict out", data, type(self.data[data]))
 
     def save_report(self, dataset_directory):
         if not os.path.exists(dataset_directory):
@@ -332,6 +338,11 @@ class Dataset:
         r = rp.Report(self.dataset_type,{})
         r.read_report(dataset_dir)
         self.report = r
+        
+    def generate_knowledge(self):
+        kn = knowledge.Knowledge(self.identifier, self.data, nodes={}, relationships={}, colors={}, graph=None)
+        
+        return kn
 
 class MultiOmicsDataset(Dataset):
     def __init__(self, identifier, data, analyses={}, report=None):
@@ -359,6 +370,12 @@ class MultiOmicsDataset(Dataset):
             if isinstance(data, pd.DataFrame):
                 store.put(name, self.data[data], format='table')
         store.close()
+        
+    def generate_knowledge(self, entities_filter):
+        kn = knowledge.MultiomicsKnowledge(self.identifier, self.data, nodes={}, relationships={}, colors={}, graph=None, entities_filter=entities_filter)
+        kn.generate_knowledge()        
+        
+        return kn
 
 class ProteomicsDataset(Dataset):
     def __init__(self, identifier, dataset_type="proteomics", data={}, analyses={}, analysis_queries={}, report=None):
@@ -400,6 +417,12 @@ class ProteomicsDataset(Dataset):
 
             processed_data = basicAnalysis.get_proteomics_measurements_ready(data, index=index, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max)
         return processed_data
+    
+    def generate_knowledge(self):
+        kn = knowledge.ProteomicsKnowledge(self.identifier, self.data, nodes={}, relationships={}, colors={}, graph=None)
+        kn.generate_knowledge()        
+        
+        return kn
 
 class LongitudinalProteomicsDataset(ProteomicsDataset):
     def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
@@ -455,6 +478,12 @@ class ClinicalDataset(Dataset):
 
             processed_data = basicAnalysis.get_clinical_measurements_ready(data, subject_id=subject_id, sample_id=sample_id, group_id=group_id, columns=columns, values=values, extra=extra, imputation=imputation, imputation_method=imputation_method)
         return processed_data
+    
+    def generate_knowledge(self):
+        kn = knowledge.ClinicalKnowledge(self.identifier, self.data, nodes={}, relationships={}, colors={}, graph=None)
+        kn.generate_knowledge()        
+        
+        return kn
 
 class DNAseqDataset(Dataset):
     def __init__(self, identifier, dataset_type, data={}, analyses={}, analysis_queries={}, report=None):

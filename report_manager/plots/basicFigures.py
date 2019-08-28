@@ -793,7 +793,7 @@ def generate_configuration_tree(report_pipeline, dataset_type):
         args['stylesheet'] = config_stylesheet
         args['title'] = 'Analysis Pipeline'
         args['layout'] = {'name': 'breadthfirst', 'roots': '#0'}
-        args['mouseover_node'] = {}
+        #args['mouseover_node'] = {}
         conf_plot = get_cytoscape_network(net, dataset_type, args)
                
     return conf_plot
@@ -863,7 +863,7 @@ def get_network(data, identifier, args):
         args['layout'] = layout
         
         cy_elements, mouseover_node = utils.networkx_to_cytoscape(vis_graph)
-        args['mouseover_node'] = mouseover_node
+        #args['mouseover_node'] = mouseover_node
 
         net = {"notebook":[cy_elements, stylesheet,layout], "app":get_cytoscape_network(cy_elements, identifier, args), "net_tables":(nodes_fig_table, edges_fig_table), "net_json":json_graph.node_link_data(graph)}
     return net
@@ -1081,7 +1081,9 @@ def get_table(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = 
 def get_violinplot(data, identifier, args):
     df = data.copy()
     graphs = []
-
+    if 'drop_cols' in args:
+        if set(args['drop_cols']).intersection(df.columns) == len(args['drop_cols']):
+            df = df.drop(args['drop_cols'], axis=1)
     for c in df.columns.unique():
         if c != args['group']:
             traces = create_violinplot(df, c, args['group'])
@@ -1444,7 +1446,7 @@ def get_cytoscape_network(net, identifier, args):
                                     layout=args['layout'],
                                     minZoom = 0.2,
                                     maxZoom = 1.5,
-                                    mouseoverNodeData=args['mouseover_node'],
+                                    #mouseoverNodeData=args['mouseover_node'],
                                     style={'width': '100%', 'height': '700px'}
                                     )
                     ])

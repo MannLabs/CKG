@@ -11,7 +11,7 @@ import ckg_utils
 import config.ckg_config as ckg_config
 from report_manager.dataset import Dataset, ProteomicsDataset, ClinicalDataset, DNAseqDataset, RNAseqDataset, LongitudinalProteomicsDataset, MultiOmicsDataset
 from report_manager.plots import basicFigures as figure
-from report_manager import report as rp, utils
+from report_manager import report as rp, utils, knowledge
 from report_manager.queries import query_utils
 from graphdb_connector import connector
 import logging
@@ -368,6 +368,29 @@ class Project:
         plots.append(self.get_similarity_network())
         
         return plots
+    
+    def generate_knowledge(self):
+        nodes = {}
+        relationships = {}
+        kn = knowledge.ProjectKnowledge(identifier=self.identifier, data=self.datasets["Project information"])
+        nodes.update(kn.nodes)
+        relationships.update(kn.relationships)
+        types = ["clinical", "proteomics", "longitudinal_proteomics", "wes", "wgs", "rnaseq", "multiomics"]
+        for dataset_type in types:
+            if dataset_type in self.datasets:
+                dataset = self.datasets[dataset_type]
+                if dataset_type == 'multiomics':
+                    kn = dataset.generate_knowledge(nodes)
+                else:
+                    kn = dataset.generate_knowledge()
+                
+                nodes.update(kn.nodes)
+                relationships.update(kn.relationships)
+        
+        kn = knowledge.Knowledge(self.identifier, {}, nodes=nodes, relationships=relationships)
+            
+        return kn
+        
 
     def generate_overlap_plots(self):
         plots = []
@@ -425,7 +448,8 @@ class Project:
             args['stylesheet'] = style
             args['layout'] = layout
             args['title'] = "Projects subgraph"
-            plot = figure.get_cytoscape_network(utils.networkx_to_cytoscape(G), "projects_subgraph", args)
+            net, mouseover = utils.networkx_to_cytoscape(G)
+            plot = figure.get_cytoscape_network(net, "projects_subgraph", args)
         
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()

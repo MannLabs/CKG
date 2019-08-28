@@ -42,7 +42,12 @@ app.layout = dcc.Loading(
     children=[html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content', style={'padding-top':10}),
-])], style={'text-align':'center','width':'15px', 'height':'15px','margin-top':'-90px','margin-bottom':'-60px','position':'absolute','top':'50%','left':'45%'}, type='cube')
+])], style={'text-align':'center',
+            'margin-top':'180px',
+            'margin-bottom':'-60px','position':'absolute',
+            'top':'50%','left':'45%', 'height':'200px'},
+    type='default', 
+    color='#2b8cbe')
 
 @app.callback(Output('page-content', 'children'),
               [Input('url', 'pathname')])
@@ -123,6 +128,7 @@ def update_dropdown(n_clicks, value):
 @app.callback(Output('data-types', 'value'),
              [Input('add_datatype', 'n_clicks')],
              [State('data-types-picker','value')])
+
 def update_dropdown(n_clicks, value):
     if n_clicks != None:
         return separator.join(value)
@@ -130,6 +136,7 @@ def update_dropdown(n_clicks, value):
 @app.callback(Output('disease', 'value'),
              [Input('add_disease', 'n_clicks')],
              [State('disease-picker','value')])
+
 def update_dropdown(n_clicks, value):
     if n_clicks != None:
         return separator.join(value)
@@ -137,6 +144,7 @@ def update_dropdown(n_clicks, value):
 @app.callback(Output('tissue', 'value'),
              [Input('add_tissue', 'n_clicks')],
              [State('tissue-picker','value')])
+
 def update_dropdown(n_clicks, value):
     if n_clicks != None:
         return separator.join(value)
@@ -144,6 +152,7 @@ def update_dropdown(n_clicks, value):
 @app.callback(Output('intervention', 'value'),
              [Input('add_intervention', 'n_clicks')],
              [State('intervention-picker','value')])
+
 def update_dropdown(n_clicks, value):
     if n_clicks != None:
         return separator.join(value)

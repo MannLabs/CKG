@@ -120,7 +120,6 @@ def imputation_normal_distribution(data, index=['group', 'sample', 'subject'], s
     data_imputed = df.T.sort_index()
     null_columns = data_imputed.columns[data_imputed.isnull().any()]
     for c in null_columns:
-        print(c)
         missing = data_imputed[data_imputed[c].isnull()].index.tolist()
         std = data_imputed[c].std()
         mean = data_imputed[c].mean()
@@ -231,6 +230,9 @@ def get_clinical_measurements_ready(df, subject_id='subject', sample_id='biologi
             df = imputation_normal_distribution(processed_df, index=index)
         elif imputation_method.lower() == 'mixed':
             df = imputation_mixed_norm_KNN(processed_df,index_cols=index, group=group_id)
+    
+    #df = df.set_index(index)
+    
     return df
 
 
@@ -238,11 +240,13 @@ def run_pca(data, drop_cols=['sample', 'subject'], group='group', components=2, 
     np.random.seed(112736)
     result = {}
     df = data.copy()
-    df = df.drop(drop_cols, axis=1)
+    if set(drop_cols).intersection(df.columns) == len(drop_cols):
+        df = df.drop(drop_cols, axis=1)
     df = df.set_index(group)
+    df = df.select_dtypes(['number'])
     if dropna:
         df = df.dropna(axis=1)
-    X = df._get_numeric_data()
+    X = df.values
     y = df.index
     pca = PCA(n_components=components)
     X = pca.fit_transform(X)
@@ -273,11 +277,13 @@ def run_pca(data, drop_cols=['sample', 'subject'], group='group', components=2, 
 def run_tsne(data, drop_cols=['sample', 'subject'], group='group', components=2, perplexity=40, n_iter=1000, init='pca', dropna=True):
     result = {}
     df = data.copy()
-    df = df.drop(drop_cols, axis=1)
+    if set(drop_cols).intersection(df.columns) == len(drop_cols):
+        df = df.drop(drop_cols, axis=1)
     df = df.set_index(group)
     if dropna:
         df = df.dropna(axis=1)
-    X = df._get_numeric_data()
+    df = df.select_dtypes(['number'])
+    X = df.values
     y = df.index
 
     tsne = TSNE(n_components=components, verbose=0, perplexity=perplexity, n_iter=n_iter, init=init)
@@ -301,11 +307,13 @@ def run_tsne(data, drop_cols=['sample', 'subject'], group='group', components=2,
 def run_umap(data, drop_cols=['sample', 'subject'], group='group', n_neighbors=10, min_dist=0.3, metric='cosine', dropna=True):
     result = {}
     df = data.copy()
-    df = df.drop(drop_cols, axis=1)
+    if set(drop_cols).intersection(df.columns) == len(drop_cols):
+        df = df.drop(drop_cols, axis=1)
     df = df.set_index(group)
     if dropna:
         df = df.dropna(axis=1)
-    X = df._get_numeric_data()
+    df = df.select_dtypes(['number'])
+    X = df.values
     y = df.index
 
     X = umap.UMAP(n_neighbors=10, min_dist=0.3, metric= metric).fit_transform(X)
@@ -959,11 +967,8 @@ def run_WGCNA(data, drop_cols_exp, drop_cols_cli, RsquaredCut=0.8, networkType='
                 result[dtype]['feature_significance_pval'] = FSPvalue
                 result[dtype]['ME_trait_diss'] = METDiss
                 result[dtype]['ME_trait_cor'] = METcor
-
-        return result
-
-    else:
-        return None
+    
+    return result
 
 def most_central_edge(G):
     centrality = nx.eigenvector_centrality_numpy(G, weight='width')
