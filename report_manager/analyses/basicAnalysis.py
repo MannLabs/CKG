@@ -27,6 +27,17 @@ from statsmodels.formula.api import ols
 import time
 from joblib import Parallel, delayed
 from numba import jit
+from rpy2 import robjects as ro
+from rpy2.robjects.packages import importr
+from rpy2.robjects import pandas2ri
+import rpy2.robjects.numpy2ri
+rpy2.robjects.numpy2ri.activate()
+pandas2ri.activate()
+
+R = ro.r
+base = importr('base')
+stats_r = importr('stats')
+smar = importr('samr')
 
 def transform_into_wide_format(data, index, columns, values, extra=[]):
     df = data.copy()
@@ -513,16 +524,23 @@ def calculate_paired_ttest(df, condition1, condition2):
 
     return (t, pvalue, mean1, mean2, log2fc)
 
-def calculate_ttest(df, condition1, condition2):
-    group1 = df[[condition1]].values
-    group2 = df[[condition2]].values
-    
-    mean1 = group1.mean() 
-    mean2 = group2.mean()
+def calculate_ttest(df, labels, n=2, s0=0):
+    conditions = df.columns.unique()
+    mean1 = df[conditions[0]].mean(axis=1)
+    mean2 = df[conditions[1]].mean(axis=1)
     log2fc = mean1 - mean2
-    t, pvalue = stats.ttest_ind(group1, group2, nan_policy='omit')
 
-    return (t, pvalue, mean1, mean2, log2fc)
+    ttest_res = smar.ttest_func(df.values, base.unlist(labels), s0=s0)
+    pvalues = [2*stats_r.pt(-base.abs(i), df=n-1)[0] for i in ttest_res[0]]
+
+    result = pd.DataFrame([df.index, mean1, mean2, log2fc, ttest_res[0], pvalues]).T
+    result.columns = ['identifier', 'mean(group1)', 'mean(group2)', 'log2FC', 't-statistics', 'pvalue']
+    result['group1'] = conditions[0]
+    result['group2'] = conditions[1]
+    result['FC'] = [np.power(2,np.abs(x)) * -1 if x < 0 else np.power(2,np.abs(x)) for x in result['log2FC'].values]
+    result = result[['identifier', 'group1', 'group2', 'mean(group1)', 'mean(group2)', 'log2FC', 'FC', 't-statistics', 'pvalue']]
+
+    return result
 
 def calculate_THSD(df, group='group', alpha=0.05):
     col = df.name
@@ -579,11 +597,14 @@ def calculate_dabest(df, idx, x, y, paired=False, id_col=None, test='mean_diff')
 
     return result
 
-def calculate_anova(df, group='group'):
-    group_values = df.groupby(group).apply(np.array).values
-    t, pvalue = stats.f_oneway(*group_values)
+def calculate_anova(df, labels, n=2, s0=0):
+    aov_res = smar.multiclass_func(df.values, base.unlist(labels), s0=s0)
+    pvalues = [2*stats_r.pt(-base.abs(i), df=n-1)[0] for i in aov_res[0]]
     
-    return (t, pvalue)
+    result = pd.DataFrame([df.index, aov_res[0], pvalues]).T
+    result.columns = ['identifier', 'F-statistics', 'pvalue']    
+
+    return result
 
 def calculate_repeated_measures_anova(df, column, subject='subject', group='group', alpha=0.05):
     aov_result = pg.rm_anova(data=df, dv=column, within=group,subject=subject, detailed=True, correction=True)
@@ -629,27 +650,52 @@ def run_dabest(df, drop_cols=['sample'], subject='subject', group='group', test=
         
     return scores
 
-def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', group='group', permutations=50):
-    if subject is not None and check_is_paired(df, subject, group):
-        groups = df[group].unique()
-        drop_cols = [d for d in drop_cols if d != subject]
-        if len(df[subject].unique()) == 1:
-            res = run_ttest(df, groups[0], groups[1], alpha = alpha, drop_cols=drop_cols, subject=subject, group=group, paired=True, correction='indep', permutations=permutations)
+def run_anova(df, alpha=0.05, s0=0, drop_cols=['sample','subject'], subject='subject', group='group', permutations=250):
+    groups = df[group].unique()
+    samples = len(set(df.filter(like='sample').values.flatten()))
+
+    if subject is not None:
+        if len(groups) == 1:
+            method = 'One class'
+        elif len(groups) == 2:
+            if check_is_paired(df, subject, group):
+                method = 'Two class paired'
+            else:
+                method = 'Two class unpaired'
         else:
-            
-            res = run_repeated_measurements_anova(df, alpha=alpha, drop_cols=drop_cols, subject=subject, group=group, permutations=0)
-    else:
-        df = df.set_index([group])
-        df = df.drop(drop_cols, axis=1)
-        aov_results = []
+            method = 'Multiclass'
+
+    print(method, groups, samples)
+
+    df = df.set_index(group).drop(drop_cols, axis=1).T
+    conditions = set(df.columns)
+    d = {v:k+1 for k, v in enumerate(conditions)}
+    labels = [d.get(item,item)  for item in df.columns]
+    
+    if method == 'Two class unpaired':
+        res = calculate_ttest(df, labels, n=samples, s0=0)
+        res = res.set_index('identifier')
+    elif method == 'Multiclass':
+        res = calculate_anova(df, labels, n=samples, s0=0)
         pairwise_results = []
-        for col in df.columns:
-            rows = df[col]
-            aov_results.append((col,) + calculate_anova(rows, group=group))
+        for col in df.T.columns:
+            rows = df.T[col]
             pairwise_results.append(calculate_THSD(rows, group=group))
-            
-        max_perm = get_max_permutations(df, group=group)
-        res = format_anova_table(df, aov_results, pairwise_results,  group, permutations, alpha, max_perm)
+        pairwise = pd.concat(pairwise_results)
+        res = pairwise.join(res.set_index('identifier'))
+
+    if permutations:
+        result = run_samr(df, labels, method, alpha=alpha, s0=s0, permutations=permutations)
+        res = res.join(result.set_index('identifier')).sort_values('padj')
+    else:
+        rejected, padj = apply_pvalue_fdrcorrection(res['pvalue'].tolist(), alpha=alpha, method = 'indep')
+        res['correction'] = 'FDR correction BH'
+        res['padj'] = padj
+
+    res['-log10 pvalue'] = [- np.log10(x) for x in res['pvalue'].values]
+    res['rejected'] = res['padj'] < alpha
+    if 'identifier' not in res.columns:
+        res = res.reset_index()
     
     return res
 
@@ -700,14 +746,16 @@ def format_anova_table(df, aov_results, pairwise_results, group, permutations, a
     
     return res
 
-def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], subject='subject', group='group', paired=False, correction='indep', permutations=50):
-    columns = ['T-statistics', 'pvalue', 'mean_group1', 'mean_group2', 'log2FC']
+def run_ttest(df, condition1, condition2, alpha = 0.05, s0=0, drop_cols=["sample"], subject='subject', group='group', paired=False, correction='indep', permutations=50):
+    columns = ['T-statistics', 'identifier', 'pvalue', 'mean_group1', 'mean_group2', 'log2FC']
+    samples = len(set(df['sample']))
     df = df.set_index([group, subject])
     df = df.drop(drop_cols, axis = 1)
     if paired:
         scores = df.T.apply(func = calculate_paired_ttest, axis=1, result_type='expand', args =(condition1, condition2))
     else:
-        scores = df.T.apply(func = calculate_ttest, axis=1, result_type='expand', args =(condition1, condition2))
+        data = df.reset_index().set_index(group).drop(subject, axis=1).T
+        scores = calculate_ttest(data, condition1, condition2, n=samples, s0=s0)
     scores.columns = columns
     scores = scores.dropna(how="all")
 
@@ -733,6 +781,45 @@ def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], su
     scores = scores.reset_index() 
 
     return scores
+
+def run_samr(df, labels, method, alpha=0.05, s0=1, permutations=250):
+    R_function = R('''result <- function(data, res_type, s0, nperms) {
+                                samr(data=data, resp.type=res_type, s0=s0, nperms=nperms, random.seed = 12345, s0.perc=NULL)
+                                }''')
+    delta = alpha
+    data = base.list(x=base.as_matrix(df.values), y=base.unlist(labels), geneid=base.unlist(df.index), logged2=True)
+    samr_res = R_function(data=data, res_type=method, s0=s0, nperms=permutations)
+    delta_table = smar.samr_compute_delta_table(samr_res)
+    siggenes_table = smar.samr_compute_siggenes_table(samr_res, delta, data, delta_table, all_genes=True)
+    nperms_run = samr_res[8][0]
+
+    if isinstance(siggenes_table[0], np.ndarray):
+        up = pd.DataFrame(np.reshape(siggenes_table[0], (-1, siggenes_table[3][0]))).T
+    else:
+        up = pd.DataFrame()
+    if isinstance(siggenes_table[1], np.ndarray):
+        down = pd.DataFrame(np.reshape(siggenes_table[1], (-1, siggenes_table[4][0]))).T
+    else:
+        down = pd.DataFrame()
+    
+    total = pd.concat([up, down])
+    total = total.sort_values(total.columns[-1])
+    qvalues = total.iloc[:, -1].astype(float)/100
+    qvalues = pd.DataFrame(qvalues)
+    qvalues.insert(0, 'id', total[2])
+    qvalues.columns = ['identifier', 'padj']
+
+    if method == 'Multiclass':
+        contrasts = ['diff_mean_group{}'.format(str(i+1)) for i in np.arange(len(set(labels)))]
+        df2 = total.iloc[:, 6:-1].reset_index(drop=True)
+        df2.insert(0, 'id', total[2])
+        df2.columns = ['identifier'] + contrasts
+    else:
+        df2 = pd.DataFrame()
+
+    qvalues['correction'] = 'permutation FDR ({} perm)'.format(nperms_run)
+
+    return qvalues#, df2
 
 def run_fisher(group1, group2, alternative='two-sided'):
     '''         annotated   not-annotated
