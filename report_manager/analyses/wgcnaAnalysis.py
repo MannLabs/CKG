@@ -289,9 +289,7 @@ def build_network(data, softPower=6, networkType='unsigned', linkagefun='average
     #Merge modules whose expression profiles are very similar
     if merge_modules == True:
         MEs, moduleColors = merge_similar_modules(data, moduleColors, MEDissThres=MEDissThres, verbose=verbose)
-    else: pass
-
-
+    
     return dissTOM, moduleColors
 
 def pick_softThreshold(data, RsquaredCut=0.8, networkType='unsigned', verbose=0):

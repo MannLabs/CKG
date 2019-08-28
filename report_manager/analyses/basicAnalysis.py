@@ -31,13 +31,13 @@ from rpy2 import robjects as ro
 from rpy2.robjects.packages import importr
 from rpy2.robjects import pandas2ri
 import rpy2.robjects.numpy2ri
-rpy2.robjects.numpy2ri.activate()
+
 pandas2ri.activate()
 
 R = ro.r
 base = importr('base')
 stats_r = importr('stats')
-smar = importr('samr')
+samr = importr('samr')
 
 def transform_into_wide_format(data, index, columns, values, extra=[]):
     df = data.copy()
@@ -530,7 +530,7 @@ def calculate_ttest(df, labels, n=2, s0=0):
     mean2 = df[conditions[1]].mean(axis=1)
     log2fc = mean1 - mean2
 
-    ttest_res = smar.ttest_func(df.values, base.unlist(labels), s0=s0)
+    ttest_res = samr.ttest_func(df.values, base.unlist(labels), s0=s0)
     pvalues = [2*stats_r.pt(-base.abs(i), df=n-1)[0] for i in ttest_res[0]]
 
     result = pd.DataFrame([df.index, mean1, mean2, log2fc, ttest_res[0], pvalues]).T
@@ -598,7 +598,7 @@ def calculate_dabest(df, idx, x, y, paired=False, id_col=None, test='mean_diff')
     return result
 
 def calculate_anova(df, labels, n=2, s0=0):
-    aov_res = smar.multiclass_func(df.values, base.unlist(labels), s0=s0)
+    aov_res = samr.multiclass_func(df.values, base.unlist(labels), s0=s0)
     pvalues = [2*stats_r.pt(-base.abs(i), df=n-1)[0] for i in aov_res[0]]
     
     result = pd.DataFrame([df.index, aov_res[0], pvalues]).T
@@ -652,7 +652,7 @@ def run_dabest(df, drop_cols=['sample'], subject='subject', group='group', test=
 
 def run_anova(df, alpha=0.05, s0=0, drop_cols=['sample','subject'], subject='subject', group='group', permutations=250):
     groups = df[group].unique()
-    samples = len(set(df.filter(like='sample').values.flatten()))
+    samples = len(df[group])
 
     if subject is not None:
         if len(groups) == 1:
@@ -789,8 +789,8 @@ def run_samr(df, labels, method, alpha=0.05, s0=1, permutations=250):
     delta = alpha
     data = base.list(x=base.as_matrix(df.values), y=base.unlist(labels), geneid=base.unlist(df.index), logged2=True)
     samr_res = R_function(data=data, res_type=method, s0=s0, nperms=permutations)
-    delta_table = smar.samr_compute_delta_table(samr_res)
-    siggenes_table = smar.samr_compute_siggenes_table(samr_res, delta, data, delta_table, all_genes=True)
+    delta_table = samr.samr_compute_delta_table(samr_res)
+    siggenes_table = samr.samr_compute_siggenes_table(samr_res, delta, data, delta_table, all_genes=True)
     nperms_run = samr_res[8][0]
 
     if isinstance(siggenes_table[0], np.ndarray):

@@ -24,6 +24,7 @@ import shutil
 import smtplib
 from email.message import EmailMessage
 
+
 def generate_html(network):
         """
         This method gets the data structures supporting the nodes, edges,
