@@ -400,7 +400,7 @@ def get_volcanoplot(results, args):
         else:
             range_x = args["range_x"]
         if "range_y" not in args:
-            range_y = [0,max(abs(result['y']))+0.8]
+            range_y = [0,max(abs(result['y']))+0.1]
         else:
             range_y = args["range_y"]
         trace = go.Scatter(x=result['x'],
@@ -473,12 +473,14 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
         title = 'Comparison: '+str(group[0])+' vs '+str(group[1])
         sig_pval = False
         signature = signature.sort_values(by="padj",ascending=True)
+        pvals = []
         for index, row in signature.iterrows():
             # Text
             text.append('<b>'+str(row['identifier'])+": "+str(index)+'<br>Comparison: '+str(row['group1'])+' vs '+str(row['group2'])+'<br>log2FC = '+str(round(row['log2FC'], ndigits=2))+'<br>p = '+'{:.2e}'.format(row['pvalue'])+'<br>FDR = '+'{:.2e}'.format(row['padj']))
 
             # Color
-            if row['padj'] <= args['alpha']:
+            if row['padj'] < args['alpha']:
+                pvals.append(row['-log10 pvalue'])
                 sig_pval = True
                 if row['FC'] <= -args['fc']:
                     annotations.append({'x': row['log2FC'], 
@@ -518,9 +520,14 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
         
         if len(annotations) < num_annotations:
             num_annotations = len(annotations)
-
+        
+        if len(pvals) > 0:
+            pvals.sort()
+            min_pval_sign = pvals[0]
+        else:
+            min_pval_sign = 0
         # Return
-        volcano_plot_results[(gidentifier, title)] = {'x': signature['log2FC'].values, 'y': signature['-log10 pvalue'].values, 'text':text, 'color': color, 'pvalue':-np.log10(alpha), 'annotations':annotations[0:num_annotations]}
+        volcano_plot_results[(gidentifier, title)] = {'x': signature['log2FC'].values, 'y': signature['-log10 pvalue'].values, 'text':text, 'color': color, 'pvalue':min_pval_sign, 'annotations':annotations[0:num_annotations]}
 
     figures = get_volcanoplot(volcano_plot_results, args)
 

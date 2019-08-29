@@ -6,7 +6,7 @@ import pandas as pd
 import h5py as h5
 import ckg_utils
 import config.ckg_config as ckg_config
-from report_manager import analysisResult as ar, report as rp, knowledge
+from report_manager import analysisResult as ar, report as rp, utils, knowledge
 from report_manager.analyses import basicAnalysis
 from report_manager.plots import basicFigures
 from graphdb_connector import connector
@@ -252,13 +252,13 @@ class Dataset:
                                 report_pipeline.update(report_step)
                                 self.update_analyses(result.result)
                                 if store_analysis:
-                                    if subsection == "regulation":
+                                    if analysis_type.lower() == "anova" or analysis_type.lower() == "samr" or analysis_type.lower() == "ttest":
                                         reg_data = result.result[analysis_type]
                                         if not reg_data.empty:
                                             sig_hits = list(set(reg_data.loc[reg_data.rejected,"identifier"]))
                                             sig_data = data[sig_hits]
                                             sig_data.index = data['group'].tolist()
-                                            sig_data["sample"] = data["sample"].tolist()
+                                            #sig_data["sample"] = data["sample"].tolist()
                                             self.update_data({"regulated":sig_data, "regulation table":reg_data})
                                     else:
                                         self.update_data({subsection+"_"+analysis_type: result.result[analysis_type]})
@@ -281,34 +281,40 @@ class Dataset:
         self.add_configuration_to_report(report_pipeline)
 
 
+    def save_dataset_recursively(self, dset, group, dt):
+        max_size = 20
+        df_set = None
+        for name in dset:
+            if isinstance(dset[name], dict):
+                grp = group.create_group(name)
+                df_set = self.save_dataset_recursively(dset[name], grp, dt)
+            elif isinstance(dset[name], pd.DataFrame):
+                if dset[name].memory_usage().sum()/1000000 < max_size: #Only store if memory usage below 20Mb
+                    df_set = group.create_dataset(name, (1,), dtype=dt, compression="gzip", chunks=True, data=dset[name].to_json(orient='records'))
+        
+        return df_set
+    
     def save_dataset(self, dataset_directory):
-        max_size = 20 #Mb
         if not os.path.isdir(dataset_directory):
             os.makedirs(dataset_directory)
         if len(self.data) > 0:
             dt = h5.special_dtype(vlen=str) 
             with h5.File(os.path.join(dataset_directory, self.dataset_type+"_dataset.h5"), "w") as f:
                 grp = f.create_group(self.dataset_type)
-                for data in self.data:
-                    name = data.replace(" ", "_")
-                    if self.data[data].memory_usage().sum()/1000000 < max_size: #Only store if memory usage below 20Mb
-                        d = self.data[data].to_json(orient='records')
-                        df_set = grp.create_dataset(name, (1,), dtype=dt, compression="gzip", chunks=True, data=d)
-                    else:
-                        print("NOT SAVED!")
+                df_set = self.save_dataset_recursively(self.data, grp, dt)
 
+    def save_dataset_recursively_to_file(self, dset, dataset_directory, base_name=''):
+        for name in dset:
+            if isinstance(dset[name], dict):
+                self.save_dataset_recursively_to_file(dset[name], dataset_directory, name+"_"+base_name)
+            elif isinstance(dset[name], pd.DataFrame):
+                dset[name].to_csv(os.path.join(dataset_directory,name), sep='\t', header=True, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
+                        
     def save_dataset_to_file(self, dataset_directory):
         if not os.path.isdir(dataset_directory):
             os.makedirs(dataset_directory)
-        for data in self.data:
-            name = data.replace(" ", "_") + ".tsv"
-            if isinstance(self.data[data], pd.DataFrame):
-                self.data[data].to_csv(os.path.join(dataset_directory,name), sep='\t', header=True, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
-            elif isinstance(self.data[data], dict):
-                for dtype in self.data[data]:
-                    if isinstance(self.data[data][dtype], pd.DataFrame):
-                        name = dtype+"_"+name
-                        self.data[data][dtype].to_csv(os.path.join(dataset_directory,name), sep='\t', header=True, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
+        self.save_dataset_recursively_to_file(self.data, dataset_directory, base_name='')
+        ckg_utils.save_dict_to_yaml(self.configuration, os.path.join(dataset_directory, self.dataset_type+".yml"))
         
     def save_report(self, dataset_directory):
         if not os.path.exists(dataset_directory):
@@ -345,10 +351,10 @@ class Dataset:
         return kn
 
 class MultiOmicsDataset(Dataset):
-    def __init__(self, identifier, data, analyses={}, report=None):
-        config_file = "multiomics.yml"
-        Dataset.__init__(self, identifier, "multiomics", data=data, analyses=analyses, analysis_queries={}, report=report)
-        self.set_configuration_from_file(config_file)
+    def __init__(self, identifier, data, analyses={}, analysis_queries={}, report=None):
+        self._config_file = "multiomics.yml"
+        Dataset.__init__(self, identifier, "multiomics", data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
+        self.set_configuration_from_file(self._config_file)
 
     def get_dataframes(self, datasets):
         data = {}
@@ -359,55 +365,6 @@ class MultiOmicsDataset(Dataset):
                 data[dataset_type] = self.data[dataset_type].get_dataframe(dataset_name)
 
         return data
-
-    def save_dataset(self, dataset_directory):
-        max_size = 20 #Mb
-        if not os.path.isdir(dataset_directory):
-            os.makedirs(dataset_directory)
-        if len(self.data) > 0:
-            dt = h5.special_dtype(vlen=str) 
-            with h5.File(os.path.join(dataset_directory, self.dataset_type+"_dataset.h5"), "w") as f:
-                grp = f.create_group(self.dataset_type)
-                for data in self.data:
-                    base_name = data.replace(" ", "_")
-                    print(base_name)
-                    if isinstance(self.data[data], dict):
-                        for dtype in self.data[data]:
-                            name = dtype.replace(" ", "_")
-                            grp_dict = grp.create_group(name)
-                            if isinstance(self.data[data][dtype], pd.DataFrame):
-                                if self.data[data][dtype].memory_usage().sum()/1000000 < max_size: #Only store if memory usage below 20Mb
-                                    d = self.data[data][dtype].to_json(orient='records')
-                                    df_set = grp_dict.create_dataset(name, (1,), dtype=dt, compression="gzip", chunks=True, data=d)
-                            elif isinstance(self.data[data][dtype], dict):
-                                d = {}
-                                for ddtype in self.data[data][dtype]:
-                                    name = ddtype
-                                    grp_ddict = grp.create_group(name)
-                                    if isinstance(self.data[data][dtype][ddtype], pd.DataFrame):
-                                        if self.data[data][dtype][ddtype].memory_usage().sum()/1000000 < max_size: #Only store if memory usage below 20Mb
-                                            d = self.data[data][dtype][ddtype].to_json(orient='records')
-                                            df_set = grp_ddict.create_dataset(name, (1,), dtype=dt, compression="gzip", chunks=True, data=d)
-                    elif isinstance(self.data[data], pd.DataFrame):
-                        if self.data[data].memory_usage().sum()/1000000 < max_size: #Only store if memory usage below 20Mb
-                            d = self.data[data].to_json(orient='records')
-                            df_set = grp.create_dataset(base_name, (1,), dtype=dt, compression="gzip", chunks=True, data=d)
-                        
-    def save_dataset_to_file(self, dataset_directory):
-        if not os.path.isdir(dataset_directory):
-            os.makedirs(dataset_directory)
-        for data in self.data:
-            base_name = data.replace(" ", "_") + ".tsv"
-            if isinstance(self.data[data], dict):
-                for dtype in self.data[data]:
-                    if isinstance(self.data[data][dtype], pd.DataFrame):
-                        name = dtype+"_"+base_name
-                        self.data[data][dtype].to_csv(os.path.join(dataset_directory,name), sep='\t', header=True, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
-                    elif isinstance(self.data[data][dtype], dict):
-                        for ddtype in self.data[data][dtype]:
-                            if isinstance(self.data[data][dtype][ddtype], pd.DataFrame):
-                                name = ddtype+"_"+dtype+"_"+base_name
-                                self.data[data][dtype][ddtype].to_csv(os.path.join(dataset_directory,name), sep='\t', header=True, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
         
     def generate_knowledge(self, entities_filter):
         kn = knowledge.MultiomicsKnowledge(self.identifier, self.data, nodes={}, relationships={}, colors={}, graph=None, entities_filter=entities_filter)

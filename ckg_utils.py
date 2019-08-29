@@ -2,8 +2,15 @@ import os
 import sys
 import yaml
 import json
-from os.path import isfile, join
 import logging
+
+def save_dict_to_yaml(data, yaml_file):
+    with open(yaml_file, 'w') as out:
+        try:
+            content = yaml.dump(data)
+            out.write(content)
+        except yaml.YAMLError as err:
+            raise yaml.YAMLError("The yaml file {} could not be parsed. {}".format(yaml_file, err))
 
 def read_yaml(yaml_file):
     content = None
@@ -53,12 +60,12 @@ def setup_logging(path='log.config', key=None):
 
 
 def listDirectoryFiles(directory):
-    onlyfiles = [f for f in os.listdir(directory) if isfile(join(directory, f)) and not f.startswith('.')]
+    onlyfiles = [f for f in os.listdir(directory) if os.path.isfile(join(directory, f)) and not f.startswith('.')]
 
     return onlyfiles
 
 def listDirectoryFolders(directory):
-    dircontent = [f for f in os.listdir(directory) if isdir(join(directory, f)) and not f.startswith('.')]
+    dircontent = [f for f in os.listdir(directory) if os.path.isdir(join(directory, f)) and not f.startswith('.')]
     return dircontent
 
 def checkDirectory(directory):

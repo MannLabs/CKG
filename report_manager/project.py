@@ -481,10 +481,10 @@ class Project:
             self.save_project_report()
             self.save_project_datasets_data()
             self.download_project()
-            # self.notify_project_ready()
+            self.notify_project_ready()
 
     def notify_project_ready(self, message_type='slack'):
-        message = "Report for project "+str(self.name)+" is ready: check it out at http://127.0.0.1:5000/apps/project/"+str(self.identifier)
+        message = "Report for project "+str(self.name)+" is ready: check it out at http://localhost:5000/apps/project/"+str(self.identifier)
         subject = 'Report ready '+self.identifier 
         message_from = "alsantosdel"
         message_to = "albsantosdel" #self.responsible_email

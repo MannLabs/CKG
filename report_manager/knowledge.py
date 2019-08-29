@@ -113,45 +113,63 @@ class Knowledge:
                 
         return nodes, relationships
     
-    def genreate_knowledge_from_correlation(self, entity_source, entity_target, filter):
+    def genreate_knowledge_from_correlation(self, entity_node1, entity_node2, filter):
         nodes = {}
         relationships = {}
-        source_color = self.colors[entity_source] if entity_source in self.colors else self.default_color
-        target_color = self.colors[entity_target] if entity_target in self.colors else self.default_color
-        if 'correlation' in self.data:
-            for row in self.data.iterrows():
+        node1_color = self.colors[entity_node1] if entity_node1 in self.colors else self.default_color
+        node2_color = self.colors[entity_node2] if entity_node2 in self.colors else self.default_color
+        if 'correlation_correlation' in self.data:
+            for i, row in self.data['correlation_correlation'].iterrows():
                 if len(filter) > 0:
-                    if row['source'] not in filter or row['target'] not in filter:
+                    if row['node1'] not in filter or row['node2'] not in filter:
                         continue
-                    nodes.update({row['source']: {'type':entity_source, 'color':source_color}, row['target'] : {'type':entity_target, 'color':target_color}})
-                    relationships.update({(row['source'], row['target']):{'type': 'correlates', 'weight':row['weight']}})
+                    nodes.update({row['node1']: {'type':entity_node1, 'color':node1_color}, row['node2'] : {'type':entity_node2, 'color':node2_color}})
+                    relationships.update({(row['node1'], row['node2']):{'type': 'correlates', 'weight':row['weight']}})
         
         return nodes, relationships
         
     def generate_knowledge_from_wgcna(self, entity1, entity2):
         nodes = {}
         relationships = {}
-        source_color = self.colors[entity1] if entity1 in self.colors else self.default_color
-        target_color = self.colors[entity2] if entity2 in self.colors else self.default_color
+        node1_color = self.colors[entity1] if entity1 in self.colors else self.default_color
+        node2_color = self.colors[entity2] if entity2 in self.colors else self.default_color
         #if 'correlation' in self.data:
         #    for row in data.iterrows():
         #        if len(filter) > 0:
-        #            if row[args['source']] not in filter or row[args['target']] not in filter:
+        #            if row[args['node1']] not in filter or row[args['node2']] not in filter:
         #                continue
-        #            nodes.update({row['source']: {'type':entity_source, 'color':source_color}, row['target'] : {'type':entity_target, 'color':target_color}})
-        #            relationships.update({(row['source'], row['target']):{'type': 'correlates', 'weight':row['weight']})
+        #            nodes.update({row['node1']: {'type':entity_node1, 'color':node1_color}, row['node2'] : {'type':entity_node2, 'color':node2_color}})
+        #            relationships.update({(row['node1'], row['node2']):{'type': 'correlates', 'weight':row['weight']})
         
         return nodes, relationships
+    
+    def generate_knowledge_from_annotations(self, entity1, entity2, filter=None):
+        nodes = {}
+        relationships = {}
+        node1_color = self.colors[entity1] if entity1 in self.colors else self.default_color
+        node2_color = self.colors[entity2] if entity2 in self.colors else self.default_color
+        if entity2.lower()+'_annotation' in self.data:
+            for i, row in self.data[entity2.lower()+'_annotation'].iterrows():
+                if len(filter) > 0:
+                    if row['identifier'] not in filter or row['annotation'] not in filter:
+                        continue
+                    nodes.update({row['identifier']: {'type':entity1, 'color':node1_color}, row['annotation'] : {'type':entity2, 'color':node2_color}})
+                    relationships.update({(row['identifier'], row['annotation']):{'type': 'is_annotated'}})
+        
+        return nodes, relationships
+        
     
     def generate_knowledge_from_queries(self, entity, queries_results):
         nodes = {}
         relationships = {}
-        for target in queries_results:
-            source_color = self.colors[entity] if entity in self.colors else self.default_color
-            target_color = self.colors[target] if target in self.colors else self.default_color
-            result = queries_results[target]
-            nodes.update({result['source']: {'type':entity, 'color':source_color}, result['target'] : {'type':target, 'color':target_color}})
-            relationships.update({(result['source'], result['target']): {'type': 'associated', 'weight':result['weight']}})
+        for node2 in queries_results:
+            node1_color = self.colors[entity] if entity in self.colors else self.default_color
+            node2_color = self.colors[node2] if node2 in self.colors else self.default_color
+            result = queries_results[node2]
+            for i, row in result.iterrows():
+                rel_type = row['type'] if 'type' in row else 'associated'
+                nodes.update({row['node1']: {'type':entity, 'color':node1_color}, row['node2'] : {'type':node2, 'color':node2_color}})
+                relationships.update({(row['node1'], row['node2']): {'type': rel_type, 'weight':row['weight']}})
         
         return nodes, relationships
     
@@ -161,7 +179,7 @@ class Knowledge:
 
         return data
     
-    def query_data(self, replace, replace_with):
+    def query_data(self, replace):
         query_data = {}
         try:
             cwd = os.path.abspath(os.path.dirname(__file__))
@@ -178,7 +196,12 @@ class Knowledge:
             logger.error("Reading queries from file {}: {}, file: {},line: {}".format(self.queries_file, sys.exc_info(), fname, exc_tb.tb_lineno))
 
         return query_data
-        
+    
+    def generate_cypher_nodes_list(self):
+        nodes = ['"{}"'.format(n) for n in self.nodes.keys()]
+        nodes = ",".join(nodes)
+        return nodes
+    
     def generate_knowledge_graph(self):
         G = nx.Graph()
         G.add_nodes_from(self.nodes.items())
@@ -207,7 +230,7 @@ class ProteomicsKnowledge(Knowledge):
     def __init__(self, identifier, data, nodes={}, relationships={}, colors={}, graph=None):
         queries_file = 'queries/proteomics_knowledge_cypher.yml'
         Knowledge.__init__(self, identifier, data=data, nodes=nodes, relationships=relationships, queries_file=queries_file, colors=colors, graph=graph)
-      
+    
     def generate_knowledge(self):
         regulation_knowledge = self.generate_knowledge_from_regulation(entity='Protein')
         correlation_knowledge = self.genreate_knowledge_from_correlation('Protein', 'Protein', filter=regulation_knowledge[0].keys())
@@ -216,7 +239,8 @@ class ProteomicsKnowledge(Knowledge):
         self.relationships = regulation_knowledge[1]
         self.relationships.update(correlation_knowledge[1])
         
-        queries_results = self.query_data(replace='PROTEINIDS', replace_with=self.nodes.keys())
+        nodes = self.generate_cypher_nodes_list()
+        queries_results = self.query_data(replace=[('PROTEINIDS',nodes)])
         queries_knowledge = self.generate_knowledge_from_queries(entity='Protein', queries_results=queries_results)
         self.nodes.update(queries_knowledge[0])
         self.relationships.update(queries_knowledge[1])
@@ -235,7 +259,8 @@ class ClinicalKnowledge(Knowledge):
         self.relationships = regulation_knowledge[1]
         self.relationships.update(correlation_knowledge[1])
         
-        queries_results = self.query_data(replace='PROJECTID', replace_with=self.nodes.keys())
+        nodes = self.generate_cypher_nodes_list()
+        queries_results = self.query_data(replace=[('PROJECTID', nodes)])
         queries_knowledge = self.generate_knowledge_from_queries(entity='Clinical', queries_results=queries_results)
         self.nodes.update(queries_knowledge[0])
         self.relationships.update(queries_knowledge[1])

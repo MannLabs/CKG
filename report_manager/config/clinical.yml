@@ -56,7 +56,7 @@ overview: #section
             x_title: clinical variables
             y_title: value
             title: 'Clinical variables measurements per group'
-    comparison:
+    regulation:
         data: processed
         analyses: 
             - anova
@@ -79,7 +79,7 @@ overview: #section
                 - biological_sample
             name: clinical_variable
             title: 'Volcano plot'
-    sample_correlation:
+    correlation:
         data: processed
         analyses:
             - correlation

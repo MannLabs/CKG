@@ -25,6 +25,10 @@ import smtplib
 from email.message import EmailMessage
 
 
+def copy_file_to_destination(cfile, destination):
+    if os.path.exists(destination):
+        shutil.copyfile(cfile, destination)
+        
 def generate_html(network):
         """
         This method gets the data structures supporting the nodes, edges,
@@ -61,7 +65,8 @@ def generate_html(network):
                                     tooltip_link=use_link_template)
 
 def send_message_to_slack_webhook(message, message_to):
-    webhook_file = "../config/wh.txt"
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    webhook_file = os.path.join(cwd, "../config/wh.txt")
     with open(webhook_file, 'r') as hf:
         webhook_url = hf.read()
  
