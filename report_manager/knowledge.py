@@ -128,11 +128,21 @@ class Knowledge:
         
         return nodes, relationships
         
-    def generate_knowledge_from_wgcna(self, entity1, entity2):
+    def generate_knowledge_from_wgcna(self, data, entity1, entity2):
         nodes = {}
         relationships = {}
         node1_color = self.colors[entity1] if entity1 in self.colors else self.default_color
         node2_color = self.colors[entity2] if entity2 in self.colors else self.default_color
+        if 'features_per_module' in data:
+            modules = data['features_per_module']
+            for i,row in modules.iterrows():
+                nodes.update({"MM"+row['modColor']: {'type':entity1, 'color':row['modColor']}, row['name'] : {'type':entity2, 'color':node2_color}})
+                relationships.update({("MM"+row['modColor'], row['name']):{'type': 'belongs_to'}})
+        if 'module_trait_cor' in data:
+            correlations = data['module_trait_cor']
+            for i,row in correlations.iterrows():
+                nodes.update({"MM"+row['modColor']: {'type':entity1, 'color':row['modColor']}, row['name'] : {'type':entity2, 'color':node2_color}})
+                relationships.update({("MM"+row['modColor'], row['name']):{'type': 'belongs_to'}})
         #if 'correlation' in self.data:
         #    for row in data.iterrows():
         #        if len(filter) > 0:
@@ -281,9 +291,11 @@ class MultiomicsKnowledge(Knowledge):
         self._entities_filter = entities_filter
         
     def generate_knowledge(self):
-        if 'clinical' in self.data:
-            for dtype in self.data:
-                if dtype in ['proteomics', 'RNAseq']:
-                    wgcna_knowledge = self.generate_knowledge_from_wgcna(entity1='clinical', entity2=dtype)
+        if 'wgcna_wgcna' in self.data:
+            for dtype in self.data['wgcna_wgcna']:
+                if dtype == 'wgcna-proteomics':
+                    entity1 = 'Clinical_variable'
+                    entity2 = 'Protein'
+                    wgcna_knowledge = self.generate_knowledge_from_wgcna(self.data['wgcna_wgcna'][dtype], entity1, entity2)
                     self.nodes.update(wgcna_knowledge[0])
                     self.relationships.update(wgcna_knowledge[1])
