@@ -141,14 +141,14 @@ data exploration:
                         ANOVA provides a statistical test of whether two or more population means are equal, and therefore generalizes the t-test beyond two means.[Wikipedia](https://en.wikipedia.org/wiki/Analysis_of_variance)'
         data: processed
         analyses:
-            - anova
+            - samr
         plots:
             - basicTable
             - volcanoplot
         store_analysis: True
         args:
             alpha: 0.05
-            s0: 0
+            s0: 2
             fc: 2.0
             group: 'group'
             subject: subject

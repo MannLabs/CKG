@@ -143,9 +143,31 @@ class AnalysisResult:
                 s0 = self.args["s0"]
             if "permutations" in self.args:
                 permutations = self.args["permutations"]
-            anova_result = analyses.run_anova(self.data, drop_cols=drop_cols, subject=subject, group=group, alpha=alpha, s0=s0, permutations=permutations)
+            anova_result = analyses.run_anova(self.data, drop_cols=drop_cols, subject=subject, group=group, alpha=alpha, permutations=permutations)
             self.result[self.analysis_type] = anova_result
             print('ANOVA', time.time() - start)
+        elif self.analysis_type  == 'samr':
+            start = time.time()
+            alpha = 0.05
+            s0 = 0
+            drop_cols = []
+            group = 'group'
+            subject = 'subject'
+            permutations = 250
+            if "alpha" in self.args:
+                alpha = self.args["alpha"]
+            if "drop_cols" in self.args:
+                drop_cols = self.args['drop_cols']
+            if "subject" in self.args:
+                subject = self.args['subject']
+            if "group" in self.args:
+                group = self.args["group"]
+            if "s0" in self.args:
+                s0 = self.args["s0"]
+            if "permutations" in self.args:
+                permutations = self.args["permutations"]
+            anova_result =analyses.run_samr(self.data, drop_cols=drop_cols, subject=subject, group=group, alpha=alpha, s0=s0, permutations=permutations)
+            self.result[self.analysis_type] = anova_result
         elif self.analysis_type  == '2-way anova':
             drop_cols = []
             subject = 'subject'

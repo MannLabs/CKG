@@ -12,6 +12,9 @@ from report_manager.plots import basicFigures
 from graphdb_connector import connector
 import logging
 import logging.config
+import time
+
+start = time.time()
 
 
 log_config = ckg_config.report_manager_log
@@ -243,6 +246,7 @@ class Dataset:
                         self.report.update_plots({(str(order), subsection+"_description", 'description'):[description]})
                         order +=1
                     if len(analysis_types) >= 1:
+                        a = time.time()
                         for analysis_type in analysis_types:
                             result = ar.AnalysisResult(self.identifier, analysis_type, args, data)
                             analysis_type = result.analysis_type
@@ -251,6 +255,8 @@ class Dataset:
                                 report_step[section][subsection]['args'] = result.args
                                 report_pipeline.update(report_step)
                                 self.update_analyses(result.result)
+                                b = time.time()
+                                print('END OF ANALYSIS {}/{}:'.format(subsection, analysis_type), b-a)
                                 if store_analysis:
                                     if analysis_type.lower() == "anova" or analysis_type.lower() == "samr" or analysis_type.lower() == "ttest":
                                         reg_data = result.result[analysis_type]
@@ -259,25 +265,39 @@ class Dataset:
                                             sig_data = data[sig_hits]
                                             sig_data.index = data['group'].tolist()
                                             #sig_data["sample"] = data["sample"].tolist()
+                                            print('REGULATION TABLE')
+                                            print(reg_data)
+                                            reg_data.to_csv('~/Downloads/regulation_table.tsv', sep='\t')
                                             self.update_data({"regulated":sig_data, "regulation table":reg_data})
                                     else:
                                         self.update_data({subsection+"_"+analysis_type: result.result[analysis_type]})
+                                    c = time.time()
+                                    print('STORE ANALYSIS {}:'.format(analysis_type), b-c)
                                 for plot_type in plot_types:
+                                    d = time.time()
                                     plots = result.get_plot(plot_type, subsection+"_"+analysis_type+"_"+plot_type)
                                     self.report.update_plots({(str(order), subsection+"_"+analysis_type, plot_type):plots})
+                                    e = time.time()
+                                    print('STORE PLOTS {}:'.format(plot_type), e-d)
                                     order +=1
                     else:
+                        z = time.time()
                         if result is None:
                             dictresult = {}
                             dictresult["_".join(subsection.split(' '))] = data
                             result = ar.AnalysisResult(self.identifier,"_".join(subsection.split(' ')), args, data, result = dictresult)
                             report_pipeline.update(report_step)
                             self.update_analyses(result.result)
+                            x = time.time()
+                            print('ANALYSIS {}:'.format(subsection), x-z)
                         for plot_type in plot_types:
                             plots = result.get_plot(plot_type, "_".join(subsection.split(' '))+"_"+plot_type)
                             self.report.update_plots({(str(order), "_".join(subsection.split(' ')), plot_type): plots})
+                            y = time.time()
+                            print('PLOTS {}:'.format(plot_type), x-y)
                             order += 1
         
+        print('OVERALL TIME FOR ANALYSIS:', time.time()-start)
         self.add_configuration_to_report(report_pipeline)
 
 
@@ -364,6 +384,8 @@ class MultiOmicsDataset(Dataset):
                 dataset = self.data[dataset_type]
                 data[dataset_type] = self.data[dataset_type].get_dataframe(dataset_name)
 
+        print('PROCESSED MULTIOMICS DATA')
+        print(data)
         return data
         
     def generate_knowledge(self, entities_filter):
@@ -410,7 +432,13 @@ class ProteomicsDataset(Dataset):
                 if "value_col" in args:
                     value_col = args["value_col"]
 
+            data.to_csv('~/Downloads/original_data.tsv', sep='\t')
             processed_data = basicAnalysis.get_proteomics_measurements_ready(data, index=index, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max)
+            processed_data.to_csv('~/Downloads/processed_data.tsv', sep='\t')
+        print('PROCESSED PROTEOMICS DATA:', time.time()-start)
+        print(data.shape)
+        print(processed_data.shape)
+        print(processed_data)
         return processed_data
     
     def generate_knowledge(self):
@@ -425,6 +453,7 @@ class LongitudinalProteomicsDataset(ProteomicsDataset):
         ProteomicsDataset.__init__(self, identifier, data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
         #self.dataset_type = "longitudinal_proteomics"
         self.update_configuration_from_file(config_file)
+        print('PROCESSED LONGITUDINAL PROTEOMICS DATA')
 
 class ClinicalDataset(Dataset):
     def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
@@ -472,6 +501,7 @@ class ClinicalDataset(Dataset):
                     group_id = args['group_id']
 
             processed_data = basicAnalysis.get_clinical_measurements_ready(data, subject_id=subject_id, sample_id=sample_id, group_id=group_id, columns=columns, values=values, extra=extra, imputation=imputation, imputation_method=imputation_method)
+        print('PROCESSED CLINICAL DATA')
         return processed_data
     
     def generate_knowledge(self):
