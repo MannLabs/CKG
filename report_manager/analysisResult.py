@@ -126,7 +126,6 @@ class AnalysisResult:
         elif self.analysis_type  == 'anova':
             start = time.time()
             alpha = 0.05
-            s0 = 0
             drop_cols = []
             group = 'group'
             subject = 'subject'
@@ -139,8 +138,6 @@ class AnalysisResult:
                 subject = self.args['subject']
             if "group" in self.args:
                 group = self.args["group"]
-            if "s0" in self.args:
-                s0 = self.args["s0"]
             if "permutations" in self.args:
                 permutations = self.args["permutations"]
             anova_result = analyses.run_anova(self.data, drop_cols=drop_cols, subject=subject, group=group, alpha=alpha, permutations=permutations)

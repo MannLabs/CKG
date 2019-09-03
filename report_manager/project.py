@@ -1,6 +1,8 @@
 import sys
 import os
 import time
+import h5py as h5
+import json
 from collections import defaultdict
 from plotly.offline import iplot
 from IPython.display import IFrame, display
@@ -193,30 +195,46 @@ class Project:
     def set_attributes(self, project_info):
         if "attributes" in project_info:
             attributes = project_info["attributes"].to_dict('r')[0]
-            if "name" in attributes:
-                self.name = attributes["name"]
-            if "acronym" in attributes:
-                self.acronym = attributes["acronym"]
-            if "description" in attributes:
-                self.description = attributes["description"]
-            if "data_types" in attributes:
+            self.from_dict(attributes)
+                
+    def from_dict(self, attributes):
+        if "name" in attributes:
+            self.name = attributes["name"]
+        if "acronym" in attributes:
+            self.acronym = attributes["acronym"]
+        if "description" in attributes:
+            self.description = attributes["description"]
+        if "data_types" in attributes:
+            if isinstance(attributes['data_types'],str):
                 self.data_types = [i.strip(' ') for i in attributes["data_types"].split('|')]
-            if "responsible" in attributes:
+            else:
+                self.data_types = attributes["data_types"]
+        if "responsible" in attributes:
+            if isinstance(attributes['responsible'], str):
                 self.responsible = [i.strip(' ') for i in attributes["responsible"].split('|')]
-            if "status" in attributes:
-                self.status = attributes["status"]
-            if "number_subjects" in attributes:
-                self.num_subjects = attributes["number_subjects"]
+            else:
+                self.responsible = attributes['responsible']
+        if "status" in attributes:
+            self.status = attributes["status"]
+        if "number_subjects" in attributes:
+            self.num_subjects = attributes["number_subjects"]
+        if "similar_projects" in attributes:
+            self.similar_projects = pd.DataFrame.from_dict(attributes['similar_projects'])
+        if "overlap" in attributes:
+            self.overlap = pd.DataFrame.from_dict(attributes['overlap'])
 
     def to_dict(self):
         d = {"identifier" : self.identifier,
+             "queries_file":self._queries_file,
             "name" : self.name,
             "acronym" : self.acronym,
             "description" : self.description,
             "data_types" : self.data_types,
             "responsible": self.responsible,
             "status": self.status,
-            "number_subjects": self.num_subjects
+            "number_subjects": self.num_subjects,
+            "similar_projects":self.similar_projects.to_dict(orient='records'),
+            "overlap":self.overlap.to_dict(orient='records')
             }
 
         return d
@@ -239,6 +257,10 @@ class Project:
         djson = dumps(d)
 
         return djson
+    
+    def from_json(self, json_str):
+        d = json.loads(json_str)
+        self.from_dict(d)       
 
     def query_data(self):
         data = {}
@@ -288,9 +310,17 @@ class Project:
                     self.datasets[data_type].report = r
                 else:
                     self.update_report({data_type:r})
+                    
+    def load_project(self, directory):
+        dataset_store = os.path.join(directory, "project_information_dataset.h5")
+        if os.path.isfile(dataset_store):
+            with h5.File(dataset_store, 'r') as f:
+                if "Project_information" in f:
+                    self.from_json(f["Project_information"][0])
 
     def load_project_data(self):
         project_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),"../../data/reports/"), self.identifier)
+        self.load_project(os.path.join(project_dir, "Project information"))
         for root, data_types, files in os.walk(project_dir):
             for data_type in data_types:
                 dataset = None
@@ -351,7 +381,7 @@ class Project:
         
     def generate_project_attributes_plot(self):
         project_df = self.to_dataframe()
-        
+        project_df = project_df.drop(['similar_projects', 'overlap'], axis=1)
         identifier = "Project info"
         title = "Project: {} information".format(self.name)
         plot = [figure.get_table(project_df, identifier, title)]
@@ -372,18 +402,16 @@ class Project:
     def generate_knowledge(self):
         nodes = {}
         relationships = {}
-        kn = knowledge.ProjectKnowledge(identifier=self.identifier, data=self.datasets["Project information"])
+        kn = knowledge.ProjectKnowledge(self.identifier, self.to_dict())
         nodes.update(kn.nodes)
         relationships.update(kn.relationships)
         types = ["clinical", "proteomics", "longitudinal_proteomics", "wes", "wgs", "rnaseq", "multiomics"]
         for dataset_type in types:
             if dataset_type in self.datasets:
                 dataset = self.datasets[dataset_type]
-                if dataset_type == 'multiomics':
-                    kn = dataset.generate_knowledge(nodes)
-                else:
-                    kn = dataset.generate_knowledge()
-                
+                kn = dataset.generate_knowledge()
+                if dataset_type ==  "multiomics":
+                    kn.reduce_to_subgraph(nodes)
                 nodes.update(kn.nodes)
                 relationships.update(kn.relationships)
         
@@ -391,7 +419,6 @@ class Project:
             
         return kn
         
-
     def generate_overlap_plots(self):
         plots = []
         identifier = "Overlap"
@@ -479,6 +506,7 @@ class Project:
                     dataset.generate_report()
                     #self.update_report({dataset.dataset_type:dataset.report})
             self.save_project_report()
+            self.save_project()
             self.save_project_datasets_data()
             self.download_project()
             self.notify_project_ready()
@@ -493,13 +521,8 @@ class Project:
         else:
             utils.send_email(message, subject, message_from, message_to)
 
-
     def empty_report(self):
         self.report = {}
-
-    def save_project(self):
-        self.save_project_report()
-        self.save_project_datasets_reports()
 
     def save_project_report(self):
         start = time.time()
@@ -523,6 +546,14 @@ class Project:
             if isinstance(dataset, Dataset):
                 dataset.save_report(dataset_directory)
         print('save dataset report', time.time() - start)
+        
+    def save_project(self):
+        directory = os.path.join(self.get_report_directory(),"Project information")
+        if not os.path.isdir(directory):
+            os.makedirs(directory)
+        dt = h5.special_dtype(vlen=str) 
+        with h5.File(os.path.join(directory, "project_information_dataset.h5"), "w") as f:
+            df_set = f.create_dataset("Project_information", (1,), dtype=dt, compression="gzip", chunks=True, data=self.to_json())
 
     def save_project_datasets_data(self):
         start = time.time()

@@ -136,20 +136,14 @@ class Knowledge:
         if 'features_per_module' in data:
             modules = data['features_per_module']
             for i,row in modules.iterrows():
-                nodes.update({"MM"+row['modColor']: {'type':entity1, 'color':row['modColor']}, row['name'] : {'type':entity2, 'color':node2_color}})
-                relationships.update({("MM"+row['modColor'], row['name']):{'type': 'belongs_to'}})
+                nodes.update({"ME"+row['modColor']: {'type':'Module', 'color':row['modColor']}, row['name'] : {'type':entity2, 'color':node2_color}})
+                relationships.update({("ME"+row['modColor'], row['name']):{'type': 'belongs_to'}})
         if 'module_trait_cor' in data:
             correlations = data['module_trait_cor']
+            correlations = correlations.set_index('index').stack().reset_index()
             for i,row in correlations.iterrows():
-                nodes.update({"MM"+row['modColor']: {'type':entity1, 'color':row['modColor']}, row['name'] : {'type':entity2, 'color':node2_color}})
-                relationships.update({("MM"+row['modColor'], row['name']):{'type': 'belongs_to'}})
-        #if 'correlation' in self.data:
-        #    for row in data.iterrows():
-        #        if len(filter) > 0:
-        #            if row[args['node1']] not in filter or row[args['node2']] not in filter:
-        #                continue
-        #            nodes.update({row['node1']: {'type':entity_node1, 'color':node1_color}, row['node2'] : {'type':entity_node2, 'color':node2_color}})
-        #            relationships.update({(row['node1'], row['node2']):{'type': 'correlates', 'weight':row['weight']})
+                nodes.update({row['level_1'] : {'type':entity1, 'color':node1_color}})
+                relationships.update({(row['index'], row['level_1']):{'type': 'correlates', 'weight':row[0]}})
         
         return nodes, relationships
     
@@ -218,6 +212,15 @@ class Knowledge:
         G.add_edges_from(self.relationships.keys())
         nx.set_edge_attributes(G, self.relationships)
         self.graph = G
+        
+    def reduce_to_subgraph(self, nodes):
+        valid_nodes = set(nodes).intersection(self.nodes)
+        self.generate_knowledge_graph()
+        graph = self.graph
+        subgraph = graph.subgraph(valid_nodes)
+        self.nodes = subgraph.nodes(data=True)
+        self.relationships = subgraph.edges(data=True)
+        self.graph = subgraph
 
 class ProjectKnowledge(Knowledge):
     
@@ -226,7 +229,7 @@ class ProjectKnowledge(Knowledge):
         Knowledge.__init__(self, identifier, data=data, nodes=nodes, relationships=relationships, queries_file=queries_file, colors=colors, graph=graph)
         
     def generate_knowledge(self):
-        similarity_knowledge = self.generate_knowledge_from_similarity(entity='Protein')
+        similarity_knowledge = self.generate_knowledge_from_similarity(entity='Project')
         self.nodes.update(similarity_knowledge[0])
         self.relationships.update(similarity_knowledge[1])
         
@@ -275,20 +278,11 @@ class ClinicalKnowledge(Knowledge):
         self.nodes.update(queries_knowledge[0])
         self.relationships.update(queries_knowledge[1])
         
-class MultiomicsKnowledge(Knowledge):
+class MultiOmicsKnowledge(Knowledge):
     
-    def __init__(self, identifier, data, nodes={}, relationships={}, colors={}, graph=None, entities_filter=[]):
+    def __init__(self, identifier, data, nodes={}, relationships={}, colors={}, graph=None):
         queries_file = 'queries/multiomics_knowledge_cypher.yml'
         Knowledge.__init__(self, identifier, data=data, nodes=nodes, relationships=relationships, queries_file=queries_file, colors=colors, graph=graph)
-        _entities_filter = entities_filter
-        
-    @property
-    def entities_filter(self):
-        return self._entities_filter
-
-    @entities_filter.setter
-    def entities_filter(self, entities_filter):
-        self._entities_filter = entities_filter
         
     def generate_knowledge(self):
         if 'wgcna_wgcna' in self.data:

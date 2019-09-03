@@ -525,6 +525,7 @@ def calculate_paired_ttest(df, condition1, condition2):
     return (t, pvalue, mean1, mean2, log2fc)
 
 def calculate_ttest_samr(df, labels, n=2, s0=0, paired=False):
+    print("TTEST ", s0)
     conditions = df.columns.unique()
     mean1 = df[conditions[0]].mean(axis=1)
     mean2 = df[conditions[1]].mean(axis=1)
@@ -538,9 +539,6 @@ def calculate_ttest_samr(df, labels, n=2, s0=0, paired=False):
             labels.append([(cur_count+1)*-1 if col == conditions[0] else (cur_count+1)][0])
             counts[col] = cur_count + 1
 
-        # print(df.values)
-        # print(labels)
-        # print(s0)
         ttest_res = samr.paired_ttest_func(df.values, base.unlist(labels), s0=s0)
     else:
         ttest_res = samr.ttest_func(df.values, base.unlist(labels), s0=s0)
@@ -623,8 +621,6 @@ def calculate_dabest(df, idx, x, y, paired=False, id_col=None, test='mean_diff')
     return result
 
 def calculate_anova_samr(df, labels, n=2, s0=0):
-    print(df.columns)
-    print(labels)
     aov_res = samr.multiclass_func(df.values, base.unlist(labels), s0=s0)
     pvalues = [2*stats_r.pt(-base.abs(i), df=n-1)[0] for i in aov_res[0]]
     
@@ -838,9 +834,7 @@ def run_samr(df, subject='subject', group='group', drop_cols=['subject', 'sample
         qvalues = pd.DataFrame(qvalues)
         qvalues.insert(0, 'identifier', total[2])
         qvalues.columns = ['identifier', 'padj']
-        print(total[2])
-        print(qvalues)
-
+        
         if method == 'One class':
         #     res.columns = ['identifier', 't-statistics', 'pvalue', 'padj']
             df2 = pd.DataFrame()
@@ -886,7 +880,7 @@ def run_samr(df, subject='subject', group='group', drop_cols=['subject', 'sample
         res['rejected'] = res['padj'] < 0.05
         res = res.reset_index()
     else:
-        res = run_anova(df, alpha=alpha, drop_cols=drop_cols, subject=subjectb, group=group, permutations=50)
+        res = run_anova(df, alpha=alpha, drop_cols=drop_cols, subject=subject, group=group, permutations=permutations)
 
     return res#, df2
 

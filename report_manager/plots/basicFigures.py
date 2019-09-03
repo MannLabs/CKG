@@ -1048,10 +1048,10 @@ def get_table(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = 
                                                 'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
                                             }],
                                             style_data={'whiteSpace': 'normal'},
-                                            style_cell={
-                                                'minWidth': '50px', 'maxWidth': '500px', 
-                                                'textAlign': 'left', 'padding': '1px', 'vertical-align': 'top'
-                                            },
+                                            #style_cell={
+                                            #    'minWidth': '50px', 'maxWidth': '500px', 
+                                            #    'textAlign': 'left', 'padding': '1px', 'vertical-align': 'top'
+                                            #},
                                             #style_table={
                                             #    "height": "fit-content", 
                                             #    "max-height": "500px",
