@@ -1,10 +1,14 @@
 import os
 import sys
 import pandas as pd
+import ast
 import networkx as nx
 import ckg_utils
 import config.ckg_config as ckg_config
 from graphdb_connector import connector
+from report_manager import utils, report as rp
+from report_manager.plots import basicFigures
+from networkx.readwrite import json_graph
 import logging
 import logging.config
 
@@ -12,7 +16,7 @@ log_config = ckg_config.report_manager_log
 logger = ckg_utils.setup_logging(log_config, key="knowledge")
 
 class Knowledge:
-    def __init__(self, identifier, data, nodes={}, relationships={}, queries_file=None, colors={}, graph=None):
+    def __init__(self, identifier, data, nodes={}, relationships={}, queries_file=None, colors={}, graph=None, report={}):
         self._identifier = identifier
         self._data = data
         self._colors = {}
@@ -20,6 +24,7 @@ class Knowledge:
         self._relationships = relationships
         self._queries_file = queries_file
         self._graph = graph
+        self._report = report
         self._default_color = '#878787'
         if len(colors) == 0:
             self._colors= {'Protein': '#3288bd', 
@@ -95,6 +100,14 @@ class Knowledge:
         self._default_color = default_color
         
     @property
+    def report(self):
+        return self._report
+
+    @report.setter
+    def report(self, report):
+        self._report = report
+        
+    @property
     def graph(self):
         return self._graph
 
@@ -103,7 +116,7 @@ class Knowledge:
         self._graph = graph
         
     def generate_knowledge_from_regulation(self, entity):
-        nodes = {'Regulated':{'type':'default',  'colot':self.default_color}}
+        nodes = {'Regulated':{'type':'default',  'color':self.default_color}}
         relationships = {}
         color = self.colors[entity] if entity in self.colors else self.default_color
         if "regulated" in self.data:
@@ -140,6 +153,8 @@ class Knowledge:
                 relationships.update({("ME"+row['modColor'], row['name']):{'type': 'belongs_to'}})
         if 'module_trait_cor' in data:
             correlations = data['module_trait_cor']
+            if not correlations.index.is_numeric():
+                correlations = correlations.reset_index()
             correlations = correlations.set_index('index').stack().reset_index()
             for i,row in correlations.iterrows():
                 nodes.update({row['level_1'] : {'type':entity1, 'color':node1_color}})
@@ -161,7 +176,18 @@ class Knowledge:
                     relationships.update({(row['identifier'], row['annotation']):{'type': 'is_annotated'}})
         
         return nodes, relationships
+    
+    def generate_knowledge_from_similarity(self, entity='Project'):
+        nodes = {}
+        relationships = {}
+        node_color = self.colors[entity] if entity in self.colors else self.default_color
+        if 'similar_projects' in self.data:
+            similar_projects = pd.DataFrame.from_dict(self.data['similar_projects'])
+            for i,row in similar_projects.iterrows():
+                nodes.update({row['current']: {'type':entity, 'color':node_color}, row['other'] : {'type':entity, 'color':node_color}})
+                relationships.update({(row['current'], row['other']):{'type': 'is_similar', 'weight':row['similarity_pearson']}})
         
+        return nodes, relationships
     
     def generate_knowledge_from_queries(self, entity, queries_results):
         nodes = {}
@@ -170,10 +196,12 @@ class Knowledge:
             node1_color = self.colors[entity] if entity in self.colors else self.default_color
             node2_color = self.colors[node2] if node2 in self.colors else self.default_color
             result = queries_results[node2]
+            result = result[result.duplicated(subset=['node2'], keep=False)]
             for i, row in result.iterrows():
                 rel_type = row['type'] if 'type' in row else 'associated'
+                weight = row['weight'] if 'weight' in row else 0
                 nodes.update({row['node1']: {'type':entity, 'color':node1_color}, row['node2'] : {'type':node2, 'color':node2_color}})
-                relationships.update({(row['node1'], row['node2']): {'type': rel_type, 'weight':row['weight']}})
+                relationships.update({(row['node1'], row['node2']): {'type': rel_type, 'weight':weight}})
         
         return nodes, relationships
     
@@ -214,35 +242,100 @@ class Knowledge:
         self.graph = G
         
     def reduce_to_subgraph(self, nodes):
-        valid_nodes = set(nodes).intersection(self.nodes)
+        edges = {}
+        valid_nodes = set(nodes).intersection(list(self.nodes.keys()))
+        aux = set()
         self.generate_knowledge_graph()
-        graph = self.graph
-        subgraph = graph.subgraph(valid_nodes)
-        self.nodes = subgraph.nodes(data=True)
-        self.relationships = subgraph.edges(data=True)
-        self.graph = subgraph
+        for n in valid_nodes:
+            if n in self.nodes:
+                for n1,n2,attr in self.graph.edges(n, data=True):
+                    aux.add(n1)
+                    aux.add(n2)
+                    edges.update({(n1,n2):attr})
+        remove = set(self.nodes.keys()).difference(aux)
+        self.graph.remove_nodes_from(list(remove))
+        self.nodes = dict(self.graph.nodes(data=True))
+        self.relationships = edges
+        
+    def get_knowledge_graph_plot(self):
+        if self.graph is None:
+            self.generate_knowledge_graph()
+        args = {'title': 'Project {} Knowledge Graph'.format(self.data['name']),
+                'node_properties': {},
+                'width': 2600,
+                'height': 2600, 
+                'maxLinkWidth': 7,
+                'maxRadius': 20}
+        color_selector = "{'selector': '[name = \"KEY\"]', 'style': {'background-color': 'VALUE'}}"
+        stylesheet=[{'selector': 'node', 'style': {'label': 'data(name)'}}, 
+                    {'selector':'edge','style':{'curve-style': 'bezier'}}]
+        layout = {'name': 'cose',
+                  'idealEdgeLength': 100,
+                  'nodeOverlap': 20,
+                  'refresh': 20,
+                  'randomize': False,
+                  'componentSpacing': 100,
+                  'nodeRepulsion': 400000,
+                  'edgeElasticity': 100,
+                  'nestingFactor': 5,
+                  'gravity': 80,
+                  'numIter': 1000,
+                  'initialTemp': 200,
+                  'coolingFactor': 0.95,
+                  'minTemp': 1.0}
+        
+        #stylesheet.extend([{'selector':'[weight < 0]', 'style':{'line-color':'#3288bd'}},{'selector':'[width > 0]', 'style':{'line-color':'#d73027'}}])
+        for n in self.nodes:
+            color = self.nodes[n]['color']
+            stylesheet.append(ast.literal_eval(color_selector.replace("KEY", n.replace("'","")).replace("VALUE",color)))
+        
+        args['stylesheet'] = stylesheet
+        args['layout'] = layout
+        
+        nodes_table, edges_table = basicFigures.network_to_tables(self.graph)
+        nodes_fig_table = basicFigures.get_table(nodes_table, identifier=self.identifier+"_nodes_table", title="Nodes table")
+        edges_fig_table = basicFigures.get_table(edges_table, identifier=self.identifier+"_edges_table", title="Edges table")
+        cy_elements, mouseover_node = utils.networkx_to_cytoscape(self.graph)
+        #args['mouseover_node'] = mouseover_node
+
+        net = {"notebook":[cy_elements, stylesheet, layout], "app":basicFigures.get_cytoscape_network(cy_elements, self.identifier, args), "net_tables":(nodes_fig_table, edges_fig_table), "net_json":json_graph.node_link_data(self.graph)}
+        
+        return net
+    
+    def generate_report(self):
+        report = rp.Report(identifier="knowledge")
+        plots = [self.get_knowledge_graph_plot()]
+        report.plots = {("Knowledge Graph","Knowledge Graph"): plots}
+        self.report = report
+    
+    def save_report(self, directory):
+        if not os.path.exists(directory):
+                os.makedirs(directory)
+        self.report.save_report(directory=directory)
 
 class ProjectKnowledge(Knowledge):
     
-    def __init__(self, identifier, data, nodes={}, relationships={}, colors={}, graph=None):
+    def __init__(self, identifier, data, nodes={}, relationships={}, colors={}, graph=None, report={}):
         queries_file = 'queries/project_knowledge_cypher.yml'
-        Knowledge.__init__(self, identifier, data=data, nodes=nodes, relationships=relationships, queries_file=queries_file, colors=colors, graph=graph)
+        Knowledge.__init__(self, identifier, data=data, nodes=nodes, relationships=relationships, queries_file=queries_file, colors=colors, graph=graph, report=report)
         
     def generate_knowledge(self):
         similarity_knowledge = self.generate_knowledge_from_similarity(entity='Project')
         self.nodes.update(similarity_knowledge[0])
         self.relationships.update(similarity_knowledge[1])
         
-        queries_results = self.query_data(replace='PROJECTID', replace_with=self.nodes.keys())
+        self.relationships.update({(self.data['name'], 'Regulated'): {'type': 'has'}})
+        
+        queries_results = self.query_data(replace=[('PROJECTID',self.identifier)])
         queries_knowledge = self.generate_knowledge_from_queries(entity='Project', queries_results=queries_results)
         self.nodes.update(queries_knowledge[0])
         self.relationships.update(queries_knowledge[1])
     
 class ProteomicsKnowledge(Knowledge):
     
-    def __init__(self, identifier, data, nodes={}, relationships={}, colors={}, graph=None):
+    def __init__(self, identifier, data, nodes={}, relationships={}, colors={}, graph=None, report={}):
         queries_file = 'queries/proteomics_knowledge_cypher.yml'
-        Knowledge.__init__(self, identifier, data=data, nodes=nodes, relationships=relationships, queries_file=queries_file, colors=colors, graph=graph)
+        Knowledge.__init__(self, identifier, data=data, nodes=nodes, relationships=relationships, queries_file=queries_file, colors=colors, graph=graph, report=report)
     
     def generate_knowledge(self):
         regulation_knowledge = self.generate_knowledge_from_regulation(entity='Protein')
@@ -260,9 +353,9 @@ class ProteomicsKnowledge(Knowledge):
         
 class ClinicalKnowledge(Knowledge):
     
-    def __init__(self, identifier, data, nodes={}, relationships={}, colors={}, graph=None):
+    def __init__(self, identifier, data, nodes={}, relationships={}, colors={}, graph=None, report={}):
         queries_file = 'queries/clinical_knowledge_cypher.yml'
-        Knowledge.__init__(self, identifier, data=data, nodes=nodes, relationships=relationships, queries_file=queries_file, colors=colors, graph=graph)
+        Knowledge.__init__(self, identifier, data=data, nodes=nodes, relationships=relationships, queries_file=queries_file, colors=colors, graph=graph, report=report)
         
     def generate_knowledge(self):
         regulation_knowledge = self.generate_knowledge_from_regulation(entity='Protein')
@@ -280,9 +373,9 @@ class ClinicalKnowledge(Knowledge):
         
 class MultiOmicsKnowledge(Knowledge):
     
-    def __init__(self, identifier, data, nodes={}, relationships={}, colors={}, graph=None):
+    def __init__(self, identifier, data, nodes={}, relationships={}, colors={}, graph=None, report={}):
         queries_file = 'queries/multiomics_knowledge_cypher.yml'
-        Knowledge.__init__(self, identifier, data=data, nodes=nodes, relationships=relationships, queries_file=queries_file, colors=colors, graph=graph)
+        Knowledge.__init__(self, identifier, data=data, nodes=nodes, relationships=relationships, queries_file=queries_file, colors=colors, graph=graph, report=report)
         
     def generate_knowledge(self):
         if 'wgcna_wgcna' in self.data:

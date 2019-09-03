@@ -513,11 +513,6 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
             else:
                 color.append('silver')
 
-        if not sig_pval:
-            alpha = 0.0000000000001
-        else:
-            alpha = args['alpha']
-        
         if len(annotations) < num_annotations:
             num_annotations = len(annotations)
         

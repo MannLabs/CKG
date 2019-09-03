@@ -258,7 +258,6 @@ class Dataset:
                                             sig_hits = list(set(reg_data.loc[reg_data.rejected,"identifier"]))
                                             sig_data = data[sig_hits]
                                             self.update_data({"regulated":sig_data, "regulation table":reg_data})
-                                            print(sig_hits)
                                     else:
                                         self.update_data({subsection+"_"+analysis_type: result.result[analysis_type]})
                                 for plot_type in plot_types:

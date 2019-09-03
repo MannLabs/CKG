@@ -30,10 +30,11 @@ class Project:
          >>> p.show_report(environment="notebook")
     '''
 
-    def __init__(self, identifier, datasets={}, report={}):
+    def __init__(self, identifier, datasets={}, knowledge=None, report={}):
         self._identifier = identifier
         self._queries_file = 'queries/project_cypher.yml'
         self._datasets = datasets
+        self._knowledge = knowledge
         self._report = report
         self._name = None
         self._acronym = None
@@ -127,6 +128,14 @@ class Project:
     @datasets.setter
     def datasets(self, datasets):
         self._datasets = datasets
+
+    @property
+    def knowledge(self):
+        return self._knowledge
+
+    @knowledge.setter
+    def knowledge(self, knowledge):
+        self._knowledge = knowledge
 
     @property
     def report(self):
@@ -398,26 +407,6 @@ class Project:
         plots.append(self.get_similarity_network())
         
         return plots
-    
-    def generate_knowledge(self):
-        nodes = {}
-        relationships = {}
-        kn = knowledge.ProjectKnowledge(self.identifier, self.to_dict())
-        nodes.update(kn.nodes)
-        relationships.update(kn.relationships)
-        types = ["clinical", "proteomics", "longitudinal_proteomics", "wes", "wgs", "rnaseq", "multiomics"]
-        for dataset_type in types:
-            if dataset_type in self.datasets:
-                dataset = self.datasets[dataset_type]
-                kn = dataset.generate_knowledge()
-                if dataset_type ==  "multiomics":
-                    kn.reduce_to_subgraph(nodes)
-                nodes.update(kn.nodes)
-                relationships.update(kn.relationships)
-        
-        kn = knowledge.Knowledge(self.identifier, {}, nodes=nodes, relationships=relationships)
-            
-        return kn
         
     def generate_overlap_plots(self):
         plots = []
@@ -484,13 +473,32 @@ class Project:
             logger.error("Reading queries from file {}: {}, file: {},line: {}".format(query_path, sys.exc_info(), fname, exc_tb.tb_lineno))
 
         return plot
+    
+    def generate_knowledge(self):
+        nodes = {}
+        relationships = {}
+        kn = knowledge.ProjectKnowledge(identifier=self.identifier, data=self.to_dict())
+        kn.generate_knowledge()
+        nodes.update(kn.nodes)
+        relationships.update(kn.relationships)
+        types = ["clinical", "proteomics", "longitudinal_proteomics", "wes", "wgs", "rnaseq", "multiomics"]
+        for dataset_type in types:
+            if dataset_type in self.datasets:
+                dataset = self.datasets[dataset_type]
+                kn = dataset.generate_knowledge()
+                if dataset_type ==  "multiomics":
+                    kn.reduce_to_subgraph(nodes.keys())
+                nodes.update(kn.nodes)
+                relationships.update(kn.relationships)
+        
+        self.knowledge = knowledge.Knowledge(self.identifier, {'name':self.name}, nodes=nodes, relationships=relationships)
 
     def generate_project_info_report(self):
         report = rp.Report(identifier="project_info")
 
         plots = self.generate_project_attributes_plot()
         plots.extend(self.generate_project_similarity_plots())
-        plots.extend(self.generate_overlap_plots())
+        plots.extend(self.generate_overlap_plots())       
                
         report.plots = {("Project info","Project Information"): plots}
 
@@ -499,12 +507,15 @@ class Project:
     def generate_report(self):
         if len(self.report) == 0:
             project_report = self.generate_project_info_report()
-            self.update_report({"Project information":project_report})
+            self.update_report({"Project information":project_report})            
             for dataset_type in self.data_types:
                 dataset = self.get_dataset(dataset_type)
                 if dataset is not None:
                     dataset.generate_report()
-                    #self.update_report({dataset.dataset_type:dataset.report})
+                    #self.update_report({dataset.dataset_type:dataset.report})            
+            self.generate_knowledge()
+            self.knowledge.generate_report()
+            
             self.save_project_report()
             self.save_project()
             self.save_project_datasets_data()
@@ -535,6 +546,7 @@ class Project:
             report.save_report(dataset_dir)
         
         self.save_project_datasets_reports()
+        self.knowledge.save_report(directory)
         print('save report', time.time() - start)
 
     def save_project_datasets_reports(self):
@@ -566,16 +578,18 @@ class Project:
         print('save datasets', time.time() - start)
 
     def show_report(self, environment):
-        types = ["Project information", "clinical", "proteomics", "longitudinal_proteomics", "wes", "wgs", "rnaseq", "multiomics"]
+        types = ["Knowledge Graph", "Project information", "clinical", "proteomics", "longitudinal_proteomics", "wes", "wgs", "rnaseq", "multiomics"]
         app_plots = defaultdict(list)
         for dataset in types:
             if dataset in self.report:
                 report = self.report[dataset]
                 app_plots[dataset.upper()] = report.visualize_report(environment)
-            else:
-                if dataset in self.datasets:
-                    report = self.datasets[dataset].report
-                    app_plots[dataset.upper()] = report.visualize_report(environment)
+            elif dataset in self.datasets:
+                report = self.datasets[dataset].report
+                app_plots[dataset.upper()] = report.visualize_report(environment)
+            elif dataset == "Knowledge Graph":
+                report = self.knowledge.report
+                app_plots[dataset.upper()] = report.visualize_report(environment)
         
         return app_plots
 
