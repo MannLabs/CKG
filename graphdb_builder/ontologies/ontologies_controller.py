@@ -78,8 +78,9 @@ def parse_ontology(ontology, download=True):
 def generate_graphFiles(import_directory, ontologies=None, download=True):
     entities = config["ontologies"]
     if ontologies is not None:
+        entities = {}
         for ontology in ontologies:
-            entities = {ontology:ontologies[ontology]}
+            entities.update({ontology:config["ontologies"][ontology]})
 
     stats = set()
     for entity in entities:
