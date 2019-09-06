@@ -71,7 +71,8 @@ if __name__ == '__main__':
                             logger.error("The indicated entities (--data) cannot be imported: {}".format(args.data))
                             print("The indicated entities (--data) cannot be imported: {}".format(args.data))
                     elif import_type.lower() == 'ontologies' or import_type.lower() == 'ontology':
-                        valid_entities = [x.lower() for x in args.data if x.lower() in oconfig['ontologies']]
+                        ontologies = [d.lower   () for d in oconfig['ontologies']]
+                        valid_entities = [x.capitalize() for x in args.data if x.lower() in ontologies]
                         if len(valid_entities) > 0:
                             logger.info("These entities will be imported: {}".format(", ".join(valid_entities)))
                             print("These entities will be loaded into the database: {}".format(", ".join(valid_entities)))

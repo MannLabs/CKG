@@ -11,6 +11,7 @@ import os.path
 from datetime import datetime
 import pandas as pd
 from joblib import Parallel, delayed
+import shortuuid
 import config.ckg_config as ckg_config
 import ckg_utils
 import create_user as uh
@@ -23,6 +24,7 @@ import logging.config
 
 log_config = ckg_config.graphdb_builder_log
 logger = builder_utils.setup_logging(log_config, key="importer")
+import_id = shortuuid.uuid()
 
 try:
     cwd = os.path.abspath(os.path.dirname(__file__))
@@ -55,6 +57,7 @@ def ontologiesImport(importDirectory, ontologies=None, download=True, import_typ
     builder_utils.checkDirectory(ontologiesImportDirectory)
     stats = oh.generate_graphFiles(ontologiesImportDirectory, ontologies, download)
     statsDf = generateStatsDataFrame(stats)
+    setupStats(import_type=import_type)
     writeStats(statsDf, import_type)
 
 def databasesImport(importDirectory, databases=None, n_jobs=1, download=True, import_type="partial"):
@@ -78,6 +81,7 @@ def databasesImport(importDirectory, databases=None, n_jobs=1, download=True, im
     builder_utils.checkDirectory(databasesImportDirectory)
     stats = dh.generateGraphFiles(databasesImportDirectory, databases, download, n_jobs)
     statsDf = generateStatsDataFrame(stats)
+    setupStats(import_type=import_type)
     writeStats(statsDf, import_type)
 
 def experimentsImport(projects=None, n_jobs=1, import_type="partial"):
@@ -183,6 +187,7 @@ def generateStatsDataFrame(stats):
         statsDf: pandas dataframe with the collected statistics
     """
     statsDf = pd.DataFrame.from_records(list(stats), columns=config["statsCols"])
+    statsDf['import_id'] = import_id
     
     return statsDf
 
@@ -214,30 +219,30 @@ def createEmptyStats(statsCols, statsFile, statsName):
     """
     try:
         statsDf = pd.DataFrame(columns=statsCols)
-        hdf = pd.HDFStore(statsFile)
-        hdf.put(statsName, statsDf, format='table', data_columns=True, min_itemsize=2000)
-        hdf.close()
+        with pd.HDFStore(statsFile) as hdf:
+            hdf.put(statsName, statsDf, format='table', data_columns=True, min_itemsize=2000)
+            hdf.close()
     except Exception as err:
         logger.error("Creating empty Stats object {} in file:{} > {}.".format(statsName, statsFile, err))
 
-def loadStats(statsFile):
-    """
-    Loads the statistics object.
-    Args:
-        statsFile (string): File path where the stats object is stored.
-    Returns:
-        hdf (HDFStore object): object with the collected statistics.
-                                stats can be accessed using a key
-                                (i.e stats_ version)
-    """
-    try:
-        hdf = None
-        if os.path.isfile(statsFile):
-            hdf = pd.HDFStore(statsFile)
-    except Exception as err:
-        logger.error("Loading Stats file:{} > {}.".format(statsFile, err))
+# def loadStats(statsFile):
+#     """
+#     Loads the statistics object.
+#     Args:
+#         statsFile (string): File path where the stats object is stored.
+#     Returns:
+#         hdf (HDFStore object): object with the collected statistics.
+#                                 stats can be accessed using a key
+#                                 (i.e stats_ version)
+#     """
+#     try:
+#         hdf = None
+#         if os.path.isfile(statsFile):
+#             hdf = pd.HDFStore(statsFile)
+#     except Exception as err:
+#         logger.error("Loading Stats file:{} > {}.".format(statsFile, err))
 
-    return hdf
+#     return hdf
 
 def writeStats(statsDf, import_type, stats_name=None):
     """
@@ -253,9 +258,9 @@ def writeStats(statsDf, import_type, stats_name=None):
     try: 
         if stats_name is None:
             stats_name = getStatsName(import_type)
-        hdf = loadStats(stats_file)
-        hdf.append(stats_name, statsDf, min_itemsize=2000)
-        hdf.close()
+        with pd.HDFStore(stats_file) as hdf:
+            hdf.append(stats_name, statsDf, data_columns=True, min_itemsize=2000)
+            hdf.close()
     except Exception as err:
         logger.error("Writing Stats object {} in file:{} > {}.".format(stats_name, stats_file, err))
 

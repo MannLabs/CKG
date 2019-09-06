@@ -13,7 +13,7 @@ class ImportsApp(basicApp.BasicApp):
         self.add_basic_layout()
         stats_file = "../../data/imports/stats/stats.hdf"
         #stats_key =  'full_stats_'+ str(ckg_config.version).replace('.','_')
-        stats_df = imports.get_stats_data(stats_file)
+        stats_df = imports.get_stats_data(stats_file, n=3)
         plots = []
         plots_partial = []
         plots.append(imports.plot_total_number_imported(stats_df, 'Number of imported entities and relationships'))
