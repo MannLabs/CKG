@@ -1,10 +1,12 @@
 import os
 import sys
 import pandas as pd
+import numpy as np
 import ast
 import networkx as nx
 import ckg_utils
 import config.ckg_config as ckg_config
+import dash_cytoscape as cyto
 from graphdb_connector import connector
 from report_manager import utils, report as rp
 from report_manager.plots import basicFigures
@@ -14,6 +16,7 @@ import logging.config
 
 log_config = ckg_config.report_manager_log
 logger = ckg_utils.setup_logging(log_config, key="knowledge")
+cyto.load_extra_layouts()
 
 class Knowledge:
     def __init__(self, identifier, data, nodes={}, relationships={}, queries_file=None, colors={}, graph=None, report={}):
@@ -25,15 +28,8 @@ class Knowledge:
         self._queries_file = queries_file
         self._graph = graph
         self._report = report
-        self._default_color = '#878787'
-        if len(colors) == 0:
-            self._colors= {'Protein': '#3288bd', 
-                           'Clinical_variable':'#1a9850',
-                           'Drug':'#fdae61', 
-                           'Disease':'#9e0142', 
-                           'Pathway': '#abdda4', 
-                           'Biological_process':'#e6f598', 
-                           'Symptom':'#f46d43'}
+        self._default_color = 'white'
+        self._colors = colors
 
     @property
     def identifier(self):
@@ -126,7 +122,7 @@ class Knowledge:
                 
         return nodes, relationships
     
-    def genreate_knowledge_from_correlation(self, entity_node1, entity_node2, filter):
+    def genreate_knowledge_from_correlation(self, entity_node1, entity_node2, filter, cutoff=0.5):
         nodes = {}
         relationships = {}
         node1_color = self.colors[entity_node1] if entity_node1 in self.colors else self.default_color
@@ -136,12 +132,13 @@ class Knowledge:
                 if len(filter) > 0:
                     if row['node1'] not in filter or row['node2'] not in filter:
                         continue
-                    nodes.update({row['node1']: {'type':entity_node1, 'color':node1_color}, row['node2'] : {'type':entity_node2, 'color':node2_color}})
-                    relationships.update({(row['node1'], row['node2']):{'type': 'correlates', 'weight':row['weight']}})
-        
+                    if np.abs(row['weight']) >= cutoff:
+                        nodes.update({row['node1']: {'type':entity_node1, 'color':node1_color}, row['node2'] : {'type':entity_node2, 'color':node2_color}})
+                        relationships.update({(row['node1'], row['node2']):{'type': 'correlates', 'weight':row['weight']}})
+            
         return nodes, relationships
         
-    def generate_knowledge_from_wgcna(self, data, entity1, entity2):
+    def generate_knowledge_from_wgcna(self, data, entity1, entity2, cutoff=0.2):
         nodes = {}
         relationships = {}
         node1_color = self.colors[entity1] if entity1 in self.colors else self.default_color
@@ -157,9 +154,10 @@ class Knowledge:
                 correlations = correlations.reset_index()
             correlations = correlations.set_index('index').stack().reset_index()
             for i,row in correlations.iterrows():
-                nodes.update({row['level_1'] : {'type':entity1, 'color':node1_color}})
-                relationships.update({(row['index'], row['level_1']):{'type': 'correlates', 'weight':row[0]}})
-        
+                if np.abs(row[0])>=cutoff:
+                    nodes.update({row['level_1'] : {'type':entity1, 'color':node1_color}})
+                    relationships.update({(row['index'], row['level_1']):{'type': 'correlates', 'weight':row[0]}})
+            
         return nodes, relationships
     
     def generate_knowledge_from_annotations(self, entity1, entity2, filter=None):
@@ -196,12 +194,11 @@ class Knowledge:
             node1_color = self.colors[entity] if entity in self.colors else self.default_color
             node2_color = self.colors[node2] if node2 in self.colors else self.default_color
             result = queries_results[node2]
-            result = result[result.duplicated(subset=['node2'], keep=False)]
             for i, row in result.iterrows():
                 rel_type = row['type'] if 'type' in row else 'associated'
                 weight = row['weight'] if 'weight' in row else 0
-                nodes.update({row['node1']: {'type':entity, 'color':node1_color}, row['node2'] : {'type':node2, 'color':node2_color}})
-                relationships.update({(row['node1'], row['node2']): {'type': rel_type, 'weight':weight}})
+                nodes.update({row['node1']: {'type':entity, 'color':node1_color}, row['node2'].replace("'","") : {'type':node2, 'color':node2_color}})
+                relationships.update({(row['node1'], row['node2'].replace("'","")): {'type': rel_type, 'weight':weight}})
         
         return nodes, relationships
     
@@ -217,11 +214,11 @@ class Knowledge:
             cwd = os.path.abspath(os.path.dirname(__file__))
             cypher_queries = ckg_utils.get_queries(os.path.join(cwd, self.queries_file))
             for query_name in cypher_queries:
-                title = query_name.lower().replace('_',' ')
                 query = cypher_queries[query_name]['query']
                 for r,by in replace:
                     query = query.replace(r,by)
-                query_data[title] = self.send_query(query)
+                print(query_name, query)
+                query_data[query_name] = self.send_query(query)
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -239,6 +236,9 @@ class Knowledge:
         G.add_nodes_from(self.nodes.items())
         G.add_edges_from(self.relationships.keys())
         nx.set_edge_attributes(G, self.relationships)
+        pos = nx.spectral_layout(G)
+        pos_attr = {k:{'position':{'x':v[0], 'y':v[1]}} for k,v in pos.items()} 
+        nx.set_node_attributes(G,pos_attr)
         self.graph = G
         
     def reduce_to_subgraph(self, nodes):
@@ -266,13 +266,16 @@ class Knowledge:
                 'height': 2600, 
                 'maxLinkWidth': 7,
                 'maxRadius': 20}
-        color_selector = "{'selector': '[name = \"KEY\"]', 'style': {'background-color': 'VALUE'}}"
-        stylesheet=[{'selector': 'node', 'style': {'label': 'data(name)'}}, 
-                    {'selector':'edge','style':{'curve-style': 'bezier'}}]
-        layout = {'name': 'cose',
-                  'idealEdgeLength': 100,
+        color_selector = "{'selector': '[name = \"KEY\"]', 'style': {'background-color':'VALUE','width': 50,'height': 50,'background-image':'/assets/graph_icons/ENTITY.png','background-fit': 'cover',}}"
+        stylesheet=[{'selector': 'node', 'style': {'label': 'data(name)', 'z-index': 9999}}, 
+                    {'selector':'edge','style':{'label':'data(type)','curve-style': 'bezier', 'z-index': 5000, 'line-color': '#bdbdbd', 'opacity':0.3,'font-size':'7px'}}]
+        layout = {'name': 'preset',
+                  'animate': False,
+                  'idealEdgeLength': 200,
                   'nodeOverlap': 20,
                   'refresh': 20,
+                  #'fit': True,
+                  #'padding': 30,
                   'randomize': False,
                   'componentSpacing': 100,
                   'nodeRepulsion': 400000,
@@ -287,7 +290,8 @@ class Knowledge:
         #stylesheet.extend([{'selector':'[weight < 0]', 'style':{'line-color':'#3288bd'}},{'selector':'[width > 0]', 'style':{'line-color':'#d73027'}}])
         for n in self.nodes:
             color = self.nodes[n]['color']
-            stylesheet.append(ast.literal_eval(color_selector.replace("KEY", n.replace("'","")).replace("VALUE",color)))
+            image = self.nodes[n]['type']
+            stylesheet.append(ast.literal_eval(color_selector.replace("KEY", n.replace("'","")).replace("VALUE",color).replace("ENTITY",image)))
         
         args['stylesheet'] = stylesheet
         args['layout'] = layout
@@ -310,8 +314,10 @@ class Knowledge:
     
     def save_report(self, directory):
         if not os.path.exists(directory):
-                os.makedirs(directory)
-        self.report.save_report(directory=directory)
+            os.makedirs(directory)
+        if not os.path.exists(os.path.join(directory, "Knowledge")):
+            os.makedirs(os.path.join(directory, "Knowledge"))
+        self.report.save_report(directory=os.path.join(directory, "Knowledge"))
 
 class ProjectKnowledge(Knowledge):
     

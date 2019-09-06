@@ -317,6 +317,8 @@ class Project:
                 r.read_report(os.path.join(root, data_type))
                 if data_type in self.datasets:
                     self.datasets[data_type].report = r
+                elif data_type == "Knowledge":
+                    self.knowledge = knowledge.Knowledge(self.identifier, {'name':self.name}, report=r)
                 else:
                     self.update_report({data_type:r})
                     
@@ -615,6 +617,15 @@ class Project:
                 if not os.path.exists(dataset_dir):
                     os.makedirs(dataset_dir)
                 report.download_report(dataset_dir)
+        
+        self.download_knowledge(os.path.join(directory, "Knowledge"))
+        
+    def download_knowledge(self, directory):
+        report = self.knowledge.report
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        
+        report.download_report(directory)
             
     def download_project_datasets(self):
         directory = self.get_downloads_directory()

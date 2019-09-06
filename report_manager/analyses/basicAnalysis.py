@@ -1159,8 +1159,9 @@ def get_publications_abstracts(data, publication_col="publication", join_by=['pu
     abstracts = pd.DataFrame()
     if not data.empty:
         abstracts = utils.getMedlineAbstracts(list(data.reset_index()[publication_col].unique()))
-        abstracts = abstracts.set_index(index)
-        abstracts = abstracts.join(data.reset_index()[join_by].set_index(publication_col)).reset_index()
+        if not abstracts.empty:
+            abstracts = abstracts.set_index(index)
+            abstracts = abstracts.join(data.reset_index()[join_by].set_index(publication_col)).reset_index()
 
     return abstracts
 
