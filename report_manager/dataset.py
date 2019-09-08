@@ -410,7 +410,7 @@ class ProteomicsDataset(Dataset):
                 if "value_col" in args:
                     value_col = args["value_col"]
 
-            processed_data = basicAnalysis.get_proteomics_measurements_ready(data, index=index, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max)
+            processed_data = basicAnalysis.get_proteomics_measurements_ready(data, index_cols=index, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max)
         return processed_data
     
     def generate_knowledge(self):

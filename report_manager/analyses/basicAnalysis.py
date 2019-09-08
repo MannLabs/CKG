@@ -80,8 +80,8 @@ def extract_number_missing(df, missing_max, drop_cols=['sample'], group='group')
         groups = df.loc[:, df.notnull().sum(axis = 1) >= missing_max]
     else:
         groups = df.copy()
-        groups = groups.drop(["sample"], axis = 1)
-        groups = groups.set_index("group").notnull().groupby(level=0).sum(axis = 1)
+        groups = groups.drop(drop_cols, axis = 1)
+        groups = groups.set_index(group).notnull().groupby(level=0).sum(axis = 1)
         groups = groups[groups>=missing_max]
 
     groups = groups.dropna(how='all', axis=1)
@@ -119,15 +119,15 @@ def imputation_KNN(data, drop_cols=['group', 'sample', 'subject'], group='group'
 
 def imputation_mixed_norm_KNN(data, index_cols=['group', 'sample', 'subject'], shift = 1.8, nstd = 0.3, group='group', cutoff=0.6):
     df = imputation_KNN(data, drop_cols=index_cols, group=group, cutoff=cutoff, alone = False)
-    df = imputation_normal_distribution(df, index=index_cols, shift=shift, nstd=nstd)
+    df = imputation_normal_distribution(df, index_cols=index_cols, shift=shift, nstd=nstd)
 
     return df
 
-def imputation_normal_distribution(data, index=['group', 'sample', 'subject'], shift = 1.8, nstd = 0.3):
+def imputation_normal_distribution(data, index_cols=['group', 'sample', 'subject'], shift = 1.8, nstd = 0.3):
     np.random.seed(112736)
     df = data.copy()
-    if index is not None:
-        df = df.set_index(index)
+    if index_cols is not None:
+        df = df.set_index(index_cols)
     data_imputed = df.T.sort_index()
     null_columns = data_imputed.columns[data_imputed.isnull().any()]
     for c in null_columns:
@@ -201,15 +201,15 @@ def get_coefficient_variation(data, drop_columns, group, columns):
     return cvs_df
 
 
-def get_proteomics_measurements_ready(df, index=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation = True, method = 'distribution', missing_method = 'percentage', missing_max = 0.3, value_col='LFQ_intensity'):
-    df = df.set_index(index)
+def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation = True, method = 'distribution', missing_method = 'percentage', missing_max = 0.3, value_col='LFQ_intensity'):
+    df = df.set_index(index_cols)
     if extra_identifier is not None and extra_identifier in df.columns:
         df[identifier] = df[extra_identifier].map(str) + "~" + df[identifier].map(str)
     df = df.pivot_table(values=value_col, index=df.index, columns=identifier, aggfunc='first')
     df = df.reset_index()
-    df[index] = df["index"].apply(pd.Series)
+    df[index_cols] = df["index"].apply(pd.Series)
     df = df.drop(["index"], axis=1)
-    aux = index
+    aux = index_cols
     if missing_method == 'at_least_x_per_group':
         aux.extend(extract_number_missing(df, missing_max, drop_cols, group=group))
     elif missing_method == 'percentage':
@@ -792,7 +792,8 @@ def run_samr(df, subject='subject', group='group', drop_cols=['subject', 'sample
 
         groups = df[group].unique()
         samples = len(df[group])
-
+        method='Multiclass'
+        
         if subject is not None:
             if len(groups) == 1:
                 method = 'One class'
@@ -801,9 +802,6 @@ def run_samr(df, subject='subject', group='group', drop_cols=['subject', 'sample
                     method = 'Two class paired'
                 else:
                     method = 'Two class unpaired'
-            else:
-                method = 'Multiclass'
-
 
         df = df.set_index(group).drop(drop_cols, axis=1).T
         conditions = set(df.columns)

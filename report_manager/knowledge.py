@@ -146,7 +146,7 @@ class Knowledge:
         if 'features_per_module' in data:
             modules = data['features_per_module']
             for i,row in modules.iterrows():
-                nodes.update({"ME"+row['modColor']: {'type':'Module', 'color':row['modColor']}, row['name'] : {'type':entity2, 'color':node2_color}})
+                nodes.update({"ME"+row['modColor']: {'type':'Module', 'color':row['modColor']}, row['name'] : {'type':entity2, 'color':node2_color, 'parent':"ME"+row['modColor']}})
                 relationships.update({("ME"+row['modColor'], row['name']):{'type': 'belongs_to'}})
         if 'module_trait_cor' in data:
             correlations = data['module_trait_cor']
@@ -182,7 +182,7 @@ class Knowledge:
         if 'similar_projects' in self.data:
             similar_projects = pd.DataFrame.from_dict(self.data['similar_projects'])
             for i,row in similar_projects.iterrows():
-                nodes.update({row['current']: {'type':entity, 'color':node_color}, row['other'] : {'type':entity, 'color':node_color}})
+                nodes.update({row['other'] : {'type':entity, 'color':node_color}})
                 relationships.update({(row['current'], row['other']):{'type': 'is_similar', 'weight':row['similarity_pearson']}})
         
         return nodes, relationships
@@ -236,9 +236,9 @@ class Knowledge:
         G.add_nodes_from(self.nodes.items())
         G.add_edges_from(self.relationships.keys())
         nx.set_edge_attributes(G, self.relationships)
-        pos = nx.spectral_layout(G)
-        pos_attr = {k:{'position':{'x':v[0], 'y':v[1]}} for k,v in pos.items()} 
-        nx.set_node_attributes(G,pos_attr)
+        #pos = nx.spectral_layout(G)
+        #pos_attr = {k:{'position':{'x':v[0], 'y':v[1]}} for k,v in pos.items()} 
+        #nx.set_node_attributes(G,pos_attr)
         self.graph = G
         
     def reduce_to_subgraph(self, nodes):
@@ -266,26 +266,10 @@ class Knowledge:
                 'height': 2600, 
                 'maxLinkWidth': 7,
                 'maxRadius': 20}
-        color_selector = "{'selector': '[name = \"KEY\"]', 'style': {'background-color':'VALUE','width': 50,'height': 50,'background-image':'/assets/graph_icons/ENTITY.png','background-fit': 'cover',}}"
+        color_selector = "{'selector': '[name = \"KEY\"]', 'style': {'font-size': 12,'background-color':'VALUE','width': 50,'height': 50,'background-image':'/assets/graph_icons/ENTITY.png','background-fit': 'cover',}}"
         stylesheet=[{'selector': 'node', 'style': {'label': 'data(name)', 'z-index': 9999}}, 
                     {'selector':'edge','style':{'label':'data(type)','curve-style': 'bezier', 'z-index': 5000, 'line-color': '#bdbdbd', 'opacity':0.3,'font-size':'7px'}}]
-        layout = {'name': 'preset',
-                  'animate': False,
-                  'idealEdgeLength': 200,
-                  'nodeOverlap': 20,
-                  'refresh': 20,
-                  #'fit': True,
-                  #'padding': 30,
-                  'randomize': False,
-                  'componentSpacing': 100,
-                  'nodeRepulsion': 400000,
-                  'edgeElasticity': 100,
-                  'nestingFactor': 5,
-                  'gravity': 80,
-                  'numIter': 1000,
-                  'initialTemp': 200,
-                  'coolingFactor': 0.95,
-                  'minTemp': 1.0}
+        layout = {'name': 'breadthfirst', 'roots':'#0'}
         
         #stylesheet.extend([{'selector':'[weight < 0]', 'style':{'line-color':'#3288bd'}},{'selector':'[width > 0]', 'style':{'line-color':'#d73027'}}])
         for n in self.nodes:

@@ -479,7 +479,7 @@ class Project:
     def generate_knowledge(self):
         nodes = {}
         relationships = {}
-        kn = knowledge.ProjectKnowledge(identifier=self.identifier, data=self.to_dict())
+        kn = knowledge.ProjectKnowledge(identifier=self.identifier, data=self.to_dict(), nodes={self.name:{'id':'#0', 'type':'Project'}})
         kn.generate_knowledge()
         nodes.update(kn.nodes)
         relationships.update(kn.relationships)

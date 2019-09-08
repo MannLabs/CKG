@@ -400,7 +400,7 @@ def get_volcanoplot(results, args):
         else:
             range_x = args["range_x"]
         if "range_y" not in args:
-            range_y = [0,max(abs(result['y']))+0.1]
+            range_y = [0,max(abs(result['y']))+0.3]
         else:
             range_y = args["range_y"]
         trace = go.Scatter(x=result['x'],
@@ -893,7 +893,7 @@ def get_network_style(node_colors, color_edges):
                 'minTemp': 1.0}
 
     if color_edges:
-        stylesheet.extend([{'selector':'[width < 0]', 'style':{'line-color':'#3288bd'}},{'selector':'[width > 0]', 'style':{'line-color':'#d73027'}}])
+        stylesheet.extend([{'selector':'[width < 0]', 'style':{'line-color':'#4add1'}},{'selector':'[width > 0]', 'style':{'line-color':'#d6604d'}}])
 
     for k,v in node_colors.items():
         stylesheet.append(ast.literal_eval(color_selector.replace("KEY", k).replace("VALUE",v)))
