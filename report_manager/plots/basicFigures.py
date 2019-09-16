@@ -1194,7 +1194,7 @@ def get_WGCNAPlots(data, identifier):
         #plots.append(wgcnaFigures.plot_complex_dendrogram(data_exp, data_cli, title='Clinical variables variation by sample', dendro_labels=data_exp.index, distfun='euclidean', linkagefun='average', hang=40, subplot='heatmap', color_missingvals=True, width=1000, height=800))
 
         # plot: gene tree dendrogram and module colors; input: dissTOM, moduleColors
-        plots.append(wgcnaFigures.plot_complex_dendrogram(dissTOM, moduleColors, title='Co-expression: dendrogram and module colors', dendro_labels=dissTOM.columns, distfun=None, linkagefun='average', hang=0.1, subplot='module colors', col_annotation=True, width=1000, height=800))
+        plots.append(wgcnaFigures.plot_complex_dendrogram(dissTOM, moduleColors, title='Co-expression: dendrogram and module colors', dendro_labels=dissTOM.columns, distfun=None, linkagefun='ward', hang=0.1, subplot='module colors', col_annotation=True, width=1000, height=800))
 
         # plot: table with features per module; input: df
         plots.append(get_table(Features_per_Module, identifier='', title='Proteins/Genes module color', colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':1500, 'font':12}, subplot = False))
@@ -1206,11 +1206,11 @@ def get_WGCNAPlots(data, identifier):
         #plots.append(wgcnaFigures.plot_intramodular_correlation(MM, FS, Features_per_Module, title='Intramodular analysis: Feature Significance vs. Module Membership', width=1000, height=2000))
 
         #input: METDiss, METcor
-        # plots.append(wgcnaFigures.plot_complex_dendrogram(METDiss, METcor, title='Eigengene network and clinical data associations', dendro_labels=METDiss.index, distfun=None, linkagefun='average', hang=0.9,
+        # plots.append(wgcnaFigures.plot_complex_dendrogram(METDiss, METcor, title='Eigengene network and clinical data associations', dendro_labels=METDiss.index, distfun=None, linkagefun='ward', hang=0.9,
         #                          subplot='heatmap', subplot_colorscale=[[0,'#67a9cf'],[0.5,'#f7f7f7'],[1,'#ef8a62']],
         #                          color_missingvals=False, row_annotation=True, col_annotation=True, width=1000, height=800))
 
-        dendro_tree = wgcnaAnalysis.get_dendrogram(METDiss, METDiss.index, distfun=None, linkagefun='average', div_clusters=False)
+        dendro_tree = wgcnaAnalysis.get_dendrogram(METDiss, METDiss.index, distfun=None, linkagefun='ward', div_clusters=False)
         dendrogram = Dendrogram.plot_dendrogram(dendro_tree, hang=0.9, cutoff_line=False)
 
         layout = go.Layout(width=900, height=900, showlegend=False, title='',
