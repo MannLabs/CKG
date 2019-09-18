@@ -6,9 +6,9 @@ import dash_html_components as html
 
 #Plotly imports
 import chart_studio.plotly as py
-from IPython.display import display
+# from IPython.display import display
 import plotly.graph_objs as go
-from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
+# from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 import plotly.subplots as tools
 
 #Data manipulation imports
@@ -35,12 +35,23 @@ def get_stats_data(filename, n=3):
     return df
 
 def select_last_n_imports(stats_file, n=3):
-    df = stats_file[['datetime', 'import_id', 'Import_flag']].sort_values('datetime').drop_duplicates(['import_id'], keep = 'first', inplace = False) 
+    df = stats_file[['datetime', 'import_id', 'Import_flag']].sort_values('datetime', ascending=False).drop_duplicates(['import_id'], keep = 'first', inplace = False) 
     f = df[df['Import_flag'] == 'full']
     f = f.iloc[:n,1].tolist()
     p = df[df['Import_flag'] == 'partial']
     p = p.iloc[:n,1].tolist()
     return p+f
+
+def remove_legend_duplicates(figure):
+    seen = []
+    for n,i in enumerate(figure['data']):
+        name = figure['data'][n]['name']
+        if name in seen:
+            figure.data[n].update(showlegend=False)
+        else:
+            figure.data[n].update(showlegend=True)
+        seen.append(name)
+
 
 def get_databases_entities_relationships(stats_file, key='full', options='databases'):
     if key == 'full':
@@ -305,6 +316,8 @@ def plot_databases_numbers_per_date(stats_file, plot_title, key='full', dropdown
     for name in names:
         fig.for_each_trace(lambda trace: trace.update(marker=dict(color=colors[name])), selector=dict(name=name))
 
+    remove_legend_duplicates(fig)
+
     return dcc.Graph(id = 'databases total imports {}'.format(key), figure = fig)
 
 
@@ -332,13 +345,13 @@ def plot_import_numbers_per_database(stats_file, plot_title, key='full', subplot
         for a, b in j.groupby('dataset'):
             for file in b['filename']:
                 mask = (b['filename'] == file)
-                fig.append_trace(go.Scatter(visible=True,
+                fig.append_trace(go.Scattergl(visible=True,
                                             x=date,
                                             y=b.loc[mask, 'Imported_number'],
                                             mode='markers+lines',
                                             marker = dict(color = ent_colors[file]),
                                             name=file.split('.')[0]),1,1)
-                fig.append_trace(go.Scatter(visible=True,
+                fig.append_trace(go.Scattergl(visible=True,
                                             x=date,
                                             y=b.loc[mask, 'file_size'],
                                             mode='markers+lines',
@@ -351,13 +364,13 @@ def plot_import_numbers_per_database(stats_file, plot_title, key='full', subplot
         for a, b in j.groupby('dataset'):
             for file in b['filename']:
                 mask = (b['filename'] == file)
-                fig.append_trace(go.Scatter(visible=True,
+                fig.append_trace(go.Scattergl(visible=True,
                                             x=date,
                                             y=b.loc[mask, 'Imported_number'],
                                             mode='markers+lines',
                                             marker = dict(color = rel_colors[file]),
                                             name=file.split('.')[0]),2,1)
-                fig.append_trace(go.Scatter(visible=True,
+                fig.append_trace(go.Scattergl(visible=True,
                                             x=date,
                                             y=b.loc[mask, 'file_size'],
                                             mode='markers+lines',
