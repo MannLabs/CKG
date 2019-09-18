@@ -82,7 +82,8 @@ def get_dendrogram(df, labels, distfun='euclidean', linkagefun='ward', div_clust
     Returns:
         Dictionary of data structures computed to render the dendrogram. Keys: 'icoords', 'dcoords', 'ivl' and 'leaves'. If div_clusters is used, it will also return a dictionary of each cluster and respective leaves.
     """
-
+    # np.random.seed(112736)
+    
     if distfun is None:
         dist = np.asarray(stats.as_dist(df))
     else:

@@ -529,7 +529,6 @@ def calculate_paired_ttest(df, condition1, condition2):
     return (t, pvalue, mean1, mean2, log2fc)
 
 def calculate_ttest_samr(df, labels, n=2, s0=0, paired=False):
-    print("TTEST ", s0)
     conditions = df.columns.unique()
     mean1 = df[conditions[0]].mean(axis=1)
     mean2 = df[conditions[1]].mean(axis=1)
@@ -794,25 +793,34 @@ def run_samr(df, subject='subject', group='group', drop_cols=['subject', 'sample
                                     samr(data=data, resp.type=res_type, s0=s0, nperms=nperms, random.seed = 12345, s0.perc=NULL)
                                     }''')
 
+        paired = check_is_paired(df, subject, group)
         groups = df[group].unique()
         samples = len(df[group])
-        method='Multiclass'
-        
+        df = df.set_index(group).drop(drop_cols, axis=1).T
+
+        labels = []
+        conditions = set(df.columns)
+        d = {v:k+1 for k, v in enumerate(conditions)}
+        labels = [d.get(item,item)  for item in df.columns]
+
         if subject is not None:
             if len(groups) == 1:
                 method = 'One class'
             elif len(groups) == 2:
-                if check_is_paired(df, subject, group):
+                if paired:
                     method = 'Two class paired'
+                    labels = []
+                    counts = {}
+                    conditions = df.columns.unique()
+                    for col in df.columns:
+                        cur_count = counts.get(col, 0)
+                        labels.append([(cur_count+1)*-1 if col == conditions[0] else (cur_count+1)][0])
+                        counts[col] = cur_count + 1
                 else:
                     method = 'Two class unpaired'
-        
-        df = df.set_index(group).drop(drop_cols, axis=1).T
-        df = df.reindex(sorted(df.columns), axis=1)
-        conditions = set(df.columns)
-        d = {v:k+1 for k, v in enumerate(conditions)}
-        labels = [d.get(item,item) for item in df.columns]
-        
+            else:
+                method = 'Multiclass'        
+
         delta = alpha
         data = base.list(x=base.as_matrix(df.values), y=base.unlist(labels), geneid=base.unlist(df.index), logged2=True)
         samr_res = R_function(data=data, res_type=method, s0=s0, nperms=permutations)
@@ -873,14 +881,13 @@ def run_samr(df, subject='subject', group='group', drop_cols=['subject', 'sample
             res['group2'] = group2
             res['FC'] = [np.power(2,np.abs(x)) * -1 if x < 0 else np.power(2,np.abs(x)) for x in res['log2FC'].values]
             res = res[['identifier', 'group1', 'group2', 'mean(group1)', 'mean(group2)', 'log2FC', 'FC', 't-statistics', 'pvalue']]
-            res.to_csv('~/Downloads/test_res.tsv', sep='\t')
-            qvalues.to_csv('~/Downloads/qvalues.tsv', sep='\t')
             df2 = pd.DataFrame()
 
         res = res.set_index('identifier').join(qvalues.set_index('identifier'))
         res['correction'] = 'permutation FDR ({} perm)'.format(nperms_run)
         res['-log10 pvalue'] = [- np.log10(x) for x in res['pvalue'].values]
         res['rejected'] = res['padj'] < 0.05
+        res['Method'] = 'SAMR {}'.format(method)
         res = res.reset_index()
     else:
         res = run_anova(df, alpha=alpha, drop_cols=drop_cols, subject=subject, group=group, permutations=permutations)
