@@ -45,8 +45,8 @@ app.layout = dcc.Loading(
 ])], style={'text-align':'center',
             'margin-top':'180px',
             'margin-bottom':'-60px','position':'absolute',
-            'top':'50%','left':'45%', 'height':'200px'},
-    type='default', 
+            'top':'50%','left':'50%', 'height':'200px'},
+    type='circle', 
     color='#2b8cbe')
 
 @app.callback(Output('page-content', 'children'),
@@ -71,7 +71,6 @@ def display_page(pathname):
             return imports.layout
         else:
             return '404'
-
 
 ###Callbacks for download project
 @app.callback(
