@@ -7,6 +7,7 @@ import time
 from datetime import datetime
 import base64
 import qrcode
+import json
 #import barcode
 from natsort import natsorted
 import flask
@@ -21,8 +22,8 @@ from dash.exceptions import PreventUpdate
 from dash_network import Network
 
 from app import app
-from apps import initialApp, projectApp, importsApp, projectCreationApp, dataUploadApp
-from apps import projectCreation, dataUpload
+from apps import initialApp, projectApp, importsApp, projectCreationApp, dataUploadApp, homepageApp
+from apps import projectCreation, dataUpload, homepageStats
 from graphdb_builder import builder_utils
 from graphdb_builder.builder import loader
 from graphdb_builder.experiments import experiments_controller as eh
@@ -53,7 +54,7 @@ app.layout = dcc.Loading(
               [Input('url', 'pathname')])
 def display_page(pathname):
     if pathname is not None:
-        if pathname == '/apps/initial' or pathname == '/':
+        if pathname == '/apps/initial':
             return initialApp.layout
         elif pathname.startswith('/apps/projectCreation'):
             projectCreation = projectCreationApp.ProjectCreationApp("Project Creation", "", "", layout = [], logo = None, footer = None)
@@ -69,14 +70,73 @@ def display_page(pathname):
         elif pathname.startswith('/apps/imports'):
             imports = importsApp.ImportsApp("CKG imports monitoring", "Statistics", "", layout = [], logo = None, footer = None)
             return imports.layout
+        elif pathname.startswith('/apps/homepage') or pathname == '/':
+            stats_db = homepageApp.HomePageApp("CKG homepage", "Database Stats", "", layout = [], logo = None, footer = None)
+            return stats_db.layout
         else:
             return '404'
 
 
+###Callbacks for CKG homepage
+@app.callback(Output('db-creation-date', 'children'),
+             [Input('db_stats_df', 'data')])
+def update_db_date(df):
+    kernel = pd.read_json(df['kernel_monitor'], orient='records')
+    db_date = kernel['storeCreationDate'][0]
+    return html.H3('Store Creation date: {}'.format(db_date))
+
+@app.callback([Output("db_indicator_1", "children"),
+               Output("db_indicator_2", "children"),
+               Output("db_indicator_3", "children"),
+               Output("db_indicator_4", "children"),
+               Output("db_indicator_5", "children"),
+               Output("db_indicator_6", "children"),
+               Output("db_indicator_7", "children"),
+               Output("db_indicator_8", "children"),
+               Output("db_indicator_9", "children"),
+               Output("db_indicator_10", "children"),
+               Output("db_indicator_11", "children"),
+               Output("db_indicator_12", "children"),
+               Output("db_indicator_13", "children"),
+               Output("db_indicator_14", "children"),],
+              [Input("db_stats_df", "data")])
+def number_panel_update(df):
+    projects = pd.read_json(df['projects'], orient='records')
+    meta_stats = pd.read_json(df['meta_stats'], orient='records')
+    store_size = pd.read_json(df['store_size'], orient='records')
+    transactions = pd.read_json(df['transactions'], orient='records')
+
+    ent = meta_stats['nodeCount'][0]
+    rel = meta_stats['relCount'][0]
+    labels = meta_stats['labelCount'][0]
+    types = meta_stats['relTypeCount'][0]
+    prop = meta_stats['propertyKeyCount'][0]
+    ent_store = store_size['size'][2]
+    rel_store = store_size['size'][4]
+    prop_store = store_size['size'][3]
+    string_store = store_size['size'][5]
+    array_store = store_size['size'][0]
+    log_store = store_size['size'][1]
+    t_open = transactions.loc[transactions['name'] == 'NumberOfOpenedTransactions', 'value'].iloc[0]
+    t_comm = transactions.loc[transactions['name'] == 'NumberOfCommittedTransactions', 'value'].iloc[0]
+    projects = projects['Projects'][0]
+    
+    return [dcc.Markdown("**{}**".format(i)) for i in [ent,labels,rel,types,prop,ent_store,rel_store,prop_store,string_store,array_store,log_store,t_open,t_comm,projects]]
+
+@app.callback(Output("project_url", "children"),
+             [Input("project_option", "value")])
+def update_project_url(value):
+    if value.startswith('P0'):
+      return 'http://127.0.0.1:5000/apps/project/{}'.format(value)
+    else:
+      return ''
+
+
+
 ###Callbacks for download project
-@app.callback(
-    Output('download-zip', 'href'),
-    [Input('download-zip', 'n_clicks')],[State('url', 'pathname')])
+@app.callback(Output('download-zip', 'href'),
+             [Input('download-zip', 'n_clicks')],
+             [State('url', 'pathname')])
 def generate_report_url(n_clicks, pathname):
     project_id = pathname.split('/')[-1]
     return '/downloads/{}'.format(project_id)
@@ -190,8 +250,13 @@ def create_project(n_clicks, name, acronym, responsible, participant, datatype, 
         projectData.insert(loc=0, column='internal_id', value=internal_id)
        
         result = create_new_project.apply_async(args=[internal_id, projectData.to_json(), separator], task_id='project_creation_'+internal_id)
-        result_output = result.get(timeout=10, propagate=False)
+
+        print('REsult project')
+        print(result)
+        result_output = result.get()
         external_id = list(result_output.keys())[0]
+        print('Result get')
+        print(external_id)
 
         if result is not None:
             response = "Project successfully submitted. Download Clinical Data template."
@@ -334,6 +399,8 @@ def update_table_download_link(n_clicks, data, data_type):
         csv_string = df.to_csv(index=False, encoding='utf-8', sep=';') 
         csv_string = "data:text/csv;charset=utf-8," + urllib.parse.quote(csv_string)
         return csv_string, 'downloaded_DATATYPE_DataUpload.csv'.replace('DATATYPE', data_type)
+
+
 
 
 
