@@ -11,7 +11,7 @@ Disease:
           MATCH (protein:Protein)-[r]-(disease:Disease)
           WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS]) AND toFloat(r.score)>3.0 AND NOT disease.id IN ["DOID:4","DOID:7","DOID:0050117","DOID:14566","	DOID:150","DOID:0014667","DOID:630","DOID:0080015","DOID:225"]
           WITH disease, count(r) AS r_count
-          WHERE r_count>2
+          WHERE r_count>1
           MATCH (protein:Protein)-[r]-(disease)
           WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS]) AND toFloat(r.score)>3.0
           RETURN (protein.name+"~"+protein.id) AS node1, disease.name AS node2, r.score AS weight, type(r) AS type
@@ -28,7 +28,7 @@ Drug:
           MATCH (protein:Protein)-[r:ACTS_ON]-(drug:Drug)
           WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS]) AND toFloat(r.score)>0.9
           WITH drug, count(r) AS r_count
-          WHERE r_count>2
+          WHERE r_count>1
           MATCH (protein:Protein)-[r:ACTS_ON]-(drug)
           WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS]) AND toFloat(r.score)>0.9
           RETURN (protein.name+"~"+protein.id) AS node1, drug.name AS node2, r.score AS weight, r.action AS type
@@ -44,8 +44,25 @@ Pathway:
           MATCH (protein:Protein)-[r]-(pathway:Pathway)
           WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS]) AND toLower(r.source)="reactome"
           WITH pathway, count(r) AS r_count
-          WHERE r_count>2
+          WHERE r_count>1
           MATCH (protein:Protein)-[r]-(pathway)
           WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS])
           RETURN (protein.name+"~"+protein.id) AS node1, pathway.name AS node2, r.score AS weight, type(r) AS type
+Publication:
+  name: associated publications
+  description: get publications where at least 3 proteins have been mentioned
+  involved_nodes:
+    - Protein
+    - Publication
+  involved_rels:
+    - MENTIONED_IN_PUBLICATION
+  query: >
+          MATCH (protein:Protein)-[r]-(publication:Publication)
+          WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS])
+          WITH publication, count(r) AS r_count
+          WHERE r_count>3
+          MATCH (protein:Protein)-[r]-(publication)
+          WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS])
+          RETURN (protein.name+"~"+protein.id) AS node1, ("PMID:"+publication.id) AS node2, type(r) AS type
+
 

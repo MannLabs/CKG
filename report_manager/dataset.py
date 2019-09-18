@@ -346,7 +346,7 @@ class Dataset:
         self.report = r
         
     def generate_knowledge(self):
-        kn = knowledge.Knowledge(self.identifier, self.data, nodes={}, relationships={}, colors={}, graph=None)
+        kn = knowledge.Knowledge(self.identifier, self.data, nodes={}, relationships={}, queries_file=None, colors={}, graph=None, report={})
         
         return kn
 
@@ -367,7 +367,7 @@ class MultiOmicsDataset(Dataset):
         return data
     
     def generate_knowledge(self):
-        kn = knowledge.MultiOmicsKnowledge(self.identifier, self.data, nodes={}, relationships={}, colors={}, graph=None)
+        kn = knowledge.MultiOmicsKnowledge(self.identifier, self.data, nodes={}, relationships={}, colors={}, graph=None, report={})
         kn.generate_knowledge()        
         
         return kn
@@ -414,7 +414,7 @@ class ProteomicsDataset(Dataset):
         return processed_data
     
     def generate_knowledge(self):
-        kn = knowledge.ProteomicsKnowledge(self.identifier, self.data, nodes={}, relationships={}, colors={}, graph=None)
+        kn = knowledge.ProteomicsKnowledge(self.identifier, self.data, nodes={}, relationships={}, colors={}, graph=None, report={})
         kn.generate_knowledge()        
         
         return kn
@@ -475,7 +475,7 @@ class ClinicalDataset(Dataset):
         return processed_data
     
     def generate_knowledge(self):
-        kn = knowledge.ClinicalKnowledge(self.identifier, self.data, nodes={}, relationships={}, colors={}, graph=None)
+        kn = knowledge.ClinicalKnowledge(self.identifier, self.data, nodes={}, relationships={}, colors={}, graph=None, report={})
         kn.generate_knowledge()        
         
         return kn

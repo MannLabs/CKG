@@ -5,6 +5,7 @@ import json
 import natsort
 import plotly.utils
 import plotly.graph_objs as go
+import dash_html_components as html
 from plotly.offline import iplot
 from collections import defaultdict
 from IPython.display import IFrame, display
@@ -149,7 +150,7 @@ class Report:
                             report_plots.append(tables[0])
                             report_plots.append(tables[1])
 
-                    report_plots.append(plot)
+                    report_plots.append(html.Div(plot, style={'overflowY': 'scroll', 'overflowX': 'scroll'}))
 
         return report_plots
 

@@ -479,13 +479,14 @@ class Project:
     def generate_knowledge(self):
         nodes = {}
         relationships = {}
-        kn = knowledge.ProjectKnowledge(identifier=self.identifier, data=self.to_dict(), nodes={self.name:{'id':'#0', 'type':'Project'}})
+        kn = knowledge.ProjectKnowledge(identifier=self.identifier, data=self.to_dict(), nodes={self.name:{'id':'#0', 'type':'Project'}}, relationships={}, colors={}, graph=None, report={})
         kn.generate_knowledge()
         nodes.update(kn.nodes)
         relationships.update(kn.relationships)
         types = ["clinical", "proteomics", "longitudinal_proteomics", "wes", "wgs", "rnaseq", "multiomics"]
         for dataset_type in types:
             if dataset_type in self.datasets:
+                print(dataset_type)
                 dataset = self.datasets[dataset_type]
                 kn = dataset.generate_knowledge()
                 if dataset_type ==  "multiomics":

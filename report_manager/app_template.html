@@ -2,7 +2,7 @@
 <!-- TEMPLATE FROM: https://www.w3schools.com/w3css/tryit.asp?filename=tryw3css_templates_architect&stacked=h-->
 <html>
 <title>Clinical Knowledge Graph</title>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="icon" type="image/png" href="/assets/favicon.png"/>
@@ -104,6 +104,23 @@
             {%scripts%}
             {%renderer%}
 </footer>
+
+<script>
+    var coll = document.getElementsByClassName("collapsible");
+    var i;
+    
+    for (i = 0; i < coll.length; i++) {
+      coll[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        if (content.style.display === "block") {
+          content.style.display = "none";
+        } else {
+          content.style.display = "block";
+        }
+      });
+    }
+    </script>
 
 </body>
 </html>

@@ -984,6 +984,11 @@ def get_sankey_plot(data, identifier, args={'source':'source', 'target':'target'
             node_colors = dict(zip(data[args['source']],scolors))
             args['source_colors'] = 'source_colors'
             data['source_colors'] = scolors
+        
+        hover_data = []
+        if 'hover' in args:
+            hover_data = [t.upper() for t in data[args['hover']].tolist()]
+            
         if 'target_colors' in args:
             node_colors.update(dict(zip(data[args['target']],data[args['target_colors']])))
         else:
@@ -993,8 +998,8 @@ def get_sankey_plot(data, identifier, args={'source':'source', 'target':'target'
                             orientation = 'h' if 'orientation' not in args else args['orientation'],
                             valueformat = ".0f" if 'valueformat' not in args else args['valueformat'],
                             arrangement = 'freeform',
-                            node = dict(pad = 25 if 'pad' not in args else args['pad'],
-                                        thickness = 25 if 'thickness' not in args else args['thickness'],
+                            node = dict(pad = 10 if 'pad' not in args else args['pad'],
+                                        thickness = 10 if 'thickness' not in args else args['thickness'],
                                         line = dict(color = "black", width = 0.3),
                                         label =  nodes,
                                         color =  ["rgba"+str(utils.hex2rgb(node_colors[c])) if node_colors[c].startswith('#') else node_colors[c] for c in nodes]
@@ -1002,7 +1007,8 @@ def get_sankey_plot(data, identifier, args={'source':'source', 'target':'target'
                             link = dict(source = [list(nodes).index(i) for i in data[args['source']].tolist()],
                                         target = [list(nodes).index(i) for i in data[args['target']].tolist()],
                                         value =  data[args['weight']].tolist(),
-                                        color = ["rgba"+str(utils.hex2rgb(c)) if c.startswith('#') else c for c in data[args['source_colors']].tolist()]
+                                        color = ["rgba"+str(utils.hex2rgb(c)) if c.startswith('#') else c for c in data[args['source_colors']].tolist()],
+                                        label = hover_data
                                         ))
         layout =  dict(
             width= 800 if 'width' not in args else args['width'],
@@ -1043,18 +1049,18 @@ def get_table(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = 
                                                 'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
                                             }],
                                             style_data={'whiteSpace': 'normal'},
-                                            #style_cell={
-                                            #    'minWidth': '50px', 'maxWidth': '500px', 
-                                            #    'textAlign': 'left', 'padding': '1px', 'vertical-align': 'top'
-                                            #},
-                                            #style_table={
-                                            #    "height": "fit-content", 
+                                            style_cell={
+                                                'minWidth': '50px', 'maxWidth': '500px', 
+                                                'textAlign': 'left', 'padding': '1px', 'vertical-align': 'top'
+                                            },
+                                            style_table={
+                                                "height": "fit-content", 
                                             #    "max-height": "500px",
-                                            #    "width": "fit-content",
+                                                "width": "fit-content",
                                             #    "max-width": "1500px",
                                             #    'overflowY': 'scroll',
                                             #    'overflowX': 'scroll'
-                                            #},
+                                            },
                                             style_header={
                                                 'backgroundColor': '#2b8cbe',
                                                 'fontWeight': 'bold',

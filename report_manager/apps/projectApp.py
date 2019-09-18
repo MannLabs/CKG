@@ -3,6 +3,7 @@ from apps import basicApp
 from report_manager import project
 import dash_html_components as html
 import dash_core_components as dcc
+import dash_bootstrap_components as dbc
 
 
 class ProjectApp(basicApp.BasicApp):
@@ -21,7 +22,7 @@ class ProjectApp(basicApp.BasicApp):
         self._project_id = project_id
 
     def build_page(self):
-        p = project.Project(self.project_id, datasets={}, report={})
+        p = project.Project(self.project_id, datasets={}, knowledge=None, report={})
         p.build_project()
         p.generate_report()
         
@@ -44,7 +45,8 @@ class ProjectApp(basicApp.BasicApp):
         self.add_to_layout(button)
         for data_type in plots:
             if len(plots[data_type]) >=1:
-                tab = dcc.Tab(label=data_type, children=[html.Div(plots[data_type])])
+                tab_content = [html.Div(plots[data_type])]
+                tab = dcc.Tab(tab_content, label=data_type)
                 tabs.append(tab)
-        lc = dcc.Tabs(id="tabs", children=tabs)
+        lc = dcc.Tabs(tabs)
         self.add_to_layout(lc)

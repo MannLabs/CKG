@@ -238,7 +238,7 @@ def get_clinical_measurements_ready(df, subject_id='subject', sample_id='biologi
         if imputation_method.lower() == "knn":
             df = imputation_KNN(processed_df, drop_cols=drop_cols, group=group_id)
         elif imputation_method.lower() == "distribution":
-            df = imputation_normal_distribution(processed_df, index=index)
+            df = imputation_normal_distribution(processed_df, index_cols=index)
         elif imputation_method.lower() == 'mixed':
             df = imputation_mixed_norm_KNN(processed_df,index_cols=index, group=group_id)
     
@@ -250,6 +250,7 @@ def get_clinical_measurements_ready(df, subject_id='subject', sample_id='biologi
 def run_pca(data, drop_cols=['sample', 'subject'], group='group', components=2, dropna=True):
     np.random.seed(112736)
     result = {}
+    args = {}
     df = data.copy()
     if set(drop_cols).intersection(df.columns) == len(drop_cols):
         df = df.drop(drop_cols, axis=1)
@@ -259,34 +260,36 @@ def run_pca(data, drop_cols=['sample', 'subject'], group='group', components=2, 
         df = df.dropna(axis=1)
     X = df.values
     y = df.index
-    pca = PCA(n_components=components)
-    X = pca.fit_transform(X)
-    var_exp = pca.explained_variance_ratio_
-    loadings = pd.DataFrame(pca.components_.transpose() * np.sqrt(pca.explained_variance_))
-    loadings.index = df.columns
-    loadings.columns = ['x', 'y']
-    loadings['value'] = np.sqrt(np.power(loadings['x'],2) + np.power(loadings['y'],2))
-    loadings = loadings.sort_values(by='value', ascending=False)
-    args = {"x_title":"PC1"+" ({0:.2f})".format(var_exp[0]),"y_title":"PC2"+" ({0:.2f})".format(var_exp[1])}
-    if components == 2:
-        resultDf = pd.DataFrame(X, index = y, columns = ["x","y"])
-        resultDf = resultDf.reset_index()
-        resultDf.columns = ["name", "x", "y"]
-    if components > 2:
-        args.update({"z_title":"PC3"+str(var_exp[2])})
-        resultDf = pd.DataFrame(X, index = y)
-        resultDf = resultDf.reset_index()
-        cols = []
-        if components>3:
-            cols = resultDf.columns[4:]
-        resultDf.columns = ["name", "x", "y", "z"] + cols
+    if X.size > 0:
+        pca = PCA(n_components=components)
+        X = pca.fit_transform(X)
+        var_exp = pca.explained_variance_ratio_
+        loadings = pd.DataFrame(pca.components_.transpose() * np.sqrt(pca.explained_variance_))
+        loadings.index = df.columns
+        loadings.columns = ['x', 'y']
+        loadings['value'] = np.sqrt(np.power(loadings['x'],2) + np.power(loadings['y'],2))
+        loadings = loadings.sort_values(by='value', ascending=False)
+        args = {"x_title":"PC1"+" ({0:.2f})".format(var_exp[0]),"y_title":"PC2"+" ({0:.2f})".format(var_exp[1])}
+        if components == 2:
+            resultDf = pd.DataFrame(X, index = y, columns = ["x","y"])
+            resultDf = resultDf.reset_index()
+            resultDf.columns = ["name", "x", "y"]
+        if components > 2:
+            args.update({"z_title":"PC3"+str(var_exp[2])})
+            resultDf = pd.DataFrame(X, index = y)
+            resultDf = resultDf.reset_index()
+            cols = []
+            if components>3:
+                cols = resultDf.columns[4:]
+            resultDf.columns = ["name", "x", "y", "z"] + cols
 
-    result['pca'] = (resultDf, loadings)
+        result['pca'] = (resultDf, loadings)
     
     return result, args
 
 def run_tsne(data, drop_cols=['sample', 'subject'], group='group', components=2, perplexity=40, n_iter=1000, init='pca', dropna=True):
     result = {}
+    args = {}
     df = data.copy()
     if set(drop_cols).intersection(df.columns) == len(drop_cols):
         df = df.drop(drop_cols, axis=1)
@@ -296,27 +299,28 @@ def run_tsne(data, drop_cols=['sample', 'subject'], group='group', components=2,
     df = df.select_dtypes(['number'])
     X = df.values
     y = df.index
-
-    tsne = TSNE(n_components=components, verbose=0, perplexity=perplexity, n_iter=n_iter, init=init)
-    X = tsne.fit_transform(X)
-    args = {"x_title":"C1","y_title":"C2"}
-    if components == 2:
-        resultDf = pd.DataFrame(X, index = y, columns = ["x","y"])
-        resultDf = resultDf.reset_index()
-        resultDf.columns = ["name", "x", "y"]
-    if components > 2:
-        args.update({"z_title":"C3"})
-        resultDf = pd.DataFrame(X, index = y)
-        resultDf = resultDf.reset_index()
-        cols = []
-        if len(components)>4:
-            cols = resultDf.columns[4:]
-        resultDf.columns = ["name", "x", "y", "z"] + cols
-    result['tsne'] = resultDf
+    if X.size > 0:
+        tsne = TSNE(n_components=components, verbose=0, perplexity=perplexity, n_iter=n_iter, init=init)
+        X = tsne.fit_transform(X)
+        args = {"x_title":"C1","y_title":"C2"}
+        if components == 2:
+            resultDf = pd.DataFrame(X, index = y, columns = ["x","y"])
+            resultDf = resultDf.reset_index()
+            resultDf.columns = ["name", "x", "y"]
+        if components > 2:
+            args.update({"z_title":"C3"})
+            resultDf = pd.DataFrame(X, index = y)
+            resultDf = resultDf.reset_index()
+            cols = []
+            if len(components)>4:
+                cols = resultDf.columns[4:]
+            resultDf.columns = ["name", "x", "y", "z"] + cols
+        result['tsne'] = resultDf
     return result, args
 
 def run_umap(data, drop_cols=['sample', 'subject'], group='group', n_neighbors=10, min_dist=0.3, metric='cosine', dropna=True):
     result = {}
+    args = {}
     df = data.copy()
     if set(drop_cols).intersection(df.columns) == len(drop_cols):
         df = df.drop(drop_cols, axis=1)
@@ -326,16 +330,16 @@ def run_umap(data, drop_cols=['sample', 'subject'], group='group', n_neighbors=1
     df = df.select_dtypes(['number'])
     X = df.values
     y = df.index
-
-    X = umap.UMAP(n_neighbors=10, min_dist=0.3, metric= metric).fit_transform(X)
-    args = {"x_title":"C1","y_title":"C2"}
-    resultDf = pd.DataFrame(X, index = y)
-    resultDf = resultDf.reset_index()
-    cols = []
-    if len(resultDf.columns)>3:
-            cols = resultDf.columns[3:]
-    resultDf.columns = ["name", "x", "y"] + cols
-    result['umap'] = resultDf
+    if X.size:
+        X = umap.UMAP(n_neighbors=10, min_dist=0.3, metric= metric).fit_transform(X)
+        args = {"x_title":"C1","y_title":"C2"}
+        resultDf = pd.DataFrame(X, index = y)
+        resultDf = resultDf.reset_index()
+        cols = []
+        if len(resultDf.columns)>3:
+                cols = resultDf.columns[3:]
+        resultDf.columns = ["name", "x", "y"] + cols
+        result['umap'] = resultDf
     return result, args
 
 def calculate_correlations(x, y, method='pearson'):
@@ -819,15 +823,6 @@ def run_samr(df, subject='subject', group='group', drop_cols=['subject', 'sample
 
         delta = alpha
         data = base.list(x=base.as_matrix(df.values), y=base.unlist(labels), geneid=base.unlist(df.index), logged2=True)
-        
-        print('SAMR conditions')
-        print(method)
-        print(conditions)
-        print(d)
-        print(labels)
-        print(df.head())
-
-
         samr_res = R_function(data=data, res_type=method, s0=s0, nperms=permutations)
         delta_table = samr.samr_compute_delta_table(samr_res)
         siggenes_table = samr.samr_compute_siggenes_table(samr_res, delta, data, delta_table, all_genes=True)

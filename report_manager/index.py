@@ -46,8 +46,8 @@ app.layout = dcc.Loading(
 ])], style={'text-align':'center',
             'margin-top':'180px',
             'margin-bottom':'-60px','position':'absolute',
-            'top':'50%','left':'45%', 'height':'200px'},
-    type='default', 
+            'top':'50%','left':'50%', 'height':'200px'},
+    type='circle', 
     color='#2b8cbe')
 
 @app.callback(Output('page-content', 'children'),
@@ -130,7 +130,6 @@ def update_project_url(value):
       return 'http://127.0.0.1:5000/apps/project/{}'.format(value)
     else:
       return ''
-
 
 
 ###Callbacks for download project
