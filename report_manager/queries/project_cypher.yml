@@ -114,3 +114,54 @@ map_node_name:
     query: >
         MATCH (n:NODE {name:$name})
         RETURN n.id;
+unique_projects:
+    name:
+    description:
+    involved_nodes:
+    involved_rels:
+    query_type: post
+    query: >
+        MATCH (p:Project) RETURN COUNT(DISTINCT(p)) as Projects
+get_db_stats:
+    name:
+    description:
+    involved_nodes:
+    involved_rels:
+    query_type: post
+    query: >
+        CALL apoc.meta.stats()
+get_db_kernel:
+    name:
+    description:
+    involved_nodes:
+    involved_rels:
+    query_type: post
+    query: >
+        CALL apoc.monitor.kernel()
+get_db_store_size:
+    name:
+    description:
+    involved_nodes:
+    involved_rels:
+    query_type: post
+    query: >
+        CALL apoc.monitor.store() YIELD
+            arrayStoreSize,  
+            logSize,
+            nodeStoreSize,
+            propStoreSize, 
+            relStoreSize,
+            stringStoreSize,
+            totalStoreSize
+        RETURN *
+get_db_transactions:
+    name:
+    description:
+    involved_nodes:
+    involved_rels:
+    query_type: post
+    query: >
+        CALL dbms.queryJmx("org.neo4j:instance=kernel#0,name=Transactions") YIELD attributes
+        WITH  KEYS(attributes) AS k , attributes
+        UNWIND k AS row
+        RETURN row AS name, attributes[row]["value"] AS value
