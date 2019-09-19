@@ -75,14 +75,14 @@ def get_ranking_with_markers(data, drop_columns, group, columns, list_markers, a
     return long_data
 
 
-def extract_number_missing(df, missing_max, drop_cols=['sample'], group='group'):
+def extract_number_missing(df, min_valid, drop_cols=['sample'], group='group'):
     if group is None:
-        groups = df.loc[:, df.notnull().sum(axis = 1) >= missing_max]
+        groups = df.loc[:, df.notnull().sum(axis = 1) >= min_valid]
     else:
         groups = df.copy()
         groups = groups.drop(drop_cols, axis = 1)
         groups = groups.set_index(group).notnull().groupby(level=0).sum(axis = 1)
-        groups = groups[groups>=missing_max]
+        groups = groups[groups>=min_valid]
 
     groups = groups.dropna(how='all', axis=1)
     return list(groups.columns)
@@ -201,7 +201,7 @@ def get_coefficient_variation(data, drop_columns, group, columns):
     return cvs_df
 
 
-def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation = True, method = 'distribution', missing_method = 'percentage', missing_max = 0.3, value_col='LFQ_intensity'):
+def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation = True, method = 'distribution', missing_method = 'percentage', missing_max = 0.3, min_valid=1, value_col='LFQ_intensity'):
     df = df.set_index(index_cols)
     if extra_identifier is not None and extra_identifier in df.columns:
         df[identifier] = df[extra_identifier].map(str) + "~" + df[identifier].map(str)
@@ -211,7 +211,7 @@ def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subjec
     df = df.drop(["index"], axis=1)
     aux = index_cols
     if missing_method == 'at_least_x_per_group':
-        aux.extend(extract_number_missing(df, missing_max, drop_cols, group=group))
+        aux.extend(extract_number_missing(df, min_valid, drop_cols, group=group))
     elif missing_method == 'percentage':
         aux.extend(extract_percentage_missing(df,  missing_max, drop_cols, group=group))
 
@@ -823,6 +823,7 @@ def run_samr(df, subject='subject', group='group', drop_cols=['subject', 'sample
 
         delta = alpha
         data = base.list(x=base.as_matrix(df.values), y=base.unlist(labels), geneid=base.unlist(df.index), logged2=True)
+        
         samr_res = R_function(data=data, res_type=method, s0=s0, nperms=permutations)
         delta_table = samr.samr_compute_delta_table(samr_res)
         siggenes_table = samr.samr_compute_siggenes_table(samr_res, delta, data, delta_table, all_genes=True)

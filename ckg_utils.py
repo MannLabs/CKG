@@ -60,12 +60,12 @@ def setup_logging(path='log.config', key=None):
 
 
 def listDirectoryFiles(directory):
-    onlyfiles = [f for f in os.listdir(directory) if os.path.isfile(join(directory, f)) and not f.startswith('.')]
+    onlyfiles = [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f)) and not f.startswith('.')]
 
     return onlyfiles
 
 def listDirectoryFolders(directory):
-    dircontent = [f for f in os.listdir(directory) if os.path.isdir(join(directory, f)) and not f.startswith('.')]
+    dircontent = [f for f in os.listdir(directory) if os.path.isdir(os.path.join(directory, f)) and not f.startswith('.')]
     return dircontent
 
 def checkDirectory(directory):

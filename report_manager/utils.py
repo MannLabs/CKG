@@ -64,13 +64,13 @@ def generate_html(network):
                                     conf=network.conf,
                                     tooltip_link=use_link_template)
 
-def send_message_to_slack_webhook(message, message_to):
+def send_message_to_slack_webhook(message, message_to, username='albsantosdel'):
     cwd = os.path.abspath(os.path.dirname(__file__))
     webhook_file = os.path.join(cwd, "../config/wh.txt")
     with open(webhook_file, 'r') as hf:
         webhook_url = hf.read()
  
-    post = {"text": "@{} : {}".format(message_to, message), "username":"albsantosdel", "icon_url": "https://slack.com/img/icons/app-57.png"}
+    post = {"text": "@{} : {}".format(message_to, message), "username":username, "icon_url": "https://slack.com/img/icons/app-57.png"}
  
     try:
         json_data = json.dumps(post)
@@ -304,8 +304,8 @@ def getMedlineAbstracts(idList):
             results.append(aux)
 
         abstracts = pd.DataFrame.from_dict(results)
-    except error.HTTPError:
-        print("Request to Bio.Entrez failed")
+    except error.HTTPError as e:
+        print("Request to Bio.Entrez failed. Error: {}".format(e))
 
     return abstracts
 
