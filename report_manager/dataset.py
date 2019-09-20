@@ -308,7 +308,7 @@ class Dataset:
             if isinstance(dset[name], dict):
                 self.save_dataset_recursively_to_file(dset[name], dataset_directory, name+"_"+base_name)
             elif isinstance(dset[name], pd.DataFrame):
-                dset[name].to_csv(os.path.join(dataset_directory,name), sep='\t', header=True, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
+                dset[name].to_csv(os.path.join(dataset_directory,name+".tsv"), sep='\t', header=True, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
                         
     def save_dataset_to_file(self, dataset_directory):
         if not os.path.isdir(dataset_directory):
