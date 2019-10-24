@@ -101,6 +101,12 @@ class BasicApp:
         if self.footer is not None:
             self.layout.append(self.footer)
 
+        # button = html.Div([html.A('Documentation',
+        #                         id='docs-link',
+        #                         href="",
+        #                         target="_blank",
+        #                         n_clicks = 0)])
+        # self.add_to_layout(button)
+
     def build_page(self):
         self.add_basic_layout()
-

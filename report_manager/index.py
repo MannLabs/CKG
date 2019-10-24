@@ -1,6 +1,7 @@
 import io
 import os
 import re
+import sys
 import pandas as pd
 import numpy as np
 import time
@@ -21,7 +22,7 @@ from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from dash_network import Network
 
-from app import app
+from app import app, server as application
 from apps import initialApp, projectApp, importsApp, projectCreationApp, dataUploadApp, homepageApp
 from apps import projectCreation, dataUpload, homepageStats
 from graphdb_builder import builder_utils
@@ -34,8 +35,6 @@ from worker import create_new_project
 from graphdb_connector import connector
 
 driver = connector.getGraphDatabaseConnectionConfiguration()
-cwd = os.path.abspath(os.path.dirname(__file__))
-templateDir = os.path.join(cwd, 'apps/templates')
 separator = '|'
 
 
@@ -77,7 +76,15 @@ def display_page(pathname):
             return '404'
 
 
-###Callbacks for CKG homepage
+# ###Calbacks for basicApp
+# @app.callback(Output('docs-link', 'href'),
+#              [Input('docs-link', 'n_clicks')])
+# def generate_report_url(n_clicks):
+#     link = 'http://localhost:8000'
+#     return link
+
+
+##Callbacks for CKG homepage
 @app.callback(Output('db-creation-date', 'children'),
              [Input('db_stats_df', 'data')])
 def update_db_date(df):
@@ -102,24 +109,56 @@ def update_db_date(df):
               [Input("db_stats_df", "data")])
 def number_panel_update(df):
     projects = pd.read_json(df['projects'], orient='records')
-    meta_stats = pd.read_json(df['meta_stats'], orient='records')
-    store_size = pd.read_json(df['store_size'], orient='records')
-    transactions = pd.read_json(df['transactions'], orient='records')
+    if not projects.empty and 'Projects' in projects:
+        projects = projects['Projects'][0]
 
-    ent = meta_stats['nodeCount'][0]
-    rel = meta_stats['relCount'][0]
-    labels = meta_stats['labelCount'][0]
-    types = meta_stats['relTypeCount'][0]
-    prop = meta_stats['propertyKeyCount'][0]
-    ent_store = store_size['size'][2]
-    rel_store = store_size['size'][4]
-    prop_store = store_size['size'][3]
-    string_store = store_size['size'][5]
-    array_store = store_size['size'][0]
-    log_store = store_size['size'][1]
-    t_open = transactions.loc[transactions['name'] == 'NumberOfOpenedTransactions', 'value'].iloc[0]
-    t_comm = transactions.loc[transactions['name'] == 'NumberOfCommittedTransactions', 'value'].iloc[0]
-    projects = projects['Projects'][0]
+    meta_stats = pd.read_json(df['meta_stats'], orient='records')
+    if not meta_stats.empty:
+      if 'nodeCount' in meta_stats:
+          ent = meta_stats['nodeCount'][0]
+      else:
+          ent = '0'
+      if 'relCount' in meta_stats:
+          rel = meta_stats['relCount'][0]
+      else:
+          rel = '0'
+      if 'labelCount' in meta_stats:
+          labels = meta_stats['labelCount'][0]
+      else:
+          labels = '0'
+      if 'relTypeCount' in  meta_stats:
+          types = meta_stats['relTypeCount'][0]
+      else:
+          types = '0'
+      if 'propertyKeyCount' in meta_stats:
+          prop = meta_stats['propertyKeyCount'][0]
+      else:
+          prop = '0'
+
+    store_size = pd.read_json(df['store_size'], orient='records')
+    if not store_size.empty and 'size' in store_size:
+        ent_store = store_size['size'][2]
+        rel_store = store_size['size'][4]
+        prop_store = store_size['size'][3]
+        string_store = store_size['size'][5]
+        array_store = store_size['size'][0]
+        log_store = store_size['size'][1]
+    else:
+        ent_store = '0 MB'
+        rel_store = '0 MB'
+        prop_store = '0 MB'
+        string_store = '0 MB'
+        array_store = '0 MB'
+        log_store = '0 MB'
+
+    transactions = pd.read_json(df['transactions'], orient='records')
+    if not transactions.empty and 'name' in transactions:
+        t_open = transactions.loc[transactions['name'] == 'NumberOfOpenedTransactions', 'value'].iloc[0]
+        t_comm = transactions.loc[transactions['name'] == 'NumberOfCommittedTransactions', 'value'].iloc[0]
+    else:
+        t_open = '0'
+        t_comm = '0'
+    
     
     return [dcc.Markdown("**{}**".format(i)) for i in [ent,labels,rel,types,prop,ent_store,rel_store,prop_store,string_store,array_store,log_store,t_open,t_comm,projects]]
 
@@ -127,10 +166,9 @@ def number_panel_update(df):
              [Input("project_option", "value")])
 def update_project_url(value):
     if value.startswith('P0'):
-      return 'http://127.0.0.1:5000/apps/project/{}'.format(value)
+      return dcc.Markdown('/apps/project/{}'.format(value))
     else:
       return ''
-
 
 ###Callbacks for download project
 @app.callback(Output('download-zip', 'href'),
@@ -140,11 +178,10 @@ def generate_report_url(n_clicks, pathname):
     project_id = pathname.split('/')[-1]
     return '/downloads/{}'.format(project_id)
     
-@app.server.route('/downloads/<value>')
+@application.route('/downloads/<value>')
 def generate_report_url(value):
     uri = os.path.join(os.getcwd(),"../../data/downloads/"+value+'.zip')
     return flask.send_file(uri, attachment_filename = value+'.zip', as_attachment = True)
-
 
 ###Callbacks for project creation app
 def image_formatter(im):
@@ -270,7 +307,7 @@ def update_download_link(n_clicks, pathname):
   project_id = pathname.split()[-1]
   return '/apps/templates?value=ClinicalData_template_{}.xlsx'.format(project_id)
 
-@app.server.route('/apps/templates')
+@application.route('/apps/templates')
 def serve_static():
     file = flask.request.args.get('value')
     filename = '_'.join(file.split('_')[:-1])+'.xlsx'
@@ -400,39 +437,5 @@ def update_table_download_link(n_clicks, data, data_type):
         return csv_string, 'downloaded_DATATYPE_DataUpload.csv'.replace('DATATYPE', data_type)
 
 
-
-
-
-#############
-
-#         localimagefolder = os.path.join(dataDir, 'QRCodes')
-
-
-#         # Generate QR code per row and save as png
-#         images = []
-#         for i, row in clinicalData.iterrows():
-#             subject, biosample, ansample = row['subject id'], row['biological_sample id'], row['analytical_sample id']
-
-#             filename = project_id+"_"+subject+"_"+biosample+"_"+ansample+".png"
-
-#             qr = qrcode.QRCode(version=1,
-#                                error_correction=qrcode.constants.ERROR_CORRECT_L,
-#                                box_size=10,
-#                                border=4)
-#             qr.add_data(project_id+"_"+subject+"_"+biosample+"_"+ansample)
-#             qr.make()
-#             img = qr.make_image()
-#             imagepath = os.path.join(localimagefolder, project_id+"_"+subject+"_"+biosample+"_"+ansample+".png")
-#             img.save(imagepath) # Save image
-#             images.append(imagepath)
-
-#         with open(os.path.join(localimagefolder, "output.pdf"), "wb") as f:
-#             f.write(img2pdf.convert([i for i in images]))
-
-#         # Add png names as new column in dataframe
-#         clinicalData['QR code'] = images
-
-
-
 if __name__ == '__main__':
-    app.run_server(debug=True, port=5000)
+    application.run(debug=True, host='0.0.0.0')

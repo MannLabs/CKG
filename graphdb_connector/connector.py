@@ -64,7 +64,7 @@ def removeRelationshipDB(entity1, entity2, relationship):
 def modifyEntityProperty(parameters):
     '''parameters: tuple with entity name, entity id, property name to modify, and value'''
 
-    driver = connector.getGraphDatabaseConnectionConfiguration()
+    driver = getGraphDatabaseConnectionConfiguration()
     entity, entityid, attribute, value = parameters
 
     try:

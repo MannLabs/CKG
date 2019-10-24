@@ -28,6 +28,9 @@ except Exception as err:
     logger.error("builder - Reading configuration > {}.".format(err))
 
 def set_arguments():
+    """
+    This function sets the arguments to be used as input for **builder.py** in the command line.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("-b", "--build_type", help="define the type of build you want (import, load or both)", type=str, choices=['import', 'load', 'full'], default='full')
     parser.add_argument("-i", "--import_types", help="define which data types (ontologies, experiments, databases) you want to import (partial import)", nargs='+', default=None, choices=['experiments', 'databases', 'ontologies', 'users'])

@@ -2,6 +2,20 @@
 # REFLECT ontologies - DO, BTO, STITCH, GO # 
 ############################################
 def parser(files, filters, qtype = None):
+    """
+    Parses and extracts relevant data from REFLECT ontologies: Disease Ontology, Tissues, STITCH and \
+    Gene Ontology databases.
+
+    :param list files: list of files downloaded from an ontology and used to generate nodes and relationships in the graph database.
+    :param list filters: list of ontology identifiers to be ignored.
+    :param int qtype: ontology type code.
+    :return: Three nested dictionaries: terms, relationships between terms, and definitions of the terms.
+
+        - terms: Dictionary where each key is an ontology dentifier (*str*) and the values are lists of names and synonyms (*list[str]*).
+        - relationships: Dictionary of tuples (*str*). Each tuple contains two ontology identifiers (source and target) and \
+                        the relationship type between them.
+        - definitions: Dictionary with ontology dentifiers as keys (*str*), and definition of the terms as values (*str*).
+    """
     entity = {}
     terms = defaultdict(list)
     relationships = set()

@@ -3,7 +3,6 @@ from apps import basicApp
 from report_manager import project
 import dash_html_components as html
 import dash_core_components as dcc
-import dash_bootstrap_components as dbc
 
 
 class ProjectApp(basicApp.BasicApp):

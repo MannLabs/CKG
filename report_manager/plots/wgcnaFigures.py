@@ -23,16 +23,15 @@ def get_module_color_annotation(map_list, col_annotation=False, row_annotation=F
     This function takes a list of values, converts them into colors, and creates a new plotly object to be used as an annotation.
     Options module_colors and dendrogram only apply when map_list is a list of experimental features used in module eigenegenes calculation.
 
-    Args:
-        map_list:
-        col_annotation:
-        row_annotation:
-        bygene:
-        module_colors:
-        dendrogram:
+    :param list map_list: dendrogram leaf labels.
+    :param bool col_annotation: if True, adds color annotations as a row.
+    :param bool row_annotation: if True, adds color annotations as a column.
+    :param bool bygene: determines wether annotation colors have to be reordered to match dendrogram leaf labels.
+    :param list module_colors: dendrogram leaf module color.
+    :param dict dendrogram: dendrogram represented as a plotly object figure.
+    :return: Plotly object figure.
 
-    Returns:
-        Plotly object figure.
+    .. note:: map_list and module_colors must have the same length.
     """
     colors_dict = color_list.make_color_dict()
 
@@ -43,7 +42,7 @@ def get_module_color_annotation(map_list, col_annotation=False, row_annotation=F
     vals = []
 
     #Use if color annotation is for experimental features in dendrogram
-    if bygene == True:
+    if bygene:
         module_colors = [i.lower().replace(' ', '') for i in module_colors]
         gene_colors = dict(zip(map_list, module_colors))
 
@@ -102,13 +101,10 @@ def get_heatmap(df, colorscale=None , color_missing=True):
     """
     This function plots a simple Plotly heatmap.
 
-    Args:
-        df: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.
-        colorscale: list of lists (e.g. [[0,'#67a9cf'],[0.5,'#f7f7f7'],[1,'#ef8a62']]). If colorscale is not defined, will take [[0, 'rgb(255,255,255)'], [1, 'rgb(255,51,0)']] as default.
-        color_missing: if set to True, plots missing values as grey in the heatmap.
-
-    Returns:
-        Plotly object figure.
+    :param df: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.
+    :param list[list] colorscale: heatmap colorscale (e.g. [[0,'#67a9cf'],[0.5,'#f7f7f7'],[1,'#ef8a62']]). If colorscale is not defined, will take [[0, 'rgb(255,255,255)'], [1, 'rgb(255,51,0)']] as default.
+    :param bool color_missing: if set to True, plots missing values as grey in the heatmap.
+    :return: Plotly object figure.
     """
     if colorscale:
         colors = colorscale
@@ -138,18 +134,15 @@ def plot_labeled_heatmap(df, textmatrix, title, colorscale=[[0,'rgb(0,255,0)'],[
     """
     This function plots a simple Plotly heatmap with column and/or row annotations and heatmap annotations.
 
-    Args:
-        df: pandas dataframe containing data to be plotted in the heatmap.
-        textmatrix: pandas dataframe with heatmap annotations as values.
-        title: the title of the figure.
-        colorscale: list of lists (e.g. [[0,'rgb(0,255,0)'],[0.5,'rgb(255,255,255)'],[1,'rgb(255,0,0)']])
-        width: the width of the figure.
-        height: the height of the figure.
-        row_annotation: if True, adds a color-coded column at the left of the heatmap.
-        col_annotation: if True, adds a color-coded row at the bottom of the heatmap.
-
-    Returns:
-        Plotly object figure.
+    :param df: pandas dataframe containing data to be plotted in the heatmap.
+    :param textmatrix: pandas dataframe with heatmap annotations as values.
+    :param str title: the title of the figure.
+    :param list[list] colorscale: heatmap colorscale (e.g. [[0,'rgb(0,255,0)'],[0.5,'rgb(255,255,255)'],[1,'rgb(255,0,0)']])
+    :param int width: the width of the figure.
+    :param int height: the height of the figure.
+    :param bool row_annotation: if True, adds a color-coded column at the left of the heatmap.
+    :param bool col_annotation: if True, adds a color-coded row at the bottom of the heatmap.
+    :return: Plotly object figure.
     """
     figure = get_heatmap(df, colorscale=colorscale, color_missing=False)
     figure['data'].append(get_module_color_annotation(list(df.index), row_annotation=row_annotation, col_annotation=col_annotation, bygene=False))
@@ -178,12 +171,9 @@ def plot_dendrogram_guidelines(Z_tree, dendrogram):
     """
     This function takes a dendrogram tree dictionary and its plotly object and creates shapes to be plotted as vertical dashed lines in the dendrogram.
 
-    Args:
-        Z_tree: dictionary of data structures computed to render the dendrogram. Keys: 'icoords', 'dcoords', 'ivl' and 'leaves'.
-        dendrogram: dendrogram represented as a plotly object figure.
-
-    Returns:
-        List of dictionaries.
+    :param dict Z_tree: dictionary of data structures computed to render the dendrogram. Keys: 'icoords', 'dcoords', 'ivl' and 'leaves'.
+    :param dendrogram: dendrogram represented as a plotly object figure.
+    :return: List of dictionaries.
     """    
     tickvals = list(dendrogram['layout']['xaxis']['tickvals'])
     maximum = len(tickvals)
@@ -211,17 +201,19 @@ def plot_intramodular_correlation(MM, FS, feature_module_df, title, width=1000, 
     """
     This function uses the Feature significance and Module Membership measures, and plots a multi-scatter plot of all modules against all clinical traits.
 
-    Args:
-        MM: module membership pandas dataframe.
-        FS: feature significance pandas dataframe.
-        feature_module_df: pandas dataframe of experimental features and module colors (use mode='dataframe' in get_FeaturesPerModule).
-        title: the title of the figure
-        width: the width of the figure.
-        height: the height of the figure.
+    :param MM: pandas dataframe with module membership data
+    :param FS: pandas dataframe with feature significance data
+    :param feature_module_df: pandas DataFrame of experimental features and module colors (use mode='dataframe' in get_FeaturesPerModule)
+    :param str title: plot title
+    :param int width: plot width
+    :param int height: plot height
+    :return: Plotly object figure.
+    
+    Example::
 
-    Returns:
-        Plotly object figure.
-    Note: There is a limit in the number of subplots one can make in Plotly. Limiting the number of modules shown to 5.
+        plot = plot_intramodular_correlation(MM, FS, feature_module_df, title='Plot', width=1000, height=800):
+
+    .. note:: There is a limit in the number of subplots one can make in Plotly. This function limits the number of modules shown to 5.
     """
     MM = MM.iloc[:,-6]
     MM['modColor'] = MM.index.map(feature_module_df.set_index('name')['modColor'].get)
@@ -289,24 +281,21 @@ def plot_complex_dendrogram(dendro_df, subplot_df, title, dendro_labels=[], dist
     """
     This function plots a dendrogram with a subplot below that can be a heatmap (annotated or not) or module colors.
 
-    Args:
-        dendro_df: pandas dataframe containing data used to generate dendrogram, columns will result in dendrogram leaves.
-        subplot_df: pandas dataframe containing data used to generate plot below dendrogram.
-        title: the title of the figure
-        dendro_labels: list of strings for dendrogram leaf nodes labels.
-        distfun:distance measure to be used ('euclidean', 'maximum', 'manhattan', 'canberra', 'binary', 'minkowski' or 'jaccard')
-        linkagefun: hierarchical/agglomeration method to be used ('single', 'complete', 'average', 'weighted', 'centroid', 'median' or 'ward')
-        hang: height at which the dendrogram leaves should be placed.
-        subplot: type of plot to be shown below dendrogram ('module colors' or 'heatmap').
-        subplot_colorscale: colorscale to be used in the subplot.
-        color_missingvals: if set to True, plots missing values as grey in the heatmap.
-        row_annotation:if True, adds a color-coded column at the left of the heatmap.
-        col_annotation: if True, adds a color-coded row at the bottom of the heatmap.
-        width: the width of the figure.
-        height: the height of the figure.
-
-    Returns:
-        Plotly object figure.
+    :param dendro_df: pandas dataframe containing data used to generate dendrogram, columns will result in dendrogram leaves.
+    :param subplot_df: pandas dataframe containing data used to generate plot below dendrogram.
+    :param str title: the title of the figure
+    :param list dendro_labels: list of strings for dendrogram leaf nodes labels.
+    :param str distfun:distance measure to be used ('euclidean', 'maximum', 'manhattan', 'canberra', 'binary', 'minkowski' or 'jaccard')
+    :param str linkagefun: hierarchical/agglomeration method to be used ('single', 'complete', 'average', 'weighted', 'centroid', 'median' or 'ward')
+    :param float hang: height at which the dendrogram leaves should be placed.
+    :param str subplot: type of plot to be shown below dendrogram ('module colors' or 'heatmap').
+    :param list[list] subplot_colorscale: colorscale to be used in the subplot.
+    :param bool color_missingvals: if set to True, plots missing values as grey in the heatmap.
+    :param bool row_annotation:if True, adds a color-coded column at the left of the heatmap.
+    :param bool col_annotation: if True, adds a color-coded row at the bottom of the heatmap.
+    :param int width: the width of the figure.
+    :param int height: the height of the figure.
+    :return: Plotly object figure.
     """
     dendro_tree = wgcnaAnalysis.get_dendrogram(dendro_df, dendro_labels, distfun=distfun, linkagefun=linkagefun, div_clusters=False)
     dendrogram = Dendrogram.plot_dendrogram(dendro_tree, hang=hang, cutoff_line=False)
@@ -384,7 +373,7 @@ def plot_complex_dendrogram(dendro_df, subplot_df, title, dendro_labels=[], dist
             figure.layout.update({'xaxis':dict(ticktext=np.array(dendrogram['layout']['xaxis']['ticktext']), tickvals=list(dendrogram['layout']['xaxis']['tickvals'])),
                               'yaxis2':dict(autorange='reversed')})
         
-        elif row_annotation == True:# and (col_annotation == False):
+        elif row_annotation == True:
             figure = tools.make_subplots(rows=2, cols=2, specs=[[{'colspan':2}, None],
                                                               [{}, {}]], print_grid=False)          
             for i in list(dendrogram['data']):

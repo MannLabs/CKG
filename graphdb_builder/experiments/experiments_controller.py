@@ -4,7 +4,6 @@ import sys
 import re
 import os.path
 import pandas as pd
-from dask import dataframe as dd
 import numpy as np
 from collections import defaultdict
 # from report_manager.queries import query_utils

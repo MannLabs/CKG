@@ -15,6 +15,11 @@ except Exception as err:
 
 
 def reset_mapping(entity):
+    """
+    Checks if mapping.tsv file exists and removes it.
+
+    :param str entity: entity label as defined in databases_config.yml
+    """
     if entity in dbconfig["sources"]:
         directory = os.path.join(dbconfig["databasesDir"], dbconfig["sources"][entity])
         mapping_file = os.path.join(directory,"complete_mapping.tsv")
@@ -22,6 +27,11 @@ def reset_mapping(entity):
             os.remove(mapping_file) 
 
 def mark_complete_mapping(entity):
+    """
+    Checks if mapping.tsv file exists and renames it to complete_mapping.tsv.
+
+    :param str entity: entity label as defined in databases_config.yml
+    """
     if entity in dbconfig["sources"]:
         directory = os.path.join(dbconfig["databasesDir"], dbconfig["sources"][entity])
         mapping_file = os.path.join(directory,"mapping.tsv")
@@ -30,6 +40,16 @@ def mark_complete_mapping(entity):
             os.rename(mapping_file, new_mapping_file)
 
 def getMappingFromOntology(ontology, source = None):
+    """
+    Converts .tsv file with complete list of ontology identifiers and aliases, \
+    to dictionary with aliases as keys and ontology identifiers as values.
+
+
+    :param str ontology: ontology label as defined in ontologies_config.yml.
+    :param source: name of the source database for selecting aliases.
+    :type source: str or None
+    :return: Dictionary of aliases (keys) and ontology identifiers (values).
+    """
     mapping = {}
     ont = oconfig["ontologies"][ontology]
     dirFile = os.path.join(oconfig["ontologies_directory"],ont)
@@ -48,10 +68,16 @@ def getMappingFromOntology(ontology, source = None):
     except:
         raise Exception("mapping - No mapping file {} for entity {}".format(mapping_file, ontology))
 
-
     return mapping
 
 def getMappingForEntity(entity):
+    """
+    Converts .tsv file with complete list of entity identifiers and aliases, \
+    to dictionary with aliases as keys and entity identifiers as values.
+
+    :param str entity: entity label as defined in databases_config.yml.
+    :return: Dictionary of aliases (keys) and entity identifiers (value).
+    """
     mapping = {}
     if entity in dbconfig["sources"]:
         mapping_file = os.path.join(dbconfig["databasesDir"], os.path.join(dbconfig["sources"][entity],"complete_mapping.tsv"))
@@ -73,6 +99,13 @@ def getMappingForEntity(entity):
     return mapping
 
 def getMultipleMappingForEntity(entity):
+    """
+    Converts .tsv file with complete list of entity identifiers and aliases, \
+    to dictionary with aliases to other databases as keys and entity identifiers as values.
+
+    :param str entity: entity label as defined in databases_config.yml.
+    :return: Dictionary of aliases (keys) and set of unique entity identifiers (values).
+    """
     mapping = defaultdict(set)
     if entity in dbconfig["sources"]:
         mapping_file = os.path.join(dbconfig["databasesDir"], os.path.join(dbconfig["sources"][entity],"complete_mapping.tsv"))
@@ -91,10 +124,19 @@ def getMultipleMappingForEntity(entity):
                         mapping[alias].add(ident)
         except:
             raise Exception("mapping - No mapping file {} for entity {}".format(mapping, entity))
-            
+    
     return mapping
 
 def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True, db = "STRING"):
+    """
+    Parses database (db) and extracts relationships between identifiers to order databases (source).
+
+    :param str url: link to download database raw file.
+    :param str source: name of the source database for selecting aliases.
+    :param bool download: wether to download the file or not.
+    :param str db: name of the database to be parsed.
+    :return: Dictionary of database identifers (keys) and set of unique aliases to other databases (values).
+    """
     mapping = defaultdict(set)
     
     directory = os.path.join(dbconfig["databasesDir"], db)
@@ -128,6 +170,13 @@ def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True, db = "ST
     return mapping
 
 def buildMappingFromOBO(oboFile, ontology):
+    """
+    Parses and extracts ontology idnetifiers, names and synonyms from raw file, and writes all the information \
+    to a .tsv file.
+    
+    :param str oboFile: path to ontology raw file.
+    :param str ontology: ontology database acronym as defined in ontologies_config.yml.
+    """
     outputDir = os.path.join(oconfig["ontologies_directory"], ontology)
     cmapping_file = os.path.join(outputDir, "complete_mapping.tsv")
     mapping_file = os.path.join(outputDir, "mapping.tsv")

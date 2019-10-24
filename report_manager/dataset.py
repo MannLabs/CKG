@@ -393,6 +393,7 @@ class ProteomicsDataset(Dataset):
             imputation = True
             method = "mixed"
             missing_method = 'percentage'
+            missing_per_group = True
             missing_max = 0.3
             min_valid = 1
             value_col = 'LFQ intensity'
@@ -406,6 +407,8 @@ class ProteomicsDataset(Dataset):
                     method = args["imputation_method"]
                 if "missing_method" in args:
                     missing_method = args["missing_method"]
+                if "missing_per_group" in args:
+                    missing_per_group = args["missing_per_group"]
                 if "missing_max" in args:
                     missing_max = args["missing_max"]
                 if "min_valid" in args:
@@ -413,7 +416,7 @@ class ProteomicsDataset(Dataset):
                 if "value_col" in args:
                     value_col = args["value_col"]
 
-            processed_data = basicAnalysis.get_proteomics_measurements_ready(data, index_cols=index, imputation = imputation, method = method, missing_method = missing_method, missing_max = missing_max, min_valid=min_valid)
+            processed_data = basicAnalysis.get_proteomics_measurements_ready(data, index_cols=index, imputation = imputation, method = method, missing_method = missing_method, missing_per_group=missing_per_group, missing_max = missing_max, min_valid=min_valid)
         return processed_data
     
     def generate_knowledge(self):

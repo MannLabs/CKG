@@ -5,28 +5,54 @@ import plotly.graph_objs as go
 
 def plot_dendrogram(Z_dendrogram, cutoff_line=True, value=15, orientation='bottom', hang=30, hide_labels=False, labels=None,
                     colorscale=None, hovertext=None, color_threshold=None):
+    """
+    Modified version of Plotly _dendrogram.py that returns a dendrogram Plotly figure object with cutoff line.
+
+    :param Z_dendrogram: Matrix of observations as array of arrays
+    :type Z_dendrogram: ndarray
+    :param cutoff_line: plot distance cutoff line
+    :type cutoff_line: boolean
+    :param value: dendrogram distance for cutoff line
+    :type value: float or int
+    :param orientation: 'top', 'right', 'bottom', or 'left'
+    :type orientation: str
+    :param hang: dendrogram distance of leaf lines
+    :type hang: float
+    :param hide_labels: show leaf labels
+    :type hide_labels: boolean
+    :param labels: List of axis category labels(observation labels)
+    :type labels: list
+    :param colorscale: Optional colorscale for dendrogram tree
+    :type colorscale: list
+    :param hovertext: List of hovertext for constituent traces of dendrogram
+                               clusters
+    :type hovertext: list[list]
+    :param color_threshold: Value at which the separation of clusters will be made
+    :type color_threshold: double
+    :return: Plotly figure object
+
+    Example::
+
+        figure = plot_dendrogram(dendro_tree, hang=0.9, cutoff_line=False)
+    """
 
     dendrogram = Dendrogram(Z_dendrogram, orientation, hang, hide_labels, labels, colorscale, hovertext=hovertext, color_threshold=color_threshold)
 
     if cutoff_line == True:
-        dendrogram.layout.update(add_line(dendrogram, value))
+        dendrogram.layout.update({'shapes':[{'type':'line',
+                                 'xref':'paper',
+                                 'yref':'y',
+                                 'x0':0, 'y0':value,
+                                 'x1':1, 'y1':value,
+                                 'line':{'color':'red'}}]})
 
     figure = dict(data=dendrogram.data, layout=dendrogram.layout)
     figure['layout']['template'] = 'plotly_white'
 
     return figure
 
-def add_line(plotly_fig, value):
-    plotly_fig.layout.update({'shapes':[{'type':'line',
-                             'xref':'paper',
-                             'yref':'y',
-                             'x0':0, 'y0':value,
-                             'x1':1, 'y1':value,
-                             'line':{'color':'red'}}]})
-    return plotly_fig.layout
-
 class Dendrogram(object):
-
+    """Refer to plot_dendrogram() for docstring."""
     def __init__(self, Z_dendrogram, orientation='bottom', hang=1, hide_labels=False, labels=None, colorscale=None, hovertext=None,
                  color_threshold=None, width=np.inf, height=np.inf, xaxis='xaxis', yaxis='yaxis'):
         self.orientation = orientation
@@ -76,12 +102,13 @@ class Dendrogram(object):
         self.layout = self.set_figure_layout(width, height, hide_labels=hide_labels)
         self.data = dd_traces
 
-
     def get_color_dict(self, colorscale):
         """
         Returns colorscale used for dendrogram tree clusters.
-        :param (list) colorscale: Colors to use for the plot in rgb format.
-        :rtype (dict): A dict of default colors mapped to the user colorscale.
+
+        :param colorscale: colors to use for the plot in rgb format
+        :type colorscale: list
+        :return (dict): default colors mapped to the user colorscale
         """
 
         # These are the color codes returned for dendrograms
@@ -117,8 +144,10 @@ class Dendrogram(object):
     def set_axis_layout(self, axis_key, hide_labels):
         """
         Sets and returns default axis object for dendrogram figure.
-        :param (str) axis_key: E.g., 'xaxis', 'xaxis1', 'yaxis', yaxis1', etc.
-        :rtype (dict): An axis_key dictionary with set parameters.
+
+        :param axis_key: E.g., 'xaxis', 'xaxis1', 'yaxis', yaxis1', etc.
+        :type axis_key: str
+        :return (dict): An axis_key dictionary with set parameters.
         """
         axis_defaults = {
                 'type': 'linear',
@@ -153,6 +182,14 @@ class Dendrogram(object):
     def set_figure_layout(self, width, height, hide_labels):
         """
         Sets and returns default layout object for dendrogram figure.
+
+        :param width: plot width
+        :type width: int
+        :param height: plot height
+        :type height: int
+        :param hide_labels: show leaf labels
+        :type hide_labels: boolean
+        :return: Plotly layout
         """
         self.layout.update({
             'showlegend': False,
@@ -169,6 +206,25 @@ class Dendrogram(object):
 
 
     def get_dendrogram_traces(self, Z_dendrogram, hang, colorscale, hovertext, color_threshold):
+        """
+        Calculates all the elements needed for plotting a dendrogram.
+        
+        :param Z_dendrogram: Matrix of observations as array of arrays
+        :type Z_dendrogram: ndarray
+        :param hang: dendrogram distance of leaf lines
+        :type hang: float
+        :param colorscale: Color scale for dendrogram tree clusters
+        :type colorscale: list
+        :param hovertext: List of hovertext for constituent traces of dendrogram
+        :type hovertext: list
+        :return (tuple): Contains all the traces in the following order:
+         
+                a. trace_list: List of Plotly trace objects for dendrogram tree
+                b. icoord: All X points of the dendrogram tree as array of arrays with length 4
+                c. dcoord: All Y points of the dendrogram tree as array of arrays with length 4
+                d. ordered_labels: leaf labels in the order they are going to appear on the plot
+                e. Z_dendrogram['leaves']: left-to-right traversal of the leaves
+        """
         icoord = scp.array(Z_dendrogram['icoord'])
         dcoord = scp.array(Z_dendrogram['dcoord'])
         ordered_labels = scp.array(Z_dendrogram['ivl'])

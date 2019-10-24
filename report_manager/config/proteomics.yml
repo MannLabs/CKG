@@ -1,8 +1,10 @@
 args:
     imputation: True
     imputation_method: distribution 
-    missing_method: at_least_x_per_group
-    missing_max: 5
+    missing_method: at_least_x
+    missing_per_group: True
+    missing_max: 0.3
+    min_valid: 5
     value_col: LFQ intensity
     index:
         - group

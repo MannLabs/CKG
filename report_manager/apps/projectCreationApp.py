@@ -18,20 +18,28 @@ Diseases = [(d['name']) for d in driver.nodes.match("Disease")]
 
 query = 'MATCH (n:Clinical_variable) RETURN n.name,n.id LIMIT 20'
 df = pd.DataFrame(connector.getCursorData(driver, query).values)
-df[0] = ['({0})'.format(i) for i in df[0].tolist()]
-ClinicalVariables = df[[1, 0]].apply(lambda x: ' '.join(x),axis=1).tolist()
+if not df.empty:
+    df[0] = ['({0})'.format(i) for i in df[0].tolist()]
+    ClinicalVariables = df[[1, 0]].apply(lambda x: ' '.join(x),axis=1).tolist()
 
 template_cols = pd.read_excel(os.path.join(os.getcwd(), 'apps/templates/ClinicalData_template.xlsx'))
 template_cols = template_cols.columns.tolist()
 
 
 class ProjectCreationApp(basicApp.BasicApp):
+    """
+    Defines what the project creation App is in the report_manager.
+    Includes multiple fill in components to gather project information and metadata.
+    """
     def __init__(self, title, subtitle, description, layout = [], logo = None, footer = None):
         self.pageType = "projectCreationPage"
         basicApp.BasicApp.__init__(self, title, subtitle, description, self.pageType, layout, logo, footer)
         self.buildPage()
 
     def buildPage(self):
+        """
+        Builds page with the basic layout from *basicApp.py* and adds relevant Dash components for project creation.
+        """
         self.add_basic_layout()
         layout = [html.Div([
                     html.Div([html.Div(children=[html.A(children=html.Button('Download Template (.xlsx)', id='download_button', style={'maxWidth':'130px'}), id='download_link', style={'marginLeft': '90%'})]),

@@ -21,6 +21,14 @@ import subprocess
 
 
 def write_relationships(relationships, header, outputfile):
+    """
+    Reads a set of relationships and saves them to a file.
+
+    :param set relationships: set of tuples with relationship data: source node, target node, \
+                                relationship type, source and other attributes.
+    :param list header: list of column names.
+    :param str outputfile: path to file to be saved (including filename and extention).
+    """
     try:
         df = pd.DataFrame(list(relationships), columns=header)
         df.to_csv(path_or_buf=outputfile, sep='\t',
@@ -30,6 +38,14 @@ def write_relationships(relationships, header, outputfile):
         raise csv.Error("Error writing relationships to file: {}.\n {}".format(outputfile, err))
 
 def write_entities(entities, header, outputfile):
+    """
+    Reads a set of entities and saves them to a file.
+
+    :param set entities: set of tuples with entities data: identifier, label, name\
+                        and other attributes.
+    :param list header: list of column names.
+    :param str outputfile: path to file to be saved (including filename and extention).
+    """
     try:
         df = pd.DataFrame(list(entities), columns=header)
         df.to_csv(path_or_buf=outputfile, sep='\t',
@@ -39,12 +55,30 @@ def write_entities(entities, header, outputfile):
         raise csv.Error("Error writing etities to file: {}.\n {}".format(outputfile, err))
 
 def get_config(config_name, data_type='databases'):
+    """
+    Reads YAML configuration file and converts it into a Python dictionary.
+
+    :param str config_name: name of the configuration YAML file.
+    :param str data_type: configuration type ('databases' or 'ontologies').
+    :return: Dictionary.
+
+    .. note:: Use this function to obtain configuration for individual database/ontology parsers.
+    """
     cwd = os.path.abspath(os.path.dirname(__file__))
     config = ckg_utils.get_configuration(os.path.join(cwd, '{}/config/{}'.format(data_type, config_name)))
-    
+
     return config
 
 def setup_config(data_type="databases"):
+    """
+    Reads YAML configuration file and converts it into a Python dictionary.
+
+    :param data_type: configuration type ('databases', 'ontologies', 'experiments' or 'builder').
+    :return: Dictionary.
+
+    .. note:: This function should be used to obtain the configuration for databases_controller.py, \
+                ontologies_controller.py, experiments_controller.py and builder.py.
+    """
     try:
         dirname = os.path.abspath(os.path.dirname(__file__))
         if data_type == 'databases':
@@ -62,6 +96,14 @@ def setup_config(data_type="databases"):
     return config
 
 def list_ftp_directory(ftp_url, user='', password=''):
+    """
+    Lists all files present in folder from FTP server.
+
+    :param str ftp_url: link to access ftp server.
+    :param str user: username to access ftp server if required.
+    :param str password: password to access ftp server if required.
+    :return: List of files contained in ftp server folder provided with ftp_url.
+    """
     try:
         domain = ftp_url.split('/')[2]
         if len(ftp_url.split('/')) > 3:
@@ -77,7 +119,14 @@ def list_ftp_directory(ftp_url, user='', password=''):
     return files
 
 def setup_logging(path='log.config', key=None):
-    """Setup logging configuration"""
+    """
+    Setup logging configuration.
+
+    :param str path: path to file containing configuration for logging file.
+    :param str key: name of the logger.
+    :return: Logger with the specified name from 'key'. If key is *None*, returns a logger which is \
+                the root logger of the hierarchy.
+    """
     if os.path.exists(path):
         with open(path, 'rt') as f:
             config = json.load(f)
@@ -92,6 +141,19 @@ def setup_logging(path='log.config', key=None):
     return logger
 
 def downloadDB(databaseURL, directory=None, file_name=None, user="", password=""):
+    """
+    This function downloads the raw files from a biomedical database server when a link is provided \
+
+
+    :param str databaseURL: link to access biomedical database server.
+    :param directory:
+    :type directory: str or None
+    :param file_name: name of the file to dowload. If None, 'databaseURL' must contain \
+                        filename after the last '/'.
+    :type file_name: str or None
+    :param str user: username to access biomedical database server if required.
+    :param str password: password to access biomedical database server if required.
+    """
     dbconfig = setup_config()
     if directory is None:
         directory = dbconfig["databasesDir"]
@@ -135,6 +197,16 @@ def downloadDB(databaseURL, directory=None, file_name=None, user="", password=""
         raise Exception("Something went wrong. {}.\nURL:{}".format(err,databaseURL))
 
 def searchPubmed(searchFields, sortby = 'relevance', num ="10", resultsFormat = 'json'):
+    """
+    Searches PubMed database for MeSH terms and other additional fields ('searchFields'), sorts them by relevance and \
+    returns the top 'num'.
+
+    :param list searchFields: list of search fields to query for.
+    :param str sortby: parameter to use for sorting.
+    :param str num: number of PubMed identifiers to return.
+    :param str resultsFormat: format of the PubMed result.
+    :return: Dictionary with total number of PubMed ids, and top 'num' ids.
+    """
     pubmedQueryUrl = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=TERM&retmode=json&retmax=NUM'
     if len(searchFields) > 1:
         query = " [MeSH Terms] AND ".join(searchFields)
@@ -176,6 +248,12 @@ def searchPubmed(searchFields, sortby = 'relevance', num ="10", resultsFormat = 
     return result
 
 def is_number(s):
+    """
+    This function checks if given input is a float and returns True if so, and False if it is not.
+
+    :param s: input
+    :return: Boolean.
+    """
     try:
         float(s)
         return True
@@ -183,6 +261,16 @@ def is_number(s):
         return False
 
 def getMedlineAbstracts(idList):
+    """
+    This function accesses NCBI over the WWWW and returns Medline data as a handle object, \
+    which is parsed and converted to a Pandas DataFrame.
+
+    :param idList: single identifier or comma-delimited list of identifiers. All the identifiers \
+                    must be from the database PubMed.
+    :type idList: str or list
+    :return: Pandas DataFrame with columns: 'title', 'authors', 'journal', 'keywords', 'abstract', 'PMID' and 'url'.
+    """
+
     fields = {"TI":"title", "AU":"authors", "JT":"journal", "DP":"date", "MH":"keywords", "AB":"abstract", "PMID":"PMID"}
     pubmedUrl = "https://www.ncbi.nlm.nih.gov/pubmed/"
     handle = Entrez.efetch(db="pubmed", id=idList, rettype="medline", retmode="json")
@@ -205,6 +293,12 @@ def getMedlineAbstracts(idList):
     return abstracts
 
 def listDirectoryFiles(directory):
+    """
+    Lists all files in a specified directory.
+
+    :param str directory: path to folder.
+    :return: List of file names.
+    """
     from os import listdir
     from os.path import isfile, join
     onlyfiles = [f for f in listdir(directory) if isfile(join(directory, f)) and not f.startswith('.')]
@@ -212,12 +306,23 @@ def listDirectoryFiles(directory):
     return onlyfiles
 
 def listDirectoryFolders(directory):
+    """
+    Lists all directories in a specified directory.
+
+    :param str directory: path to folder.
+    :return: List of folder names.
+    """
     from os import listdir
     from os.path import isdir, join
     dircontent = [f for f in listdir(directory) if isdir(join(directory, f)) and not f.startswith('.')]
     return dircontent
 
 def checkDirectory(directory):
+    """
+    Checks if given directory exists and if not, creates it.
+
+    :param str directory: path to folder.
+    """
     if not os.path.exists(directory):
         os.makedirs(directory)
 
@@ -237,21 +342,41 @@ def flatten(t):
             yield from flatten(x)
 
 def pretty_print(data):
+    """
+    This function provides a capability to "pretty-print" arbitrary Python data structures in a forma that can be \
+    used as input to the interpreter. For more information visit https://docs.python.org/2/library/pprint.html.
+
+    :param data: python object.
+    """
     pp = pprint.PrettyPrinter(indent=4)
     pp.pprint(data)
 
 def convertOBOtoNet(ontologyFile):
+    """
+    Takes an .obo file and returns a NetworkX graph representation of the ontology, that holds multiple \
+    edges between two nodes.
+
+    :param str ontologyFile: path to ontology file.
+    :return: NetworkX graph.
+    """
     graph = obonet.read_obo(ontologyFile)
     
     return graph
 
 def getCurrentTime():
+    """
+    Returns current date (Year-Month-Day) and time (Hour-Minute-Second).
+
+    :return: Two strings: date and time.
+    """
     now = datetime.datetime.now()
     return '{}-{}-{}'.format(now.year, now.month, now.day), '{}:{}:{}'.format(now.hour, now.minute, now.second) 
 
 def convert_bytes(num):
     """
-    this function will convert bytes to MB.... GB... etc
+    This function will convert bytes to MB.... GB... etc.
+
+    :param num: float, integer or pandas.Series.
     """
     for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
         if num < 1024.0:
@@ -261,13 +386,28 @@ def convert_bytes(num):
 
 def file_size(file_path):
     """
-    this function will return the file size
+    This function returns the file size.
+
+    :param str file_path: path to file.
+    :return: Size in bytes of a plain file.
+    :rtype: str
     """
     if os.path.isfile(file_path):
         file_info = os.stat(file_path)
         return str(file_info.st_size)
 
 def buildStats(count, otype, name, dataset, filename):
+    """
+    Returns a tuple with all the information needed to build a stats file.
+
+    :param int count: number of entities/relationships.
+    :param str otype: 'entity' or 'relationsgips'.
+    :param str name: entity/relationship label.
+    :param str dataset: database/ontology.
+    :param str filename: path to file where entities/relationships are stored.
+    :return: Tuple with date, time, database name, file where entities/relationships are stored, \
+    file size, number of entities/relationships imported, type and label.
+    """
     y,t = getCurrentTime()
     size = file_size(filename)
     filename = filename.split('/')[-1]
@@ -275,6 +415,13 @@ def buildStats(count, otype, name, dataset, filename):
     return(y, t, dataset, filename, size, count, otype, name)
 
 def compress_directory(folder_to_backup, dest_folder, file_name):
+    """
+    Compresses folder to .tar.gz to create data backup archive file.
+
+    :param str folder_to_backup: path to folder to compress and backup.
+    :param str dest_folder: path where to save compressed folder.
+    :param str file_name: name of the compressed file.
+    """
     #tar cf - paths-to-archive | pigz -9 -p 32 > archive.tar.gz
     filePath = os.path.join(dest_folder,file_name+".tar.gz")
     filePath = filePath.replace("(","\(").replace(")","\)")
@@ -283,6 +430,12 @@ def compress_directory(folder_to_backup, dest_folder, file_name):
 
 
 def read_gzipped_file(filepath):
+    """
+    Opens an underlying process to access a gzip file through the creation of a new pipe to the child.
+
+    :param str filepath: path to gzip file.
+    :return: A bytes sequence that specifies the standard output.
+    """
     p = subprocess.Popen(["gzcat", filepath],
         stdout=subprocess.PIPE
     )

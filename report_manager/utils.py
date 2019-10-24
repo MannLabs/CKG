@@ -10,7 +10,6 @@ from Bio import Medline
 import re
 import pandas as pd
 import numpy as np
-from dask import dataframe as dd
 import bs4 as bs
 import dash_html_components as html
 import networkx as nx

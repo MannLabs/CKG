@@ -35,13 +35,10 @@ def get_data(data, drop_cols_exp=['subject', 'group', 'sample', 'index'], drop_c
     """ 
     This function cleanes up and formats experimental and clinical data into similarly shaped dataframes.
     
-    Args:
-        data: dictionary with processed clinical and proteomics datasets
-        drop_cols_exp: list of columns to drop from processed experimental (protemics/rna-seq/dna-seq) dataframe
-        drop_cols_cli: list of columns to drop from processed clinical dataframe
-    
-    Returns:
-        Dictionary with experimental and clinical dataframes (keys are the same as in the input dictionary).  
+    :param dict data: dictionary with processed clinical and proteomics datasets.
+    :param list drop_cols_exp: list of columns to drop from processed experimental (protemics/rna-seq/dna-seq) dataframe.
+    :param list drop_cols_cli: list of columns to drop from processed clinical dataframe.
+    :return: Dictionary with experimental and clinical dataframes (keys are the same as in the input dictionary).  
     """   
     wgcna_data = {}
     for i in data:
@@ -70,17 +67,14 @@ def get_dendrogram(df, labels, distfun='euclidean', linkagefun='ward', div_clust
     """ 
     This function calculates the distance matrix and performs hierarchical cluster analysis on a set of dissimilarities and methods for analyzing it.
    
-    Args:
-        df: pandas dataframe with samples/subjects as index and features as columns
-        labels: list of labels for the leaves of the tree
-        distfun: distance measure to be used ('euclidean', 'maximum', 'manhattan', 'canberra', 'binary', 'minkowski' or 'jaccard')
-        linkagefun: hierarchical/agglomeration method to be used ('single', 'complete', 'average', 'weighted', 'centroid', 'median' or 'ward')
-        div_clusters: dividing dendrogram leaves into clusters (True or False)
-        fcluster_method: criterion to use in forming flat clusters
-        fcluster_cutoff: maximum cophenetic distance between observations in each cluster
-    
-    Returns:
-        Dictionary of data structures computed to render the dendrogram. Keys: 'icoords', 'dcoords', 'ivl' and 'leaves'. If div_clusters is used, it will also return a dictionary of each cluster and respective leaves.
+    :param df: pandas dataframe with samples/subjects as index and features as columns.
+    :param list labels: labels for the leaves of the tree.
+    :param str distfun: distance measure to be used ('euclidean', 'maximum', 'manhattan', 'canberra', 'binary', 'minkowski' or 'jaccard').
+    :param str linkagefun: hierarchical/agglomeration method to be used ('single', 'complete', 'average', 'weighted', 'centroid', 'median' or 'ward').
+    :param bool div_clusters: dividing dendrogram leaves into clusters (True or False).
+    :param str fcluster_method: criterion to use in forming flat clusters.
+    :param int fcluster_cutoff: maximum cophenetic distance between observations in each cluster.
+    :return: Dictionary of data structures computed to render the dendrogram. Keys: 'icoords', 'dcoords', 'ivl' and 'leaves'. If div_clusters is used, it will also return a dictionary of each cluster and respective leaves.
     """
     # np.random.seed(112736)
     
@@ -104,14 +98,11 @@ def get_clusters_elements(linkage_matrix, fcluster_method, fcluster_cutoff, labe
     """ 
     This function implements the generation of flat clusters from an hierarchical clustering with the same interface as scipy.cluster.hierarchy.fcluster.
     
-    Args:
-        linkage_matrix: hierarchical clustering encoded with a linkage matrix.
-        fcluster_method: criterion to use in forming flat clusters ('inconsistent', 'distance', 'maxclust', 'monocrit', 'maxclust_monocrit')
-        fcluster_cutoff: maximum cophenetic distance between observations in each cluster.
-        labels: list of labels for the leaves of the dendrogram.
-    
-    Returns:
-        A dictionary where keys are the cluster numbers and values are the dendrogram leaves.
+    :param ndarray linkage_matrix: hierarchical clustering encoded with a linkage matrix.
+    :param str fcluster_method: criterion to use in forming flat clusters ('inconsistent', 'distance', 'maxclust', 'monocrit', 'maxclust_monocrit').
+    :param float fcluster_cutoff: maximum cophenetic distance between observations in each cluster.
+    :param list labels: labels for the leaves of the dendrogram.
+    :return: A dictionary where keys are the cluster numbers and values are the dendrogram leaves.
     """
     clust = fcluster(linkage_matrix, fcluster_cutoff, fcluster_method)
     clusters = defaultdict(list)
@@ -123,13 +114,10 @@ def filter_df_by_cluster(df, clusters, number):
     """ 
     Select only the members of a defined cluster.
     
-    Args:
-        df: pandas dataframe with samples/subjects as index and features as columns
-        clusters: clusters dictionary from get_dendrogram function if div_clusters option was True.
-        number: cluster number (key)
-    
-    Returns:
-        Pandas dataframe with all the features (columns) and samples/subjects belonging to the defined cluster (index).
+    :param df: pandas dataframe with samples/subjects as index and features as columns.
+    :param dict clusters: clusters dictionary from get_dendrogram function if div_clusters option was True.
+    :param int number: cluster number (key).
+    :return: Pandas dataframe with all the features (columns) and samples/subjects belonging to the defined cluster (index).
     """
     return df[df.index.isin(clusters[number])]
 
@@ -137,12 +125,9 @@ def df_sort_by_dendrogram(df, Z_dendrogram):
     """ 
     Reorders pandas dataframe by index and according to the dendrogram list of leaf nodes labels.
 
-    Args:
-        df: pandas dataframe with the labels to be reordered as index
-        Z_dendrogram: dictionary of data structures computed to render the dendrogram. Keys: 'icoords', 'dcoords', 'ivl' and 'leaves'.
-    
-    Returns:
-        Reordered pandas dataframe.
+    :param df: pandas dataframe with the labels to be reordered as index.
+    :param dict Z_dendrogram: dictionary of data structures computed to render the dendrogram. Keys: 'icoords', 'dcoords', 'ivl' and 'leaves'.
+    :return: Reordered pandas dataframe.
     """
     data = df.copy()
     data.index = pd.CategoricalIndex(data.index, categories=Z_dendrogram['ivl'])
@@ -153,14 +138,11 @@ def get_percentiles_heatmap(df, Z_dendrogram, bydendro= True, bycols=False):
     """ 
     This function transforms the absolute values in each row or column (option 'bycols') into relative values.
     
-    Args:
-        df: pandas dataframe with samples/subjects as index and features as columns.
-        Z_dendrogram: dictionary of data structures computed to render the dendrogram. Keys: 'icoords', 'dcoords', 'ivl' and 'leaves'.
-        bydendro: if labels should be ordered according to dendrogram list of leaf nodes labels set to True, otherwise set to False.
-        bycols: relative values calculated across rows (samples) then set to False. Calculation performed across columns (features) set to True.
-    
-    Returns:
-        Pandas dataframe.
+    :param df: pandas dataframe with samples/subjects as index and features as columns.
+    :param dict Z_dendrogram: dictionary of data structures computed to render the dendrogram. Keys: 'icoords', 'dcoords', 'ivl' and 'leaves'.
+    :param bool bydendro: if labels should be ordered according to dendrogram list of leaf nodes labels set to True, otherwise set to False.
+    :param bool bycols: relative values calculated across rows (samples) then set to False. Calculation performed across columns (features) set to True.
+    :return: Pandas dataframe.
     """
     if bydendro == True:
         df2 = df_sort_by_dendrogram(df, Z_dendrogram)
@@ -187,11 +169,8 @@ def get_miss_values_df(data):
     """ 
     Proccesses pandas dataframe so missing values can be plotted in heatmap with specific color.
 
-    Args:
-        data: pandas dataframe.
-    
-    Returns:
-        Pandas dataframe with missing values as integer 1, and originally valid values as NaN.
+    :param data: pandas dataframe.
+    :return: Pandas dataframe with missing values as integer 1, and originally valid values as NaN.
     """
     df = data.copy()
     df = df.isnull().astype('int')
@@ -200,18 +179,14 @@ def get_miss_values_df(data):
 
 def paste_matrices(matrix1, matrix2, rows, cols):
     """ 
-    Takes two R matrices with analog shapes and concatenates each value in matrix 1 with corresponding one in matrix 2, returning a single pandas dataframe.
+    Takes two matrices with analog shapes and concatenates each value in matrix 1 with corresponding one in matrix 2, returning a single pandas dataframe.
 
-    Args:
-        matrix1: R matrix
-        matrix2: R matrix
-    
-    Returns:
-        Pandas dataframe.
+    :param ndarray matrix1: input 1
+    :param ndarray matrix2: input 2
+    :return: Pandas dataframe.
     """
     #a = pandas2ri.ri2py(matrix1)
     #b = pandas2ri.ri2py(matrix2)
-    
     text = []
     for i, j in zip(matrix1, matrix2):
         for x, y in zip(i, j):
@@ -226,17 +201,14 @@ def cutreeDynamic(distmatrix, linkagefun='average', minModuleSize=50, method='hy
     """
     This function implements the R cutreeDynamic wrapper in Python, provinding an access point for methods of adaptive branh pruning of hierarchical clustering dendrograms.
 
-    Args:
-        data: pandas dataframe.
-        distfun: distance measure to be used ('euclidean', 'maximum', 'manhattan', 'canberra', 'binary', 'minkowski' or 'jaccard').
-        linkagefun: hierarchical/agglomeration method to be used ('single', 'complete', 'average', 'weighted', 'centroid', 'median' or 'ward').
-        minModuleSize: minimum module size.
-        method: method to use ('hybrid' or 'tree').
-        deepSplit: provides a rough control over sensitivity to cluster splitting, the higher the value (with 'hybrid' method) or if True (with 'tree' method), the more and smaller modules.
-        pamRespectsDendro: only used for method 'hybrid'. Objects and small modules will only be assigned to modules that belong to the same branch in the dendrogram structure.
-
-    Returns:
-        Numpy array of numerical labels giving assignment of objects to modules. Unassigned objects are labeled 0, the largest module has label 1, next largest 2 etc.
+    :param data: pandas dataframe.
+    :param str distfun: distance measure to be used ('euclidean', 'maximum', 'manhattan', 'canberra', 'binary', 'minkowski' or 'jaccard').
+    :param str linkagefun: hierarchical/agglomeration method to be used ('single', 'complete', 'average', 'weighted', 'centroid', 'median' or 'ward').
+    :param int minModuleSize: minimum module size.
+    :param str method: method to use ('hybrid' or 'tree').
+    :param int deepSplit: provides a rough control over sensitivity to cluster splitting, the higher the value (with 'hybrid' method) or if True (with 'tree' method), the more and smaller modules.
+    :param bool pamRespectsDendro: only used for method 'hybrid'. Objects and small modules will only be assigned to modules that belong to the same branch in the dendrogram structure.
+    :return: Numpy array of numerical labels giving assignment of objects to modules. Unassigned objects are labeled 0, the largest module has label 1, next largest 2 etc.
     """
     #if distfun is None:
     #    dist = stats.as_dist(distmatrix)
@@ -257,21 +229,18 @@ def build_network(data, softPower=6, networkType='unsigned', linkagefun='average
     """ 
     Weighted gene network construction and module detection. Calculates co-expression similarity and adjacency, topological overlap matrix (TOM) and clusters features in modules.
 
-    Args:
-        data: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.
-        softPower: soft-thresholding power.
-        networkType: network type ('unsigned', 'signed', 'signed hybrid', 'distance').
-        linkagefun: hierarchical/agglomeration method to be used ('single', 'complete', 'average', 'weighted', 'centroid', 'median' or 'ward').
-        method: method to use ('hybrid' or 'tree').
-        minModuleSize: minimum module size.
-        deepSplit: provides a rough control over sensitivity to cluster splitting, the higher the value (with 'hybrid' method) or if True (with 'tree' method), the more and smaller modules.
-        pamRespectsDendro: only used for method 'hybrid'. Objects and small modules will only be assigned to modules that belong to the same branch in the dendrogram structure.
-        merge_modules: if True, very similar modules are merged.
-        MEDissThres: maximum dissimilarity (i.e., 1-correlation) that qualifies modules for merging.
-        verbose: integer level of verbosity. Zero means silent, higher values make the output progressively more and more verbose.
-    
-    Returns:
-         Tuple with TOM dissimilarity pandas dataframe, and R/rpy2 vector array with module colors per experimental feature.
+    :param data: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.
+    :param int softPower: soft-thresholding power.
+    :param str networkType: network type ('unsigned', 'signed', 'signed hybrid', 'distance').
+    :param str linkagefun: hierarchical/agglomeration method to be used ('single', 'complete', 'average', 'weighted', 'centroid', 'median' or 'ward').
+    :param str method: method to use ('hybrid' or 'tree').
+    :param int minModuleSize: minimum module size.
+    :paran int deepSplit: provides a rough control over sensitivity to cluster splitting, the higher the value (with 'hybrid' method) or if True (with 'tree' method), the more and smaller modules.
+    :param bool pamRespectsDendro: only used for method 'hybrid'. Objects and small modules will only be assigned to modules that belong to the same branch in the dendrogram structure.
+    :param bool merge_modules: if True, very similar modules are merged.
+    :param float MEDissThres: maximum dissimilarity (i.e., 1-correlation) that qualifies modules for merging.
+    :param int verbose: integer level of verbosity. Zero means silent, higher values make the output progressively more and more verbose.
+    :return: Tuple with TOM dissimilarity pandas dataframe, numpy array with module colors per experimental feature.
     """
     #Calculate adjacencies
     adjacency = WGCNA.adjacency(data, power=softPower, type=networkType)
@@ -297,14 +266,12 @@ def pick_softThreshold(data, RsquaredCut=0.8, networkType='unsigned', verbose=0)
     """ 
     Analysis of scale free topology for multiple soft thresholding powers. Aids the user in choosing a proper soft-thresholding power for network construction.
     
-    Args:
-        data: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.
-        RsquaredCut: desired minimum scale free topology fitting index R^2.
-        networkType: network type ('unsigned', 'signed', 'signed hybrid', 'distance').
-        verbose: integer level of verbosity. Zero means silent, higher values make the output progressively more and more verbose.
-    
-    Returns:
-        Estimated appropriate soft-thresholding power: the lowest power for which the scale free topology fit R^2 exceeds RsquaredCut.
+    :param data: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.
+    :param float RsquaredCut: desired minimum scale free topology fitting index R^2.
+    :param str networkType: network type ('unsigned', 'signed', 'signed hybrid', 'distance').
+    :param int verbose: integer level of verbosity. Zero means silent, higher values make the output progressively more and more verbose.
+    :return: Estimated appropriate soft-thresholding power: the lowest power for which the scale free topology fit R^2 exceeds RsquaredCut.
+    :rtype: int
     """
     powers = np.arange(1,20,1)
     sft = WGCNA.pickSoftThreshold(data, RsquaredCut=RsquaredCut, powerVector=powers, networkType=networkType, verbose=verbose)
@@ -315,14 +282,11 @@ def identify_module_colors(matrix, linkagefun='average', method='hybrid', minMod
     """
     Identifies co-expression modules and converts the numeric labels into colors.
     
-    Args:
-        matrix: dissimilarity structure as produced by R.stats dist.
-        minModuleSize: minimum module size.
-        deepSplit: provides a rough control over sensitivity to cluster splitting, the higher the value (with 'hybrid' method) or if True (with 'tree' method), the more and smaller modules.
-        pamRespectsDendro: only used for method 'hybrid'. Objects and small modules will only be assigned to modules that belong to the same branch in the dendrogram structure.
-    
-    Returns:
-        Numpy array of strings with module color of each experimental feature.
+    :param matrix: dissimilarity structure as produced by R.stats dist.
+    :param int minModuleSize: minimum module size.
+    :param int deepSplit: provides a rough control over sensitivity to cluster splitting, the higher the value (with 'hybrid' method) or if True (with 'tree' method), the more and smaller modules.
+    :param bool pamRespectsDendro: only used for method 'hybrid'. Objects and small modules will only be assigned to modules that belong to the same branch in the dendrogram structure.
+    :return: Numpy array of strings with module color of each experimental feature.
     """
     dynamicMods = cutreeDynamic(matrix, linkagefun=linkagefun, method=method, minModuleSize=minModuleSize, deepSplit=deepSplit, pamRespectsDendro=pamRespectsDendro)
 
@@ -334,14 +298,11 @@ def calculate_module_eigengenes(data, modColors, softPower=6, dissimilarity=True
     """ 
     Calculates modules eigengenes to quantify co-expression similarity of entire modules.
 
-    Args:
-        data: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.
-        modColors: vector (numeric, character or a factor) attributing module colors to each feature in the experimental dataframe.
-        softPower: soft-thresholding power.
-        dissimilarity: calculates dissimilarity of module eigengenes.
-    
-    Returns:
-        R/rpy2 dataframe with calculated module eigengenes. If dissimilarity is set to True, returns a tuple with two dataframes, the first in R/rpy2 with the module eigengenes and the second in pandas with the eigengenes dissimilarity. 
+    :param data: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.
+    :param ndarray modColors: array (numeric, character or a factor) attributing module colors to each feature in the experimental dataframe.
+    :param int softPower: soft-thresholding power.
+    :param dissimilarity: calculates dissimilarity of module eigengenes.
+    :return: Pandas dataframe with calculated module eigengenes. If dissimilarity is set to True, returns a tuple with two pandas dataframes, the first with the module eigengenes and the second with the eigengenes dissimilarity. 
     """
     MEList = WGCNA.moduleEigengenes(data, modColors, softPower=softPower)
     MEs0 = MEList.rx2('eigengenes')
@@ -358,14 +319,11 @@ def merge_similar_modules(data, modColors, MEDissThres=0.4, verbose=0):
     """ 
     Merges modules in co-expression network that are too close as measured by the correlation of their eigengenes.
 
-    Args:
-        data: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.
-        modColors: vector (numeric, character or a factor) attributing module colors to each feature in the experimental dataframe.
-        MEDissThres: maximum dissimilarity (i.e., 1-correlation) that qualifies modules for merging.
-        verbose: integer level of verbosity. Zero means silent, higher values make the output progressively more and more verbose.
-    
-    Returns:
-        Tuple containing R dataframe with eigengenes of the new merged modules, and R charater array with module colors of each expeirmental feature.
+    :param data: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.
+    :param ndarray modColors: array (numeric, character or a factor) attributing module colors to each feature in the experimental dataframe.
+    :para, float MEDissThres: maximum dissimilarity (i.e., 1-correlation) that qualifies modules for merging.
+    :param int verbose: integer level of verbosity. Zero means silent, higher values make the output progressively more and more verbose.
+    :return: Tuple containing pandas dataframe with eigengenes of the new merged modules, and array with module colors of each expeirmental feature.
     """
     merge = WGCNA.mergeCloseModules(data, modColors, cutHeight=MEDissThres, verbose=verbose)
     mergedColors = merge.rx2('colors')
@@ -376,13 +334,10 @@ def calculate_ModuleTrait_correlation(df_exp, df_traits, MEs):
     """ 
     Correlates eigengenes with external traits in order to identify the most significant module-trait associations.
 
-    Args:
-        df_exp: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.
-        df_traits: pandas dataframe containing clinical data, with samples/subjects as rows and clinical traits as columns.
-        MEs: module eigengenes.
-    
-    Returns:
-        Tuple with two pandas datafames, first the correlation between all module eigengenes and all clinical traits, second a dataframe with concatenated correlation and p-value used for heatmap annotation.
+    :param df_exp: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.
+    :param df_traits: pandas dataframe containing clinical data, with samples/subjects as rows and clinical traits as columns.
+    :param MEs: pandas dataframe with module eigengenes.
+    :return: Tuple with two pandas datafames, first the correlation between all module eigengenes and all clinical traits, second a dataframe with concatenated correlation and p-value used for heatmap annotation.
     """
     nSamples = len(df_exp.index)
 
@@ -415,12 +370,9 @@ def calculate_ModuleMembership(data, MEs):
     """ 
     For each module, calculates the correlation of the module eigengene and the feature expression profile (quantitative measure of module membership (MM)). 
 
-    Args:
-        data: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.
-        MEs: module eigengenes.
-    
-    Returns:
-        Tuple with two pandas dataframes, one with MM correlations and another with p-values.
+    :param data: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.
+    :param MEs: pandas dataframe with module eigengenes.
+    :return: Tuple with two pandas dataframes, one with module membership correlations and another with p-values.
     """
     nSamples=len(data.index)
     
@@ -447,12 +399,9 @@ def calculate_FeatureTraitSignificance(df_exp, df_traits):
     """ 
     Quantifies associations of individual experimental features with the measured clinical traits, by defining Feature Significance (FS) as the absolute value of the correlation between the feature and the trait.
 
-    Args:
-        df_exp: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.
-        df_traits: pandas dataframe containing clinical data, with samples/subjects as rows and clinical traits as columns.
-    
-    Returns:
-        Tuple with two pandas dataframes, one with FS correlations and another with p-values.
+    :param df_exp: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.
+    :param df_traits: pandas dataframe containing clinical data, with samples/subjects as rows and clinical traits as columns.
+    :return: Tuple with two pandas dataframes, one with feature significance correlations and another with p-values.
     """
     nSamples=len(df_exp.index)
 
@@ -489,13 +438,10 @@ def get_FeaturesPerModule(data, modColors, mode='dictionary'):
     """ 
     Groups all experimental features by the co-expression module they belong to.
 
-    Args:
-        data: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.
-        modColors: vector (numeric, character or a factor) attributing module colors to each feature in the experimental dataframe.
-        mode: type of the value returned by the function ('dictionary' or 'dataframe').
-    
-    Returns:
-        Depending on selected mode, returns a dictionary or dataframe with module color per experimental feature.
+    :param data: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.
+    :param ndarray modColors: array (numeric, character or a factor) attributing module colors to each feature in the experimental dataframe.
+    :param str mode: type of the value returned by the function ('dictionary' or 'dataframe').
+    :return: Depending on selected mode, returns a dictionary or dataframe with module color per experimental feature.
     """
     if mode == 'dataframe':
         features_per_module = dict(zip(data.columns, modColors))
@@ -512,13 +458,10 @@ def get_ModuleFeatures(data, modColors, modules=[]):
     """ 
     Groups and returns a list of the experimental features clustered in specific co-expression modules.
 
-    Args:
-        data: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.
-        modColors: vector (numeric, character or a factor) attributing module colors to each feature in the experimental dataframe.
-        modules: list of module colors of interest.
-    
-    Returns:
-        List of lists with experimental features in each selected module.
+    :param data: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.
+    :param ndarray modColors: array (numeric, character or a factor) attributing module colors to each feature in the experimental dataframe.
+    :param list modules: list of module colors of interest.
+    :return: List of lists with experimental features in each selected module.
     """
     allfeatures = get_FeaturesPerModule(data, modColors, mode='dictionary')
 
@@ -531,12 +474,9 @@ def get_EigengenesTrait_correlation(MEs, data):
     Eigengenes are used as representative profiles of the co-expression modules, and correlation between them is used to quantify module similarity.
     Clinical traits are added to the eigengenes to see how the traits fir into the eigengen network.
 
-    Args:
-        MEs: module eigengenes.
-        data: pandas dataframe containing clinical data, with samples/subjects as rows and clinical traits as columns.
-    
-    Returns:
-        Tuple with two pandas dataframes, one with features and traits recalculates module eigengenes dissimilarity, and another with all the overall correlations.
+    :param MEs: pandas dataframe with module eigengenes.
+    :param data: pandas dataframe containing clinical data, with samples/subjects as rows and clinical traits as columns.
+    :return: Tuple with two pandas dataframes, one with features and traits recalculates module eigengenes dissimilarity, and another with all the overall correlations.
     """
     df_traits_r =  data.copy()
     df_traits_r.columns = df_traits_r.columns.str.replace(' ', 'space')

@@ -26,6 +26,13 @@ except Exception as err:
 #########################
 
 def entries_to_remove(entries, the_dict):
+    """
+    This function removes pairs from a given dictionary, based on a list of provided keys.
+    
+    :param list entries: list of keys to be deleted from dictionary.
+    :param dict the_dict: dictionary.
+    :return: The original dictionary minus the key,value pairs from the provided entries list.
+    """
     for key in entries:
         if key in the_dict:
             del the_dict[key]
@@ -34,6 +41,14 @@ def entries_to_remove(entries, the_dict):
 # Calling the right parser #
 ############################
 def parse_ontology(ontology, download=True):
+    """
+    Parses and extracts data from a given ontology file(s), and returns a tuple with multiple dictionaries.
+
+    :param str ontology: acronym of the ontology to be parsed (e.g. Disease Ontology:'DO').
+    :param bool download: wether database is to be downloaded.
+    :return: Tuple with three nested dictionaries: terms, relationships between terms, and definitions of the terms.\
+            For more information on the returned dictionaries, see the documentation for any ontology parser.
+    """
     directory = config["ontologies_directory"]
     ontology_directory = os.path.join(directory, ontology)
     builder_utils.checkDirectory(ontology_directory)
@@ -76,6 +91,18 @@ def parse_ontology(ontology, download=True):
 #       Graph files     #
 #########################
 def generate_graphFiles(import_directory, ontologies=None, download=True):
+    """
+    This function parses and extracts data from a given list of ontologies. If no ontologies are provided, \
+    all availables ontologies are used. Terms, relationships and definitions are saved as .tsv files to be loaded into \
+    the graph database.
+
+    :param str import_directory: relative path from current python module to 'imports' directory.
+    :param ontologies: list of ontologies to be imported. If None, all available ontologies are imported.
+    :type ontologies: list or None
+    :param bool download: wether database is to be downloaded.
+    :return: Dictionary of tuples. Each tuple corresponds to a unique label/relationship type, date, time, \
+            database, and number of nodes and relationships.
+    """
     entities = config["ontologies"]
     if ontologies is not None:
         entities = {}

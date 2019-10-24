@@ -40,17 +40,15 @@ START_TIME = datetime.now()
 
 def ontologiesImport(importDirectory, ontologies=None, download=True, import_type="partial"):
     """
-    Generates all the entities and relationships
-    from the provided ontologies. If the ontologies list is
-    not provided, then all the ontologies listed in the configuration
-    will be imported (full_import).
-    This function also updates the stats object with numbers from the
-    imported ontologies
-    Args:
-        importDirectory (string): path of the import directory where
-                                files will be created
-        ontologies (list): A list of ontology names to be imported
-        import_type: type of import (full or partial)
+    Generates all the entities and relationships from the provided ontologies. If the ontologies list is\
+    not provided, then all the ontologies listed in the configuration will be imported (full_import). \
+    This function also updates the stats object with numbers from the imported ontologies.
+    
+    :param str importDirectory: path of the import directory where files will be created.
+    :param list ontologies: a list of ontology names to be imported.
+    :param str import_type: type of import ('full' or 'partial').
+    :return: Writes all the relevant .tsv files for each ontology provided, and records information on /
+    the number of entities and relationships to a stats file.
     """
     #Ontologies
     ontologiesImportDirectory = os.path.join(importDirectory, oconfig["ontologies_importDir"])
@@ -62,19 +60,16 @@ def ontologiesImport(importDirectory, ontologies=None, download=True, import_typ
 
 def databasesImport(importDirectory, databases=None, n_jobs=1, download=True, import_type="partial"):
     """
-    Generates all the entities and relationships
-    from the provided databases. If the databases list is
-    not provided, then all the databases listed in the configuration
-    will be imported (full_import).
-    This function also updates the stats object with numbers from the
-    imported databases.
-    Args:
-        importDirectory (string): path of the import directory where
-                                files will be created
-        databases (list): A list of database names to be imported
-        n_jobs (int): Number of jobs to run in parallel. 1 by default
-                    when updating one database
-        import_type: type of import (full or partial)
+    Generates all the entities and relationships from the provided databases. If the databases list is\
+    not provided, then all the databases listed in the configuration will be imported (full_import).\
+    This function also updates the stats object with numbers from the imported databases.
+
+    :param str importDirectory: path of the import directory where files will be created.
+    :param list databases: a list of database names to be imported.
+    :param int n_jobs: number of jobs to run in parallel. 1 by default when updating one database.
+    :param str import_type: type of import ('full' or 'partial').
+    :return: Writes all the relevant .tsv files for each database provided, and records information on /
+    the number of entities and relationships to a stats file.
     """
     #Databases
     databasesImportDirectory = os.path.join(importDirectory, dbconfig["databasesImportDir"])
@@ -86,15 +81,13 @@ def databasesImport(importDirectory, databases=None, n_jobs=1, download=True, im
 
 def experimentsImport(projects=None, n_jobs=1, import_type="partial"):
     """
-    Generates all the entities and relationships
-    from the specified Projects. If the projects list is
-    not provided, then all the projects the experiments directory
-    will be imported (full_import). Calls function experimentImport.
-    Args:
-        projects (list): A list of project identifiers to be imported
-        n_jobs (int): Number of jobs to run in parallel. 1 by default
-                    when updating one project
-        import_type: type of import (full or partial)
+    Generates all the entities and relationships from the specified Projects. If the projects list is\
+    not provided, then all the projects the experiments directory will be imported (full_import). \
+    Calls function experimentImport.
+    
+    :param list projects:  list of project identifiers to be imported.
+    :param int n_jobs: number of jobs to run in parallel. 1 by default when updating one project.
+    :param str import_type: type of import ('full' or 'partial').
     """
     #Experiments
     experimentsImportDirectory = econfig["experimentsImportDirectory"]
@@ -106,14 +99,12 @@ def experimentsImport(projects=None, n_jobs=1, import_type="partial"):
 
 def experimentImport(importDirectory, experimentsDirectory, project):
     """
-    Generates all the entities and relationships
-    from the specified Project. Called from function experimentsImport.
-    Args:
-        importDirectory (string): path to the directory where all the import
-                        files are generated
-        experimentDirectory (string): path to the directory where all the
-                        experiments are located
-        project (string): Identifier of the project to be imported
+    Generates all the entities and relationships from the specified Project. Called from function experimentsImport.
+    
+    :param str importDirectory: path to the directory where all the import files are generated.
+    :param str experimentDirectory: path to the directory where all the experiments are located.
+    :param str project: identifier of the project to be imported.
+    :return: Writes all the relevant .tsv files for the project.
     """
     projectPath = os.path.join(importDirectory, project)
     builder_utils.checkDirectory(projectPath)
@@ -127,23 +118,23 @@ def experimentImport(importDirectory, experimentsDirectory, project):
 def usersImport(import_type='partial'):
     """
     Generates User entities from excel file.
-    Args:
-        importDirectory (string): path to the directory where all the import
-                        files are generated
-        experimentDirectory (string): path to the directory where all the
-                        experiments are located
-        project (string): Identifier of the project to be imported
+
+    :param str importDirectory: path to the directory where all the import files are generated.
+    :param str experimentDirectory: path to the directory where all the experiments are located.
+    :param str project: identifier of the project to be imported.
+    :return: Writes the users.tsv file, creates and grants access of new users to the database.
     """
     usersPath = config['usersDirectory']
     filename = config['usersFile']
     builder_utils.checkDirectory(usersPath)
-    uh.create_user_from_file(os.path.join(usersPath, filename), expiration=365)    
+    # uh.create_user_from_file(os.path.join(usersPath, filename), expiration=365)
+    uh.extractUsersInfo(os.path.join(usersPath, filename), expiration=365)   
 
 
 def fullImport():
     """
-    Calls the different importer functions: Ontologies, databases,
-    experiments. The first step is to check if the stats object exists
+    Calls the different importer functions: Ontologies, databases, \
+    experiments. The first step is to check if the stats object exists \
     and create it otherwise. Calls setupStats.
     """
     try:
@@ -180,11 +171,9 @@ def fullImport():
 def generateStatsDataFrame(stats):
     """
     Generates a dataframe with the stats from each import.
-    Args:
-        stats (list): A list with statistics collected from each importer
-                        function
-    Returns:
-        statsDf: pandas dataframe with the collected statistics
+    
+    :param list stats: a list with statistics collected from each importer function.
+    :return: Pandas dataframe with the collected statistics.
     """
     statsDf = pd.DataFrame.from_records(list(stats), columns=config["statsCols"])
     statsDf['import_id'] = import_id
@@ -193,8 +182,7 @@ def generateStatsDataFrame(stats):
 
 def setupStats(import_type):
     """
-    Creates a stats object that will collect all the statistics collected from
-    each import.
+    Creates a stats object that will collect all the statistics collected from each import.
     """
     statsDirectory = config["statsDirectory"]
     statsFile = os.path.join(statsDirectory, config["statsFile"])
@@ -204,18 +192,21 @@ def setupStats(import_type):
         if not os.path.exists(statsDirectory) or not os.path.isfile(statsFile):
             if not os.path.exists(statsDirectory):
                 os.makedirs(statsDirectory)
+            else:
+                pass
             createEmptyStats(statsCols, statsFile, statsName)
+        else:
+            pass
     except Exception as err:
         logger.error("Setting up Stats object {} in file:{} > {}.".format(statsName, statsFile, err))
 
 def createEmptyStats(statsCols, statsFile, statsName):
     """
     Creates a HDFStore object with a empty dataframe with the collected stats columns.
-    Args:
-        statsCols (list): A list of columns with the fields collected from the
-                            import statistics
-        statsFile (string): path where the object should be stored
-        statsName (string): name if the file containing the stats object
+    
+    :param list statsCols: a list of columns with the fields collected from the import statistics.
+    :param str statsFile: path where the object should be stored.
+    :param str statsName: name if the file containing the stats object.
     """
     try:
         statsDf = pd.DataFrame(columns=statsCols)
@@ -228,12 +219,10 @@ def createEmptyStats(statsCols, statsFile, statsName):
 # def loadStats(statsFile):
 #     """
 #     Loads the statistics object.
-#     Args:
-#         statsFile (string): File path where the stats object is stored.
-#     Returns:
-#         hdf (HDFStore object): object with the collected statistics.
-#                                 stats can be accessed using a key
-#                                 (i.e stats_ version)
+    
+#     :param str statsFile: file path where the stats object is stored.
+#     :returns: HDFStore object with the collected statistics. \
+#                 stats can be accessed using a key (i.e stats_ version).
 #     """
 #     try:
 #         hdf = None
@@ -247,11 +236,9 @@ def createEmptyStats(statsCols, statsFile, statsName):
 def writeStats(statsDf, import_type, stats_name=None):
     """
     Appends the new collected statistics to the existing stats object.
-    Args:
-        statsDf (dataframe): A pandas dataframe with the new statistics
-                            from the importing.
-        statsName (string): If the statistics should be stored with a
-                            specific name
+    
+    :param statsDf: a pandas dataframe with the new statistics from the importing.
+    :param str statsName: If the statistics should be stored with a specific name.
     """
     stats_directory = config["statsDirectory"]
     stats_file = os.path.join(stats_directory, config["statsFile"])
@@ -266,10 +253,11 @@ def writeStats(statsDf, import_type, stats_name=None):
 
 def getStatsName(import_type):
     """
-    Generates the stats object name where to store the importing
-    statistics from the CKG version, which is defined in the configuration.
-    Returns:
-        statsName (string): key used to store in the stats object.
+    Generates the stats object name where to store the importing statistics from the CKG version, \
+    which is defined in the configuration.
+    
+    :return: statsName: key used to store in the stats object.
+    :rtype: str
     """
     version = ckg_config.version
     statsName = import_type+'_stats_'+ str(version).replace('.', '_')

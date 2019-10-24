@@ -32,6 +32,14 @@ except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
 
 def load_into_database(driver, queries, requester):
+    """
+    This function runs the queries provided in the graph database using a py2neo driver.
+
+    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
+    :type driver: py2neo driver
+    :param list[dict] queries: list of queries to be passed to the database.
+    :param str requester: identifier of the query.
+    """
     result = None
     for query in queries:
         try:
@@ -54,15 +62,15 @@ def load_into_database(driver, queries, requester):
 
 def updateDB(driver, imports=None):
     """
-    Populates the graph database with information for each Database, Ontology or Experiment
-    specified in imports. If imports is not defined, the function populates the entire graph 
-    database based on the graph variable defined in the grapher_config.py module.
-    This function also updates the graph stats object with numbers from the loaded entities andq
+    Populates the graph database with information for each Database, Ontology or Experiment \
+    specified in imports. If imports is not defined, the function populates the entire graph \
+    database based on the graph variable defined in the grapher_config.py module. \
+    This function also updates the graph stats object with numbers from the loaded entities and \
     relationships.
-    Args:
-        driver (py2neo driver): py2neo driver, which provides the 
-                                connection to the neo4j graph database
-        imports (list): A list of entities to be loaded into the graph
+
+    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
+    :type driver: py2neo driver
+    :param list imports: a list of entities to be loaded into the graph.
     """
     if imports is None:
         imports = config["graph"]
@@ -254,10 +262,10 @@ def updateDB(driver, imports=None):
 
 def fullUpdate():
     """
-    Main method that controls the population of the graph database. Firstly, it gets a connection
-    to the database (driver) and then initiates the update of the entire database getting
-    all the graph entities to update from configuration. Once the graph database has been 
-    populated, the imports folder in data/ is compressed and archived in the archive/ folder
+    Main method that controls the population of the graph database. Firstly, it gets a connection \
+    to the database (driver) and then initiates the update of the entire database getting \
+    all the graph entities to update from configuration. Once the graph database has been \
+    populated, the imports folder in data/ is compressed and archived in the archive/ folder \
     so that a backup of the imports files is kept (full).
     """
     imports = config["graph"]
@@ -271,13 +279,13 @@ def fullUpdate():
 
 def partialUpdate(imports):
     """
-    Method that controls the update of the graph database with the specified entities and 
-    relationships. Firstly, it gets a connection
-    to the database (driver) and then initiates the update of the specified graph entities. 
-    Once the graph database has been populated, the data files uploaded to the graph are compressed 
+    Method that controls the update of the graph database with the specified entities and \
+    relationships. Firstly, it gets a connection to the database (driver) and then initiates \
+    the update of the specified graph entities. \
+    Once the graph database has been populated, the data files uploaded to the graph are compressed \
     and archived in the archive/ folder (partial).
-    Args:
-        imports (list): list of entities to update
+    
+    :param list imports: list of entities to update
     """
     driver = connector.getGraphDatabaseConnectionConfiguration()
     logger.info("Partial update of the database - Updating: {}".format(",".join(imports)))
@@ -289,12 +297,12 @@ def partialUpdate(imports):
     
 def archiveImportDirectory(archive_type="full"):
     """
-    This function creates the compressed backup imports folder with either the whole folder
-    (full update) or with only the files uploaded (partial update). The folder or files are
-    compressed into a gzipped tarball file and stored in the archive/ folder defined in the 
+    This function creates the compressed backup imports folder with either the whole folder \
+    (full update) or with only the files uploaded (partial update). The folder or files are \
+    compressed into a gzipped tarball file and stored in the archive/ folder defined in the \
     configuration.
-    Args:
-        archive_type (string): whether it is a full update or a partial update
+
+    :param str archive_type: whether it is a full update or a partial update.
     """
     dest_folder = config["archiveDirectory"]
     builder_utils.checkDirectory(dest_folder)

@@ -2,6 +2,17 @@
 # Diagnose entity - ICD # 
 #########################
 def parser(ICDfile):
+    """
+    Parses and extracts relevant data from ICD-10 files (Classification of Diseases).
+
+    :param ICDfile: list of files downloaded from the ontology database and used to generate nodes and relationships to the graph database.
+    :return: Three nested dictionaries: terms, relationships between terms, and definitions of the terms.
+
+        - terms: Dictionary where each key is an ontology identifier (*str*) and the values are lists of names and synonyms (*list[str]*).
+        - relationships: Dictionary of tuples (*str*). Each tuple contains two ontology identifiers (source and target) and \
+                        the relationship type between them.
+        - definitions: Dictionary with ontology identifiers as keys (*str*), and definition of the terms as values (*str*).
+    """
     terms = defaultdict(set)
     relationships = set()
     definitions = defaultdict()

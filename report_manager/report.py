@@ -160,7 +160,7 @@ class Report:
             if environment == "notebook":
                 if "notebook" in plot:
                     net = plot['notebook']
-                    report_plots = Cytoscape(data={'elements':net[0]}, visual_style=net[1], layout={'width':'100%', 'height':'700px'})
+                    report_plots = basicFigures.visualize_notebook_network(net)
                 else:
                     if 'props' in plot:
                         if 'figure' in plot['props']:

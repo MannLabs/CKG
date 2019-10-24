@@ -4,6 +4,18 @@ from collections import defaultdict
 # Clinical_variable - SNOMED-CT # 
 #################################
 def parser(files, filters):
+    """
+    Parses and extracts relevant data from SNOMED CT database files.
+
+    :param list files: list of files downloaded from SNOMED CT and used to generate nodes and relationships in the graph database.
+    :param list filters: list of SNOMED CT Identifiers to be ignored.
+    :return: Three nested dictionaries: terms, relationships between terms, and definitions of the terms.
+
+        - terms: Dictionary where each key is a SNOMED CT Identifier (*str*) and the values are lists of names and synonyms (*list[str]*).
+        - relationships: Dictionary of tuples (*str*). Each tuple contains two SNOMED CT Identifiers (source and target) and \
+                        the relationship type between them.
+        - definitions: Dictionary with SNOMED CT Identifiers as keys (*str*), and definition of the terms as values (*str*).
+    """
     terms = {"SNOMED-CT":defaultdict(list)}
     relationships = defaultdict(set)
     definitions = defaultdict()
@@ -49,6 +61,11 @@ def parser(files, filters):
     return terms, relationships, definitions
 
 def read_concept_file(concept_file):
+    """
+    
+    :param concept_file:
+    :return:
+    """
     inactive_terms = set()
     first = True
     with open(concept_file, 'r') as cf:

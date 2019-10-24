@@ -20,6 +20,14 @@ from collections import defaultdict
 from natsort import natsorted, ns
 
 def get_stats_data(filename, n=3):
+    """
+    Reads graph database stats file and filters for the last 'n' full and partial independent \
+    imports, returning a Pandas DataFrame.
+    
+    :param str filename: path to stats file (including filename and '.hdf' extension).
+    :param int n: number of independent imports to plot.
+    :return: Pandas Dataframe with different entities and relationships as rows and columns:
+    """
     store = pd.HDFStore(filename, 'r')
     full, partial = list(store.keys())
     df_full = store[full]
@@ -35,6 +43,13 @@ def get_stats_data(filename, n=3):
     return df
 
 def select_last_n_imports(stats_file, n=3):
+    """
+    Selects which independent full and partial imports should be plotted based on 'n'.
+
+    :param stats_file: pandas DataFrame with stats data.
+    :param int n: number of independent imports to select.
+    return: List of import ids to be plotted according to selection criterion 'n'.
+    """
     df = stats_file[['datetime', 'import_id', 'Import_flag']].sort_values('datetime', ascending=False).drop_duplicates(['import_id'], keep = 'first', inplace = False) 
     f = df[df['Import_flag'] == 'full']
     f = f.iloc[:n,1].tolist()
@@ -43,6 +58,11 @@ def select_last_n_imports(stats_file, n=3):
     return p+f
 
 def remove_legend_duplicates(figure):
+    """
+    Removes duplicated legend items.
+
+    :param figure: plotly graph object figure.
+    """
     seen = []
     for n,i in enumerate(figure['data']):
         name = figure['data'][n]['name']
@@ -54,6 +74,19 @@ def remove_legend_duplicates(figure):
 
 
 def get_databases_entities_relationships(stats_file, key='full', options='databases'):
+    """
+    Builds dictionary from stats file. Depending on 'options', keys and values can differ. \
+    If *options* is set to 'dates', keys are dates of the imports and values are databases imported at each date; \
+    if 'databases', keys are databases and values are entities and relationships created from each database; \
+    if 'entities', keys are databases and values are entities created from each database; \
+    if 'relationships', keys are databases and values are relationships created from each database.
+
+    :param stats_file: pandas DataFrame with stats data.
+    :param str key: use only full, partial or both kinds of imports ('full', 'partial', 'all').
+    :param str options: name of the variables to be used as keys in the output dictionary ('dates', \
+                        'databases', 'entities' or 'relationships').
+    return: Dictionary.
+    """
     if key == 'full':
         stats = stats_file[stats_file['Import_flag'] == 'full']
     elif key == 'partial':
@@ -65,7 +98,7 @@ def get_databases_entities_relationships(stats_file, key='full', options='databa
     mask2 = (stats['Import_type']=='relationships')
     ent = list(set(list(zip(stats.loc[mask,'filename'], stats.loc[mask,'dataset']))))
     rel = list(set(list(zip(stats.loc[mask2,'filename'], stats.loc[mask2,'dataset']))))
-    # dat = list(set(list(zip(stats['date'].apply(str).str.split(' ').str[0], stats['dataset']))))
+
     dat = []
     for i, j in stats.groupby('import_id'):
         date = str(j['datetime'].sort_values().reset_index(drop=True)[0])
@@ -102,6 +135,12 @@ def get_databases_entities_relationships(stats_file, key='full', options='databa
     if options == 'dates': return d_dat
 
 def set_colors(dictionary):
+    """
+    This function takes the values in a dictionary and attributes them an RGB color.
+
+    :param dict dictionary: dictionary with variables to be attributed a color, as values.
+    return: Dictionary where 'dictionary' values are keys and random RGB colors are the values.
+    """
     colors = []
     for i in list(chain(*dictionary.values())):
         color = 'rgb' + str(tuple(np.random.choice(range(256), size=3)))
@@ -110,74 +149,68 @@ def set_colors(dictionary):
 
     return colors
 
-def get_dropdown_menu(fig, options_dict, add_button=True, entities_dict=None, number_traces=2):
-    if entities_dict == None:
-        list_updatemenus = []
-        start = 0
-        for n, i in enumerate(options_dict.keys()):
+def get_dropdown_menu(fig, options_dict, add_button=True, equal_traces=True, number_traces=2):
+    """
+    Builds a list for the dropdown menu, based on a plotly figure traces and a dictionary with \
+    the options to be used in the dropdown.
+
+    :param fig: plotly graph object figure.
+    :param options_dict: dictionary where keys are used as dropdown options and values data points.
+    :param bool add_button: add option to display all dropdown options simultaneously.
+    :param bool equal_traces: defines if all dropdown options have the same number of traces each. \
+                                If True, define 'number_traces' as well. If False, number of traces \
+                                will be the same as the number of values for each 'options_dict' key.
+    :param int number_traces: number of traces created for each 'options_dict' key.
+    return: List of nested structures. Each dictionary within *updatemenus[0]['buttons'][0]* corresponds \
+            to one dropdown menu options and contains information on which traces are visible, label and method.
+
+    .. note:: Use 'number_traces' when building one single plot (''). When creating subplots, use 'entitied_dict'
+    """
+    
+    list_updatemenus = []
+    
+    start = 0
+    for n, i in enumerate(options_dict.keys()):
+        if equal_traces:
             visible = [False] * len(fig['data'])
             end = start + number_traces
             visible[start:end] = [True] * number_traces
             start += number_traces
-            temp_dict = dict(label = str(i),
-                             method = 'update',
-                             args = [{'visible': visible},
-                                     {'title': 'Date: '+i}])
-            list_updatemenus.append(temp_dict)
-
-        if add_button:
-            button = [dict(label = 'All',
-                            method = 'update',
-                            args = [{'visible': [True]*len(fig['data'])}, {'title': 'All'}])]
-            list_updatemenus = list_updatemenus + button
-        else: pass
-
-        updatemenus = list([dict(active = len(list_updatemenus)-1,
-                                 buttons = list_updatemenus,
-                                 direction='down',
-                                 #pad={'r':10, 't':10},
-                                 showactive=True,x=-0.17,xanchor='left',y=1.1,yanchor='top'),])
-
-    else:
-        list_updatemenus = []
-
-        n_entities = sum(len(v) for v in entities_dict.values())
-        start = 0
-        start2 = n_entities*2
-        for n, i in enumerate(options_dict.keys()):
+        else:
+            number_traces = len([element for tupl in options_dict[i] for element in tupl])*2
             visible = [False] * len(fig['data'])
-            if len(options_dict[i][0]) or len(options_dict[i][1]) > 0:
-                end = start + len(options_dict[i][0])*2
-                end2 = start2 + len(options_dict[i][1])*2
-                visible[start:end] = [True]*len(options_dict[i][0])*2
-                visible[start2:end2] = [True]*len(options_dict[i][1])*2
-            else: continue
+            end = start + number_traces
+            visible[start:end] = [True] * number_traces
+            start += number_traces    
+        temp_dict = dict(label = str(i),
+                         method = 'update',
+                         args = [{'visible': visible},
+                                 {'title': 'Date: '+i}])
+        list_updatemenus.append(temp_dict)
 
-            start += len(options_dict[i][0])*2
-            start2 += len(options_dict[i][1])*2
+    if add_button:
+        button = [dict(label = 'All',
+                        method = 'update',
+                        args = [{'visible': [True]*len(fig['data'])}, {'title': 'All'}])]
+        list_updatemenus = list_updatemenus + button
+    else: pass
 
-            temp_dict = dict(label = str(i),
-                             method = 'update',
-                             args = [{'visible': visible},
-                                     {'title': 'Database: '+i}])
-            list_updatemenus.append(temp_dict)
-
-        if add_button:
-            button = [dict(label = 'All',
-                            method = 'update',
-                            args = [{'visible': [True]*len(fig['data'])}, {'title': 'All'}])]
-            list_updatemenus = list_updatemenus + button
-        else: pass
-
-        updatemenus = list([dict(active = len(list_updatemenus)-1,
-                                 buttons = list_updatemenus,
-                                 direction='down',
-                                 #pad={'r':10, 't':10},
-                                 showactive=True,x=-0.07,xanchor='left',y=1.2,yanchor='top'),])
+    updatemenus = list([dict(active = len(list_updatemenus)-1,
+                             buttons = list_updatemenus,
+                             direction='down',
+                             showactive=True,x=-0.17,xanchor='left',y=1.1,yanchor='top'),])
 
     return updatemenus
 
 def get_totals_per_date(stats_file, key='full', import_types=False):
+    """
+    
+
+    :param stats_file:
+    :param str key:
+    :param bool import_types:
+    return:
+    """
     if key == 'full':
         stats = stats_file[stats_file['Import_flag'] == 'full']
     elif key == 'partial':
@@ -208,6 +241,12 @@ def get_totals_per_date(stats_file, key='full', import_types=False):
     return df
 
 def get_imports_per_database_date(stats_file):
+    """
+
+
+    :param stats_file:
+    return:
+    """
     cols = ['date', 'dataset', 'entities', 'relationships', 'total']
     stats_sum = []
     for i, j in stats_file.groupby(['import_id']):
@@ -226,6 +265,13 @@ def get_imports_per_database_date(stats_file):
     return df
 
 def plot_total_number_imported(stats_file, plot_title):
+    """
+
+
+    :param stats_file:
+    :param str plot_title: title of the plot.
+    return: Line plot figure within the <div id="_dash-app-content">.
+    """
     df_full = get_totals_per_date(stats_file, key='full', import_types=False).sort_index()
     df_partial = get_totals_per_date(stats_file, key='partial', import_types=False).sort_index()
 
@@ -248,6 +294,13 @@ def plot_total_number_imported(stats_file, plot_title):
     return dcc.Graph(id = 'total imports', figure = fig)
 
 def plot_total_numbers_per_date(stats_file, plot_title):
+    """
+
+
+    :param stats_file:
+    :param str plot_title: title of the plot.
+    return: Scatter plot figure within the <div id="_dash-app-content">, with scalled markers.
+    """
     df_full = get_totals_per_date(stats_file, key='full', import_types=True)
     df_partial = get_totals_per_date(stats_file, key='partial', import_types=True)
 
@@ -274,6 +327,16 @@ def plot_total_numbers_per_date(stats_file, plot_title):
     return dcc.Graph(id = 'entities-relationships per date', figure = fig)
 
 def plot_databases_numbers_per_date(stats_file, plot_title, key='full', dropdown=False, dropdown_options='dates'):
+    """
+
+
+    :param stats_file:
+    :param str plot_title: title of the plot.
+    :param str key:
+    :param bool dropdown: add dropdown menu to figure or not.
+    :param str dropdown_options:
+    return: Horizontal barplot figure within the <div id="_dash-app-content">.
+    """
     if key == 'full':
         stats = stats_file[stats_file['Import_flag'] == 'full']
     elif key == 'partial':
@@ -303,25 +366,35 @@ def plot_databases_numbers_per_date(stats_file, plot_title, key='full', dropdown
     fig['layout']['template'] = 'plotly_white'
 
     if dropdown:
-        updatemenus = get_dropdown_menu(fig, dropdown_options, add_button=True, entities_dict=None, number_traces=2)
+        updatemenus = get_dropdown_menu(fig, dropdown_options, add_button=True, equal_traces=True, number_traces=2)
         fig.layout.update(go.Layout(updatemenus = updatemenus))
         
     names = set([fig['data'][n]['name'] for n,i in enumerate(fig['data'])])
     colors = dict(zip(names, ['red', 'blue', 'green', 'yellow', 'orange']))
-    # colors = {}
-    # for name in names:
-    #     color = 'rgb' + str(tuple(np.random.choice(range(256), size=3)))
-    #     colors[name] = color
 
     for name in names:
         fig.for_each_trace(lambda trace: trace.update(marker=dict(color=colors[name])), selector=dict(name=name))
 
-    remove_legend_duplicates(fig)
+    # remove_legend_duplicates(fig)
 
-    return dcc.Graph(id = 'databases total imports {}'.format(key), figure = fig)
+    return dcc.Graph(id = 'databases imports {}'.format(key), figure = fig)
 
 
 def plot_import_numbers_per_database(stats_file, plot_title, key='full', subplot_titles = ('',''), colors=True, color1='entities', color2='relationships', dropdown=True, dropdown_options='databases'):
+    """
+
+
+    :param stats_file:
+    :param str plot_title: title of the plot.
+    :param str key:
+    :param tuple subplot_titles: title of the subplots (tuple of strings, one for each subplot).
+    :param bool colors: define standard colors for entities and for relationships.
+    :param str color1:
+    :param str color2:
+    :param bool dropdown: add dropdown menu to figure or not.
+    :param str dropdown_options:
+    return: Multi-scatterplot figure within the <div id="_dash-app-content">.
+    """
     if key == 'full':
         stats = stats_file[stats_file['Import_flag'] == 'full']
     elif key == 'partial':
@@ -339,44 +412,41 @@ def plot_import_numbers_per_database(stats_file, plot_title, key='full', subplot
 
     fig = tools.make_subplots(2, 2, subplot_titles = subplot_titles, vertical_spacing = 0.18, horizontal_spacing = 0.2)
 
-    for i, j in stats.groupby('import_id'):
+    for i, j in stats.groupby(['dataset', 'filename']):
         date = pd.Series(str(j['datetime'].sort_values().reset_index(drop=True)[0]))
-        j = j[j['Import_type'] == 'entity']
-        for a, b in j.groupby('dataset'):
-            for file in b['filename']:
-                mask = (b['filename'] == file)
-                fig.append_trace(go.Scattergl(visible=True,
-                                            x=date,
-                                            y=b.loc[mask, 'Imported_number'],
-                                            mode='markers+lines',
-                                            marker = dict(color = ent_colors[file]),
-                                            name=file.split('.')[0]),1,1)
-                fig.append_trace(go.Scattergl(visible=True,
-                                            x=date,
-                                            y=b.loc[mask, 'file_size'],
-                                            mode='markers+lines',
-                                            marker = dict(color = ent_colors[file]),
-                                            name=file.split('.')[0],
-                                            showlegend=False),1,2)
-    for i, j in stats.groupby('import_id'):
-        date = pd.Series(str(j['datetime'].sort_values().reset_index(drop=True)[0]))
-        j = j[j['Import_type'] == 'relationships']
-        for a, b in j.groupby('dataset'):
-            for file in b['filename']:
-                mask = (b['filename'] == file)
-                fig.append_trace(go.Scattergl(visible=True,
-                                            x=date,
-                                            y=b.loc[mask, 'Imported_number'],
-                                            mode='markers+lines',
-                                            marker = dict(color = rel_colors[file]),
-                                            name=file.split('.')[0]),2,1)
-                fig.append_trace(go.Scattergl(visible=True,
-                                            x=date,
-                                            y=b.loc[mask, 'file_size'],
-                                            mode='markers+lines',
-                                            marker = dict(color = rel_colors[file]),
-                                            name=file.split('.')[0],
-                                            showlegend=False),2,2)
+        j = j.sort_values(['import_id', 'datetime']).drop_duplicates(['dataset', 'import_id', 'filename'], keep='first', inplace=False)
+        entities_df = j[j['Import_type'] == 'entity']
+        relationships_df = j[j['Import_type'] == 'relationships']
+        
+        if not entities_df['Imported_number'].empty:
+            fig.append_trace(go.Scattergl(visible=True,
+                                                  x=entities_df['datetime'],
+                                                  y=entities_df['Imported_number'],
+                                                  mode='markers+lines',
+                                                  marker = dict(color = ent_colors[i[1]]),
+                                                  name=i[1].split('.')[0]),1,1)
+            fig.append_trace(go.Scattergl(visible=True,
+                                                  x=entities_df['datetime'],
+                                                  y=entities_df['file_size'],
+                                                  mode='markers+lines',
+                                                  marker = dict(color = ent_colors[i[1]]),
+                                                  name=i[1].split('.')[0],
+                                                  showlegend=False),2,1)
+        
+        if not relationships_df['Imported_number'].empty:
+            fig.append_trace(go.Scattergl(visible=True,
+                                                  x=relationships_df['datetime'],
+                                                  y=relationships_df['Imported_number'],
+                                                  mode='markers+lines',
+                                                  marker = dict(color = rel_colors[i[1]]),
+                                                  name=i[1].split('.')[0]),1,2)
+            fig.append_trace(go.Scattergl(visible=True,
+                                                  x=relationships_df['datetime'],
+                                                  y=relationships_df['file_size'],
+                                                  mode='markers+lines',
+                                                  marker = dict(color = rel_colors[i[1]]),
+                                                  name=i[1].split('.')[0],
+                                                  showlegend=False),2,2)
                 
     fig.layout.update(go.Layout(legend={'orientation':'v', 'font':{'size':11}},
                                 height=700, margin=go.layout.Margin(l=20,r=20,t=150,b=60)))
@@ -393,7 +463,7 @@ def plot_import_numbers_per_database(stats_file, plot_title, key='full', subplot
     fig['layout']['template'] = 'plotly_white'
 
     if dropdown:
-        updatemenus = get_dropdown_menu(fig, dropdown_options, add_button=True, entities_dict=ent)
+        updatemenus = get_dropdown_menu(fig, dropdown_options, add_button=True, equal_traces=False)
         fig.layout.update(go.Layout(updatemenus = updatemenus))
             
 
