@@ -11,13 +11,11 @@ umap==0.1.1
 py2neo==4.1.0
 python_louvain==0.11
 joblib==0.13.1
-kmapper.egg==info
 dash_auth==1.3.2
 dash_core_components==0.43.0
 multi_key_dict==2.0.3
 pandas==0.24.1
 fancyimpute==0.4.2
-rpy2.egg==info
 statsmodels==0.9.0
 dash_html_components==0.13.5
 wordcloud==1.5.0
