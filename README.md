@@ -1,3 +1,4 @@
+![alt text](https://github.com/albsantosdel/CKG/blob/master/report_manager/assets/banner.jpg)
 # Clinical Knowledge Graph
 
 ## Abstract
