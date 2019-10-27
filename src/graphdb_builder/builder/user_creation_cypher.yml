@@ -1,0 +1,73 @@
+list_db_users:
+    name: list database Users
+    description: Returns a list of database Users
+    query: "CALL dbms.security.listUsers() YIELD username RETURN username"
+
+create_db_user: 
+    name: create system user
+    description: 'Creates a new user in the database'
+    involved_nodes:
+    involved_rels:
+    query: >
+        CALL dbms.security.createUser($username, $password, false);
+add_role_to_db_user: 
+    name': add role to user
+    description': 'Add a new database role to the specified user'
+    involved_nodes:
+    involved_rels:
+    query: >
+        CALL dbms.security.addRoleToUser($rolename, $username);
+increment_user_id:
+    name: create new user id
+    description: 'Returns a new User identifier based on existing users in the database (sequential identifier)'
+    involved_nodes:
+        - User
+    involved_rels:
+    query: >
+        MATCH (u:User)
+        WITH max(toInteger(SPLIT(u.id, 'U')[1]))+1 as new_id
+        RETURN SUBSTRING('U',0,1) + new_id AS result;
+create_user_node:
+    name: create user node
+    description: 'Creates a new user as a node in the database'
+    involved_nodes:
+        - User
+    involved_rels:
+    query: >
+        CREATE CONSTRAINT ON (u:User) ASSERT u.id IS UNIQUE;
+        CREATE CONSTRAINT ON (u:User) ASSERT u.name IS UNIQUE;
+        CREATE CONSTRAINT ON (u:User) ASSERT u.username IS UNIQUE;
+        CREATE CONSTRAINT ON (u:User) ASSERT u.email IS UNIQUE;
+        MERGE (u:User {id:$ID})
+        ON CREATE SET u.acronym=$acronym,u.name=$name,u.username=$username,u.email=$email,u.secondary_email=$secondary_email,u.phone_number=$phone_number,u.affiliation=$affiliation,u.expiration_date=$expiration_date,u.rolename=$rolename,u.image=$image
+        RETURN COUNT(u) AS User_nodes;
+find_user:
+    name: find user node
+    description: 'Returns node identifier if property with value exists in any User node'
+    involved_nodes:
+        - User
+    involved_rels:
+    query: >
+        MATCH (u:User) WHERE u.PROPERTY=$value
+        RETURN u.id;
+suspend_user:
+    name:
+    description:
+    involved_nodes:
+    involved_rels:
+    query: >
+        CALL dbms.security.suspendUser($username)
+activate_user:
+    name:
+    description:
+    involved_nodes:
+    involved_rels:
+    query: >
+        CALL dbms.security.activateUser($username, true)
+delete_user:
+    name: delete system user
+    description: 'Delete a user from the system'
+    involved_nodes:
+    involved_rels:
+    query: >
+        CALL dbms.security.deleteUser($username);

@@ -1,0 +1,65 @@
+increment_biosample_id:
+    name:  create new biosample internal identifier 
+    description: 'Returns a new Biological_sample identifier based on the existing ones in the database (sequential identifier)'
+    involved_nodes:
+        - Biological_sample
+    involved_rels:
+    query: >
+        MATCH (b:Biological_sample) 
+        WITH max(toInteger(SPLIT(b.id, 'BS')[1]))+1 as new_id
+        RETURN SUBSTRING('BS',0,2) + new_id AS result;
+create_biosample:
+    name: create biosamples from app
+    description: 'Creates Biological_sample nodes and links them to Subject nodes, directly from dataUploadApp (web app).'
+    involved_nodes:
+        - Subject
+        - Biological_sample
+    involved_rels:
+        - BELONGS_TO_SUBJECT
+    query: >
+        CREATE CONSTRAINT ON (b:Biological_sample) ASSERT b.id IS UNIQUE;
+        MERGE (b:Biological_sample {id:$biosample_id})
+        ON CREATE SET b.external_id=$external_id,b.quantity=$quantity,b.quantity_units=$quantity_units,b.source=$source,b.collection_date=$collection_date,b.conservation_conditions=$conservation_conditions,b.storage=$storage,b.status=$status
+        WITH b
+        MATCH (s:Subject {id:$subject_id})
+        SET s.external_id = $subject_external_id
+        WITH b, s
+        MATCH (b)
+        MERGE (b)-[r:BELONGS_TO_SUBJECT]->(s)
+        RETURN COUNT(b) AS PROJECTID_biosample, COUNT(r) AS PROJECTID_biosample_belongs_to_subject;
+increment_analytical_sample_id:
+    name:  create new analytical sample internal identifier 
+    description: 'Returns a new Analytical_sample identifier based on the existing ones in the database (sequential identifier)'
+    involved_nodes:
+        - Analytical_sample
+    involved_rels:
+    query: >
+        MATCH (a:Analytical_sample) 
+        WITH max(toInteger(SPLIT(a.id, 'AS')[1]))+1 as new_id
+        RETURN SUBSTRING('AS',0,2) + new_id AS result;
+create_analytical_sample:
+    name: create analytical sample from app
+    description: 'Creates Analytical_sample nodes and links them to Biological_sample nodes, directly from dataUploadApp (web app).'
+    involved_nodes:
+        - Biological_sample
+        - Analytical_sample
+    involved_rels:
+        - SPLITTED_INTO
+    query: >
+        CREATE CONSTRAINT ON (a:Analytical_sample) ASSERT a.id IS UNIQUE;
+        MERGE (a:Analytical_sample {id:$ansample_id})
+        ON CREATE SET a.external_id=$external_id,a.quantity=$quantity,a.quantity_units=$quantity_units,a.source=$source,a.collection_date=$collection_date,a.conservation_conditions=$conservation_conditions,a.storage=$storage,a.status=$status,a.group=$group,a.secondary_group=$secondary_group
+        WITH a
+        MATCH (b:Biological_sample {id:$biosample_id})
+        MATCH (a) 
+        MERGE (b)-[r:SPLITTED_INTO{quantity:$quantity,quantity_units:$quantity_units}]->(a)
+        RETURN COUNT(a) AS PROJECTID_analytical_sample, COUNT(r) AS PROJECTID_biosample_splitted_into_ansample;
+subject_number:
+    name:
+    description:
+    involved_nodes:
+        - Project
+    involved_rels:
+    query: >
+        MATCH (p:Project {id:$external_id})
+        RETURN p.subjects

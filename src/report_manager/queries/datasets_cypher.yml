@@ -1,0 +1,243 @@
+proteomics:
+    NUMBER_OF_PROTEINS:
+        name: 'number of proteins'
+        description: 'Extracts the number of proteins identified in a given Project. Requires: Project.id'
+        involved_nodes:
+            - Project
+            - Analytical_sample
+            - Protein
+        involved_rels:
+            - HAS_QUANTIFIED_PROTEIN
+        query_type: pre
+        query: >
+            MATCH p=(project:Project)-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
+            WHERE project.id="PROJECTID"  AND toBoolean(r.is_razor)
+            RETURN a.id AS name, a.id AS x,COUNT(DISTINCT(protein.id)) AS y, a.group AS group ORDER BY group;
+    NUMBER_OF_PEPTIDES:
+        name: 'number of peptides'
+        description: 'Extracts the number of peptides identified in a given Project. Requires: Project.id'
+        involved_nodes:
+            - Project
+            - Analytical_sample
+            - Peptide
+        involved_rels:
+            - HAS_QUANTIFIED_PEPTIDE
+        query_type: pre
+        query: >
+            MATCH p=(project:Project)-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PEPTIDE]->(peptide:Peptide) 
+            WHERE project.id="PROJECTID" 
+            RETURN a.id AS name, a.id AS x, a.group AS group,COUNT(DISTINCT(peptide.id)) AS y ORDER BY group;
+    NUMBER_OF_MODIFIED_PROTEINS:
+        name: number of modified proteins
+        description: 'Extracts the number of modified proteins identified in a given Project. Requires: Project.id'
+        involved_nodes:
+            - Project
+            - Analytical_sample
+            - Modified_protein
+        involved_rels:
+            - HAS_QUANTIFIED_MODIFIED_PROTEIN
+        query_type: pre
+        query: >
+            MATCH p=(project:Project)-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_MODIFIED_PROTEIN]->(modifiedprotein:Modified_protein)-[:HAS_MODIFICATION]->(modification:Modification) 
+            WHERE project.id="PROJECTID" 
+            RETURN a.id AS name, a.id AS x,a.group AS group,COUNT(DISTINCT(modifiedprotein.id)) AS y,modification.name AS type ORDER BY group;
+    PROTEIN_BIOMARKERS:
+        name: 'protein ranking with biomarkers'
+        description: 'Extracts the proteins identified in each group and highlights known biomarkers'
+        involved_nodes:
+            - Project
+            - Analytical_sample
+            - Protein
+            - Disease
+            - Biomarker
+        involved_rels:
+            - HAS_QUANTIFIED_PROTEIN
+            - IS_BIOMARKER_IN_DISEASE
+        query_type: pre
+        query: >
+            MATCH (project:Project)-[:STUDIES_DISEASE]->(disease:Disease)-[:HAS_PARENT]->(pdisease:Disease)<-[:HAS_PARENT]-(cdiseases:Disease)
+            WHERE project.id="PROJECTID"
+            WITH project, collect(disease)+collect(pdisease)+collect(cdiseases) AS diseases
+            MATCH (project:Project)-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
+            WHERE toBoolean(r.is_razor)
+            WITH diseases, protein
+            MATCH (protein)-[:IS_BIOMARKER_OF_DISEASE]->(d)
+            WHERE d IN diseases
+            RETURN DISTINCT protein.name+"~"+protein.id AS identifier, d.name AS disease;
+    PATHWAY_ANNOTATION:
+        name: 'get pathway annotations for the proteins identified'
+        description: 'Get all the pathway annotations for the all the proteins identified in a project'
+        involved_nodes:
+            - Project
+            - Analytical_sample
+            - Protein
+            - Pathway
+        involved_relationships:
+            - ANNOTATED_IN_PATHWAY
+        query_type: pre
+        query: >
+            MATCH (project:Project)-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein)-[rp:ANNOTATED_IN_PATHWAY]->(pathway:Pathway) 
+            WHERE toBoolean(r.is_razor)
+            RETURN DISTINCT protein.name+"~"+protein.id AS identifier,pathway.name AS annotation,rp.source AS source
+    GO_ANNOTATION:
+        name: 'get gene ontology annotations for the proteins identified'
+        description: 'Get all the gene ontology annotations for the all the proteins identified in a project'
+        involved_nodes:
+            - Project
+            - Analytical_sample
+            - Protein
+            - Biological_process
+        involved_relationships:
+            - ASSOCIATED_WITH
+        query_type: pre
+        query: >
+            MATCH (project:Project)-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein)-[rp:ASSOCIATED_WITH]->(go:Biological_process) 
+            WHERE toBoolean(r.is_razor)
+            RETURN DISTINCT protein.name+"~"+protein.id AS identifier,go.name AS annotation,rp.source AS source
+    ORIGINAL:
+        name: 'get dataset from project'
+        description: 'Extracts the dataset matrix of quantified proteins in a given Project. Requires: Project.id'
+        involved_nodes:
+            - Project
+            - Analytical_sample
+            - Protein
+        involved_rels:
+            - HAS_QUANTIFIED_PROTEIN
+        query_type: pre
+        query: >
+            MATCH (project:Project)-[]-(subject:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
+            WHERE project.id="PROJECTID" AND toBoolean(r.is_razor)
+            RETURN subject.id as subject, a.id AS sample, protein.id AS identifier, a.group AS group, toFloat(r.value) as LFQ_intensity, protein.name AS name ORDER BY name, group;
+    INTERACTION_NETWORK:
+        name: 'get PPI network'
+        description: 'Get all the protein-protein interactions for the relevant proteins'
+        involved_nodes:
+            - Protein
+        involved_relationships:
+            - CURATED_INTERACTS_WITH
+            - COMPILED_INTERACTS_WITH
+            - ACTS_ON
+        query_type: post
+        query: >
+            MATCH (protein1:Protein)-[r:CURATED_INTERACTS_WITH|:COMPILED_INTERACTS_WITH|:ACTS_ON]->(protein2:Protein) 
+            WHERE ((protein1.name+"~"+protein1.id) IN [IDENTIFIERS]) AND ((protein2.name+"~"+protein2.id) IN [IDENTIFIERS]) AND (r.score>=0.4 OR toLower(toString(r.score))="curated")
+            RETURN protein1.name+"~"+protein1.id AS node1,protein2.name+"~"+protein2.id AS node2,r.score AS score, r.source AS source,r.action AS action,r.interaction_type AS interaction_type
+    DRUG_ASSOCIATIONS:
+        name: 'get drugs targetting the list of proteins'
+        description: 'Get all the drug-protein associations for the relevant proteins'
+        involved_nodes:
+            - Protein
+            - Drug
+        involved_relationships:
+            - ACTS_ON
+            - COMPILED_INTERACTS_WITH
+        query_type: post
+        query: >
+            MATCH (drug:Drug)-[r:ACTS_ON]->(protein:Protein) 
+            WHERE ((protein.name+"~"+protein.id) IN [IDENTIFIERS]) AND r.score>=0.4
+            RETURN DISTINCT collect(protein.name+"~"+protein.id) AS Proteins,drug.name AS Drug,r.score AS score, r.source AS source,r.action AS action
+    DISEASE_ASSOCIATIONS:
+        name: 'get diseases associated to the list of proteins'
+        description: 'Get all the disease-protein associations for the relevant proteins'
+        involved_nodes:
+            - Protein
+            - Disease
+        involved_relationships:
+            - ASSOCIATED_WITH
+        query_type: post
+        query: >
+            MATCH (disease:Disease)<-[r:ASSOCIATED_WITH]-(protein:Protein) 
+            WHERE ((protein.name+"~"+protein.id) IN [IDENTIFIERS]) AND ((r.score>=2.0 AND r.source="DISEASES") OR (r.score>=0.7 AND toLower(r.source) =~ "disgenet.+") OR toLower(toString(r.score))="curated")
+            RETURN DISTINCT collect(protein.name+"~"+protein.id) AS Proteins,disease.name AS Disease,disease.description AS Description, r.score AS score, r.source AS source
+    LITERATURE_ASSOCIATIONS:
+        name: 'get publications mentioning the any of the proteins in the list'
+        description: 'Get all the articles mentioning the relevant proteins together with the studied tissue or disease'
+        involved_nodes:
+            - Protein
+            - Disease
+            - Tissue
+            - Publication
+        involved_relationships:
+            - ASSOCIATED_WITH
+        query_type: post
+        query: >
+            MATCH (project:Project)-[:STUDIES_DISEASE]->(disease:Disease)-[:HAS_PARENT]->(pdisease:Disease)<-[:HAS_PARENT]-(cdiseases:Disease)
+            WHERE project.id="PROJECTID"
+            WITH collect(disease)+collect(pdisease)+collect(cdiseases) AS diseases           
+            MATCH (d:Disease)-[:MENTIONED_IN_PUBLICATION]->(publication:Publication)
+            WHERE d IN diseases
+            WITH d, publication
+            MATCH (publication)<-[:MENTIONED_IN_PUBLICATION]-(protein:Protein)
+            WHERE (protein.name+"~"+protein.id) IN [IDENTIFIERS]
+            RETURN DISTINCT collect(DISTINCT protein.name+"~"+protein.id) AS Proteins, collect(DISTINCT d.name) AS Diseases, publication.id AS publication, publication.linkout AS linkout;
+clinical:
+    CLINICAL_VARIABLES:
+        name: 'get clinical variables and clinical states'
+        description: 'Extracts the list of clinical variables for each of the subjects in a Project and their description. Requires: Project.id'
+        involved_nodes:
+            - Project
+            - Subject
+            - Disease
+            - Biological_sample
+            - Clinical_variable
+        involved_rels:
+            - HAS_ENROLLED
+            - HAS_DISEASE
+            - BELONGS_TO_SUBJECT
+            - HAS_QUANTIFIED_CLINICAL
+        query_type: pre
+        query: >
+            MATCH (project:Project)-[:HAS_ENROLLED]->(subject:Subject)-[:HAS_DISEASE]-(disease:Disease)
+            WITH subject,disease
+            WHERE project.id="PROJECTID"
+            MATCH (subject)<-[:BELONGS_TO_SUBJECT]-(bs:Biological_sample)-[r:HAS_QUANTIFIED_CLINICAL]->(clinvar:Clinical_variable)
+            RETURN subject.id AS subject, disease.id AS disease_id, disease.name AS disease_name, disease.description AS disease_description, clinvar.id AS clinvar_id, clinvar.name AS clinical_variable, clinvar.description AS clinical_variable_description ORDER BY subject    
+    ORIGINAL:
+        name: 'get all the measurements for clinical variables'
+        description: 'Extracts the list of clinical variables measured in a project. Requires: Project.id'
+        involved_nodes:
+            - Project
+            - Subject
+            - Biological_sample
+            - Clinical_variable
+        involved_rels:
+            - HAS_ENROLLED
+            - HAS_DISEASE
+            - BELONGS_TO_SUBJECT
+            - HAS_QUANTIFIED_CLINICAL
+        query_type: pre
+        query: >
+            MATCH (project:Project)-[:HAS_ENROLLED]->(subject:Subject)<-[:BELONGS_TO_SUBJECT]-(bs:Biological_sample)-[r1:HAS_QUANTIFIED_CLINICAL]->(clinvar:Clinical_variable)
+            WITH subject, bs, clinvar, r1
+            WHERE project.id="PROJECTID"
+            MATCH (bs)-[r2:SPLITTED_INTO]-(an:Analytical_sample)
+            RETURN subject.id AS subject, bs.id AS biological_sample, an.group AS group, clinvar.name AS clinical_variable, r1.value AS value ORDER BY subject
+wes:
+    NUMBER_SOMATIC_MUTATIONS:
+        name: 'number somatic mutations'
+        description: 'Provides the number of somatic variants called in a Project. Requires: Project.id'
+        involved_nodes:
+            - Project
+            - Analytical_sample
+            - Somatic_mutation
+        involved_rels:
+            - CONTAINS_MUTATION
+        query_type: pre
+        query: >
+            MATCH p=(project:Project)-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:CONTAINS_MUTATION]-> (s:Somatic_mutation)
+            WHERE project.id="PROJECTID"
+            RETURN a.id AS name, a.id AS x,COUNT(DISTINCT(s.id)) AS y, a.group AS group ORDER BY group;
+    SOMATIC_MUTATIONS:
+        name: 'somatic mutations'
+        description: 'Extracts the list of somatic variants called in a Project with all they attributes. Requires: Project.id'
+        involved_nodes:
+            - Project
+            - Analytical_sample
+            - Somatic_mutation
+        involved_rels:
+            - CONTAINS_MUTATION 
+        query_type: pre
+        query: >
+            MATCH p=(project:Project)-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:CONTAINS_MUTATION]-> (s:Somatic_mutation) 
+            WHERE project.id="PROJECTID" 
+            RETURN a.id AS analytical_sample, s.id AS somatic_mutation, s.somaticalternative_names AS alternative_names, s.function AS function, s.SNVid AS variant_id, s.region AS region, s.Xref AS external_reference, s.TFATHMM_score AS FATHMM_score, s.DLRT_score AS DLRT_score, s.MutationAssessor_score AS MutationAssessor_score, s.MutationTaster_score AS MutationTaster_score,s.PROVEAN_score AS PROVEAN_score,s.Polyphen2_HDIV_score AS Polyphen2_HDIV_score,s.Polyphen2_HVAR_score AS Polyphen2_HVAR_score,s.SIFT_score AS SIFT_score, s.VEST3_score AS VEST3_score

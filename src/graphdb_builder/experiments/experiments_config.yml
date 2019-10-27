@@ -1,0 +1,243 @@
+dataDirectory : '../../../data'
+mappingFile : '../../../data/ontologies/mapping.tsv'
+experimentsImportDirectory : '../../../data/imports/experiments'
+
+#Dataset types
+experimentsDir : '../../../data/experiments/'
+#Proteomics
+clinicalDirectory : &var_clinicalDirectory '../../../data/experiments/PROJECTID/clinical/'
+proteomicsDirectory : &var_proteomicsDirectory '../../../data/experiments/PROJECTID/proteomics/'
+genomicsDirectory : &var_genomicsDirectory '../../../data/experiments/PROJECTID/wes/'
+
+ox : &var_ox
+    'columns':
+        - 'Proteins'
+        - 'Positions within proteins'
+        - 'id'
+        - 'Amino acid'
+        - 'Sequence window'
+        - 'Score'
+        - 'Intensity \w+_AS\d+_?-?\d*'
+        - 'Reverse'
+        - 'Score'
+        - 'Delta score'
+        - 'Score for localization'
+        - 'Localization prob'
+    'filters':
+        - 'Reverse'
+    'attributes':
+        'col':
+            - 'Sequence window'
+            - 'Score'
+            - 'Delta score'
+            - 'Score for localization'
+            - 'Localization prob'
+    'proteinCol': 'Proteins'
+    'indexCol': 'Proteins'
+    'groupCol': 'id'
+    'valueCol': 'Intensity'
+    'contaminant_tag': 'CON__'
+    'multipositions': 'Positions within proteins'
+    'positionCols':
+        - 'Positions within proteins'
+        - 'Amino acid'
+    'sequenceCol': 'Sequence window'
+    'geneCol': 'Gene names'
+    'log': 'log2'
+    'modId': 'MOD:00256'
+    'mod_acronym': 'ox'
+    'file': 'Oxidation (M)Sites.txt'
+
+gly : &var_gly
+    'columns':
+        - 'Proteins'
+        - 'Positions within proteins'
+        - 'id'
+        - 'Amino acid'
+        - 'Sequence window'
+        - 'Score'
+        - 'Intensity \w+_AS\d+_?-?\d*'
+        - 'Reverse'
+        - 'Score'
+        - 'Delta score'
+        - 'Score for localization'
+        - 'Localization prob'
+    'filters':
+        - 'Reverse'
+    'attributes':
+        'col':
+            - 'Sequence window'
+            - 'Score'
+            - 'Delta score'
+            - 'Score for localization'
+            - 'Localization prob'
+    'proteinCol': 'Proteins'
+    'indexCol': 'Proteins'
+    'groupCol': 'id'
+    'valueCol': 'Intensity'
+    'contaminant_tag': 'CON__'
+    'multipositions': 'Positions within proteins'
+    'positionCols':
+        - 'Positions within proteins'
+        - 'Amino acid'
+    'sequenceCol': 'Sequence window'
+    'geneCol': 'Gene names'
+    'log': 'log2'
+    'modId': 'MOD:00767'
+    'mod_acronym': 'gly'
+    'file': 'GlycationSites.txt'
+
+p : &var_p
+    'columns':
+        - 'Proteins'
+        - 'Positions within proteins'
+        - 'Amino acid'
+        - 'id'
+        - 'Sequence window'
+        - 'Score'
+        - 'Intensity \w+_AS\d+_?-?\d*'
+        - 'Reverse'
+        - 'Score'
+        - 'Delta score'
+        - 'Score for localization'
+        - 'Localization prob'
+    'filters':
+        - 'Reverse'
+    'attributes':
+        'col':
+            - 'Sequence window'
+            - 'Score'
+            - 'Delta score'
+            - 'Score for localization'
+            - 'Localization prob'
+    'proteinCol': 'Proteins'
+    'indexCol': 'Proteins'
+    'groupCol': 'id'
+    'valueCol': 'Intensity'
+    'contaminant_tag': 'CON__'
+    'multipositions': 'Positions within proteins'
+    'positionCols':
+        - 'Positions within proteins'
+        - 'Amino acid'
+    'sequenceCol': 'Sequence window'
+    'geneCol': 'Gene names'
+    'log': 'log2'
+    'modId': 'MOD:00696'
+    'mod_acronym': 'p'
+    'file': 'Phosphosites (STY).txt'
+
+dataTypes :
+    'clinical':
+        'directory': *var_clinicalDirectory
+        'file_cli': 'ClinicalData_PROJECTID.xlsx'
+        'file_pro': 'ProjectData_PROJECTID.xlsx'
+        'separator': '|'
+    'proteomics':
+        'directory': *var_proteomicsDirectory
+        'proteins':
+            'columns':
+                - 'Majority protein IDs'
+                - 'Q-value'
+                - 'Score'
+                - 'id'
+                - 'LFQ intensity \w+_AS\d+_?-?\d*'  #subject_replicate_timepoint
+                - 'Intensity \w+_AS\d+_?-?\d*'
+                - 'Reverse'
+                - 'Only identified by site'
+                - 'is_razor'
+            'filters':
+                - 'Reverse'
+                - 'Only identified by site'
+            'proteinCol': 'Majority protein IDs'
+            'contaminant_tag': 'CON__'
+            'valueCol': 'LFQ intensity'
+            'groupCol': 'id'
+            'indexCol': 'Majority protein IDs'
+            'attributes':
+                'cols':
+                    - 'Q-value'
+                    - 'Score'
+                    - 'id'
+                    - 'is_razor'
+                'regex':
+                    - 'Intensity'
+            'log': 'log2'
+            'file': 'proteinGroups.txt'
+        'peptides':
+            'columns':
+                - 'Sequence'
+                - 'Amino acid before'
+                - 'First amino acid'
+                - 'Second amino acid'
+                - 'Second last amino acid'
+                - 'Last amino acid'
+                - 'Amino acid after'
+                - 'Experiment \w+_AS\d+_?-?\d*'
+                - 'Proteins'
+                - 'id'
+                - 'Start position'
+                - 'End position'
+                - 'Score'
+                - 'Protein group IDs'
+                - 'Intensity \w+_AS\d+_?-?\d*'
+                - 'Reverse'
+            'filters':
+                - 'Reverse'
+            'attributes':
+                'col':
+                    - 'Score'
+                    - 'Protein group IDs'
+            'proteinCol': 'Proteins'
+            'contaminant_tag': 'CON__'
+            'valueCol': 'Intensity'
+            'groupCol': 'id'
+            'indexCol': 'Sequence'
+            'positionCols':
+                - 'Start position'
+                - 'End position'
+            'type': 'tryptic peptide'
+            'log': 'log2'
+            'file': 'peptides.txt'
+        'Oxydation(M)': *var_ox
+        'Glycation': *var_gly
+        'Phosphorylation': *var_p
+    'wes':
+        'directory': *var_genomicsDirectory
+        'columns':
+            - 'CHROM'
+            - 'POS'
+            - 'REF'
+            - 'ALT_1'
+            - 'ANN_Annotation'
+            - 'ANN_Annotation_Impact'
+            - 'ANN_Gene_Name'
+            - 'ANN_Feature_Type'
+            - 'ANN_Transcript_BioType'
+            - 'ANN_HGVS_p'
+        'position': 'POS'
+        'filter': 'FILTER_PASS'
+        'id_fields':
+            - 'CHROM'
+            - 'POS'
+            - 'REF'
+            - 'ALT_1'
+        'alt_names':
+            - 'ANN_HGVS_p'
+        'new_columns':
+            - 'chr'
+            - 'position'
+            - 'reference'
+            - 'alternative'
+            - 'effect'
+            - 'impact'
+            - 'gene'
+            - 'feature_type'
+            - 'biotype'
+            - 'sample'
+            - 'variant_calling_method'
+            - 'annotated_with'
+            - 'alternative_names'
+            - 'ID'
+        'types':
+            'Somatic_mutation': 'PASS'
+            'Germline_mutation': 'REJECT'
