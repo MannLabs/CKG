@@ -13,11 +13,13 @@ USER root
 RUN apt-get update && \
     apt-get -yq dist-upgrade && \
     apt-get install -yq --no-install-recommends && \
+    apt-get install -yq apt-utils && \
     apt-get install -yq locales && \
     apt-get install -yq wget && \
     apt-get install -yq unzip && \
     apt-get install -yq python3.6 python3-pip python3-setuptools python3-dev libxml2 libxml2-dev zlib1g-dev && \
     apt-get install -yq nginx uwsgi uwsgi-plugin-python3 && \
+    apt-get -y install sudo && \
     rm -rf /var/lib/apt/lists/*
 
 # Set the locale
@@ -42,7 +44,7 @@ RUN update-alternatives --install "/usr/bin/java" "java" "/usr/local/oracle-jre8
 
 # NEO4J
 RUN wget -O - http://debian.neo4j.org/neotechnology.gpg.key | apt-key add - && \
-    echo "deb http://debian.neo4j.org/repo stable/" > /etc/apt/sources.list.d/neo4j.list && \
+    echo "deb [trusted=yes] https://debian.neo4j.org/repo stable/" > /etc/apt/sources.list.d/neo4j.list && \
     apt-get update && \
     apt-get install -yq neo4j=1:3.5.8
 
@@ -51,29 +53,25 @@ RUN rm -f /var/lib/neo4j/data/dbms/auth && \
     neo4j-admin set-initial-password "bioinfo1112"
 
 ## Install algorithms Neo4j
-RUN wget -P /var/lib/neo4j/plugins https://s3-eu-west-1.amazonaws.com/com.neo4j.graphalgorithms.dist/neo4j-graph-algorithms-3.5.8.0-standalone.zip && \
-    unzip /var/lib/neo4j/plugins/neo4j-graph-algorithms-3.5.8.0-standalone.zip -d /var/lib/neo4j/plugins && \
-    rm /var/lib/neo4j/plugins/neo4j-graph-algorithms-3.5.8.0-standalone.zip
-
-RUN wget -P /var/lib/neo4j/plugins https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.5.0.4/apoc-3.5.0.4-all.jar 
+RUN wget -P /var/lib/neo4j/plugins https://s3-eu-west-1.amazonaws.com/com.neo4j.graphalgorithms.dist/neo4j-graph-algorithms-3.5.8.1-standalone.jar
+RUN wget -P /var/lib/neo4j/plugins https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.5.0.5/apoc-3.5.0.5-all.jar
 
 RUN ls -lrth /var/lib/neo4j/plugins
 
-## Test the service Neo4j
-RUN service neo4j start && \
-    cat /var/log/neo4j/neo4j.log && \
-    sleep 30 && \
-    service neo4j stop
-
 ## Change configuration
 COPY /resources/neo4j_db/neo4j.conf  /etc/neo4j/.
+
+## Test the service Neo4j
+RUN service neo4j start && \
+    sleep 30 && \
+    service neo4j stop && \
+    cat /var/log/neo4j/neo4j.log
 
 ## Load backup with Clinical Knowledge Graph
 COPY /resources/neo4j_db/backups /var/lib/neo4j/data/backups
 RUN mkdir -p /var/lib/neo4j/data/databases/graph.db
 RUN ls -lrth /var/lib/neo4j/data/
-RUN neo4j-admin load --from=/var/lib/neo4j/data/backups/graph.db/2019_1909.dump --database=graph.db --force
-
+RUN sudo -u neo4j neo4j-admin load --from=/var/lib/neo4j/data/backups/graph.db/2019_1909.dump --database=graph.db --force
 
 ## Remove dump file
 RUN echo "Done with restoring backup, removing backup folder"
@@ -85,14 +83,15 @@ RUN [ -e  /var/lib/neo4j/data/databases/store_lock ] && rm /var/lib/neo4j/data/d
 # R
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \ 
-        littler \
-        r-cran-littler \
-		r-base=${R_BASE_VERSION}* \
-		r-base-dev=${R_BASE_VERSION}* \
-		r-recommended=${R_BASE_VERSION}* && \
-        echo 'options(repos = c(CRAN = "https://cloud.r-project.org/"), download.file.method = "libcurl")' >> /etc/R/Rprofile.site
-## Install packages
-ADD ./R_packages.R /R_packages.R
+    littler \
+    r-cran-littler \
+    r-base=${R_BASE_VERSION}* \
+    r-base-dev=${R_BASE_VERSION}* \
+    r-recommended=${R_BASE_VERSION}* && \
+    echo 'options(repos = c(CRAN = "https://cloud.r-project.org/"), download.file.method = "libcurl")' >> /etc/R/Rprofile.site
+    
+# Install packages
+ADD /resources/R_packages.R /R_packages.R
 RUN Rscript R_packages.R
 
 # Python
@@ -103,7 +102,7 @@ ADD ./requirements.txt /requirements.txt
 RUN pip3 install --ignore-installed -r requirements.txt
 RUN mkdir /CKG
 ADD . /CKG/
-ENV PYTHONPATH "${PYTHONPATH}:/CKG"
+ENV PYTHONPATH "${PYTHONPATH}:/CKG/src"
 
 # JupyterHub
 RUN apt-get -y install npm nodejs && \
@@ -121,7 +120,6 @@ RUN adduser --quiet --disabled-password --shell /bin/bash --home /home/adminhub 
 
 RUN mkdir /etc/jupyterhub
 COPY /resources/jupyterhub.py /etc/jupyterhub/.
-
 
 # NGINX and UWSGI
 

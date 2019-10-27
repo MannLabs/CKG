@@ -1,0 +1,95 @@
+###### OncoKB Database #########
+OncoKB_annotated_url: 'http://oncokb.org/api/v1/utils/allAnnotatedVariants.txt'
+
+OncoKB_actionable_url: 'http://oncokb.org/api/v1/utils/allActionableVariants.txt'
+
+amino_acids: 
+    'A': 'Ala'
+    'C': 'Cys'
+    'D': 'Asp'
+    'E': 'Glu'
+    'F': 'Phe'
+    'G': 'Gly'
+    'H': 'His'
+    'I': 'Ile'
+    'K': 'Lys'
+    'L': 'Leu'
+    'M': 'Met'
+    'N': 'Asn'
+    'P': 'Pro'
+    'Q': 'Gln'
+    'R': 'Arg'
+    'S': 'Ser'
+    'T': 'Thr'
+    'V': 'Val'
+    'W': 'Trp'
+    'Y': 'Tyr'
+
+OncoKB_levels: 
+    '1': 
+        - 'approved'
+        - 'Responsive'
+    '2A': 
+        - 'approved'
+        - 'Responsive'
+    '2B': 
+        - 'approved'
+        - 'Responsive other'
+    '3A': 
+        - 'Clinical evidence'
+        - 'Responsive'
+    '3B':
+        - 'Clinical evidence'
+        - 'Responsive other'
+    '4':
+        - 'Biological evidence'
+        - 'Responsive'
+    '4B':
+        - 'FDA approved'
+        - 'Resistant'
+
+entities_header: 
+    - 'ID'
+    - ':LABEL'
+    - 'alternative_names'
+    - 'chromosome'
+    - 'position'
+    - 'reference'
+    - 'alternative'
+    - 'effect'
+    - 'oncogeneicity'
+
+relationships_headers: 
+    'targets_clinically_relevant_variant':
+        - 'START_ID'
+        - 'END_ID'
+        - 'TYPE'
+        - 'evidence'
+        - 'response'
+        - 'disease'
+        - 'type'
+        - 'source'
+    'targets':
+        - 'START_ID'
+        - 'END_ID'
+        - 'TYPE'
+        - 'evidence'
+        - 'response'
+        - 'disease'
+        - 'type'
+        - 'source'
+    'associated_with':
+        - 'START_ID'
+        - 'END_ID'
+        - 'TYPE'
+        - 'score'
+        - 'evidence_type'
+        - 'source'
+        - 'number_publications'
+    'known_variant_is_clinically_relevant':
+        - 'START_ID'
+        - 'END_ID'
+        - 'TYPE'
+        - 'source'
+
+

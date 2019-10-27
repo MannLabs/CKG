@@ -1,0 +1,107 @@
+args:
+    subject_id: subject
+    sample_id: biological_sample
+    group_id: group
+    imputation_method: KNN
+    columns: clinical_variable
+    values: value
+    extra: 
+        - group
+overview: #section
+    clinical variables:
+        data: clinical variables 
+        analyses: []
+        plots:
+            - basicTable
+        args: 
+            title: 'List of clinical variables'
+    stratification:
+        description: '# Principal Component Analysis
+
+                        **Principal component analysis (PCA)** is a statistical procedure that uses an orthogonal transformation to convert a set of observations 
+                        of possibly correlated variables (entities each of which takes on various numerical values) into a set of values of linearly uncorrelated 
+                        variables called principal components. This transformation is defined in such a way that the first principal component has the largest possible variance 
+                        (that is, accounts for as much of the variability in the data as possible), and each succeeding component in turn has the highest variance possible under 
+                        the constraint that it is orthogonal to the preceding components. The resulting vectors (each being a linear combination of the variables and containing n observations) 
+                        are an uncorrelated orthogonal basis set. PCA is sensitive to the relative scaling of the original variables. [Wikipedia](https://en.wikipedia.org/wiki/Principal_component_analysis)'
+        data: processed
+        analyses:
+            - pca
+            #- tsne
+            #- umap
+        plots:
+            - pca
+        args:
+            x_title: PC1
+            y_title: PC2
+            drop_cols:
+                - subject
+                - biological_sample
+            components: 2
+            perplexity: 40
+            n_iter: 1000
+            init: 'pca'
+            width: 1000
+            height: 700
+            loadings: 5
+            title: 'Sample stratification'
+    measurement matrix:
+        data: processed
+        analyses: []
+        plots: 
+            - violinplot
+            - basicTable
+        args:
+            group: group
+            x_title: clinical variables
+            y_title: value
+            title: 'Clinical variables measurements per group'
+    regulation:
+        data: processed
+        analyses: 
+            - anova
+        plots: 
+            - basicTable
+        store_analysis: True
+        args:
+            alpha: 0.05
+            fc: 2.0
+            permutations: 0
+            group: group
+            subject: subject
+            colorscale: Blues
+            showscale: False
+            marker_size: 10
+            x_title: logFC
+            y_title: -log(pvalue)
+            drop_cols:
+                - subject
+                - biological_sample
+            name: clinical_variable
+            title: 'Volcano plot'
+    correlation:
+        data: processed
+        analyses:
+            - correlation
+        plots:
+            - network
+            #- heatmap
+        store_analysis: True
+        args:
+            source: node1
+            target: node2
+            title: 'Features correlation network'
+            format: edgelist
+            values: weight
+            dist: False
+            node_properties: {}
+            maxLinkWidth: 6
+            maxRadius: 20
+            node_size: 'degree'
+            cutoff: 0.2
+            subject: subject
+            cutoff_abs: True
+            color_weight: True
+            communities_algorithm: louvain
+            width: 1600
+            height: 1600

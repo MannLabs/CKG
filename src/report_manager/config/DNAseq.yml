@@ -1,0 +1,21 @@
+overview: #section
+    'number somatic mutations':
+        data: number of somatic mutations 
+        analyses: []
+        plots: 
+            #- barplot
+            - basicTable
+        args: 
+            x: x
+            y: y
+            group: group
+            x_title: Analytical sample
+            y_title: number of somatic mutations
+            title: 'Number of somatic mutations identified per group'
+    somatic mutations:
+        data: somatic mutations 
+        analyses: []
+        plots: 
+            - basicTable
+        args: 
+            title: 'Somatic mutations identified'

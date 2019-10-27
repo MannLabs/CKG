@@ -40,7 +40,7 @@ dask==2.0.0
 decorator==4.4.0
 defusedxml==0.6.0
 dill==0.2.9
-Django==2.2.2
+django==2.2.4
 django-class==2019.4.13
 ecos==2.0.7.post1
 entrypoints==0.3
@@ -106,7 +106,7 @@ nbformat==4.4.0
 neobolt==1.7.13
 neotime==1.7.4
 networkx==2.3
-nltk==3.4.3
+nltk==3.4.5
 notebook==5.7.8
 numba==0.45.1
 numexpr==2.6.9
@@ -123,7 +123,7 @@ pep8==1.7.1
 percy==2.0.2
 pexpect==4.7.0
 pickleshare==0.7.5
-Pillow==6.0.0
+pillow==6.2.0
 pingouin==0.2.9
 plotly==4.1.0
 plotly-express==0.4.0
