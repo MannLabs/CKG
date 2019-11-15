@@ -30,6 +30,7 @@ with open("app_template.html", 'r', encoding='utf8') as f:
 app.index_string = template
 app.scripts.config.serve_locally = False
 app.config.suppress_callback_exceptions = True
+
 # Dash CSS
 external_css = ["https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css",
                 "https://codepen.io/chriddyp/pen/bWLwgP.css",

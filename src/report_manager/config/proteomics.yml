@@ -212,7 +212,7 @@ data associations:
             maxLinkWidth: 7
             maxRadius: 20
             color_weight: False
-            node_size: 'ev_centrality'
+            node_size: 'degree'
             communities_algorithm: louvain
     drug_associations:
         data: regulated
