@@ -1,7 +1,7 @@
 ###### Exposome Explorer Database ########
 database_urls: 
     - 'http://exposome-explorer.iarc.fr/system/downloads/current/biomarkers.csv.zip'
-    - 'http://exposome-explorer.iarc.fr/system/downloads/current/correlation_values.csv.zip'
+    - 'http://exposome-explorer.iarc.fr/system/downloads/current/correlations.csv.zip'
 
 relationships_header: 
     'food':

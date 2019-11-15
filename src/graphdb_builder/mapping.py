@@ -141,6 +141,7 @@ def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True, db = "ST
     
     directory = os.path.join(dbconfig["databasesDir"], db)
     file_name = os.path.join(directory, url.split('/')[-1])
+    builder_utils.checkDirectory(directory)
 
     if download:
         builder_utils.downloadDB(url, directory)

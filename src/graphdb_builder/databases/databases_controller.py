@@ -141,7 +141,7 @@ def parseDatabase(importDirectory, database, download=True):
             builder_utils.write_relationships(relationships, header, outputfile)
             logger.info("Database {} - Number of {} relationships: {}".format(database, "has_side_effect", len(relationships)))
             stats.add(builder_utils.buildStats(len(relationships), "relationships", "has_side_effect", database, outputfile))
-            relationships, header, outputfileName = siderParser.parserIndications(dbconfig["databasesDir"], drugMapping, phenotypeMapping, download = True)
+            relationships, header, outputfileName = siderParser.parserIndications(dbconfig["databasesDir"], drugMapping, phenotypeMapping, download = download)
             outputfile = os.path.join(importDirectory, outputfileName)
             builder_utils.write_relationships(relationships, header, outputfile)
             logger.info("Database {} - Number of {} relationships: {}".format(database, "indicated_for", len(relationships)))

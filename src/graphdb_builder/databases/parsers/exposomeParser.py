@@ -26,7 +26,7 @@ def parser(databases_directory, download=True):
         with zipfile.ZipFile(zipped_fileName) as z:
             if file_name == "biomarkers.csv":
                 biomarkers = parseBiomarkersFile(z, file_name)
-            elif file_name == "correlation_values.csv":
+            elif file_name == "correlations.csv":
                 correlations = parseCorrelationsFile(z, file_name, biomarkers, mapping)
 
     return correlations, relationships_header
@@ -43,7 +43,7 @@ def parseBiomarkersFile(fhandler, file_name):
                 first = False
                 continue
             identifier = row[0]
-            metabolite = row[9]
+            metabolite = row[10]
             if metabolite != '':
                 biomarkers[identifier] = metabolite
 
@@ -61,18 +61,18 @@ def parseCorrelationsFile(fhandler, file_name, biomarkers, mapping):
                 first = False
                 continue
             biomarker = row[0]
-            food_name = row[10]
-            intake_median = row[15]
-            intake_units = row[16]
-            biosample = row[19]
-            method = row[20]
+            food_name = row[9]
+            intake_median = row[14]
+            intake_units = row[15]
+            biosample = row[18]
+            method = row[19]
             #corr_method = row[29]
-            corr = float(row[30])
-            ci_low = row[31]
-            ci_high = row[32]
-            pvalue = row[33]
-            significant = row[34]
-            publication = row[38]
+            corr = float(row[29])
+            ci_low = row[30]
+            ci_high = row[31]
+            pvalue = row[32]
+            significant = row[33]
+            publication = row[37]
 
             if significant in ["Yes","yes","YES", "Y"]:
                 if food_name in mapping:

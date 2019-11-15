@@ -36,6 +36,8 @@ def parser(databases_directory, import_directory, download=False):
     if not os.path.exists(os.path.join(directory,filename)):
         if download:
             builder_utils.downloadDB(ftp_url+filename, directory)
+
+    print('FINISHED DOWNLOAD')
     
     stats = set()
     if os.path.exists(os.path.join(directory, filename)):
@@ -110,6 +112,8 @@ def parser(databases_directory, import_directory, download=False):
             num_relationships['mentioned_in_publication'] += len(relationships['mentioned_in_publication'])
             print_files(relationships['found_in_protein'], relationship_headers['found_in_protein'], outputfile=os.path.join(import_directory,'Functional_region_found_in_protein.tsv'), is_first=is_first)
             num_relationships['found_in_protein'] += len(relationships['found_in_protein'])
+
+        print('FILES WRITTEN')
 
         stats.add(builder_utils.buildStats(num_entities, "entity", "Functional_region", "Pfam", 'Functional_region.tsv'))
 

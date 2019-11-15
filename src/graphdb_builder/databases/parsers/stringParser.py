@@ -25,7 +25,7 @@ def parser(databases_directory, importDirectory, drug_source = None, download = 
         outputfile = os.path.join(importDirectory, "stitch_associated_with.tsv")
 
         drugmapping_url = config['STITCH_mapping_url']
-        drugmapping = mp.getSTRINGMapping(drugmapping_url, source = drug_source, download = False, db = db)
+        drugmapping = mp.getSTRINGMapping(drugmapping_url, source = drug_source, download = download, db = db)
         
     elif db == "STRING":
         evidences = ["Neighborhood in the Genome", "Gene fusions", "Co-ocurrence across genomes","Co-expression", "Experimental/biochemical data", "Association in curated databases", "Text-mining"]

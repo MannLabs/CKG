@@ -12,7 +12,7 @@ def parser(databases_directory, download=True):
     config = builder_utils.get_config(config_name="internalDBsConfig.yml", data_type='databases')
     string_url = config['string_url']
     string_mapping = mp.getSTRINGMapping(string_url, download=download)
-    
+
     for qtype in config['internal_db_types']:
         relationships = parseInternalDatabasePairs(config, databases_directory, qtype, string_mapping)
         entity1, entity2 = config['internal_db_types'][qtype]
@@ -41,11 +41,11 @@ def parserMentions(databases_directory, importDirectory, download=True):
     organisms = config['organisms']
     
     directory = os.path.join(databases_directory, "InternalDatabases")
-    builder_utils.checkDirectory(directory)
+    builder_utils.checkDirectory(os.path.join(directory,"textmining"))
     
     if download:
         builder_utils.downloadDB(url.replace("FILE", ifile), os.path.join(directory,"textmining"))
-    
+
     ifile = os.path.join(directory,os.path.join("textmining",ifile))
     #valid_pubs = read_valid_pubs(organisms, ifile)
     #print(valid_pubs)
@@ -59,8 +59,10 @@ def parseInternalDatabasePairs(config, databases_directory, qtype, mapping, down
     ifile = config['internal_db_files'][qtype]
     source = config['internal_db_sources'][qtype]
     relationships = set()
+    
     directory = os.path.join(databases_directory, "InternalDatabases")
-    builder_utils.checkDirectory(directory)
+    builder_utils.checkDirectory(os.path.join(directory,"integration"))
+    
     if download:
         builder_utils.downloadDB(url.replace("FILE", ifile), os.path.join(directory,"integration"))
     ifile = os.path.join(directory,os.path.join("integration",ifile))
@@ -112,8 +114,12 @@ def parseInternalDatabaseMentions(config, databases_directory, qtype, importDire
     ifile = config['internal_db_mentions_files'][qtype]
     if qtype == "9606":
         mapping = mp.getSTRINGMapping(string_url, download=False)
+        print('FINISHED PARSING MENTIONS 9606')
+
     elif qtype == "-1":
         mapping = mp.getSTRINGMapping(stitch_url, source = config['internal_db_sources']["Drug"], download = False, db = "STITCH")
+        print('FINISHED PARSING MENTIONS -1')
+
     filters = []
     if qtype in config['internal_db_mentions_filters']:
         filters = config['internal_db_mentions_filters'][qtype]

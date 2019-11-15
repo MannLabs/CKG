@@ -13,6 +13,7 @@ def parser(databases_directory, download = True):
     config = builder_utils.get_config(config_name="disgenetConfig.yml", data_type='databases')
     
     files = config['disgenet_files']
+    mapping_files = config['disgenet_mapping_files']
     url = config['disgenet_url']
     directory = os.path.join(databases_directory,"disgenet")
     builder_utils.checkDirectory(directory)
@@ -22,6 +23,8 @@ def parser(databases_directory, download = True):
     if download:
         for f in files:
             builder_utils.downloadDB(url+files[f], directory)
+        for f in mapping_files:
+            builder_utils.downloadDB(url+mapping_files[f], directory)
 
     proteinMapping = readDisGeNetProteinMapping(config, databases_directory) 
     diseaseMapping = readDisGeNetDiseaseMapping(config, databases_directory)
@@ -46,7 +49,7 @@ def parser(databases_directory, download = True):
                 #disease_pleiotropy_index = data[3]
                 diseaseId = data[4]
                 score = float(data[scorePos])
-                pmids = data[12]
+                pmids = data[13]
                 source = data[-1]
                 if geneId in proteinMapping:
                     for identifier in proteinMapping[geneId]:
@@ -63,7 +66,7 @@ def parser(databases_directory, download = True):
 def readDisGeNetProteinMapping(config, databases_directory):
     files = config['disgenet_mapping_files']
     directory = os.path.join(databases_directory,"disgenet")
-    
+   
     first = True
     mapping = defaultdict(set)
     if "protein_mapping" in files:
@@ -81,7 +84,8 @@ def readDisGeNetProteinMapping(config, databases_directory):
 
 def readDisGeNetDiseaseMapping(config, databases_directory):
     files = config['disgenet_mapping_files']
-    directory =  os.path.join(databases_directory,"disgenet")
+    directory = os.path.join(databases_directory,"disgenet")
+
     first = True
     mapping = defaultdict(set)
     if "disease_mapping" in files:
@@ -91,7 +95,7 @@ def readDisGeNetDiseaseMapping(config, databases_directory):
                 if first:
                     first = False
                     continue
-                data = line.decode('utf-8').rstrip("\r\n").split("\t")
+                data = line.decode('utf-8').rstrip("\r\n").split("|")
                 identifier = data[0]
                 vocabulary = data[2]
                 code = data[3]
