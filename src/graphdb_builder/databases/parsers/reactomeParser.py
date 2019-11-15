@@ -18,6 +18,8 @@ def parser(databases_directory, download=True):
     builder_utils.checkDirectory(directory)
     metabolite_mapping = mp.getMappingForEntity("Metabolite")
     #drug_mapping = mp.getMappingForEntity("Drug")
+
+    print('FINISHED MAPPING')
     
     for dataset in urls:
         url = urls[dataset]

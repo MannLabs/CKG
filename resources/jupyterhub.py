@@ -5,9 +5,12 @@
 # set of users who can administer the Hub itself 
 c.Authenticator.admin_users = {'adminhub'}
 
+# set the Clinical Knowledge Graph logo
+c.JupyterHub.logo_file = '/CKG/src/report_manager/assets/logo_small.jpg'
+
 ## The public facing port of the proxy.
 c.JupyterHub.port = 8090
-c.Spawner.notebook_dir='/CKG/notebooks'
+c.Spawner.notebook_dir='/CKG/src/notebooks'
 
 #  Supports Linux and BSD variants only.
 c.LocalAuthenticator.create_system_users = True

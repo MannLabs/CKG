@@ -2,6 +2,7 @@ import pandas as pd
 import csv
 import certifi
 import urllib3
+import wget
 import ftplib
 import json
 import urllib
@@ -142,8 +143,7 @@ def setup_logging(path='log.config', key=None):
 
 def downloadDB(databaseURL, directory=None, file_name=None, user="", password=""):
     """
-    This function downloads the raw files from a biomedical database server when a link is provided \
-
+    This function downloads the raw files from a biomedical database server when a link is provided.
 
     :param str databaseURL: link to access biomedical database server.
     :param directory:
@@ -169,10 +169,11 @@ def downloadDB(databaseURL, directory=None, file_name=None, user="", password=""
                 ftp.login(user=user, passwd = password)
                 ftp.retrbinary("RETR " + ftp_file ,  open(os.path.join(directory, file_name), mode).write)
         else:
-            http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
-            response = http.request("GET", databaseURL)
-            with open(os.path.join(directory, file_name), mode) as out:
-                out.write(response.data)
+            if os.path.exists(os.path.join(directory, file_name)):
+                os.remove(os.path.join(directory, file_name))
+            # wget.download(databaseURL, os.path.join(directory, file_name))
+            os.system("wget -O {0} {1}".format(os.path.join(directory, file_name), databaseURL))
+
     except urllib3.exceptions.InvalidHeader:
         raise urllib3.exceptions.InvalidHeader("Invalid HTTP header provided. {}.\nURL:{}".format(err,databaseURL))
     except urllib3.exceptions.ConnectTimeoutError:

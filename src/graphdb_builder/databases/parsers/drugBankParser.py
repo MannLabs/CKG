@@ -29,7 +29,9 @@ def extract_drugs(config, databases_directory):
     fields = config['DrugBank_fields']
     parentFields = config['DrugBank_parentFields']
     structuredFields = config['DrugBank_structures']
+
     vocabulary = parseDrugBankVocabulary(config, databases_directory)
+
     with zipfile.ZipFile(fileName, 'r') as zipped:
         for f in zipped.namelist():
             data = zipped.read(f) 
@@ -72,14 +74,15 @@ def parseDrugBankVocabulary(config, databases_directory):
     fileName = os.path.join(directory, url.split('/')[-1])
     with zipfile.ZipFile(fileName, 'r') as zipped:
         for f in zipped.namelist():
-            with open(os.path.join(directory,f), 'r') as vf:
+            with zipped.open(f) as vf:
+            # with open(os.path.join(directory,f), 'r') as vf:
                 for line in vf:
-                    data = line.rstrip('\r\n').split(',')
+                    data = line.decode('utf-8').rstrip('\r\n').split(',')
                     primary = data[0]
                     secondaries = data[1].split(' | ')
                     for sec in secondaries:
                         vocabulary[sec] = primary
-                        vocabulary[primary] = primary 
+                        vocabulary[primary] = primary
     return vocabulary
 
 
