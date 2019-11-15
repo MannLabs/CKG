@@ -351,10 +351,11 @@ class Dataset:
         return kn
 
 class MultiOmicsDataset(Dataset):
-    def __init__(self, identifier, data, analyses={}, analysis_queries={}, report=None):
-        self._config_file = "multiomics.yml"
-        Dataset.__init__(self, identifier, "multiomics", data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
-        self.set_configuration_from_file(self._config_file)
+    def __init__(self, identifier, data, configuration=None, analyses={}, analysis_queries={}, report=None):
+        Dataset.__init__(self, identifier, "multiomics", data=data, configuration=configuration, analyses=analyses, analysis_queries=analysis_queries, report=report)
+        if configuration is None:
+            self._config_file = "multiomics.yml" 
+            self.set_configuration_from_file(self._config_file)
 
     def get_dataframes(self, datasets):
         data = {}
@@ -373,10 +374,11 @@ class MultiOmicsDataset(Dataset):
         return kn
     
 class ProteomicsDataset(Dataset):
-    def __init__(self, identifier, dataset_type="proteomics", data={}, analyses={}, analysis_queries={}, report=None):
-        config_file = "proteomics.yml"
-        Dataset.__init__(self, identifier, dataset_type, data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
-        self.set_configuration_from_file(config_file)
+    def __init__(self, identifier, dataset_type="proteomics", data={}, configuration=None, analyses={}, analysis_queries={}, report=None):
+        Dataset.__init__(self, identifier, dataset_type, data=data, configuration=configuration, analyses=analyses, analysis_queries=analysis_queries, report=report)
+        if configuration is None:
+            config_file = "proteomics.yml"
+            self.set_configuration_from_file(config_file)
 
     def generate_dataset(self):
         self._data = self.query_data()
@@ -426,17 +428,19 @@ class ProteomicsDataset(Dataset):
         return kn
 
 class LongitudinalProteomicsDataset(ProteomicsDataset):
-    def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
-        config_file = "longitudinal_proteomics.yml"
-        ProteomicsDataset.__init__(self, identifier, data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
-        #self.dataset_type = "longitudinal_proteomics"
-        self.update_configuration_from_file(config_file)
+    def __init__(self, identifier, data={}, configuration=None, analyses={}, analysis_queries={}, report=None):
+        
+        ProteomicsDataset.__init__(self, identifier, data=data, configuration=configuration, analyses=analyses, analysis_queries=analysis_queries, report=report)
+        if configuration is None:
+            config_file = "longitudinal_proteomics.yml"
+            self.update_configuration_from_file(config_file)
 
 class ClinicalDataset(Dataset):
-    def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
-        config_file = "clinical.yml"
-        Dataset.__init__(self, identifier, "clinical", data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
-        self.set_configuration_from_file(config_file)
+    def __init__(self, identifier, data={}, configuration=None, analyses={}, analysis_queries={}, report=None):
+        Dataset.__init__(self, identifier, "clinical", data=data, configuration=configuration, analyses=analyses, analysis_queries=analysis_queries, report=report)
+        if configuration is None:
+            config_file = "clinical.yml"
+            self.set_configuration_from_file(config_file)
 
     def generate_dataset(self):
         self._data = self.query_data()
@@ -487,19 +491,23 @@ class ClinicalDataset(Dataset):
         return kn
 
 class DNAseqDataset(Dataset):
-    def __init__(self, identifier, dataset_type, data={}, analyses={}, analysis_queries={}, report=None):
-        config_file = "DNAseq.yml"
-        Dataset.__init__(self, identifier, dataset_type=dataset_type, data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
-        self.set_configuration_from_file(config_file)
+    def __init__(self, identifier, dataset_type, data={}, configuration=None, analyses={}, analysis_queries={}, report=None):
+        
+        Dataset.__init__(self, identifier, dataset_type=dataset_type, data=data, configuration=configuration, analyses=analyses, analysis_queries=analysis_queries, report=report)
+        if configuration is None:
+            config_file = "DNAseq.yml"
+            self.set_configuration_from_file(config_file)
 
     def generate_dataset(self):
         self._data = self.query_data()
 
 class RNAseqDataset(Dataset):
-    def __init__(self, identifier, data={}, analyses={}, analysis_queries={}, report=None):
-        config_file = "RNAseq.yml"
-        Dataset.__init__(self, identifier, "RNAseq", data=data, analyses=analyses, analysis_queries=analysis_queries, report=report)
-        self.set_configuration_from_file(config_file)
+    def __init__(self, identifier, data={}, configuration=None, analyses={}, analysis_queries={}, report=None):
+        
+        Dataset.__init__(self, identifier, "RNAseq", data=data, configuration=configuration, analyses=analyses, analysis_queries=analysis_queries, report=report)
+        if configuration is None:
+            config_file = "RNAseq.yml"
+            self.set_configuration_from_file(config_file)
 
     def generate_dataset(self):
         self._data = self.query_data()

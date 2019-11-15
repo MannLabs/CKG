@@ -671,8 +671,26 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
                                     'font': dict(color = "#d7191c", size = 10)})
                     color.append('#d7191c')
                 elif row['FC'] < -1.:
+                    annotations.append({'x': row['log2FC'], 
+                                    'y': row['-log10 pvalue'], 
+                                    'xref':'x', 
+                                    'yref': 'y', 
+                                    'text': str(row['identifier']), 
+                                    'showarrow': False, 
+                                    'ax': 0, 
+                                    'ay': -10,
+                                    'font': dict(color = "#abd9e9", size = 10)})
                     color.append('#abd9e9')
                 elif row['FC'] > 1.:
+                    annotations.append({'x': row['log2FC'], 
+                                    'y': row['-log10 pvalue'], 
+                                    'xref':'x', 
+                                    'yref': 'y', 
+                                    'text': str(row['identifier']), 
+                                    'showarrow': False, 
+                                    'ax': 0, 
+                                    'ay': -10,
+                                    'font': dict(color = "#fdae61", size = 10)})
                     color.append('#fdae61')
                 else:
                     color.append('lightblue')
@@ -1277,7 +1295,7 @@ def get_sankey_plot(data, identifier, args={'source':'source', 'target':'target'
                                 'target_colors':'target_colors', 'orientation': 'h', 'valueformat': '.0f', 'width':800, 'height':800, 'font':12, 'title':'Sankey plot'})
     """
     figure = {}
-    if not data.empty:
+    if data is not None and not data.empty:
         nodes = list(set(data[args['source']].tolist() + data[args['target']].tolist()))
         if 'source_colors' in args:
             node_colors = dict(zip(data[args['source']],data[args['source_colors']]))

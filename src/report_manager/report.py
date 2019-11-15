@@ -129,28 +129,34 @@ class Report:
         report_plots = []
         for plot_type in natsort.natsorted(self.plots):
             for plot in self.plots[plot_type]:
-                if environment == "notebook":
-                    if "notebook" in plot:
-                        net = plot['notebook']
-                        report_plots.append(Cytoscape(data={'elements':net[0]}, visual_style=net[1], layout={'width':'100%', 'height':'700px'}))
-                    else:
-                        if 'props' in plot:
-                            if 'figure' in plot['props']:
+                if plot is not None:
+                    if environment == "notebook":
+                        if "notebook" in plot:
+                            net = plot['notebook']
+                            report_plots.append(Cytoscape(data={'elements':net[0]}, visual_style=net[1], layout={'width':'100%', 'height':'700px'}))
+                        else:
+                            if isinstance(plot, dict):
+                                if 'props' in plot:
+                                    if 'figure' in plot['props']:
+                                        try:
+                                            iplot(plot['props']['figure'])
+                                        except:
+                                            pass
+                            elif hasattr(plot, 'figure'):
                                 try:
-                                    iplot(plot['props']['figure'])
+                                    iplot(plot.figure)
                                 except:
                                     pass
-                         
-                else:
-                    if isinstance(plot, dict):
-                        if "app" in plot:
-                            plot = plot["app"]
-                        if 'net_tables' in plot:
-                            tables = plot['net_tables']
-                            report_plots.append(tables[0])
-                            report_plots.append(tables[1])
+                    else:
+                        if isinstance(plot, dict):
+                            if "app" in plot:
+                                plot = plot["app"]
+                            if 'net_tables' in plot:
+                                tables = plot['net_tables']
+                                report_plots.append(tables[0])
+                                report_plots.append(tables[1])
 
-                    report_plots.append(html.Div(plot, style={'overflowY': 'scroll', 'overflowX': 'scroll'}))
+                        report_plots.append(html.Div(plot, style={'overflowY': 'scroll', 'overflowX': 'scroll'}))
 
         return report_plots
 
