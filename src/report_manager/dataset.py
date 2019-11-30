@@ -6,9 +6,10 @@ import pandas as pd
 import h5py as h5
 import ckg_utils
 import config.ckg_config as ckg_config
-from report_manager import analysisResult as ar, report as rp, utils, knowledge
-from report_manager.analyses import basicAnalysis
-from report_manager.plots import basicFigures
+from report_manager import report as rp, utils, knowledge
+from analytics_core import analytics_factory
+from analytics_core.analytics import analytics
+from analytics_core.viz import viz
 from graphdb_connector import connector
 import logging
 import logging.config
@@ -168,7 +169,7 @@ class Dataset:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             logger.error("Reading queries from file {}: {}, file: {},line: {}".format(queries_path, sys.exc_info(), fname, exc_tb.tb_lineno))
-
+        
         return data
 
     def send_query(self, query):
@@ -200,7 +201,7 @@ class Dataset:
         return description, data_name, analysis_types, plot_types, store_analysis, args
 
     def add_configuration_to_report(self, report_pipeline):
-        conf_plot = basicFigures.generate_configuration_tree(report_pipeline, self.dataset_type)
+        conf_plot = viz.generate_configuration_tree(report_pipeline, self.dataset_type)
         self.report.update_plots({('0', self.dataset_type+'_pipeline', 'cytoscape_network'):[conf_plot]})
 
     def generate_report(self):
@@ -215,7 +216,7 @@ class Dataset:
             for subsection in self.configuration[section]:
                 description, data_names, analysis_types, plot_types, store_analysis, args = self.extract_configuration(self.configuration[section][subsection])
                 if description is not None:
-                    description = basicFigures.get_markdown(description, args={})
+                    description = viz.get_markdown(description, args={})
                 report_step[section][subsection] = {'data' : data_names, 'analyses': [], 'args': {}}
                 if isinstance(data_names, dict) or isinstance(data_names, list):
                     data = self.get_dataframes(data_names)
@@ -244,7 +245,7 @@ class Dataset:
                         order +=1
                     if len(analysis_types) >= 1:
                         for analysis_type in analysis_types:
-                            result = ar.AnalysisResult(self.identifier, analysis_type, args, data)
+                            result = analytics_factory.Analysis(self.identifier, analysis_type, args, data)
                             analysis_type = result.analysis_type
                             if analysis_type in result.result and result.result[analysis_type] is not None and len(result.result[analysis_type]) >=1:
                                 report_step[section][subsection]['analyses'].append(analysis_type)
@@ -268,7 +269,7 @@ class Dataset:
                         if result is None:
                             dictresult = {}
                             dictresult["_".join(subsection.split(' '))] = data
-                            result = ar.AnalysisResult(self.identifier,"_".join(subsection.split(' ')), args, data, result = dictresult)
+                            result = analytics_factory.Analysis(self.identifier,"_".join(subsection.split(' ')), args, data, result = dictresult)
                             report_pipeline.update(report_step)
                             self.update_analyses(result.result)
                         for plot_type in plot_types:
@@ -418,7 +419,7 @@ class ProteomicsDataset(Dataset):
                 if "value_col" in args:
                     value_col = args["value_col"]
 
-            processed_data = basicAnalysis.get_proteomics_measurements_ready(data, index_cols=index, imputation = imputation, method = method, missing_method = missing_method, missing_per_group=missing_per_group, missing_max = missing_max, min_valid=min_valid)
+            processed_data = analytics.get_proteomics_measurements_ready(data, index_cols=index, imputation = imputation, method = method, missing_method = missing_method, missing_per_group=missing_per_group, missing_max = missing_max, min_valid=min_valid)
         return processed_data
     
     def generate_knowledge(self):
@@ -481,7 +482,7 @@ class ClinicalDataset(Dataset):
                 if 'group_id' in args:
                     group_id = args['group_id']
 
-            processed_data = basicAnalysis.get_clinical_measurements_ready(data, subject_id=subject_id, sample_id=sample_id, group_id=group_id, columns=columns, values=values, extra=extra, imputation=imputation, imputation_method=imputation_method)
+            processed_data = analytics.get_clinical_measurements_ready(data, subject_id=subject_id, sample_id=sample_id, group_id=group_id, columns=columns, values=values, extra=extra, imputation=imputation, imputation_method=imputation_method)
         return processed_data
     
     def generate_knowledge(self):

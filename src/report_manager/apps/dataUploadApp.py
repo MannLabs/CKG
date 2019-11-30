@@ -107,7 +107,7 @@ class DataUploadApp(basicApp.BasicApp):
                              							 style={'marginTop':'1%', 'width':'15%', 'marginLeft': 5, 'verticalAlign':'top', 'display':'inline-block'}),
                     				  html.Div([dash_table.DataTable(id='clinical-table', columns=[{'name': '', 'id': '', 'renamable':False, 'deletable':True} for i in range(5)],
                                       		                         data=[{j: ''} for j in range(10)], fixed_rows={'headers':True}, editable=True, style_cell={'minWidth': '220px', 'width': '220px','maxWidth': '220px', 'whiteSpace': 'normal'},
-                                                                     css=[{'selector': '.dash-cell div.dash-cell-value', 'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'}])],
+                                                                     )],
                              					style={'marginTop':'1%', 'maxHeight': 800, 'overflowY': 'scroll', 'overflowX': 'scroll'}),
                 					  html.Div(children=[html.Button('Upload Data', id='submit_button')],
                              							 style={'marginTop':'5%', 'fontSize':'22px', 'minWidth':'500px', 'marginLeft':'89%'})]),

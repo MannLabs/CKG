@@ -1,6 +1,6 @@
 Disease:
-  name: associated diseases
-  description: get relationships to diseases
+  name: associated diseases in at least two of the proteins specified
+  description: get relationships to diseases from a list of proteins. Limit the result to diseases associated to the disease studied and with a score higher than 3 (DISEASES).
   involved_nodes:
     - Protein
     - Disease
@@ -8,16 +8,15 @@ Disease:
     - ASSOCIATED_WITH
     - ASSOCIATED_WITH_INTEGRATED
   query: >
-          MATCH (protein:Protein)-[r]-(disease:Disease)
-          WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS]) AND toFloat(r.score)>3.0 AND NOT disease.id IN ["DOID:4","DOID:7","DOID:0050117","DOID:14566","	DOID:150","DOID:0014667","DOID:630","DOID:0080015","DOID:225"]
-          WITH disease, count(r) AS r_count
-          WHERE r_count>1
-          MATCH (protein:Protein)-[r]-(disease)
-          WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS]) AND toFloat(r.score)>3.0
+          MATCH (project:Project)-[:STUDIES_DISEASE]-(d:Disease)-[:HAS_PARENT]->(parent_disease:Disease)
+          WHERE project.id="PROJECTID"
+          WITH COLLECT(parent_disease) + COLLECT(d) AS parent_diseases
+          MATCH (protein:Protein)-[r]-(disease:Disease)-[:HAS_PARENT]->(parents:Disease)
+          WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS]) AND toFloat(r.score)>1.0 AND parents IN parent_diseases
           RETURN (protein.name+"~"+protein.id) AS node1, disease.name AS node2, r.score AS weight, type(r) AS type
 Drug:
-  name: associated drugs
-  description: get relationships to drugs
+  name: associated drugs in at least two of the proteins specified
+  description: get relationships to drugs. Limit the result to drugs associated to at least two proteins with a score higher than 0.9 (STITCH).
   involved_nodes:
     - Protein
     - Drug
@@ -34,7 +33,7 @@ Drug:
           RETURN (protein.name+"~"+protein.id) AS node1, drug.name AS node2, r.score AS weight, r.action AS type
 Pathway:
   name: associated pathways
-  description: get relationships to pathways
+  description: get relationships to pathways. Limit the result to pathways associated to at least two proteins.
   involved_nodes:
     - Protein
     - Pathway
@@ -44,7 +43,7 @@ Pathway:
           MATCH (protein:Protein)-[r]-(pathway:Pathway)
           WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS]) AND toLower(r.source)="reactome"
           WITH pathway, count(r) AS r_count
-          WHERE r_count>1
+          WHERE r_count>2
           MATCH (protein:Protein)-[r]-(pathway)
           WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS])
           RETURN (protein.name+"~"+protein.id) AS node1, pathway.name AS node2, r.score AS weight, type(r) AS type
@@ -59,10 +58,101 @@ Publication:
   query: >
           MATCH (protein:Protein)-[r]-(publication:Publication)
           WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS])
-          WITH publication, count(r) AS r_count
-          WHERE r_count>3
-          MATCH (protein:Protein)-[r]-(publication)
-          WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS])
+          WITH publication, count(r) AS r_count WHERE r_count>1
+          MATCH (project:Project)-[:STUDIES_DISEASE]-(d:Disease)-[:HAS_PARENT]->(parent_disease:Disease)
+          WHERE project.id="PROJECTID"
+          WITH COLLECT(parent_disease) + COLLECT(d) AS parent_diseases, publication
+          MATCH (protein:Protein)-[r]-(publication)-[]-(:Disease)-[:HAS_PARENT]->(parents:Disease)
+          WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS]) AND parents IN parent_diseases
           RETURN (protein.name+"~"+protein.id) AS node1, ("PMID:"+publication.id) AS node2, type(r) AS type
-
-
+association_disease_score:
+  name: specific disease
+  description: Return the list of proteins associated to a specific disease with a specific score.
+  involved_nodes:
+    - Protein
+    - Disease
+  involved_rels:
+    - ASSOCIATED_WITH
+    - ASSOCIATED_WITH_INTEGRATED
+  example:
+          - proteins = ['A1BG~P04217','A2M~P01023','ACACB~O00763','ACTC1~P68032','ADIPOQ~Q15848','AGT~P01019','AIFM2~Q9BRQ8','APOA2~V9GYM3']
+          - disease  = ['DOID:1324']
+          - score = 3
+          - protein_disease_associations = queries["association_disease_score"]["query"].format(proteins, disease, score)
+  query: >
+          MATCH (protein:Protein)-[r]-(disease:Disease)
+          WHERE ((protein.name+"~"+protein.id) IN [{}]) AND disease.id IN [{}] AND toFloat(r.score)>{}
+          RETURN (protein.name+"~"+protein.id) AS node1, disease.name AS node2, r.score AS weight, type(r) AS type, r.source AS source
+association_drug_intervention_proteins:
+  name: drug intervention- protein association
+  description: Return associations between a list of proteins and the drug intervention in the project
+  involved_nodes:
+    - Project
+    - Protein
+    - Clinical_variable
+    - Drug
+  involved_rels:
+    - HAD_INTERVENTION
+    - ACTS_ON
+  example:
+          - project_id = 'P0000002'
+          - proteins = ['A1BG~P04217','A2M~P01023','ACACB~O00763','ACTC1~P68032','ADIPOQ~Q15848','AGT~P01019','AIFM2~Q9BRQ8','APOA2~V9GYM3']
+          - type  = 'inhibition'
+          - score = 0.9
+          - intervention_protein_associations = queries["association_drug_intervention_proteins"]["query"].format(project_id, proteins, type, score)
+  query: >
+          MATCH (project:Project)-[]-()-[:HAD_INTERVENTION]-(c:Clinical_variable)
+          WHERE project.id={} AND intervention.type='drug treatment'
+          WITH COLLECT(toLower(c.name)) AS interventions
+          MATCH (drug:Drug)-[r:ACTS_ON]->(protein:Protein)
+          WHERE ((protein.name+"~"+protein.id) IN [{}]) AND r.action="{}" AND toFloat(r.score)>={} AND toLower(drug.name) IN interventions
+          RETURN (protein.name+"~"+protein.id) AS node1, drug.name AS node2, drug.id AS drug_id, drug.description AS Drug_desc, r.score AS weight, type(r) AS type, r.action AS action, r.source AS source
+association_drug_interaction_score:
+  name: drug interaction association
+  description: Return the list of drugs associated to the list of proteins provided with a specific interaction (i.e. inhibition, activation) with a specific score
+  involved_nodes:
+    - Protein
+    - Drug
+  involved_rels:
+    - ACTS_ON
+  example:
+          - proteins = ['A1BG~P04217','A2M~P01023','ACACB~O00763','ACTC1~P68032','ADIPOQ~Q15848','AGT~P01019','AIFM2~Q9BRQ8','APOA2~V9GYM3']
+          - type  = 'inhibition'
+          - score = 0.9
+          - protein_drug_associations = queries["association_drug_interaction_score"]["query"].format(proteins, type, score)
+  query: >
+          MATCH (protein:Protein)-[r]-(drug:Drug)
+          WHERE ((protein.name+"~"+protein.id) IN [{}]) AND r.action="{}" AND toFloat(r.score)>={}
+          RETURN (protein.name+"~"+protein.id) AS node1, drug.name AS node2, drug.id AS drug_id, drug.description AS Drug_desc, r.score AS weight, type(r) AS type, r.action AS action, r.source AS source
+association_drug_sideeffects:
+  name: drug side effect association
+  description: Return the list of side effects linked to drugs
+  involved_nodes:
+    - Phenotype
+    - Drug
+  involved_rels:
+    - ASSOCIATED_WITH
+  example:
+          - drugs = ['DB00439', 'DB06196']
+          - drug_side_effect_associations = queries["association_drug_sideeffects"]["query"].format(drugs)
+  query: >
+          MATCH (sideeffect:Phenotype)-[r]-(drug:Drug)
+          WHERE (drug.id IN [{}])
+          RETURN drug.name AS node1, sideeffect.name AS node2, type(r) AS type, r.source AS source
+association_drug_disease_publication:
+  name: drug used in disease
+  description: Return the list of publications co-mentioning drugs and a specific disease
+  involved_nodes:
+    - Drug
+    - Disease
+    - Publication
+  involved_rels:
+    - MENTIONED_IN_PUBLICATION
+  example:
+          - drugs = ['DB00439', 'DB06196']
+          - disease  = ['DOID:1324']
+          - drug_disease_publications = queries["association_drug_disease_publication"]["query"].format(drugs, disease)
+  query: >
+          MATCH (drug:Drug)-[r:MENTIONED_IN_PUBLICATION]-(publication:Publication)-[:MENTIONED_IN_PUBLICATION]-(disease:Disease)
+          WHERE (drug.id IN [{}]) AND disease.id IN [{}]
+          RETURN drug.name AS node1, ("PMID:"+publication.id) AS node2, type(r) AS type

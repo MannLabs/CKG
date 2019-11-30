@@ -8,8 +8,9 @@ import ckg_utils
 import config.ckg_config as ckg_config
 import dash_cytoscape as cyto
 from graphdb_connector import connector
-from report_manager import utils, report as rp
-from report_manager.plots import basicFigures, color_list
+from report_manager import report as rp
+from analytics_core import utils
+from analytics_core.viz import viz, color_list
 from networkx.readwrite import json_graph
 import logging
 import logging.config
@@ -231,7 +232,6 @@ class Knowledge:
                 query = cypher_queries[query_name]['query']
                 for r,by in replace:
                     query = query.replace(r,by)
-                print(query_name, query)
                 query_data[query_name] = self.send_query(query)
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -302,25 +302,25 @@ class Knowledge:
         args['stylesheet'] = stylesheet
         args['layout'] = layout
         
-        nodes_table, edges_table = basicFigures.network_to_tables(self.graph)
-        nodes_fig_table = basicFigures.get_table(nodes_table, identifier=self.identifier+"_nodes_table", title="Nodes table")
-        edges_fig_table = basicFigures.get_table(edges_table, identifier=self.identifier+"_edges_table", title="Edges table")
+        nodes_table, edges_table = viz.network_to_tables(self.graph)
+        nodes_fig_table = viz.get_table(nodes_table, identifier=self.identifier+"_nodes_table", title="Nodes table")
+        edges_fig_table = viz.get_table(edges_table, identifier=self.identifier+"_edges_table", title="Edges table")
         cy_elements, mouseover_node = utils.networkx_to_cytoscape(self.graph)
         #args['mouseover_node'] = mouseover_node
 
-        net = {"notebook":[cy_elements, stylesheet, layout], "app":basicFigures.get_cytoscape_network(cy_elements, self.identifier, args), "net_tables":(nodes_fig_table, edges_fig_table), "net_json":json_graph.node_link_data(self.graph)}
+        net = {"notebook":[cy_elements, stylesheet, layout], "app":viz.get_cytoscape_network(cy_elements, self.identifier, args), "net_tables":(nodes_fig_table, edges_fig_table), "net_json":json_graph.node_link_data(self.graph)}
         
         return net
     
-    def generate_report(self, viz='sankey'):
+    def generate_report(self, visualization='sankey'):
         report = rp.Report(identifier="knowledge")
-        if viz == 'network':
+        if visualization == 'network':
             plots = [self.get_knowledge_graph_plot()]
-        elif viz == 'sankey':
+        elif visualization == 'sankey':
             if self.graph is None:
                 self.generate_knowledge_graph()
             df = nx.to_pandas_edgelist(self.graph).fillna(1)
-            plots = [basicFigures.get_sankey_plot(df, self.identifier, args={'source':'source', 
+            plots = [viz.get_sankey_plot(df, self.identifier, args={'source':'source', 
                                                                              'target':'target', 
                                                                              'source_colors':'source_color', 
                                                                              'target_colors':'target_color',
@@ -376,7 +376,7 @@ class ProteomicsKnowledge(Knowledge):
         #self.relationships.update(correlation_knowledge[1])
         
         nodes = self.generate_cypher_nodes_list()
-        queries_results = self.query_data(replace=[('PROTEINIDS',nodes)])
+        queries_results = self.query_data(replace=[('PROTEINIDS',nodes), ('PROJECTID', self.identifier)])
         queries_knowledge = self.generate_knowledge_from_queries(entity='Protein', queries_results=queries_results)
         self.nodes.update(queries_knowledge[0])
         self.relationships.update(queries_knowledge[1])

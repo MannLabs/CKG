@@ -1,4 +1,4 @@
-from report_manager.plots import basicFigures as figure
+from analytics_core.viz import viz
 #Dash
 import dash
 import dash_core_components as dcc
@@ -44,11 +44,11 @@ def get_stats_data(filename, n=3):
 
 def select_last_n_imports(stats_file, n=3):
     """
-    Selects which independent full and partial imports should be plotted based on 'n'.
+    Selects which independent full and partial imports should be plotted based on n.
 
     :param stats_file: pandas DataFrame with stats data.
     :param int n: number of independent imports to select.
-    return: List of import ids to be plotted according to selection criterion 'n'.
+    :return: List of import ids to be plotted according to selection criterion.
     """
     df = stats_file[['datetime', 'import_id', 'Import_flag']].sort_values('datetime', ascending=False).drop_duplicates(['import_id'], keep = 'first', inplace = False) 
     f = df[df['Import_flag'] == 'full']
@@ -85,7 +85,7 @@ def get_databases_entities_relationships(stats_file, key='full', options='databa
     :param str key: use only full, partial or both kinds of imports ('full', 'partial', 'all').
     :param str options: name of the variables to be used as keys in the output dictionary ('dates', \
                         'databases', 'entities' or 'relationships').
-    return: Dictionary.
+    :return: Dictionary.
     """
     if key == 'full':
         stats = stats_file[stats_file['Import_flag'] == 'full']
@@ -139,7 +139,7 @@ def set_colors(dictionary):
     This function takes the values in a dictionary and attributes them an RGB color.
 
     :param dict dictionary: dictionary with variables to be attributed a color, as values.
-    return: Dictionary where 'dictionary' values are keys and random RGB colors are the values.
+    :return: Dictionary where 'dictionary' values are keys and random RGB colors are the values.
     """
     colors = []
     for i in list(chain(*dictionary.values())):
@@ -161,7 +161,7 @@ def get_dropdown_menu(fig, options_dict, add_button=True, equal_traces=True, num
                                 If True, define 'number_traces' as well. If False, number of traces \
                                 will be the same as the number of values for each 'options_dict' key.
     :param int number_traces: number of traces created for each 'options_dict' key.
-    return: List of nested structures. Each dictionary within *updatemenus[0]['buttons'][0]* corresponds \
+    :return: List of nested structures. Each dictionary within *updatemenus[0]['buttons'][0]* corresponds \
             to one dropdown menu options and contains information on which traces are visible, label and method.
     """
     
@@ -208,7 +208,7 @@ def get_totals_per_date(stats_file, key='full', import_types=False):
     :param stats_file: pandas DataFrame with stats data.
     :param str key: use only full or partial imports ('full', 'partial').
     :param bool import_types: breakdown importing stats into entities or relationships related.
-    return: Pandas DataFrame with independent import dates as rows and imported numbers as columns.
+    :return: Pandas DataFrame with independent import dates as rows and imported numbers as columns.
     """
     if key == 'full':
         stats = stats_file[stats_file['Import_flag'] == 'full']
@@ -245,7 +245,7 @@ def get_imports_per_database_date(stats_file):
     imported entities and relationships per database.
 
     :param stats_file: pandas DataFrame with stats data.
-    return: Pandas DataFrame with independent import dates and databases as rows and imported numbers as columns.
+    :return: Pandas DataFrame with independent import dates and databases as rows and imported numbers as columns.
     """
     cols = ['date', 'dataset', 'entities', 'relationships', 'total']
     stats_sum = []
@@ -270,13 +270,13 @@ def plot_total_number_imported(stats_file, plot_title):
 
     :param stats_file: pandas DataFrame with stats data.
     :param str plot_title: title of the plot.
-    return: Line plot figure within the <div id="_dash-app-content">.
+    :return: Line plot figure within the <div id="_dash-app-content">.
     """
     df_full = get_totals_per_date(stats_file, key='full', import_types=False).sort_index()
     df_partial = get_totals_per_date(stats_file, key='partial', import_types=False).sort_index()
 
-    traces_f = figure.getPlotTraces(df_full, key='full', type='lines')
-    traces_p = figure.getPlotTraces(df_partial, key='partial', type='lines')
+    traces_f = viz.getPlotTraces(df_full, key='full', type='lines')
+    traces_p = viz.getPlotTraces(df_partial, key='partial', type='lines')
     traces = traces_f + traces_p
 
     if type(traces[0]) == list:
@@ -299,13 +299,13 @@ def plot_total_numbers_per_date(stats_file, plot_title):
 
     :param stats_file: pandas DataFrame with stats data.
     :param str plot_title: title of the plot.
-    return: Scatter plot figure within the <div id="_dash-app-content">, with scalled markers.
+    :return: Scatter plot figure within the <div id="_dash-app-content">, with scalled markers.
     """
     df_full = get_totals_per_date(stats_file, key='full', import_types=True)
     df_partial = get_totals_per_date(stats_file, key='partial', import_types=True)
 
-    traces_f = figure.getPlotTraces(df_full, key='full', type='scaled markers', div_factor=float(10^1000))
-    traces_p = figure.getPlotTraces(df_partial, key='partial', type='scaled markers', div_factor=float(10^1000))
+    traces_f = viz.getPlotTraces(df_full, key='full', type='scaled markers', div_factor=float(10^1000))
+    traces_p = viz.getPlotTraces(df_partial, key='partial', type='scaled markers', div_factor=float(10^1000))
     traces = traces_f + traces_p
 
     if type(traces[0]) == list:
@@ -336,7 +336,7 @@ def plot_databases_numbers_per_date(stats_file, plot_title, key='full', dropdown
     :param bool dropdown: add dropdown menu to figure or not.
     :param str dropdown_options: name of the variables to be used as options in the dropdown menu ('dates', \
                         'databases', 'entities' or 'relationships').
-    return: Horizontal barplot figure within the <div id="_dash-app-content">.
+    :return: Horizontal barplot figure within the <div id="_dash-app-content">.
     """
     if key == 'full':
         stats = stats_file[stats_file['Import_flag'] == 'full']
@@ -351,7 +351,7 @@ def plot_databases_numbers_per_date(stats_file, plot_title, key='full', dropdown
     traces = []
     for i in dropdown_options.keys():
         df = data.iloc[data.index.get_level_values(0).str.contains(i)].droplevel(0)
-        traces.append(figure.getPlotTraces(df, key=key, type = 'bars', horizontal=True))
+        traces.append(viz.getPlotTraces(df, key=key, type = 'bars', horizontal=True))
 
     if type(traces[0]) == list:
         traces = list(chain.from_iterable(traces))
@@ -396,7 +396,7 @@ def plot_import_numbers_per_database(stats_file, plot_title, key='full', subplot
     :param bool dropdown: add dropdown menu to figure or not.
     :param str dropdown_options: name of the variables to be used as options in the dropdown menu ('dates', \
                         'databases', 'entities' or 'relationships').
-    return: Multi-scatterplot figure within the <div id="_dash-app-content">.
+    :return: Multi-scatterplot figure within the <div id="_dash-app-content">.
     """
     if key == 'full':
         stats = stats_file[stats_file['Import_flag'] == 'full']

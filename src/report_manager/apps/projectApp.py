@@ -109,7 +109,7 @@ class ProjectApp(basicApp.BasicApp):
                                 value=self.id+'/defaults',
                                 clearable=False,
                                 style={'width': '50%', 'margin-bottom':'10px'}),
-                            dcc.Upload(id='upload-data',
+                            dcc.Upload(id='upload-config',
                                 children=html.Div(['Drag and Drop or ',
                                     html.A('Select Files')]),
                                 max_size=-1,
@@ -131,8 +131,6 @@ class ProjectApp(basicApp.BasicApp):
             directory = os.path.join('../../data/tmp',self.id)
             if os.path.exists(directory):
                 config_files = {f.split('.')[0]:os.path.join(directory,f) for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))}
-        print(self.id)
-        print(config_files)
         p = project.Project(self.project_id, datasets={}, knowledge=None, report={}, configuration_files=config_files)
         p.build_project(self.force)
         p.generate_report()
@@ -156,3 +154,5 @@ class ProjectApp(basicApp.BasicApp):
                 tabs.append(tab)
         lc = dcc.Tabs(tabs)
         self.add_to_layout(lc)
+        
+        p = None

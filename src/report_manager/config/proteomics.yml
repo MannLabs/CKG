@@ -11,6 +11,15 @@ args:
         - sample
         - subject
 overview: #section
+    overview statistics:
+        data: processed
+        analyses:
+            - summary
+        plots:
+            - multiTable
+        store_analysis: True
+        args:
+            title: Summary Statistics
     peptides:
         data: number of peptides
         analyses: []
@@ -158,6 +167,7 @@ data exploration:
             showscale: False
             marker_size: 10
             permutations: 250
+            num_annotations: 50
             x_title: logFC
             y_title: -log(pvalue)
             drop_cols:
@@ -270,7 +280,7 @@ enrichment:
             - regulation_enrichment
         plots:
             - basicTable
-        store_analysis: False
+        store_analysis: True
         args:
             regulation_data: regulation table
             annotation: go annotation
@@ -291,7 +301,7 @@ enrichment:
             - regulation_enrichment
         plots:
             - basicTable
-        store_analysis: False
+        store_analysis: True
         args:
             regulation_data: regulation table
             annotation: pathway annotation
