@@ -1,0 +1,405 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Analytics Core &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Analysis" href="analytics_core.analytics.html" />
+    <link rel="prev" title="Report Dash Apps" href="report_manager.apps.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> ClinicalKnowledgeGraph
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">Clinical Knowledge Graph</a></li>
+</ul>
+<p class="caption"><span class="caption-text">First steps</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/connect-to-ckg.html">Connecting to the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/create-new-user.html">Create a new user in the graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/create-new-project.html">Create a new project in the database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/upload-data.html">Upload project experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/data-analysis-config.html">Define data analysis parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/access-report.html">Accessing the analysis report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/notifications.html">Report notifications</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Project Report</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../project_report/project-report.html">Generating a project report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project_report/project-tabs.html">Project report tabs</a></li>
+</ul>
+<p class="caption"><span class="caption-text">CKG Builder</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/ontologies.html">Ontology sources and raw file parsers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/databases.html">Biomedical databases and resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/experiments.html">Parsing experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/graphdb-builder.html">Building the graph database from one Python module</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/import-statistics.html">Clinical Knowledge Graph Statistics: Imports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/R-interface.html">Python - R interface</a></li>
+</ul>
+<p class="caption"><span class="caption-text">System Requirements</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../system_require/mac-os.html">Mac OS X requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system_require/linux.html">Linux requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system_require/windows.html">Windows requirements</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../src.html">Clinical Knowledge Graph package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="graphdb_connector.html">Graph Database Connector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graphdb_builder.html">Graph Database Builder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="report_manager.html">Report Manager</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Analytics Core</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="analytics_core.analytics.html">Analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="analytics_core.viz.html">Vizualization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-analytics_core.R_wrapper">R wrapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-analytics_core.analytics_factory">Analytics factory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-analytics_core.utils">Utils</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks.html">Notebooks</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#backers">Backers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#history">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#code-of-conduct">Code of Conduct</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ClinicalKnowledgeGraph</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../src.html">Clinical Knowledge Graph package</a> &raquo;</li>
+        
+      <li>Analytics Core</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_autosummary/analytics_core.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="analytics-core">
+<h1>Analytics Core<a class="headerlink" href="#analytics-core" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="analytics_core.analytics.html">Analysis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="analytics_core.analytics.html#module-analytics_core.analytics.analytics">Analytics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="analytics_core.analytics.html#module-analytics_core.analytics.wgcnaAnalysis">WGCNA analytics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="analytics_core.viz.html">Vizualization</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="analytics_core.viz.html#module-analytics_core.viz.viz">Viz module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="analytics_core.viz.html#module-analytics_core.viz.wgcnaFigures">WGCNA viz</a></li>
+<li class="toctree-l2"><a class="reference internal" href="analytics_core.viz.html#module-analytics_core.viz.Dendrogram">Dendrogram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="analytics_core.viz.html#module-analytics_core.viz.color_list">Colors</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="module-analytics_core.R_wrapper">
+<span id="r-wrapper"></span><h2>R wrapper<a class="headerlink" href="#module-analytics_core.R_wrapper" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="analytics_core.R_wrapper.call_Rpackage">
+<code class="sig-prename descclassname">analytics_core.R_wrapper.</code><code class="sig-name descname">call_Rpackage</code><span class="sig-paren">(</span><em class="sig-param">call='function'</em>, <em class="sig-param">designation='aov'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/R_wrapper.html#call_Rpackage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.R_wrapper.call_Rpackage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="analytics_core.R_wrapper.R_matrix2Py_matrix">
+<code class="sig-prename descclassname">analytics_core.R_wrapper.</code><code class="sig-name descname">R_matrix2Py_matrix</code><span class="sig-paren">(</span><em class="sig-param">r_matrix</em>, <em class="sig-param">index</em>, <em class="sig-param">columns</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/R_wrapper.html#R_matrix2Py_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.R_wrapper.R_matrix2Py_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-analytics_core.analytics_factory">
+<span id="analytics-factory"></span><h2>Analytics factory<a class="headerlink" href="#module-analytics_core.analytics_factory" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="analytics_core.analytics_factory.Analysis">
+<em class="property">class </em><code class="sig-prename descclassname">analytics_core.analytics_factory.</code><code class="sig-name descname">Analysis</code><span class="sig-paren">(</span><em class="sig-param">identifier</em>, <em class="sig-param">analysis_type</em>, <em class="sig-param">args</em>, <em class="sig-param">data</em>, <em class="sig-param">result=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/analytics_factory.html#Analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.analytics_factory.Analysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="analytics_core.analytics_factory.Analysis.identifier">
+<em class="property">property </em><code class="sig-name descname">identifier</code><a class="headerlink" href="#analytics_core.analytics_factory.Analysis.identifier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analytics_core.analytics_factory.Analysis.analysis_type">
+<em class="property">property </em><code class="sig-name descname">analysis_type</code><a class="headerlink" href="#analytics_core.analytics_factory.Analysis.analysis_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analytics_core.analytics_factory.Analysis.args">
+<em class="property">property </em><code class="sig-name descname">args</code><a class="headerlink" href="#analytics_core.analytics_factory.Analysis.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analytics_core.analytics_factory.Analysis.data">
+<em class="property">property </em><code class="sig-name descname">data</code><a class="headerlink" href="#analytics_core.analytics_factory.Analysis.data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analytics_core.analytics_factory.Analysis.result">
+<em class="property">property </em><code class="sig-name descname">result</code><a class="headerlink" href="#analytics_core.analytics_factory.Analysis.result" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analytics_core.analytics_factory.Analysis.generate_result">
+<code class="sig-name descname">generate_result</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/analytics_factory.html#Analysis.generate_result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.analytics_factory.Analysis.generate_result" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analytics_core.analytics_factory.Analysis.get_plot">
+<code class="sig-name descname">get_plot</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">identifier</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/analytics_factory.html#Analysis.get_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.analytics_factory.Analysis.get_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-analytics_core.utils">
+<span id="utils"></span><h2>Utils<a class="headerlink" href="#module-analytics_core.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="analytics_core.utils.generate_html">
+<code class="sig-prename descclassname">analytics_core.utils.</code><code class="sig-name descname">generate_html</code><span class="sig-paren">(</span><em class="sig-param">network</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/utils.html#generate_html"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.utils.generate_html" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method gets the data structures supporting the nodes, edges,
+and options and updates the pyvis html template holding the visualization.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="analytics_core.utils.neoj_path_to_networkx">
+<code class="sig-prename descclassname">analytics_core.utils.</code><code class="sig-name descname">neoj_path_to_networkx</code><span class="sig-paren">(</span><em class="sig-param">paths</em>, <em class="sig-param">key='path'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/utils.html#neoj_path_to_networkx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.utils.neoj_path_to_networkx" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="analytics_core.utils.networkx_to_cytoscape">
+<code class="sig-prename descclassname">analytics_core.utils.</code><code class="sig-name descname">networkx_to_cytoscape</code><span class="sig-paren">(</span><em class="sig-param">graph</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/utils.html#networkx_to_cytoscape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.utils.networkx_to_cytoscape" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="analytics_core.utils.get_clustergrammer_link">
+<code class="sig-prename descclassname">analytics_core.utils.</code><code class="sig-name descname">get_clustergrammer_link</code><span class="sig-paren">(</span><em class="sig-param">net</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/utils.html#get_clustergrammer_link"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.utils.get_clustergrammer_link" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="analytics_core.utils.generator_to_dict">
+<code class="sig-prename descclassname">analytics_core.utils.</code><code class="sig-name descname">generator_to_dict</code><span class="sig-paren">(</span><em class="sig-param">genvar</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/utils.html#generator_to_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.utils.generator_to_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="analytics_core.utils.parse_html">
+<code class="sig-prename descclassname">analytics_core.utils.</code><code class="sig-name descname">parse_html</code><span class="sig-paren">(</span><em class="sig-param">html_snippet</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/utils.html#parse_html"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.utils.parse_html" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="analytics_core.utils.hex2rgb">
+<code class="sig-prename descclassname">analytics_core.utils.</code><code class="sig-name descname">hex2rgb</code><span class="sig-paren">(</span><em class="sig-param">color</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/utils.html#hex2rgb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.utils.hex2rgb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="analytics_core.utils.get_rgb_colors">
+<code class="sig-prename descclassname">analytics_core.utils.</code><code class="sig-name descname">get_rgb_colors</code><span class="sig-paren">(</span><em class="sig-param">n</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/utils.html#get_rgb_colors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.utils.get_rgb_colors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="analytics_core.utils.get_hex_colors">
+<code class="sig-prename descclassname">analytics_core.utils.</code><code class="sig-name descname">get_hex_colors</code><span class="sig-paren">(</span><em class="sig-param">n</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/utils.html#get_hex_colors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.utils.get_hex_colors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="analytics_core.utils.getMedlineAbstracts">
+<code class="sig-prename descclassname">analytics_core.utils.</code><code class="sig-name descname">getMedlineAbstracts</code><span class="sig-paren">(</span><em class="sig-param">idList</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/utils.html#getMedlineAbstracts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.utils.getMedlineAbstracts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="analytics_core.analytics.html" class="btn btn-neutral float-right" title="Analysis" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="report_manager.apps.html" class="btn btn-neutral float-left" title="Report Dash Apps" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

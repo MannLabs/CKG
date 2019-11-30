@@ -1,0 +1,9 @@
+########################
+usersDirectory: '../../../data/users'
+usersImportDirectory: 'users'
+
+usersFile: 'CKG_users.xlsx'
+
+import_file: 'users.tsv'
+
+cypher_queries_file: 'user_creation_cypher.yml'

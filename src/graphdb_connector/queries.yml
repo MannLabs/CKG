@@ -1,9 +1,9 @@
-"modify":
-    'name': 'modify node attribute'
-    'description': 'Adds or Overwrittes (if property already exists) a specific attribute for a given entity. Requires: Entity, Entity.id, Property and new Property.value'
-    'involved_nodes':
-    'involved_rels':
-    'query': >
+modify_attribute:
+    name: modify node attribute
+    description: 'Adds or Overwrittes (if property already exists) a specific attribute for a given entity. Requires: Entity, Entity.id, Property and new Property.value'
+    involved_nodes:
+    involved_rels:
+    query: >
         MATCH (n:%s)
         WHERE n.id = "%s"
         SET n += {%s: "%s"};

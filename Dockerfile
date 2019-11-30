@@ -19,6 +19,8 @@ RUN apt-get update && \
     apt-get install -yq unzip && \
     apt-get install -yq python3.6 python3-pip python3-setuptools python3-dev libxml2 libxml2-dev zlib1g-dev && \
     apt-get install -yq nginx uwsgi uwsgi-plugin-python3 && \
+    apt-get install -yq redis-server && \
+    apt-get install -yq git && \
     apt-get -y install sudo && \
     rm -rf /var/lib/apt/lists/*
 
@@ -101,7 +103,7 @@ ADD ./requirements.txt /requirements.txt
 ## Install Python libraries
 RUN pip3 install --ignore-installed -r requirements.txt
 RUN mkdir /CKG
-ADD . /CKG/
+#ADD . /CKG/
 ENV PYTHONPATH "${PYTHONPATH}:/CKG/src"
 
 # JupyterHub

@@ -1,0 +1,1268 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Report Manager &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Report Queries" href="report_manager.queries.html" />
+    <link rel="prev" title="CKG Builder" href="graphdb_builder.builder.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> ClinicalKnowledgeGraph
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">Clinical Knowledge Graph</a></li>
+</ul>
+<p class="caption"><span class="caption-text">First steps</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/connect-to-ckg.html">Connecting to the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/create-new-user.html">Create a new user in the graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/create-new-project.html">Create a new project in the database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/upload-data.html">Upload project experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/data-analysis-config.html">Define data analysis parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/access-report.html">Accessing the analysis report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/notifications.html">Report notifications</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Project Report</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../project_report/project-report.html">Generating a project report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project_report/project-tabs.html">Project report tabs</a></li>
+</ul>
+<p class="caption"><span class="caption-text">CKG Builder</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/ontologies.html">Ontology sources and raw file parsers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/databases.html">Biomedical databases and resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/experiments.html">Parsing experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/graphdb-builder.html">Building the graph database from one Python module</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/import-statistics.html">Clinical Knowledge Graph Statistics: Imports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/R-interface.html">Python - R interface</a></li>
+</ul>
+<p class="caption"><span class="caption-text">System Requirements</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../system_require/mac-os.html">Mac OS X requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system_require/linux.html">Linux requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system_require/windows.html">Windows requirements</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../src.html">Clinical Knowledge Graph package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="graphdb_connector.html">Graph Database Connector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graphdb_builder.html">Graph Database Builder</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Report Manager</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="report_manager.queries.html">Report Queries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="report_manager.apps.html">Report Dash Apps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-report_manager.dataset">dataset.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-report_manager.knowledge">knowledge.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-report_manager.project">project.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-report_manager.report">report.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-report_manager.user">user.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-report_manager.utils">utils.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-report_manager.worker">worker.py</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="analytics_core.html">Analytics Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks.html">Notebooks</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#backers">Backers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#history">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#code-of-conduct">Code of Conduct</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ClinicalKnowledgeGraph</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../src.html">Clinical Knowledge Graph package</a> &raquo;</li>
+        
+      <li>Report Manager</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_autosummary/report_manager.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="report-manager">
+<h1>Report Manager<a class="headerlink" href="#report-manager" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="report_manager.queries.html">Report Queries</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="report_manager.queries.html#module-report_manager.queries.query_utils">Query Utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="report_manager.apps.html">Report Dash Apps</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="report_manager.apps.html#login-app">Login App</a></li>
+<li class="toctree-l2"><a class="reference internal" href="report_manager.apps.html#basic-app">Basic App</a></li>
+<li class="toctree-l2"><a class="reference internal" href="report_manager.apps.html#module-report_manager.apps.homepageStats">HomePage Stats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="report_manager.apps.html#homepage-app">HomePage App</a></li>
+<li class="toctree-l2"><a class="reference internal" href="report_manager.apps.html#module-report_manager.apps.imports">DB Imports Stats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="report_manager.apps.html#db-imports-app">DB Imports App</a></li>
+<li class="toctree-l2"><a class="reference internal" href="report_manager.apps.html#module-report_manager.apps.projectCreation">Project Creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="report_manager.apps.html#project-creation-app">Project Creation App</a></li>
+<li class="toctree-l2"><a class="reference internal" href="report_manager.apps.html#data-upload-app">Data Upload App</a></li>
+<li class="toctree-l2"><a class="reference internal" href="report_manager.apps.html#module-report_manager.apps.dataUpload">Data Upload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="report_manager.apps.html#project-app">Project App</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="module-report_manager.dataset">
+<span id="dataset-py"></span><h2>dataset.py<a class="headerlink" href="#module-report_manager.dataset" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="report_manager.dataset.Dataset">
+<em class="property">class </em><code class="sig-prename descclassname">report_manager.dataset.</code><code class="sig-name descname">Dataset</code><span class="sig-paren">(</span><em class="sig-param">identifier</em>, <em class="sig-param">dataset_type</em>, <em class="sig-param">configuration=None</em>, <em class="sig-param">data={}</em>, <em class="sig-param">analyses={}</em>, <em class="sig-param">analysis_queries={}</em>, <em class="sig-param">report=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.identifier">
+<em class="property">property </em><code class="sig-name descname">identifier</code><a class="headerlink" href="#report_manager.dataset.Dataset.identifier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.dataset_type">
+<em class="property">property </em><code class="sig-name descname">dataset_type</code><a class="headerlink" href="#report_manager.dataset.Dataset.dataset_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.data">
+<em class="property">property </em><code class="sig-name descname">data</code><a class="headerlink" href="#report_manager.dataset.Dataset.data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.analyses">
+<em class="property">property </em><code class="sig-name descname">analyses</code><a class="headerlink" href="#report_manager.dataset.Dataset.analyses" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.configuration">
+<em class="property">property </em><code class="sig-name descname">configuration</code><a class="headerlink" href="#report_manager.dataset.Dataset.configuration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.analysis_queries">
+<em class="property">property </em><code class="sig-name descname">analysis_queries</code><a class="headerlink" href="#report_manager.dataset.Dataset.analysis_queries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.report">
+<em class="property">property </em><code class="sig-name descname">report</code><a class="headerlink" href="#report_manager.dataset.Dataset.report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.generate_dataset">
+<code class="sig-name descname">generate_dataset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.generate_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.generate_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.update_report">
+<code class="sig-name descname">update_report</code><span class="sig-paren">(</span><em class="sig-param">report</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.update_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.update_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.update_analysis_queries">
+<code class="sig-name descname">update_analysis_queries</code><span class="sig-paren">(</span><em class="sig-param">query</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.update_analysis_queries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.update_analysis_queries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.get_dataframe">
+<code class="sig-name descname">get_dataframe</code><span class="sig-paren">(</span><em class="sig-param">dataset_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.get_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.get_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.get_dataframes">
+<code class="sig-name descname">get_dataframes</code><span class="sig-paren">(</span><em class="sig-param">dataset_names</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.get_dataframes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.get_dataframes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.list_dataframes">
+<code class="sig-name descname">list_dataframes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.list_dataframes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.list_dataframes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.get_analysis">
+<code class="sig-name descname">get_analysis</code><span class="sig-paren">(</span><em class="sig-param">analysis</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.get_analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.get_analysis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.update_data">
+<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">new</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.update_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.update_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.update_analyses">
+<code class="sig-name descname">update_analyses</code><span class="sig-paren">(</span><em class="sig-param">new</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.update_analyses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.update_analyses" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.set_configuration_from_file">
+<code class="sig-name descname">set_configuration_from_file</code><span class="sig-paren">(</span><em class="sig-param">configuration_file</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.set_configuration_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.set_configuration_from_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.update_configuration_from_file">
+<code class="sig-name descname">update_configuration_from_file</code><span class="sig-paren">(</span><em class="sig-param">configuration_file</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.update_configuration_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.update_configuration_from_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.get_dataset_data_directory">
+<code class="sig-name descname">get_dataset_data_directory</code><span class="sig-paren">(</span><em class="sig-param">directory='../../../data/reports'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.get_dataset_data_directory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.get_dataset_data_directory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.query_data">
+<code class="sig-name descname">query_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.query_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.query_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.send_query">
+<code class="sig-name descname">send_query</code><span class="sig-paren">(</span><em class="sig-param">query</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.send_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.send_query" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.extract_configuration">
+<code class="sig-name descname">extract_configuration</code><span class="sig-paren">(</span><em class="sig-param">configuration</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.extract_configuration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.extract_configuration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.add_configuration_to_report">
+<code class="sig-name descname">add_configuration_to_report</code><span class="sig-paren">(</span><em class="sig-param">report_pipeline</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.add_configuration_to_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.add_configuration_to_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.generate_report">
+<code class="sig-name descname">generate_report</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.generate_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.generate_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.save_dataset_recursively">
+<code class="sig-name descname">save_dataset_recursively</code><span class="sig-paren">(</span><em class="sig-param">dset</em>, <em class="sig-param">group</em>, <em class="sig-param">dt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.save_dataset_recursively"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.save_dataset_recursively" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.save_dataset">
+<code class="sig-name descname">save_dataset</code><span class="sig-paren">(</span><em class="sig-param">dataset_directory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.save_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.save_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.save_dataset_recursively_to_file">
+<code class="sig-name descname">save_dataset_recursively_to_file</code><span class="sig-paren">(</span><em class="sig-param">dset</em>, <em class="sig-param">dataset_directory</em>, <em class="sig-param">base_name=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.save_dataset_recursively_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.save_dataset_recursively_to_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.save_dataset_to_file">
+<code class="sig-name descname">save_dataset_to_file</code><span class="sig-paren">(</span><em class="sig-param">dataset_directory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.save_dataset_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.save_dataset_to_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.save_report">
+<code class="sig-name descname">save_report</code><span class="sig-paren">(</span><em class="sig-param">dataset_directory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.save_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.save_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.load_dataset_recursively">
+<code class="sig-name descname">load_dataset_recursively</code><span class="sig-paren">(</span><em class="sig-param">dset</em>, <em class="sig-param">loaded_dset={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.load_dataset_recursively"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.load_dataset_recursively" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.load_dataset">
+<code class="sig-name descname">load_dataset</code><span class="sig-paren">(</span><em class="sig-param">dataset_directory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.load_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.load_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.load_dataset_report">
+<code class="sig-name descname">load_dataset_report</code><span class="sig-paren">(</span><em class="sig-param">report_dir</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.load_dataset_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.load_dataset_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.Dataset.generate_knowledge">
+<code class="sig-name descname">generate_knowledge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#Dataset.generate_knowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.Dataset.generate_knowledge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="report_manager.dataset.MultiOmicsDataset">
+<em class="property">class </em><code class="sig-prename descclassname">report_manager.dataset.</code><code class="sig-name descname">MultiOmicsDataset</code><span class="sig-paren">(</span><em class="sig-param">identifier</em>, <em class="sig-param">data</em>, <em class="sig-param">configuration=None</em>, <em class="sig-param">analyses={}</em>, <em class="sig-param">analysis_queries={}</em>, <em class="sig-param">report=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#MultiOmicsDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.MultiOmicsDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#report_manager.dataset.Dataset" title="report_manager.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">report_manager.dataset.Dataset</span></code></a></p>
+<dl class="method">
+<dt id="report_manager.dataset.MultiOmicsDataset.get_dataframes">
+<code class="sig-name descname">get_dataframes</code><span class="sig-paren">(</span><em class="sig-param">datasets</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#MultiOmicsDataset.get_dataframes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.MultiOmicsDataset.get_dataframes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.MultiOmicsDataset.generate_knowledge">
+<code class="sig-name descname">generate_knowledge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#MultiOmicsDataset.generate_knowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.MultiOmicsDataset.generate_knowledge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="report_manager.dataset.ProteomicsDataset">
+<em class="property">class </em><code class="sig-prename descclassname">report_manager.dataset.</code><code class="sig-name descname">ProteomicsDataset</code><span class="sig-paren">(</span><em class="sig-param">identifier</em>, <em class="sig-param">dataset_type='proteomics'</em>, <em class="sig-param">data={}</em>, <em class="sig-param">configuration=None</em>, <em class="sig-param">analyses={}</em>, <em class="sig-param">analysis_queries={}</em>, <em class="sig-param">report=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#ProteomicsDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.ProteomicsDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#report_manager.dataset.Dataset" title="report_manager.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">report_manager.dataset.Dataset</span></code></a></p>
+<dl class="method">
+<dt id="report_manager.dataset.ProteomicsDataset.generate_dataset">
+<code class="sig-name descname">generate_dataset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#ProteomicsDataset.generate_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.ProteomicsDataset.generate_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.ProteomicsDataset.process_dataset">
+<code class="sig-name descname">process_dataset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#ProteomicsDataset.process_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.ProteomicsDataset.process_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.ProteomicsDataset.processing">
+<code class="sig-name descname">processing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#ProteomicsDataset.processing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.ProteomicsDataset.processing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.ProteomicsDataset.generate_knowledge">
+<code class="sig-name descname">generate_knowledge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#ProteomicsDataset.generate_knowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.ProteomicsDataset.generate_knowledge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="report_manager.dataset.LongitudinalProteomicsDataset">
+<em class="property">class </em><code class="sig-prename descclassname">report_manager.dataset.</code><code class="sig-name descname">LongitudinalProteomicsDataset</code><span class="sig-paren">(</span><em class="sig-param">identifier</em>, <em class="sig-param">data={}</em>, <em class="sig-param">configuration=None</em>, <em class="sig-param">analyses={}</em>, <em class="sig-param">analysis_queries={}</em>, <em class="sig-param">report=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#LongitudinalProteomicsDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.LongitudinalProteomicsDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#report_manager.dataset.ProteomicsDataset" title="report_manager.dataset.ProteomicsDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">report_manager.dataset.ProteomicsDataset</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="report_manager.dataset.ClinicalDataset">
+<em class="property">class </em><code class="sig-prename descclassname">report_manager.dataset.</code><code class="sig-name descname">ClinicalDataset</code><span class="sig-paren">(</span><em class="sig-param">identifier</em>, <em class="sig-param">data={}</em>, <em class="sig-param">configuration=None</em>, <em class="sig-param">analyses={}</em>, <em class="sig-param">analysis_queries={}</em>, <em class="sig-param">report=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#ClinicalDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.ClinicalDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#report_manager.dataset.Dataset" title="report_manager.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">report_manager.dataset.Dataset</span></code></a></p>
+<dl class="method">
+<dt id="report_manager.dataset.ClinicalDataset.generate_dataset">
+<code class="sig-name descname">generate_dataset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#ClinicalDataset.generate_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.ClinicalDataset.generate_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.ClinicalDataset.process_dataset">
+<code class="sig-name descname">process_dataset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#ClinicalDataset.process_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.ClinicalDataset.process_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.ClinicalDataset.processing">
+<code class="sig-name descname">processing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#ClinicalDataset.processing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.ClinicalDataset.processing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.dataset.ClinicalDataset.generate_knowledge">
+<code class="sig-name descname">generate_knowledge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#ClinicalDataset.generate_knowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.ClinicalDataset.generate_knowledge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="report_manager.dataset.DNAseqDataset">
+<em class="property">class </em><code class="sig-prename descclassname">report_manager.dataset.</code><code class="sig-name descname">DNAseqDataset</code><span class="sig-paren">(</span><em class="sig-param">identifier</em>, <em class="sig-param">dataset_type</em>, <em class="sig-param">data={}</em>, <em class="sig-param">configuration=None</em>, <em class="sig-param">analyses={}</em>, <em class="sig-param">analysis_queries={}</em>, <em class="sig-param">report=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#DNAseqDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.DNAseqDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#report_manager.dataset.Dataset" title="report_manager.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">report_manager.dataset.Dataset</span></code></a></p>
+<dl class="method">
+<dt id="report_manager.dataset.DNAseqDataset.generate_dataset">
+<code class="sig-name descname">generate_dataset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#DNAseqDataset.generate_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.DNAseqDataset.generate_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="report_manager.dataset.RNAseqDataset">
+<em class="property">class </em><code class="sig-prename descclassname">report_manager.dataset.</code><code class="sig-name descname">RNAseqDataset</code><span class="sig-paren">(</span><em class="sig-param">identifier</em>, <em class="sig-param">data={}</em>, <em class="sig-param">configuration=None</em>, <em class="sig-param">analyses={}</em>, <em class="sig-param">analysis_queries={}</em>, <em class="sig-param">report=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#RNAseqDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.RNAseqDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#report_manager.dataset.Dataset" title="report_manager.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">report_manager.dataset.Dataset</span></code></a></p>
+<dl class="method">
+<dt id="report_manager.dataset.RNAseqDataset.generate_dataset">
+<code class="sig-name descname">generate_dataset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/dataset.html#RNAseqDataset.generate_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.dataset.RNAseqDataset.generate_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-report_manager.knowledge">
+<span id="knowledge-py"></span><h2>knowledge.py<a class="headerlink" href="#module-report_manager.knowledge" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="report_manager.knowledge.Knowledge">
+<em class="property">class </em><code class="sig-prename descclassname">report_manager.knowledge.</code><code class="sig-name descname">Knowledge</code><span class="sig-paren">(</span><em class="sig-param">identifier</em>, <em class="sig-param">data</em>, <em class="sig-param">nodes={}</em>, <em class="sig-param">relationships={}</em>, <em class="sig-param">queries_file=None</em>, <em class="sig-param">colors={}</em>, <em class="sig-param">graph=None</em>, <em class="sig-param">report={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#Knowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.Knowledge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.identifier">
+<em class="property">property </em><code class="sig-name descname">identifier</code><a class="headerlink" href="#report_manager.knowledge.Knowledge.identifier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.data">
+<em class="property">property </em><code class="sig-name descname">data</code><a class="headerlink" href="#report_manager.knowledge.Knowledge.data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.entities">
+<em class="property">property </em><code class="sig-name descname">entities</code><a class="headerlink" href="#report_manager.knowledge.Knowledge.entities" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.nodes">
+<em class="property">property </em><code class="sig-name descname">nodes</code><a class="headerlink" href="#report_manager.knowledge.Knowledge.nodes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.relationships">
+<em class="property">property </em><code class="sig-name descname">relationships</code><a class="headerlink" href="#report_manager.knowledge.Knowledge.relationships" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.queries_file">
+<em class="property">property </em><code class="sig-name descname">queries_file</code><a class="headerlink" href="#report_manager.knowledge.Knowledge.queries_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.colors">
+<em class="property">property </em><code class="sig-name descname">colors</code><a class="headerlink" href="#report_manager.knowledge.Knowledge.colors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.default_color">
+<em class="property">property </em><code class="sig-name descname">default_color</code><a class="headerlink" href="#report_manager.knowledge.Knowledge.default_color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.report">
+<em class="property">property </em><code class="sig-name descname">report</code><a class="headerlink" href="#report_manager.knowledge.Knowledge.report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.graph">
+<em class="property">property </em><code class="sig-name descname">graph</code><a class="headerlink" href="#report_manager.knowledge.Knowledge.graph" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.generate_knowledge_from_regulation">
+<code class="sig-name descname">generate_knowledge_from_regulation</code><span class="sig-paren">(</span><em class="sig-param">entity</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#Knowledge.generate_knowledge_from_regulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.Knowledge.generate_knowledge_from_regulation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.genreate_knowledge_from_correlation">
+<code class="sig-name descname">genreate_knowledge_from_correlation</code><span class="sig-paren">(</span><em class="sig-param">entity_node1</em>, <em class="sig-param">entity_node2</em>, <em class="sig-param">filter</em>, <em class="sig-param">cutoff=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#Knowledge.genreate_knowledge_from_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.Knowledge.genreate_knowledge_from_correlation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.generate_knowledge_from_wgcna">
+<code class="sig-name descname">generate_knowledge_from_wgcna</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">entity1</em>, <em class="sig-param">entity2</em>, <em class="sig-param">cutoff=0.2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#Knowledge.generate_knowledge_from_wgcna"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.Knowledge.generate_knowledge_from_wgcna" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.generate_knowledge_from_annotations">
+<code class="sig-name descname">generate_knowledge_from_annotations</code><span class="sig-paren">(</span><em class="sig-param">entity1</em>, <em class="sig-param">entity2</em>, <em class="sig-param">filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#Knowledge.generate_knowledge_from_annotations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.Knowledge.generate_knowledge_from_annotations" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.generate_knowledge_from_similarity">
+<code class="sig-name descname">generate_knowledge_from_similarity</code><span class="sig-paren">(</span><em class="sig-param">entity='Project'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#Knowledge.generate_knowledge_from_similarity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.Knowledge.generate_knowledge_from_similarity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.generate_knowledge_from_queries">
+<code class="sig-name descname">generate_knowledge_from_queries</code><span class="sig-paren">(</span><em class="sig-param">entity</em>, <em class="sig-param">queries_results</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#Knowledge.generate_knowledge_from_queries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.Knowledge.generate_knowledge_from_queries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.send_query">
+<code class="sig-name descname">send_query</code><span class="sig-paren">(</span><em class="sig-param">query</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#Knowledge.send_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.Knowledge.send_query" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.query_data">
+<code class="sig-name descname">query_data</code><span class="sig-paren">(</span><em class="sig-param">replace</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#Knowledge.query_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.Knowledge.query_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.generate_cypher_nodes_list">
+<code class="sig-name descname">generate_cypher_nodes_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#Knowledge.generate_cypher_nodes_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.Knowledge.generate_cypher_nodes_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.generate_knowledge_graph">
+<code class="sig-name descname">generate_knowledge_graph</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#Knowledge.generate_knowledge_graph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.Knowledge.generate_knowledge_graph" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.reduce_to_subgraph">
+<code class="sig-name descname">reduce_to_subgraph</code><span class="sig-paren">(</span><em class="sig-param">nodes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#Knowledge.reduce_to_subgraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.Knowledge.reduce_to_subgraph" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.get_knowledge_graph_plot">
+<code class="sig-name descname">get_knowledge_graph_plot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#Knowledge.get_knowledge_graph_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.Knowledge.get_knowledge_graph_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.generate_report">
+<code class="sig-name descname">generate_report</code><span class="sig-paren">(</span><em class="sig-param">visualization='sankey'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#Knowledge.generate_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.Knowledge.generate_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.save_report">
+<code class="sig-name descname">save_report</code><span class="sig-paren">(</span><em class="sig-param">directory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#Knowledge.save_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.Knowledge.save_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="report_manager.knowledge.ProjectKnowledge">
+<em class="property">class </em><code class="sig-prename descclassname">report_manager.knowledge.</code><code class="sig-name descname">ProjectKnowledge</code><span class="sig-paren">(</span><em class="sig-param">identifier</em>, <em class="sig-param">data</em>, <em class="sig-param">nodes={}</em>, <em class="sig-param">relationships={}</em>, <em class="sig-param">colors={}</em>, <em class="sig-param">graph=None</em>, <em class="sig-param">report={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#ProjectKnowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.ProjectKnowledge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#report_manager.knowledge.Knowledge" title="report_manager.knowledge.Knowledge"><code class="xref py py-class docutils literal notranslate"><span class="pre">report_manager.knowledge.Knowledge</span></code></a></p>
+<dl class="method">
+<dt id="report_manager.knowledge.ProjectKnowledge.generate_knowledge">
+<code class="sig-name descname">generate_knowledge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#ProjectKnowledge.generate_knowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.ProjectKnowledge.generate_knowledge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="report_manager.knowledge.ProteomicsKnowledge">
+<em class="property">class </em><code class="sig-prename descclassname">report_manager.knowledge.</code><code class="sig-name descname">ProteomicsKnowledge</code><span class="sig-paren">(</span><em class="sig-param">identifier</em>, <em class="sig-param">data</em>, <em class="sig-param">nodes={}</em>, <em class="sig-param">relationships={}</em>, <em class="sig-param">colors={}</em>, <em class="sig-param">graph=None</em>, <em class="sig-param">report={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#ProteomicsKnowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.ProteomicsKnowledge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#report_manager.knowledge.Knowledge" title="report_manager.knowledge.Knowledge"><code class="xref py py-class docutils literal notranslate"><span class="pre">report_manager.knowledge.Knowledge</span></code></a></p>
+<dl class="method">
+<dt id="report_manager.knowledge.ProteomicsKnowledge.generate_knowledge">
+<code class="sig-name descname">generate_knowledge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#ProteomicsKnowledge.generate_knowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.ProteomicsKnowledge.generate_knowledge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="report_manager.knowledge.ClinicalKnowledge">
+<em class="property">class </em><code class="sig-prename descclassname">report_manager.knowledge.</code><code class="sig-name descname">ClinicalKnowledge</code><span class="sig-paren">(</span><em class="sig-param">identifier</em>, <em class="sig-param">data</em>, <em class="sig-param">nodes={}</em>, <em class="sig-param">relationships={}</em>, <em class="sig-param">colors={}</em>, <em class="sig-param">graph=None</em>, <em class="sig-param">report={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#ClinicalKnowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.ClinicalKnowledge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#report_manager.knowledge.Knowledge" title="report_manager.knowledge.Knowledge"><code class="xref py py-class docutils literal notranslate"><span class="pre">report_manager.knowledge.Knowledge</span></code></a></p>
+<dl class="method">
+<dt id="report_manager.knowledge.ClinicalKnowledge.generate_knowledge">
+<code class="sig-name descname">generate_knowledge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#ClinicalKnowledge.generate_knowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.ClinicalKnowledge.generate_knowledge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="report_manager.knowledge.MultiOmicsKnowledge">
+<em class="property">class </em><code class="sig-prename descclassname">report_manager.knowledge.</code><code class="sig-name descname">MultiOmicsKnowledge</code><span class="sig-paren">(</span><em class="sig-param">identifier</em>, <em class="sig-param">data</em>, <em class="sig-param">nodes={}</em>, <em class="sig-param">relationships={}</em>, <em class="sig-param">colors={}</em>, <em class="sig-param">graph=None</em>, <em class="sig-param">report={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#MultiOmicsKnowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.MultiOmicsKnowledge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#report_manager.knowledge.Knowledge" title="report_manager.knowledge.Knowledge"><code class="xref py py-class docutils literal notranslate"><span class="pre">report_manager.knowledge.Knowledge</span></code></a></p>
+<dl class="method">
+<dt id="report_manager.knowledge.MultiOmicsKnowledge.generate_knowledge">
+<code class="sig-name descname">generate_knowledge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#MultiOmicsKnowledge.generate_knowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.MultiOmicsKnowledge.generate_knowledge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-report_manager.project">
+<span id="project-py"></span><h2>project.py<a class="headerlink" href="#module-report_manager.project" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="report_manager.project.Project">
+<em class="property">class </em><code class="sig-prename descclassname">report_manager.project.</code><code class="sig-name descname">Project</code><span class="sig-paren">(</span><em class="sig-param">identifier</em>, <em class="sig-param">configuration_files={}</em>, <em class="sig-param">datasets={}</em>, <em class="sig-param">knowledge=None</em>, <em class="sig-param">report={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A project class that defines an experimental project.
+A project can be of different types, contain several datasets and reports.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">Project</span><span class="p">(</span><span class="n">identifier</span><span class="o">=</span><span class="s2">&quot;P0000001&quot;</span><span class="p">,</span> <span class="n">datasets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">show_report</span><span class="p">(</span><span class="n">environment</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="report_manager.project.Project.identifier">
+<em class="property">property </em><code class="sig-name descname">identifier</code><a class="headerlink" href="#report_manager.project.Project.identifier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.configuration_files">
+<em class="property">property </em><code class="sig-name descname">configuration_files</code><a class="headerlink" href="#report_manager.project.Project.configuration_files" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.queries_file">
+<em class="property">property </em><code class="sig-name descname">queries_file</code><a class="headerlink" href="#report_manager.project.Project.queries_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#report_manager.project.Project.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.acronym">
+<em class="property">property </em><code class="sig-name descname">acronym</code><a class="headerlink" href="#report_manager.project.Project.acronym" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.data_types">
+<em class="property">property </em><code class="sig-name descname">data_types</code><a class="headerlink" href="#report_manager.project.Project.data_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.append_data_type">
+<code class="sig-name descname">append_data_type</code><span class="sig-paren">(</span><em class="sig-param">data_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.append_data_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.append_data_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.responsible">
+<em class="property">property </em><code class="sig-name descname">responsible</code><a class="headerlink" href="#report_manager.project.Project.responsible" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.description">
+<em class="property">property </em><code class="sig-name descname">description</code><a class="headerlink" href="#report_manager.project.Project.description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.status">
+<em class="property">property </em><code class="sig-name descname">status</code><a class="headerlink" href="#report_manager.project.Project.status" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.num_subjects">
+<em class="property">property </em><code class="sig-name descname">num_subjects</code><a class="headerlink" href="#report_manager.project.Project.num_subjects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.datasets">
+<em class="property">property </em><code class="sig-name descname">datasets</code><a class="headerlink" href="#report_manager.project.Project.datasets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.knowledge">
+<em class="property">property </em><code class="sig-name descname">knowledge</code><a class="headerlink" href="#report_manager.project.Project.knowledge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.report">
+<em class="property">property </em><code class="sig-name descname">report</code><a class="headerlink" href="#report_manager.project.Project.report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.similar_projects">
+<em class="property">property </em><code class="sig-name descname">similar_projects</code><a class="headerlink" href="#report_manager.project.Project.similar_projects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.overlap">
+<em class="property">property </em><code class="sig-name descname">overlap</code><a class="headerlink" href="#report_manager.project.Project.overlap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.get_dataset">
+<code class="sig-name descname">get_dataset</code><span class="sig-paren">(</span><em class="sig-param">dataset</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.get_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.get_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.update_dataset">
+<code class="sig-name descname">update_dataset</code><span class="sig-paren">(</span><em class="sig-param">dataset</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.update_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.update_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.update_report">
+<code class="sig-name descname">update_report</code><span class="sig-paren">(</span><em class="sig-param">new</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.update_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.update_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.remove_project">
+<code class="sig-name descname">remove_project</code><span class="sig-paren">(</span><em class="sig-param">host='localhost'</em>, <em class="sig-param">port=7687</em>, <em class="sig-param">user='neo4j'</em>, <em class="sig-param">password='password'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.remove_project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.remove_project" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.get_report_directory">
+<code class="sig-name descname">get_report_directory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.get_report_directory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.get_report_directory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.get_downloads_directory">
+<code class="sig-name descname">get_downloads_directory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.get_downloads_directory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.get_downloads_directory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.set_attributes">
+<code class="sig-name descname">set_attributes</code><span class="sig-paren">(</span><em class="sig-param">project_info</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.set_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.set_attributes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.from_dict">
+<code class="sig-name descname">from_dict</code><span class="sig-paren">(</span><em class="sig-param">attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.from_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.from_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.to_dict">
+<code class="sig-name descname">to_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.to_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.to_dataframe">
+<code class="sig-name descname">to_dataframe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.to_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.to_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.list_datasets">
+<code class="sig-name descname">list_datasets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.list_datasets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.list_datasets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.to_json">
+<code class="sig-name descname">to_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.to_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.to_json" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.from_json">
+<code class="sig-name descname">from_json</code><span class="sig-paren">(</span><em class="sig-param">json_str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.from_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.from_json" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.query_data">
+<code class="sig-name descname">query_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.query_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.query_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.check_report_exists">
+<code class="sig-name descname">check_report_exists</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.check_report_exists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.check_report_exists" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.load_project_report">
+<code class="sig-name descname">load_project_report</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.load_project_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.load_project_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.load_project">
+<code class="sig-name descname">load_project</code><span class="sig-paren">(</span><em class="sig-param">directory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.load_project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.load_project" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.load_project_data">
+<code class="sig-name descname">load_project_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.load_project_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.load_project_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.build_project">
+<code class="sig-name descname">build_project</code><span class="sig-paren">(</span><em class="sig-param">force=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.build_project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.build_project" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.get_projects_overlap">
+<code class="sig-name descname">get_projects_overlap</code><span class="sig-paren">(</span><em class="sig-param">project_info</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.get_projects_overlap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.get_projects_overlap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.get_similar_projects">
+<code class="sig-name descname">get_similar_projects</code><span class="sig-paren">(</span><em class="sig-param">project_info</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.get_similar_projects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.get_similar_projects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.generate_project_attributes_plot">
+<code class="sig-name descname">generate_project_attributes_plot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.generate_project_attributes_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.generate_project_attributes_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.generate_project_similarity_plots">
+<code class="sig-name descname">generate_project_similarity_plots</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.generate_project_similarity_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.generate_project_similarity_plots" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.generate_overlap_plots">
+<code class="sig-name descname">generate_overlap_plots</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.generate_overlap_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.generate_overlap_plots" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.get_similarity_network_style">
+<code class="sig-name descname">get_similarity_network_style</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.get_similarity_network_style"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.get_similarity_network_style" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.get_similarity_network">
+<code class="sig-name descname">get_similarity_network</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.get_similarity_network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.get_similarity_network" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.generate_knowledge">
+<code class="sig-name descname">generate_knowledge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.generate_knowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.generate_knowledge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.generate_project_info_report">
+<code class="sig-name descname">generate_project_info_report</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.generate_project_info_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.generate_project_info_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.generate_report">
+<code class="sig-name descname">generate_report</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.generate_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.generate_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.notify_project_ready">
+<code class="sig-name descname">notify_project_ready</code><span class="sig-paren">(</span><em class="sig-param">message_type='slack'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.notify_project_ready"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.notify_project_ready" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.empty_report">
+<code class="sig-name descname">empty_report</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.empty_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.empty_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.save_project_report">
+<code class="sig-name descname">save_project_report</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.save_project_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.save_project_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.save_project_datasets_reports">
+<code class="sig-name descname">save_project_datasets_reports</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.save_project_datasets_reports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.save_project_datasets_reports" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.save_project">
+<code class="sig-name descname">save_project</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.save_project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.save_project" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.save_project_datasets_data">
+<code class="sig-name descname">save_project_datasets_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.save_project_datasets_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.save_project_datasets_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.show_report">
+<code class="sig-name descname">show_report</code><span class="sig-paren">(</span><em class="sig-param">environment</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.show_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.show_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.download_project">
+<code class="sig-name descname">download_project</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.download_project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.download_project" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.download_project_report">
+<code class="sig-name descname">download_project_report</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.download_project_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.download_project_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.download_knowledge">
+<code class="sig-name descname">download_knowledge</code><span class="sig-paren">(</span><em class="sig-param">directory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.download_knowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.download_knowledge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.project.Project.download_project_datasets">
+<code class="sig-name descname">download_project_datasets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/project.html#Project.download_project_datasets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.project.Project.download_project_datasets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-report_manager.report">
+<span id="report-py"></span><h2>report.py<a class="headerlink" href="#module-report_manager.report" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="report_manager.report.Report">
+<em class="property">class </em><code class="sig-prename descclassname">report_manager.report.</code><code class="sig-name descname">Report</code><span class="sig-paren">(</span><em class="sig-param">identifier</em>, <em class="sig-param">plots={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/report.html#Report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.report.Report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="report_manager.report.Report.identifier">
+<em class="property">property </em><code class="sig-name descname">identifier</code><a class="headerlink" href="#report_manager.report.Report.identifier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.report.Report.plots">
+<em class="property">property </em><code class="sig-name descname">plots</code><a class="headerlink" href="#report_manager.report.Report.plots" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.report.Report.get_plot">
+<code class="sig-name descname">get_plot</code><span class="sig-paren">(</span><em class="sig-param">plot</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/report.html#Report.get_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.report.Report.get_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.report.Report.update_plots">
+<code class="sig-name descname">update_plots</code><span class="sig-paren">(</span><em class="sig-param">plot</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/report.html#Report.update_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.report.Report.update_plots" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.report.Report.list_plots">
+<code class="sig-name descname">list_plots</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/report.html#Report.list_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.report.Report.list_plots" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.report.Report.print_report">
+<code class="sig-name descname">print_report</code><span class="sig-paren">(</span><em class="sig-param">directory</em>, <em class="sig-param">plot_format='pdf'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/report.html#Report.print_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.report.Report.print_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.report.Report.save_report">
+<code class="sig-name descname">save_report</code><span class="sig-paren">(</span><em class="sig-param">directory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/report.html#Report.save_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.report.Report.save_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.report.Report.read_report">
+<code class="sig-name descname">read_report</code><span class="sig-paren">(</span><em class="sig-param">directory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/report.html#Report.read_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.report.Report.read_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.report.Report.visualize_report">
+<code class="sig-name descname">visualize_report</code><span class="sig-paren">(</span><em class="sig-param">environment</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/report.html#Report.visualize_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.report.Report.visualize_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.report.Report.visualize_plot">
+<code class="sig-name descname">visualize_plot</code><span class="sig-paren">(</span><em class="sig-param">environment</em>, <em class="sig-param">plot_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/report.html#Report.visualize_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.report.Report.visualize_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.report.Report.download_report">
+<code class="sig-name descname">download_report</code><span class="sig-paren">(</span><em class="sig-param">directory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/report.html#Report.download_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.report.Report.download_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-report_manager.user">
+<span id="user-py"></span><h2>user.py<a class="headerlink" href="#module-report_manager.user" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="report_manager.user.User">
+<em class="property">class </em><code class="sig-prename descclassname">report_manager.user.</code><code class="sig-name descname">User</code><span class="sig-paren">(</span><em class="sig-param">username</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/user.html#User"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.user.User" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="report_manager.user.User.find">
+<code class="sig-name descname">find</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/user.html#User.find"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.user.User.find" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.user.User.register">
+<code class="sig-name descname">register</code><span class="sig-paren">(</span><em class="sig-param">password</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/user.html#User.register"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.user.User.register" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.user.User.verify_password">
+<code class="sig-name descname">verify_password</code><span class="sig-paren">(</span><em class="sig-param">password</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/user.html#User.verify_password"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.user.User.verify_password" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-report_manager.utils">
+<span id="utils-py"></span><h2>utils.py<a class="headerlink" href="#module-report_manager.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="report_manager.utils.copy_file_to_destination">
+<code class="sig-prename descclassname">report_manager.utils.</code><code class="sig-name descname">copy_file_to_destination</code><span class="sig-paren">(</span><em class="sig-param">cfile</em>, <em class="sig-param">destination</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/utils.html#copy_file_to_destination"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.utils.copy_file_to_destination" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="report_manager.utils.send_message_to_slack_webhook">
+<code class="sig-prename descclassname">report_manager.utils.</code><code class="sig-name descname">send_message_to_slack_webhook</code><span class="sig-paren">(</span><em class="sig-param">message</em>, <em class="sig-param">message_to</em>, <em class="sig-param">username='albsantosdel'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/utils.html#send_message_to_slack_webhook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.utils.send_message_to_slack_webhook" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="report_manager.utils.send_email">
+<code class="sig-prename descclassname">report_manager.utils.</code><code class="sig-name descname">send_email</code><span class="sig-paren">(</span><em class="sig-param">message</em>, <em class="sig-param">subject</em>, <em class="sig-param">message_from</em>, <em class="sig-param">message_to</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/utils.html#send_email"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.utils.send_email" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="report_manager.utils.compress_directory">
+<code class="sig-prename descclassname">report_manager.utils.</code><code class="sig-name descname">compress_directory</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">directory</em>, <em class="sig-param">compression_format='zip'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/utils.html#compress_directory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.utils.compress_directory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="report_manager.utils.get_markdown_date">
+<code class="sig-prename descclassname">report_manager.utils.</code><code class="sig-name descname">get_markdown_date</code><span class="sig-paren">(</span><em class="sig-param">extra_text</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/utils.html#get_markdown_date"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.utils.get_markdown_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="report_manager.utils.convert_html_to_dash">
+<code class="sig-prename descclassname">report_manager.utils.</code><code class="sig-name descname">convert_html_to_dash</code><span class="sig-paren">(</span><em class="sig-param">el</em>, <em class="sig-param">style=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/utils.html#convert_html_to_dash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.utils.convert_html_to_dash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="report_manager.utils.extract_style">
+<code class="sig-prename descclassname">report_manager.utils.</code><code class="sig-name descname">extract_style</code><span class="sig-paren">(</span><em class="sig-param">el</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/utils.html#extract_style"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.utils.extract_style" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="report_manager.utils.is_jsonable">
+<code class="sig-prename descclassname">report_manager.utils.</code><code class="sig-name descname">is_jsonable</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/utils.html#is_jsonable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.utils.is_jsonable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="report_manager.utils.convert_dash_to_json">
+<code class="sig-prename descclassname">report_manager.utils.</code><code class="sig-name descname">convert_dash_to_json</code><span class="sig-paren">(</span><em class="sig-param">dash_object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/utils.html#convert_dash_to_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.utils.convert_dash_to_json" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="report_manager.utils.get_image">
+<code class="sig-prename descclassname">report_manager.utils.</code><code class="sig-name descname">get_image</code><span class="sig-paren">(</span><em class="sig-param">figure</em>, <em class="sig-param">width</em>, <em class="sig-param">height</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/utils.html#get_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.utils.get_image" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="report_manager.utils.parse_html">
+<code class="sig-prename descclassname">report_manager.utils.</code><code class="sig-name descname">parse_html</code><span class="sig-paren">(</span><em class="sig-param">html_snippet</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/utils.html#parse_html"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.utils.parse_html" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="report_manager.utils.hex2rgb">
+<code class="sig-prename descclassname">report_manager.utils.</code><code class="sig-name descname">hex2rgb</code><span class="sig-paren">(</span><em class="sig-param">color</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/utils.html#hex2rgb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.utils.hex2rgb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="report_manager.utils.getNumberText">
+<code class="sig-prename descclassname">report_manager.utils.</code><code class="sig-name descname">getNumberText</code><span class="sig-paren">(</span><em class="sig-param">num</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/utils.html#getNumberText"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.utils.getNumberText" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="report_manager.utils.get_rgb_colors">
+<code class="sig-prename descclassname">report_manager.utils.</code><code class="sig-name descname">get_rgb_colors</code><span class="sig-paren">(</span><em class="sig-param">n</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/utils.html#get_rgb_colors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.utils.get_rgb_colors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="report_manager.utils.get_hex_colors">
+<code class="sig-prename descclassname">report_manager.utils.</code><code class="sig-name descname">get_hex_colors</code><span class="sig-paren">(</span><em class="sig-param">n</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/utils.html#get_hex_colors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.utils.get_hex_colors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="report_manager.utils.convert_html_to_pdf">
+<code class="sig-prename descclassname">report_manager.utils.</code><code class="sig-name descname">convert_html_to_pdf</code><span class="sig-paren">(</span><em class="sig-param">source_html</em>, <em class="sig-param">output_filename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/utils.html#convert_html_to_pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.utils.convert_html_to_pdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="report_manager.utils.NumpyEncoder">
+<em class="property">class </em><code class="sig-prename descclassname">report_manager.utils.</code><code class="sig-name descname">NumpyEncoder</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">skipkeys=False</em>, <em class="sig-param">ensure_ascii=True</em>, <em class="sig-param">check_circular=True</em>, <em class="sig-param">allow_nan=True</em>, <em class="sig-param">sort_keys=False</em>, <em class="sig-param">indent=None</em>, <em class="sig-param">separators=None</em>, <em class="sig-param">default=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/utils.html#NumpyEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.utils.NumpyEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">json.encoder.JSONEncoder</span></code></p>
+<dl class="method">
+<dt id="report_manager.utils.NumpyEncoder.default">
+<code class="sig-name descname">default</code><span class="sig-paren">(</span><em class="sig-param">obj</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/utils.html#NumpyEncoder.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.utils.NumpyEncoder.default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement this method in a subclass such that it returns
+a serializable object for <code class="docutils literal notranslate"><span class="pre">o</span></code>, or calls the base implementation
+(to raise a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>).</p>
+<p>For example, to support arbitrary iterators, you could
+implement default like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">iterable</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+    <span class="c1"># Let the base class default method raise the TypeError</span>
+    <span class="k">return</span> <span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="report_manager.utils.DictDFEncoder">
+<em class="property">class </em><code class="sig-prename descclassname">report_manager.utils.</code><code class="sig-name descname">DictDFEncoder</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">skipkeys=False</em>, <em class="sig-param">ensure_ascii=True</em>, <em class="sig-param">check_circular=True</em>, <em class="sig-param">allow_nan=True</em>, <em class="sig-param">sort_keys=False</em>, <em class="sig-param">indent=None</em>, <em class="sig-param">separators=None</em>, <em class="sig-param">default=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/utils.html#DictDFEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.utils.DictDFEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">json.encoder.JSONEncoder</span></code></p>
+<dl class="method">
+<dt id="report_manager.utils.DictDFEncoder.default">
+<code class="sig-name descname">default</code><span class="sig-paren">(</span><em class="sig-param">obj</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/utils.html#DictDFEncoder.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.utils.DictDFEncoder.default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement this method in a subclass such that it returns
+a serializable object for <code class="docutils literal notranslate"><span class="pre">o</span></code>, or calls the base implementation
+(to raise a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>).</p>
+<p>For example, to support arbitrary iterators, you could
+implement default like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">iterable</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+    <span class="c1"># Let the base class default method raise the TypeError</span>
+    <span class="k">return</span> <span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-report_manager.worker">
+<span id="worker-py"></span><h2>worker.py<a class="headerlink" href="#module-report_manager.worker" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="report_manager.queries.html" class="btn btn-neutral float-right" title="Report Queries" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="graphdb_builder.builder.html" class="btn btn-neutral float-left" title="CKG Builder" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

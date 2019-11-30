@@ -1,0 +1,380 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>User Creation &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CKG Builder" href="graphdb_builder.builder.html" />
+    <link rel="prev" title="Experiments Parsers" href="graphdb_builder.experiments.parsers.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> ClinicalKnowledgeGraph
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">Clinical Knowledge Graph</a></li>
+</ul>
+<p class="caption"><span class="caption-text">First steps</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/connect-to-ckg.html">Connecting to the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/create-new-user.html">Create a new user in the graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/create-new-project.html">Create a new project in the database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/upload-data.html">Upload project experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/data-analysis-config.html">Define data analysis parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/access-report.html">Accessing the analysis report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/notifications.html">Report notifications</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Project Report</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../project_report/project-report.html">Generating a project report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project_report/project-tabs.html">Project report tabs</a></li>
+</ul>
+<p class="caption"><span class="caption-text">CKG Builder</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/ontologies.html">Ontology sources and raw file parsers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/databases.html">Biomedical databases and resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/experiments.html">Parsing experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/graphdb-builder.html">Building the graph database from one Python module</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/import-statistics.html">Clinical Knowledge Graph Statistics: Imports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/R-interface.html">Python - R interface</a></li>
+</ul>
+<p class="caption"><span class="caption-text">System Requirements</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../system_require/mac-os.html">Mac OS X requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system_require/linux.html">Linux requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system_require/windows.html">Windows requirements</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../src.html">Clinical Knowledge Graph package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="graphdb_connector.html">Graph Database Connector</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="graphdb_builder.html">Graph Database Builder</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.ontologies.html">Ontology Databases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.html">Biomedical Databases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.experiments.html">Experimental Data</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">User Creation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-graphdb_builder.users.users_controller">Users Controller</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.builder.html">CKG Builder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.html#module-graphdb_builder.builder_utils">builder_utils.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.html#module-graphdb_builder.mapping">mapping.py</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="report_manager.html">Report Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="analytics_core.html">Analytics Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks.html">Notebooks</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#backers">Backers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#history">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#code-of-conduct">Code of Conduct</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ClinicalKnowledgeGraph</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../src.html">Clinical Knowledge Graph package</a> &raquo;</li>
+        
+          <li><a href="graphdb_builder.html">Graph Database Builder</a> &raquo;</li>
+        
+      <li>User Creation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_autosummary/graphdb_builder.users.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="user-creation">
+<h1>User Creation<a class="headerlink" href="#user-creation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-graphdb_builder.users.users_controller">
+<span id="users-controller"></span><h2>Users Controller<a class="headerlink" href="#module-graphdb_builder.users.users_controller" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="graphdb_builder.users.users_controller.parseUsersFile">
+<code class="sig-prename descclassname">graphdb_builder.users.users_controller.</code><code class="sig-name descname">parseUsersFile</code><span class="sig-paren">(</span><em class="sig-param">importDirectory</em>, <em class="sig-param">expiration=365</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/users/users_controller.html#parseUsersFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.users.users_controller.parseUsersFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates new user in the graph database and corresponding node, through the following steps:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Generates new user identifier</p></li>
+<li><p>Checks if a user with given properties already exists in the database. If not:</p></li>
+<li><p>Creates new local user (access to graph database)</p></li>
+<li><p>Saves data to tab-delimited file.</p></li>
+</ol>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>importDirectory</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to the directory where all the import files are generated.</p></li>
+<li><p><strong>expiration</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – number of days a user is given access.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Writes relevant .tsv file for the users in the provided file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.users.users_controller.get_user_creation_queries">
+<code class="sig-prename descclassname">graphdb_builder.users.users_controller.</code><code class="sig-name descname">get_user_creation_queries</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/users/users_controller.html#get_user_creation_queries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.users.users_controller.get_user_creation_queries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads the YAML file containing the queries relevant to user creation, parses the given stream and     returns a Python object (dict[dict]).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.users.users_controller.get_new_user_identifier">
+<code class="sig-prename descclassname">graphdb_builder.users.users_controller.</code><code class="sig-name descname">get_new_user_identifier</code><span class="sig-paren">(</span><em class="sig-param">driver</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/users/users_controller.html#get_new_user_identifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.users.users_controller.get_new_user_identifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries the database for the last user identifier and returns a new sequential identifier.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>driver</strong> (<em>py2neo driver</em>) – py2neo driver, which provides the connection to the neo4j graph database.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>User identifier.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.users.users_controller.check_if_node_exists">
+<code class="sig-prename descclassname">graphdb_builder.users.users_controller.</code><code class="sig-name descname">check_if_node_exists</code><span class="sig-paren">(</span><em class="sig-param">driver</em>, <em class="sig-param">node_property</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/users/users_controller.html#check_if_node_exists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.users.users_controller.check_if_node_exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries the graph database and checks if a node with a specific property and property value already exists.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>driver</strong> (<em>py2neo driver</em>) – py2neo driver, which provides the connection to the neo4j graph database.</p></li>
+<li><p><strong>node_property</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – property of the node.</p></li>
+<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – property value.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pandas dataframe with user identifier if User with node_property and value already exists,             if User does not exist, returns and empty dataframe.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.users.users_controller.create_db_user">
+<code class="sig-prename descclassname">graphdb_builder.users.users_controller.</code><code class="sig-name descname">create_db_user</code><span class="sig-paren">(</span><em class="sig-param">driver</em>, <em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/users/users_controller.html#create_db_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.users.users_controller.create_db_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates and assigns role to new graph database user, if user not in list of local users.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>driver</strong> (<em>py2neo driver</em>) – py2neo driver, which provides the connection to the neo4j graph database.</p></li>
+<li><p><strong>data</strong> (<em>Series</em>) – pandas Series with required user information (see set_arguments()).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.users.users_controller.GenerateGraphFiles">
+<code class="sig-prename descclassname">graphdb_builder.users.users_controller.</code><code class="sig-name descname">GenerateGraphFiles</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">output_file</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/users/users_controller.html#GenerateGraphFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.users.users_controller.GenerateGraphFiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves pandas dataframe to users.tsv.
+If file already exists, appends new lines.     Else, creates file and writes dataframe to it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – pandas dataframe to be written to .tsv file.</p></li>
+<li><p><strong>output_file</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to output csv file.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="graphdb_builder.builder.html" class="btn btn-neutral float-right" title="CKG Builder" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="graphdb_builder.experiments.parsers.html" class="btn btn-neutral float-left" title="Experiments Parsers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

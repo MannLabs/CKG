@@ -1,0 +1,806 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Graph Database Builder &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Ontology Databases" href="graphdb_builder.ontologies.html" />
+    <link rel="prev" title="Graph Database Connector" href="graphdb_connector.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> ClinicalKnowledgeGraph
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">Clinical Knowledge Graph</a></li>
+</ul>
+<p class="caption"><span class="caption-text">First steps</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/connect-to-ckg.html">Connecting to the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/create-new-user.html">Create a new user in the graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/create-new-project.html">Create a new project in the database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/upload-data.html">Upload project experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/data-analysis-config.html">Define data analysis parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/access-report.html">Accessing the analysis report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/notifications.html">Report notifications</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Project Report</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../project_report/project-report.html">Generating a project report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project_report/project-tabs.html">Project report tabs</a></li>
+</ul>
+<p class="caption"><span class="caption-text">CKG Builder</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/ontologies.html">Ontology sources and raw file parsers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/databases.html">Biomedical databases and resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/experiments.html">Parsing experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/graphdb-builder.html">Building the graph database from one Python module</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/import-statistics.html">Clinical Knowledge Graph Statistics: Imports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/R-interface.html">Python - R interface</a></li>
+</ul>
+<p class="caption"><span class="caption-text">System Requirements</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../system_require/mac-os.html">Mac OS X requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system_require/linux.html">Linux requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system_require/windows.html">Windows requirements</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../src.html">Clinical Knowledge Graph package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="graphdb_connector.html">Graph Database Connector</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Graph Database Builder</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.ontologies.html">Ontology Databases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.html">Biomedical Databases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.experiments.html">Experimental Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.users.html">User Creation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.builder.html">CKG Builder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-graphdb_builder.builder_utils">builder_utils.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-graphdb_builder.mapping">mapping.py</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="report_manager.html">Report Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="analytics_core.html">Analytics Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks.html">Notebooks</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#backers">Backers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#history">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#code-of-conduct">Code of Conduct</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ClinicalKnowledgeGraph</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../src.html">Clinical Knowledge Graph package</a> &raquo;</li>
+        
+      <li>Graph Database Builder</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_autosummary/graphdb_builder.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="graph-database-builder">
+<h1>Graph Database Builder<a class="headerlink" href="#graph-database-builder" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="graphdb_builder.ontologies.html">Ontology Databases</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="graphdb_builder.ontologies.parsers.html">Ontologies Parsers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.ontologies.parsers.html#module-graphdb_builder.ontologies.parsers.icdParser">icdParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.ontologies.parsers.html#module-graphdb_builder.ontologies.parsers.oboParser">oboParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.ontologies.parsers.html#module-graphdb_builder.ontologies.parsers.reflectParser">reflectParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.ontologies.parsers.html#module-graphdb_builder.ontologies.parsers.snomedParser">snomedParser.py</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="graphdb_builder.ontologies.html#module-graphdb_builder.ontologies.ontologies_controller">Ontologies Controller</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="graphdb_builder.databases.html">Biomedical Databases</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="graphdb_builder.databases.parsers.html">Biomedical Databases Parsers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.cancerGenomeInterpreterParser">cancerGenomeInterpreterParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.corumParser">corumParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.disgenetParser">disgenetParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.drugBankParser">drugBankParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.drugGeneInteractionDBParser">drugGeneInteractionDBParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.exposomeParser">exposomeParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.foodbParser">foodbParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.goaParser">goaParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.gwasCatalogParser">gwasCatalogParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.hgncParser">hgncParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.hmdbParser">hmdbParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.hpaParser">hpaParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.intactParser">intactParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.internalDBsParser">internalDBsParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.mutationDsParser">mutationDsParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.oncokbParser">oncokbParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.pathwayCommonsParser">pathwayCommonsParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.pfamParser">pfamParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.pspParser">pspParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.reactomeParser">reactomeParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.refseqParser">refseqParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.siderParser">siderParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.smpdbParser">smpdbParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.stringParser">stringParser.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.parsers.html#module-graphdb_builder.databases.parsers.uniprotParser">uniprotParser.py</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="graphdb_builder.databases.html#module-graphdb_builder.databases.databases_controller">Databases Controller</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="graphdb_builder.experiments.html">Experimental Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="graphdb_builder.experiments.parsers.html">Experiments Parsers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.experiments.parsers.html#module-graphdb_builder.experiments.parsers.clinicalParser">Clinical parser</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.experiments.parsers.html#module-graphdb_builder.experiments.parsers.proteomicsParser">Proteomics parser</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.experiments.parsers.html#module-graphdb_builder.experiments.parsers.wesParser">WES parser</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="graphdb_builder.experiments.html#module-graphdb_builder.experiments.experiments_controller">Experiments Controller</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="graphdb_builder.users.html">User Creation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="graphdb_builder.users.html#module-graphdb_builder.users.users_controller">Users Controller</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="graphdb_builder.builder.html">CKG Builder</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="graphdb_builder.builder.html#module-graphdb_builder.builder.create_user">User Creation Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graphdb_builder.builder.html#module-graphdb_builder.builder.importer">Importer Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graphdb_builder.builder.html#module-graphdb_builder.builder.loader">Loader Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graphdb_builder.builder.html#module-graphdb_builder.builder.builder">Builder Module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="module-graphdb_builder.builder_utils">
+<span id="builder-utils-py"></span><h2>builder_utils.py<a class="headerlink" href="#module-graphdb_builder.builder_utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.readDataset">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">readDataset</code><span class="sig-paren">(</span><em class="sig-param">uri</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#readDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.readDataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.readDataFromCSV">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">readDataFromCSV</code><span class="sig-paren">(</span><em class="sig-param">uri</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#readDataFromCSV"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.readDataFromCSV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the data from csv file</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.readDataFromTXT">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">readDataFromTXT</code><span class="sig-paren">(</span><em class="sig-param">uri</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#readDataFromTXT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.readDataFromTXT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the data from tsv or txt file</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.readDataFromExcel">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">readDataFromExcel</code><span class="sig-paren">(</span><em class="sig-param">uri</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#readDataFromExcel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.readDataFromExcel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the data from Excel file</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.write_relationships">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">write_relationships</code><span class="sig-paren">(</span><em class="sig-param">relationships</em>, <em class="sig-param">header</em>, <em class="sig-param">outputfile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#write_relationships"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.write_relationships" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a set of relationships and saves them to a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>relationships</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#set" title="(in Python v3.5)"><em>set</em></a>) – set of tuples with relationship data: source node, target node,                                 relationship type, source and other attributes.</p></li>
+<li><p><strong>header</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – list of column names.</p></li>
+<li><p><strong>outputfile</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to file to be saved (including filename and extention).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.write_entities">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">write_entities</code><span class="sig-paren">(</span><em class="sig-param">entities</em>, <em class="sig-param">header</em>, <em class="sig-param">outputfile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#write_entities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.write_entities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a set of entities and saves them to a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>entities</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#set" title="(in Python v3.5)"><em>set</em></a>) – set of tuples with entities data: identifier, label, name                        and other attributes.</p></li>
+<li><p><strong>header</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – list of column names.</p></li>
+<li><p><strong>outputfile</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to file to be saved (including filename and extention).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.get_config">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">get_config</code><span class="sig-paren">(</span><em class="sig-param">config_name</em>, <em class="sig-param">data_type='databases'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#get_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.get_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads YAML configuration file and converts it into a Python dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_name</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the configuration YAML file.</p></li>
+<li><p><strong>data_type</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – configuration type (‘databases’ or ‘ontologies’).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Use this function to obtain configuration for individual database/ontology parsers.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.setup_config">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">setup_config</code><span class="sig-paren">(</span><em class="sig-param">data_type='databases'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#setup_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.setup_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads YAML configuration file and converts it into a Python dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data_type</strong> – configuration type (‘databases’, ‘ontologies’, ‘experiments’ or ‘builder’).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function should be used to obtain the configuration for databases_controller.py,                 ontologies_controller.py, experiments_controller.py and builder.py.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.list_ftp_directory">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">list_ftp_directory</code><span class="sig-paren">(</span><em class="sig-param">ftp_url</em>, <em class="sig-param">user=''</em>, <em class="sig-param">password=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#list_ftp_directory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.list_ftp_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lists all files present in folder from FTP server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ftp_url</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – link to access ftp server.</p></li>
+<li><p><strong>user</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – username to access ftp server if required.</p></li>
+<li><p><strong>password</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – password to access ftp server if required.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of files contained in ftp server folder provided with ftp_url.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.setup_logging">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">setup_logging</code><span class="sig-paren">(</span><em class="sig-param">path='log.config'</em>, <em class="sig-param">key=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#setup_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.setup_logging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup logging configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to file containing configuration for logging file.</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the logger.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Logger with the specified name from ‘key’. If key is <em>None</em>, returns a logger which is                 the root logger of the hierarchy.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.downloadDB">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">downloadDB</code><span class="sig-paren">(</span><em class="sig-param">databaseURL</em>, <em class="sig-param">directory=None</em>, <em class="sig-param">file_name=None</em>, <em class="sig-param">user=''</em>, <em class="sig-param">password=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#downloadDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.downloadDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function downloads the raw files from a biomedical database server when a link is provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>databaseURL</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – link to access biomedical database server.</p></li>
+<li><p><strong>directory</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.5/library/constants.html#None" title="(in Python v3.5)"><em>None</em></a>) – </p></li>
+<li><p><strong>file_name</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.5/library/constants.html#None" title="(in Python v3.5)"><em>None</em></a>) – name of the file to dowload. If None, ‘databaseURL’ must contain                         filename after the last ‘/’.</p></li>
+<li><p><strong>user</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – username to access biomedical database server if required.</p></li>
+<li><p><strong>password</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – password to access biomedical database server if required.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.searchPubmed">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">searchPubmed</code><span class="sig-paren">(</span><em class="sig-param">searchFields</em>, <em class="sig-param">sortby='relevance'</em>, <em class="sig-param">num='10'</em>, <em class="sig-param">resultsFormat='json'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#searchPubmed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.searchPubmed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Searches PubMed database for MeSH terms and other additional fields (‘searchFields’), sorts them by relevance and     returns the top ‘num’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>searchFields</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – list of search fields to query for.</p></li>
+<li><p><strong>sortby</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – parameter to use for sorting.</p></li>
+<li><p><strong>num</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – number of PubMed identifiers to return.</p></li>
+<li><p><strong>resultsFormat</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – format of the PubMed result.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary with total number of PubMed ids, and top ‘num’ ids.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.is_number">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">is_number</code><span class="sig-paren">(</span><em class="sig-param">s</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#is_number"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.is_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function checks if given input is a float and returns True if so, and False if it is not.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>s</strong> – input</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Boolean.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.getMedlineAbstracts">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">getMedlineAbstracts</code><span class="sig-paren">(</span><em class="sig-param">idList</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#getMedlineAbstracts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.getMedlineAbstracts" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function accesses NCBI over the WWWW and returns Medline data as a handle object,     which is parsed and converted to a Pandas DataFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>idList</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – single identifier or comma-delimited list of identifiers. All the identifiers                     must be from the database PubMed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pandas DataFrame with columns: ‘title’, ‘authors’, ‘journal’, ‘keywords’, ‘abstract’, ‘PMID’ and ‘url’.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.listDirectoryFiles">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">listDirectoryFiles</code><span class="sig-paren">(</span><em class="sig-param">directory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#listDirectoryFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.listDirectoryFiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lists all files in a specified directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>directory</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to folder.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of file names.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.listDirectoryFolders">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">listDirectoryFolders</code><span class="sig-paren">(</span><em class="sig-param">directory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#listDirectoryFolders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.listDirectoryFolders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lists all directories in a specified directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>directory</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to folder.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of folder names.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.checkDirectory">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">checkDirectory</code><span class="sig-paren">(</span><em class="sig-param">directory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#checkDirectory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.checkDirectory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if given directory exists and if not, creates it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>directory</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to folder.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.flatten">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">flatten</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#flatten"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.flatten" title="Permalink to this definition">¶</a></dt>
+<dd><p>Code from: <a class="reference external" href="https://gist.github.com/shaxbee/0ada767debf9eefbdb6e">https://gist.github.com/shaxbee/0ada767debf9eefbdb6e</a>
+Acknowledgements: Zbigniew Mandziejewicz (shaxbee)
+Generator flattening the structure</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">flatten</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="mi">4</span><span class="p">]],</span> <span class="mi">6</span><span class="p">)]]))</span>
+<span class="go">[2, 2, 4, 5, 7, 2, 6, 2, 6, 6, 4, 6]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.pretty_print">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">pretty_print</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#pretty_print"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.pretty_print" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function provides a capability to “pretty-print” arbitrary Python data structures in a forma that can be     used as input to the interpreter. For more information visit <a class="reference external" href="https://docs.python.org/2/library/pprint.html">https://docs.python.org/2/library/pprint.html</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> – python object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.convertOBOtoNet">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">convertOBOtoNet</code><span class="sig-paren">(</span><em class="sig-param">ontologyFile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#convertOBOtoNet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.convertOBOtoNet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes an .obo file and returns a NetworkX graph representation of the ontology, that holds multiple     edges between two nodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ontologyFile</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to ontology file.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>NetworkX graph.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.getCurrentTime">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">getCurrentTime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#getCurrentTime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.getCurrentTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns current date (Year-Month-Day) and time (Hour-Minute-Second).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Two strings: date and time.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.convert_bytes">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">convert_bytes</code><span class="sig-paren">(</span><em class="sig-param">num</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#convert_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.convert_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function will convert bytes to MB…. GB… etc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>num</strong> – float, integer or pandas.Series.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.file_size">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">file_size</code><span class="sig-paren">(</span><em class="sig-param">file_path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#file_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.file_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns the file size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file_path</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to file.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Size in bytes of a plain file.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.buildStats">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">buildStats</code><span class="sig-paren">(</span><em class="sig-param">count</em>, <em class="sig-param">otype</em>, <em class="sig-param">name</em>, <em class="sig-param">dataset</em>, <em class="sig-param">filename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#buildStats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.buildStats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a tuple with all the information needed to build a stats file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>count</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – number of entities/relationships.</p></li>
+<li><p><strong>otype</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – ‘entity’ or ‘relationsgips’.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – entity/relationship label.</p></li>
+<li><p><strong>dataset</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – database/ontology.</p></li>
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to file where entities/relationships are stored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Tuple with date, time, database name, file where entities/relationships are stored,     file size, number of entities/relationships imported, type and label.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.compress_directory">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">compress_directory</code><span class="sig-paren">(</span><em class="sig-param">folder_to_backup</em>, <em class="sig-param">dest_folder</em>, <em class="sig-param">file_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#compress_directory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.compress_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compresses folder to .tar.gz to create data backup archive file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder_to_backup</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to folder to compress and backup.</p></li>
+<li><p><strong>dest_folder</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path where to save compressed folder.</p></li>
+<li><p><strong>file_name</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the compressed file.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.read_gzipped_file">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">read_gzipped_file</code><span class="sig-paren">(</span><em class="sig-param">filepath</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#read_gzipped_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.read_gzipped_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens an underlying process to access a gzip file through the creation of a new pipe to the child.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to gzip file.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A bytes sequence that specifies the standard output.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-graphdb_builder.mapping">
+<span id="mapping-py"></span><h2>mapping.py<a class="headerlink" href="#module-graphdb_builder.mapping" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="graphdb_builder.mapping.reset_mapping">
+<code class="sig-prename descclassname">graphdb_builder.mapping.</code><code class="sig-name descname">reset_mapping</code><span class="sig-paren">(</span><em class="sig-param">entity</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/mapping.html#reset_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.mapping.reset_mapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if mapping.tsv file exists and removes it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>entity</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – entity label as defined in databases_config.yml</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.mapping.mark_complete_mapping">
+<code class="sig-prename descclassname">graphdb_builder.mapping.</code><code class="sig-name descname">mark_complete_mapping</code><span class="sig-paren">(</span><em class="sig-param">entity</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/mapping.html#mark_complete_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.mapping.mark_complete_mapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if mapping.tsv file exists and renames it to complete_mapping.tsv.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>entity</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – entity label as defined in databases_config.yml</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.mapping.getMappingFromOntology">
+<code class="sig-prename descclassname">graphdb_builder.mapping.</code><code class="sig-name descname">getMappingFromOntology</code><span class="sig-paren">(</span><em class="sig-param">ontology</em>, <em class="sig-param">source=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/mapping.html#getMappingFromOntology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.mapping.getMappingFromOntology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts .tsv file with complete list of ontology identifiers and aliases,     to dictionary with aliases as keys and ontology identifiers as values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ontology</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – ontology label as defined in ontologies_config.yml.</p></li>
+<li><p><strong>source</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.5/library/constants.html#None" title="(in Python v3.5)"><em>None</em></a>) – name of the source database for selecting aliases.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary of aliases (keys) and ontology identifiers (values).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.mapping.getMappingForEntity">
+<code class="sig-prename descclassname">graphdb_builder.mapping.</code><code class="sig-name descname">getMappingForEntity</code><span class="sig-paren">(</span><em class="sig-param">entity</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/mapping.html#getMappingForEntity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.mapping.getMappingForEntity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts .tsv file with complete list of entity identifiers and aliases,     to dictionary with aliases as keys and entity identifiers as values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>entity</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – entity label as defined in databases_config.yml.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary of aliases (keys) and entity identifiers (value).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.mapping.getMultipleMappingForEntity">
+<code class="sig-prename descclassname">graphdb_builder.mapping.</code><code class="sig-name descname">getMultipleMappingForEntity</code><span class="sig-paren">(</span><em class="sig-param">entity</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/mapping.html#getMultipleMappingForEntity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.mapping.getMultipleMappingForEntity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts .tsv file with complete list of entity identifiers and aliases,     to dictionary with aliases to other databases as keys and entity identifiers as values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>entity</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – entity label as defined in databases_config.yml.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary of aliases (keys) and set of unique entity identifiers (values).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.mapping.getSTRINGMapping">
+<code class="sig-prename descclassname">graphdb_builder.mapping.</code><code class="sig-name descname">getSTRINGMapping</code><span class="sig-paren">(</span><em class="sig-param">url</em>, <em class="sig-param">source='BLAST_UniProt_AC'</em>, <em class="sig-param">download=True</em>, <em class="sig-param">db='STRING'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/mapping.html#getSTRINGMapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.mapping.getSTRINGMapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses database (db) and extracts relationships between identifiers to order databases (source).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – link to download database raw file.</p></li>
+<li><p><strong>source</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the source database for selecting aliases.</p></li>
+<li><p><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – wether to download the file or not.</p></li>
+<li><p><strong>db</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the database to be parsed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary of database identifers (keys) and set of unique aliases to other databases (values).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.mapping.buildMappingFromOBO">
+<code class="sig-prename descclassname">graphdb_builder.mapping.</code><code class="sig-name descname">buildMappingFromOBO</code><span class="sig-paren">(</span><em class="sig-param">oboFile</em>, <em class="sig-param">ontology</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/mapping.html#buildMappingFromOBO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.mapping.buildMappingFromOBO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses and extracts ontology idnetifiers, names and synonyms from raw file, and writes all the information     to a .tsv file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>oboFile</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to ontology raw file.</p></li>
+<li><p><strong>ontology</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – ontology database acronym as defined in ontologies_config.yml.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="graphdb_builder.ontologies.html" class="btn btn-neutral float-right" title="Ontology Databases" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="graphdb_connector.html" class="btn btn-neutral float-left" title="Graph Database Connector" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,182 @@
+\babel@toc {english}{}
+\contentsline {chapter}{\numberline {1}Clinical Knowledge Graph}{3}{chapter.1}% 
+\contentsline {section}{\numberline {1.1}Abstract}{3}{section.1.1}% 
+\contentsline {section}{\numberline {1.2}Features}{4}{section.1.2}% 
+\contentsline {chapter}{\numberline {2}First steps}{5}{chapter.2}% 
+\contentsline {section}{\numberline {2.1}Getting Started with Neo4j}{5}{section.2.1}% 
+\contentsline {subsection}{\numberline {2.1.1}Add Neo4j graph database to \sphinxstyleemphasis {.bashrc}}{5}{subsection.2.1.1}% 
+\contentsline {section}{\numberline {2.2}Getting Started with the CKG Build}{5}{section.2.2}% 
+\contentsline {subsection}{\numberline {2.2.1}Create a virtual environment}{6}{subsection.2.2.1}% 
+\contentsline {subsection}{\numberline {2.2.2}Install python modules with pip}{6}{subsection.2.2.2}% 
+\contentsline {subsection}{\numberline {2.2.3}Add CKG to \sphinxstyleemphasis {.bashrc}}{6}{subsection.2.2.3}% 
+\contentsline {subsection}{\numberline {2.2.4}Build Neo4j graph database}{6}{subsection.2.2.4}% 
+\contentsline {chapter}{\numberline {3}Getting started}{9}{chapter.3}% 
+\contentsline {section}{\numberline {3.1}Connecting to the Clinical Knowledge Graph database}{9}{section.3.1}% 
+\contentsline {section}{\numberline {3.2}Create a new user in the graph database}{9}{section.3.2}% 
+\contentsline {section}{\numberline {3.3}Create a new project in the database}{9}{section.3.3}% 
+\contentsline {subsection}{\numberline {3.3.1}Preparations}{9}{subsection.3.3.1}% 
+\contentsline {subsection}{\numberline {3.3.2}Project creation}{10}{subsection.3.3.2}% 
+\contentsline {subsection}{\numberline {3.3.3}Other}{10}{subsection.3.3.3}% 
+\contentsline {section}{\numberline {3.4}Upload project experimental data}{10}{section.3.4}% 
+\contentsline {subsection}{\numberline {3.4.1}Prepare data for upload}{10}{subsection.3.4.1}% 
+\contentsline {subsubsection}{Upload data}{11}{subsubsection*.3}% 
+\contentsline {section}{\numberline {3.5}Define data analysis parameters}{12}{section.3.5}% 
+\contentsline {subsection}{\numberline {3.5.1}Clinical data analysis parameters}{12}{subsection.3.5.1}% 
+\contentsline {subsection}{\numberline {3.5.2}Proteomics data analysis parameters}{12}{subsection.3.5.2}% 
+\contentsline {subsection}{\numberline {3.5.3}Whole Exome Sequencing data analysis parameters}{12}{subsection.3.5.3}% 
+\contentsline {subsection}{\numberline {3.5.4}Multiomics data analysis parameters}{12}{subsection.3.5.4}% 
+\contentsline {section}{\numberline {3.6}Accessing the analysis report}{12}{section.3.6}% 
+\contentsline {subsection}{\numberline {3.6.1}Report: Dash web app}{12}{subsection.3.6.1}% 
+\contentsline {subsection}{\numberline {3.6.2}Report: Jupyter-notebook}{12}{subsection.3.6.2}% 
+\contentsline {section}{\numberline {3.7}Report notifications}{12}{section.3.7}% 
+\contentsline {chapter}{\numberline {4}The project report}{13}{chapter.4}% 
+\contentsline {section}{\numberline {4.1}Generating a project report}{13}{section.4.1}% 
+\contentsline {section}{\numberline {4.2}Project report tabs}{13}{section.4.2}% 
+\contentsline {chapter}{\numberline {5}CKG Builder}{15}{chapter.5}% 
+\contentsline {section}{\numberline {5.1}Ontology sources and raw file parsers}{15}{section.5.1}% 
+\contentsline {section}{\numberline {5.2}Biomedical databases and resources}{15}{section.5.2}% 
+\contentsline {section}{\numberline {5.3}Parsing experimental data}{15}{section.5.3}% 
+\contentsline {subsection}{\numberline {5.3.1}Clinical data}{15}{subsection.5.3.1}% 
+\contentsline {subsection}{\numberline {5.3.2}Proteomics}{15}{subsection.5.3.2}% 
+\contentsline {subsection}{\numberline {5.3.3}Phosphoproteomics}{15}{subsection.5.3.3}% 
+\contentsline {subsection}{\numberline {5.3.4}WES}{15}{subsection.5.3.4}% 
+\contentsline {section}{\numberline {5.4}Building the graph database from one Python module}{15}{section.5.4}% 
+\contentsline {chapter}{\numberline {6}Advanced featues}{17}{chapter.6}% 
+\contentsline {section}{\numberline {6.1}Clinical Knowledge Graph Statistics: Imports}{17}{section.6.1}% 
+\contentsline {section}{\numberline {6.2}Clinical Knowledge Graph Statistics: Database}{17}{section.6.2}% 
+\contentsline {section}{\numberline {6.3}Using Jupyter Notebooks with the Clinical Knowledge Graph}{17}{section.6.3}% 
+\contentsline {subsection}{\numberline {6.3.1}Reporting notebooks}{17}{subsection.6.3.1}% 
+\contentsline {subsection}{\numberline {6.3.2}Development notebooks}{18}{subsection.6.3.2}% 
+\contentsline {section}{\numberline {6.4}Retrieving data from the Clinical Knowledge Graph database}{18}{section.6.4}% 
+\contentsline {section}{\numberline {6.5}Standardizing the data analysis}{18}{section.6.5}% 
+\contentsline {section}{\numberline {6.6}Visualization plots}{18}{section.6.6}% 
+\contentsline {section}{\numberline {6.7}Python - R interface}{18}{section.6.7}% 
+\contentsline {chapter}{\numberline {7}System requirements}{19}{chapter.7}% 
+\contentsline {section}{\numberline {7.1}Mac OS X requirements}{19}{section.7.1}% 
+\contentsline {section}{\numberline {7.2}Linux requirements}{19}{section.7.2}% 
+\contentsline {section}{\numberline {7.3}Windows requirements}{19}{section.7.3}% 
+\contentsline {chapter}{\numberline {8}API Reference}{21}{chapter.8}% 
+\contentsline {section}{\numberline {8.1}Clinical Knowledge Graph package}{21}{section.8.1}% 
+\contentsline {subsection}{\numberline {8.1.1}Graph Database Connector}{21}{subsection.8.1.1}% 
+\contentsline {subsubsection}{connector.py}{21}{subsubsection*.4}% 
+\contentsline {subsection}{\numberline {8.1.2}Graph Database Builder}{21}{subsection.8.1.2}% 
+\contentsline {subsubsection}{Ontology Databases}{21}{subsubsection*.13}% 
+\contentsline {paragraph}{Ontologies Parsers}{21}{paragraph*.14}% 
+\contentsline {subparagraph}{icdParser.py}{21}{subparagraph*.15}% 
+\contentsline {subparagraph}{oboParser.py}{22}{subparagraph*.17}% 
+\contentsline {subparagraph}{reflectParser.py}{22}{subparagraph*.19}% 
+\contentsline {subparagraph}{snomedParser.py}{23}{subparagraph*.21}% 
+\contentsline {paragraph}{Ontologies Controller}{23}{paragraph*.24}% 
+\contentsline {subsubsection}{Biomedical Databases}{24}{subsubsection*.28}% 
+\contentsline {paragraph}{Biomedical Databases Parsers}{24}{paragraph*.29}% 
+\contentsline {subparagraph}{cancerGenomeInterpreterParser.py}{24}{subparagraph*.30}% 
+\contentsline {subparagraph}{corumParser.py}{25}{subparagraph*.32}% 
+\contentsline {subparagraph}{disgenetParser.py}{25}{subparagraph*.34}% 
+\contentsline {subparagraph}{drugBankParser.py}{25}{subparagraph*.38}% 
+\contentsline {subparagraph}{drugGeneInteractionDBParser.py}{26}{subparagraph*.45}% 
+\contentsline {subparagraph}{exposomeParser.py}{27}{subparagraph*.47}% 
+\contentsline {subparagraph}{foodbParser.py}{27}{subparagraph*.51}% 
+\contentsline {subparagraph}{goaParser.py}{27}{subparagraph*.56}% 
+\contentsline {subparagraph}{gwasCatalogParser.py}{27}{subparagraph*.59}% 
+\contentsline {subparagraph}{hgncParser.py}{27}{subparagraph*.61}% 
+\contentsline {subparagraph}{hmdbParser.py}{27}{subparagraph*.63}% 
+\contentsline {subparagraph}{hpaParser.py}{28}{subparagraph*.69}% 
+\contentsline {subparagraph}{intactParser.py}{28}{subparagraph*.72}% 
+\contentsline {subparagraph}{internalDBsParser.py}{28}{subparagraph*.74}% 
+\contentsline {subparagraph}{mutationDsParser.py}{29}{subparagraph*.81}% 
+\contentsline {subparagraph}{oncokbParser.py}{29}{subparagraph*.83}% 
+\contentsline {subparagraph}{pathwayCommonsParser.py}{29}{subparagraph*.85}% 
+\contentsline {subparagraph}{pfamParser.py}{29}{subparagraph*.87}% 
+\contentsline {subparagraph}{pspParser.py}{29}{subparagraph*.90}% 
+\contentsline {subparagraph}{reactomeParser.py}{30}{subparagraph*.96}% 
+\contentsline {subparagraph}{refseqParser.py}{30}{subparagraph*.101}% 
+\contentsline {subparagraph}{siderParser.py}{30}{subparagraph*.103}% 
+\contentsline {subparagraph}{smpdbParser.py}{30}{subparagraph*.106}% 
+\contentsline {subparagraph}{stringParser.py}{31}{subparagraph*.111}% 
+\contentsline {subparagraph}{uniprotParser.py}{31}{subparagraph*.114}% 
+\contentsline {paragraph}{Databases Controller}{32}{paragraph*.124}% 
+\contentsline {subsubsection}{Experimental Data}{32}{subsubsection*.127}% 
+\contentsline {paragraph}{Experiments Parsers}{32}{paragraph*.128}% 
+\contentsline {subparagraph}{Clinical parser}{32}{subparagraph*.129}% 
+\contentsline {subparagraph}{Proteomics parser}{34}{subparagraph*.150}% 
+\contentsline {subparagraph}{WES parser}{36}{subparagraph*.173}% 
+\contentsline {paragraph}{Experiments Controller}{36}{paragraph*.178}% 
+\contentsline {subsubsection}{User Creation}{36}{subsubsection*.181}% 
+\contentsline {paragraph}{Users Controller}{36}{paragraph*.182}% 
+\contentsline {subsubsection}{CKG Builder}{38}{subsubsection*.189}% 
+\contentsline {paragraph}{User Creation Module}{38}{paragraph*.190}% 
+\contentsline {paragraph}{Importer Module}{39}{paragraph*.196}% 
+\contentsline {paragraph}{Loader Module}{41}{paragraph*.208}% 
+\contentsline {paragraph}{Builder Module}{42}{paragraph*.214}% 
+\contentsline {subsubsection}{builder\_utils.py}{42}{subsubsection*.216}% 
+\contentsline {subsubsection}{mapping.py}{45}{subsubsection*.243}% 
+\contentsline {subsection}{\numberline {8.1.3}Report Manager}{46}{subsection.8.1.3}% 
+\contentsline {subsubsection}{Report Queries}{46}{subsubsection*.251}% 
+\contentsline {paragraph}{Query Utils}{46}{paragraph*.252}% 
+\contentsline {subsubsection}{Report Dash Apps}{47}{subsubsection*.262}% 
+\contentsline {paragraph}{Login App}{47}{paragraph*.263}% 
+\contentsline {paragraph}{Basic App}{47}{paragraph*.264}% 
+\contentsline {paragraph}{HomePage Stats}{47}{paragraph*.265}% 
+\contentsline {paragraph}{HomePage App}{48}{paragraph*.273}% 
+\contentsline {paragraph}{DB Imports Stats}{48}{paragraph*.274}% 
+\contentsline {paragraph}{DB Imports App}{51}{paragraph*.287}% 
+\contentsline {paragraph}{Project Creation}{51}{paragraph*.288}% 
+\contentsline {paragraph}{Project Creation App}{54}{paragraph*.301}% 
+\contentsline {paragraph}{Data Upload App}{54}{paragraph*.302}% 
+\contentsline {paragraph}{Data Upload}{54}{paragraph*.303}% 
+\contentsline {paragraph}{Project App}{56}{paragraph*.312}% 
+\contentsline {subsubsection}{dataset.py}{56}{subsubsection*.313}% 
+\contentsline {subsubsection}{knowledge.py}{58}{subsubsection*.366}% 
+\contentsline {subsubsection}{project.py}{59}{subsubsection*.400}% 
+\contentsline {subsubsection}{report.py}{61}{subsubsection*.458}% 
+\contentsline {subsubsection}{user.py}{61}{subsubsection*.471}% 
+\contentsline {subsubsection}{utils.py}{61}{subsubsection*.476}% 
+\contentsline {subsubsection}{worker.py}{63}{subsubsection*.497}% 
+\contentsline {subsection}{\numberline {8.1.4}Analytics Core}{63}{subsection.8.1.4}% 
+\contentsline {subsubsection}{Analysis}{63}{subsubsection*.498}% 
+\contentsline {paragraph}{Analytics}{63}{paragraph*.499}% 
+\contentsline {paragraph}{WGCNA analytics}{87}{paragraph*.563}% 
+\contentsline {subsubsection}{Vizualization}{93}{subsubsection*.584}% 
+\contentsline {paragraph}{Viz module}{93}{paragraph*.585}% 
+\contentsline {paragraph}{WGCNA viz}{107}{paragraph*.622}% 
+\contentsline {paragraph}{Dendrogram}{110}{paragraph*.629}% 
+\contentsline {paragraph}{Colors}{111}{paragraph*.636}% 
+\contentsline {subsubsection}{R wrapper}{112}{subsubsection*.640}% 
+\contentsline {subsubsection}{Analytics factory}{113}{subsubsection*.643}% 
+\contentsline {subsubsection}{Utils}{113}{subsubsection*.652}% 
+\contentsline {subsection}{\numberline {8.1.5}Notebooks}{113}{subsection.8.1.5}% 
+\contentsline {subsubsection}{vis.py}{113}{subsubsection*.663}% 
+\contentsline {chapter}{\numberline {9}Project Info}{115}{chapter.9}% 
+\contentsline {section}{\numberline {9.1}Credits}{115}{section.9.1}% 
+\contentsline {subsection}{\numberline {9.1.1}Development Leads}{115}{subsection.9.1.1}% 
+\contentsline {subsection}{\numberline {9.1.2}Core Committers}{115}{subsection.9.1.2}% 
+\contentsline {subsection}{\numberline {9.1.3}Contributors}{115}{subsection.9.1.3}% 
+\contentsline {section}{\numberline {9.2}Backers}{115}{section.9.2}% 
+\contentsline {section}{\numberline {9.3}Contributing}{115}{section.9.3}% 
+\contentsline {subsection}{\numberline {9.3.1}Types of Contributions}{115}{subsection.9.3.1}% 
+\contentsline {subsubsection}{Create Analysis or Visualization methods}{116}{subsubsection*.666}% 
+\contentsline {subsubsection}{Report Bugs}{116}{subsubsection*.667}% 
+\contentsline {subsubsection}{Fix Bugs}{116}{subsubsection*.668}% 
+\contentsline {subsubsection}{Implement Features}{116}{subsubsection*.669}% 
+\contentsline {subsubsection}{Write Documentation}{116}{subsubsection*.670}% 
+\contentsline {subsubsection}{Submit Feedback}{116}{subsubsection*.671}% 
+\contentsline {subsection}{\numberline {9.3.2}Setting Up the Code for Local Development}{117}{subsection.9.3.2}% 
+\contentsline {subsection}{\numberline {9.3.3}Contributor Guidelines}{117}{subsection.9.3.3}% 
+\contentsline {subsubsection}{Pull Request Guidelines}{117}{subsubsection*.672}% 
+\contentsline {subsubsection}{Coding Standards}{117}{subsubsection*.673}% 
+\contentsline {subsection}{\numberline {9.3.4}Core Committer Guide}{118}{subsection.9.3.4}% 
+\contentsline {subsubsection}{Vision and Scope}{118}{subsubsection*.674}% 
+\contentsline {paragraph}{Command-Line and API Accessible}{118}{paragraph*.675}% 
+\contentsline {paragraph}{Extensible}{118}{paragraph*.676}% 
+\contentsline {paragraph}{Inclusive}{118}{paragraph*.677}% 
+\contentsline {subsubsection}{Process: Pull Requests}{119}{subsubsection*.678}% 
+\contentsline {subsubsection}{Process: Issues}{119}{subsubsection*.679}% 
+\contentsline {subsubsection}{Process: Pull Request merging and HISTORY.md maintenance}{119}{subsubsection*.680}% 
+\contentsline {subsubsection}{Process: Accepting New Features Pull Requests}{120}{subsubsection*.681}% 
+\contentsline {subsubsection}{Process: Your own code changes}{120}{subsubsection*.682}% 
+\contentsline {subsubsection}{Responsibilities}{120}{subsubsection*.683}% 
+\contentsline {section}{\numberline {9.4}History}{120}{section.9.4}% 
+\contentsline {subsection}{\numberline {9.4.1}0.1.0 (2019-12-10)}{120}{subsection.9.4.1}% 
+\contentsline {section}{\numberline {9.5}Code of Conduct}{120}{section.9.5}% 
+\contentsline {chapter}{\numberline {10}Index}{121}{chapter.10}% 
+\contentsline {chapter}{Python Module Index}{123}{section*.684}% 

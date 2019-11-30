@@ -12,15 +12,12 @@ experimentsDirectory: '../../../data/imports/experiments'
 databasesDirectory: '../../../data/imports/databases'
 #ontologies import diretory
 ontologiesDirectory: '../../../data/imports/ontologies'
-#users directory
-usersDirectory: '../../../data/users'
-usersImportDirectory: '../../../data/imports/users'
+#users import directory
+usersDirectory: '../../../data/imports/users'
 
 download: True
 
 cypher_queries_file: 'cypher.yml'
-
-usersFile: 'CKG_users.xlsx'
 
 statsFile: 'stats.hdf'
 statsCols: 
