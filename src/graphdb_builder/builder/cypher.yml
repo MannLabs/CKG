@@ -782,7 +782,7 @@ CREATE_PROJECT: &create_project
     'query': >
         CREATE CONSTRAINT ON (p:Project) ASSERT p.id IS UNIQUE;
         CREATE CONSTRAINT ON (p:Project) ASSERT p.name IS UNIQUE; 
-        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID.tsv" AS line
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_info.tsv" AS line
         FIELDTERMINATOR '\t'
         MERGE (p:Project {id:line.external_id})
         ON CREATE SET p.internal_id=line.internal_id,p.name=line.name,p.acronym=line.acronym,p.description=line.description,p.type=line.datatypes,p.timepoint=line.timepoints,p.disease=line.disease,p.tissue=line.tissue,p.intervention=line.intervention,p.responsible=line.responsible,p.participant=line.participant,p.start_date=line.start_date,p.end_date=line.end_date,p.status=line.status

@@ -1,0 +1,330 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Create a new project in the database &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Upload project experimental data" href="upload-data.html" />
+    <link rel="prev" title="Create a new user in the graph database" href="create-new-user.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> ClinicalKnowledgeGraph
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">Clinical Knowledge Graph</a></li>
+</ul>
+<p class="caption"><span class="caption-text">First steps</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="connect-to-ckg.html">Connecting to the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-new-user.html">Create a new user in the graph database</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Create a new project in the database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#preparations">Preparations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#project-creation">Project creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#other">Other</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="upload-data.html">Upload project experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-analysis-config.html">Define data analysis parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="access-report.html">Accessing the analysis report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notifications.html">Report notifications</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Project Report</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../project_report/project-report.html">Generating a project report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project_report/project-tabs.html">Project report tabs</a></li>
+</ul>
+<p class="caption"><span class="caption-text">CKG Builder</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/ontologies.html">Ontology sources and raw file parsers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/databases.html">Biomedical databases and resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/experiments.html">Parsing experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/graphdb-builder.html">Building the graph database from one Python module</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/import-statistics.html">Clinical Knowledge Graph Statistics: Imports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/R-interface.html">Python - R interface</a></li>
+</ul>
+<p class="caption"><span class="caption-text">System Requirements</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../system_require/mac-os.html">Mac OS X requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system_require/linux.html">Linux requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system_require/windows.html">Windows requirements</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../src.html">Clinical Knowledge Graph package</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#backers">Backers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#history">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#code-of-conduct">Code of Conduct</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ClinicalKnowledgeGraph</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Create a new project in the database</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/getting_started/create-new-project.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="create-a-new-project-in-the-database">
+<h1>Create a new project in the database<a class="headerlink" href="#create-a-new-project-in-the-database" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="preparations">
+<h2>Preparations<a class="headerlink" href="#preparations" title="Permalink to this headline">¶</a></h2>
+<p><strong>Neo4j</strong></p>
+<ol class="arabic simple">
+<li><p>Open neo4j desktop</p></li>
+<li><p>Start the database</p></li>
+</ol>
+<p><strong>Terminal</strong></p>
+<ol class="arabic simple">
+<li><p>In one terminal window:</p></li>
+</ol>
+<ul class="simple">
+<li><p>Start a redis-server:</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><style type="text/css">
+span.prompt1:before {
+  content: "$ ";
+}
+</style><span class="prompt1">redis-server</span>
+</pre></div></div><ol class="arabic simple" start="2">
+<li><p>In another terminal window:</p></li>
+</ol>
+<ul class="simple">
+<li><p>Navigate to CKG/src/report_manager/</p></li>
+<li><p>Start a celery queue from the report_manager directory:</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="prompt1">celery -A worker worker -l info</span>
+</pre></div></div><ol class="arabic simple" start="3">
+<li><p>In another terminal window:</p></li>
+</ol>
+<ul class="simple">
+<li><p>run the index:</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="prompt1">python index.py</span>
+</pre></div></div><p>This will print some warnings, which should be okay</p>
+<p><strong>Browser</strong></p>
+<ol class="arabic simple">
+<li><p>Go to <code class="docutils literal notranslate"><span class="pre">http://localhost:5000/</span></code>.</p></li>
+<li><p>Enter username and password</p></li>
+</ol>
+</div>
+<div class="section" id="project-creation">
+<h2>Project creation<a class="headerlink" href="#project-creation" title="Permalink to this headline">¶</a></h2>
+<p><strong>Browser</strong></p>
+<p>Go to <code class="docutils literal notranslate"><span class="pre">http://localhost:5000/apps/projectCreation</span></code></p>
+<p>This will direct you to the project creation page.
+Fill in your project information.
+Remember to press “Add” after selecting items from the drop-down menu (the page will update every time).
+Press “Create Project” (you will now be able to find your project in the neo4j database)
+Download the “Clinical Data template” and proceed to the ‘Upload project experimental data’_.</p>
+</div>
+<div class="section" id="other">
+<h2>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h2>
+<p><strong>Neo4j</strong></p>
+<p>&gt; My Project &gt; Manage &gt; Open Browser &gt; Project [Node Labels]
+You can expand your project information if you click on your project node and next press the &lt; in the bottom of the window
+Here you will find your “id”, typically something like “P00000**”</p>
+<p><strong>Browser</strong></p>
+<dl class="simple">
+<dt>Go to:</dt><dd><p><a class="reference external" href="http://localhost:5000/apps/project">http://localhost:5000/apps/project</a>/{YOUR_PROJECT_ID}</p>
+</dd>
+<dt>or go to:</dt><dd><p><a class="reference external" href="http://localhost:5000">http://localhost:5000</a>
+and select your project from the drop-down menu</p>
+</dd>
+</dl>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="upload-data.html" class="btn btn-neutral float-right" title="Upload project experimental data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="create-new-user.html" class="btn btn-neutral float-left" title="Create a new user in the graph database" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

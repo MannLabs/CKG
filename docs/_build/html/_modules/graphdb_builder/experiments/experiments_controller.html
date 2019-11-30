@@ -1,0 +1,299 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>graphdb_builder.experiments.experiments_controller &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> ClinicalKnowledgeGraph
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../README.html">Clinical Knowledge Graph</a></li>
+</ul>
+<p class="caption"><span class="caption-text">First steps</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/connect-to-ckg.html">Connecting to the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/create-new-user.html">Create a new user in the graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/create-new-project.html">Create a new project in the database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/upload-data.html">Upload project experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/data-analysis-config.html">Define data analysis parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/access-report.html">Accessing the analysis report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/notifications.html">Report notifications</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Project Report</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../project_report/project-report.html">Generating a project report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../project_report/project-tabs.html">Project report tabs</a></li>
+</ul>
+<p class="caption"><span class="caption-text">CKG Builder</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ckg_builder/ontologies.html">Ontology sources and raw file parsers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ckg_builder/databases.html">Biomedical databases and resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ckg_builder/experiments.html">Parsing experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ckg_builder/graphdb-builder.html">Building the graph database from one Python module</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/import-statistics.html">Clinical Knowledge Graph Statistics: Imports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/R-interface.html">Python - R interface</a></li>
+</ul>
+<p class="caption"><span class="caption-text">System Requirements</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../system_require/mac-os.html">Mac OS X requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../system_require/linux.html">Linux requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../system_require/windows.html">Windows requirements</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.html">Clinical Knowledge Graph package</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../MANIFEST.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../MANIFEST.html#backers">Backers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../MANIFEST.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../MANIFEST.html#history">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../MANIFEST.html#code-of-conduct">Code of Conduct</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">ClinicalKnowledgeGraph</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>graphdb_builder.experiments.experiments_controller</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for graphdb_builder.experiments.experiments_controller</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">graphdb_connector</span> <span class="k">import</span> <span class="n">connector</span>
+<span class="kn">from</span> <span class="nn">graphdb_builder</span> <span class="k">import</span> <span class="n">builder_utils</span>
+<span class="kn">from</span> <span class="nn">graphdb_builder.experiments.parsers</span> <span class="k">import</span> <span class="n">clinicalParser</span><span class="p">,</span> <span class="n">proteomicsParser</span><span class="p">,</span> <span class="n">wesParser</span>
+<span class="kn">import</span> <span class="nn">config.ckg_config</span> <span class="k">as</span> <span class="nn">ckg_config</span>
+<span class="kn">import</span> <span class="nn">ckg_utils</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">logging.config</span>
+
+<span class="n">log_config</span> <span class="o">=</span> <span class="n">ckg_config</span><span class="o">.</span><span class="n">graphdb_builder_log</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">builder_utils</span><span class="o">.</span><span class="n">setup_logging</span><span class="p">(</span><span class="n">log_config</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;experiments_controller&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="generate_dataset_imports"><a class="viewcode-back" href="../../../_autosummary/graphdb_builder.experiments.html#graphdb_builder.experiments.experiments_controller.generate_dataset_imports">[docs]</a><span class="k">def</span> <span class="nf">generate_dataset_imports</span><span class="p">(</span><span class="n">projectId</span><span class="p">,</span> <span class="n">dataType</span><span class="p">,</span> <span class="n">dataset_import_dir</span><span class="p">):</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">dataType</span> <span class="o">==</span> <span class="s1">&#39;clinical&#39;</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">clinicalParser</span><span class="o">.</span><span class="n">parser</span><span class="p">(</span><span class="n">projectId</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">ot</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                <span class="n">generate_graph_files</span><span class="p">(</span><span class="n">data</span><span class="p">[(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">ot</span><span class="p">)],</span><span class="n">dtype</span><span class="p">,</span> <span class="n">projectId</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span> <span class="n">ot</span><span class="p">,</span> <span class="n">dataset_import_dir</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dataType</span> <span class="o">==</span> <span class="s2">&quot;proteomics&quot;</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">proteomicsParser</span><span class="o">.</span><span class="n">parser</span><span class="p">(</span><span class="n">projectId</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">ot</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                <span class="n">generate_graph_files</span><span class="p">(</span><span class="n">data</span><span class="p">[(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">ot</span><span class="p">)],</span><span class="n">dtype</span><span class="p">,</span> <span class="n">projectId</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span> <span class="n">ot</span><span class="p">,</span> <span class="n">dataset_import_dir</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dataType</span> <span class="o">==</span> <span class="s2">&quot;wes&quot;</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">wesParser</span><span class="o">.</span><span class="n">parser</span><span class="p">(</span><span class="n">projectId</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">ot</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                <span class="n">generate_graph_files</span><span class="p">(</span><span class="n">data</span><span class="p">[(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">ot</span><span class="p">)],</span><span class="n">dtype</span><span class="p">,</span> <span class="n">projectId</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span> <span class="n">ot</span><span class="p">,</span> <span class="n">dataset_import_dir</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Error when importing experiment for project </span><span class="si">{}</span><span class="s2">. Non-existing parser for data type </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">projectId</span><span class="p">,</span> <span class="n">dataType</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_obj</span><span class="p">,</span> <span class="n">exc_tb</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">exc_tb</span><span class="o">.</span><span class="n">tb_frame</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_filename</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Experiment </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2"> file: </span><span class="si">{}</span><span class="s2">, line: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">projectId</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">(),</span> <span class="n">fname</span><span class="p">,</span> <span class="n">exc_tb</span><span class="o">.</span><span class="n">tb_lineno</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Error when importing experiment </span><span class="si">{}</span><span class="s2">.</span><span class="se">\n</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">projectId</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="generate_graph_files"><a class="viewcode-back" href="../../../_autosummary/graphdb_builder.experiments.html#graphdb_builder.experiments.experiments_controller.generate_graph_files">[docs]</a><span class="k">def</span> <span class="nf">generate_graph_files</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dataType</span><span class="p">,</span> <span class="n">projectId</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span> <span class="n">ot</span> <span class="o">=</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">dataset_import_dir</span><span class="o">=</span><span class="s1">&#39;experiments&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">dataType</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="n">outputfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dataset_import_dir</span><span class="p">,</span> <span class="n">projectId</span><span class="o">+</span><span class="s2">&quot;.tsv&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">outputfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dataset_import_dir</span><span class="p">,</span> <span class="n">projectId</span><span class="o">+</span><span class="s2">&quot;_&quot;</span><span class="o">+</span><span class="n">dataType</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">+</span><span class="s2">&quot;.tsv&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outputfile</span><span class="p">,</span> <span class="n">ot</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path_or_buf</span> <span class="o">=</span> <span class="n">f</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="n">header</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">quotechar</span><span class="o">=</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span>
+            <span class="n">line_terminator</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">escapechar</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">)</span>
+    
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Experiment </span><span class="si">{}</span><span class="s2"> - Number of </span><span class="si">{}</span><span class="s2"> relationships: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">projectId</span><span class="p">,</span> <span class="n">dataType</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">stats</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">builder_utils</span><span class="o">.</span><span class="n">buildStats</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;relationships&quot;</span><span class="p">,</span> <span class="n">dataType</span><span class="p">,</span> <span class="s2">&quot;Experiment&quot;</span><span class="p">,</span> <span class="n">outputfile</span><span class="p">))</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="k">pass</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

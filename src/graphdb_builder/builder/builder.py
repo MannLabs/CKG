@@ -1,12 +1,15 @@
 """
-    **builder.py**
     Builds the database in two main steps:
+    
     1) Imports all the data from ontologies, databases and experiments
     2) Loads these data into the database
+    
     The module can perform full updates, executing both steps for all the ontologies,
     databases and experiments or a partial update. Partial updates can execute step 1 or
     step 2 for specific data.
+
 """
+
 import os
 import sys
 import argparse
@@ -62,7 +65,7 @@ if __name__ == '__main__':
                     if import_type.lower() == 'experiments' or import_type.lower() == 'experiment':
                         importer.experimentsImport(projects=args.data, n_jobs=1)
                     elif import_type.lower() == 'users' or import_type.lower() == 'user':
-                        importer.usersImport()
+                        importer.usersImport(importDirectory='../../../data/imports')
                     elif import_type.lower() == 'databases' or import_type.lower() == 'database':
                         databases = [d.lower() for d in dbconfig['databases']]
                         valid_entities = [x.lower() for x in args.data if x.lower() in databases]

@@ -44,7 +44,6 @@ def getMappingFromOntology(ontology, source = None):
     Converts .tsv file with complete list of ontology identifiers and aliases, \
     to dictionary with aliases as keys and ontology identifiers as values.
 
-
     :param str ontology: ontology label as defined in ontologies_config.yml.
     :param source: name of the source database for selecting aliases.
     :type source: str or None

@@ -109,3 +109,15 @@ def getCursorData(driver, query, parameters={}):
     df = pd.DataFrame(result.data())
 
     return df
+
+def create_node(driver, node_type, **kwargs):
+    node = py2neo.Node(node_type, **kwargs)
+    driver.create(node)
+    
+    return True
+
+def find_node(driver, node_type, **kwargs):
+    matcher = py2neo.NodeMatcher(driver)
+    found = matcher.match(node_type, **kwargs).first()
+    
+    return found

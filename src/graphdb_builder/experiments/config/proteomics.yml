@@ -1,0 +1,224 @@
+directory : '../../../data/experiments/PROJECTID/proteomics/'
+
+ox : &var_ox
+    'columns':
+        - 'Proteins'
+        - 'Positions within proteins'
+        - 'id'
+        - 'Amino acid'
+        - 'Sequence window'
+        - 'Score'
+        - 'Intensity \w+_AS\d+_?-?\d*'
+        - 'Reverse'
+        - 'Score'
+        - 'Delta score'
+        - 'Score for localization'
+        - 'Localization prob'
+    'filters':
+        - 'Reverse'
+    'attributes':
+        'col':
+            - 'Sequence window'
+            - 'Score'
+            - 'Delta score'
+            - 'Score for localization'
+            - 'Localization prob'
+    'proteinCol': 'Proteins'
+    'indexCol': 'Proteins'
+    'groupCol': 'id'
+    'valueCol': 'Intensity'
+    'contaminant_tag': 'CON__'
+    'multipositions': 'Positions within proteins'
+    'positionCols':
+        - 'Positions within proteins'
+        - 'Amino acid'
+    'sequenceCol': 'Sequence window'
+    'geneCol': 'Gene names'
+    'log': 'log2'
+    'modId': 'MOD:00256'
+    'mod_acronym': 'ox'
+    'file': 'Oxidation \(M\)Sites.txt'
+
+gly : &var_gly
+    'columns':
+        - 'Proteins'
+        - 'Positions within proteins'
+        - 'id'
+        - 'Amino acid'
+        - 'Sequence window'
+        - 'Score'
+        - 'Intensity \w+_AS\d+_?-?\d*'
+        - 'Reverse'
+        - 'Score'
+        - 'Delta score'
+        - 'Score for localization'
+        - 'Localization prob'
+    'filters':
+        - 'Reverse'
+    'attributes':
+        'col':
+            - 'Sequence window'
+            - 'Score'
+            - 'Delta score'
+            - 'Score for localization'
+            - 'Localization prob'
+    'proteinCol': 'Proteins'
+    'indexCol': 'Proteins'
+    'groupCol': 'id'
+    'valueCol': 'Intensity'
+    'contaminant_tag': 'CON__'
+    'multipositions': 'Positions within proteins'
+    'positionCols':
+        - 'Positions within proteins'
+        - 'Amino acid'
+    'sequenceCol': 'Sequence window'
+    'geneCol': 'Gene names'
+    'log': 'log2'
+    'modId': 'MOD:00767'
+    'mod_acronym': 'gly'
+    'file': 'GlycationSites.txt'
+
+p : &var_p
+    'columns':
+        - 'Proteins'
+        - 'Positions within proteins'
+        - 'Amino acid'
+        - 'id'
+        - 'Sequence window'
+        - 'Score'
+        - 'Intensity \w+_AS\d+_?-?\d*'
+        - 'Reverse'
+        - 'Score'
+        - 'Delta score'
+        - 'Score for localization'
+        - 'Localization prob'
+    'filters':
+        - 'Reverse'
+    'attributes':
+        'col':
+            - 'Sequence window'
+            - 'Score'
+            - 'Delta score'
+            - 'Score for localization'
+            - 'Localization prob'
+    'proteinCol': 'Proteins'
+    'indexCol': 'Proteins'
+    'groupCol': 'id'
+    'valueCol': 'Intensity'
+    'contaminant_tag': 'CON__'
+    'multipositions': 'Positions within proteins'
+    'positionCols':
+        - 'Positions within proteins'
+        - 'Amino acid'
+    'sequenceCol': 'Sequence window'
+    'geneCol': 'Gene names'
+    'log': 'log2'
+    'modId': 'MOD:00696'
+    'mod_acronym': 'p'
+    'file': 'Phosphosites \(STY\).txt'
+
+maxquant :
+  'proteins':
+      'columns':
+          - 'Majority protein IDs'
+          - 'Q-value'
+          - 'Score'
+          - 'id'
+          - 'LFQ intensity \w+_AS\d+_?-?\d*'  #subject_replicate_timepoint
+          - 'Intensity \w+_AS\d+_?-?\d*'
+          - 'Reverse'
+          - 'Only identified by site'
+          - 'is_razor'
+      'filters':
+          - 'Reverse'
+          - 'Only identified by site'
+      'proteinCol': 'Majority protein IDs'
+      'contaminant_tag': 'CON__'
+      'valueCol': 'LFQ intensity'
+      'groupCol': 'id'
+      'indexCol': 'Majority protein IDs'
+      'attributes':
+          'cols':
+              - 'Q-value'
+              - 'Score'
+              - 'id'
+              - 'is_razor'
+          'regex':
+              - 'Intensity'
+      'log': 'log2'
+      'file': 'proteinGroups.txt'
+  'peptides':
+      'columns':
+          - 'Sequence'
+          - 'Amino acid before'
+          - 'First amino acid'
+          - 'Second amino acid'
+          - 'Second last amino acid'
+          - 'Last amino acid'
+          - 'Amino acid after'
+          - 'Experiment \w+_AS\d+_?-?\d*'
+          - 'Proteins'
+          - 'id'
+          - 'Start position'
+          - 'End position'
+          - 'Score'
+          - 'Protein group IDs'
+          - 'Intensity \w+_AS\d+_?-?\d*'
+          - 'Reverse'
+      'filters':
+          - 'Reverse'
+      'attributes':
+          'col':
+              - 'Score'
+              - 'Protein group IDs'
+      'proteinCol': 'Proteins'
+      'contaminant_tag': 'CON__'
+      'valueCol': 'Intensity'
+      'groupCol': 'id'
+      'indexCol': 'Sequence'
+      'positionCols':
+          - 'Start position'
+          - 'End position'
+      'type': 'tryptic peptide'
+      'log': 'log2'
+      'file': 'peptides.txt'
+  'Oxydation(M)': *var_ox
+  'Glycation': *var_gly
+  'Phosphorylation': *var_p
+
+spectronaut :
+  'proteins':
+      'columns':
+          - 'PG.ProteinAccessions'
+          - 'PG.Genes'
+          - '\w+_AS\d+_?-?\d*\.PG\.Quantity'  #subject_replicate_timepoint
+          - '\w+_AS\d+_?-?\d*\.PG\.NrOfStrippedSequencesMeasured'
+          - '\w+_AS\d+_?-?\d*\.PG\.NrOfPrecursorsMeasured'
+          - '\w+_AS\d+_?-?\d*\.PG\.NrOfStrippedSequencesIdentified'
+          - '\w+_AS\d+_?-?\d*\.PG\.NrOfPrecursorsIdentified'
+          - '\w+_AS\d+_?-?\d*\.PG\.IsSingleHit'
+          - '\w+_AS\d+_?-?\d*\.PG\.NrOfStrippedSequencesUsedForQuantification'
+          - '\w+_AS\d+_?-?\d*\.PG\.NrOfModifiedSequencesUsedForQuantification'
+          - '\w+_AS\d+_?-?\d*\.PG\.NrOfPrecursorsUsedForQuantification'
+          - '\w+_AS\d+_?-?\d*\.PG\.MS1Quantity'
+          - '\w+_AS\d+_?-?\d*\.PG\.MS2Quantity'
+      'filters':
+      'proteinCol': 'PG.ProteinAccessions'
+      'valueCol': 'PG.Quantity'
+      'groupCol': 'index'
+      'indexCol': 'PG.ProteinAccessions'
+      'attributes':
+          'cols':
+          'regex':
+            - '\.PG\.NrOfStrippedSequencesMeasured'
+            - '\.PG\.NrOfPrecursorsMeasured'
+            - '\.PG\.NrOfStrippedSequencesIdentified'
+            - '\.PG\.NrOfPrecursorsIdentified'
+            - '\.PG\.IsSingleHit'
+            - '\.PG\.NrOfStrippedSequencesUsedForQuantification'
+            - '\.PG\.NrOfModifiedSequencesUsedForQuantification'
+            - '\.PG\.NrOfPrecursorsUsedForQuantification'
+            - '\.PG\.MS1Quantity'
+            - '\.PG\.MS2Quantity'
+      'log': 'log2'
+      'file': '*Report.xls'
