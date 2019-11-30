@@ -77,7 +77,7 @@ proteomics:
         query_type: pre
         query: >
             MATCH (project:Project)-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein)-[rp:ANNOTATED_IN_PATHWAY]->(pathway:Pathway) 
-            WHERE toBoolean(r.is_razor)
+            WHERE toBoolean(r.is_razor) AND toLower(rp.source) IN ["reactome"]
             RETURN DISTINCT protein.name+"~"+protein.id AS identifier,pathway.name AS annotation,rp.source AS source
     GO_ANNOTATION:
         name: 'get gene ontology annotations for the proteins identified'

@@ -1,5 +1,6 @@
 import io
 import os
+import shutil
 import re
 import sys
 import pandas as pd
@@ -8,27 +9,20 @@ import time
 from datetime import datetime
 from uuid import uuid4
 import base64
-import qrcode
 import json
-#import barcode
 from natsort import natsorted
 import flask
 import urllib.parse
-from urllib.parse import quote as urlquote
-from IPython.display import HTML
-
+import user
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-from dash_network import Network
 
 from app import app, server as application
-from apps import initialApp, projectApp, importsApp, projectCreationApp, dataUploadApp, homepageApp
-from apps import projectCreation, dataUpload, homepageStats
+from apps import initialApp, projectCreationApp, dataUploadApp, dataUpload, projectApp, importsApp, homepageApp, loginApp, projectCreation
 from graphdb_builder import builder_utils
 from graphdb_builder.builder import loader
-from graphdb_builder.experiments import experiments_controller as eh
 import ckg_utils
 import config.ckg_config as ckg_config
 
@@ -38,48 +32,82 @@ from graphdb_connector import connector
 driver = connector.getGraphDatabaseConnectionConfiguration()
 separator = '|'
 
-
 app.layout = dcc.Loading(
     children=[html.Div([
     dcc.Location(id='url', refresh=False),
-    html.Div(id='page-content', style={'padding-top':10}),
+    html.Div(id='page-content', style={'padding-top':10}, className='container-fluid'),
 ])], style={'text-align':'center',
-            'margin-top':'180px',
+            'margin-top':'70px',
             'margin-bottom':'-60px','position':'absolute',
             'top':'50%','left':'50%', 'height':'200px'},
     type='circle', 
     color='#2b8cbe')
 
-@app.callback(Output('page-content', 'children'),
-              [Input('url', 'href')])
+@app.callback([Output('page-content', 'children'), 
+               Output('logout_form', 'style')],
+              [Input('url','href')])
 def display_page(pathname):
-    if pathname is not None:
+    session_cookie = flask.request.cookies.get('custom-auth-session')
+    logged_in = session_cookie is not None
+    if not logged_in:
+        login_form = loginApp.LoginApp("Login", "", "", layout = [], logo = None, footer = None)
+        return (login_form.layout, {'display': 'none'})
+    elif pathname is not None:
         if '/apps/initial' in pathname:
-            return initialApp.layout
-        elif '/apps/projectCreation' in pathname:
-            projectCreation = projectCreationApp.ProjectCreationApp("Project Creation", "", "", layout = [], logo = None, footer = None)
-            return projectCreation.layout
-        elif '/apps/dataUpload' in pathname:
+            return (initialApp.layout, {'display': 'block',
+                                        'position': 'absolute',
+                                        'right': '50px'})
+        elif '/apps/login' in pathname:
+            if logged_in:
+                stats_db = homepageApp.HomePageApp("CKG homepage", "Database Stats", "", layout = [], logo = None, footer = None)
+                return (stats_db.layout, {'display': 'block',
+                                          'position': 'absolute',
+                                          'right': '50px'})
+            else:
+                login_form = loginApp.LoginApp("Login", "", "", layout = [], logo = None, footer = None)
+                return (login_form.layout, {'display': 'none'})
+        elif '/apps/projectCreationApp' in pathname:
+            projectCreation_form = projectCreationApp.ProjectCreationApp("Project Creation", "", "", layout = [], logo = None, footer = None)
+            return (projectCreation_form.layout, {'display': 'block',
+                                             'position': 'absolute',
+                                             'right': '50px'})
+        elif '/apps/dataUploadApp' in pathname:
             projectId = pathname.split('/')[-1]
-            dataUpload = dataUploadApp.DataUploadApp(projectId, "Data Upload", "", "", layout = [], logo = None, footer = None)
-            return dataUpload.layout
-        elif '/apps/project' in pathname:
+            dataUpload_form = dataUploadApp.DataUploadApp(projectId, "Data Upload", "", "", layout = [], logo = None, footer = None)
+            return (dataUpload_form.layout, {'display': 'block',
+                                        'position': 'absolute',
+                                        'right': '50px'})
+        elif '/apps/project?' in pathname:
             project_id, force, session_id = get_project_params_from_url(pathname)
             if session_id is None:
                 session_id = datetime.now().strftime('%Y%m-%d%H-%M%S-') + str(uuid4())
             if project_id is None:
-                return initialApp.layout
+                return (initialApp.layout, {'display': 'block',
+                                            'position': 'absolute',
+                                            'right': '50px'})
             else:
+                print("I am in")
                 project = projectApp.ProjectApp(session_id, project_id, project_id, "", "", layout = [], logo = None, footer = None, force=force)
-                return project.layout
+                return (project.layout, {'display': 'block',
+                                         'position': 'absolute',
+                                         'right': '50px'})
         elif '/apps/imports' in pathname:
             imports = importsApp.ImportsApp("CKG imports monitoring", "Statistics", "", layout = [], logo = None, footer = None)
-            return imports.layout
+            return (imports.layout, {'display': 'block',
+                                     'position': 'absolute',
+                                     'right': '50px'})
         elif '/apps/homepage' in pathname or pathname.count('/') <= 3:
+            print("Stats")
             stats_db = homepageApp.HomePageApp("CKG homepage", "Database Stats", "", layout = [], logo = None, footer = None)
-            return stats_db.layout
+            return (stats_db.layout, {'display': 'block',
+                                      'position': 'absolute',
+                                      'right': '50px'})
         else:
-            return '404'
+            return ('404',{'display': 'block',
+                           'position': 'absolute',
+                           'right': '50px'})
+    return (None, None)
+
 
 
 def get_project_params_from_url(pathname):
@@ -101,21 +129,20 @@ def get_project_params_from_url(pathname):
     
     return project_id, force, session_id
 
-# ###Calbacks for basicApp
-# @app.callback(Output('docs-link', 'href'),
-#              [Input('docs-link', 'n_clicks')])
-# def generate_report_url(n_clicks):
-#     link = 'http://localhost:8000'
-#     return link
 
-#s Callback upload configuration files
-@app.callback([Output('upload-data', 'style'), 
+# Documentation files
+@app.server.route("/docs/<value>")
+def return_docs(value):
+    docs_url = ckg_config.docs_url
+    return flask.render_template(docs_url+"{}".format(value))
+ 
+# Callback upload configuration files
+@app.callback([Output('upload-config', 'style'), 
                Output('output-data-upload','children')],
-              [Input('upload-data', 'contents'),
-               Input('upload-data', 'filename'),
+              [Input('upload-config', 'contents'),
+               Input('upload-config', 'filename'),
                Input('my-dropdown','value')])
 def update_output(contents, filename, value):
-    print(value)
     display = {'display': 'none'}
     uploaded = None
     if value is not None:
@@ -140,14 +167,18 @@ def update_output(contents, filename, value):
                     content_type, content_string = contents.split(',')
                     decoded = base64.b64decode(content_string)
                     out.write(decoded)
-                uploaded = dcc.Markdown("**{} configuration uploaded** &#x2705;".format(dataset.title()))
+                uploaded = dcc.Markdown("**{} configuration uploaded: {}** &#x2705;".format(dataset.title(),filename))
+                contents = None
+            else:
+                uploaded = None
         else:
             display = {'display': 'none'}
             if os.path.exists(directory):
-                os.rmdir(directory)
+                shutil.rmtree(directory)
                 
     return display, uploaded
                 
+
 ##Callbacks for CKG homepage
 @app.callback(Output('db-creation-date', 'children'),
              [Input('db_stats_df', 'data')])
@@ -227,14 +258,40 @@ def number_panel_update(df):
     return [dcc.Markdown("**{}**".format(i)) for i in [ent,labels,rel,types,prop,ent_store,rel_store,prop_store,string_store,array_store,log_store,t_open,t_comm,projects]]
 
 @app.callback(Output("project_url", "children"),
-             [Input("project_option", "value")],
-             [State('url', 'href')])
-def update_project_url(value, pathname):
-    basic_path = '/'.join(pathname.split('/')[0:3])
-    if value.startswith('P0'):
-        return dcc.Markdown("[Project {}]({}/apps/project?project_id={}&force=0)".format(value,basic_path, value))
+             [Input("project_option", "value")])
+def update_project_url(value):
+    if value is not None and len(value) > 1:
+        return html.A(value[0].title(),
+                        href='/apps/project?project_id={}&force=0'.format(value[1]),
+                        target='', 
+                        n_clicks=0,
+                        className="button_link")
     else:
       return ''
+  
+# Create a login route
+@app.server.route('/apps/login', methods=['POST'])
+def route_login():
+    data = flask.request.form
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        flask.abort(401)
+    elif not user.User(username).verify_password(password):
+        return dcc.Markdown('**Invalid login.** &#x274C;')
+    else:
+        rep = flask.redirect('/')
+        rep.set_cookie('custom-auth-session', username)
+        return rep
+
+@app.server.route('/apps/logout', methods=['POST'])
+def route_logout():
+    # Redirect back to the index and remove the session cookie.
+    rep = flask.redirect('/')
+    rep.set_cookie('custom-auth-session', '', expires=0)
+    
+    return rep
 
 ###Callbacks for download project
 @app.callback(Output('download-zip', 'href'),
@@ -245,7 +302,7 @@ def generate_report_url(n_clicks, pathname):
     return '/downloads/{}'.format(project_id)
     
 @application.route('/downloads/<value>')
-def generate_report_url(value):
+def route_report_url(value):
     uri = os.path.join(os.getcwd(),"../../data/downloads/"+value+'.zip')
     return flask.send_file(uri, attachment_filename = value+'.zip', as_attachment = True)
 
@@ -261,7 +318,8 @@ def regenerate_report(n_clicks, title, pathname):
 
 ###Callbacks for project creation app
 def image_formatter(im):
-    return f'<img src="data:image/jpeg;base64,{image_base64(im)}">'
+    data_im = base64.b64encode(im).decode('ascii')
+    return f'<img src="data:image/jpeg;base64,{data_im}">'
 
 def add_internal_identifiers_to_excel(driver, external_id, data):
     subject_ids = projectCreation.get_subjects_in_project(driver, external_id)
@@ -269,119 +327,83 @@ def add_internal_identifiers_to_excel(driver, external_id, data):
     data.insert(loc=0, column='subject id', value=subject_ids)
     return data
 
-@app.callback(Output('dum-div', 'children'),
-             [Input('responsible', 'value'),
-              Input('participant', 'value'),
-              Input('data-types', 'value'),
-              Input('disease', 'value'),
-              Input('tissue', 'value'),
-              Input('intervention', 'value'),
-              Input('number_subjects', 'value'),
-              Input('number_timepoints', 'value'),
-              Input('upload-data-type', 'value'),
-              Input('update_project_id', 'value')])
-def update_input(responsible, participant, datatype, timepoints, disease, tissue, intervention, upload_dt, project_id):
-    return responsible, participant, datatype, timepoints, disease, tissue, intervention, upload_dt, project_id
-
-@app.callback(Output('responsible', 'value'),
-             [Input('add_responsible', 'n_clicks')],
-             [State('responsible-picker','value')])
-def update_dropdown(n_clicks, value):
-    if n_clicks != None:
-        return separator.join(value)
-
-@app.callback(Output('participant', 'value'),
-             [Input('add_participant', 'n_clicks')],
-             [State('participant-picker','value')])
-def update_dropdown(n_clicks, value):
-    if n_clicks != None:
-        return separator.join(value)
-
-@app.callback(Output('data-types', 'value'),
-             [Input('add_datatype', 'n_clicks')],
-             [State('data-types-picker','value')])
-
-def update_dropdown(n_clicks, value):
-    if n_clicks != None:
-        return separator.join(value)
-
-@app.callback(Output('disease', 'value'),
-             [Input('add_disease', 'n_clicks')],
-             [State('disease-picker','value')])
-
-def update_dropdown(n_clicks, value):
-    if n_clicks != None:
-        return separator.join(value)
-
-@app.callback(Output('tissue', 'value'),
-             [Input('add_tissue', 'n_clicks')],
-             [State('tissue-picker','value')])
-
-def update_dropdown(n_clicks, value):
-    if n_clicks != None:
-        return separator.join(value)
-
-@app.callback(Output('intervention', 'value'),
-             [Input('add_intervention', 'n_clicks')],
-             [State('intervention-picker','value')])
-
-def update_dropdown(n_clicks, value):
-    if n_clicks != None:
-        return separator.join(value)
-
 @app.callback([Output('project-creation', 'children'),
                Output('update_project_id','children'),
-               Output('update_project_id','style')],
+               Output('update_project_id','style'),
+               Output('download_button', 'style')],
               [Input('project_button', 'n_clicks')],
               [State('project name', 'value'),
                State('project acronym', 'value'),
-               State('responsible', 'value'),
-               State('participant', 'value'),
-               State('data-types', 'value'),
+               State('responsible-picker', 'value'),
+               State('participant-picker', 'value'),
+               State('data-types-picker', 'value'),
                State('number_timepoints', 'value'),
-               State('disease', 'value'),
-               State('tissue', 'value'),
-               State('intervention', 'value'),
+               State('disease-picker', 'value'),
+               State('tissue-picker', 'value'),
+               State('intervention-picker', 'value'),
                State('number_subjects', 'value'),
                State('project description', 'value'),
                State('date-picker-start', 'date'),
                State('date-picker-end', 'date')])
 def create_project(n_clicks, name, acronym, responsible, participant, datatype, timepoints, disease, tissue, intervention, number_subjects, description, start_date, end_date):
-    if n_clicks != None and any(elem is None for elem in [name, number_subjects, datatype, disease, tissue, responsible]) == True:
-        response = "Insufficient information to create project. Refresh page."
-        return response, None, {'display': 'inline-block'}
-    if n_clicks != None and any(elem is None for elem in [name, number_subjects, datatype, disease, tissue, responsible]) == False:
+    if n_clicks > 0:
+        responsible = separator.join(responsible)
+        participant = separator.join(participant)
+        datatype = separator.join(datatype)
+        disease = separator.join(disease)
+        tissue = separator.join(tissue)
+        intervention = separator.join(intervention)
+
+        if any(elem is None for elem in [name, number_subjects, datatype, disease, tissue, responsible]) == True:
+            response = "Insufficient information to create project. Fill in all fields with '*'."
+            return response, None, {'display': 'none'}, {'display': 'none'}
+        
+        if any(elem is None for elem in [name, number_subjects, datatype, disease, tissue, responsible]) == False:
         # Get project data from filled-in fields
-        projectData = pd.DataFrame([name, acronym, description, number_subjects, datatype, timepoints, disease, tissue, intervention, responsible, participant, start_date, end_date]).T
-        projectData.columns = ['name', 'acronym', 'description', 'subjects', 'datatypes', 'timepoints', 'disease', 'tissue', 'intervention', 'responsible', 'participant', 'start_date', 'end_date']
-        projectData['status'] = ''
-        # Generate project internal identifier bsed on timestamp
-        # Excel file is saved in folder with internal id name
-        epoch = time.time()
-        internal_id = "%s%d" % ("CP", epoch)
-        projectData.insert(loc=0, column='internal_id', value=internal_id)
-       
-        result = create_new_project.apply_async(args=[internal_id, projectData.to_json(), separator], task_id='project_creation_'+internal_id)
+            projectData = pd.DataFrame([name, acronym, description, number_subjects, datatype, timepoints, disease, tissue, intervention, responsible, participant, start_date, end_date]).T
+            projectData.columns = ['name', 'acronym', 'description', 'subjects', 'datatypes', 'timepoints', 'disease', 'tissue', 'intervention', 'responsible', 'participant', 'start_date', 'end_date']
+            projectData['status'] = ''
 
-        print('REsult project')
-        print(result)
-        result_output = result.get()
-        external_id = list(result_output.keys())[0]
-        print('Result get')
-        print(external_id)
+            # Generate project internal identifier bsed on timestamp
+            # Excel file is saved in folder with internal id name
+            epoch = time.time()
+            internal_id = "%s%d" % ("CP", epoch)
+            projectData.insert(loc=0, column='internal_id', value=internal_id)
+           
+            result = create_new_project.apply_async(args=[internal_id, projectData.to_json(), separator], task_id='project_creation_'+internal_id)
+            result_output = result.get()
+            external_id = list(result_output.keys())[0]
 
-        if result is not None:
-            response = "Project successfully submitted. Download Clinical Data template."
-        else:
-            response = "There was a problem when creating the project."
-        return response, '- '+external_id, {'display': 'inline-block'}
+            if result is not None:
+                if external_id != '':
+                    response = "Project successfully submitted. Download Clinical Data template."
+                else:
+                    response = 'A project with the same name already exists in the database.'
+            else:
+                response = "There was a problem when creating the project."
+
+            return response, '- '+external_id, {'display': 'inline-block'}, {'display': 'block'}
+    else:
+        return None, None, {'display': 'none'}, {'display': 'none'}
+
+
+@app.callback(Output('project-creation', 'style'),
+              [Input('project-creation', 'children')])
+def change_style(style):
+    if style is not None and 'successfully' in style:
+        return {'fontSize':'20px', 'marginLeft':'70%', 'color': 'black'}
+    else:
+        return {'fontSize':'20px', 'marginLeft':'70%', 'color': 'red'}
+
 
 @app.callback(Output('download_link', 'href'),
-             [Input('download_button', 'n_clicks')],
-             [State('update_project_id', 'children')])
-def update_download_link(n_clicks, pathname):
-  project_id = pathname.split()[-1]
-  return '/apps/templates?value=ClinicalData_template_{}.xlsx'.format(project_id)
+              [Input('update_project_id', 'children')])
+def update_download_link(project):
+    if project is not None and project != '':
+        project_id = project.split()[-1]
+        return '/apps/templates?value=ClinicalData_template_{}.xlsx'.format(project_id)
+    else:
+        return ''
 
 @application.route('/apps/templates')
 def serve_static():
@@ -402,12 +424,6 @@ def serve_static():
                           as_attachment=True,
                           cache_timeout=0)
 
-@app.callback(Output('project_button', 'disabled'),
-             [Input('project_button', 'n_clicks')])
-def disable_submit_button(n_clicks):
-    if n_clicks > 0:
-        return True
-
 
 ###Callbacks for data upload app
 def parse_contents(contents, filename):
@@ -415,7 +431,7 @@ def parse_contents(contents, filename):
     decoded = base64.b64decode(content_string)
     file = filename.split('.')[-1]
     
-    if file == 'txt':
+    if file == 'txt' or file == 'tsv':
         df = pd.read_csv(io.StringIO(decoded.decode('utf-8')), sep='\t', low_memory=False)
     elif file == 'csv':
         df = pd.read_csv(io.StringIO(decoded.decode('utf-8')), low_memory=False)
@@ -482,7 +498,7 @@ def run_processing(n_clicks, data, filename, path_name, dtype):
         # Extract all relationahips and nodes and save as csv files
         if dtype == 'clinical':
             df = dataUpload.create_new_experiment_in_db(driver, project_id, df, separator=separator)
-            loader.partialUpdate(imports=['project', 'experiment']) #This will run loader for clinical only. To run for proteomics, etc, move to after 'else: pass'
+            loader.partialUpdate(imports=['project', 'experiment'])
         else:
             pass
         # Path to new local folder
@@ -514,4 +530,5 @@ def update_table_download_link(n_clicks, data, data_type):
 
 
 if __name__ == '__main__':
+    print("IN MAIN")
     application.run(debug=True, host='0.0.0.0')

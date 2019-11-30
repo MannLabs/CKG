@@ -17,12 +17,23 @@ class HomePageApp(basicApp.BasicApp):
         """
         Builds page with the basic layout from *basicApp.py* and adds all the relevant plots from *homepageStats.py*.
         """
+        args = {}
+        args['valueCol'] = 'value'
+        args['textCol'] = 'size'
+        args['x'] = 'index'
+        args['y'] = 'number'
+        args['title'] = ''
+        args['x_title'] = ''
+        args['y_title'] = ''
+        args['height'] = 700
+        args['width'] = 900
+
         self.add_basic_layout()
         layout = hpstats.quick_numbers_panel()
         dfs = hpstats.get_db_stats_data()
         plots = []
-        plots.append(hpstats.plot_store_size_components(dfs, title='DB Store Size'))
-        plots.append(hpstats.plot_node_rel_per_label(dfs, focus='nodes', title='Nodes per Label'))
-        plots.append(hpstats.plot_node_rel_per_label(dfs, focus='relationships', title='Relationships per Type'))
+        plots.append(hpstats.plot_store_size_components(dfs, title='DB Store Size', args=args))
+        plots.append(hpstats.plot_node_rel_per_label(dfs, focus='nodes', title='Nodes per Label', args=args))
+        plots.append(hpstats.plot_node_rel_per_label(dfs, focus='relationships', title='Relationships per Type', args=args))
         self.extend_layout(layout)
         self.extend_layout(plots)

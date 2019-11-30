@@ -2,7 +2,7 @@ import os
 import config.ckg_config as ckg_config
 from apps import basicApp
 from apps import imports
-from report_manager.plots import basicFigures
+from analytics_core.viz import viz
 
 
 class ImportsApp(basicApp.BasicApp):
@@ -29,9 +29,9 @@ class ImportsApp(basicApp.BasicApp):
             plots.append(imports.plot_total_numbers_per_date(stats_df, 'Imported entities vs relationships'))
             plots.append(imports.plot_databases_numbers_per_date(stats_df, 'Full imports: entities/relationships per database', key='full', dropdown=True, dropdown_options='dates'))
             plots.append(imports.plot_databases_numbers_per_date(stats_df, 'Partial imports: entities/relationships per database', key='partial', dropdown=True, dropdown_options='dates'))
-            plots.append(imports.plot_import_numbers_per_database(stats_df, 'Full imports: Breakdown entities/relationships', key='full', subplot_titles = ('Entities imported', 'Relationships imported', 'File size', 'File size'), colors=True, color1='entities', color2='relationships', dropdown=True, dropdown_options='databases'))
-            plots.append(imports.plot_import_numbers_per_database(stats_df, 'Partial imports: Breakdown entities/relationships', key='partial', subplot_titles = ('Entities imported', 'Relationships imported', 'File size', 'File size'), colors=True, color1='entities', color2='relationships', dropdown=True, dropdown_options='databases'))
+            plots.append(imports.plot_import_numbers_per_database(stats_df, 'Full imports: Breakdown entities/relationships', key='full', subplot_titles = ('Entities imported', 'Relationships imported', 'File size', 'File size'), colors=True, plots_1='entities', plots_2='relationships', dropdown=True, dropdown_options='databases'))
+            plots.append(imports.plot_import_numbers_per_database(stats_df, 'Partial imports: Breakdown entities/relationships', key='partial', subplot_titles = ('Entities imported', 'Relationships imported', 'File size', 'File size'), colors=True, plots_1='entities', plots_2='relationships', dropdown=True, dropdown_options='databases'))
         else:
-            plots.append(basicFigures.get_markdown(text="# There are no statistics about recent imports."))
+            plots.append(viz.get_markdown(text="# There are no statistics about recent imports."))
             
         self.extend_layout(plots)

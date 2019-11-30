@@ -8,9 +8,13 @@ import config.ckg_config as ckg_config
 import ckg_utils
 from graphdb_connector import connector
 from graphdb_builder import builder_utils
-from graphdb_builder.experiments import experiments_controller as eh
-from report_manager.queries import query_utils
+from graphdb_builder.experiments.parsers import clinicalParser as cp, proteomicsParser as pp, wesParser as wp
+<<<<<<< HEAD
+from graphdb_connector import query_utils
 from apps import projectCreation as pc
+=======
+from report_manager.queries import query_utils
+>>>>>>> d1808da816a069bd7d0e845014b2138e81c4103f
 import logging
 import logging.config
 
@@ -27,8 +31,8 @@ except Exception as err:
 
 def get_data_upload_queries():
 	"""
-    Reads the YAML file containing the queries relevant to parsing of clinical data and \
-    returns a Python object (dict[dict]).
+	Reads the YAML file containing the queries relevant to parsing of clinical data and \
+	returns a Python object (dict[dict]).
 	
 	:return: Nested dictionary.
 	"""
@@ -46,9 +50,9 @@ def get_new_biosample_identifier(driver):
 	Queries the database for the last biological sample internal identifier and returns a new sequential identifier.
 	
 	:param driver: py2neo driver, which provides the connection to the neo4j graph database.
-    :type driver: py2neo driver
+	:type driver: py2neo driver
 	:return: Biological sample identifier.
-    :rtype: str
+	:rtype: str
 	"""
 	query_name = 'increment_biosample_id'
 	try:
@@ -66,7 +70,7 @@ def get_new_analytical_sample_identifier(driver):
 	Queries the database for the last analytical sample internal identifier and returns a new sequential identifier.
 	
 	:param driver: py2neo driver, which provides the connection to the neo4j graph database.
-    :type driver: py2neo driver
+	:type driver: py2neo driver
 	:return: Analytical sample identifier.
 	:rtype: str
 	"""
@@ -86,7 +90,7 @@ def get_subject_number_in_project(driver, projectId):
 	Extracts the number of subjects included in a given project.
 	
 	:param driver: py2neo driver, which provides the connection to the neo4j graph database.
-    :type driver: py2neo driver
+	:type driver: py2neo driver
 	:param str projectId: external project identifier (from the graph database).
 	:return: Integer with the number of subjects.
 	"""
@@ -106,7 +110,7 @@ def create_new_biosamples(driver, projectId, data):
 	Creates new graph database nodes and relationships for biological samples obtained from subjects participating in a project.
 	
 	:param driver: py2neo driver, which provides the connection to the neo4j graph database.
-    :type driver: py2neo driver
+	:type driver: py2neo driver
 	:param str projectId: external project identifier (from the graph database).
 	:param data: pandas Dataframe with clinical data as columns and samples as rows.
 	:return: Pandas DataFrame where new biological sample internal identifiers have been added.
@@ -146,7 +150,7 @@ def create_new_ansamples(driver, projectId, data):
 	Creates new graph database nodes and relationships for analytical samples obtained.
 	
 	:param driver: py2neo driver, which provides the connection to the neo4j graph database.
-    :type driver: py2neo driver
+	:type driver: py2neo driver
 	:param str projectId: external project identifier (from the graph database).
 	:param data: pandas Dataframe with clinical data as columns and samples as rows.
 	:return: Pandas DataFrame where new analytical sample internal identifiers have been added.
@@ -186,7 +190,7 @@ def create_new_ansamples(driver, projectId, data):
 def create_new_experiment_in_db(driver, projectId, data, separator='|'):
 	"""
 	Creates a new project in the graph database, following the steps:
-    
+
 	1. Maps intervention, disease and tissue names to database identifiers and adds data to \
 		pandas DataFrame.
 	2. Creates new biological and analytical samples.
@@ -195,7 +199,7 @@ def create_new_experiment_in_db(driver, projectId, data, separator='|'):
 	4. Saves all the relevant node and relationship dataframes to tab-delimited files.
 
 	:param driver: py2neo driver, which provides the connection to the neo4j graph database.
-    :type driver: py2neo driver
+	:type driver: py2neo driver
 	:param str projectId: external project identifier (from the graph database).
 	:param data: pandas Dataframe with clinical data as columns and samples as rows.
 	:param str separator: character used to separate multiple entries in an attribute.
@@ -240,31 +244,31 @@ def create_new_experiment_in_db(driver, projectId, data, separator='|'):
 		dataRows = None
 	if dataRows is not None:
 		generateGraphFiles(dataRows,'subjects', projectId, d='clinical')
-	dataRows = eh.extractBiologicalSampleSubjectRelationships(df2)
+	dataRows = cp.extract_biological_sample_subject_rels(df2)
 	if dataRows is not None:
 		generateGraphFiles(dataRows,'subject_biosample', projectId, d='clinical')
-	dataRows = eh.extractBiologicalSamplesInfo(df2)
+	dataRows = cp.extract_biological_samples_info(df2)
 	if dataRows is not None:
 		generateGraphFiles(dataRows,'biological_samples', projectId, d='clinical')
-	dataRows = eh.extractAnalyticalSamplesInfo(df2)
+	dataRows = cp.extract_analytical_samples_info(df2)
 	if dataRows is not None:
 		generateGraphFiles(dataRows,'analytical_samples', projectId, d='clinical')
-	dataRows = eh.extractBiologicalSampleAnalyticalSampleRelationships(df2)
+	dataRows = cp.extract_biological_sample_analytical_sample_rels(df2)
 	if dataRows is not None:
 		generateGraphFiles(dataRows,'biosample_analytical', projectId, d='clinical')
-	dataRows = eh.extractBiologicalSampleTimepointRelationships(df2)
+	dataRows = cp.extract_biological_sample_timepoint_rels(df2)
 	if dataRows is not None:
 		generateGraphFiles(dataRows,'biological_sample_at_timepoint', projectId, d='clinical')
-	dataRows = eh.extractBiologicalSampleTissueRelationships(df2)
+	dataRows = cp.extract_biological_sample_tissue_rels(df2)
 	if dataRows is not None:
 		generateGraphFiles(dataRows,'biosample_tissue', projectId, d='clinical')
-	dataRows = eh.extractSubjectDiseaseRelationships(df2, separator=separator)
+	dataRows = cp.extract_subject_disease_rels(df2, separator=separator)
 	if dataRows is not None:
 		generateGraphFiles(dataRows,'disease', projectId, d='clinical')
-	dataRows = eh.extractBiologicalSampleGroupRelationships(df2)
+	dataRows = cp.extract_biological_sample_group_rels(df2)
 	if dataRows is not None:
 		generateGraphFiles(dataRows,'groups', projectId, d='clinical')
-	dataRows1, dataRows2 = eh.extractBiologicalSampleClinicalVariablesRelationships(df2)
+	dataRows1, dataRows2 = cp.extract_biological_sample_clinical_variables_rels(df2)
 	if dataRows is not None:
 		generateGraphFiles(dataRows1,'clinical_state', projectId, d='clinical')
 		generateGraphFiles(dataRows2,'clinical_quant', projectId, d='clinical')

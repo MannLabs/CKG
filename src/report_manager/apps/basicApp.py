@@ -1,5 +1,6 @@
 from apps import apps_config as config
 import dash_html_components as html
+import dash_core_components as dcc
 from IPython.display import display, HTML
 
 class BasicApp:
@@ -94,6 +95,12 @@ class BasicApp:
         Calls class functions to setup the layout: title, subtitle, description, \
         logo and footer.
         """
+        self.layout.append(html.Div([html.Form([
+                                    html.Button('Logout', type='submit')], 
+                                    action='/apps/logout', method='post', 
+                                    style={'display':'none', 
+                                            'position': 'absolute',
+                                            'right': '0px'}, id='logout_form')]))
         if self.title is not None:
             self.layout.append(self.get_HTML_title())
         if self.subtitle is not None:

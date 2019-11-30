@@ -99,6 +99,14 @@ extract_project_subjects:
         MATCH (p:Project)-[r:HAS_ENROLLED]-(s:Subject)
         WHERE p.id=$external_id
         RETURN s.id;
-
+check_node:
+    name: check node exists
+    description: 'Returns node identifier if property with value exists in any specified node'
+    involved_nodes:
+        - Project
+    involved_rels:
+    query: >
+        MATCH (n:Project) WHERE n.PROPERTY=$value
+        RETURN n.id;
 
 
