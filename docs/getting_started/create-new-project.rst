@@ -47,15 +47,15 @@ This will print some warnings, which should be okay
 
 Project creation
 ----------------
+
 **Browser**
 
-Go to ``http://localhost:5000/apps/projectCreation``
+Navigate to project creation from the front page by pressing the button "PROJECT CREATION"
+or go to ``http://localhost:5000/apps/projectCreation``
 
-This will direct you to the project creation page.
 Fill in your project information.
-Remember to press "Add" after selecting items from the drop-down menu (the page will update every time).
 Press "Create Project" (you will now be able to find your project in the neo4j database)
-Download the "Clinical Data template" and proceed to the 'Upload project experimental data'_.
+Download the "Clinical Data template" and proceed to 'Upload project experimental data'_.
 
 
 Other

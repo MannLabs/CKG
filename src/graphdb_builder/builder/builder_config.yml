@@ -12,12 +12,15 @@ experimentsDirectory: '../../../data/imports/experiments'
 databasesDirectory: '../../../data/imports/databases'
 #ontologies import diretory
 ontologiesDirectory: '../../../data/imports/ontologies'
-#users import directory
-usersDirectory: '../../../data/imports/users'
+#users directory
+usersDirectory: '../../../data/users'
+usersImportDirectory: '../../../data/imports/users'
 
 download: True
 
 cypher_queries_file: 'cypher.yml'
+
+usersFile: 'CKG_users.xlsx'
 
 statsFile: 'stats.hdf'
 statsCols: 
@@ -52,6 +55,7 @@ graph:
     - functional_regions
     - side effects
     - metabolite
+    - protein_structure
     - food
     - gwas
     - pathway
@@ -59,7 +63,6 @@ graph:
     - user
     - project
     - experiment
-    - protein_structure
 
 #Imports 
 ontology_entities: 

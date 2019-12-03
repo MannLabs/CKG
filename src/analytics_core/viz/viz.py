@@ -1074,7 +1074,7 @@ def get_network(data, identifier, args):
     Example::
 
         result = get_network(data, identifier='network', args={'source':'node1', 'target':'node2', 'cutoff':0.5, 'cutoff_abs':True, 'values':'weight', \
-                            'node_size':'ev_centrality', 'title':'Network Figure', 'color_weight': True})
+                            'node_size':'degree', 'title':'Network Figure', 'color_weight': True})
     """
     net = None
     if 'cutoff_abs' not in args:
@@ -1094,9 +1094,11 @@ def get_network(data, identifier, args):
             data[args["values"]] = 1 
         
         data = data.rename(index=str, columns={args['values']: "width"})
-        data['edge_width'] = data['width'].apply(np.abs)
-        min_edge_value = data['edge_width'].min()
-        max_edge_value = data['edge_width'].max()
+        data = data.fillna('null')
+        data.columns = [c.replace('_', '') for c in data.columns]
+        data['edgewidth'] = data['width'].apply(np.abs)
+        min_edge_value = data['edgewidth'].min()
+        max_edge_value = data['edgewidth'].max()
         graph = nx.from_pandas_edgelist(data, args['source'], args['target'], edge_attr=True)
 
         degrees = dict(graph.degree())
@@ -1154,7 +1156,7 @@ def get_network(data, identifier, args):
         edges_fig_table = get_table(edges_table, identifier=identifier+"_edges_table", title=args['title']+" edges table")
 
         stylesheet, layout = get_network_style(colors, args['color_weight'])
-        stylesheet.append({'selector':'edge','style':{'width':'mapData(edge_width,'+ str(min_edge_value) +','+ str(max_edge_value) +', .5, 8)'}})
+        stylesheet.append({'selector':'edge','style':{'width':'mapData(edgewidth,'+ str(min_edge_value) +','+ str(max_edge_value) +', .5, 8)'}})
         if min_node_size > 0 and max_node_size >0:
             mapper = 'mapData(radius,'+ str(min_node_size) +','+ str(max_node_size) +', 15, 50)'
             stylesheet.append({'selector':'node','style':{'width':mapper, 'height':mapper}})
@@ -1181,15 +1183,22 @@ def get_network_style(node_colors, color_edges):
     '''
 
     color_selector = "{'selector': '[name = \"KEY\"]', 'style': {'background-color': 'VALUE'}}"
-    stylesheet=[{'selector': 'node', 'style': {'label': 'data(name)'}},
-                {'selector':'edge','style':{'curve-style': 'bezier'}}]
+    stylesheet=[{'selector': 'node', 'style': {'label': 'data(name)', 
+                                               'text-valign': 'center', 
+                                               'text-halign': 'center', 
+                                               'border-color':'gray', 
+                                               'border-width': '1px',
+                                               'font-size': '12',
+                                               'opacity':0.75}},
+                {'selector':'edge','style':{'label':'data(label)',
+                                            'curve-style': 'bezier',
+                                            'opacity':0.7,
+                                            'font-size': '4'}}]
 
     layout = {'name': 'cose',
                 'idealEdgeLength': 100,
                 'nodeOverlap': 20,
                 'refresh': 20,
-                #'fit': True,
-                #'padding': 30,
                 'randomize': False,
                 'componentSpacing': 100,
                 'nodeRepulsion': 400000,
@@ -1970,6 +1979,12 @@ def get_cytoscape_network(net, identifier, args):
         * **layout** (dict) -- specifies how the nodes should be positioned on the screen.
     :return: network figure within <div id="_dash-app-content">.
     """
+    height = '700px'    
+    width = '100%'
+    if 'height' in args:
+        height = args['height']
+    if 'width' in args:
+        width = args['width']
     cytonet = html.Div([html.H2(args['title']), cyto.Cytoscape(id=identifier,
                                     stylesheet=args['stylesheet'],
                                     elements=net,
@@ -1977,7 +1992,7 @@ def get_cytoscape_network(net, identifier, args):
                                     minZoom = 0.2,
                                     maxZoom = 1.5,
                                     #mouseoverNodeData=args['mouseover_node'],
-                                    style={'width': '100%', 'height': '700px'}
+                                    style={'width': width, 'height': height}
                                     )
                     ])
 
