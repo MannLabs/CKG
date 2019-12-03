@@ -36,14 +36,15 @@ Follow this link to search for 'SNOWMED'_ terms:
 .. _SNOWMED: https://browser.ihtsdotools.org/?perspective=full&conceptId1=734000001&edition=MAIN/2019-07-31&release=&languages=en
 Example: To add a column with "Age" search for "age". This gives multiple matches, with the first one being: "Age (qualifier value), SCTID:397669002". Please enter this information as column header with the SCTID in brackets: Age (qualifier value) (397669002)
 
-If you can't find your header in SNOWMED????
+If you can't find your header in SNOWMED you should contact annelaura.bach@cpr.ku.dk, put "Header Creation, CKG" in the subject.
+In the email please provide your "missing" header and a description of what it is.
 
 **Proteomic data**
-
-Do not perform any imputations or similar methods on your data before uploading it. This will be carried out in the CKG.
+Do not perform any imputations or similar on your data before uploading it. This will be carried out by the CKG.
 
 Data from MaxQuant(DDA):
 Upload the proteinGroups.txt
+Upload
 
 Data from Spectronaut(DIA):
 ?

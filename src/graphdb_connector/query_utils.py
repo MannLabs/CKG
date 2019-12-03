@@ -34,10 +34,10 @@ def find_queries_involving_nodes(queries, nodes, print_pretty=False):
             print("Query Name: ", query["name"])
             print("Description: ", query["description"])
             print("Involves nodes:", ",".join(query['involved_nodes']))
-            print("Involves relationships:", ",".join(query['involved_nodes']))
+            print("Involves relationships:", ",".join(query['involved_rels']))
             print("Query:\n", query["query"])
             if "example" in query:
-                print("How to use it:\n", "\n".join(query["example"]))
+                print("How to use it:\n", "\n".join(query["example"]), "\n")
             
     return valid_queries
 

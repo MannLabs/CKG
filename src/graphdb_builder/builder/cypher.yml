@@ -654,6 +654,13 @@ IMPORT_DATASETS:
         'name': 'import clinical data'
         'description': 'Loads into the database all the clinical variables measured in a project'
         'query': >
+            USING PERIODIC COMMIT 10000
+            LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_subject_had_intervention.tsv" AS line
+            FIELDTERMINATOR '\t'
+            MATCH (subject:Subject {id:line.START_ID})
+            MATCH (intervention:Clinical_variable {id:line.END_ID})
+            MERGE (subject)-[r:HAD_INTERVENTION{type:line.type, in_combination:line.in_combination, response:line.response}]->(intervention)
+            RETURN COUNT(r) AS interventions;
             USING PERIODIC COMMIT 10000 
             LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_clinical_state.tsv" AS line 
             FIELDTERMINATOR '\t'
