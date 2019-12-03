@@ -102,10 +102,11 @@ class ProjectApp(basicApp.BasicApp):
                             dcc.Dropdown(
                                 id='my-dropdown',
                                 options=[
-                                    {'label': 'Default configuration', 'value': self.id+'/defaults'},
+                                    {'label': '', 'value': self.id+'/defaults'},
                                     {'label': 'Proteomics configuration', 'value': self.id+'/proteomics'},
                                     {'label': 'Clinical data configuration', 'value': self.id+'/clinical'},
-                                    {'label': 'Multiomics configuration', 'value': self.id+'/multiomics'}],
+                                    {'label': 'Multiomics configuration', 'value': self.id+'/multiomics'},
+                                    {'label': 'Reset to defaults', 'value': self.id+'/reset'}],
                                 value=self.id+'/defaults',
                                 clearable=False,
                                 style={'width': '50%', 'margin-bottom':'10px'}),
@@ -114,7 +115,7 @@ class ProjectApp(basicApp.BasicApp):
                                     html.A('Select Files')]),
                                 max_size=-1,
                                 multiple=False),
-                                html.Div(id='output-data-upload'),])
+                                html.Div(id='output-data-upload')])
                             ])
         
         return buttons
@@ -131,6 +132,7 @@ class ProjectApp(basicApp.BasicApp):
             directory = os.path.join('../../data/tmp',self.id)
             if os.path.exists(directory):
                 config_files = {f.split('.')[0]:os.path.join(directory,f) for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))}
+        
         p = project.Project(self.project_id, datasets={}, knowledge=None, report={}, configuration_files=config_files)
         p.build_project(self.force)
         p.generate_report()

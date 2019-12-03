@@ -390,15 +390,11 @@ class Project:
                     if data_type == "proteomics":
                         if "proteomics" in self.configuration_files:
                             configuration = ckg_utils.get_configuration(self.configuration_files["proteomics"])
-                        print("Getting proteomics configuration")
                         dataset = ProteomicsDataset(self.identifier, data={}, configuration=configuration, analyses={}, analysis_queries={}, report=None)
-                        print("Proteomics done")
                     elif data_type == "clinical":
                         if "clinical" in self.configuration_files:
                             configuration = ckg_utils.get_configuration(self.configuration_files["clinical"])
-                        print("Getting clinical configuration")
                         dataset = ClinicalDataset(self.identifier, data={}, configuration=configuration, analyses={}, analysis_queries={}, report=None)
-                        print("Clinical done")
                     elif data_type == "wes" or data_type == "wgs":
                         if "wes" in self.configuration_files:
                             configuration = ckg_utils.get_configuration(self.configuration_files["wes"])
@@ -415,7 +411,9 @@ class Project:
                         self.update_dataset({data_type:dataset})
                 
                 if len(self.datasets) > 1:
-                    dataset = MultiOmicsDataset(self.identifier, data=self.datasets, analyses={}, report=None)
+                    if "multiomics" in self.configuration_files:
+                        configuration = ckg_utils.get_configuration(self.configuration_files["multiomics"])
+                    dataset = MultiOmicsDataset(self.identifier, data=self.datasets, configuration=configuration, analyses={}, report=None)
                     self.update_dataset({'multiomics':dataset})
                     self.append_data_type('multiomics')
             else:
@@ -469,7 +467,7 @@ class Project:
 
     def get_similarity_network_style(self):
         #color_selector = "{'selector': '[name = \"KEY\"]', 'style': {'background-color': 'VALUE'}}"
-        stylesheet=[{'selector': 'node', 'style': {'label': 'data(name)'}},{'selector':'edge','style':{'label':'data(name)', 'curve-style': 'bezier'}}]
+        stylesheet=[{'selector': 'node', 'style': {'label': 'data(name)'}},{'selector':'edge','style':{'label':'data(label)', 'curve-style': 'bezier'}}]
         layout = {'name': 'cose',
                 'idealEdgeLength': 100,
                 'nodeOverlap': 20,
@@ -505,7 +503,7 @@ class Project:
             list_projects = ",".join(['"{}"'.format(i) for i in list_projects])
             query = query.replace("LIST_PROJECTS",list_projects)
             path = connector.sendQuery(driver, query, parameters={}).data()
-            G = acore_utils.neoj_path_to_networkx(path, key='path')
+            G = acore_utils.neo4j_path_to_networkx(path, key='path')
             args = {}
             style, layout = self.get_similarity_network_style()
             args['stylesheet'] = style
@@ -627,7 +625,7 @@ class Project:
         print('save datasets', time.time() - start)
 
     def show_report(self, environment):
-        types = ["Knowledge Graph", "Project information", "clinical", "proteomics", "longitudinal_proteomics", "wes", "wgs", "rnaseq", "multiomics"]
+        types = ["Project information", "clinical", "proteomics", "longitudinal_proteomics", "wes", "wgs", "rnaseq", "multiomics", "Knowledge Graph"]
         app_plots = defaultdict(list)
         for dataset in types:
             if dataset in self.report:
