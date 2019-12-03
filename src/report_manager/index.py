@@ -86,7 +86,6 @@ def display_page(pathname):
                                             'position': 'absolute',
                                             'right': '50px'})
             else:
-                print("I am in")
                 project = projectApp.ProjectApp(session_id, project_id, project_id, "", "", layout = [], logo = None, footer = None, force=force)
                 return (project.layout, {'display': 'block',
                                          'position': 'absolute',
@@ -97,7 +96,6 @@ def display_page(pathname):
                                      'position': 'absolute',
                                      'right': '50px'})
         elif '/apps/homepage' in pathname or pathname.count('/') <= 3:
-            print("Stats")
             stats_db = homepageApp.HomePageApp("CKG homepage", "Database Stats", "", layout = [], logo = None, footer = None)
             return (stats_db.layout, {'display': 'block',
                                       'position': 'absolute',
@@ -138,11 +136,12 @@ def return_docs(value):
  
 # Callback upload configuration files
 @app.callback([Output('upload-config', 'style'), 
-               Output('output-data-upload','children')],
+               Output('output-data-upload','children'),
+               Output('upload-config', 'filename')],
               [Input('upload-config', 'contents'),
-               Input('upload-config', 'filename'),
-               Input('my-dropdown','value')])
-def update_output(contents, filename, value):
+               Input('my-dropdown','value')],
+              [State('upload-config', 'filename')])
+def update_output(contents, value, fname):
     display = {'display': 'none'}
     uploaded = None
     if value is not None:
@@ -162,21 +161,24 @@ def update_output(contents, filename, value):
                 os.makedirs('../../data/tmp')
             elif not os.path.exists(directory):
                 os.makedirs(directory)
+            if  fname is None:
+                contents = None
             if contents is not None:
                 with open(os.path.join(directory, dataset+'.yml'), 'wb') as out:
                     content_type, content_string = contents.split(',')
                     decoded = base64.b64decode(content_string)
                     out.write(decoded)
-                uploaded = dcc.Markdown("**{} configuration uploaded: {}** &#x2705;".format(dataset.title(),filename))
+                uploaded = dcc.Markdown("**{} configuration uploaded: {}** &#x2705;".format(dataset.title(),fname))
+                fname = None
                 contents = None
             else:
                 uploaded = None
-        else:
+        elif dataset == 'reset':
             display = {'display': 'none'}
             if os.path.exists(directory):
                 shutil.rmtree(directory)
                 
-    return display, uploaded
+    return display, uploaded, fname
                 
 
 ##Callbacks for CKG homepage

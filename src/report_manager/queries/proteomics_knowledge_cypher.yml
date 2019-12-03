@@ -140,7 +140,7 @@ association_drug_sideeffects:
           WHERE (drug.id IN [{}])
           RETURN drug.name AS node1, sideeffect.name AS node2, type(r) AS type, r.source AS source
 association_drug_disease_publication:
-  name: drug used in disease
+  name: drug co-mentioned with disease in publication
   description: Return the list of publications co-mentioning drugs and a specific disease
   involved_nodes:
     - Drug
@@ -153,6 +153,54 @@ association_drug_disease_publication:
           - disease  = ['DOID:1324']
           - drug_disease_publications = queries["association_drug_disease_publication"]["query"].format(drugs, disease)
   query: >
+          MATCH (drug:Drug)-[r:MENTIONED_IN_PUBLICATION]-(publication)-[:MENTIONED_IN_PUBLICATION]-(disease:Disease)
+          WHERE (drug.id IN [{}]) AND disease.id IN [{}]
+          RETURN drug.name AS node1, ("PMID:"+publication.id) AS node2, publication.linkout AS linkout, publication.year as Year, type(r) AS type
+association_combination_drug_disease_publication:
+  name: combinations of drugs co-mentioned with disease
+  description: Return the list of publications co-mentioning combinations of drugs and a specific disease
+  involved_nodes:
+    - Drug
+    - Disease
+    - Publication
+  involved_rels:
+    - MENTIONED_IN_PUBLICATION
+  example:
+          - drugs = ['DB00439', 'DB06196']
+          - disease  = ['DOID:1324']
+          - drug_disease_publications = queries["association_drug_disease_publication"]["query"].format(drugs, disease, drugs, disease)
+  query: >
           MATCH (drug:Drug)-[r:MENTIONED_IN_PUBLICATION]-(publication:Publication)-[:MENTIONED_IN_PUBLICATION]-(disease:Disease)
           WHERE (drug.id IN [{}]) AND disease.id IN [{}]
-          RETURN drug.name AS node1, ("PMID:"+publication.id) AS node2, type(r) AS type
+          WITH publication, count(r) AS r_count WHERE r_count>1
+          MATCH (drug:Drug)-[r:MENTIONED_IN_PUBLICATION]-(publication)-[:MENTIONED_IN_PUBLICATION]-(disease:Disease)
+          WHERE (drug.id IN [{}]) AND disease.id IN [{}]
+          RETURN drug.name AS node1, ("PMID:"+publication.id) AS node2, publication.linkout AS linkout, publication.year as Year, type(r) AS type
+side_effects_jaccard_similarity_intervention_proposed_drugs:
+  name: similarity between side effects
+  description: Return the jaccard similarity between drugs used and alternative drugs proposed
+  involved_nodes:
+    - Drug
+    - Clinical_variable
+  involved_rels:
+    - HAS_SIDE_EFFECT
+  example:
+          - intervention = ['Capecitabine', 'Fluorouracil']
+          - drugs = ['DB00439', 'DB06196']
+          - similarity = queries["side_effects_jaccard_similarity_intervention_proposed_drugs"]["query"].replace("INTERVENTION", ",".join(intervention)).replace("DRUG", ",".join(drugs))
+  query: >
+          MATCH (d1:Drug)-[:HAS_SIDE_EFFECT]->(phenotype1) 
+          WHERE d1.name in [INTERVENTION]
+          WITH {item:id(d1), categories: collect(id(phenotype1))} as treatmentData
+          WITH collect(treatmentData) as treatment_data_vec 
+          MATCH (d2:Drug)-[:HAS_SIDE_EFFECT]->(phenotype2) 
+          WHERE d2.id IN [DRUG]
+          WITH {item:id(d2), categories: collect(id(phenotype2))} as proposedData, treatment_data_vec 
+          WITH collect(proposedData) as proposed_data_vec, treatment_data_vec 
+          CALL algo.similarity.jaccard.stream(treatment_data_vec+proposed_data_vec) 
+          YIELD item1, item2, count1, count2, intersection, similarity 
+          RETURN algo.asNode(item1).name AS from, algo.asNode(item2).name AS to, intersection, similarity 
+          ORDER BY similarity DESC
+
+
+
