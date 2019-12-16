@@ -7,7 +7,7 @@ increment_biosample_id:
     query: >
         MATCH (b:Biological_sample) 
         WITH max(toInteger(SPLIT(b.id, 'BS')[1]))+1 as new_id
-        RETURN SUBSTRING('BS',0,2) + new_id AS result;
+        RETURN new_id AS result;
 create_biosample:
     name: create biosamples from app
     description: 'Creates Biological_sample nodes and links them to Subject nodes, directly from dataUploadApp (web app).'
@@ -36,7 +36,7 @@ increment_analytical_sample_id:
     query: >
         MATCH (a:Analytical_sample) 
         WITH max(toInteger(SPLIT(a.id, 'AS')[1]))+1 as new_id
-        RETURN SUBSTRING('AS',0,2) + new_id AS result;
+        RETURN new_id AS result;
 create_analytical_sample:
     name: create analytical sample from app
     description: 'Creates Analytical_sample nodes and links them to Biological_sample nodes, directly from dataUploadApp (web app).'

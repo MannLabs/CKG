@@ -37,7 +37,8 @@ IMPORT_PROTEIN_DATA:
     'name': "import protein data"
     'description': "Creates Protein and Peptide nodes, their relationship and relationships to Gene and Transcript nodes"
     'query': >
-        CREATE INDEX ON :Protein(accession); 
+        CREATE INDEX ON :Protein(accession);
+        CREATE INDEX ON :Protein(name); 
         CREATE CONSTRAINT ON (a:Protein) ASSERT a.id IS UNIQUE; 
         CREATE CONSTRAINT ON (a:Protein) ASSERT a.accesion IS UNIQUE; 
         USING PERIODIC COMMIT 10000
@@ -107,27 +108,27 @@ IMPORT_MODIFIED_PROTEINS:
     'query': >
         CREATE CONSTRAINT ON (m:Modified_protein) ASSERT m.id IS UNIQUE;
         USING PERIODIC COMMIT 10000
-        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Modified_protein.tsv" AS line
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_Modified_protein.tsv" AS line
         FIELDTERMINATOR '\t'
         MERGE (m:Modified_protein {id:line.ID})
         ON CREATE SET m.protein=line.protein,m.position=line.position,m.residue=line.residue,m.sequence_window=line.sequence_window,m.source=line.source
         RETURN COUNT(m) AS modified_protein;
         USING PERIODIC COMMIT 10000
-        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/psp_modified_protein_has_modification.tsv" AS line
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_modified_protein_has_modification.tsv" AS line
         FIELDTERMINATOR '\t'
         MATCH (mp:Modified_protein {id:line.START_ID})
         MATCH (m:Modification {id:line.END_ID}) 
         MERGE (mp)-[r:HAS_MODIFICATION{source:line.source}]->(m)
         RETURN COUNT(r) AS modified_protein_has_modifcation_modification;
         USING PERIODIC COMMIT 10000
-        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/psp_protein_has_modified_site.tsv" AS line 
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_protein_has_modified_site.tsv" AS line 
         FIELDTERMINATOR '\t'
         MATCH (p:Protein {id:line.START_ID})
         MATCH (mp:Modified_protein {id:line.END_ID}) 
         MERGE (p)-[r:HAS_MODIFIED_SITE]->(mp)
         RETURN COUNT(r) AS protein_has_modified_site;
         USING PERIODIC COMMIT 10000
-        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/psp_peptide_has_modified_site.tsv" AS line 
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_peptide_has_modified_site.tsv" AS line 
         FIELDTERMINATOR '\t'
         MATCH (p:Peptide {id:line.START_ID})
         MATCH (mp:Modified_protein {id:line.END_ID})
@@ -229,7 +230,7 @@ IMPORT_MODIFIED_PROTEIN_ANNOTATIONS:
         FIELDTERMINATOR '\t'
         MATCH (m:Modified_protein {id:line.START_ID})
         MATCH (p:Protein {id:line.END_ID})
-        MERGE (m)-[r:IS_SUBSTRATE_OF{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type}]->(p)
+        MERGE (m)-[r:IS_SUBSTRATE_OF{score:toFloat(line.score),regulation:line.regulation,source:line.source,evidence_type:line.evidence_type}]->(p)
         RETURN COUNT(r) AS modified_protein_is_substrate_of_protein;
 
 IMPORT_PROTEIN_STRUCTURES:
@@ -326,8 +327,8 @@ IMPORT_COMPILED_PPI_DATA:
         MERGE (p1)-[r:COMPILED_INTERACTS_WITH{score:toFloat(line.score),interaction_type:line.interaction_type,source:SPLIT(line.source,','),scores:SPLIT(line.scores,','),evidence:SPLIT(line.evidence,',')}]->(p2)
         RETURN COUNT(r) AS protein_compiled_interacts_with_protein;
 
-IMPORT_INTERNAL_DATA:
-    'name': 'import internal data'
+IMPORT_JENSENLAB_DATA:
+    'name': 'import jensenlab data'
     'description': 'Loads into the database all the associations from jenseblab.org: DISEASES, TISSUES, COMPARTMENTS'
     'query': >
         USING PERIODIC COMMIT 10000
@@ -444,7 +445,7 @@ IMPORT_DRUG_SIDE_EFFECTS:
         FIELDTERMINATOR '\t'
         MATCH (d:Drug {id:line.START_ID})
         MATCH (p:Phenotype {id:line.END_ID})
-        MERGE (d)-[r:HAS_SIDE_EFFECT{source:line.source,original_side_effect_code:line.original_side_effect}]->(p)
+        MERGE (d)-[r:HAS_SIDE_EFFECT{source:line.source,original_side_effect_code:line.original_side_effect,evidence_from:line.evidence_from,frequency:line.frequency,lower_bound:line.lower_bound,upper_bound:line.upper_bound}]->(p)
         RETURN COUNT(r) AS drug_has_side_effect_phenotype;
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_is_indicated_for.tsv" AS line
@@ -556,7 +557,7 @@ IMPORT_BIOMARKERS:
     'description': 'Creates relationships is_biomarker_of (Disease, ...)'
     'query': >
         USING PERIODIC COMMIT 10000
-        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/curated/protein_is_biomarker_of_disease.tsv" AS line
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/protein_is_biomarker_of_disease.tsv" AS line
         FIELDTERMINATOR '\t'
         MATCH (p:Protein{id:line.START_ID})
         MATCH (d:Disease{id:line.END_ID}) 
@@ -792,7 +793,7 @@ CREATE_PROJECT: &create_project
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_info.tsv" AS line
         FIELDTERMINATOR '\t'
         MERGE (p:Project {id:line.external_id})
-        ON CREATE SET p.internal_id=line.internal_id,p.name=line.name,p.acronym=line.acronym,p.description=line.description,p.type=line.datatypes,p.timepoint=line.timepoints,p.disease=line.disease,p.tissue=line.tissue,p.intervention=line.intervention,p.responsible=line.responsible,p.participant=line.participant,p.start_date=line.start_date,p.end_date=line.end_date,p.status=line.status
+        ON CREATE SET p.internal_id=line.internal_id,p.name=line.name,p.acronym=line.acronym,p.description=line.description,p.subjects=line.subjects,p.type=line.datatypes,p.timepoint=line.timepoints,p.disease=line.disease,p.tissue=line.tissue,p.intervention=line.intervention,p.responsible=line.responsible,p.participant=line.participant,p.start_date=line.start_date,p.end_date=line.end_date,p.status=line.status
         RETURN COUNT(p) AS PROJECTID_project;
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_studies_disease.tsv" AS line 
         FIELDTERMINATOR '\t'

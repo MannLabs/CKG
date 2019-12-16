@@ -10,17 +10,17 @@ from graphdb_builder import mapping as mp, builder_utils
 #########################
 #       UniProt         # 
 #########################
-def parser(databases_directory, import_directory, download=True):
+def parser(databases_directory, import_directory, download=True, updated_on=None):
     config = builder_utils.get_config(config_name="uniprotConfig.yml", data_type='databases')
     relationships_header = config['relationships_header']
     #Proteins
-    stats = parse_idmapping_file(databases_directory, config, import_directory, download=download)
+    stats = parse_idmapping_file(databases_directory, config, import_directory, download=download, updated_on=updated_on)
     #Peptides
     entities, relationships = parseUniProtPeptides(config, databases_directory, download)
     entities_header = config['peptides_header']
     output_file = os.path.join(import_directory, "Peptide.tsv")
-    stats.update(print_single_file(entities, entities_header, output_file, "entity", "Peptide", is_first=True))
-    stats.update(print_multiple_relationships_files(relationships, relationships_header, import_directory, is_first=True))
+    stats.update(print_single_file(entities, entities_header, output_file, "entity", "Peptide", is_first=True, updated_on=updated_on))
+    stats.update(print_multiple_relationships_files(relationships, relationships_header, import_directory, is_first=True, updated_on=updated_on))
 
     #Variants
     stats.update(parseUniProtVariants(config, databases_directory, import_directory, download))
@@ -28,11 +28,11 @@ def parser(databases_directory, import_directory, download=True):
     #Gene ontology annotation
     relationships = parseUniProtAnnotations(config, databases_directory, download)
     relationships_header = config['go_header']
-    stats.update(print_multiple_relationships_files(relationships, relationships_header, import_directory, is_first=True))
+    stats.update(print_multiple_relationships_files(relationships, relationships_header, import_directory, is_first=True, updated_on=updated_on))
 
     return stats 
 
-def parse_idmapping_file(databases_directory, config, import_directory, download=False):
+def parse_idmapping_file(databases_directory, config, import_directory, download=True, updated_on=None):
     regex_transcript = r"(-\d+$)"
     taxids = config['species']
 
@@ -94,9 +94,9 @@ def parse_idmapping_file(databases_directory, config, import_directory, download
                             aux.pop(identifier, None)
                             if len(proteins) >= 1000:
                                 entities, relationships, pdb_entities = format_output(proteins)
-                                stats.update(print_single_file(entities, config['proteins_header'], proteins_output_file, "entity", "Protein", is_first))
-                                stats.update(print_single_file(pdb_entities, config['pdb_header'], pdbs_output_file, "entity", "Protein_structure", is_first))
-                                stats.update(print_multiple_relationships_files(relationships, config['relationships_header'], import_directory, is_first))
+                                stats.update(print_single_file(entities, config['proteins_header'], proteins_output_file, "entity", "Protein", is_first, updated_on))
+                                stats.update(print_single_file(pdb_entities, config['pdb_header'], pdbs_output_file, "entity", "Protein_structure", is_first, updated_on))
+                                stats.update(print_multiple_relationships_files(relationships, config['relationships_header'], import_directory, is_first, updated_on))
                                 is_first = False
                                 proteins = {}
                     identifier = iid
@@ -119,9 +119,9 @@ def parse_idmapping_file(databases_directory, config, import_directory, download
 
     if len(proteins)>0:
         entities, relationships, pdb_entities = format_output(proteins)
-        stats.update(print_single_file(entities, config['proteins_header'], proteins_output_file, "entity", "Protein", is_first))
-        stats.update(print_single_file(pdb_entities, config['pdb_header'], pdbs_output_file, "entity", "Protein_structure", is_first))
-        stats.update(print_multiple_relationships_files(relationships, config['relationships_header'], import_directory, is_first))
+        stats.update(print_single_file(entities, config['proteins_header'], proteins_output_file, "entity", "Protein", is_first, updated_on))
+        stats.update(print_single_file(pdb_entities, config['pdb_header'], pdbs_output_file, "entity", "Protein_structure", is_first, updated_on))
+        stats.update(print_multiple_relationships_files(relationships, config['relationships_header'], import_directory, is_first, updated_on))
     
     mp.mark_complete_mapping(entity="Protein")
 
@@ -169,10 +169,10 @@ def format_output(proteins):
             
     return entities, relationships, pdb_entities
 
-def print_single_file(data, header, output_file, data_type, data_object, is_first):
+def print_single_file(data, header, output_file, data_type, data_object, is_first, updated_on):
     stats = set()
     df = pd.DataFrame(list(data), columns=header)
-    stats.add(builder_utils.buildStats(len(data), data_type, data_object, "UniProt", output_file))
+    stats.add(builder_utils.buildStats(len(data), data_type, data_object, "UniProt", output_file, updated_on))
     with open(output_file, 'a') as ef:
         df.to_csv(path_or_buf=ef, sep='\t',
                 header=is_first, index=False, quotechar='"', 
@@ -180,12 +180,12 @@ def print_single_file(data, header, output_file, data_type, data_object, is_firs
 
     return stats
 
-def print_multiple_relationships_files(data, header, output_dir, is_first):
+def print_multiple_relationships_files(data, header, output_dir, is_first, updated_on):
     stats = set()
     for entity, relationship in data:
         df = pd.DataFrame(list(data[(entity, relationship)]), columns=header)
         output_file = os.path.join(output_dir, entity+"_"+relationship.lower()+".tsv")
-        stats.add(builder_utils.buildStats(len(data[(entity,relationship)]), 'relationships', relationship, "UniProt", output_file))
+        stats.add(builder_utils.buildStats(len(data[(entity,relationship)]), 'relationships', relationship, "UniProt", output_file, updated_on))
         with open(output_file, 'a') as ef:
             df.to_csv(path_or_buf=ef, sep='\t',
             header=is_first, index=False, quotechar='"', 
@@ -204,7 +204,7 @@ def addUniProtTexts(textsFile, proteins):
             if protein in proteins:
                 proteins[protein].update({"description":function})
 
-def parseUniProtVariants(config, databases_directory, import_directory, download=True):
+def parseUniProtVariants(config, databases_directory, import_directory, download=True, updated_on=None):
     data = defaultdict()
     variant_regex = r"(g\.\w+>\w)"
     chromosome_regex = r"(\w+)[p|q]"
@@ -264,16 +264,16 @@ def parseUniProtVariants(config, databases_directory, import_directory, download
                     relationships[('Protein','known_variant_found_in_protein')].add((ident, protein, "VARIANT_FOUND_IN_PROTEIN", "UniProt"))
 
                 if len(entities) >= 1000:
-                    stats.update(print_single_file(entities, config['variants_header'], os.path.join(import_directory, "Known_variant.tsv"), "entity", "Known_variant", is_first))
-                    stats.update(print_multiple_relationships_files(relationships, config['relationships_header'], import_directory, is_first))
+                    stats.update(print_single_file(entities, config['variants_header'], os.path.join(import_directory, "Known_variant.tsv"), "entity", "Known_variant", is_first, updated_on))
+                    stats.update(print_multiple_relationships_files(relationships, config['relationships_header'], import_directory, is_first, updated_on))
                     entities = set()
                     relationships = defaultdict(set)
 
                     is_first = False
 
     if len(entities) > 0:
-        stats.update(print_single_file(entities, config['variants_header'], os.path.join(import_directory, "Known_variant.tsv"), "entity", "Known_variant", is_first))
-        stats.update(print_multiple_relationships_files(relationships, config['relationships_header'], import_directory, is_first))
+        stats.update(print_single_file(entities, config['variants_header'], os.path.join(import_directory, "Known_variant.tsv"), "entity", "Known_variant", is_first, updated_on))
+        stats.update(print_multiple_relationships_files(relationships, config['relationships_header'], import_directory, is_first, updated_on))
         del(entities)
         del(relationships)
 

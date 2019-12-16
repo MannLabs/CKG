@@ -126,7 +126,24 @@ def getMultipleMappingForEntity(entity):
     
     return mapping
 
-def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True, db = "STRING"):
+def get_STRING_mapping_url(db="STRING"):
+    """
+    Get the url for downloading the mapping file from either STRING or STITCH
+
+    :param str db: Which database to get the url from: STRING or STITCH
+    :return: url where to download the mapping file
+    """
+    url = None
+    config = builder_utils.get_config(config_name="stringConfig.yml", data_type='databases')
+    if db.upper() == "STRING":        
+        url = config['STRING_mapping_url']
+    elif db.upper() == "STITCH":
+        url = config['STITCH_mapping_url']
+        
+    return url
+        
+
+def getSTRINGMapping(source = "BLAST_UniProt_AC", download = True, db = "STRING"):
     """
     Parses database (db) and extracts relationships between identifiers to order databases (source).
 
@@ -136,8 +153,8 @@ def getSTRINGMapping(url, source = "BLAST_UniProt_AC", download = True, db = "ST
     :param str db: name of the database to be parsed.
     :return: Dictionary of database identifers (keys) and set of unique aliases to other databases (values).
     """
+    url = get_STRING_mapping_url(db=db)
     mapping = defaultdict(set)
-    
     directory = os.path.join(dbconfig["databasesDir"], db)
     file_name = os.path.join(directory, url.split('/')[-1])
     builder_utils.checkDirectory(directory)

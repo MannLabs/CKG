@@ -11,8 +11,7 @@ from graphdb_builder import mapping as mp, builder_utils
 #########################
 def parser(databases_directory, importDirectory, drug_source = None, download = True, db="STRING"):
     config = builder_utils.get_config(config_name="stringConfig.yml", data_type='databases')
-    mapping_url = config['STRING_mapping_url']
-    mapping = mp.getSTRINGMapping(mapping_url, download = False)
+    mapping = mp.getSTRINGMapping(download = False)
     stored = set()
     relationship = None
     cutoff = config['STRING_cutoff']
@@ -24,8 +23,7 @@ def parser(databases_directory, importDirectory, drug_source = None, download = 
         url = config['STITCH_url']
         outputfile = os.path.join(importDirectory, "stitch_associated_with.tsv")
 
-        drugmapping_url = config['STITCH_mapping_url']
-        drugmapping = mp.getSTRINGMapping(drugmapping_url, source = drug_source, download = download, db = db)
+        drugmapping = mp.getSTRINGMapping(source = drug_source, download = download, db = db)
         
     elif db == "STRING":
         evidences = ["Neighborhood in the Genome", "Gene fusions", "Co-ocurrence across genomes","Co-expression", "Experimental/biochemical data", "Association in curated databases", "Text-mining"]

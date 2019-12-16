@@ -84,14 +84,6 @@ def neo4j_schema_to_networkx(schema):
             matches = re.search(regex, str(relationship))
             if matches:
                 source = matches.group(1)
-                source_match = re.search(regex, source)
-                if source_match:
-                    source = source_match.group(1)
-                    relationship = source_match.group(2)
-                    target = source_match.group(3)
-                    nodes.update([source, target])
-                    rels.add((source, target, relationship))
-                    source = target
                 relationship = matches.group(2)
                 target = matches.group(3)
                 nodes.update([source, target])

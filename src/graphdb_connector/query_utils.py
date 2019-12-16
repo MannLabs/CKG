@@ -74,7 +74,7 @@ def get_relationships(query):
 def map_node_name_to_id(driver, node, value):
     query_name = 'map_node_name'
     cwd = os.path.abspath(os.path.dirname(__file__))
-    queries_path = "project_cypher.yml"
+    queries_path = "queries.yml"
     cypher = read_queries(os.path.join(cwd, queries_path))
     query = cypher[query_name]['query'].replace('NODE', node)
     identifier = connector.getCursorData(driver, query, parameters={

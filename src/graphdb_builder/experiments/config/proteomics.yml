@@ -1,4 +1,4 @@
-directory : '../../../data/experiments/PROJECTID/proteomics/'
+directory : '../../../../data/experiments/PROJECTID/proteomics/'
 
 ox : &var_ox
     'columns':

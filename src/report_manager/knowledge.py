@@ -161,7 +161,7 @@ class Knowledge:
                 nodes.update({"ME"+row['modColor']: {'type':'Module', 'color':color_dict[row['modColor']], 'parent':'Regulated'}, row['name'] : {'type':entity2, 'color':node2_color, 'parent':"ME"+row['modColor']}})
                 relationships.update({('Regulated', "ME"+row['modColor']):{'type': '', 'weight':5, 'source_color':self.default_color, 'target_color':color_dict[row['modColor']]}})
                 relationships.update({("ME"+row['modColor'], row['name']):{'type': 'CONTAINS', 'weight':5, 'source_color':color_dict[row['modColor']], 'target_color':node2_color}})
-        if 'module_trait_cor' in data:
+        if 'module_trait_cor' in data and data['module_trait_cor'] is not None:
             correlations = data['module_trait_cor']
             if not correlations.index.is_numeric():
                 correlations = correlations.reset_index()

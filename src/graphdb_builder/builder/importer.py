@@ -123,25 +123,24 @@ def usersImport(importDirectory, import_type='partial'):
     builder_utils.checkDirectory(usersImportDirectory)
     uh.parseUsersFile(usersImportDirectory, expiration=365)
 
-def fullImport():
+def fullImport(download=True, n_jobs=4):
     """
     Calls the different importer functions: Ontologies, databases, \
     experiments. The first step is to check if the stats object exists \
     and create it otherwise. Calls setupStats.
     """
     try:
-        download = config["download"]
         importDirectory = config["importDirectory"]
         builder_utils.checkDirectory(importDirectory)
         setupStats(import_type='full')
         logger.info("Full import: importing all Ontologies")
-        ontologiesImport(importDirectory, import_type='full')
+        ontologiesImport(importDirectory, download=download, import_type='full')
         logger.info("Full import: Ontologies import took {}".format(datetime.now() - START_TIME))
         logger.info("Full import: importing all Databases")
-        databasesImport(importDirectory, n_jobs=4, download=download, import_type='full')
+        databasesImport(importDirectory, n_jobs=n_jobs, download=download, import_type='full')
         logger.info("Full import: Databases import took {}".format(datetime.now() - START_TIME))
         logger.info("Full import: importing all Experiments")
-        experimentsImport(n_jobs=4, import_type='full')
+        experimentsImport(n_jobs=n_jobs, import_type='full')
         logger.info("Full import: Experiments import took {}".format(datetime.now() - START_TIME))
         logger.info("Full import: importing all Users")
         usersImport(importDirectory, import_type='full')

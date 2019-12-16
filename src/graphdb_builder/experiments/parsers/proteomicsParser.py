@@ -7,10 +7,11 @@ from graphdb_builder import builder_utils
 
 def parser(projectId):
     data = {}
-    directory = '../../../data/experiments/PROJECTID/proteomics/'
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    directory = os.path.join(cwd, '../../../../data/experiments/PROJECTID/proteomics/')
     config = builder_utils.get_config(config_name="proteomics.yml", data_type='experiments')
     if 'directory' in config:
-        directory = config['directory']
+        directory = os.path.join(cwd, config['directory'])
     directory = directory.replace('PROJECTID', projectId)
     processing_results = [x[0] for x in os.walk(directory)]
     for results_path in processing_results:

@@ -467,7 +467,18 @@ class Project:
 
     def get_similarity_network_style(self):
         #color_selector = "{'selector': '[name = \"KEY\"]', 'style': {'background-color': 'VALUE'}}"
-        stylesheet=[{'selector': 'node', 'style': {'label': 'data(name)'}},{'selector':'edge','style':{'label':'data(label)', 'curve-style': 'bezier'}}]
+        stylesheet=[{'selector': 'node', 
+                     'style': {'label': 'data(name)',
+                               'text-valign': 'center',
+                               'text-halign': 'center',
+                               'opacity':0.8,
+                               'font-size': '12'}},
+                    {'selector':'edge',
+                     'style':{'label':'data(label)', 
+                              'curve-style': 'bezier',
+                              'opacity':0.7,
+                              'width':0.4,
+                              'font-size': '5'}}]
         layout = {'name': 'cose',
                 'idealEdgeLength': 100,
                 'nodeOverlap': 20,

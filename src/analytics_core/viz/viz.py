@@ -151,6 +151,7 @@ def get_barplot(data, identifier, args):
     """
     figure = {}
     figure["data"] = []
+
     if "group" in args:
         for g in data[args["group"]].unique():
             color = None
@@ -161,21 +162,40 @@ def get_barplot(data, identifier, args):
             if 'errors' in args:
                 errors = data.loc[data[args["group"]] == g, args['errors']]
             #errors = data.groupby(args["group"]).agg({args['y']:'std'})
-            trace = go.Bar(
-                        x = data.loc[data[args["group"]] == g,args['x']], # assign x as the dataframe column 'x'
-                        y = data.loc[data[args["group"]] == g, args['y']],
-                        error_y = dict(type='data',array=errors),
-                        name = g,
-                        marker = dict(color=color)
-                        )
+            if 'orientation' in args:
+                trace = go.Bar(
+                            x = data.loc[data[args["group"]] == g,args['x']], 
+                            y = data.loc[data[args["group"]] == g, args['y']],
+                            error_y = dict(type='data',array=errors),
+                            name = g,
+                            marker = dict(color=color),
+                            orientation = args['orientation']
+                            )
+            else:
+                trace = go.Bar(
+                            x = data.loc[data[args["group"]] == g,args['x']], # assign x as the dataframe column 'x'
+                            y = data.loc[data[args["group"]] == g, args['y']],
+                            error_y = dict(type='data',array=errors),
+                            name = g,
+                            marker = dict(color=color),
+                            )
             figure["data"].append(trace)
     else:
-        figure["data"].append(
-                      go.Bar(
-                            x=data[args['x']], # assign x as the dataframe column 'x'
-                            y=data[args['y']]
+        if 'orientation' in args:
+            figure["data"].append(
+                          go.Bar(
+                                x = data[args['x']],
+                                y = data[args['y']],
+                                orientation = args['orientation']
+                            )
                         )
-                    )
+        else:
+            figure["data"].append(
+                          go.Bar(
+                                x = data[args['x']], # assign x as the dataframe column 'x'
+                                y = data[args['y']],
+                            )
+                        )
     figure["layout"] = go.Layout(
                             title = args['title'],
                             xaxis={"title":args["x_title"]},
@@ -1635,7 +1655,7 @@ def get_WGCNAPlots(data, identifier):
     :param str identifier: is the id used to identify the div where the figure will be generated.
     :return: list of dcc.Graph.
     """
-    graphs = []
+    graphs = [html.H2("Weighted Gene Co-expression Network Analysis")]
     data = tuple(data[k] for k in data)
 
     if data is not None:
@@ -1663,44 +1683,45 @@ def get_WGCNAPlots(data, identifier):
         #                          color_missingvals=False, row_annotation=True, col_annotation=True, width=1000, height=800))
 
         dendro_tree = wgcnaAnalysis.get_dendrogram(METDiss, METDiss.index, distfun=None, linkagefun='ward', div_clusters=False)
-        dendrogram = Dendrogram.plot_dendrogram(dendro_tree, hang=0.9, cutoff_line=False)
+        if dendro_tree is not None:
+            dendrogram = Dendrogram.plot_dendrogram(dendro_tree, hang=0.9, cutoff_line=False)
 
-        layout = go.Layout(width=900, height=900, showlegend=False, title='',
-                            xaxis=dict(domain=[0, 1], range=[np.min(dendrogram['layout']['xaxis']['tickvals'])-6,np.max(dendrogram['layout']['xaxis']['tickvals'])+4], showgrid=False,
-                                        zeroline=True, ticks='', automargin=True, anchor='y'),
-                            yaxis=dict(domain=[0.7, 1], autorange=True, showgrid=False, zeroline=False, ticks='outside', title='Height', automargin=True, anchor='x'),
-                            xaxis2=dict(domain=[0, 1], autorange=True, showgrid=True, zeroline=False, ticks='', showticklabels=False, automargin=True, anchor='y2'),
-                            yaxis2=dict(domain=[0, 0.64], autorange=True, showgrid=False, zeroline=False, automargin=True, anchor='x2'))
+            layout = go.Layout(width=900, height=900, showlegend=False, title='',
+                                xaxis=dict(domain=[0, 1], range=[np.min(dendrogram['layout']['xaxis']['tickvals'])-6,np.max(dendrogram['layout']['xaxis']['tickvals'])+4], showgrid=False,
+                                            zeroline=True, ticks='', automargin=True, anchor='y'),
+                                yaxis=dict(domain=[0.7, 1], autorange=True, showgrid=False, zeroline=False, ticks='outside', title='Height', automargin=True, anchor='x'),
+                                xaxis2=dict(domain=[0, 1], autorange=True, showgrid=True, zeroline=False, ticks='', showticklabels=False, automargin=True, anchor='y2'),
+                                yaxis2=dict(domain=[0, 0.64], autorange=True, showgrid=False, zeroline=False, automargin=True, anchor='x2'))
 
-        if all(list(METcor.columns.map(lambda x: METcor[x].between(-1,1, inclusive=True).all()))) != True:
-            df = wgcnaAnalysis.get_percentiles_heatmap(METcor, dendro_tree, bydendro=True, bycols=False).T
-        else:
-            df = wgcnaAnalysis.df_sort_by_dendrogram(wgcnaAnalysis.df_sort_by_dendrogram(METcor, dendro_tree).T, dendro_tree)
-
-        heatmap = wgcnaFigures.get_heatmap(df, colorscale=[[0,'#67a9cf'],[0.5,'#f7f7f7'],[1,'#ef8a62']], color_missing=False)
-
-        figure = tools.make_subplots(rows=2, cols=1, print_grid=False)
-
-        for i in list(dendrogram['data']):
-            figure.append_trace(i, 1, 1)
-        for j in list(heatmap['data']):
-            figure.append_trace(j, 2, 1)
-
-        figure['layout'] = layout
-        figure['layout']['template'] = 'plotly_white'
-        figure['layout'].update({'xaxis':dict(domain=[0, 1], ticks='', showticklabels=False, anchor='y'),
-                                 'xaxis2':dict(domain=[0, 1], ticks='', showticklabels=True, anchor='y2'),
-                                 'yaxis':dict(domain=[0.635, 1], anchor='x'),
-                                 'yaxis2':dict(domain=[0., 0.635], ticks='', showticklabels=True, anchor='x2')})
-
-        plots.append(figure)
-
-        graphs = []
-        for i, j in enumerate(plots):
-            if isinstance(j, html.Div):
-                graphs.append(j)
+            if all(list(METcor.columns.map(lambda x: METcor[x].between(-1,1, inclusive=True).all()))) != True:
+                df = wgcnaAnalysis.get_percentiles_heatmap(METcor, dendro_tree, bydendro=True, bycols=False).T
             else:
-                graphs.append(dcc.Graph(id=identifier+'_'+str(i), figure=j))
+                df = wgcnaAnalysis.df_sort_by_dendrogram(wgcnaAnalysis.df_sort_by_dendrogram(METcor, dendro_tree).T, dendro_tree)
+
+            heatmap = wgcnaFigures.get_heatmap(df, colorscale=[[0,'#67a9cf'],[0.5,'#f7f7f7'],[1,'#ef8a62']], color_missing=False)
+
+            figure = tools.make_subplots(rows=2, cols=1, print_grid=False)
+
+            for i in list(dendrogram['data']):
+                figure.append_trace(i, 1, 1)
+            for j in list(heatmap['data']):
+                figure.append_trace(j, 2, 1)
+
+            figure['layout'] = layout
+            figure['layout']['template'] = 'plotly_white'
+            figure['layout'].update({'xaxis':dict(domain=[0, 1], ticks='', showticklabels=False, anchor='y'),
+                                    'xaxis2':dict(domain=[0, 1], ticks='', showticklabels=True, anchor='y2'),
+                                    'yaxis':dict(domain=[0.635, 1], anchor='x'),
+                                    'yaxis2':dict(domain=[0., 0.635], ticks='', showticklabels=True, anchor='x2')})
+
+            plots.append(figure)
+
+            graphs = []
+            for i, j in enumerate(plots):
+                if isinstance(j, html.Div):
+                    graphs.append(j)
+                else:
+                    graphs.append(dcc.Graph(id=identifier+'_'+str(i), figure=j))
 
     return graphs
 

@@ -12,6 +12,8 @@ experimentsDirectory: '../../../data/imports/experiments'
 databasesDirectory: '../../../data/imports/databases'
 #ontologies import diretory
 ontologiesDirectory: '../../../data/imports/ontologies'
+#curated import directory
+curatedDirectory: '../../../data/imports/curated'
 #users directory
 usersDirectory: '../../../data/users'
 usersImportDirectory: '../../../data/imports/users'
@@ -32,6 +34,7 @@ statsCols:
     - 'Imported_number'
     - 'Import_type'
     - 'name'
+    - 'updated_on'
 
 #Full Graph
 graph: 
@@ -51,7 +54,7 @@ graph:
     - clinical variants
     - pathology_expression
     - mentions
-    - internal
+    - jensenlab
     - functional_regions
     - side effects
     - metabolite
@@ -79,6 +82,7 @@ ontology_entities:
 #Modified proteins
 modified_proteins_resources:
     - 'psp'
+    - 'signor'
 #Protein complexes
 complexes_resources:
     - 'CORUM'
@@ -126,7 +130,7 @@ food_resources:
     - 'FooDB'
 
 #Internal Databases entities
-internalEntities:
+jensenlabEntities:
     - ['Protein','Disease']
     - ['Protein', 'Tissue']
     - ['Protein','Cellular_component']
@@ -137,5 +141,7 @@ mentionEntities:
     - 'Tissue'
     - 'Protein'
     - 'Drug'
+    - 'Cellular_component'
+    - 'Modified_protein'
 publicationEntities:
     - 'GWAS_study'

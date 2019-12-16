@@ -1,0 +1,91 @@
+##### Databases at jensenlab.org) #####
+db_url: 'http://download.jensenlab.org/FILE'
+
+organisms_file: organism_textmining_mentions.tsv
+
+organisms: 
+    - 9606
+
+db_files: 
+    '-26': 'human_disease_integrated_full.tsv'
+    '-25': 'human_tissue_integrated_full.tsv'
+    '-23': 'human_compartment_integrated_full.tsv'
+
+db_mentions_files: 
+    '-26': 'disease_textmining_mentions.tsv'
+    '-25': 'tissue_textmining_mentions.tsv'
+    '-23': 'compartment_textmining_mentions.tsv'
+    '9606': 'human_textmining_mentions.tsv'
+    '-1': 'chemical_textmining_mentions.tsv'
+
+db_types: 
+    '-26':
+        - 'Protein'
+        - 'Disease'
+    '-25':
+        - 'Protein'
+        - 'Tissue'
+    '-23':
+        - 'Protein'
+        - 'Cellular_component'
+
+db_mentions_types: 
+    '-26':
+        - 'Disease'
+        - 'Publication'
+    '-25':
+        - 'Tissue'
+        - 'Publication'
+    '-23':
+        - 'Cellular_component'
+        - 'Publication'
+    '9606':
+        - 'Protein'
+        - 'Publication'
+    '-1':
+        - 'Drug'
+        - 'Publication'
+
+db_mentions_filters: 
+    '-25': 
+        - 'BTO:0000000'
+    '-26': 
+        - 'DOID:4'
+        - 'DOID:162'
+    '-23':
+        - 'GO:0005575'
+        - 'GO:0005623'
+        - 'GO:0044464'
+        - 'GO:0030054'
+
+db_sources: 
+    '-25': 'TISSUES'
+    '-26': 'DISEASES'
+    '-23': 'COMPARTMENTS'
+    'Drug': 'DrugBank'
+
+string_url: 'https://stringdb-static.org/download/protein.aliases.v11.0/9606.protein.aliases.v11.0.txt.gz'
+stitch_url: 'http://stitch.embl.de/download/chemical.aliases.v5.0.tsv.gz'
+header: 
+    - 'START_ID'
+    - 'END_ID'
+    - 'TYPE'
+    - 'source'
+    - 'score'
+    - 'evidence_type'
+    
+#### Pubmed ######
+PMC_db_url: 'ftp://ftp.ncbi.nlm.nih.gov/pub/pmc/PMC-ids.csv.gz'
+
+PMC_fields: 
+    - 'PMID'
+    - 'Journal Title'
+    - 'ISSN'
+    - 'Year'
+    - 'Volume'
+    - 'Issue'
+    - 'Page'
+    - 'DOI'
+    - 'PMCID'
+
+pubmed_linkout: 'https://www.ncbi.nlm.nih.gov/pubmed/PUBMEDID'

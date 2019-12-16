@@ -1,0 +1,57 @@
+###### SIGNOR 2.0 Database ########
+url: https://signor.uniroma2.it/releases/getLatestRelease.php
+
+modifications: 
+  'phosphorylation': 'MOD:00696'
+  'dephosphorylation': 'MOD:01157'
+  'ubiquitination': 'MOD:01148'
+
+accronyms:
+  'phosphorylation': 'p'
+  'dephosphorylation': 'dp'
+  'ubiquitination': 'ub'
+
+amino_acids: 
+    'Ala': 'A'
+    'Cys': 'C'
+    'Asp': 'D'
+    'Glu': 'E'
+    'Phe': 'F'
+    'Gly': 'G'
+    'His': 'H'
+    'Ile': 'I'
+    'Lys': 'K'
+    'Leu': 'L'
+    'Met': 'M'
+    'Asn': 'N'
+    'Pro': 'P'
+    'Gln': 'Q'
+    'Arg': 'R'
+    'Ser': 'S'
+    'Thr': 'T'
+    'Val': 'V'
+    'Trp': 'W'
+    'Tyr': 'Y'
+
+entities_header: 
+    - 'ID'
+    - 'type'
+    - 'protein'
+    - 'sequence_window'
+    - 'position'
+    - 'residue'
+    - 'source'
+
+rel_headers: 
+  is_substrate_of:
+      - 'START_ID'
+      - 'END_ID'
+      - 'TYPE'
+      - 'regulation'
+      - 'evidence_type'
+      - 'score'
+      - 'source'
+  mentioned_in_publication:
+      - 'START_ID'
+      - 'END_ID'
+      - 'TYPE'

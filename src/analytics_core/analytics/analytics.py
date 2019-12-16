@@ -15,6 +15,9 @@ import pingouin as pg
 import numpy as np
 import networkx as nx
 import community
+import snf
+from sklearn.cluster import spectral_clustering
+from sklearn.metrics import v_measure_score
 import math
 from fancyimpute import KNN
 import kmapper as km
@@ -145,7 +148,7 @@ def extract_number_missing(data, min_valid, drop_cols=['sample'], group='group')
         groups = groups[groups>=min_valid]
 
     groups = groups.dropna(how='all', axis=1)
-    return list(groups.columns)
+    return groups.columns.unique().tolist()
 
 def extract_percentage_missing(data, missing_max, drop_cols=['sample'], group='group'):
     """ 
@@ -168,9 +171,9 @@ def extract_percentage_missing(data, missing_max, drop_cols=['sample'], group='g
         groups = groups.set_index(group)
         groups = groups.isnull().groupby(level=0).mean()
         groups = groups[groups<=missing_max]
-        groups = groups.dropna(how='all', axis=1).columns
+        groups = groups.dropna(how='all', axis=1).columns.unique().tolist()
 
-    return list(groups)
+    return groups
 
 def imputation_KNN(data, drop_cols=['group', 'sample', 'subject'], group='group', cutoff=0.6, alone = True):
     """ 
@@ -542,8 +545,9 @@ def run_pca(data, drop_cols=['sample', 'subject'], group='group', components=2, 
     result = {}
     args = {}
     df = data.copy()
-    if set(drop_cols).intersection(df.columns) == len(drop_cols):
+    if len(set(drop_cols).intersection(df.columns)) == len(drop_cols):
         df = df.drop(drop_cols, axis=1)
+        
     df = df.set_index(group)
     df = df.select_dtypes(['number'])
     if dropna:
@@ -597,7 +601,7 @@ def run_tsne(data, drop_cols=['sample', 'subject'], group='group', components=2,
     result = {}
     args = {}
     df = data.copy()
-    if set(drop_cols).intersection(df.columns) == len(drop_cols):
+    if len(set(drop_cols).intersection(df.columns)) == len(drop_cols):
         df = df.drop(drop_cols, axis=1)
     df = df.set_index(group)
     if dropna:
@@ -644,7 +648,7 @@ def run_umap(data, drop_cols=['sample', 'subject'], group='group', n_neighbors=1
     result = {}
     args = {}
     df = data.copy()
-    if set(drop_cols).intersection(df.columns) == len(drop_cols):
+    if len(set(drop_cols).intersection(df.columns)) == len(drop_cols):
         df = df.drop(drop_cols, axis=1)
     df = df.set_index(group)
     if dropna:
@@ -837,8 +841,8 @@ def run_correlation(df, alpha=0.05, subject='subject', group='group', method='pe
                 rejected, padj = apply_pvalue_fdrcorrection(correlation["pvalue"].tolist(), alpha=alpha, method=correction[1])
             elif correction[0] == '2fdr':
                 rejected, padj = apply_pvalue_twostage_fdrcorrection(correlation["pvalue"].tolist(), alpha=alpha, method=correction[1])
-            correlation["pvalue"] = [round(i, 8) for i in correlation['pvalue']] #limit number of decimals to 8 and avoid scientific notation
-            correlation["padj"] = [round(i, 8) for i in padj] #limit number of decimals to 8 and avoid scientific notation
+            correlation["pvalue"] = [str(round(i, 8)) for i in correlation['pvalue']] #limit number of decimals to 8 and avoid scientific notation
+            correlation["padj"] = [str(round(i, 8)) for i in padj] #limit number of decimals to 8 and avoid scientific notation
             correlation["rejected"] = rejected
             correlation = correlation[correlation.rejected]
             
@@ -906,7 +910,6 @@ def calculate_rm_correlation(df, x, y, subject):
     # Extract p-value
     pvalue = table.loc[a, 'PR(>F)']
     pvalue *= 0.5
-    pvalue = [round(i, 8) for i in pvalue] #limit number of decimals to 8 and avoid scientific notation
     
     #r, dof, pvalue, ci, power = pg.rm_corr(data=df, x=x, y=y, subject=subject)
 
@@ -942,7 +945,7 @@ def run_rm_correlation(df, alpha=0.05, subject='subject', correction=('fdr', 'in
         elif correction[0] == '2fdr':
             rejected, padj = apply_pvalue_twostage_fdrcorrection(correlation["pvalue"].tolist(), alpha=alpha, method=correction[1])
 
-        correlation["padj"] = padj
+        correlation["padj"] = [str(round(i, 8)) for i in padj] #limit number of decimals to 8 and avoid scientific notation
         correlation["rejected"] = rejected
         correlation = correlation[correlation.rejected]
 
@@ -2076,3 +2079,13 @@ def run_two_way_anova(df, drop_cols=['sample'], subject='subject', group=['group
     anova_df = anova_df.dropna(how="all")
     
     return anova_df, residuals
+
+def run_snf(df_dict, clusters, distance_metric, K_affinity, mu_affinity):
+    """
+        
+    :param df_dict: 
+    :param clusters: 
+    
+    
+    """
+    pass
