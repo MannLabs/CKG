@@ -22,13 +22,17 @@ from dash.exceptions import PreventUpdate
 from app import app, server as application
 from apps import initialApp, projectCreationApp, dataUploadApp, dataUpload, projectApp, importsApp, homepageApp, loginApp, projectCreation
 from graphdb_builder import builder_utils
-from graphdb_builder.builder import loader
+from graphdb_builder.builder import loader, importer
+from graphdb_builder.experiments import experiments_controller as eh
 import ckg_utils
 import config.ckg_config as ckg_config
 
 from worker import create_new_project
 from graphdb_connector import connector
 
+cwd = os.path.abspath(os.path.dirname(__file__))
+importDir = os.path.join(cwd, '../../data/imports/experiments')
+experimentDir = os.path.join(cwd, '../../data/experiments')
 driver = connector.getGraphDatabaseConnectionConfiguration()
 separator = '|'
 
@@ -355,16 +359,20 @@ def create_project(n_clicks, name, acronym, responsible, participant, datatype, 
         disease = separator.join(disease)
         tissue = separator.join(tissue)
         intervention = separator.join(intervention)
+        arguments = [name, number_subjects, datatype, disease, tissue, responsible]
 
-        if any(elem is None for elem in [name, number_subjects, datatype, disease, tissue, responsible]) == True:
+        if any(not arguments[n] for n, i in enumerate(arguments)) == True:
             response = "Insufficient information to create project. Fill in all fields with '*'."
             return response, None, {'display': 'none'}, {'display': 'none'}
         
-        if any(elem is None for elem in [name, number_subjects, datatype, disease, tissue, responsible]) == False:
+        if any(not arguments[n] for n, i in enumerate(arguments)) == False:
         # Get project data from filled-in fields
             projectData = pd.DataFrame([name, acronym, description, number_subjects, datatype, timepoints, disease, tissue, intervention, responsible, participant, start_date, end_date]).T
             projectData.columns = ['name', 'acronym', 'description', 'subjects', 'datatypes', 'timepoints', 'disease', 'tissue', 'intervention', 'responsible', 'participant', 'start_date', 'end_date']
             projectData['status'] = ''
+
+            projectData.fillna(value=pd.np.nan, inplace=True)
+            projectData.replace('', np.nan, inplace=True)
 
             # Generate project internal identifier bsed on timestamp
             # Excel file is saved in folder with internal id name
@@ -456,11 +464,21 @@ def export_contents(data, dataDir, filename):
               [Input('upload-data', 'contents'),
                Input('upload-data', 'filename')])
 def store_original_data(contents, filename):
+    print("IN")
     if contents is not None:
         df = parse_contents(contents, filename)
         return df.to_dict('records')
     else:
         raise PreventUpdate
+
+@app.callback(Output('proteomics-tool', 'style'),
+              [Input('upload-data-type-picker', 'value')])
+def show_proteomics_options(datatype):
+    if datatype == 'proteomics' or datatype == 'longitudinal_proteomics':
+        return {'display': 'block'}
+    else:
+        return {'display': 'none'}
+
 
 @app.callback([Output('clinical-table', 'data'),
                Output('clinical-table', 'columns')],
@@ -485,31 +503,96 @@ def update_data(data, n_clicks, variables, dtype):
     columns = [d for d in columns if d.get('id') != '']
     return df, columns
 
-@app.callback(Output('data-upload', 'children'),
+@app.callback(Output('prot_tool_div', 'children'),
+              [Input('submit_button', 'n_clicks')],
+              [State('proteomics-tool', 'value')])
+def update_proteomics_tool(n_clicks, value):
+    if n_clicks > 0:
+        return str(value)
+    else:
+        return ''
+
+@app.callback([Output('data-upload', 'children'),
+              Output('data_download_link', 'style')],
              [Input('submit_button', 'n_clicks')],
              [State('memory-original-data', 'data'),
               State('upload-data', 'filename'),
-              State('url', 'pathname'),
-              State('upload-data-type-picker', 'value')])
-def run_processing(n_clicks, data, filename, path_name, dtype):
-    if n_clicks is not None:
+              State('project_id', 'value'),
+              State('upload-data-type-picker', 'value'),
+              State('proteomics-tool', 'value')])
+def run_processing(n_clicks, data, filename, project_id, dtype, prot_tool):
+    if n_clicks > 0:
+        if dtype == '':
+            message = 'Error: Please refresh the page and select the type of data to be uploaded.'
+            return message, {'display':'none'}
+
+        if prot_tool == '' and dtype == 'proteomics' or dtype == 'longitudinal_proteomics':
+            message = 'Error: Please refresh the page and select tool: MaxQuant or Spectronaut.'
+            return message, {'display':'none'}
+
         # Get Clinical data from Uploaded and updated table
         df = pd.DataFrame(data, columns=data[0].keys())
         df.fillna(value=pd.np.nan, inplace=True)
-        project_id = path_name.split('/')[-1]
-        # Extract all relationahips and nodes and save as csv files
-        if dtype == 'clinical':
-            df = dataUpload.create_new_experiment_in_db(driver, project_id, df, separator=separator)
-            loader.partialUpdate(imports=['project', 'experiment'])
-        else:
-            pass
         # Path to new local folder
-        dataDir = '../../data/experiments/PROJECTID/DATATYPE/'.replace('PROJECTID', project_id).replace('DATATYPE', dtype)
-        # Check/create folders based on local
-        ckg_utils.checkDirectory(dataDir)
-        csv_string = export_contents(df, dataDir, filename)
+        dataDir = os.path.join(experimentDir, os.path.join(project_id, dtype.split('_')[-1]))
+        
+        # Extract all relationahips and nodes and save as tsv files
+        if dtype == 'clinical' or dtype == 'longitudinal_clinical':
+            style = {'display':'block'}
+            df = dataUpload.create_new_experiment_in_db(driver, project_id, df, separator=separator)
+            ckg_utils.checkDirectory(dataDir)
+            export_contents(df, dataDir, filename)
+        
+        if dtype == 'proteomics' or dtype == 'longitudinal_proteomics':
+            style = {'display':'none'}
+            dataDir = os.path.join(dataDir, prot_tool.lower())
+            ckg_utils.checkDirectory(dataDir)
+            export_contents(df, dataDir, filename)
+            
+            datasetPath = os.path.join(os.path.join(importDir, project_id), 'proteomics')
+            builder_utils.checkDirectory(datasetPath)
+            print('CREATED DIR')
+            print(datasetPath)
+            eh.generate_dataset_imports(project_id, 'proteomics', datasetPath)
+            print('FINISHED IMPORTER')
+
+        loader.partialUpdate(imports=['project', 'experiment'])
         message = 'FILE successfully uploaded.'.replace('FILE', '"'+filename+'"')
-        return message
+        return message, style
+    else:
+        return '', {'display':'none'}
+
+@app.callback(Output('dummy-div', 'children'),
+             [Input('submit_button', 'n_clicks')],
+             [State('project_id', 'value')])
+def update_project_id(n_clicks, project):
+    if n_clicks > 0:
+        return str(project)
+    else:
+        return ''
+
+@app.callback(Output('data_download_link', 'href'),
+             [Input('dummy-div', 'children')])
+def generate_upload_url(project_id):
+    return '/clinical?value={}'.format('ClinicalData_'+project_id+'.xlsx')
+    
+@application.route('/clinical/')
+def route_upload_url():
+    value = flask.request.args.get('value')
+    project = value.split('_')[-1].split('.')[0]
+    url = os.path.join(os.getcwd(),"../../data/experiments/"+project+'/clinical/'+value)
+    return flask.send_file(url, attachment_filename = value, as_attachment = True)
+
+@app.callback(Output('data-upload', 'style'),
+              [Input('data-upload', 'children')])
+def change_style(message):
+    if message is None:
+        return {'fontSize':'20px', 'marginLeft':'70%', 'color': 'black'}
+    else:
+        if 'Error' in message:
+            return {'fontSize':'20px', 'marginLeft':'70%', 'color': 'red'}
+        else:
+            return {'fontSize':'20px', 'marginLeft':'70%', 'color': 'black'}
 
 @app.callback(Output('memory-original-data', 'clear_data'),
               [Input('submit_button', 'n_clicks')])
@@ -517,18 +600,6 @@ def clear_click(n_click_clear):
     if n_click_clear is not None and n_click_clear > 0:
         return True
     return False
-
-@app.callback([Output('data_download_link', 'href'),
-               Output('data_download_link', 'download')],
-              [Input('data_download_button', 'n_clicks')],
-              [State('memory-original-data', 'data'),
-               State('upload-data-type-picker', 'value')])
-def update_table_download_link(n_clicks, data, data_type):
-    if n_clicks != None:
-        df = pd.DataFrame(data, columns=data[0].keys())
-        csv_string = df.to_csv(index=False, encoding='utf-8', sep=';') 
-        csv_string = "data:text/csv;charset=utf-8," + urllib.parse.quote(csv_string)
-        return csv_string, 'downloaded_DATATYPE_DataUpload.csv'.replace('DATATYPE', data_type)
 
 
 if __name__ == '__main__':

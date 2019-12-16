@@ -75,9 +75,9 @@ def read_concept_file(concept_file):
                 continue
             data = line.rstrip('\r\n').split('\t')
             concept = data[0]
-            is_active = data[2]
+            is_active = bool(data[2])
 
             if not is_active:
-                invalid_concepts.add(concept)
+                inactive_terms.add(concept)
 
     return inactive_terms

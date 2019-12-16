@@ -51,6 +51,7 @@ rel_headers:
         - 'START_ID'
         - 'END_ID'
         - 'TYPE'
+        - 'regulation'
         - 'evidence_type'
         - 'score'
         - 'source'

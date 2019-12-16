@@ -78,22 +78,23 @@ def get_dendrogram(df, labels, distfun='euclidean', linkagefun='ward', div_clust
     :return: Dictionary of data structures computed to render the dendrogram. Keys: 'icoords', 'dcoords', 'ivl' and 'leaves'. If div_clusters is used, it will also return a dictionary of each cluster and respective leaves.
     """
     # np.random.seed(112736)
-    
-    if distfun is None:
-        dist = np.asarray(stats.as_dist(df))
-    else:
-        dist = np.asarray(stats.dist(df, method = distfun))
+    if df is not None and len(labels) > 0:
+        if distfun is None:
+            dist = np.asarray(stats.as_dist(df))
+        else:
+            dist = np.asarray(stats.dist(df, method = distfun))
 
-    Z = linkage(dist, method = linkagefun)
+        Z = linkage(dist, method = linkagefun)
 
-    Z_dendrogram = dendrogram(Z, no_plot = True, labels = labels)
+        Z_dendrogram = dendrogram(Z, no_plot = True, labels = labels)
 
-    if div_clusters == True:
-        clusters = get_clusters_elements(Z, fcluster_method, fcluster_cutoff, labels)
-        return Z_dendrogram, clusters
-    else:
-        return Z_dendrogram
+        if div_clusters == True:
+            clusters = get_clusters_elements(Z, fcluster_method, fcluster_cutoff, labels)
+            return Z_dendrogram, clusters
+        else:
+            return Z_dendrogram
 
+    return None
 
 def get_clusters_elements(linkage_matrix, fcluster_method, fcluster_cutoff, labels):
     """ 
@@ -341,29 +342,32 @@ def calculate_ModuleTrait_correlation(df_exp, df_traits, MEs):
     :return: Tuple with two pandas datafames, first the correlation between all module eigengenes and all clinical traits, second a dataframe with concatenated correlation and p-value used for heatmap annotation.
     """
     nSamples = len(df_exp.index)
+    moduleTraitCor = None 
+    textMatrix = None
 
     df_traits_r = df_traits.copy()
     df_traits_r.columns = df_traits_r.columns.str.replace(' ', 'space')
     df_traits_r.columns = df_traits_r.columns.str.replace('(', 'parentheses1')
     df_traits_r.columns = df_traits_r.columns.str.replace(')', 'parentheses2')
     common = list(set(MEs.index).intersection(df_traits_r.index))
-    moduleTraitCor_r = WGCNA.cor(MEs.loc[common,:], df_traits_r.loc[common,:], use='p', verbose=0)
-    moduleTraitPvalue_r = WGCNA.corPvalueStudent(moduleTraitCor_r, nSamples)
+    if len(common) > 0:
+        moduleTraitCor_r = WGCNA.cor(MEs.loc[common,:], df_traits_r.loc[common,:], use='p', verbose=0)
+        moduleTraitPvalue_r = WGCNA.corPvalueStudent(moduleTraitCor_r, nSamples)
 
-    textMatrix = paste_matrices(moduleTraitCor_r, moduleTraitPvalue_r, MEs.columns, df_traits_r.columns)
-    
-    moduleTraitCor = pd.DataFrame(moduleTraitCor_r, index=MEs.columns, columns=df_traits_r.columns)
-    moduleTraitPvalue = pd.DataFrame(moduleTraitPvalue_r, index=MEs.columns, columns=df_traits_r.columns)
+        textMatrix = paste_matrices(moduleTraitCor_r, moduleTraitPvalue_r, MEs.columns, df_traits_r.columns)
+        
+        moduleTraitCor = pd.DataFrame(moduleTraitCor_r, index=MEs.columns, columns=df_traits_r.columns)
+        moduleTraitPvalue = pd.DataFrame(moduleTraitPvalue_r, index=MEs.columns, columns=df_traits_r.columns)
 
-    moduleTraitCor.columns = moduleTraitCor.columns.str.replace('space', ' ')
-    moduleTraitPvalue.columns = moduleTraitPvalue.columns.str.replace('space', ' ')
-    textMatrix.columns = textMatrix.columns.str.replace('space', ' ')
-    moduleTraitCor.columns = moduleTraitCor.columns.str.replace('parentheses1', '(')
-    moduleTraitCor.columns = moduleTraitCor.columns.str.replace('parentheses2', ')')
-    moduleTraitPvalue.columns = moduleTraitPvalue.columns.str.replace('parentheses1', '(')
-    moduleTraitPvalue.columns = moduleTraitPvalue.columns.str.replace('parentheses2', ')')
-    textMatrix.columns = textMatrix.columns.str.replace('parentheses1', '(')
-    textMatrix.columns = textMatrix.columns.str.replace('parentheses2', ')')
+        moduleTraitCor.columns = moduleTraitCor.columns.str.replace('space', ' ')
+        moduleTraitPvalue.columns = moduleTraitPvalue.columns.str.replace('space', ' ')
+        textMatrix.columns = textMatrix.columns.str.replace('space', ' ')
+        moduleTraitCor.columns = moduleTraitCor.columns.str.replace('parentheses1', '(')
+        moduleTraitCor.columns = moduleTraitCor.columns.str.replace('parentheses2', ')')
+        moduleTraitPvalue.columns = moduleTraitPvalue.columns.str.replace('parentheses1', '(')
+        moduleTraitPvalue.columns = moduleTraitPvalue.columns.str.replace('parentheses2', ')')
+        textMatrix.columns = textMatrix.columns.str.replace('parentheses1', '(')
+        textMatrix.columns = textMatrix.columns.str.replace('parentheses2', ')')
 
     return moduleTraitCor, textMatrix
 
@@ -479,6 +483,8 @@ def get_EigengenesTrait_correlation(MEs, data):
     :param data: pandas dataframe containing clinical data, with samples/subjects as rows and clinical traits as columns.
     :return: Tuple with two pandas dataframes, one with features and traits recalculates module eigengenes dissimilarity, and another with all the overall correlations.
     """
+    METDiss = pd.DataFrame()
+    METcor = 0
     df_traits_r =  data.copy()
     df_traits_r.columns = df_traits_r.columns.str.replace(' ', 'space')
     df_traits_r.columns = df_traits_r.columns.str.replace('(', 'parentheses1')
@@ -486,19 +492,20 @@ def get_EigengenesTrait_correlation(MEs, data):
     df_traits_r.columns = df_traits_r.columns.str.replace('/', 'slash')
     
     common = list(set(MEs.index).intersection(df_traits_r.index))
-    MET = WGCNA.orderMEs(base.cbind(MEs.loc[common,:], df_traits_r.loc[common,:]), verbose=0)
-    METcor = WGCNA.cor(MET, use='p', verbose=0)
-    METcor = pd.DataFrame(METcor, MET.columns, MET.columns)
+    if len(common) > 0:
+        MET = WGCNA.orderMEs(base.cbind(MEs.loc[common,:], df_traits_r.loc[common,:]), verbose=0)
+        METcor = WGCNA.cor(MET, use='p', verbose=0)
+        METcor = pd.DataFrame(METcor, MET.columns, MET.columns)
 
-    METcor.columns = METcor.columns.str.replace('space', ' ')
-    METcor.columns = METcor.columns.str.replace('parentheses1', '(')
-    METcor.columns = METcor.columns.str.replace('parentheses2', ')')
-    METcor.columns = METcor.columns.str.replace('slash', '/')
-    METcor.index = METcor.index.str.replace('space', ' ')
-    METcor.index = METcor.index.str.replace('parentheses1', '(')
-    METcor.index = METcor.index.str.replace('parentheses2', ')')
-    METcor.index = METcor.index.str.replace('slash', '/')
+        METcor.columns = METcor.columns.str.replace('space', ' ')
+        METcor.columns = METcor.columns.str.replace('parentheses1', '(')
+        METcor.columns = METcor.columns.str.replace('parentheses2', ')')
+        METcor.columns = METcor.columns.str.replace('slash', '/')
+        METcor.index = METcor.index.str.replace('space', ' ')
+        METcor.index = METcor.index.str.replace('parentheses1', '(')
+        METcor.index = METcor.index.str.replace('parentheses2', ')')
+        METcor.index = METcor.index.str.replace('slash', '/')
 
-    METDiss = 1 - METcor
+        METDiss = 1 - METcor
 
     return METDiss, METcor

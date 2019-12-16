@@ -28,6 +28,7 @@ Diseases = [(d['name']) for d in driver.nodes.match("Disease")]
 
 query = 'MATCH (n:Clinical_variable) RETURN n.name,n.id LIMIT 20'
 df = pd.DataFrame(connector.getCursorData(driver, query).values)
+ClinicalVariables = pd.DataFrame()
 if not df.empty:
     df[0] = ['({0})'.format(i) for i in df[0].tolist()]
     ClinicalVariables = df[[1, 0]].apply(lambda x: ' '.join(x),axis=1).tolist()
@@ -68,8 +69,9 @@ class DataUploadApp(basicApp.BasicApp):
         projectID = self.project_id
         self.add_basic_layout()
         layout = [html.Div([
+                            html.Div([html.H4('Project identifier:', style={'marginTop':30, 'marginBottom':20}),
+                                      dcc.Input(id='project_id', placeholder='e.g. P0000001', type='text', value='', style={'width':'100%', 'height':'55px'})], style={'width':'20%'}),
                             html.Div([dcc.Store(id='memory-original-data', storage_type='memory'),
-                                      # dcc.Store(id='memory-table-data', storage_type='memory'),
                                       html.H4('Upload Experiment file', style={'marginTop':30, 'marginBottom':20}),
                                       dcc.Upload(id='upload-data', children=html.Div(['Drag and Drop or ', html.A('Select Files')]),
                                                  style={'width': '100%',
@@ -87,14 +89,11 @@ class DataUploadApp(basicApp.BasicApp):
                             html.Div(id='dumm-div'),
                             html.Div(children=[dcc.Dropdown(id='upload-data-type-picker', options=[{'label':i, 'value':i} for i in DataTypes], value='', multi=False, style={'width':'100%'})],
                                                style={'width':'20%', 'marginLeft': '0%', 'verticalAlign':'top', 'display':'inline-block'}),
-                            # html.Div(children=[html.Button('Add', id='add_upload_datatype', style={'height':'35px'})],
-                            #                    style={'width':'10%', 'marginLeft': '0.4%', 'verticalAlign':'top', 'display':'inline-block'}),
-                            # html.Div(children=[dcc.Input(id='upload-data-type', value='', type='text', style={'width':'100%', 'height':'35px', 'marginTop':5})],
-                            #                      style={'width':'49%', 'marginLeft':'0%', 'verticalAlign':'top'}),
-                            # html.Div(id='error_msg', style={'fontSize':'15px', 'marginLeft':'0%'}),
-                			html.Div([
-                    				  html.Div(children=[html.A(children=html.Button('Export Table', id='data_download_button', style={'height':36, 'maxWidth':'200px'}), id='data_download_link', download='downloaded_ClinicalData.csv')],
-                                      					 style={'marginTop':'0%', 'marginLeft': '91.4%', 'horizontalAlign':'right', 'verticalAlign':'top', 'display':'inline-block'}),
+                            html.Div(children=[dcc.RadioItems(id='proteomics-tool', options=[{'label':i, 'value':i} for i in ['MaxQuant', 'Spectronaut']], value='', labelStyle={'display': 'inline-block', 'margin-right': 20},
+                                                              inputStyle={"margin-right": "5px"}, style={'display':'block', 'fontSize':'16px'})]),
+                            html.Div(id='prot_tool_div', style={'display':'none'}),
+                			
+                      html.Div([
                     				  html.Div(children=[dcc.Dropdown(id='clinical-variables-picker', placeholder='Select clinical variables...', options=[{'label':i, 'value':i} for i in ClinicalVariables], value=['', ''], multi=True, style={})],
                              							 style={'marginTop':'1%', 'width':'25%', 'verticalAlign':'top', 'display':'inline-block'}),
                     				  html.Div(children=[html.Button('Add Column', id='editing-columns-button', n_clicks=0, style={'height':36, 'width':100})],
@@ -109,9 +108,11 @@ class DataUploadApp(basicApp.BasicApp):
                                       		                         data=[{j: ''} for j in range(10)], fixed_rows={'headers':True}, editable=True, style_cell={'minWidth': '220px', 'width': '220px','maxWidth': '220px', 'whiteSpace': 'normal'},
                                                                      )],
                              					style={'marginTop':'1%', 'maxHeight': 800, 'overflowY': 'scroll', 'overflowX': 'scroll'}),
-                					  html.Div(children=[html.Button('Upload Data', id='submit_button')],
-                             							 style={'marginTop':'5%', 'fontSize':'22px', 'minWidth':'500px', 'marginLeft':'89%'})]),
+                					  html.Div(children=html.Button('Upload Data', id='submit_button', n_clicks = 0, className="button_link", style={'fontSize':'25px'}),
+                             							 style={'width':'100%', 'padding-left':'87%', 'padding-right':'0%'})]),
+                            html.Div(children=html.A('Download File', id='data_download_link', href='', n_clicks=0, style={'display':'none'}), style={'width':'100%', 'padding-left':'87%', 'padding-right':'0%'}),
                             html.Div(id='data-upload', style={'fontSize':'20px', 'marginLeft':'70%'}),
+                            html.Div(id='dummy-div', style={'display':'none'}),
                 			html.Hr()])]
 
         self.extend_layout(layout)

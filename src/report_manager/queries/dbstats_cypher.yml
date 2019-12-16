@@ -7,18 +7,6 @@ db_schema:
     - all
   query_type: post
   query: CALL db.schema()
-map_node_name:
-    name:
-    description:
-    involved_nodes:
-        - Disease
-        - Tissue
-        - Clinical_variable
-    involved_rels:
-    query_type: post
-    query: >
-        MATCH (n:NODE {name:$name})
-        RETURN n.id;
 unique_projects:
     name:
     description:

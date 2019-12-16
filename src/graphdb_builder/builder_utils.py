@@ -2,10 +2,11 @@ import pandas as pd
 import csv
 import certifi
 import urllib3
+import urllib
 import wget
+import requests
 import ftplib
 import json
-import urllib
 from Bio import Entrez
 from Bio import Medline
 import os.path
@@ -200,7 +201,7 @@ def downloadDB(databaseURL, directory=None, file_name=None, user="", password=""
         directory = dbconfig["databasesDir"]
     if file_name is None:
         file_name = databaseURL.split('/')[-1]
-    #urllib.request.URLopener.version = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36 SE 2.X MetaSr 1.0'
+    header = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36'}
     try:
         mode = 'wb'
         if databaseURL.startswith('ftp:'):
@@ -212,21 +213,13 @@ def downloadDB(databaseURL, directory=None, file_name=None, user="", password=""
         else:
             if os.path.exists(os.path.join(directory, file_name)):
                 os.remove(os.path.join(directory, file_name))
-            # wget.download(databaseURL, os.path.join(directory, file_name))
-            os.system("wget -O {0} {1}".format(os.path.join(directory, file_name), databaseURL))
-
-    except urllib3.exceptions.InvalidHeader:
-        raise urllib3.exceptions.InvalidHeader("Invalid HTTP header provided. {}.\nURL:{}".format(err,databaseURL))
-    except urllib3.exceptions.ConnectTimeoutError:
-        raise urllib3.exceptions.ConnectTimeoutError("Connection timeout requesting URL. {}.\nURL:{}".format(err,databaseURL))
-    except urllib3.exceptions.ConnectionError:
-        raise urllib3.exceptions.ConnectionError("Protocol error when downloading. {}.\nURL:{}".format(err,databaseURL))
-    except urllib3.exceptions.DecodeError:
-        raise urllib3.exceptions.DecodeError("Decoder error when downloading. {}.\nURL:{}".format(err,databaseURL))
-    except urllib3.exceptions.SecurityWarning:
-        raise urllib3.exceptions.SecurityWarning("Security warning when downloading. {}.\nURL:{}".format(err,databaseURL))
-    except urllib3.exceptions.ProtocolError:
-        raise urllib3.exceptions.ProtocolError("Protocol error when downloading. {}.\nURL:{}".format(err,databaseURL))
+            try:
+                wget.download(databaseURL, os.path.join(directory, file_name))
+            except:
+                r = requests.get(databaseURL, headers=header)
+                with open(os.path.join(directory, file_name), 'wb') as out:
+                    out.write(r.content)
+            #os.system("wget -O {0} {1}".format(os.path.join(directory, file_name), databaseURL))
     except ftplib.error_reply as err:
         raise ftplib.error_reply("Exception raised when an unexpected reply is received from the server. {}.\nURL:{}".format(err,databaseURL))
     except ftplib.error_temp as err:
@@ -438,7 +431,7 @@ def file_size(file_path):
         file_info = os.stat(file_path)
         return str(file_info.st_size)
 
-def buildStats(count, otype, name, dataset, filename):
+def buildStats(count, otype, name, dataset, filename, updated_on=None):
     """
     Returns a tuple with all the information needed to build a stats file.
 
@@ -454,7 +447,7 @@ def buildStats(count, otype, name, dataset, filename):
     size = file_size(filename)
     filename = filename.split('/')[-1]
     
-    return(y, t, dataset, filename, size, count, otype, name)
+    return(str(y), str(t), dataset, filename, size, count, otype, name, updated_on)
 
 def compress_directory(folder_to_backup, dest_folder, file_name):
     """

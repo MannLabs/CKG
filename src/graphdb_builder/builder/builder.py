@@ -35,54 +35,60 @@ def set_arguments():
     This function sets the arguments to be used as input for **builder.py** in the command line.
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("-b", "--build_type", help="define the type of build you want (import, load or both)", type=str, choices=['import', 'load', 'full'], default='full')
-    parser.add_argument("-i", "--import_types", help="define which data types (ontologies, experiments, databases) you want to import (partial import)", nargs='+', default=None, choices=['experiments', 'databases', 'ontologies', 'users'])
-    parser.add_argument("-l", "--load_entities",  help="define which entities you want to load into the database (partial load)",  nargs='+', default=config["graph"])
-    parser.add_argument("-d", "--data", help="define which ontology/ies, experiment/s or database/s you want to import",  nargs='+', default=None)
+    parser.add_argument("-b", "--build_type", help="define the type of build you want (import, load or full)", type=str, choices=['import', 'load', 'full'], default='full')
+    parser.add_argument("-i", "--import_types", help="If only import, define which data types (ontologies, experiments, databases, users) you want to import (partial import)", nargs='+', default=None, choices=['experiments', 'databases', 'ontologies', 'users'])
+    parser.add_argument("-l", "--load_entities",  help="If only load, define which entities you want to load into the database (partial load)",  nargs='+', default=config["graph"])
+    parser.add_argument("-d", "--data", help="If only import, define which ontology/ies, experiment/s or database/s you want to import",  nargs='+', default=None)
     parser.add_argument("-n", "--n_jobs", help="define number of cores used when importing data", type=int, default=4)
-    parser.add_argument("-w", "--download", help="define whether or not to download imported data", type=str, default='True')
-    parser.add_argument("-u", "--user", help="define the user that will build the database", type=str, required=True)
+    parser.add_argument("-w", "--download", help="define whether or not to download imported data", type=str, default="True")
+    parser.add_argument("-u", "--user", help="Specify a user name to keep track of who is building the database", type=str, required=True)
     
     return parser
 
 if __name__ == '__main__':
     parser =  set_arguments()
     args = parser.parse_args()
-    
+    download = args.download=="True"
     if args.build_type == 'full':
         logger.info("The user {} chose to perform a full build".format(args.user))
         logger.info("Building database > step 1: Importing data from ontologies, databases and experiments")
-        importer.fullImport()
+        importer.fullImport(download=download, n_jobs=args.n_jobs)
         logger.info("Building database > step 2: Loading all data imported into the database")
         loader.fullUpdate()
     elif args.build_type == 'import':
         logger.info("The user chose to perform a partial build")
         if args.import_types is not None:
-            if len(args.data) > 0:
+            if args.data is None or len(args.data) > 0:
                 logger.info("The build will import data from {}".format("".join(args.import_types)))
                 for import_type in args.import_types:
-                    logger.info("Importing {}: {}".format(import_type, "".join(args.data)))
+                    logger.info("Importing {}: {}".format(import_type, args.data))
                     if import_type.lower() == 'experiments' or import_type.lower() == 'experiment':
                         importer.experimentsImport(projects=args.data, n_jobs=1)
                     elif import_type.lower() == 'users' or import_type.lower() == 'user':
                         importer.usersImport(importDirectory='../../../data/imports')
                     elif import_type.lower() == 'databases' or import_type.lower() == 'database':
                         databases = [d.lower() for d in dbconfig['databases']]
-                        valid_entities = [x.lower() for x in args.data if x.lower() in databases]
+                        if args.data is not None:
+                            valid_entities = [x.lower() for x in args.data if x.lower() in databases]
+                        else:
+                            valid_entities = databases
                         if len(valid_entities) > 0:
                             logger.info("These entities will be imported: {}".format(", ".join(valid_entities)))
                             print("These entities will be imported: {}".format(", ".join(valid_entities)))
-                            importer.databasesImport(importDirectory='../../../data/imports', databases=valid_entities, n_jobs=args.n_jobs, download=bool(args.download))
+                            importer.databasesImport(importDirectory='../../../data/imports', databases=valid_entities, n_jobs=args.n_jobs, download=download)
                         else:
                             logger.error("The indicated entities (--data) cannot be imported: {}".format(args.data))
                             print("The indicated entities (--data) cannot be imported: {}".format(args.data))
                     elif import_type.lower() == 'ontologies' or import_type.lower() == 'ontology':
                         ontologies = [d.lower   () for d in oconfig['ontologies']]
-                        valid_entities = [x.capitalize() for x in args.data if x.lower() in ontologies]
+                        if args.data is not None:
+                            valid_entities = [x.capitalize() for x in args.data if x.lower() in ontologies]
+                        else:
+                            valid_entities = ontologies
                         if len(valid_entities) > 0:
                             logger.info("These entities will be imported: {}".format(", ".join(valid_entities)))
                             print("These entities will be loaded into the database: {}".format(", ".join(valid_entities)))
-                            importer.ontologiesImport(importDirectory='../../../data/imports', ontologies=valid_entities)
+                            importer.ontologiesImport(importDirectory='../../../data/imports', ontologies=valid_entities, download=download)
                         else:
                             logger.error("The indicated entities (--data) cannot be imported: {}".format(args.data))
                             print("The indicated entities (--data) cannot be imported: {}".format(args.data))

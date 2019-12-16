@@ -9,6 +9,7 @@ import pandas as pd
 import csv
 import obonet
 import re
+from datetime import date
 import logging
 import logging.config
 import sys
@@ -55,20 +56,20 @@ def parse_ontology(ontology, download=True):
     ontology_files = []
     if ontology in config["ontology_types"]:
         otype = config["ontology_types"][ontology]
-        if download:
-            if 'urls' in config:
-                if otype in config['urls']:
-                    urls = config['urls'][otype]
-                    for url in urls:
-                        f = url.split('/')[-1]
-                        ontology_files.append(os.path.join(ontology_directory, f))
+        if 'urls' in config:
+            if otype in config['urls']:
+                urls = config['urls'][otype]
+                for url in urls:
+                    f = url.split('/')[-1]
+                    ontology_files.append(os.path.join(ontology_directory, f))
+                    if download:
                         builder_utils.downloadDB(url, directory=ontology_directory)
-                elif otype in config["files"]:
-                    ofiles = config["files"][otype]
-                    ###Check SNOMED-CT files exist
-                    for f in ofiles:
-                        if os.path.isfile(os.path.join(directory, f)):
-                            ontology_files.append(os.path.join(directory, f))
+            elif otype in config["files"]:
+                ofiles = config["files"][otype]
+                ###Check SNOMED-CT files exist
+                for f in ofiles:
+                    if os.path.isfile(os.path.join(directory, f)):
+                        ontology_files.append(os.path.join(directory, f))
         filters = None
         if otype in config["parser_filters"]:
             filters = config["parser_filters"][otype]
@@ -108,6 +109,10 @@ def generate_graphFiles(import_directory, ontologies=None, download=True):
         entities = {}
         for ontology in ontologies:
             entities.update({ontology:config["ontologies"][ontology]})
+    
+    updated_on = None
+    if download:
+        updated_on = date.today()
 
     stats = set()
     for entity in entities:
@@ -126,7 +131,7 @@ def generate_graphFiles(import_directory, ontologies=None, download=True):
                     for term in terms[namespace]:
                         writer.writerow([term, entity, list(terms[namespace][term])[0], definitions[term], ontologyType, ",".join(terms[namespace][term])])
                 logger.info("Ontology {} - Number of {} entities: {}".format(ontology, name, len(terms[namespace])))
-                stats.add(builder_utils.buildStats(len(terms[namespace]), "entity", name, ontology, entity_outputfile))
+                stats.add(builder_utils.buildStats(len(terms[namespace]), "entity", name, ontology, entity_outputfile, updated_on))
                 if namespace in relationships:
                     relationships_outputfile = os.path.join(import_directory, name+"_has_parent.tsv")
                     relationshipsDf = pd.DataFrame(list(relationships[namespace]))
@@ -137,7 +142,7 @@ def generate_graphFiles(import_directory, ontologies=None, download=True):
                                                 quoting=csv.QUOTE_ALL,
                                                 line_terminator='\n', escapechar='\\')
                     logger.info("Ontology {} - Number of {} relationships: {}".format(ontology, name+"_has_parent", len(relationships[namespace])))
-                    stats.add(builder_utils.buildStats(len(relationships[namespace]), "relationships", name+"_has_parent", ontology, relationships_outputfile))
+                    stats.add(builder_utils.buildStats(len(relationships[namespace]), "relationships", name+"_has_parent", ontology, relationships_outputfile, updated_on))
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]

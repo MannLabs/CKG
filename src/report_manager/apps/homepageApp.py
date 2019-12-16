@@ -20,12 +20,13 @@ class HomePageApp(basicApp.BasicApp):
         args = {}
         args['valueCol'] = 'value'
         args['textCol'] = 'size'
-        args['x'] = 'index'
-        args['y'] = 'number'
+        args['y'] = 'index'
+        args['x'] = 'number'
+        args['orientation'] = 'h'
         args['title'] = ''
         args['x_title'] = ''
         args['y_title'] = ''
-        args['height'] = 700
+        args['height'] = 900
         args['width'] = 900
 
         self.add_basic_layout()

@@ -14,7 +14,7 @@ def parser(databases_directory, drug_source, download=True):
 
     output_file = 'sider_has_side_effect.tsv'
 
-    drugmapping = mp.getSTRINGMapping(config['SIDER_mapping'], source = drug_source, download = False, db = "STITCH")
+    drugmapping = mp.getSTRINGMapping(source = drug_source, download = download, db = "STITCH")
     phenotypemapping = mp.getMappingFromOntology(ontology="Phenotype", source = config['SIDER_source'])
     
     relationships = set()
@@ -26,12 +26,16 @@ def parser(databases_directory, drug_source, download=True):
     associations = gzip.open(fileName, 'r')
     for line in associations:
         data = line.decode('utf-8').rstrip("\r\n").split("\t")
-        drug = re.sub(r'CID\d', 'CIDm', data[1])
-        se = data[3]
+        drug = re.sub(r'CID\d', 'CIDm', data[0])
+        se = data[2]
+        evidence_from = str(data[3])
+        freq = data[4]
+        lower_bound = data[5]
+        upper_bound = data[6]
         if se.lower() in phenotypemapping and drug in drugmapping:
             for d in drugmapping[drug]:
                 p = phenotypemapping[se.lower()]
-                relationships.add((d, p, "HAS_SIDE_EFFECT", "SIDER", se))
+                relationships.add((d, p, "HAS_SIDE_EFFECT", "SIDER", se, evidence_from, freq, lower_bound, upper_bound))
     associations.close()
 
     return (relationships, header, output_file, drugmapping, phenotypemapping)

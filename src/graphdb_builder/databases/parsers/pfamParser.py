@@ -18,7 +18,7 @@ from graphdb_builder import mapping as mp
 #         Pfam          # 
 #########################
 
-def parser(databases_directory, import_directory, download=False):
+def parser(databases_directory, import_directory, download=True, updated_on=None):
     config = builder_utils.get_config(config_name="pfamConfig.yml", data_type='databases')
     
     entity_header = config['entity_header']
@@ -37,8 +37,6 @@ def parser(databases_directory, import_directory, download=False):
         if download:
             builder_utils.downloadDB(ftp_url+filename, directory)
 
-    print('FINISHED DOWNLOAD')
-    
     stats = set()
     if os.path.exists(os.path.join(directory, filename)):
         fhandler = builder_utils.read_gzipped_file(os.path.join(directory,filename))
@@ -113,12 +111,10 @@ def parser(databases_directory, import_directory, download=False):
             print_files(relationships['found_in_protein'], relationship_headers['found_in_protein'], outputfile=os.path.join(import_directory,'Functional_region_found_in_protein.tsv'), is_first=is_first)
             num_relationships['found_in_protein'] += len(relationships['found_in_protein'])
 
-        print('FILES WRITTEN')
-
-        stats.add(builder_utils.buildStats(num_entities, "entity", "Functional_region", "Pfam", 'Functional_region.tsv'))
+        stats.add(builder_utils.buildStats(num_entities, "entity", "Functional_region", "Pfam", 'Functional_region.tsv', updated_on))
 
         for rel in num_relationships:
-            stats.add(builder_utils.buildStats(num_relationships[rel], "relationship", rel.upper(), "Pfam", 'Functional_region_'+rel+'.tsv'))
+            stats.add(builder_utils.buildStats(num_relationships[rel], "relationship", rel.upper(), "Pfam", 'Functional_region_'+rel+'.tsv', updated_on))
 
     return stats
 
