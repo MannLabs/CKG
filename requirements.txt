@@ -34,7 +34,7 @@ dash-cytoscape==0.1.1
 decorator==4.4.0
 defusedxml==0.6.0
 dill==0.2.9
-django==2.2.4
+django==2.2.8
 django-class==2019.4.13
 ecos==2.0.7.post1
 entrypoints==0.3
