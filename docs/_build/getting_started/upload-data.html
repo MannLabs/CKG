@@ -1,0 +1,349 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Upload project experimental data &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Define data analysis parameters" href="data-analysis-config.html" />
+    <link rel="prev" title="Create a new project in the database" href="create-new-project.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> ClinicalKnowledgeGraph
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../INTRO.html">Clinical Knowledge Graph</a></li>
+</ul>
+<p class="caption"><span class="caption-text">First steps</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="connect-to-ckg.html">Connecting to the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-new-user.html">Create a new user in the graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-new-project.html">Create a new project in the database</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Upload project experimental data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#prepare-data-for-upload">Prepare data for upload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#additional-clinical-data-columns">Additional Clinical Data columns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#upload-data">Upload data</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data-analysis-config.html">Define data analysis parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="access-report.html">Accessing the analysis report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notifications.html">Report notifications</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Project Report</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../project_report/project-report.html">Generating a project report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project_report/project-tabs.html">Project report tabs</a></li>
+</ul>
+<p class="caption"><span class="caption-text">CKG Builder</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/ontologies.html">Ontology sources and raw file parsers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/databases.html">Biomedical databases and resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/experiments.html">Parsing experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/graphdb-builder.html">Building the graph database from one Python module</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/import-statistics.html">Clinical Knowledge Graph Statistics: Imports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/R-interface.html">Python - R interface</a></li>
+</ul>
+<p class="caption"><span class="caption-text">System Requirements</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../system_require/mac-os.html">Mac OS X requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system_require/linux.html">Linux requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system_require/windows.html">Windows requirements</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../src.html">Clinical Knowledge Graph package</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#backers">Backers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#history">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#code-of-conduct">Code of Conduct</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ClinicalKnowledgeGraph</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Upload project experimental data</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/getting_started/upload-data.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="upload-project-experimental-data">
+<h1>Upload project experimental data<a class="headerlink" href="#upload-project-experimental-data" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="prepare-data-for-upload">
+<h2>Prepare data for upload<a class="headerlink" href="#prepare-data-for-upload" title="Permalink to this headline">¶</a></h2>
+<p><strong>Clinical Data</strong></p>
+<p>Open the Clinical Data excel file, automatically download when the project was created, and fill in as much information as you can.
+Be aware that the following columns are mandatory to fill in:</p>
+<ul class="simple">
+<li><p><strong>subject external_id</strong>: This is the identifier your subject has in your study so far.</p></li>
+<li><p><strong>tissue</strong>: This is the name of the tissue each sample came from. Make sure it is also one of the tissues selected during Project creation.</p></li>
+<li><p><strong>disease</strong>: This should be identical to the disease you selected from the drop-down menu in the <a href="#id1"><span class="problematic" id="id2">`Project creation`_</span></a>.</p></li>
+<li><p><strong>biological_sample external_id</strong>: This is the identifier of the sample taken from your subject, if you have both blood and urine for every subject, you should correspondingly have two biological sample identifiers for each subject identifier.</p></li>
+<li><p><strong>biological_sample quantity</strong>: Amount of biological sampl.</p></li>
+<li><p><strong>biological_sample quantity_units</strong>: Unit.</p></li>
+<li><p><strong>analytical_sample external_id</strong>: If multiple analyses were performed on the same biological sample, eg. proteomics and transcriptomics, there should be multiple analytical sample identifiers for every biological sample.</p></li>
+<li><p><strong>analytical_sample quantity</strong>: Amount of sample used in the experiment.</p></li>
+<li><p><strong>analytical_sample quantity_units</strong>: Unit.</p></li>
+<li><p><strong>grouping1</strong>: Annotate grouping of each sample.</p></li>
+<li><p><strong>grouping2</strong>: If there are more than one grouping (two independent variables) use this column to add a second level.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Be aware, the two-independent-variable statistics is not yet implemented in the default analysis pipeline.</p>
+</div>
+<p>Additional clinical information about your study subjects can be added in the subsequent columns.
+Please use SNOWMED terms as headers for every new column you add. This will be used to gather existing information about the type of data you have.
+To find an adequate SNOMED term for your clinical variavles, please visit the <a class="reference external" href="https://browser.ihtsdotools.org/?perspective=full&amp;conceptId1=734000001&amp;edition=MAIN/2019-07-31&amp;release=&amp;languages=en">SNOMED browser</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To add a column with “Age” search for “age” in the SNOMED browser. This gives multiple matches, with the first one being: “Age (qualifier value), SCTID:397669002”. Please enter this information as your clinical variable column header with the SCTID in brackets: Age (qualifier value) (397669002)</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If an adequate SNOMED term is not available, please write an e-mail to <a class="reference external" href="mailto:annelaura&#46;bach&#37;&#52;&#48;cpr&#46;ku&#46;dk">annelaura<span>&#46;</span>bach<span>&#64;</span>cpr<span>&#46;</span>ku<span>&#46;</span>dk</a> with the subject “Header Creation, CKG”. In the email please provide your “missing” header and a description of what it is.</p>
+</div>
+<p><strong>Proteomics data</strong>
+Do not perform any imputations or similar on your data before uploading it. This will be carried out by the CKG.</p>
+<p>You can proceed to <a class="reference internal" href="#upload-data">Upload data</a> when you have prepared your experimental design file, and clinical and proteomics data.</p>
+</div>
+<div class="section" id="additional-clinical-data-columns">
+<h2>Additional Clinical Data columns<a class="headerlink" href="#additional-clinical-data-columns" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><strong>had_intervention</strong>: If a subject has been subjected to a determined medical intervention. For now, select only drugs that have been given to the subject (e.g. “327032007”). Use an appropriate SNOMED SCTID value.</p></li>
+<li><p><strong>had_intervention_type</strong>: This is the type of intervention applied to a subject. “drug treatment” is the only value available for now.</p></li>
+<li><p><strong>had_intervention_in_combination</strong>: Boolean. If True, requires more than one value in <strong>had_intervention</strong>.</p></li>
+<li><p><strong>had_intervention_response</strong>: “positive” or “negative”.</p></li>
+<li><p><strong>studies_intervention</strong>: A medical intervention under study in the project. For example, study subjects before and after stomach bypass (SCTID:442338001). Use an appropriate SNOMED SCTID value.</p></li>
+</ul>
+</div>
+<div class="section" id="upload-data">
+<h2>Upload data<a class="headerlink" href="#upload-data" title="Permalink to this headline">¶</a></h2>
+<p>In order to make data uploading simple, we created an app that takes care of this in only a few steps:</p>
+<p>Go to <a href="#id3"><span class="problematic" id="id4">`http://localhost:5000/apps/dataUploadApp/`_</span></a> or use the <code class="docutils literal notranslate"><span class="pre">Data</span> <span class="pre">Upload</span></code> button in the <a class="reference external" href="http://localhost:5000/">homepage app</a>, and follow the steps.</p>
+<ol class="arabic">
+<li><p>Fill in <code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">identifier</span></code> with your project external identifier from <a href="#id5"><span class="problematic" id="id6">`Project creation`_</span></a>.</p></li>
+<li><p>Select the type of data you will upload first</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">proteomics</span></code> or <code class="docutils literal notranslate"><span class="pre">longitudinal_proteomics</span></code> is selected, please also select the processing tool used (<code class="docutils literal notranslate"><span class="pre">MaxQuant</span></code> or <code class="docutils literal notranslate"><span class="pre">Spectronaut</span></code>).</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Drag and drop or select the files to upload to the selected data type.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Multiple files can be selected at once. This is specially important in the case of proteomics files, please make sure you select all of the relevant MS files at once.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Click <code class="docutils literal notranslate"><span class="pre">Upload</span> <span class="pre">Data</span></code>.</p></li>
+<li><p>Select another data type to upload, drag and drop or select the files to upload, and click <code class="docutils literal notranslate"><span class="pre">Upload</span> <span class="pre">Data</span></code>.</p></li>
+<li><p>When you have uploaded all the relevant files, click <code class="docutils literal notranslate"><span class="pre">Add</span> <span class="pre">to</span> <span class="pre">CKG</span></code>. After the <code class="docutils literal notranslate"><span class="pre">Add</span> <span class="pre">to</span> <span class="pre">CKG</span></code> is clicked, it will be deactivated. To restore its function, refresh the page.</p></li>
+<li><p>Once the data is uploaded, click <code class="docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Uploaded</span> <span class="pre">Files</span> <span class="pre">(.zip)</span></code> to download all the upload files in a compressed format.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When the files are uploaded, the filenames are shown under <code class="docutils literal notranslate"><span class="pre">Uploaded</span> <span class="pre">Files:</span></code></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To replace the files uploaded, just select the correct data type and processing tool, reselect the files and click <code class="docutils literal notranslate"><span class="pre">Upload</span> <span class="pre">Data</span></code> again.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Make sure the correct data type and processing tool (when applicable) are selected before selecting files.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="data-analysis-config.html" class="btn btn-neutral float-right" title="Define data analysis parameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="create-new-project.html" class="btn btn-neutral float-left" title="Create a new project in the database" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,398 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>graphdb_builder.ontologies.ontologies_controller &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> ClinicalKnowledgeGraph
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../INTRO.html">Clinical Knowledge Graph</a></li>
+</ul>
+<p class="caption"><span class="caption-text">First steps</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/connect-to-ckg.html">Connecting to the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/create-new-user.html">Create a new user in the graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/create-new-project.html">Create a new project in the database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/upload-data.html">Upload project experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/data-analysis-config.html">Define data analysis parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/access-report.html">Accessing the analysis report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/notifications.html">Report notifications</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Project Report</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../project_report/project-report.html">Generating a project report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../project_report/project-tabs.html">Project report tabs</a></li>
+</ul>
+<p class="caption"><span class="caption-text">CKG Builder</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ckg_builder/ontologies.html">Ontology sources and raw file parsers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ckg_builder/databases.html">Biomedical databases and resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ckg_builder/experiments.html">Parsing experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ckg_builder/graphdb-builder.html">Building the graph database from one Python module</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/import-statistics.html">Clinical Knowledge Graph Statistics: Imports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/R-interface.html">Python - R interface</a></li>
+</ul>
+<p class="caption"><span class="caption-text">System Requirements</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../system_require/mac-os.html">Mac OS X requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../system_require/linux.html">Linux requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../system_require/windows.html">Windows requirements</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.html">Clinical Knowledge Graph package</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../MANIFEST.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../MANIFEST.html#backers">Backers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../MANIFEST.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../MANIFEST.html#history">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../MANIFEST.html#code-of-conduct">Code of Conduct</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">ClinicalKnowledgeGraph</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>graphdb_builder.ontologies.ontologies_controller</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for graphdb_builder.ontologies.ontologies_controller</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">from</span> <span class="nn">graphdb_builder</span> <span class="k">import</span> <span class="n">mapping</span> <span class="k">as</span> <span class="n">mp</span><span class="p">,</span> <span class="n">builder_utils</span>
+<span class="kn">import</span> <span class="nn">config.ckg_config</span> <span class="k">as</span> <span class="nn">ckg_config</span>
+<span class="kn">import</span> <span class="nn">ckg_utils</span>
+<span class="kn">from</span> <span class="nn">graphdb_builder.ontologies.parsers</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">obonet</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">date</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">logging.config</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">log_config</span> <span class="o">=</span> <span class="n">ckg_config</span><span class="o">.</span><span class="n">graphdb_builder_log</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">builder_utils</span><span class="o">.</span><span class="n">setup_logging</span><span class="p">(</span><span class="n">log_config</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;ontologies_controller&quot;</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">builder_utils</span><span class="o">.</span><span class="n">setup_config</span><span class="p">(</span><span class="s1">&#39;ontologies&#39;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Reading configuration &gt; </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+
+<span class="c1">#########################</span>
+<span class="c1"># General functionality #</span>
+<span class="c1">#########################</span>
+
+<div class="viewcode-block" id="entries_to_remove"><a class="viewcode-back" href="../../../_autosummary/graphdb_builder.ontologies.html#graphdb_builder.ontologies.ontologies_controller.entries_to_remove">[docs]</a><span class="k">def</span> <span class="nf">entries_to_remove</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">the_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function removes pairs from a given dictionary, based on a list of provided keys.</span>
+<span class="sd">    </span>
+<span class="sd">    :param list entries: list of keys to be deleted from dictionary.</span>
+<span class="sd">    :param dict the_dict: dictionary.</span>
+<span class="sd">    :return: The original dictionary minus the key,value pairs from the provided entries list.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">the_dict</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">the_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+
+<span class="c1">############################</span>
+<span class="c1"># Calling the right parser #</span>
+<span class="c1">############################</span>
+<div class="viewcode-block" id="parse_ontology"><a class="viewcode-back" href="../../../_autosummary/graphdb_builder.ontologies.html#graphdb_builder.ontologies.ontologies_controller.parse_ontology">[docs]</a><span class="k">def</span> <span class="nf">parse_ontology</span><span class="p">(</span><span class="n">ontology</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parses and extracts data from a given ontology file(s), and returns a tuple with multiple dictionaries.</span>
+
+<span class="sd">    :param str ontology: acronym of the ontology to be parsed (e.g. Disease Ontology:&#39;DO&#39;).</span>
+<span class="sd">    :param bool download: wether database is to be downloaded.</span>
+<span class="sd">    :return: Tuple with three nested dictionaries: terms, relationships between terms, and definitions of the terms.\</span>
+<span class="sd">            For more information on the returned dictionaries, see the documentation for any ontology parser.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">directory</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ontologies_directory&quot;</span><span class="p">]</span>
+    <span class="n">ontology_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">ontology</span><span class="p">)</span>
+    <span class="n">builder_utils</span><span class="o">.</span><span class="n">checkDirectory</span><span class="p">(</span><span class="n">ontology_directory</span><span class="p">)</span>
+    <span class="n">ontology_files</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">ontology</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ontology_types&quot;</span><span class="p">]:</span>
+        <span class="n">otype</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ontology_types&quot;</span><span class="p">][</span><span class="n">ontology</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;urls&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">otype</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;urls&#39;</span><span class="p">]:</span>
+                <span class="n">urls</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;urls&#39;</span><span class="p">][</span><span class="n">otype</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">urls</span><span class="p">:</span>
+                    <span class="n">f</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">ontology_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ontology_directory</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">download</span><span class="p">:</span>
+                        <span class="n">builder_utils</span><span class="o">.</span><span class="n">downloadDB</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">directory</span><span class="o">=</span><span class="n">ontology_directory</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">otype</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">]:</span>
+                <span class="n">ofiles</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">][</span><span class="n">otype</span><span class="p">]</span>
+                <span class="c1">###Check SNOMED-CT files exist</span>
+                <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">ofiles</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">f</span><span class="p">)):</span>
+                        <span class="n">ontology_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
+        <span class="n">filters</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">otype</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;parser_filters&quot;</span><span class="p">]:</span>
+            <span class="n">filters</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;parser_filters&quot;</span><span class="p">][</span><span class="n">otype</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ontology_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ontology</span> <span class="o">==</span> <span class="s2">&quot;SNOMED-CT&quot;</span><span class="p">:</span>
+            <span class="n">ontologyData</span> <span class="o">=</span> <span class="n">snomedParser</span><span class="o">.</span><span class="n">parser</span><span class="p">(</span><span class="n">ontology_files</span><span class="p">,</span> <span class="n">filters</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">ontology</span> <span class="o">==</span> <span class="s2">&quot;ICD&quot;</span><span class="p">:</span>
+            <span class="n">ontologyData</span> <span class="o">=</span> <span class="n">icdParser</span><span class="o">.</span><span class="n">parser</span><span class="p">(</span><span class="n">ontology_files</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ontologyData</span> <span class="o">=</span> <span class="n">oboParser</span><span class="o">.</span><span class="n">parser</span><span class="p">(</span><span class="n">ontology</span><span class="p">,</span> <span class="n">ontology_files</span><span class="p">)</span>
+            <span class="n">mp</span><span class="o">.</span><span class="n">buildMappingFromOBO</span><span class="p">(</span><span class="n">ontology_files</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ontology</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ontology</span> <span class="o">==</span> <span class="s2">&quot;SNOMED-CT&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;WARNING: SNOMED-CT terminology needs to be downloaded manually since it requires UMLS License. More information available here: https://www.nlm.nih.gov/databases/umls.html&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;WARNING: Ontology </span><span class="si">{}</span><span class="s2"> could not be downloaded. Check that the link in configuration works.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ontology</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">ontologyData</span></div>
+
+<span class="c1">#########################</span>
+<span class="c1">#       Graph files     #</span>
+<span class="c1">#########################</span>
+<div class="viewcode-block" id="generate_graphFiles"><a class="viewcode-back" href="../../../_autosummary/graphdb_builder.ontologies.html#graphdb_builder.ontologies.ontologies_controller.generate_graphFiles">[docs]</a><span class="k">def</span> <span class="nf">generate_graphFiles</span><span class="p">(</span><span class="n">import_directory</span><span class="p">,</span> <span class="n">ontologies</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function parses and extracts data from a given list of ontologies. If no ontologies are provided, \</span>
+<span class="sd">    all availables ontologies are used. Terms, relationships and definitions are saved as .tsv files to be loaded into \</span>
+<span class="sd">    the graph database.</span>
+
+<span class="sd">    :param str import_directory: relative path from current python module to &#39;imports&#39; directory.</span>
+<span class="sd">    :param ontologies: list of ontologies to be imported. If None, all available ontologies are imported.</span>
+<span class="sd">    :type ontologies: list or None</span>
+<span class="sd">    :param bool download: wether database is to be downloaded.</span>
+<span class="sd">    :return: Dictionary of tuples. Each tuple corresponds to a unique label/relationship type, date, time, \</span>
+<span class="sd">            database, and number of nodes and relationships.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">entities</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ontologies&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">ontologies</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">entities</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">ontology</span> <span class="ow">in</span> <span class="n">ontologies</span><span class="p">:</span>
+            <span class="n">entities</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">ontology</span><span class="p">:</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ontologies&quot;</span><span class="p">][</span><span class="n">ontology</span><span class="p">]})</span>
+    
+    <span class="n">updated_on</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">download</span><span class="p">:</span>
+        <span class="n">updated_on</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+
+    <span class="n">stats</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="n">entities</span><span class="p">:</span>
+        <span class="n">ontology</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ontologies&quot;</span><span class="p">][</span><span class="n">entity</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">ontology</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ontology_types&quot;</span><span class="p">]:</span>
+            <span class="n">ontologyType</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ontology_types&quot;</span><span class="p">][</span><span class="n">ontology</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">terms</span><span class="p">,</span> <span class="n">relationships</span><span class="p">,</span> <span class="n">definitions</span> <span class="o">=</span> <span class="n">parse_ontology</span><span class="p">(</span><span class="n">ontology</span><span class="p">,</span> <span class="n">download</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">namespace</span> <span class="ow">in</span> <span class="n">terms</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">namespace</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;entities&quot;</span><span class="p">]:</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;entities&quot;</span><span class="p">][</span><span class="n">namespace</span><span class="p">]</span>
+                <span class="n">entity_outputfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">import_directory</span><span class="p">,</span> <span class="n">name</span><span class="o">+</span><span class="s2">&quot;.tsv&quot;</span><span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">entity_outputfile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">csvfile</span><span class="p">:</span>
+                    <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">csvfile</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">escapechar</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">quotechar</span><span class="o">=</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="n">quoting</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">QUOTE_ALL</span><span class="p">)</span>
+                    <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;:LABEL&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;synonyms&#39;</span><span class="p">])</span>
+                    <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">terms</span><span class="p">[</span><span class="n">namespace</span><span class="p">]:</span>
+                        <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="n">term</span><span class="p">,</span> <span class="n">entity</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">terms</span><span class="p">[</span><span class="n">namespace</span><span class="p">][</span><span class="n">term</span><span class="p">])[</span><span class="mi">0</span><span class="p">],</span> <span class="n">definitions</span><span class="p">[</span><span class="n">term</span><span class="p">],</span> <span class="n">ontologyType</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">terms</span><span class="p">[</span><span class="n">namespace</span><span class="p">][</span><span class="n">term</span><span class="p">])])</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Ontology </span><span class="si">{}</span><span class="s2"> - Number of </span><span class="si">{}</span><span class="s2"> entities: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ontology</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">terms</span><span class="p">[</span><span class="n">namespace</span><span class="p">])))</span>
+                <span class="n">stats</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">builder_utils</span><span class="o">.</span><span class="n">buildStats</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">terms</span><span class="p">[</span><span class="n">namespace</span><span class="p">]),</span> <span class="s2">&quot;entity&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ontology</span><span class="p">,</span> <span class="n">entity_outputfile</span><span class="p">,</span> <span class="n">updated_on</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">namespace</span> <span class="ow">in</span> <span class="n">relationships</span><span class="p">:</span>
+                    <span class="n">relationships_outputfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">import_directory</span><span class="p">,</span> <span class="n">name</span><span class="o">+</span><span class="s2">&quot;_has_parent.tsv&quot;</span><span class="p">)</span>
+                    <span class="n">relationshipsDf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">relationships</span><span class="p">[</span><span class="n">namespace</span><span class="p">]))</span>
+                    <span class="n">relationshipsDf</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;START_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;END_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;TYPE&#39;</span><span class="p">]</span>
+                    <span class="n">relationshipsDf</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path_or_buf</span><span class="o">=</span><span class="n">relationships_outputfile</span><span class="p">,</span>
+                                                <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span>
+                                                <span class="n">header</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">quotechar</span><span class="o">=</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span>
+                                                <span class="n">quoting</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">QUOTE_ALL</span><span class="p">,</span>
+                                                <span class="n">line_terminator</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">escapechar</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Ontology </span><span class="si">{}</span><span class="s2"> - Number of </span><span class="si">{}</span><span class="s2"> relationships: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ontology</span><span class="p">,</span> <span class="n">name</span><span class="o">+</span><span class="s2">&quot;_has_parent&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">relationships</span><span class="p">[</span><span class="n">namespace</span><span class="p">])))</span>
+                    <span class="n">stats</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">builder_utils</span><span class="o">.</span><span class="n">buildStats</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">relationships</span><span class="p">[</span><span class="n">namespace</span><span class="p">]),</span> <span class="s2">&quot;relationships&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">+</span><span class="s2">&quot;_has_parent&quot;</span><span class="p">,</span> <span class="n">ontology</span><span class="p">,</span> <span class="n">relationships_outputfile</span><span class="p">,</span> <span class="n">updated_on</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_obj</span><span class="p">,</span> <span class="n">exc_tb</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">exc_tb</span><span class="o">.</span><span class="n">tb_frame</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_filename</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Ontology </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">, file: </span><span class="si">{}</span><span class="s2">,line: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ontology</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">(),</span> <span class="n">fname</span><span class="p">,</span> <span class="n">exc_tb</span><span class="o">.</span><span class="n">tb_lineno</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Error when importing ontology </span><span class="si">{}</span><span class="s2">.</span><span class="se">\n</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ontology</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">stats</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">generate_graphFiles</span><span class="p">(</span><span class="n">import_directory</span><span class="o">=</span><span class="s1">&#39;../../../data/imports&#39;</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> 
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

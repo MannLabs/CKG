@@ -147,13 +147,6 @@ IMPORT_PROTEIN_ANNOTATIONS:
         MERGE (p)-[r:ASSOCIATED_WITH{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type}]->(c)
         RETURN COUNT(r) AS protein_associated_with_cellular_component;
         USING PERIODIC COMMIT 10000
-        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Protein_Cellular_component_associated_with_integrated.tsv" AS line
-        FIELDTERMINATOR '\t'
-        MATCH (p:Protein {id:line.START_ID})
-        MATCH (c:Cellular_component {id:line.END_ID})
-        MERGE (p)-[r:ASSOCIATED_WITH_INTEGRATED{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type}]->(c)
-        RETURN COUNT(r) AS protein_associated_with_integrated_cellular_component;
-        USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Molecular_function_associated_with.tsv" AS line
         FIELDTERMINATOR '\t'
         MATCH (p:Protein {id:line.START_ID})
@@ -445,14 +438,18 @@ IMPORT_DRUG_SIDE_EFFECTS:
         FIELDTERMINATOR '\t'
         MATCH (d:Drug {id:line.START_ID})
         MATCH (p:Phenotype {id:line.END_ID})
-        MERGE (d)-[r:HAS_SIDE_EFFECT{source:line.source,original_side_effect_code:line.original_side_effect,evidence_from:line.evidence_from,frequency:line.frequency,lower_bound:line.lower_bound,upper_bound:line.upper_bound}]->(p)
+        MERGE (d)-[r:HAS_SIDE_EFFECT]->(p)
+        ON CREATE SET r.source=line.source,r.original_side_effect_code=line.original_side_effect,r.evidence_from=line.evidence_from,r.frequency=line.frequency,r.lower_bound=line.lower_bound,r.upper_bound=line.upper_bound
+        ON MATCH SET r.source=line.source,r.original_side_effect_code=line.original_side_effect,r.evidence_from=line.evidence_from,r.frequency=line.frequency,r.lower_bound=line.lower_bound,r.upper_bound=line.upper_bound
         RETURN COUNT(r) AS drug_has_side_effect_phenotype;
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_is_indicated_for.tsv" AS line
         FIELDTERMINATOR '\t'
         MATCH (d:Drug {id:line.START_ID})
         MATCH (p:Phenotype {id:line.END_ID})
-        MERGE (d)-[r:IS_INDICATED_FOR{source:line.source,original_side_effect_code:line.original_side_effect,evidence:line.evidence}]->(p)
+        MERGE (d)-[r:IS_INDICATED_FOR]->(p)
+        ON CREATE SET r.source=line.source,r.original_side_effect_code=line.original_side_effect,r.evidence=line.evidence
+        ON MATCH SET r.source=line.source,r.original_side_effect_code=line.original_side_effect,r.evidence=line.evidence
         RETURN COUNT(r) AS drug_is_indicated_for_phenotype;
         
 IMPORT_DRUG_ACTS_ON:
@@ -658,21 +655,21 @@ IMPORT_DATASETS:
             USING PERIODIC COMMIT 10000
             LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_subject_had_intervention.tsv" AS line
             FIELDTERMINATOR '\t'
-            MATCH (subject:Subject {id:line.START_ID})
+            MATCH (:Project {id:'PROJECTID'})-[:HAS_ENROLLED]-(subject:Subject {external_id:line.START_ID})
             MATCH (intervention:Clinical_variable {id:line.END_ID})
             MERGE (subject)-[r:HAD_INTERVENTION{type:line.type, in_combination:line.in_combination, response:line.response}]->(intervention)
             RETURN COUNT(r) AS interventions;
             USING PERIODIC COMMIT 10000 
             LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_clinical_state.tsv" AS line 
             FIELDTERMINATOR '\t'
-            MATCH (b:Biological_sample{id:line.START_ID})
+            MATCH (:Project {id:'PROJECTID'})-[:HAS_ENROLLED]-(:Subject)-[:BELONGS_TO_SUBJECT]-(b:Biological_sample {external_id:line.START_ID})
             MATCH (c:Clinical_variable{id:line.END_ID}) 
             MERGE (b)-[r:HAS_CLINICAL_STATE{value:line.value}]->(c)
             RETURN COUNT(r) AS PROJECTID_biological_sample_has_clinical_state_clinical_variable;
             USING PERIODIC COMMIT 10000 
             LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_clinical_quant.tsv" AS line 
             FIELDTERMINATOR '\t'
-            MATCH (b:Biological_sample{id:line.START_ID})
+            MATCH (:Project {id:'PROJECTID'})-[:HAS_ENROLLED]-(:Subject)-[:BELONGS_TO_SUBJECT]-(b:Biological_sample {external_id:line.START_ID})
             MATCH (c:Clinical_variable{id:line.END_ID}) 
             MERGE (b)-[r:HAS_QUANTIFIED_CLINICAL{value:toFloat(line.value)}]->(c)
             RETURN COUNT(r) AS PROJECTID_biological_sample_has_quantified_clinical_variable;
@@ -685,7 +682,9 @@ IMPORT_DATASETS:
             FIELDTERMINATOR '\t'
             MATCH (s:Analytical_sample {id:line.START_ID}) 
             MATCH (p:Protein{id:line.END_ID}) 
-            MERGE (s)-[r:HAS_QUANTIFIED_PROTEIN{value:toFloat(line.value),intensity:toFloat(line.Intensity),qvalue:toFloat(line.Qvalue),score:toFloat(line.Score),proteinGroup:line.id,is_razor:line.is_razor}]->(p)
+            MERGE (s)-[r:HAS_QUANTIFIED_PROTEIN]-(p)
+            ON CREATE SET r.value=toFloat(line.value),r.intensity=toFloat(line.Intensity),r.qvalue=toFloat(line.Qvalue),r.score=toFloat(line.Score),r.proteinGroup=line.id,r.is_razor=line.is_razor,r.NrOfStrippedSequencesMeasured=line.NrOfStrippedSequencesMeasured,r.NrOfStrippedSequencesIdentified=line.NrOfStrippedSequencesIdentified,r.NrOfPrecursorsIdentified=line.NrOfPrecursorsIdentified,r.IsSingleHit=line.IsSingleHit,r.NrOfStrippedSequencesUsedForQuantification=line.NrOfStrippedSequencesUsedForQuantification,r.PG.NrOfModifiedSequencesUsedForQuantification=line.PG.NrOfModifiedSequencesUsedForQuantification,r.NrOfPrecursorsUsedForQuantification=line.NrOfPrecursorsUsedForQuantification,r.MS1Quantity=line.MS1Quantity,r.MS2Quantity=line.MS2Quantity
+            ON MATCH SET r.value=toFloat(line.value),r.intensity=toFloat(line.Intensity),r.qvalue=toFloat(line.Qvalue),r.score=toFloat(line.Score),r.proteinGroup=line.id,r.is_razor=line.is_razor,r.NrOfStrippedSequencesMeasured=line.NrOfStrippedSequencesMeasured,r.NrOfStrippedSequencesIdentified=line.NrOfStrippedSequencesIdentified,r.NrOfPrecursorsIdentified=line.NrOfPrecursorsIdentified,r.IsSingleHit=line.IsSingleHit,r.NrOfStrippedSequencesUsedForQuantification=line.NrOfStrippedSequencesUsedForQuantification,r.PG.NrOfModifiedSequencesUsedForQuantification=line.PG.NrOfModifiedSequencesUsedForQuantification,r.NrOfPrecursorsUsedForQuantification=line.NrOfPrecursorsUsedForQuantification,r.MS1Quantity=line.MS1Quantity,r.MS2Quantity=line.MS2Quantity
             RETURN COUNT(r) AS PROJECTID_analytical_sample_has_quantified_protein;
             USING PERIODIC COMMIT 10000 
             LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_subject_peptide.tsv" AS line 
@@ -857,7 +856,7 @@ CREATE_SUBJECTS: &create_subject
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_disease.tsv" AS line 
         FIELDTERMINATOR '\t'
-        MATCH (s:Subject {id:line.START_ID})
+        MATCH (:Project {id:'PROJECTID'})-[:HAS_ENROLLED]-(s:Subject{external_id:line.START_ID})
         MATCH (d:Disease {id:line.END_ID}) 
         MERGE (s)-[r:HAS_DISEASE]->(d)
         RETURN COUNT(r) AS PROJECTID_subject_has_disease;
@@ -871,8 +870,8 @@ CREATE_BIOSAMPLES: &create_bio
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_biological_samples.tsv" AS line
         FIELDTERMINATOR '\t'
         MERGE (s:Biological_sample {id:line.ID})
-        ON CREATE SET s.external_id=line.external_id,s.quantity=line.quantity,s.quantity_units=line.quantity_units,s.source=line.source,s.collection_date=line.collection_date,s.conservation_conditions=line.conservation_conditions,s.storage=line.storage,s.status=line.status
-        RETURN COUNT(s) AS PROJECTID_biological_samples;
+        ON CREATE SET s.external_id=line.external_id
+        RETURN COUNT(s) AS PROJECTID_biosamples; 
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_subject_biosample.tsv" AS line 
         FIELDTERMINATOR '\t'
@@ -881,9 +880,15 @@ CREATE_BIOSAMPLES: &create_bio
         MERGE (b)-[r:BELONGS_TO_SUBJECT]->(s)
         RETURN COUNT(r) AS PROJECTID_biological_samples_belongs_to_subject;
         USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_biosamples_info.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (:Project {id:'PROJECTID'})-[:HAS_ENROLLED]-(:Subject)-[:BELONGS_TO_SUBJECT]-(s:Biological_sample {external_id:line.ID})
+        SET s.quantity=line.quantity,s.quantity_units=line.quantity_units,s.source=line.source,s.collection_date=line.collection_date,s.conservation_conditions=line.conservation_conditions,s.storage=line.storage,s.status=line.status
+        RETURN COUNT(s) AS PROJECTID_biosamples_updated;
+        USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_biosample_tissue.tsv" AS line 
         FIELDTERMINATOR '\t'
-        MATCH (b:Biological_sample {id:line.START_ID}) 
+        MATCH (:Project {id:'PROJECTID'})-[:HAS_ENROLLED]-(:Subject)-[:BELONGS_TO_SUBJECT]-(b:Biological_sample {external_id:line.START_ID})
         MATCH (t:Tissue {id:line.END_ID})
         MERGE (b)-[r:FROM_TISSUE]->(t)
         RETURN COUNT(r) AS PROJECTID_biological_samples_come_from_tissue;
@@ -898,15 +903,27 @@ CREATE_ANALYTICALSAMPLES: &create_ana
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_analytical_samples.tsv" AS line
         FIELDTERMINATOR '\t'
         MERGE (s:Analytical_sample {id:line.ID})
-        ON CREATE SET s.external_id=line.external_id,s.quantity=line.quantity,s.quantity_units=line.quantity_units,s.source=line.source,s.collection_date=line.collection_date,s.conservation_conditions=line.conservation_conditions,s.storage=line.storage,s.status=line.status,s.group=line.group,s.secondary_group=line.secondary_group
-        RETURN COUNT(s) AS PROJECTID_analytical_sample;
+        ON CREATE SET s.external_id=line.external_id
+        RETURN COUNT(s) AS PROJECTID_analytical_samples; 
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_biosample_analytical.tsv" AS line
         FIELDTERMINATOR '\t'
         MATCH (s1:Biological_sample {id:line.START_ID})
         MATCH (s2:Analytical_sample {id:line.END_ID}) 
-        MERGE (s1)-[r:SPLITTED_INTO{quantity:line.quantity,quantity_units:line.quantity_units}]->(s2)
+        MERGE (s1)-[r:SPLITTED_INTO]->(s2)
         RETURN COUNT(r) AS PROJECTID_biological_sample_splitted_into_analytical_sample;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_biosample_analytical_attributes.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (:Project {id:'PROJECTID'})-[:HAS_ENROLLED]-(:Subject)-[:BELONGS_TO_SUBJECT]-(:Biological_sample {external_id:line.START_ID})-[r:SPLITTED_INTO]-(:Analytical_sample {external_id:line.END_ID})
+        SET r.quantity=line.quantity,r.quantity_units=line.quantity_units
+        RETURN COUNT(r) AS PROJECTID_splitted_into_relationship_attributes;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_analytical_samples_info.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (:Project {id:'PROJECTID'})-[:HAS_ENROLLED]-(:Subject)-[:BELONGS_TO_SUBJECT]-(:Biological_sample)-[:SPLITTED_INTO]-(s:Analytical_sample {external_id:line.ID})
+        SET s.quantity=line.quantity,s.quantity_units=line.quantity_units,s.source=line.source,s.collection_date=line.collection_date,s.conservation_conditions=line.conservation_conditions,s.storage=line.storage,s.status=line.status,s.group=line.group,s.secondary_group=line.secondary_group
+        RETURN COUNT(s) AS PROJECTID_analytical_samples_updated; 
 
 CREATE_TIMEPOINT: &create_timepoint
     'name': 'create timepoint'
@@ -922,7 +939,7 @@ CREATE_TIMEPOINT: &create_timepoint
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_biological_sample_at_timepoint.tsv" AS line
         FIELDTERMINATOR '\t'
-        MATCH (b:Biological_sample {id:line.START_ID})
+        MATCH (:Project {id:'PROJECTID'})-[:HAS_ENROLLED]-(:Subject)-[:BELONGS_TO_SUBJECT]-(b:Biological_sample {external_id:line.START_ID})
         MATCH (t:Timepoint {id:line.END_ID}) 
         MERGE (b)-[r:SAMPLED_AT_TIMEPOINT{units:line.timepoint_units,intervention:line.intervention}]->(t)
         RETURN COUNT(r) AS PROJECTID_biological_sample_sampled_at_timepoint;

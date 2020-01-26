@@ -1,5 +1,7 @@
-directory : '../../../../data/experiments/PROJECTID/clinical/'
+clinical_directory : '../../../../data/experiments/PROJECTID/clinical/'
+design_directory : '../../../../data/experiments/PROJECTID/experimental_design/'
 separator: '|'
 
 file_clinical: 'ClinicalData_PROJECTID.xlsx'
 file_project: 'ProjectData_PROJECTID.xlsx'
+file_design: 'ExperimentalDesign_PROJECTID.xlsx'

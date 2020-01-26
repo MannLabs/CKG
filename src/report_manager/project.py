@@ -371,10 +371,8 @@ class Project:
             
     def build_project(self, force=False):
         if self.check_report_exists() and not force:
-            print("Loading project")
             self.load_project_report()
         elif force:
-            print("Force generate report")
             self.report = {}
             self.datasets = {}
         

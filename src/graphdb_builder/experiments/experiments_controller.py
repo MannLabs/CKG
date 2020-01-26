@@ -4,7 +4,6 @@ import os.path
 import pandas as pd
 import numpy as np
 from collections import defaultdict
-from graphdb_connector import connector
 from graphdb_builder import builder_utils
 from graphdb_builder.experiments.parsers import clinicalParser, proteomicsParser, wesParser
 import config.ckg_config as ckg_config
@@ -17,6 +16,7 @@ logger = builder_utils.setup_logging(log_config, key="experiments_controller")
 
 def generate_dataset_imports(projectId, dataType, dataset_import_dir):
     stats = set()
+    builder_utils.checkDirectory(dataset_import_dir)
     try:
         if dataType == 'clinical':
             data = clinicalParser.parser(projectId)
@@ -43,6 +43,7 @@ def generate_graph_files(data, dataType, projectId, stats, ot = 'w', dataset_imp
         outputfile = os.path.join(dataset_import_dir, projectId+".tsv")
     else:
         outputfile = os.path.join(dataset_import_dir, projectId+"_"+dataType.lower()+".tsv")
+    
     with open(outputfile, ot) as f:
         data.to_csv(path_or_buf = f, sep='\t',
             header=True, index=False, quotechar='"',
@@ -50,6 +51,7 @@ def generate_graph_files(data, dataType, projectId, stats, ot = 'w', dataset_imp
     
     logger.info("Experiment {} - Number of {} relationships: {}".format(projectId, dataType, data.shape[0]))
     stats.add(builder_utils.buildStats(data.shape[0], "relationships", dataType, "Experiment", outputfile))
+
 
 if __name__ == "__main__":
     pass

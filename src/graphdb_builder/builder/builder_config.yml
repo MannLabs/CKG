@@ -1,22 +1,33 @@
 ########################
-dataDirectory: '../../../data'
-#Import directory
-importDirectory: '../../../data/imports'
-#Archive directory
-archiveDirectory: '../../../data/archive'
-#Stats directory
-statsDirectory: '../../../data/imports/stats'
-#experiments import directory
-experimentsDirectory: '../../../data/imports/experiments'
-#databases import diretory
-databasesDirectory: '../../../data/imports/databases'
-#ontologies import diretory
-ontologiesDirectory: '../../../data/imports/ontologies'
-#curated import directory
-curatedDirectory: '../../../data/imports/curated'
-#users directory
-usersDirectory: '../../../data/users'
-usersImportDirectory: '../../../data/imports/users'
+directories:
+    dataDirectory: '../../data'
+    #Import directory
+    importDirectory: '../../data/imports'
+    #Archive directory
+    archiveDirectory: '../../data/archive'
+    #Stats directory
+    statsDirectory: '../../data/imports/stats'
+    #experiments import directory
+    experimentsDirectory: '../../data/imports/experiments'
+    #databases import diretory
+    databasesDirectory: '../../data/imports/databases'
+    #ontologies import diretory
+    ontologiesDirectory: '../../data/imports/ontologies'
+    #curated import directory
+    curatedDirectory: '../../data/imports/curated'
+    #users directory
+    usersDirectory: '../../data/users'
+    usersImportDirectory: '../../data/imports/users'
+    #temp directory
+    tmpDirectory: '../../data/tmp'
+    #Downloads directory
+    downloadsDirectory : '../../data/downloads'
+
+separator: '|'
+
+file_clinical: 'ClinicalData_PROJECTID.xlsx'
+file_project: 'ProjectData_PROJECTID.xlsx'
+file_design: 'ExperimentalDesign_PROJECTID.xlsx'
 
 download: True
 

@@ -6,19 +6,30 @@ from graphdb_builder import builder_utils
 from graphdb_connector import connector
 
 def parser(projectId):
-    data = {}
     cwd = os.path.abspath(os.path.dirname(__file__))
     config = builder_utils.get_config(config_name="clinical.yml", data_type='experiments')
-    directory = os.path.join(cwd, '../../../../data/experiments/PROJECTID/clinical/')
+    clinical_directory = os.path.join(cwd, '../../../../data/experiments/PROJECTID/clinical/')
+    design_directory = os.path.join(cwd, '../../../../data/experiments/PROJECTID/experimental_design/')
     separator = config["separator"]
-    if 'directory' in config:
-        directory = os.path.join(cwd, config['directory'])
-    directory = directory.replace('PROJECTID', projectId)
-    # driver = connector.getGraphDatabaseConnectionConfiguration()
+    if 'clinical_directory' in config:
+        clinical_directory = os.path.join(cwd, config['clinical_directory'])
+    clinical_directory = clinical_directory.replace('PROJECTID', projectId)
+    if 'design_directory' in config:
+        design_directory = os.path.join(cwd, config['design_directory'])
+    design_directory = design_directory.replace('PROJECTID', projectId)
+    project_dfs = project_parser(projectId, config, clinical_directory, separator)
+    design_dfs = experimental_desgin_parser(projectId, config, design_directory)
+    clinical_dfs = clinical_parser(projectId, config, clinical_directory, separator)
+    data = project_dfs
+    data.update(design_dfs)
+    data.update(clinical_dfs)
     
+    return data
+
+def project_parser(projectId, config, directory, separator):
+    data = {}
     project_data = parse_dataset(projectId, config, directory, key='project')
-    clinical_data = parse_dataset(projectId, config, directory, key='clinical')
-    if project_data is not None and clinical_data is not None:
+    if project_data is not None:
         data[('info', 'w')] = extract_project_info(project_data)
         data[('responsibles', 'w')] = extract_responsible_rels(project_data, separator=separator)
         data[('participants', 'w')] = extract_participant_rels(project_data, separator=separator)
@@ -26,12 +37,29 @@ def parser(projectId):
         data[('studies_disease', 'w')] = extract_project_disease_rels(project_data, separator=separator)
         data[('studies_intervention', 'w')] = extract_project_intervention_rels(project_data, separator=separator)
         data[('timepoint', 'w')] = extract_timepoints(project_data, separator=separator)
-        data[('project', 'w')] = extract_project_subject_rels(project_data, clinical_data)
-        data[('subjects', 'w')] = extract_subject_identifiers(project_data, clinical_data)
-        data[('subject_biosample', 'w')] = extract_biological_sample_subject_rels(clinical_data)
-        data[('biological_samples', 'w')] = extract_biological_samples_info(clinical_data)
-        data[('analytical_samples', 'w')] = extract_analytical_samples_info(clinical_data)
-        data[('biosample_analytical', 'w')] = extract_biological_sample_analytical_sample_rels(clinical_data)
+    
+    return data
+
+def experimental_desgin_parser(projectId, config, directory):
+    data = {}
+    design_data = parse_dataset(projectId, config, directory, key='design')
+    if design_data is not None:
+        data[('project', 'w')] = extract_project_subject_rels(projectId, design_data)
+        data[('subjects', 'w')] = extract_subject_identifiers(design_data)
+        data[('biological_samples', 'w')] = extract_biosample_identifiers(design_data)
+        data[('analytical_samples', 'w')] = extract_analytical_sample_identifiers(design_data)
+        data[('subject_biosample', 'w')] = extract_biological_sample_subject_rels(design_data)
+        data[('biosample_analytical', 'w')] = extract_biological_sample_analytical_sample_rels(design_data)
+    return data
+
+def clinical_parser(projectId, config, directory, separator):
+    data = {}
+    project_data = parse_dataset(projectId, config, directory, key='project')
+    clinical_data = parse_dataset(projectId, config, directory, key='clinical')
+    if project_data is not None and clinical_data is not None:
+        data[('biosamples_info', 'w')] = extract_biological_samples_info(clinical_data)
+        data[('analytical_samples_info', 'w')] = extract_analytical_samples_info(clinical_data)
+        data[('biosample_analytical_attributes', 'w')] = extract_biosample_analytical_sample_relationship_attributes(clinical_data)
         data[('biological_sample_at_timepoint', 'w')] = extract_biological_sample_timepoint_rels(clinical_data)
         data[('biosample_tissue', 'w')] = extract_biological_sample_tissue_rels(clinical_data)
         data[('disease', 'w')] = extract_subject_disease_rels(clinical_data, separator=separator)
@@ -42,7 +70,6 @@ def parser(projectId):
         data[('clinical_quant', 'w')] = clinical_quant
         
     return data
-
 
 def parse_dataset(projectId, configuration, dataDir, key='project'):
     '''This function parses clinical data from subjects in the project
@@ -129,69 +156,104 @@ def extract_timepoints(project_data, separator='|'):
     
     return df
 
-def extract_project_subject_rels(project_data, clinical_data):
+########################
+
+def extract_project_subject_rels(projectId, design_data):
     df = pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE'])
-    if 'subject id' in clinical_data:
-        if not pd.isna(clinical_data['subject id']).any():
-            df = pd.DataFrame(clinical_data['subject id'].dropna().unique(), columns=['END_ID'])
-            df.insert(loc=0, column='START_ID', value=project_data['external_id'][0])
+    if 'subject external_id' in design_data:
+        if not pd.isna(design_data['subject id']).any():
+            df = pd.DataFrame(design_data['subject id'].dropna().unique(), columns=['END_ID'])
+            df.insert(loc=0, column='START_ID', value=projectId)
             df['TYPE'] = 'HAS_ENROLLED'
     
     return df
 
-def extract_subject_identifiers(project_data, clinical_data):
+def extract_subject_identifiers(design_data):
     df = pd.DataFrame(columns=['ID', 'external_id'])
-    data = clinical_data.set_index('subject id').copy()
+    data = design_data.set_index('subject id').copy()
     if not pd.isna(data['subject external_id']).any():
         df = data[['subject external_id']].dropna(axis=0).reset_index()
         df = df.drop_duplicates(keep='first').reset_index(drop=True)
         df.columns = ['ID', 'external_id']
-        if int(project_data['subjects'][0]) != len(df['ID']):
-            df = pd.DataFrame(columns=['ID', 'external_id'])
             
     return df
+########################
+#New desgin_data functions
 
-def extract_biological_sample_subject_rels(clinical_data):
+def extract_biosample_identifiers(design_data):
+    df = pd.DataFrame(columns=['ID', 'external_id'])
+    data = design_data.set_index('biological_sample id').copy()
+    if not pd.isna(data['biological_sample external_id']).any():
+        df = data[['biological_sample external_id']].dropna(axis=0).reset_index()
+        df = df.drop_duplicates(keep='first').reset_index(drop=True)
+        df.columns = ['ID', 'external_id']
+
+    return df
+
+
+def extract_analytical_sample_identifiers(design_data):
+    df = pd.DataFrame(columns=['ID', 'external_id'])
+    data = design_data.set_index('analytical_sample id').copy()
+    if not pd.isna(data['analytical_sample external_id']).any():
+        df = data[['analytical_sample external_id']].dropna(axis=0).reset_index()
+        df = df.drop_duplicates(keep='first').reset_index(drop=True)
+        df.columns = ['ID', 'external_id']
+        
+    return df
+############################
+
+def extract_biological_sample_subject_rels(design_data):
     df = pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE'])
-    if 'biological_sample id' in clinical_data:
-        if not pd.isna(clinical_data['biological_sample id']).any():
-            df = clinical_data[['biological_sample id', 'subject id']].drop_duplicates(keep='first').reset_index(drop=True)
+    if 'biological_sample id' in design_data:
+        if not pd.isna(design_data['biological_sample id']).any():
+            df = design_data[['biological_sample id', 'subject id']].drop_duplicates(keep='first').reset_index(drop=True)
             df.columns = ['START_ID', 'END_ID']
             df['TYPE'] = 'BELONGS_TO_SUBJECT'
     
     return df
 
+def extract_biological_sample_analytical_sample_rels(design_data):
+    df = pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE'])
+    if 'analytical_sample id' in design_data:
+        if not pd.isna(design_data['analytical_sample external_id']).any():
+            df = design_data[['biological_sample id', 'analytical_sample id']].drop_duplicates(keep='first').reset_index(drop=True)
+            df.columns = ['START_ID', 'END_ID']
+            df['TYPE'] = 'SPLITTED_INTO'
+    
+    return df
+############################
+
 def extract_biological_samples_info(clinical_data):
     df = pd.DataFrame(columns=['ID'])
-    if 'biological_sample id' in clinical_data:
-        if not pd.isna(clinical_data['biological_sample id']).any():
+    if 'biological_sample external_id' in clinical_data:
+        if not pd.isna(clinical_data['biological_sample external_id']).any():
             cols = [i for i in clinical_data.columns if str(i).startswith('biological_sample')]
             df = clinical_data[cols]
             df.columns=[col.replace('biological_sample ', '') for col in cols]
-            df = df.rename(columns={'id':'ID'})
+            df = df.rename(columns={'external_id':'ID'})
             df = df.drop_duplicates(keep='first').reset_index(drop=True)
     
     return df
 
 def extract_analytical_samples_info(clinical_data):
     df = pd.DataFrame(columns=['ID', 'group', 'secondary_group'])
-    if 'analytical_sample id' in clinical_data:
-        if not pd.isna(clinical_data['analytical_sample id']).any():
+    if 'analytical_sample external_id' in clinical_data:
+        if not pd.isna(clinical_data['analytical_sample external_id']).any():
             cols = [i for i in clinical_data.columns if str(i).startswith('analytical_sample')]
             df = clinical_data[cols]
             df.columns = [col.replace('analytical_sample ', '') for col in cols]
-            df = df.rename(columns={'id':'ID'})
+            df = df.rename(columns={'external_id':'ID'})
             df[['group', 'secondary_group']] = clinical_data[['grouping1', 'grouping2']]
     
     return df
 
-def extract_biological_sample_analytical_sample_rels(clinical_data):
+def extract_biosample_analytical_sample_relationship_attributes(clinical_data):
     df = pd.DataFrame(columns=['START_ID', 'END_ID', 'quantity', 'quantity_units'])
-    if 'analytical_sample id' in clinical_data:
-        if not pd.isna(clinical_data['analytical_sample id']).any():
-            df = clinical_data[['biological_sample id', 'analytical_sample id', 'analytical_sample quantity', 'analytical_sample quantity_units']].drop_duplicates(keep='first').reset_index(drop=True)
+    if 'analytical_sample external_id' in clinical_data:
+        if not pd.isna(clinical_data['analytical_sample external_id']).any():
+            df = clinical_data[['biological_sample external_id', 'analytical_sample external_id', 'analytical_sample quantity', 'analytical_sample quantity_units']].drop_duplicates(keep='first').reset_index(drop=True)
             df.columns = ['START_ID', 'END_ID', 'quantity', 'quantity_units']
-            df.insert(loc=2, column='TYPE', value='SPLITTED_INTO')
+            # df.insert(loc=2, column='TYPE', value='SPLITTED_INTO')
     
     return df
 
@@ -199,7 +261,7 @@ def extract_biological_sample_timepoint_rels(clinical_data):
     df = pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE','timepoint_units', 'intervention'])
     if 'timepoint' in clinical_data:
         if not pd.isna(clinical_data['timepoint']).all():
-            df = clinical_data[['biological_sample id', 'timepoint', 'timepoint units', 'intervention id']].drop_duplicates(keep='first').reset_index(drop=True)
+            df = clinical_data[['biological_sample external_id', 'timepoint', 'timepoint units', 'intervention id']].drop_duplicates(keep='first').reset_index(drop=True)
             df['intervention id'] = df['intervention id'].replace(np.nan, 0).astype('int64').astype('str').replace('0', np.nan)
             df.columns = ['START_ID', 'END_ID', 'timepoint_units', 'intervention']
             df.insert(loc=2, column='TYPE', value='SAMPLE_AT_TIMEPOINT')
@@ -210,7 +272,7 @@ def extract_biological_sample_tissue_rels(clinical_data):
     df = pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE'])
     if 'tissue id' in clinical_data:
         if not pd.isna(clinical_data['tissue id']).all():
-            df = clinical_data[['biological_sample id', 'tissue id']].drop_duplicates(keep='first').reset_index(drop=True)
+            df = clinical_data[['biological_sample external_id', 'tissue id']].drop_duplicates(keep='first').reset_index(drop=True)
             df.columns = ['START_ID', 'END_ID']
             df['TYPE'] = 'FROM_TISSUE'
     
@@ -221,8 +283,8 @@ def extract_subject_disease_rels(clinical_data, separator='|'):
     if 'disease id' in clinical_data:
         if not pd.isna(clinical_data['disease id']).all():
             clinical_data['disease id'] = clinical_data['disease id'].astype(str)
-            df = pd.DataFrame(clinical_data['disease id'].str.split(separator).tolist(), index=clinical_data['subject id']).stack()
-            df = df.reset_index([0, 'subject id']).replace('nan', np.nan).dropna().drop_duplicates(keep='first')
+            df = pd.DataFrame(clinical_data['disease id'].str.split(separator).tolist(), index=clinical_data['subject external_id']).stack()
+            df = df.reset_index([0, 'subject external_id']).replace('nan', np.nan).dropna().drop_duplicates(keep='first')
             df.columns = ['START_ID', 'END_ID']
             df['TYPE'] = 'HAS_DISEASE'
     
@@ -232,13 +294,13 @@ def extract_subject_intervention_rels(clinical_data, separator='|'):
     df = pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE', 'in_combination', 'response'])
     if 'had_intervention' in clinical_data:
         if not pd.isna(clinical_data['had_intervention']).all():
-            interventions = clinical_data.set_index('subject id')['had_intervention'].str.split(separator, expand=True).stack().str.strip().reset_index(level=1, drop=True)
+            interventions = clinical_data.set_index('subject external_id')['had_intervention'].str.split(separator, expand=True).stack().str.strip().reset_index(level=1, drop=True)
             
             ##Uncomment line if clinical variable name is also included
             # interventions = interventions.str.split().str[-1].str.extract(r'.*\((.*)\).*')[0]
-            types = clinical_data.set_index('subject id')['had_intervention_type'].str.split(separator, expand=True).stack().str.strip().reset_index(level=1, drop=True)
-            combi = clinical_data.set_index('subject id')['had_intervention_in_combination'].str.split(separator, expand=True).stack().str.strip().reset_index(level=1, drop=True)
-            response = clinical_data.set_index('subject id')['had_intervention_response'].str.split(separator, expand=True).stack().str.strip().reset_index(level=1, drop=True)
+            types = clinical_data.set_index('subject external_id')['had_intervention_type'].str.split(separator, expand=True).stack().str.strip().reset_index(level=1, drop=True)
+            combi = clinical_data.set_index('subject external_id')['had_intervention_in_combination'].str.split(separator, expand=True).stack().str.strip().reset_index(level=1, drop=True)
+            response = clinical_data.set_index('subject external_id')['had_intervention_response'].str.split(separator, expand=True).stack().str.strip().reset_index(level=1, drop=True)
             df = pd.concat([interventions, types, combi, response], axis=1).reset_index()
             df.columns = ['START_ID', 'END_ID', 'type', 'in_combination', 'response']
             df.insert(loc=2, column='TYPE', value='HAD_INTERVENTION')
@@ -249,10 +311,10 @@ def extract_biological_sample_group_rels(clinical_data):
     df = pd.DataFrame(columns=['START_ID', 'END_ID', 'primary', 'TYPE'])
     if 'grouping1' in clinical_data:
         if not pd.isna(clinical_data['grouping1']).all():
-            df = clinical_data[['biological_sample id', 'grouping1', 'grouping2']]
-            df = pd.melt(df, id_vars=['biological_sample id'], value_vars=['grouping1', 'grouping2'])
+            df = clinical_data[['biological_sample external_id', 'grouping1', 'grouping2']]
+            df = pd.melt(df, id_vars=['biological_sample external_id'], value_vars=['grouping1', 'grouping2'])
             df['primary'] = df['variable'].map(lambda x: x=='grouping1')
-            df = df.drop(['variable'], axis=1).dropna(subset=['value']).drop_duplicates(keep='first').sort_values('biological_sample id').reset_index(drop=True)
+            df = df.drop(['variable'], axis=1).dropna(subset=['value']).drop_duplicates(keep='first').sort_values('biological_sample external_id').reset_index(drop=True)
             df.columns = ['START_ID', 'END_ID', 'primary']
             df.insert(loc=2, column='TYPE', value='BELONGS_TO_GROUP')
     return df
@@ -260,8 +322,8 @@ def extract_biological_sample_group_rels(clinical_data):
 def extract_biological_sample_clinical_variables_rels(clinical_data):
     df_quant = pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE','value'])
     df_state = pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE','value'])
-    if 'biological_sample id' in clinical_data and 'grouping2' in clinical_data:
-        data = clinical_data.set_index('biological_sample id').copy()
+    if 'biological_sample external_id' in clinical_data and 'grouping2' in clinical_data:
+        data = clinical_data.set_index('biological_sample external_id').copy()
         df = data.loc[:,'grouping2':].drop('grouping2', axis=1)
         df.columns = [i.split()[-1] for i in df.columns]
         df.columns = df.columns.str.extract(r'.*\((.*)\).*')[0].tolist()

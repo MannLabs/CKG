@@ -1,0 +1,317 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Using Jupyter Notebooks with the Clinical Knowledge Graph &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Retrieving data from the Clinical Knowledge Graph database" href="ckg-queries.html" />
+    <link rel="prev" title="Clinical Knowledge Graph Statistics: Database" href="graphdb-statistics.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> ClinicalKnowledgeGraph
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../INTRO.html">Clinical Knowledge Graph</a></li>
+</ul>
+<p class="caption"><span class="caption-text">First steps</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/connect-to-ckg.html">Connecting to the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/create-new-user.html">Create a new user in the graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/create-new-project.html">Create a new project in the database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/upload-data.html">Upload project experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/data-analysis-config.html">Define data analysis parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/access-report.html">Accessing the analysis report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/notifications.html">Report notifications</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Project Report</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../project_report/project-report.html">Generating a project report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project_report/project-tabs.html">Project report tabs</a></li>
+</ul>
+<p class="caption"><span class="caption-text">CKG Builder</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/ontologies.html">Ontology sources and raw file parsers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/databases.html">Biomedical databases and resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/experiments.html">Parsing experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/graphdb-builder.html">Building the graph database from one Python module</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Features</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="import-statistics.html">Clinical Knowledge Graph Statistics: Imports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using Jupyter Notebooks with the Clinical Knowledge Graph</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#reporting-notebooks">Reporting notebooks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#development-notebooks">Development notebooks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="standard-analysis.html">Standardizing the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="R-interface.html">Python - R interface</a></li>
+</ul>
+<p class="caption"><span class="caption-text">System Requirements</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../system_require/mac-os.html">Mac OS X requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system_require/linux.html">Linux requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system_require/windows.html">Windows requirements</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../src.html">Clinical Knowledge Graph package</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#backers">Backers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#history">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#code-of-conduct">Code of Conduct</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ClinicalKnowledgeGraph</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Using Jupyter Notebooks with the Clinical Knowledge Graph</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/advanced_features/ckg-notebooks.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="using-jupyter-notebooks-with-the-clinical-knowledge-graph">
+<h1>Using Jupyter Notebooks with the Clinical Knowledge Graph<a class="headerlink" href="#using-jupyter-notebooks-with-the-clinical-knowledge-graph" title="Permalink to this headline">¶</a></h1>
+<p>The Jupyter Notebook is used to interact with the notebooks provided in the Clinical Knowledge Graph.
+This open-source application allows you to create and share code, vizualize outputs and integrated multiple big data tools.</p>
+<p>In order to get started, make sure you have Python installed (3.3 or greater) as well as Jupyter Notebook. The latter can be installed using pip (see below).For more detailed instructions, visit the <a class="reference external" href="https://jupyter.org/install.html">offical guide</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><style type="text/css">
+span.prompt1:before {
+  content: "$ ";
+}
+</style><span class="prompt1">python3 -m pip install --upgrade pip</span>
+<span class="prompt1">python3 -m pip install jupyter</span>
+</pre></div></div><p>Congratulations! Now you can run the notebook, by typing the following command in the Terminal (Mac/Linux):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="prompt1">jupyter notebook</span>
+</pre></div></div><p>Or,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="prompt1">jupyter-notebook</span>
+</pre></div></div><p>As part of the Clinical Knowledge Graph package, we provide a series of Jupyter notebooks to facilitate the analysis of data, database querying and the use of multiple visualization tools. These notebooks can be found in <code class="docutils literal notranslate"><span class="pre">src/notebooks</span></code>, under <code class="docutils literal notranslate"><span class="pre">reporting</span></code> or <code class="docutils literal notranslate"><span class="pre">development</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you would like to use two instances of the same notebook, just duplicate inplace and modify the name accordingly.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If the Clinical Knowledge Graph is deployed in a server, please set up a Jupyter Hub in order to allow access to the Jupyter Notebook.</p>
+</div>
+<div class="section" id="reporting-notebooks">
+<h2>Reporting notebooks<a class="headerlink" href="#reporting-notebooks" title="Permalink to this headline">¶</a></h2>
+<p>Reporting notebooks referes to Jupyter notebooks that have been finished and properly tested by the devleopers, and are ready to be used by the community.</p>
+<ul class="simple">
+<li><p><strong>project_reporting.ipynb</strong></p></li>
+</ul>
+<p>Easy access to all the projects in the graph database. Loads all the data from a specific project (e.g. “P0000001”) and shows the report in the notebook.
+This notebook enables the visualization of all the plots and tables that constitue a report, as well as all the dataframes used and produced during its generation.
+By accessing the data directly, you can use the python functionality to further the analysis or visualization.</p>
+<ul class="simple">
+<li><p><strong>working_with_R.ipynb</strong></p></li>
+</ul>
+<p>Notebook entirely written in R. One of the many advantages of using Jupyter notebooks is the possibility of writing in different programming languages.
+In this notebook, we demonstrate how R can be used to, similarly to <em>project_reporting.ipynb</em>, load a project and explore the analysis and plots.</p>
+<p>In the beginning of the notebook, we create costum functions to load a project, read the report, read a dataset, and plot and network from a json file.
+Other R functions like these can be developed by the users according to their needs.</p>
+<ul class="simple">
+<li><p><strong>Parallel plots.ipynb</strong></p></li>
+</ul>
+<p>An example of a new interactive visualization method, not currently implemented in the Clinical Knowledge Graph, but using data from a stored project. We start by loading all the data and the report of a specific project (e.g. “P0000001”), and accessing diferent dataframes within the proteomics dataset, as well as, the correlation network. This plot is then converted into a Pandas DataFrame and used as input for the interactive Parallel plot.</p>
+<p>The function is created and made interactive with Jupyter Widgets <code class="docutils literal notranslate"><span class="pre">interact</span></code> function (<code class="docutils literal notranslate"><span class="pre">ipywidgets.interact</span></code>), which automatically creates user interface (UI) controlos within the notebook. In this case, the user can select different clusters of proteins (from the correlation network) and observe their variation across groups.</p>
+<ul class="simple">
+<li><p><strong>Urachal Carcinoma Case Study.ipynb</strong></p></li>
+</ul>
+<p>Jupyter notebook depicting the use of the Clinical Knowledge Graph database and the analytics core as a decision support tool, proposing a drug candidate in a specific subject case.</p>
+<p>The project is analysed with the standard analytics workflow and a list of significantly differentially expressed proteins is returned. To further this analysis we first filter for regulated proteins that have been associated to the disease in study (lung cancer); we then search the database for known inhibitory drugs for these proteins; and to narrow down the list, we can query the database for each drug’s side effects. The treatment regimens are also available in the database and their side effects can be used to rank the proposed drugs. We can prioritize drugs with side effects dissimilar to the ones that caused an adverse reaction in the patient, and identify papers where these drugs have already been associated to the studied disease, further reducing the list of potential drugs candidates.</p>
+</div>
+<div class="section" id="development-notebooks">
+<h2>Development notebooks<a class="headerlink" href="#development-notebooks" title="Permalink to this headline">¶</a></h2>
+<p>In <code class="docutils literal notranslate"><span class="pre">src/report_manager/development</span></code> we gathered Jupyter notebooks with analysis and workflows we believe are of interest for the users but are still under development.</p>
+<p>When a notebook in this folder is functional and successfully benchmarked, the notebook is moved to the reporting directory.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ckg-queries.html" class="btn btn-neutral float-right" title="Retrieving data from the Clinical Knowledge Graph database" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="graphdb-statistics.html" class="btn btn-neutral float-left" title="Clinical Knowledge Graph Statistics: Database" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
