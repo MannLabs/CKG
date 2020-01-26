@@ -8,46 +8,15 @@ increment_project_id:
         MATCH (p:Project) 
         WITH toInteger(SPLIT(max(p.id), 'P')[1])+1 AS new_external_id, SIZE(SPLIT(max(p.id), 'P')[1]) AS length, SIZE(toString(toInteger(SPLIT(max(p.id), 'P')[1])+1)) AS new_length 
         RETURN SUBSTRING('P', 0, 1) + SUBSTRING('00000000000', 0, length-new_length) + new_external_id AS Project_external_id;
-increment_subject_id:
-    name: create new subject id
-    description: 'Returns a new Subject identifier based on existing subjects in the database (sequential identifier).'
-    involved_nodes:
-        - Subject
-    involved_rels:
-    query: >
-        MATCH (s:Subject)
-        WITH max(toInteger(SPLIT(s.id, 'S')[1]))+1 as new_id
-        RETURN new_id AS result;
-create_subjects:
-    name: create subjects from file
-    description: 'Creates Subject nodes and links them to Project nodes, directly from projectCreationApp (web app).'
+subject_number:
+    name:
+    description:
     involved_nodes:
         - Project
-        - Subject
     involved_rels:
     query: >
-        CREATE CONSTRAINT ON (s:Subject) ASSERT s.id IS UNIQUE;
-        USING PERIODIC COMMIT 10000
-        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_project.tsv" AS line 
-        FIELDTERMINATOR '\t'
-        MERGE (s:Subject {id:line.END_ID})
-        WITH s, line
-        MATCH (p:Project {id:line.START_ID})
-        MATCH (s) 
-        MERGE (p)-[r:HAS_ENROLLED]->(s)
-        RETURN COUNT(s) AS PROJECTID_subject, COUNT(r) AS PROJECTID_project_has_enrolled_subject;
-extract_project_subjects:
-    name: project subjects
-    description: 'Extracts subject ids from specific project id.'
-    involved_nodes:
-        - Project
-        - Subject
-    involved_rels:
-        - HAS_ENROLLED
-    query: >
-        MATCH (p:Project)-[r:HAS_ENROLLED]-(s:Subject)
-        WHERE p.id=$external_id
-        RETURN s.id;
+        MATCH (p:Project {id:$external_id})
+        RETURN p.subjects
 check_node:
     name: check node exists
     description: 'Returns node identifier if property with value exists in any specified node'
@@ -55,7 +24,7 @@ check_node:
         - Project
     involved_rels:
     query: >
-        MATCH (n:Project) WHERE n.PROPERTY=$value
-        RETURN n.id;
+        MATCH (n:NODE) WHERE n.PROPERTY=$value
+        RETURN n.name;
 
 

@@ -1,4 +1,4 @@
-a.button_link:link, a.button_link:visited {
+button.button_link, a.button_link:link, a.button_link:visited {
   color: rgb(255, 255, 255);
   background-color: rgb(32, 92, 204);
   text-transform: uppercase;
@@ -11,7 +11,7 @@ a.button_link:link, a.button_link:visited {
   text-decoration: none;
 }
 
-a.button_link:hover, a.button_link:active {
+button.button_link:hover, button.button_link:active, a.button_link:hover, a.button_link:active {
   color: rgb(32, 92, 204);
   background-color: rgb(255, 255, 255);
 }
@@ -36,4 +36,52 @@ a.nav_link:hover, a.nav_link:active {
 
 div {
   margin-bottom: 10px;
+}
+
+.navbar {
+  overflow: hidden;
+  background-color: #333;
+}
+
+.dropdown {
+  float: left;
+  overflow: hidden;
+}
+
+.dropdown .dropbtn {
+  font-size: 10px;  
+  border: none;
+  outline: none;
+  color: black;
+  padding: 14px 16px;
+  background-color: inherit;
+  font-family: inherit;
+  margin: 0;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  text-transform: uppercase;
+  background-color: #c2bdbd;
+  min-width: 60px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  float: none;
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+.dropdown-content a:hover {
+  background-color: #ddd;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
 }

@@ -10,21 +10,7 @@ from graphdb_connector import connector
 
 
 driver = connector.getGraphDatabaseConnectionConfiguration()
-
 DataTypes = ['proteomics', 'clinical', 'wes', 'longitudinal_proteomics', 'longitudinal_clinical']
-Users = [(u['name']) for u in driver.nodes.match("User")]
-Tissues = [(t['name']) for t in driver.nodes.match("Tissue")]
-Diseases = [(d['name']) for d in driver.nodes.match("Disease")]
-
-query = 'MATCH (n:Clinical_variable) RETURN n.name,n.id LIMIT 20'
-df = pd.DataFrame(connector.getCursorData(driver, query).values)
-if not df.empty:
-    df[0] = ['({0})'.format(i) for i in df[0].tolist()]
-    ClinicalVariables = df[[1, 0]].apply(lambda x: ' '.join(x),axis=1).tolist()
-
-template_cols = pd.read_excel(os.path.join(os.getcwd(), 'apps/templates/ClinicalData_template.xlsx'))
-template_cols = template_cols.columns.tolist()
-
 
 class ProjectCreationApp(basicApp.BasicApp):
     """
@@ -40,6 +26,9 @@ class ProjectCreationApp(basicApp.BasicApp):
         """
         Builds page with the basic layout from *basicApp.py* and adds relevant Dash components for project creation.
         """
+        Users = [(u['name']) for u in driver.nodes.match("User")]
+        Tissues = [(t['name']) for t in driver.nodes.match("Tissue")]
+        Diseases = [(d['name']) for d in driver.nodes.match("Disease")]
         self.add_basic_layout()
         layout = [html.Div([
                     html.Div([html.H4('Project information', style={'width':'15.5%', 'verticalAlign':'top', 'display':'inline-block'}),
@@ -79,7 +68,7 @@ class ProjectCreationApp(basicApp.BasicApp):
                                                  style={'width':'49%', 'marginLeft':'2%', 'verticalAlign':'top', 'display':'inline-block'}),
                               html.Div(children=[dcc.Dropdown(id='tissue-picker', options=[{'label':i, 'value':i} for i in Tissues], value=[], multi=True, searchable=True, style={'width':'100%'})],
                                                  style={'width':'49%', 'marginLeft': '0%', 'verticalAlign':'top', 'display':'inline-block'}),
-                              html.Div(children=[dcc.Dropdown(id='intervention-picker', options=[{'label':i, 'value':i} for i in ClinicalVariables], value=[], multi=True, searchable=True, style={'width':'100%'})],
+                              html.Div(children=[dcc.Input(id='intervention-picker', placeholder='E.g. SNOMED identifier|SNOMED identifier|...', type='text', style={'width':'100%', 'height':'54px'})],
                                                  style={'width':'49%', 'marginLeft': '2%', 'verticalAlign':'top', 'display':'inline-block'}),
                               html.Br(),
                               html.Br(),

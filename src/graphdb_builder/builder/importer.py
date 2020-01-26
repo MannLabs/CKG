@@ -30,6 +30,7 @@ import_id = uuid4()
 try:
     cwd = os.path.abspath(os.path.dirname(__file__))
     config = builder_utils.setup_config('builder')
+    directories = builder_utils.get_full_path_directories()
     oconfig = builder_utils.setup_config('ontologies')
     dbconfig = builder_utils.setup_config('databases')
     econfig = builder_utils.setup_config('experiments')
@@ -86,9 +87,9 @@ def experimentsImport(projects=None, n_jobs=1, import_type="partial"):
     :param int n_jobs: number of jobs to run in parallel. 1 by default when updating one project.
     :param str import_type: type of import (´full´ or ´partial´).
     """
-    experiments_import_directory = os.path.join(config['importDirectory'],econfig["import_directory"])
+    experiments_import_directory = os.path.join(directories['importDirectory'],econfig["import_directory"])
     builder_utils.checkDirectory(experiments_import_directory)
-    experiments_directory = os.path.join(config['dataDirectory'],econfig["experiments_directory"])
+    experiments_directory = os.path.join(directories['dataDirectory'],econfig["experiments_directory"])
     if projects is None:
         projects = builder_utils.listDirectoryFolders(experiments_directory)
     Parallel(n_jobs=n_jobs)(delayed(experimentImport)(experiments_import_directory, experiments_directory, project) for project in projects)
@@ -130,7 +131,7 @@ def fullImport(download=True, n_jobs=4):
     and create it otherwise. Calls setupStats.
     """
     try:
-        importDirectory = config["importDirectory"]
+        importDirectory = directories["importDirectory"]
         builder_utils.checkDirectory(importDirectory)
         setupStats(import_type='full')
         logger.info("Full import: importing all Ontologies")
@@ -176,7 +177,7 @@ def setupStats(import_type):
     """
     Creates a stats object that will collect all the statistics collected from each import.
     """
-    statsDirectory = config["statsDirectory"]
+    statsDirectory = directories["statsDirectory"]
     statsFile = os.path.join(statsDirectory, config["statsFile"])
     statsCols = config["statsCols"]
     statsName = getStatsName(import_type)
@@ -232,7 +233,7 @@ def writeStats(statsDf, import_type, stats_name=None):
     :param statsDf: a pandas dataframe with the new statistics from the importing.
     :param str statsName: If the statistics should be stored with a specific name.
     """
-    stats_directory = config["statsDirectory"]
+    stats_directory = directories["statsDirectory"]
     stats_file = os.path.join(stats_directory, config["statsFile"])
     try: 
         if stats_name is None:

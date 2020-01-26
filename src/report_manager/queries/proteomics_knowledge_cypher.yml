@@ -6,7 +6,6 @@ Disease:
     - Disease
   involved_rels:
     - ASSOCIATED_WITH
-    - ASSOCIATED_WITH_INTEGRATED
   query: >
           MATCH (project:Project)-[:STUDIES_DISEASE]-(d:Disease)-[:HAS_PARENT]->(parent_disease:Disease)
           WHERE project.id="PROJECTID"
@@ -21,8 +20,7 @@ Drug:
     - Protein
     - Drug
   involved_rels:
-    - ASSOCIATED_WITH
-    - ASSOCIATED_WITH_INTEGRATED
+    - ACTS_ON
   query: >
           MATCH (protein:Protein)-[r:ACTS_ON]-(drug:Drug)
           WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS]) AND toFloat(r.score)>0.9
@@ -73,7 +71,6 @@ association_disease_score:
     - Disease
   involved_rels:
     - ASSOCIATED_WITH
-    - ASSOCIATED_WITH_INTEGRATED
   example:
           - proteins = ['A1BG~P04217','A2M~P01023','ACACB~O00763','ACTC1~P68032','ADIPOQ~Q15848','AGT~P01019','AIFM2~Q9BRQ8','APOA2~V9GYM3']
           - disease  = ['DOID:1324']

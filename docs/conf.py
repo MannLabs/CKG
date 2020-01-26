@@ -14,7 +14,8 @@ import os
 import sys
 import sphinx_rtd_theme
 
-sys.path.insert(0, os.path.abspath('../..'))
+cwd = os.path.abspath(os.path.dirname(__file__))
+sys.path.insert(0, os.path.abspath(os.path.join(cwd, '..')))
 
 # -- Project information -----------------------------------------------------
 
@@ -203,3 +204,13 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/3.5/': None}
+
+
+# A string of reStructuredText that will be included at the end of every source 
+# file that is read.
+rst_epilog = """
+
+.. |pic2| image:: ../src/report_manager/assets/banner.jpg
+           :alt: ckg logo
+
+"""

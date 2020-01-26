@@ -98,7 +98,7 @@ class ProjectApp(basicApp.BasicApp):
                                 target='', 
                                 n_clicks=0,
                                 className="button_link")]),
-                            html.Div([html.H3("Change Analysis Configurations: "),
+                            html.Div([html.H3("Change Analysis' Configuration: "),
                             dcc.Dropdown(
                                 id='my-dropdown',
                                 options=[

@@ -1,0 +1,758 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>analytics_core.analytics.wgcnaAnalysis &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> ClinicalKnowledgeGraph
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../INTRO.html">Clinical Knowledge Graph</a></li>
+</ul>
+<p class="caption"><span class="caption-text">First steps</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/connect-to-ckg.html">Connecting to the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/create-new-user.html">Create a new user in the graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/create-new-project.html">Create a new project in the database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/upload-data.html">Upload project experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/data-analysis-config.html">Define data analysis parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/access-report.html">Accessing the analysis report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/notifications.html">Report notifications</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Project Report</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../project_report/project-report.html">Generating a project report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../project_report/project-tabs.html">Project report tabs</a></li>
+</ul>
+<p class="caption"><span class="caption-text">CKG Builder</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ckg_builder/ontologies.html">Ontology sources and raw file parsers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ckg_builder/databases.html">Biomedical databases and resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ckg_builder/experiments.html">Parsing experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ckg_builder/graphdb-builder.html">Building the graph database from one Python module</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/import-statistics.html">Clinical Knowledge Graph Statistics: Imports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/R-interface.html">Python - R interface</a></li>
+</ul>
+<p class="caption"><span class="caption-text">System Requirements</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../system_require/mac-os.html">Mac OS X requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../system_require/linux.html">Linux requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../system_require/windows.html">Windows requirements</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.html">Clinical Knowledge Graph package</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../MANIFEST.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../MANIFEST.html#backers">Backers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../MANIFEST.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../MANIFEST.html#history">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../MANIFEST.html#code-of-conduct">Code of Conduct</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">ClinicalKnowledgeGraph</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>analytics_core.analytics.wgcnaAnalysis</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for analytics_core.analytics.wgcnaAnalysis</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">scp</span>
+<span class="kn">from</span> <span class="nn">scipy.cluster.hierarchy</span> <span class="k">import</span> <span class="n">distance</span><span class="p">,</span> <span class="n">linkage</span><span class="p">,</span> <span class="n">dendrogram</span><span class="p">,</span> <span class="n">fcluster</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span><span class="p">,</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">natsort</span> <span class="k">import</span> <span class="n">natsorted</span><span class="p">,</span> <span class="n">index_natsorted</span><span class="p">,</span> <span class="n">order_by_index</span>
+<span class="kn">import</span> <span class="nn">urllib.request</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">rpy2</span> <span class="k">import</span> <span class="n">robjects</span> <span class="k">as</span> <span class="n">ro</span>
+    <span class="kn">from</span> <span class="nn">rpy2.robjects</span> <span class="k">import</span> <span class="n">pandas2ri</span>
+    <span class="kn">from</span> <span class="nn">rpy2.robjects.packages</span> <span class="k">import</span> <span class="n">importr</span>
+    <span class="kn">from</span> <span class="nn">rpy2.robjects.vectors</span> <span class="k">import</span> <span class="n">StrVector</span><span class="p">,</span> <span class="n">FloatVector</span>
+    <span class="kn">import</span> <span class="nn">rpy2.robjects.packages</span> <span class="k">as</span> <span class="nn">rpacks</span>
+    <span class="kn">from</span> <span class="nn">analytics_core</span> <span class="k">import</span> <span class="n">R_wrapper</span>
+    <span class="n">pandas2ri</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
+    <span class="c1"># sys.setrecursionlimit(10000)</span>
+
+    <span class="c1">#Call R</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">ro</span><span class="o">.</span><span class="n">r</span>
+    <span class="n">R</span><span class="p">(</span><span class="s1">&#39;options(stringsAsFactors = FALSE)&#39;</span><span class="p">)</span>
+    <span class="c1">#R(&#39;source(&quot;http://bioconductor.org/biocLite.R&quot;)&#39;)</span>
+    <span class="c1">#R(&#39;biocLite(c(&quot;GO.db&quot;, &quot;preprocessCore&quot;, &quot;impute&quot;))&#39;)</span>
+
+
+    <span class="c1">#Call R packages</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="n">R_wrapper</span><span class="o">.</span><span class="n">call_Rpackage</span><span class="p">(</span><span class="s2">&quot;package&quot;</span><span class="p">,</span> <span class="s2">&quot;base&quot;</span><span class="p">)</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">R_wrapper</span><span class="o">.</span><span class="n">call_Rpackage</span><span class="p">(</span><span class="s2">&quot;package&quot;</span><span class="p">,</span> <span class="s2">&quot;stats&quot;</span><span class="p">)</span>
+    <span class="n">WGCNA</span> <span class="o">=</span> <span class="n">R_wrapper</span><span class="o">.</span><span class="n">call_Rpackage</span><span class="p">(</span><span class="s2">&quot;package&quot;</span><span class="p">,</span> <span class="s2">&quot;WGCNA&quot;</span><span class="p">)</span>
+    <span class="n">flashClust</span> <span class="o">=</span> <span class="n">R_wrapper</span><span class="o">.</span><span class="n">call_Rpackage</span><span class="p">(</span><span class="s1">&#39;package&#39;</span><span class="p">,</span> <span class="s1">&#39;flashClust&#39;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WGCNA functions will not work. Module Rpy2 not installed.&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_data"><a class="viewcode-back" href="../../../_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.get_data">[docs]</a><span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">drop_cols_exp</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">,</span> <span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="s1">&#39;sample&#39;</span><span class="p">,</span> <span class="s1">&#39;index&#39;</span><span class="p">],</span> <span class="n">drop_cols_cli</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">,</span> <span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="s1">&#39;biological_sample&#39;</span><span class="p">,</span> <span class="s1">&#39;index&#39;</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    This function cleanes up and formats experimental and clinical data into similarly shaped dataframes.</span>
+<span class="sd">    </span>
+<span class="sd">    :param dict data: dictionary with processed clinical and proteomics datasets.</span>
+<span class="sd">    :param list drop_cols_exp: list of columns to drop from processed experimental (protemics/rna-seq/dna-seq) dataframe.</span>
+<span class="sd">    :param list drop_cols_cli: list of columns to drop from processed clinical dataframe.</span>
+<span class="sd">    :return: Dictionary with experimental and clinical dataframes (keys are the same as in the input dictionary).  </span>
+<span class="sd">    &quot;&quot;&quot;</span>   
+    <span class="n">wgcna_data</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="s1">&#39;clinical&#39;</span><span class="p">:</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+                <span class="n">df</span><span class="p">[</span><span class="s1">&#39;rows&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;subject&#39;</span><span class="p">,</span> <span class="s1">&#39;group&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;rows&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">natsorted</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">drop_cols_cli</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+                <span class="n">df</span><span class="p">[</span><span class="s1">&#39;rows&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;subject&#39;</span><span class="p">,</span> <span class="s1">&#39;group&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;rows&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">natsorted</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">drop_cols_exp</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="n">wgcna_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span>
+
+    <span class="k">return</span> <span class="n">wgcna_data</span></div>
+
+
+<div class="viewcode-block" id="get_dendrogram"><a class="viewcode-back" href="../../../_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.get_dendrogram">[docs]</a><span class="k">def</span> <span class="nf">get_dendrogram</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">distfun</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">,</span> <span class="n">linkagefun</span><span class="o">=</span><span class="s1">&#39;ward&#39;</span><span class="p">,</span> <span class="n">div_clusters</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fcluster_method</span><span class="o">=</span><span class="s1">&#39;distance&#39;</span><span class="p">,</span> <span class="n">fcluster_cutoff</span><span class="o">=</span><span class="mi">15</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    This function calculates the distance matrix and performs hierarchical cluster analysis on a set of dissimilarities and methods for analyzing it.</span>
+<span class="sd">   </span>
+<span class="sd">    :param df: pandas dataframe with samples/subjects as index and features as columns.</span>
+<span class="sd">    :param list labels: labels for the leaves of the tree.</span>
+<span class="sd">    :param str distfun: distance measure to be used (&#39;euclidean&#39;, &#39;maximum&#39;, &#39;manhattan&#39;, &#39;canberra&#39;, &#39;binary&#39;, &#39;minkowski&#39; or &#39;jaccard&#39;).</span>
+<span class="sd">    :param str linkagefun: hierarchical/agglomeration method to be used (&#39;single&#39;, &#39;complete&#39;, &#39;average&#39;, &#39;weighted&#39;, &#39;centroid&#39;, &#39;median&#39; or &#39;ward&#39;).</span>
+<span class="sd">    :param bool div_clusters: dividing dendrogram leaves into clusters (True or False).</span>
+<span class="sd">    :param str fcluster_method: criterion to use in forming flat clusters.</span>
+<span class="sd">    :param int fcluster_cutoff: maximum cophenetic distance between observations in each cluster.</span>
+<span class="sd">    :return: Dictionary of data structures computed to render the dendrogram. Keys: &#39;icoords&#39;, &#39;dcoords&#39;, &#39;ivl&#39; and &#39;leaves&#39;. If div_clusters is used, it will also return a dictionary of each cluster and respective leaves.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># np.random.seed(112736)</span>
+    <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">distfun</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">as_dist</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">distfun</span><span class="p">))</span>
+
+        <span class="n">Z</span> <span class="o">=</span> <span class="n">linkage</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">linkagefun</span><span class="p">)</span>
+
+        <span class="n">Z_dendrogram</span> <span class="o">=</span> <span class="n">dendrogram</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">no_plot</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">div_clusters</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">clusters</span> <span class="o">=</span> <span class="n">get_clusters_elements</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">fcluster_method</span><span class="p">,</span> <span class="n">fcluster_cutoff</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Z_dendrogram</span><span class="p">,</span> <span class="n">clusters</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Z_dendrogram</span>
+
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="get_clusters_elements"><a class="viewcode-back" href="../../../_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.get_clusters_elements">[docs]</a><span class="k">def</span> <span class="nf">get_clusters_elements</span><span class="p">(</span><span class="n">linkage_matrix</span><span class="p">,</span> <span class="n">fcluster_method</span><span class="p">,</span> <span class="n">fcluster_cutoff</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    This function implements the generation of flat clusters from an hierarchical clustering with the same interface as scipy.cluster.hierarchy.fcluster.</span>
+<span class="sd">    </span>
+<span class="sd">    :param ndarray linkage_matrix: hierarchical clustering encoded with a linkage matrix.</span>
+<span class="sd">    :param str fcluster_method: criterion to use in forming flat clusters (&#39;inconsistent&#39;, &#39;distance&#39;, &#39;maxclust&#39;, &#39;monocrit&#39;, &#39;maxclust_monocrit&#39;).</span>
+<span class="sd">    :param float fcluster_cutoff: maximum cophenetic distance between observations in each cluster.</span>
+<span class="sd">    :param list labels: labels for the leaves of the dendrogram.</span>
+<span class="sd">    :return: A dictionary where keys are the cluster numbers and values are the dendrogram leaves.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">clust</span> <span class="o">=</span> <span class="n">fcluster</span><span class="p">(</span><span class="n">linkage_matrix</span><span class="p">,</span> <span class="n">fcluster_cutoff</span><span class="p">,</span> <span class="n">fcluster_method</span><span class="p">)</span>
+    <span class="n">clusters</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">clust</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+        <span class="n">clusters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">clusters</span></div>
+
+<div class="viewcode-block" id="filter_df_by_cluster"><a class="viewcode-back" href="../../../_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.filter_df_by_cluster">[docs]</a><span class="k">def</span> <span class="nf">filter_df_by_cluster</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">number</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Select only the members of a defined cluster.</span>
+<span class="sd">    </span>
+<span class="sd">    :param df: pandas dataframe with samples/subjects as index and features as columns.</span>
+<span class="sd">    :param dict clusters: clusters dictionary from get_dendrogram function if div_clusters option was True.</span>
+<span class="sd">    :param int number: cluster number (key).</span>
+<span class="sd">    :return: Pandas dataframe with all the features (columns) and samples/subjects belonging to the defined cluster (index).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">clusters</span><span class="p">[</span><span class="n">number</span><span class="p">])]</span></div>
+
+<div class="viewcode-block" id="df_sort_by_dendrogram"><a class="viewcode-back" href="../../../_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.df_sort_by_dendrogram">[docs]</a><span class="k">def</span> <span class="nf">df_sort_by_dendrogram</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">Z_dendrogram</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Reorders pandas dataframe by index and according to the dendrogram list of leaf nodes labels.</span>
+
+<span class="sd">    :param df: pandas dataframe with the labels to be reordered as index.</span>
+<span class="sd">    :param dict Z_dendrogram: dictionary of data structures computed to render the dendrogram. Keys: &#39;icoords&#39;, &#39;dcoords&#39;, &#39;ivl&#39; and &#39;leaves&#39;.</span>
+<span class="sd">    :return: Reordered pandas dataframe.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">CategoricalIndex</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">categories</span><span class="o">=</span><span class="n">Z_dendrogram</span><span class="p">[</span><span class="s1">&#39;ivl&#39;</span><span class="p">])</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="get_percentiles_heatmap"><a class="viewcode-back" href="../../../_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.get_percentiles_heatmap">[docs]</a><span class="k">def</span> <span class="nf">get_percentiles_heatmap</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">Z_dendrogram</span><span class="p">,</span> <span class="n">bydendro</span><span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">bycols</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    This function transforms the absolute values in each row or column (option &#39;bycols&#39;) into relative values.</span>
+<span class="sd">    </span>
+<span class="sd">    :param df: pandas dataframe with samples/subjects as index and features as columns.</span>
+<span class="sd">    :param dict Z_dendrogram: dictionary of data structures computed to render the dendrogram. Keys: &#39;icoords&#39;, &#39;dcoords&#39;, &#39;ivl&#39; and &#39;leaves&#39;.</span>
+<span class="sd">    :param bool bydendro: if labels should be ordered according to dendrogram list of leaf nodes labels set to True, otherwise set to False.</span>
+<span class="sd">    :param bool bycols: relative values calculated across rows (samples) then set to False. Calculation performed across columns (features) set to True.</span>
+<span class="sd">    :return: Pandas dataframe.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">bydendro</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">df2</span> <span class="o">=</span> <span class="n">df_sort_by_dendrogram</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">Z_dendrogram</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">df2</span> <span class="o">=</span> <span class="n">df</span>
+
+    <span class="n">p</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">df2</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">df2</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">bycols</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">df2</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df2</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">pct</span> <span class="o">=</span> <span class="p">(</span><span class="n">df2</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">df2</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">j</span><span class="p">,:]))</span> <span class="o">/</span> <span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">df2</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="p">:])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">df2</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="p">:]))</span> <span class="o">*</span> <span class="mf">1.</span><span class="p">)</span>
+                <span class="n">pct</span> <span class="o">=</span> <span class="n">pct</span> <span class="o">-</span> <span class="p">(</span><span class="n">pct</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.</span> <span class="o">/</span> <span class="mi">40</span> <span class="c1">#have to rescale it to account for endpoints of cmaps</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pct</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df2</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">df2</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">pct</span> <span class="o">=</span> <span class="p">(</span><span class="n">df2</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">df2</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="n">j</span><span class="p">]))</span> <span class="o">/</span> <span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">df2</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="n">j</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">df2</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="n">j</span><span class="p">]))</span> <span class="o">*</span> <span class="mf">1.</span><span class="p">)</span>
+                <span class="n">pct</span> <span class="o">=</span> <span class="n">pct</span> <span class="o">-</span> <span class="p">(</span><span class="n">pct</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.</span> <span class="o">/</span> <span class="mi">40</span> <span class="c1">#have to rescale it to account for endpoints of cmaps</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">pct</span>
+    <span class="k">return</span> <span class="n">p</span></div>
+
+<div class="viewcode-block" id="get_miss_values_df"><a class="viewcode-back" href="../../../_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.get_miss_values_df">[docs]</a><span class="k">def</span> <span class="nf">get_miss_values_df</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Proccesses pandas dataframe so missing values can be plotted in heatmap with specific color.</span>
+
+<span class="sd">    :param data: pandas dataframe.</span>
+<span class="sd">    :return: Pandas dataframe with missing values as integer 1, and originally valid values as NaN.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+<div class="viewcode-block" id="paste_matrices"><a class="viewcode-back" href="../../../_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.paste_matrices">[docs]</a><span class="k">def</span> <span class="nf">paste_matrices</span><span class="p">(</span><span class="n">matrix1</span><span class="p">,</span> <span class="n">matrix2</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Takes two matrices with analog shapes and concatenates each value in matrix 1 with corresponding one in matrix 2, returning a single pandas dataframe.</span>
+
+<span class="sd">    :param ndarray matrix1: input 1</span>
+<span class="sd">    :param ndarray matrix2: input 2</span>
+<span class="sd">    :return: Pandas dataframe.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#a = pandas2ri.ri2py(matrix1)</span>
+    <span class="c1">#b = pandas2ri.ri2py(matrix2)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">matrix1</span><span class="p">,</span> <span class="n">matrix2</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">):</span>
+            <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;</span><span class="si">{:0.2}</span><span class="s1">&lt;br&gt;</span><span class="si">{:.0e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)))</span>
+    
+    <span class="n">text</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">text</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">matrix1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">matrix1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">textMatrix</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">rows</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">textMatrix</span></div>
+
+<div class="viewcode-block" id="cutreeDynamic"><a class="viewcode-back" href="../../../_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.cutreeDynamic">[docs]</a><span class="k">def</span> <span class="nf">cutreeDynamic</span><span class="p">(</span><span class="n">distmatrix</span><span class="p">,</span> <span class="n">linkagefun</span><span class="o">=</span><span class="s1">&#39;average&#39;</span><span class="p">,</span> <span class="n">minModuleSize</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;hybrid&#39;</span><span class="p">,</span> <span class="n">deepSplit</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">pamRespectsDendro</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">distfun</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function implements the R cutreeDynamic wrapper in Python, provinding an access point for methods of adaptive branh pruning of hierarchical clustering dendrograms.</span>
+
+<span class="sd">    :param data: pandas dataframe.</span>
+<span class="sd">    :param str distfun: distance measure to be used (&#39;euclidean&#39;, &#39;maximum&#39;, &#39;manhattan&#39;, &#39;canberra&#39;, &#39;binary&#39;, &#39;minkowski&#39; or &#39;jaccard&#39;).</span>
+<span class="sd">    :param str linkagefun: hierarchical/agglomeration method to be used (&#39;single&#39;, &#39;complete&#39;, &#39;average&#39;, &#39;weighted&#39;, &#39;centroid&#39;, &#39;median&#39; or &#39;ward&#39;).</span>
+<span class="sd">    :param int minModuleSize: minimum module size.</span>
+<span class="sd">    :param str method: method to use (&#39;hybrid&#39; or &#39;tree&#39;).</span>
+<span class="sd">    :param int deepSplit: provides a rough control over sensitivity to cluster splitting, the higher the value (with &#39;hybrid&#39; method) or if True (with &#39;tree&#39; method), the more and smaller modules.</span>
+<span class="sd">    :param bool pamRespectsDendro: only used for method &#39;hybrid&#39;. Objects and small modules will only be assigned to modules that belong to the same branch in the dendrogram structure.</span>
+<span class="sd">    :return: Numpy array of numerical labels giving assignment of objects to modules. Unassigned objects are labeled 0, the largest module has label 1, next largest 2 etc.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#if distfun is None:</span>
+    <span class="c1">#    dist = stats.as_dist(distmatrix)</span>
+    <span class="c1">#else:</span>
+    <span class="c1">#    dist = stats.dist(distmatrix, method = distfun)</span>
+          
+    <span class="n">R_function</span> <span class="o">=</span> <span class="n">R</span><span class="p">(</span><span class="s1">&#39;&#39;&#39; clusters &lt;- function(distmatrix, linkagefun, method, minModuleSize, deepSplit, pamRespectsDendro) {</span>
+<span class="s1">                                        cutreeDynamic(dendro=flashClust(as.dist(distmatrix),method=linkagefun),</span>
+<span class="s1">                                                        distM=distmatrix, method=method, deepSplit=deepSplit,</span>
+<span class="s1">                                                        pamRespectsDendro=pamRespectsDendro, minClusterSize=minModuleSize)} &#39;&#39;&#39;</span><span class="p">)</span>       
+    
+    <span class="n">cutree</span> <span class="o">=</span> <span class="n">R_function</span><span class="p">(</span><span class="n">distmatrix</span><span class="p">,</span> <span class="n">linkagefun</span><span class="o">=</span><span class="n">linkagefun</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">minModuleSize</span><span class="o">=</span><span class="n">minModuleSize</span><span class="p">,</span> <span class="n">deepSplit</span><span class="o">=</span><span class="n">deepSplit</span><span class="p">,</span> <span class="n">pamRespectsDendro</span><span class="o">=</span><span class="n">pamRespectsDendro</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cutree</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="build_network"><a class="viewcode-back" href="../../../_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.build_network">[docs]</a><span class="k">def</span> <span class="nf">build_network</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">softPower</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">networkType</span><span class="o">=</span><span class="s1">&#39;unsigned&#39;</span><span class="p">,</span> <span class="n">linkagefun</span><span class="o">=</span><span class="s1">&#39;average&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;hybrid&#39;</span><span class="p">,</span> <span class="n">minModuleSize</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">deepSplit</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">pamRespectsDendro</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">merge_modules</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">MEDissThres</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Weighted gene network construction and module detection. Calculates co-expression similarity and adjacency, topological overlap matrix (TOM) and clusters features in modules.</span>
+
+<span class="sd">    :param data: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.</span>
+<span class="sd">    :param int softPower: soft-thresholding power.</span>
+<span class="sd">    :param str networkType: network type (&#39;unsigned&#39;, &#39;signed&#39;, &#39;signed hybrid&#39;, &#39;distance&#39;).</span>
+<span class="sd">    :param str linkagefun: hierarchical/agglomeration method to be used (&#39;single&#39;, &#39;complete&#39;, &#39;average&#39;, &#39;weighted&#39;, &#39;centroid&#39;, &#39;median&#39; or &#39;ward&#39;).</span>
+<span class="sd">    :param str method: method to use (&#39;hybrid&#39; or &#39;tree&#39;).</span>
+<span class="sd">    :param int minModuleSize: minimum module size.</span>
+<span class="sd">    :paran int deepSplit: provides a rough control over sensitivity to cluster splitting, the higher the value (with &#39;hybrid&#39; method) or if True (with &#39;tree&#39; method), the more and smaller modules.</span>
+<span class="sd">    :param bool pamRespectsDendro: only used for method &#39;hybrid&#39;. Objects and small modules will only be assigned to modules that belong to the same branch in the dendrogram structure.</span>
+<span class="sd">    :param bool merge_modules: if True, very similar modules are merged.</span>
+<span class="sd">    :param float MEDissThres: maximum dissimilarity (i.e., 1-correlation) that qualifies modules for merging.</span>
+<span class="sd">    :param int verbose: integer level of verbosity. Zero means silent, higher values make the output progressively more and more verbose.</span>
+<span class="sd">    :return: Tuple with TOM dissimilarity pandas dataframe, numpy array with module colors per experimental feature.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#Calculate adjacencies</span>
+    <span class="n">adjacency</span> <span class="o">=</span> <span class="n">WGCNA</span><span class="o">.</span><span class="n">adjacency</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">power</span><span class="o">=</span><span class="n">softPower</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">networkType</span><span class="p">)</span>
+
+    <span class="c1">#Transforms the adjacency into topological overlap matrix (TOM)</span>
+    <span class="n">TOM</span> <span class="o">=</span> <span class="n">WGCNA</span><span class="o">.</span><span class="n">TOMsimilarity</span><span class="p">(</span><span class="n">adjacency</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span><span class="p">)</span>
+
+    <span class="c1">#Calculates the corresponding dissimilarity matrix</span>
+    <span class="n">dissTOM</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">R</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">)</span> <span class="o">-</span> <span class="n">TOM</span><span class="p">)</span>
+    <span class="n">dissTOM</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span>
+    <span class="n">dissTOM</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span>
+
+    <span class="c1">#Identify co-expression modules</span>
+    <span class="n">moduleColors</span> <span class="o">=</span> <span class="n">identify_module_colors</span><span class="p">(</span><span class="n">dissTOM</span><span class="p">,</span> <span class="n">linkagefun</span><span class="o">=</span><span class="n">linkagefun</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">minModuleSize</span><span class="o">=</span><span class="n">minModuleSize</span><span class="p">,</span> <span class="n">deepSplit</span><span class="o">=</span><span class="n">deepSplit</span><span class="p">,</span> <span class="n">pamRespectsDendro</span><span class="o">=</span><span class="n">pamRespectsDendro</span><span class="p">)</span>
+
+    <span class="c1">#Merge modules whose expression profiles are very similar</span>
+    <span class="k">if</span> <span class="n">merge_modules</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">MEs</span><span class="p">,</span> <span class="n">moduleColors</span> <span class="o">=</span> <span class="n">merge_similar_modules</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">moduleColors</span><span class="p">,</span> <span class="n">MEDissThres</span><span class="o">=</span><span class="n">MEDissThres</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">dissTOM</span><span class="p">,</span> <span class="n">moduleColors</span></div>
+
+<div class="viewcode-block" id="pick_softThreshold"><a class="viewcode-back" href="../../../_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.pick_softThreshold">[docs]</a><span class="k">def</span> <span class="nf">pick_softThreshold</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">RsquaredCut</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">networkType</span><span class="o">=</span><span class="s1">&#39;unsigned&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Analysis of scale free topology for multiple soft thresholding powers. Aids the user in choosing a proper soft-thresholding power for network construction.</span>
+<span class="sd">    </span>
+<span class="sd">    :param data: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.</span>
+<span class="sd">    :param float RsquaredCut: desired minimum scale free topology fitting index R^2.</span>
+<span class="sd">    :param str networkType: network type (&#39;unsigned&#39;, &#39;signed&#39;, &#39;signed hybrid&#39;, &#39;distance&#39;).</span>
+<span class="sd">    :param int verbose: integer level of verbosity. Zero means silent, higher values make the output progressively more and more verbose.</span>
+<span class="sd">    :return: Estimated appropriate soft-thresholding power: the lowest power for which the scale free topology fit R^2 exceeds RsquaredCut.</span>
+<span class="sd">    :rtype: int</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">powers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">sft</span> <span class="o">=</span> <span class="n">WGCNA</span><span class="o">.</span><span class="n">pickSoftThreshold</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">RsquaredCut</span><span class="o">=</span><span class="n">RsquaredCut</span><span class="p">,</span> <span class="n">powerVector</span><span class="o">=</span><span class="n">powers</span><span class="p">,</span> <span class="n">networkType</span><span class="o">=</span><span class="n">networkType</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="n">softPower</span> <span class="o">=</span> <span class="n">sft</span><span class="o">.</span><span class="n">rx2</span><span class="p">(</span><span class="s1">&#39;powerEstimate&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">softPower</span></div>
+
+<div class="viewcode-block" id="identify_module_colors"><a class="viewcode-back" href="../../../_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.identify_module_colors">[docs]</a><span class="k">def</span> <span class="nf">identify_module_colors</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">linkagefun</span><span class="o">=</span><span class="s1">&#39;average&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;hybrid&#39;</span><span class="p">,</span> <span class="n">minModuleSize</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">deepSplit</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">pamRespectsDendro</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Identifies co-expression modules and converts the numeric labels into colors.</span>
+<span class="sd">    </span>
+<span class="sd">    :param matrix: dissimilarity structure as produced by R.stats dist.</span>
+<span class="sd">    :param int minModuleSize: minimum module size.</span>
+<span class="sd">    :param int deepSplit: provides a rough control over sensitivity to cluster splitting, the higher the value (with &#39;hybrid&#39; method) or if True (with &#39;tree&#39; method), the more and smaller modules.</span>
+<span class="sd">    :param bool pamRespectsDendro: only used for method &#39;hybrid&#39;. Objects and small modules will only be assigned to modules that belong to the same branch in the dendrogram structure.</span>
+<span class="sd">    :return: Numpy array of strings with module color of each experimental feature.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dynamicMods</span> <span class="o">=</span> <span class="n">cutreeDynamic</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">linkagefun</span><span class="o">=</span><span class="n">linkagefun</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">minModuleSize</span><span class="o">=</span><span class="n">minModuleSize</span><span class="p">,</span> <span class="n">deepSplit</span><span class="o">=</span><span class="n">deepSplit</span><span class="p">,</span> <span class="n">pamRespectsDendro</span><span class="o">=</span><span class="n">pamRespectsDendro</span><span class="p">)</span>
+
+    <span class="n">dynamicColors</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">WGCNA</span><span class="o">.</span><span class="n">labels2colors</span><span class="p">(</span><span class="n">dynamicMods</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">dynamicColors</span></div>
+
+<div class="viewcode-block" id="calculate_module_eigengenes"><a class="viewcode-back" href="../../../_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.calculate_module_eigengenes">[docs]</a><span class="k">def</span> <span class="nf">calculate_module_eigengenes</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">modColors</span><span class="p">,</span> <span class="n">softPower</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">dissimilarity</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Calculates modules eigengenes to quantify co-expression similarity of entire modules.</span>
+
+<span class="sd">    :param data: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.</span>
+<span class="sd">    :param ndarray modColors: array (numeric, character or a factor) attributing module colors to each feature in the experimental dataframe.</span>
+<span class="sd">    :param int softPower: soft-thresholding power.</span>
+<span class="sd">    :param dissimilarity: calculates dissimilarity of module eigengenes.</span>
+<span class="sd">    :return: Pandas dataframe with calculated module eigengenes. If dissimilarity is set to True, returns a tuple with two pandas dataframes, the first with the module eigengenes and the second with the eigengenes dissimilarity. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">MEList</span> <span class="o">=</span> <span class="n">WGCNA</span><span class="o">.</span><span class="n">moduleEigengenes</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">modColors</span><span class="p">,</span> <span class="n">softPower</span><span class="o">=</span><span class="n">softPower</span><span class="p">)</span>
+    <span class="n">MEs0</span> <span class="o">=</span> <span class="n">MEList</span><span class="o">.</span><span class="n">rx2</span><span class="p">(</span><span class="s1">&#39;eigengenes&#39;</span><span class="p">)</span>
+    <span class="n">MEs</span> <span class="o">=</span> <span class="n">WGCNA</span><span class="o">.</span><span class="n">orderMEs</span><span class="p">(</span><span class="n">MEs0</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dissimilarity</span><span class="p">:</span>
+        <span class="n">MEcor</span> <span class="o">=</span> <span class="n">WGCNA</span><span class="o">.</span><span class="n">cor</span><span class="p">(</span><span class="n">MEs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">MEcor</span> <span class="o">=</span> <span class="n">R_wrapper</span><span class="o">.</span><span class="n">R_matrix2Py_matrix</span><span class="p">(</span><span class="n">MEcor</span><span class="p">,</span> <span class="n">MEcor</span><span class="o">.</span><span class="n">rownames</span><span class="p">,</span> <span class="n">MEcor</span><span class="o">.</span><span class="n">colnames</span><span class="p">)</span>
+        <span class="n">MEDiss</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">MEcor</span>
+        <span class="k">return</span> <span class="n">MEs</span><span class="p">,</span> <span class="n">MEDiss</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">MEs</span></div>
+
+<div class="viewcode-block" id="merge_similar_modules"><a class="viewcode-back" href="../../../_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.merge_similar_modules">[docs]</a><span class="k">def</span> <span class="nf">merge_similar_modules</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">modColors</span><span class="p">,</span> <span class="n">MEDissThres</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Merges modules in co-expression network that are too close as measured by the correlation of their eigengenes.</span>
+
+<span class="sd">    :param data: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.</span>
+<span class="sd">    :param ndarray modColors: array (numeric, character or a factor) attributing module colors to each feature in the experimental dataframe.</span>
+<span class="sd">    :para, float MEDissThres: maximum dissimilarity (i.e., 1-correlation) that qualifies modules for merging.</span>
+<span class="sd">    :param int verbose: integer level of verbosity. Zero means silent, higher values make the output progressively more and more verbose.</span>
+<span class="sd">    :return: Tuple containing pandas dataframe with eigengenes of the new merged modules, and array with module colors of each expeirmental feature.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">merge</span> <span class="o">=</span> <span class="n">WGCNA</span><span class="o">.</span><span class="n">mergeCloseModules</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">modColors</span><span class="p">,</span> <span class="n">cutHeight</span><span class="o">=</span><span class="n">MEDissThres</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="n">mergedColors</span> <span class="o">=</span> <span class="n">merge</span><span class="o">.</span><span class="n">rx2</span><span class="p">(</span><span class="s1">&#39;colors&#39;</span><span class="p">)</span>
+    <span class="n">mergedMEs</span> <span class="o">=</span> <span class="n">merge</span><span class="o">.</span><span class="n">rx2</span><span class="p">(</span><span class="s1">&#39;newMEs&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mergedMEs</span><span class="p">,</span> <span class="n">mergedColors</span></div>
+
+<div class="viewcode-block" id="calculate_ModuleTrait_correlation"><a class="viewcode-back" href="../../../_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.calculate_ModuleTrait_correlation">[docs]</a><span class="k">def</span> <span class="nf">calculate_ModuleTrait_correlation</span><span class="p">(</span><span class="n">df_exp</span><span class="p">,</span> <span class="n">df_traits</span><span class="p">,</span> <span class="n">MEs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Correlates eigengenes with external traits in order to identify the most significant module-trait associations.</span>
+
+<span class="sd">    :param df_exp: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.</span>
+<span class="sd">    :param df_traits: pandas dataframe containing clinical data, with samples/subjects as rows and clinical traits as columns.</span>
+<span class="sd">    :param MEs: pandas dataframe with module eigengenes.</span>
+<span class="sd">    :return: Tuple with two pandas datafames, first the correlation between all module eigengenes and all clinical traits, second a dataframe with concatenated correlation and p-value used for heatmap annotation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nSamples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_exp</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="n">moduleTraitCor</span> <span class="o">=</span> <span class="kc">None</span> 
+    <span class="n">textMatrix</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">df_traits_r</span> <span class="o">=</span> <span class="n">df_traits</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">df_traits_r</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df_traits_r</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;space&#39;</span><span class="p">)</span>
+    <span class="n">df_traits_r</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df_traits_r</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s1">&#39;parentheses1&#39;</span><span class="p">)</span>
+    <span class="n">df_traits_r</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df_traits_r</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;parentheses2&#39;</span><span class="p">)</span>
+    <span class="n">common</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">MEs</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">df_traits_r</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">common</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">moduleTraitCor_r</span> <span class="o">=</span> <span class="n">WGCNA</span><span class="o">.</span><span class="n">cor</span><span class="p">(</span><span class="n">MEs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">common</span><span class="p">,:],</span> <span class="n">df_traits_r</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">common</span><span class="p">,:],</span> <span class="n">use</span><span class="o">=</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">moduleTraitPvalue_r</span> <span class="o">=</span> <span class="n">WGCNA</span><span class="o">.</span><span class="n">corPvalueStudent</span><span class="p">(</span><span class="n">moduleTraitCor_r</span><span class="p">,</span> <span class="n">nSamples</span><span class="p">)</span>
+
+        <span class="n">textMatrix</span> <span class="o">=</span> <span class="n">paste_matrices</span><span class="p">(</span><span class="n">moduleTraitCor_r</span><span class="p">,</span> <span class="n">moduleTraitPvalue_r</span><span class="p">,</span> <span class="n">MEs</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">df_traits_r</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        
+        <span class="n">moduleTraitCor</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">moduleTraitCor_r</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">MEs</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">df_traits_r</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="n">moduleTraitPvalue</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">moduleTraitPvalue_r</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">MEs</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">df_traits_r</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+        <span class="n">moduleTraitCor</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">moduleTraitCor</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;space&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="n">moduleTraitPvalue</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">moduleTraitPvalue</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;space&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="n">textMatrix</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">textMatrix</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;space&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="n">moduleTraitCor</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">moduleTraitCor</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;parentheses1&#39;</span><span class="p">,</span> <span class="s1">&#39;(&#39;</span><span class="p">)</span>
+        <span class="n">moduleTraitCor</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">moduleTraitCor</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;parentheses2&#39;</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span>
+        <span class="n">moduleTraitPvalue</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">moduleTraitPvalue</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;parentheses1&#39;</span><span class="p">,</span> <span class="s1">&#39;(&#39;</span><span class="p">)</span>
+        <span class="n">moduleTraitPvalue</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">moduleTraitPvalue</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;parentheses2&#39;</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span>
+        <span class="n">textMatrix</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">textMatrix</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;parentheses1&#39;</span><span class="p">,</span> <span class="s1">&#39;(&#39;</span><span class="p">)</span>
+        <span class="n">textMatrix</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">textMatrix</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;parentheses2&#39;</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">moduleTraitCor</span><span class="p">,</span> <span class="n">textMatrix</span></div>
+
+<div class="viewcode-block" id="calculate_ModuleMembership"><a class="viewcode-back" href="../../../_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.calculate_ModuleMembership">[docs]</a><span class="k">def</span> <span class="nf">calculate_ModuleMembership</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">MEs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    For each module, calculates the correlation of the module eigengene and the feature expression profile (quantitative measure of module membership (MM)). </span>
+
+<span class="sd">    :param data: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.</span>
+<span class="sd">    :param MEs: pandas dataframe with module eigengenes.</span>
+<span class="sd">    :return: Tuple with two pandas dataframes, one with module membership correlations and another with p-values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nSamples</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    
+    <span class="n">data_r</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">data_r</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">data_r</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">,</span> <span class="s1">&#39;dash&#39;</span><span class="p">)</span>
+
+    <span class="n">modLabels</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">MEs</span><span class="o">.</span><span class="n">columns</span><span class="p">)]</span>
+    <span class="n">FeatureModuleMembership</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">as_data_frame</span><span class="p">(</span><span class="n">WGCNA</span><span class="o">.</span><span class="n">cor</span><span class="p">(</span><span class="n">data_r</span><span class="p">,</span> <span class="n">MEs</span><span class="p">,</span> <span class="n">use</span><span class="o">=</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">MMPvalue</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">as_data_frame</span><span class="p">(</span><span class="n">WGCNA</span><span class="o">.</span><span class="n">corPvalueStudent</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">(</span><span class="n">FeatureModuleMembership</span><span class="p">),</span> <span class="n">nSamples</span><span class="p">))</span>
+
+    <span class="n">FeatureModuleMembership</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MM&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">modLabels</span><span class="p">]</span>
+    <span class="n">FeatureModuleMembership</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">data_r</span><span class="o">.</span><span class="n">columns</span>
+    <span class="n">MMPvalue</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;p.MM&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">modLabels</span><span class="p">]</span>
+    <span class="n">MMPvalue</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">data_r</span><span class="o">.</span><span class="n">columns</span>
+
+    <span class="c1">#FeatureModuleMembership = R_wrapper.R_matrix2Py_matrix(FeatureModuleMembership, FeatureModuleMembership.index, FeatureModuleMembership.columns)</span>
+    <span class="c1">#MMPvalue = R_wrapper.R_matrix2Py_matrix(MMPvalue, MMPvalue.rownames, MMPvalue.colnames)</span>
+    <span class="n">FeatureModuleMembership</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">data_r</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;dash&#39;</span><span class="p">,</span> <span class="s1">&#39;~&#39;</span><span class="p">)</span>
+    <span class="n">MMPvalue</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">MMPvalue</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;dash&#39;</span><span class="p">,</span> <span class="s1">&#39;~&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">FeatureModuleMembership</span><span class="p">,</span> <span class="n">MMPvalue</span></div>
+
+<div class="viewcode-block" id="calculate_FeatureTraitSignificance"><a class="viewcode-back" href="../../../_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.calculate_FeatureTraitSignificance">[docs]</a><span class="k">def</span> <span class="nf">calculate_FeatureTraitSignificance</span><span class="p">(</span><span class="n">df_exp</span><span class="p">,</span> <span class="n">df_traits</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Quantifies associations of individual experimental features with the measured clinical traits, by defining Feature Significance (FS) as the absolute value of the correlation between the feature and the trait.</span>
+
+<span class="sd">    :param df_exp: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.</span>
+<span class="sd">    :param df_traits: pandas dataframe containing clinical data, with samples/subjects as rows and clinical traits as columns.</span>
+<span class="sd">    :return: Tuple with two pandas dataframes, one with feature significance correlations and another with p-values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nSamples</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df_exp</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+    <span class="n">df_exp_r</span> <span class="o">=</span> <span class="n">df_exp</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">df_exp_r</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df_exp_r</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">,</span> <span class="s1">&#39;dash&#39;</span><span class="p">)</span>
+    <span class="n">df_cli_r</span> <span class="o">=</span> <span class="n">df_traits</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">df_cli_r</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df_cli_r</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;space&#39;</span><span class="p">)</span>
+    <span class="n">df_cli_r</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df_cli_r</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s1">&#39;parentheses1&#39;</span><span class="p">)</span>
+    <span class="n">df_cli_r</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df_cli_r</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;parentheses2&#39;</span><span class="p">)</span>
+    <span class="n">common</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">df_exp_r</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">df_cli_r</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+    <span class="n">FeatureTraitSignificance</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">as_data_frame</span><span class="p">(</span><span class="n">WGCNA</span><span class="o">.</span><span class="n">cor</span><span class="p">(</span><span class="n">df_exp_r</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">common</span><span class="p">,:],</span> <span class="n">df_cli_r</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">common</span><span class="p">,:],</span> <span class="n">use</span><span class="o">=</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">FSPvalue</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">as_data_frame</span><span class="p">(</span><span class="n">WGCNA</span><span class="o">.</span><span class="n">corPvalueStudent</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">(</span><span class="n">FeatureTraitSignificance</span><span class="p">),</span> <span class="n">nSamples</span><span class="p">))</span>
+
+    <span class="n">FeatureTraitSignificance</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;GS.&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df_cli_r</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    <span class="n">FeatureTraitSignificance</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">df_exp_r</span><span class="o">.</span><span class="n">columns</span>
+    <span class="n">FSPvalue</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;p.GS.&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df_cli_r</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    <span class="n">FSPvalue</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">df_exp_r</span><span class="o">.</span><span class="n">columns</span>
+
+    <span class="c1">#FeatureTraitSignificance = R_wrapper.R_matrix2Py_matrix(FeatureTraitSignificance, FeatureTraitSignificance.rownames, FeatureTraitSignificance.colnames)</span>
+    <span class="c1">#FSPvalue = R_wrapper.R_matrix2Py_matrix(FSPvalue, FSPvalue.rownames, FSPvalue.colnames)</span>
+
+    <span class="n">FeatureTraitSignificance</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">FeatureTraitSignificance</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;space&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="n">FeatureTraitSignificance</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">FeatureTraitSignificance</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;parentheses1&#39;</span><span class="p">,</span> <span class="s1">&#39;(&#39;</span><span class="p">)</span>
+    <span class="n">FeatureTraitSignificance</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">FeatureTraitSignificance</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;parentheses2&#39;</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span>
+    <span class="n">FeatureTraitSignificance</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">FeatureTraitSignificance</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;dash&#39;</span><span class="p">,</span> <span class="s1">&#39;~&#39;</span><span class="p">)</span>
+    <span class="n">FSPvalue</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df_cli_r</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;space&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="n">FSPvalue</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">FSPvalue</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;parentheses1&#39;</span><span class="p">,</span> <span class="s1">&#39;(&#39;</span><span class="p">)</span>
+    <span class="n">FSPvalue</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">FSPvalue</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;parentheses2&#39;</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span>
+    <span class="n">FSPvalue</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">FSPvalue</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;dash&#39;</span><span class="p">,</span> <span class="s1">&#39;~&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">FeatureTraitSignificance</span><span class="p">,</span> <span class="n">FSPvalue</span></div>
+
+<div class="viewcode-block" id="get_FeaturesPerModule"><a class="viewcode-back" href="../../../_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.get_FeaturesPerModule">[docs]</a><span class="k">def</span> <span class="nf">get_FeaturesPerModule</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">modColors</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;dictionary&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Groups all experimental features by the co-expression module they belong to.</span>
+
+<span class="sd">    :param data: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.</span>
+<span class="sd">    :param ndarray modColors: array (numeric, character or a factor) attributing module colors to each feature in the experimental dataframe.</span>
+<span class="sd">    :param str mode: type of the value returned by the function (&#39;dictionary&#39; or &#39;dataframe&#39;).</span>
+<span class="sd">    :return: Depending on selected mode, returns a dictionary or dataframe with module color per experimental feature.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;dataframe&#39;</span><span class="p">:</span>
+        <span class="n">features_per_module</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">modColors</span><span class="p">))</span>
+        <span class="n">features_per_module</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">features_per_module</span><span class="o">.</span><span class="n">items</span><span class="p">()),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;modColor&#39;</span><span class="p">])</span>
+        
+    <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;dictionary&#39;</span><span class="p">:</span>
+        <span class="n">features_per_module</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">modColors</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+            <span class="n">features_per_module</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="n">features_per_module</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">features_per_module</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">features_per_module</span></div>
+
+<div class="viewcode-block" id="get_ModuleFeatures"><a class="viewcode-back" href="../../../_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.get_ModuleFeatures">[docs]</a><span class="k">def</span> <span class="nf">get_ModuleFeatures</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">modColors</span><span class="p">,</span> <span class="n">modules</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Groups and returns a list of the experimental features clustered in specific co-expression modules.</span>
+
+<span class="sd">    :param data: pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.</span>
+<span class="sd">    :param ndarray modColors: array (numeric, character or a factor) attributing module colors to each feature in the experimental dataframe.</span>
+<span class="sd">    :param list modules: list of module colors of interest.</span>
+<span class="sd">    :return: List of lists with experimental features in each selected module.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">allfeatures</span> <span class="o">=</span> <span class="n">get_FeaturesPerModule</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">modColors</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;dictionary&#39;</span><span class="p">)</span>
+
+    <span class="n">modules</span> <span class="o">=</span> <span class="n">modules</span>
+    <span class="n">selectfeatures</span> <span class="o">=</span> <span class="p">[</span><span class="n">allfeatures</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">modules</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">selectfeatures</span></div>
+
+<div class="viewcode-block" id="get_EigengenesTrait_correlation"><a class="viewcode-back" href="../../../_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.get_EigengenesTrait_correlation">[docs]</a><span class="k">def</span> <span class="nf">get_EigengenesTrait_correlation</span><span class="p">(</span><span class="n">MEs</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Eigengenes are used as representative profiles of the co-expression modules, and correlation between them is used to quantify module similarity.</span>
+<span class="sd">    Clinical traits are added to the eigengenes to see how the traits fir into the eigengen network.</span>
+
+<span class="sd">    :param MEs: pandas dataframe with module eigengenes.</span>
+<span class="sd">    :param data: pandas dataframe containing clinical data, with samples/subjects as rows and clinical traits as columns.</span>
+<span class="sd">    :return: Tuple with two pandas dataframes, one with features and traits recalculates module eigengenes dissimilarity, and another with all the overall correlations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">METDiss</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+    <span class="n">METcor</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">df_traits_r</span> <span class="o">=</span>  <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">df_traits_r</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df_traits_r</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;space&#39;</span><span class="p">)</span>
+    <span class="n">df_traits_r</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df_traits_r</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s1">&#39;parentheses1&#39;</span><span class="p">)</span>
+    <span class="n">df_traits_r</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df_traits_r</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;parentheses2&#39;</span><span class="p">)</span>
+    <span class="n">df_traits_r</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df_traits_r</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;slash&#39;</span><span class="p">)</span>
+    
+    <span class="n">common</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">MEs</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">df_traits_r</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">common</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">MET</span> <span class="o">=</span> <span class="n">WGCNA</span><span class="o">.</span><span class="n">orderMEs</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">cbind</span><span class="p">(</span><span class="n">MEs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">common</span><span class="p">,:],</span> <span class="n">df_traits_r</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">common</span><span class="p">,:]),</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">METcor</span> <span class="o">=</span> <span class="n">WGCNA</span><span class="o">.</span><span class="n">cor</span><span class="p">(</span><span class="n">MET</span><span class="p">,</span> <span class="n">use</span><span class="o">=</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">METcor</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">METcor</span><span class="p">,</span> <span class="n">MET</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">MET</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+        <span class="n">METcor</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">METcor</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;space&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="n">METcor</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">METcor</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;parentheses1&#39;</span><span class="p">,</span> <span class="s1">&#39;(&#39;</span><span class="p">)</span>
+        <span class="n">METcor</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">METcor</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;parentheses2&#39;</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span>
+        <span class="n">METcor</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">METcor</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;slash&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+        <span class="n">METcor</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">METcor</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;space&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="n">METcor</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">METcor</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;parentheses1&#39;</span><span class="p">,</span> <span class="s1">&#39;(&#39;</span><span class="p">)</span>
+        <span class="n">METcor</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">METcor</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;parentheses2&#39;</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span>
+        <span class="n">METcor</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">METcor</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;slash&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+
+        <span class="n">METDiss</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">METcor</span>
+
+    <span class="k">return</span> <span class="n">METDiss</span><span class="p">,</span> <span class="n">METcor</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -8,27 +8,30 @@ from collections import OrderedDict, defaultdict
 from natsort import natsorted, index_natsorted, order_by_index
 import urllib.request
 
-from rpy2 import robjects as ro
-from rpy2.robjects import pandas2ri
-from rpy2.robjects.packages import importr
-from rpy2.robjects.vectors import StrVector, FloatVector
-import rpy2.robjects.packages as rpacks
-from analytics_core import R_wrapper
-pandas2ri.activate()
-# sys.setrecursionlimit(10000)
+try:
+    from rpy2 import robjects as ro
+    from rpy2.robjects import pandas2ri
+    from rpy2.robjects.packages import importr
+    from rpy2.robjects.vectors import StrVector, FloatVector
+    import rpy2.robjects.packages as rpacks
+    from analytics_core import R_wrapper
+    pandas2ri.activate()
+    # sys.setrecursionlimit(10000)
 
-#Call R
-R = ro.r
-R('options(stringsAsFactors = FALSE)')
-#R('source("http://bioconductor.org/biocLite.R")')
-#R('biocLite(c("GO.db", "preprocessCore", "impute"))')
+    #Call R
+    R = ro.r
+    R('options(stringsAsFactors = FALSE)')
+    #R('source("http://bioconductor.org/biocLite.R")')
+    #R('biocLite(c("GO.db", "preprocessCore", "impute"))')
 
 
-#Call R packages
-base = R_wrapper.call_Rpackage("package", "base")
-stats = R_wrapper.call_Rpackage("package", "stats")
-WGCNA = R_wrapper.call_Rpackage("package", "WGCNA")
-flashClust = R_wrapper.call_Rpackage('package', 'flashClust')
+    #Call R packages
+    base = R_wrapper.call_Rpackage("package", "base")
+    stats = R_wrapper.call_Rpackage("package", "stats")
+    WGCNA = R_wrapper.call_Rpackage("package", "WGCNA")
+    flashClust = R_wrapper.call_Rpackage('package', 'flashClust')
+except ImportError:
+    print("WGCNA functions will not work. Module Rpy2 not installed.")
 
 
 def get_data(data, drop_cols_exp=['subject', 'group', 'sample', 'index'], drop_cols_cli=['subject', 'group', 'biological_sample', 'index']):

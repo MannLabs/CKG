@@ -1264,6 +1264,30 @@ def visualize_notebook_network(network, notebook_type='jupyter', layout={'width'
 
     return net
 
+def visualize_notebook_path(path, notebook_type='jupyter'):
+    """
+    This function returns a Cytoscape network visualization for Jupyter notebooks
+
+    :param path object: dash_html_components object with the cytoscape network (returned by get_cytoscape_network())
+    :param str notebook_type: the type of notebook where the network will be visualized (currently only jupyter notebook is supported)
+    :param dict layout: specific layout properties (see https://dash.plot.ly/cytoscape/layout)
+    :return: cyjupyter.cytoscape.Cytoscape object
+
+    Example::
+    
+        net = get_cytoscape_network(G, identifier='corr', args={'title':'Cytoscape path',
+                                                            'stylesheet':stylesheet,
+                                                            'layout': layout})
+        visualize_notebook_path(net, notebook_type='jupyter')
+    """
+    net = None
+    if notebook_type == 'jupyter':
+        net = path.children[1]
+    elif notebook_type == 'jupyterlab':
+        pass
+
+    return net
+
 def get_pca_plot(data, identifier, args):
     """
     This function creates a pca plot with scores and top "args['loadings']" loadings.

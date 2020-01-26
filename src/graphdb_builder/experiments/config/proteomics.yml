@@ -118,107 +118,107 @@ p : &var_p
     'file': 'Phosphosites \(STY\).txt'
 
 maxquant :
-  'proteins':
-      'columns':
-          - 'Majority protein IDs'
-          - 'Q-value'
-          - 'Score'
-          - 'id'
-          - 'LFQ intensity \w+_AS\d+_?-?\d*'  #subject_replicate_timepoint
-          - 'Intensity \w+_AS\d+_?-?\d*'
-          - 'Reverse'
-          - 'Only identified by site'
-          - 'is_razor'
-      'filters':
-          - 'Reverse'
-          - 'Only identified by site'
-      'proteinCol': 'Majority protein IDs'
-      'contaminant_tag': 'CON__'
-      'valueCol': 'LFQ intensity'
-      'groupCol': 'id'
-      'indexCol': 'Majority protein IDs'
-      'attributes':
-          'cols':
-              - 'Q-value'
-              - 'Score'
-              - 'id'
-              - 'is_razor'
-          'regex':
-              - 'Intensity'
-      'log': 'log2'
-      'file': 'proteinGroups.txt'
-  'peptides':
-      'columns':
-          - 'Sequence'
-          - 'Amino acid before'
-          - 'First amino acid'
-          - 'Second amino acid'
-          - 'Second last amino acid'
-          - 'Last amino acid'
-          - 'Amino acid after'
-          - 'Experiment \w+_AS\d+_?-?\d*'
-          - 'Proteins'
-          - 'id'
-          - 'Start position'
-          - 'End position'
-          - 'Score'
-          - 'Protein group IDs'
-          - 'Intensity \w+_AS\d+_?-?\d*'
-          - 'Reverse'
-      'filters':
-          - 'Reverse'
-      'attributes':
-          'col':
-              - 'Score'
-              - 'Protein group IDs'
-      'proteinCol': 'Proteins'
-      'contaminant_tag': 'CON__'
-      'valueCol': 'Intensity'
-      'groupCol': 'id'
-      'indexCol': 'Sequence'
-      'positionCols':
-          - 'Start position'
-          - 'End position'
-      'type': 'tryptic peptide'
-      'log': 'log2'
-      'file': 'peptides.txt'
-  'Oxydation(M)': *var_ox
-  'Glycation': *var_gly
-  'Phosphorylation': *var_p
+    'proteins':
+        'columns':
+            - 'Majority protein IDs'
+            - 'Q-value'
+            - 'Score'
+            - 'id'
+            - 'LFQ intensity \w+_AS\d+_?-?\d*'  #subject_replicate_timepoint
+            - 'Intensity \w+_AS\d+_?-?\d*'
+            - 'Reverse'
+            - 'Only identified by site'
+            - 'is_razor'
+        'filters':
+            - 'Reverse'
+            - 'Only identified by site'
+        'proteinCol': 'Majority protein IDs'
+        'contaminant_tag': 'CON__'
+        'valueCol': 'LFQ intensity'
+        'groupCol': 'id'
+        'indexCol': 'Majority protein IDs'
+        'attributes':
+            'cols':
+                - 'Q-value'
+                - 'Score'
+                - 'id'
+                - 'is_razor'
+            'regex':
+                - 'Intensity'
+        'log': 'log2'
+        'file': 'proteinGroups.txt'
+    'peptides':
+        'columns':
+            - 'Sequence'
+            - 'Amino acid before'
+            - 'First amino acid'
+            - 'Second amino acid'
+            - 'Second last amino acid'
+            - 'Last amino acid'
+            - 'Amino acid after'
+            - 'Experiment \w+_AS\d+_?-?\d*'
+            - 'Proteins'
+            - 'id'
+            - 'Start position'
+            - 'End position'
+            - 'Score'
+            - 'Protein group IDs'
+            - 'Intensity \w+_AS\d+_?-?\d*'
+            - 'Reverse'
+        'filters':
+            - 'Reverse'
+        'attributes':
+            'col':
+                - 'Score'
+                - 'Protein group IDs'
+        'proteinCol': 'Proteins'
+        'contaminant_tag': 'CON__'
+        'valueCol': 'Intensity'
+        'groupCol': 'id'
+        'indexCol': 'Sequence'
+        'positionCols':
+            - 'Start position'
+            - 'End position'
+        'type': 'tryptic peptide'
+        'log': 'log2'
+        'file': 'peptides.txt'
+    'Oxydation(M)': *var_ox
+    'Glycation': *var_gly
+    'Phosphorylation': *var_p
 
 spectronaut :
-  'proteins':
-      'columns':
-          - 'PG.ProteinAccessions'
-          - 'PG.Genes'
-          - '\w+_AS\d+_?-?\d*\.PG\.Quantity'  #subject_replicate_timepoint
-          - '\w+_AS\d+_?-?\d*\.PG\.NrOfStrippedSequencesMeasured'
-          - '\w+_AS\d+_?-?\d*\.PG\.NrOfPrecursorsMeasured'
-          - '\w+_AS\d+_?-?\d*\.PG\.NrOfStrippedSequencesIdentified'
-          - '\w+_AS\d+_?-?\d*\.PG\.NrOfPrecursorsIdentified'
-          - '\w+_AS\d+_?-?\d*\.PG\.IsSingleHit'
-          - '\w+_AS\d+_?-?\d*\.PG\.NrOfStrippedSequencesUsedForQuantification'
-          - '\w+_AS\d+_?-?\d*\.PG\.NrOfModifiedSequencesUsedForQuantification'
-          - '\w+_AS\d+_?-?\d*\.PG\.NrOfPrecursorsUsedForQuantification'
-          - '\w+_AS\d+_?-?\d*\.PG\.MS1Quantity'
-          - '\w+_AS\d+_?-?\d*\.PG\.MS2Quantity'
-      'filters':
-      'proteinCol': 'PG.ProteinAccessions'
-      'valueCol': 'PG.Quantity'
-      'groupCol': 'index'
-      'indexCol': 'PG.ProteinAccessions'
-      'attributes':
-          'cols':
-          'regex':
-            - '\.PG\.NrOfStrippedSequencesMeasured'
-            - '\.PG\.NrOfPrecursorsMeasured'
-            - '\.PG\.NrOfStrippedSequencesIdentified'
-            - '\.PG\.NrOfPrecursorsIdentified'
-            - '\.PG\.IsSingleHit'
-            - '\.PG\.NrOfStrippedSequencesUsedForQuantification'
-            - '\.PG\.NrOfModifiedSequencesUsedForQuantification'
-            - '\.PG\.NrOfPrecursorsUsedForQuantification'
-            - '\.PG\.MS1Quantity'
-            - '\.PG\.MS2Quantity'
-      'log': 'log2'
-      'file': '*Report.xls'
+    'proteins':
+        'columns':
+            - 'PG.ProteinAccessions'
+            - '\w*_?AS\d+_?-?\d*\.PG\.Quantity'  #subject_replicate_timepoint
+            - 'PG.Qvalue'
+            - '\w*_?AS\d+_?-?\d*\.PG\.NrOfStrippedSequencesMeasured'
+            - '\w*_?AS\d+_?-?\d*\.PG\.NrOfStrippedSequencesIdentified'
+            - '\w*_?AS\d+_?-?\d*\.PG\.NrOfPrecursorsIdentified'
+            - '\w*_?AS\d+_?-?\d*\.PG\.IsSingleHit'
+            - '\w*_?AS\d+_?-?\d*\.PG\.NrOfStrippedSequencesUsedForQuantification'
+            - '\w*_?AS\d+_?-?\d*\.PG\.NrOfModifiedSequencesUsedForQuantification'
+            - '\w*_?AS\d+_?-?\d*\.PG\.NrOfPrecursorsUsedForQuantification'
+            - '\w*_?AS\d+_?-?\d*\.PG\.MS1Quantity'
+            - '\w*_?AS\d+_?-?\d*\.PG\.MS2Quantity'
+        'proteinCol': 'PG.ProteinAccessions'
+        'valueCol': 'PG.Quantity'
+        'groupCol': 'id'
+        'indexCol': 'PG.ProteinAccessions'
+        'attributes':
+            'col':
+                - id
+                - 'PG.Qvalue'
+                - 'is_razor'
+            'regex':
+                - 'PG.NrOfStrippedSequencesMeasured'
+                - 'PG.NrOfStrippedSequencesIdentified'
+                - 'PG.NrOfPrecursorsIdentified'
+                - 'PG.IsSingleHit'
+                - 'PG.NrOfStrippedSequencesUsedForQuantification'
+                - 'PG.NrOfModifiedSequencesUsedForQuantification'
+                - 'PG.NrOfPrecursorsUsedForQuantification'
+                - 'PG.MS1Quantity'
+                - 'PG.MS2Quantity'
+        'log': 'log2'
+        'file': '\w+\.xlsx'
