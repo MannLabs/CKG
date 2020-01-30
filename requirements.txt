@@ -170,7 +170,7 @@ snfpy==0.2.1
 statsmodels==0.10.0
 tables==3.5.2
 tensorboard==1.15.0
-tensorflow==1.15.0
+tensorflow==1.15.2
 tensorflow-estimator==1.15.0
 termcolor==1.1.0
 terminado==0.8.2
