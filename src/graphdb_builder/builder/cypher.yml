@@ -485,8 +485,8 @@ IMPORT_DRUG_SIDE_EFFECTS:
         MATCH (d:Drug {id:line.START_ID})
         MATCH (p:Phenotype {id:line.END_ID})
         MERGE (d)-[r:HAS_SIDE_EFFECT]->(p)
-        ON CREATE SET r.source=line.source,r.original_side_effect_code=line.original_side_effect,r.evidence_from=line.evidence_from,r.frequency=line.frequency,r.lower_bound=line.lower_bound,r.upper_bound=line.upper_bound
-        ON MATCH SET r.source=line.source,r.original_side_effect_code=line.original_side_effect,r.evidence_from=line.evidence_from,r.frequency=line.frequency,r.lower_bound=line.lower_bound,r.upper_bound=line.upper_bound
+        ON CREATE SET r.source=line.source,r.original_side_effect_code=line.original_side_effect,r.evidence_from=line.evidence_from
+        ON MATCH SET r.source=line.source,r.original_side_effect_code=line.original_side_effect,r.evidence_from=line.evidence_from
         RETURN COUNT(r) AS drug_has_side_effect_phenotype;
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_is_indicated_for.tsv" AS line

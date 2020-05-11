@@ -75,7 +75,7 @@ graph:
     - mentions
     - jensenlab
     - functional_regions
-    - side effects
+    - side_effects
     - metabolite
     - protein_structure
     - gwas

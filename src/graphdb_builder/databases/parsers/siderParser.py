@@ -28,13 +28,13 @@ def parser(databases_directory, drug_source, download=True):
         drug = re.sub(r'CID\d', 'CIDm', data[0])
         se = data[2]
         evidence_from = str(data[3])
-        freq = data[4]
-        lower_bound = data[5]
-        upper_bound = data[6]
+        #freq = data[4]
+        #lower_bound = data[5]
+        #upper_bound = data[6]
         if se.lower() in phenotypemapping and drug in drugmapping:
             for d in drugmapping[drug]:
                 p = phenotypemapping[se.lower()]
-                relationships.add((d, p, "HAS_SIDE_EFFECT", "SIDER", se, evidence_from, freq, lower_bound, upper_bound))
+                relationships.add((d, p, "HAS_SIDE_EFFECT", "SIDER", se, evidence_from))
     associations.close()
 
     builder_utils.remove_directory(directory)
