@@ -1,14 +1,13 @@
 import os.path
 from collections import defaultdict
 import zipfile
-import ckg_utils
 from graphdb_builder import builder_utils, mapping as mp
 import re
 
 #######################################
 #   The Cancer Genome Interpreter     # 
 #######################################
-def parser(databases_directory, download = True):
+def parser(databases_directory, download=True):
     variant_regex = r"(\D\d+\D)$"
     regex = r"(chr\d+)\:g\.(\d+)(\w)>(\w)"
     config = builder_utils.get_config(config_name="cancerGenomeInterpreterConfig.yml", data_type='databases')
@@ -16,14 +15,14 @@ def parser(databases_directory, download = True):
     entities_header = config['entities_header']
     relationships_headers = config['relationships_headers']
     amino_acids = config['amino_acids']
-    mapping = mp.getMappingFromOntology(ontology = "Disease", source = None)
+    mapping = mp.getMappingFromOntology(ontology="Disease", source=None)
     drugmapping = mp.getMappingForEntity("Drug")
     protein_mapping = mp.getMultipleMappingForEntity("Protein")
-    
+
     fileName = config['cancerBiomarkers_variant_file']
     relationships = defaultdict(set)
     entities = set()
-    directory = os.path.join(databases_directory,"CancerGenomeInterpreter")
+    directory = os.path.join(databases_directory, "CancerGenomeInterpreter")
     builder_utils.checkDirectory(directory)
     zipFile = os.path.join(directory, url.split('/')[-1])
 
@@ -73,7 +72,7 @@ def parser(databases_directory, download = True):
                                         valid_variants.append(valid_variant)
                                         entities.add((valid_variant, "Clinically_relevant_variant",  ",".join(alternative_names), chromosome, position, reference, alternative, "", "", "CGI"))
                                         relationships["known_variant_is_clinically_relevant"].add((valid_variant, valid_variant, "KNOWN_VARIANT_IS_CLINICALLY_RELEVANT", "CGI"))
-                    
+
                     for drug in drugs:
                         if drug.lower() in drugmapping:
                             drug = drugmapping[drug.lower()]
@@ -82,14 +81,16 @@ def parser(databases_directory, download = True):
                         elif " ".join(drug.split(" ")[1:]).lower() in drugmapping:
                             drug = drugmapping[" ".join(drug.split(" ")[1:]).lower()]
                         relationships["targets"].add((drug, gene, "CURATED_TARGETS", evidence, response, ",".join(tumors), "curated", "CGI"))
-                        
+
                         for valid_variant in valid_variants:
                             relationships["targets_clinically_relevant_variant"].add((drug, valid_variant, "TARGETS_CLINICALLY_RELEVANT_VARIANT", evidence, response, "".join(tumors), "curated", "CGI"))
-                        
+
                     for tumor in tumors:                         
                         if tumor.lower() in mapping:
                             tumor = mapping[tumor.lower()]
                             for valid_variant in valid_variants:
                                 relationships["associated_with"].add((valid_variant, tumor, "ASSOCIATED_WITH", "curated","curated", "CGI", len(publications)))
+
+    builder_utils.remove_directory(directory)
 
     return (entities, relationships, entities_header, relationships_headers)

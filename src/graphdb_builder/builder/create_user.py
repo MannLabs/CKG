@@ -58,10 +58,9 @@ def create_user_from_command_line(args, expiration):
     .. note:: This function can be used directly with *python create_user_from_command_line.py -u username \
                 -n user_name -e email -s secondary_email -p phone_number -a affiliation* .
     """
-    usersDirectory = os.path.join(directories['dataDirectory'], uconfig['usersImportDirectory'])
-    usersFile = os.path.join(usersDirectory, uconfig['usersFile'])
+    usersImportDirectory = os.path.join(cwd, directories['usersImportDirectory'])
+    usersFile = os.path.join(usersImportDirectory, uconfig['usersFile'])
 
-    usersImportDirectory = directories['usersDirectory']
     builder_utils.checkDirectory(usersImportDirectory)
     import_file = os.path.join(usersImportDirectory, uconfig['import_file'])
 
@@ -87,10 +86,9 @@ def create_user_from_file(filepath, expiration):
  
     .. note:: This function can be used directly with *python create_user_from_file.py -f path_to_file* .
     """
-    usersDirectory = os.path.join(directories['dataDirectory'], uconfig['usersImportDirectory'])
-    usersFile = os.path.join(usersDirectory, uconfig['usersFile'])
-
-    usersImportDirectory = directories['usersDirectory']
+    usersImportDirectory = os.path.join(cwd, directories['usersImportDirectory'])
+    usersFile = os.path.join(usersImportDirectory, uconfig['usersFile'])
+    
     builder_utils.checkDirectory(usersImportDirectory)
     import_file = os.path.join(usersImportDirectory, uconfig['import_file'])
 
@@ -121,7 +119,7 @@ def create_user(data, output_file, expiration=365):
     :param int expiration: number of days users is given access.
     :return: Writes relevant .tsv file for the users in data.
     """
-    driver = connector.getGraphDatabaseConnectionConfiguration()
+    driver = connector.getGraphDatabaseConnectionConfiguration(database=None)
     date = datetime.today() + timedelta(days=expiration)
     df = []
  

@@ -1,10 +1,7 @@
 import os.path
 import zipfile
-import ckg_utils
-from graphdb_builder import mapping as mp, builder_utils
+from graphdb_builder import builder_utils
 from collections import defaultdict
-import pandas as pd
-import re
 
 ###################
 #       CORUM     # 
@@ -12,9 +9,9 @@ import re
 def parser(databases_directory, download=True):
     entities = set()
     relationships = defaultdict(set)
-    directory = os.path.join(databases_directory,"CORUM")
+    directory = os.path.join(databases_directory, "CORUM")
     builder_utils.checkDirectory(directory)
-    
+
     try:
         config = builder_utils.get_config(config_name="corumConfig.yml", data_type='databases')
     except Exception as err:
@@ -58,7 +55,10 @@ def parser(databases_directory, download=True):
                         #START_ID END_ID type evidence_type score source
                         relationships["Biological_process", "associated_with"].add((identifier, process, "ASSOCIATED_WITH", "CURATED", 5, "CORUM"))
 
+    builder_utils.remove_directory(directory)
+
     return entities, relationships, entities_header, relationships_headers
-    
+
+
 if __name__ == "__main__":
     pass

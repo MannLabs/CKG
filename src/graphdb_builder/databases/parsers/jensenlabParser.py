@@ -1,11 +1,10 @@
 import os.path
-import pandas as pd
-import ckg_utils
 from graphdb_builder import mapping as mp, builder_utils
 
 ######################################
 #   Databases at jensenLab.org)      # 
 ######################################
+
 
 def parser(databases_directory, download=True):
     result = {}
@@ -15,25 +14,26 @@ def parser(databases_directory, download=True):
     for qtype in config['db_types']:
         relationships = parsePairs(config, databases_directory, qtype, string_mapping)
         entity1, entity2 = config['db_types'][qtype]
-        outputfileName =  entity1+"_"+entity2+"_associated_with_integrated.tsv"
+        outputfileName = entity1+"_"+entity2+"_associated_with_integrated.tsv"
         header = config['header']
         result[qtype] = (relationships, header, outputfileName)
-    
+
     return result
+
 
 def parsePairs(config, databases_directory, qtype, mapping, download=True):
     url = config['db_url']
     ifile = config['db_files'][qtype]
     source = config['db_sources'][qtype]
     relationships = set()
-    
+
     directory = os.path.join(databases_directory, "Jensenlab")
-    builder_utils.checkDirectory(os.path.join(directory,"integration"))
-    
+    builder_utils.checkDirectory(os.path.join(directory, "integration"))
+
     if download:
-        builder_utils.downloadDB(url.replace("FILE", ifile), os.path.join(directory,"integration"))
-    ifile = os.path.join(directory,os.path.join("integration",ifile))
-    
+        builder_utils.downloadDB(url.replace("FILE", ifile), os.path.join(directory, "integration"))
+    ifile = os.path.join(directory,os.path.join("integration", ifile))
+
     with open(ifile, 'r') as idbf:
         for line in idbf:
             data = line.rstrip("\r\n").split('\t')
@@ -46,8 +46,5 @@ def parsePairs(config, databases_directory, qtype, mapping, download=True):
                     relationships.add((ident, id2, "ASSOCIATED_WITH_INTEGRATED", source, score, "compiled"))
             else:
                 continue
-                
+
     return relationships
-
-
-

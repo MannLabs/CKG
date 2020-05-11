@@ -12,37 +12,34 @@ try:
     from rpy2 import robjects as ro
     from rpy2.robjects import pandas2ri
     from rpy2.robjects.packages import importr
+    from rpy2.rinterface_lib import embedded
     from rpy2.robjects.vectors import StrVector, FloatVector
     import rpy2.robjects.packages as rpacks
-    from analytics_core import R_wrapper
     pandas2ri.activate()
     # sys.setrecursionlimit(10000)
 
     #Call R
     R = ro.r
     R('options(stringsAsFactors = FALSE)')
-    #R('source("http://bioconductor.org/biocLite.R")')
-    #R('biocLite(c("GO.db", "preprocessCore", "impute"))')
-
-
+    
     #Call R packages
-    base = R_wrapper.call_Rpackage("package", "base")
-    stats = R_wrapper.call_Rpackage("package", "stats")
-    WGCNA = R_wrapper.call_Rpackage("package", "WGCNA")
-    flashClust = R_wrapper.call_Rpackage('package', 'flashClust')
+    base = importr('base')
+    stats = importr('stats')
+    WGCNA = importr('WGCNA')
+    flashClust = importr('flashClust')
 except ImportError:
     print("WGCNA functions will not work. Module Rpy2 not installed.")
 
 
-def get_data(data, drop_cols_exp=['subject', 'group', 'sample', 'index'], drop_cols_cli=['subject', 'group', 'biological_sample', 'index']):
-    """ 
+def get_data(data, drop_cols_exp=['subject', 'group', 'sample', 'index'], drop_cols_cli=['subject', 'group', 'biological_sample', 'index'], sd_cutoff=0):
+    """
     This function cleanes up and formats experimental and clinical data into similarly shaped dataframes.
-    
+
     :param dict data: dictionary with processed clinical and proteomics datasets.
     :param list drop_cols_exp: list of columns to drop from processed experimental (protemics/rna-seq/dna-seq) dataframe.
     :param list drop_cols_cli: list of columns to drop from processed clinical dataframe.
     :return: Dictionary with experimental and clinical dataframes (keys are the same as in the input dictionary).  
-    """   
+    """
     wgcna_data = {}
     for i in data:
         if data[i] is not None:
@@ -61,7 +58,9 @@ def get_data(data, drop_cols_exp=['subject', 'group', 'sample', 'index'], drop_c
                 df.set_index(['rows'], inplace=True)
                 df = df.reindex(index=natsorted(df.index))
                 df = df.drop(drop_cols_exp, axis=1)
-
+                if sd_cutoff > 0:
+                    df = df.loc[:, df.std() > sd_cutoff]
+                    
             wgcna_data[i] = df
 
     return wgcna_data
@@ -85,13 +84,13 @@ def get_dendrogram(df, labels, distfun='euclidean', linkagefun='ward', div_clust
         if distfun is None:
             dist = np.asarray(stats.as_dist(df))
         else:
-            dist = np.asarray(stats.dist(df, method = distfun))
+            dist = np.asarray(stats.dist(df, method=distfun))
 
-        Z = linkage(dist, method = linkagefun)
+        Z = linkage(dist, method=linkagefun)
 
-        Z_dendrogram = dendrogram(Z, no_plot = True, labels = labels)
+        Z_dendrogram = dendrogram(Z, no_plot=True, labels=labels)
 
-        if div_clusters == True:
+        if div_clusters:
             clusters = get_clusters_elements(Z, fcluster_method, fcluster_cutoff, labels)
             return Z_dendrogram, clusters
         else:
@@ -115,6 +114,7 @@ def get_clusters_elements(linkage_matrix, fcluster_method, fcluster_cutoff, labe
         clusters[i].append(j)
     return clusters
 
+
 def filter_df_by_cluster(df, clusters, number):
     """ 
     Select only the members of a defined cluster.
@@ -125,6 +125,7 @@ def filter_df_by_cluster(df, clusters, number):
     :return: Pandas dataframe with all the features (columns) and samples/subjects belonging to the defined cluster (index).
     """
     return df[df.index.isin(clusters[number])]
+
 
 def df_sort_by_dendrogram(df, Z_dendrogram):
     """ 
@@ -139,6 +140,7 @@ def df_sort_by_dendrogram(df, Z_dendrogram):
     data.sort_index(level=0, inplace=True)
     return data
 
+
 def get_percentiles_heatmap(df, Z_dendrogram, bydendro= True, bycols=False):
     """ 
     This function transforms the absolute values in each row or column (option 'bycols') into relative values.
@@ -149,14 +151,14 @@ def get_percentiles_heatmap(df, Z_dendrogram, bydendro= True, bycols=False):
     :param bool bycols: relative values calculated across rows (samples) then set to False. Calculation performed across columns (features) set to True.
     :return: Pandas dataframe.
     """
-    if bydendro == True:
+    if bydendro:
         df2 = df_sort_by_dendrogram(df, Z_dendrogram)
     else:
         df2 = df
 
     p = pd.DataFrame(index=df2.index, columns=df2.columns)
 
-    if bycols == True:
+    if bycols:
         for j in df2.index:
             for i in df2.columns:
                 pct = (df2.loc[j,i] - np.nanmin(df2.loc[j,:])) / ((np.nanmax(df2.loc[j, :]) - np.nanmin(df2.loc[j, :])) * 1.)
@@ -170,6 +172,7 @@ def get_percentiles_heatmap(df, Z_dendrogram, bydendro= True, bycols=False):
                 p.loc[i,j] = pct
     return p
 
+
 def get_miss_values_df(data):
     """ 
     Proccesses pandas dataframe so missing values can be plotted in heatmap with specific color.
@@ -181,6 +184,7 @@ def get_miss_values_df(data):
     df = df.isnull().astype('int')
     df = df.replace(0, np.nan)
     return df
+
 
 def paste_matrices(matrix1, matrix2, rows, cols):
     """ 
@@ -201,6 +205,7 @@ def paste_matrices(matrix1, matrix2, rows, cols):
     text.shape = (matrix1.shape[0], matrix1.shape[1])
     textMatrix = pd.DataFrame(text, index=rows, columns=cols)
     return textMatrix
+
 
 def cutreeDynamic(distmatrix, linkagefun='average', minModuleSize=50, method='hybrid', deepSplit=2, pamRespectsDendro=False, distfun=None):
     """
@@ -309,16 +314,23 @@ def calculate_module_eigengenes(data, modColors, softPower=6, dissimilarity=True
     :param dissimilarity: calculates dissimilarity of module eigengenes.
     :return: Pandas dataframe with calculated module eigengenes. If dissimilarity is set to True, returns a tuple with two pandas dataframes, the first with the module eigengenes and the second with the eigengenes dissimilarity. 
     """
-    MEList = WGCNA.moduleEigengenes(data, modColors, softPower=softPower)
-    MEs0 = MEList.rx2('eigengenes')
-    MEs = WGCNA.orderMEs(MEs0, verbose=0)
-    if dissimilarity:
-        MEcor = WGCNA.cor(MEs, verbose=0)
-        MEcor = R_wrapper.R_matrix2Py_matrix(MEcor, MEcor.rownames, MEcor.colnames)
-        MEDiss = 1 - MEcor
-        return MEs, MEDiss
-    else:
-        return MEs
+    MEs = pd.DataFrame()
+    MEDiss = pd.DataFrame()
+    try:
+        MEList = WGCNA.moduleEigengenes(data, modColors, softPower=softPower)
+        MEs0 = MEList.rx2('eigengenes')
+        MEs = WGCNA.orderMEs(MEs0, verbose=0)
+        if dissimilarity:
+            MEcor = WGCNA.cor(MEs, verbose=0)
+            MEcor = R_wrapper.R_matrix2Py_matrix(MEcor, MEcor.rownames, MEcor.colnames)
+            MEDiss = 1 - MEcor
+            return MEs, MEDiss
+        else:
+            return MEs, MEDiss
+    except embedded.RRuntimeError as err:
+        print(err)
+    
+    return MEs, MEDiss
 
 def merge_similar_modules(data, modColors, MEDissThres=0.4, verbose=0):
     """ 
@@ -330,10 +342,17 @@ def merge_similar_modules(data, modColors, MEDissThres=0.4, verbose=0):
     :param int verbose: integer level of verbosity. Zero means silent, higher values make the output progressively more and more verbose.
     :return: Tuple containing pandas dataframe with eigengenes of the new merged modules, and array with module colors of each expeirmental feature.
     """
-    merge = WGCNA.mergeCloseModules(data, modColors, cutHeight=MEDissThres, verbose=verbose)
-    mergedColors = merge.rx2('colors')
-    mergedMEs = merge.rx2('newMEs')
+    mergedMEs = pd.DataFrame()
+    mergedColors = []
+    try:
+        merge = WGCNA.mergeCloseModules(data, modColors, cutHeight=MEDissThres, verbose=verbose)
+        mergedColors = merge.rx2('colors')
+        mergedMEs = merge.rx2('newMEs')
+    except embedded.RRuntimeError as err:
+        print(err)
+        
     return mergedMEs, mergedColors
+
 
 def calculate_ModuleTrait_correlation(df_exp, df_traits, MEs):
     """ 
@@ -347,20 +366,21 @@ def calculate_ModuleTrait_correlation(df_exp, df_traits, MEs):
     nSamples = len(df_exp.index)
     moduleTraitCor = None 
     textMatrix = None
-
-    df_traits_r = df_traits.copy()
-    df_traits_r.columns = df_traits_r.columns.str.replace(' ', 'space')
-    df_traits_r.columns = df_traits_r.columns.str.replace('(', 'parentheses1')
-    df_traits_r.columns = df_traits_r.columns.str.replace(')', 'parentheses2')
-    common = list(set(MEs.index).intersection(df_traits_r.index))
+    print(type(MEs))
+    print(type(df_traits))
+    
+    df_traits.columns = df_traits.columns.str.replace(' ', 'space')
+    df_traits.columns = df_traits.columns.str.replace('(', 'parentheses1')
+    df_traits.columns = df_traits.columns.str.replace(')', 'parentheses2')
+    common = list(set(MEs.index).intersection(df_traits.index))
     if len(common) > 0:
-        moduleTraitCor_r = WGCNA.cor(MEs.loc[common,:], df_traits_r.loc[common,:], use='p', verbose=0)
+        moduleTraitCor_r = WGCNA.cor(MEs.loc[common,:], df_traits.loc[common,:], use='p', verbose=0)
         moduleTraitPvalue_r = WGCNA.corPvalueStudent(moduleTraitCor_r, nSamples)
 
-        textMatrix = paste_matrices(moduleTraitCor_r, moduleTraitPvalue_r, MEs.columns, df_traits_r.columns)
+        textMatrix = paste_matrices(moduleTraitCor_r, moduleTraitPvalue_r, MEs.columns, df_traits.columns)
         
-        moduleTraitCor = pd.DataFrame(moduleTraitCor_r, index=MEs.columns, columns=df_traits_r.columns)
-        moduleTraitPvalue = pd.DataFrame(moduleTraitPvalue_r, index=MEs.columns, columns=df_traits_r.columns)
+        moduleTraitCor = pd.DataFrame(moduleTraitCor_r, index=MEs.columns, columns=df_traits.columns)
+        moduleTraitPvalue = pd.DataFrame(moduleTraitPvalue_r, index=MEs.columns, columns=df_traits.columns)
 
         moduleTraitCor.columns = moduleTraitCor.columns.str.replace('space', ' ')
         moduleTraitPvalue.columns = moduleTraitPvalue.columns.str.replace('space', ' ')

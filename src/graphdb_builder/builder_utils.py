@@ -4,23 +4,24 @@ import certifi
 import urllib3
 import urllib
 import wget
+import base64
+import glob
+import io
 import requests
 import ftplib
 import json
+import gzip
 import shutil
-from Bio import Entrez
-from Bio import Medline
+from Bio import Entrez, Medline, SeqIO
 import os.path
 import collections
 import pprint
 import obonet
 import datetime
-import tarfile
 import logging
 import logging.config
 from config import ckg_config
 import ckg_utils
-import subprocess
 
 
 def readDataset(uri):
@@ -35,32 +36,74 @@ def readDataset(uri):
 
     return data
 
+
 def readDataFromCSV(uri):
     """
     Read the data from csv file
 
     """
-    data = pd.read_csv(uri, sep = ',', low_memory=False)
+    data = pd.read_csv(uri, sep=',', low_memory=False)
 
     return data
+
 
 def readDataFromTXT(uri):
     """
     Read the data from tsv or txt file
 
     """
-    data = pd.read_csv(uri, sep = '\t', low_memory=False)
+    data = pd.read_csv(uri, sep='\t', low_memory=False)
 
     return data
+
 
 def readDataFromExcel(uri):
     """
     Read the data from Excel file
 
     """
-    data = pd.read_excel(uri, index_col=None, na_values=['NA'], convert_float = True)
+    data = pd.read_excel(uri, index_col=None, na_values=['NA'], convert_float=True)
 
     return data
+
+
+def get_files_by_pattern(regex_path):
+    files = glob.glob(regex_path)
+
+    return files
+
+
+def get_extra_pairs(directory, extra_file):
+    extra = set()
+    file_path = os.path.join(directory, extra_file)
+
+    if os.path.isfile(file_path):
+        with open(file_path, 'r') as f:
+            for line in f:
+                data = line.rstrip("\r\n").split("\t")
+                extra.add(tuple(data))
+
+    return extra
+
+
+def parse_contents(contents, filename):
+    """
+    Reads binary string files and returns a Pandas DataFrame.
+    """
+    df = None
+    content_type, content_string = contents.split(',')
+    decoded = base64.b64decode(content_string)
+    file_format = filename.split('.')[-1]
+
+    if file_format == 'txt':
+        df = pd.read_csv(io.StringIO(decoded.decode('utf-8')), sep='\t', low_memory=True)
+    elif file_format == 'csv':
+        df = pd.read_csv(io.StringIO(decoded.decode('utf-8')), low_memory=True)
+    elif file_format == 'xlsx' or file_format == 'xls':
+        df = pd.read_excel(io.BytesIO(decoded))
+
+    return df
+
 
 def export_contents(data, dataDir, filename):
     """
@@ -69,12 +112,13 @@ def export_contents(data, dataDir, filename):
     """
     file = filename.split('.')[-1]
     if file == 'txt' or file == 'tsv':
-        csv_string = data.to_csv(os.path.join(dataDir, filename), sep='\t', index=False, encoding='utf-8')
+        csv_string = data.to_csv(os.path.join(dataDir, filename), sep='\t', index=True, encoding='utf-8')
     elif file == 'csv':
-        csv_string = data.to_csv(os.path.join(dataDir, filename), sep=',', index=False, encoding='utf-8')
+        csv_string = data.to_csv(os.path.join(dataDir, filename), sep=',', index=True, encoding='utf-8')
     elif file == 'xlsx' or file == 'xls':
-        csv_string = data.to_excel(os.path.join(dataDir, filename), index=False, encoding='utf-8')   
+        csv_string = data.to_excel(os.path.join(dataDir, filename), index=True, encoding='utf-8')
     return csv_string
+
 
 def write_relationships(relationships, header, outputfile):
     """
@@ -93,6 +137,7 @@ def write_relationships(relationships, header, outputfile):
     except Exception as err:
         raise csv.Error("Error writing relationships to file: {}.\n {}".format(outputfile, err))
 
+
 def write_entities(entities, header, outputfile):
     """
     Reads a set of entities and saves them to a file.
@@ -110,6 +155,7 @@ def write_entities(entities, header, outputfile):
     except csv.Error as err:
         raise csv.Error("Error writing etities to file: {}.\n {}".format(outputfile, err))
 
+
 def get_config(config_name, data_type='databases'):
     """
     Reads YAML configuration file and converts it into a Python dictionary.
@@ -124,6 +170,24 @@ def get_config(config_name, data_type='databases'):
     config = ckg_utils.get_configuration(os.path.join(cwd, '{}/config/{}'.format(data_type, config_name)))
 
     return config
+
+
+def expand_cols(data, col, sep=';'):
+    """
+    Expands the rows of a dataframe by splitting the specified column
+
+    :param data: dataframe to be expanded
+    :param str col: column that contains string to be expanded (i.e. 'P02788;E7EQB2;E7ER44;P02788-2;C9JCF5')
+    :param str sep: separator (i.e. ';')
+    :return: expanded pandas dataframe
+    """
+    s = data[col].str.split(sep).apply(pd.Series, 1).stack().reset_index(level=1, drop=True)
+    del data[col]
+    pdf = s.to_frame(col)
+    data = data.join(pdf)
+
+    return data
+
 
 def setup_config(data_type="databases"):
     """
@@ -153,6 +217,7 @@ def setup_config(data_type="databases"):
 
     return config
 
+
 def get_full_path_directories():
     """
     Reads Builder YAML configuration file and returns the full path of all directories.
@@ -164,12 +229,13 @@ def get_full_path_directories():
         config = ckg_utils.get_configuration(os.path.join(dirname, ckg_config.builder_config_file))
         if 'directories' in config:
             for directory in config['directories']:
-                directories[directory] = os.path.join(dirname,config['directories'][directory])
+                directories[directory] = os.path.join(dirname, config['directories'][directory])
         
     except Exception as err:
         raise Exception("Error {}: builder_utils - Reading directories from configuration > {}.".format(err, ckg_config.builder_config_file))
 
     return directories
+
 
 def list_ftp_directory(ftp_url, user='', password=''):
     """
@@ -194,6 +260,7 @@ def list_ftp_directory(ftp_url, user='', password=''):
 
     return files
 
+
 def setup_logging(path='log.config', key=None):
     """
     Setup logging configuration.
@@ -208,13 +275,14 @@ def setup_logging(path='log.config', key=None):
             config = json.load(f)
         try:
             logging.config.dictConfig(config)
-        except:
+        except Exception:
             logging.basicConfig(level=logging.DEBUG)        
     else:
         logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger(key)
-    
+ 
     return logger
+
 
 def downloadDB(databaseURL, directory=None, file_name=None, user="", password=""):
     """
@@ -233,7 +301,7 @@ def downloadDB(databaseURL, directory=None, file_name=None, user="", password=""
     if directory is None:
         directory = dbconfig["databasesDir"]
     if file_name is None:
-        file_name = databaseURL.split('/')[-1]
+        file_name = databaseURL.split('/')[-1].replace('?','_').replace('=','_')
     header = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36'}
     try:
         mode = 'wb'
@@ -241,14 +309,14 @@ def downloadDB(databaseURL, directory=None, file_name=None, user="", password=""
             domain = databaseURL.split('/')[2]
             ftp_file = '/'.join(databaseURL.split('/')[3:])
             with ftplib.FTP(domain) as ftp:
-                ftp.login(user=user, passwd = password)
-                ftp.retrbinary("RETR " + ftp_file ,  open(os.path.join(directory, file_name), mode).write)
+                ftp.login(user=user, passwd=password)
+                ftp.retrbinary("RETR " + ftp_file,  open(os.path.join(directory, file_name), mode).write)
         else:
             if os.path.exists(os.path.join(directory, file_name)):
                 os.remove(os.path.join(directory, file_name))
             try:
                 wget.download(databaseURL, os.path.join(directory, file_name))
-            except:
+            except Exception:
                 r = requests.get(databaseURL, headers=header)
                 with open(os.path.join(directory, file_name), 'wb') as out:
                     out.write(r.content)
@@ -264,7 +332,8 @@ def downloadDB(databaseURL, directory=None, file_name=None, user="", password=""
     except Exception as err:
         raise Exception("Something went wrong. {}.\nURL:{}".format(err,databaseURL))
 
-def searchPubmed(searchFields, sortby = 'relevance', num ="10", resultsFormat = 'json'):
+
+def searchPubmed(searchFields, sortby='relevance', num="10", resultsFormat='json'):
     """
     Searches PubMed database for MeSH terms and other additional fields ('searchFields'), sorts them by relevance and \
     returns the top 'num'.
@@ -279,9 +348,9 @@ def searchPubmed(searchFields, sortby = 'relevance', num ="10", resultsFormat = 
     if len(searchFields) > 1:
         query = " [MeSH Terms] AND ".join(searchFields)
     else:
-        query = searchFields[0] +" [MeSH Terms] AND"
+        query = searchFields[0] + " [MeSH Terms] AND"
     try:
-        url = pubmedQueryUrl.replace('TERMS',query).replace('NUM', num)
+        url = pubmedQueryUrl.replace('TERMS', query).replace('NUM', num)
         http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
         response = http.request("GET", urllib.parse.quote(url))
         jsonResponse = response.read()
@@ -312,8 +381,9 @@ def searchPubmed(searchFields, sortby = 'relevance', num ="10", resultsFormat = 
     result = []
     if 'esearchresult' in resultDict:
         result = resultDict['esearchresult']
-    
+
     return result
+
 
 def is_number(s):
     """
@@ -328,6 +398,7 @@ def is_number(s):
     except ValueError:
         return False
 
+
 def getMedlineAbstracts(idList):
     """
     This function accesses NCBI over the WWWW and returns Medline data as a handle object, \
@@ -339,7 +410,7 @@ def getMedlineAbstracts(idList):
     :return: Pandas DataFrame with columns: 'title', 'authors', 'journal', 'keywords', 'abstract', 'PMID' and 'url'.
     """
 
-    fields = {"TI":"title", "AU":"authors", "JT":"journal", "DP":"date", "MH":"keywords", "AB":"abstract", "PMID":"PMID"}
+    fields = {"TI": "title", "AU": "authors", "JT": "journal", "DP": "date", "MH": "keywords", "AB": "abstract", "PMID": "PMID"}
     pubmedUrl = "https://www.ncbi.nlm.nih.gov/pubmed/"
     handle = Entrez.efetch(db="pubmed", id=idList, rettype="medline", retmode="json")
     records = Medline.parse(handle)
@@ -360,6 +431,22 @@ def getMedlineAbstracts(idList):
 
     return abstracts
 
+
+def remove_directory(directory):
+    if os.path.exists(directory):
+        files = listDirectoryFiles(directory)
+        folders = listDirectoryFolders(directory)
+        if 'complete_mapping.tsv' in files:
+            for f in files:
+                if f != 'complete_mapping.tsv':
+                    os.remove(os.path.join(directory, f))
+            for d in folders:
+                remove_directory(os.path.join(directory, d))
+        else:
+            shutil.rmtree(directory, ignore_errors=False, onerror=None)
+    else:
+        print("Done")
+
 def listDirectoryFiles(directory):
     """
     Lists all files in a specified directory.
@@ -373,6 +460,7 @@ def listDirectoryFiles(directory):
 
     return onlyfiles
 
+
 def listDirectoryFolders(directory):
     """
     Lists all directories in a specified directory.
@@ -384,6 +472,7 @@ def listDirectoryFolders(directory):
     from os.path import isdir, join
     dircontent = [f for f in listdir(directory) if isdir(join(directory, f)) and not f.startswith('.')]
     return dircontent
+
 
 def listDirectoryFoldersNotEmpty(directory):
     """
@@ -400,6 +489,7 @@ def listDirectoryFoldersNotEmpty(directory):
     
     return dircontent
 
+
 def checkDirectory(directory):
     """
     Checks if given directory exists and if not, creates it.
@@ -408,6 +498,7 @@ def checkDirectory(directory):
     """
     if not os.path.exists(directory):
         os.makedirs(directory)
+
 
 def flatten(t):
     """
@@ -424,6 +515,7 @@ def flatten(t):
         else:
             yield from flatten(x)
 
+
 def pretty_print(data):
     """
     This function provides a capability to "pretty-print" arbitrary Python data structures in a forma that can be \
@@ -433,6 +525,7 @@ def pretty_print(data):
     """
     pp = pprint.PrettyPrinter(indent=4)
     pp.pprint(data)
+
 
 def convertOBOtoNet(ontologyFile):
     """
@@ -446,6 +539,7 @@ def convertOBOtoNet(ontologyFile):
     
     return graph
 
+
 def getCurrentTime():
     """
     Returns current date (Year-Month-Day) and time (Hour-Minute-Second).
@@ -454,6 +548,7 @@ def getCurrentTime():
     """
     now = datetime.datetime.now()
     return '{}-{}-{}'.format(now.year, now.month, now.day), '{}:{}:{}'.format(now.hour, now.minute, now.second) 
+
 
 def convert_bytes(num):
     """
@@ -466,15 +561,17 @@ def convert_bytes(num):
             return "%3.1f %s" % (num, x)
         num /= 1024.0
 
+
 def copytree(src, dst, symlinks=False, ignore=None):
     for item in os.listdir(src):
         s = os.path.join(src, item)
         checkDirectory(dst)
         d = os.path.join(dst, item)
-        if os.path.isdir(s):
+        if os.path.isdir(s):    
             copytree(s, d, symlinks, ignore)
         else:
             shutil.copy2(s, d)
+
 
 def file_size(file_path):
     """
@@ -487,6 +584,7 @@ def file_size(file_path):
     if os.path.isfile(file_path):
         file_info = os.stat(file_path)
         return str(file_info.st_size)
+
 
 def buildStats(count, otype, name, dataset, filename, updated_on=None):
     """
@@ -505,6 +603,7 @@ def buildStats(count, otype, name, dataset, filename, updated_on=None):
     filename = filename.split('/')[-1]
     
     return(str(y), str(t), dataset, filename, size, count, otype, name, updated_on)
+
 
 def compress_directory(folder_to_backup, dest_folder, file_name):
     """
@@ -528,7 +627,52 @@ def read_gzipped_file(filepath):
     :param str filepath: path to gzip file.
     :return: A bytes sequence that specifies the standard output.
     """
-    p = subprocess.Popen(["gzcat", filepath],
-        stdout=subprocess.PIPE
-    )
-    return p.stdout
+    handle = gzip.open(filepath, "rt")
+    
+    return handle
+
+
+def parse_fasta(file_handler):
+    """
+    Using BioPython to read fasta file as SeqIO objects
+    
+    :param file_handler file_handler: opened fasta file
+    :return iterator records: iterator of sequence objects
+    """
+    records = SeqIO.parse(file_handler,format="fasta")
+    
+    return records
+    
+
+def batch_iterator(iterator, batch_size):
+    """Returns lists of length batch_size.
+
+    This can be used on any iterator, for example to batch up
+    SeqRecord objects from Bio.SeqIO.parse(...), or to batch
+    Alignment objects from Bio.AlignIO.parse(...), or simply
+    lines from a file handle.
+
+    This is a generator function, and it returns lists of the
+    entries from the supplied iterator.  Each list will have
+    batch_size entries, although the final list may be shorter.
+    
+    :param iterator iterator: batch to be extracted
+    :param integer batch_size: size of the batch
+    :return list batch: list with the batch elements of size batch_size
+        
+    source: https://biopython.org/wiki/Split_large_file
+    """
+    entry = True
+    while entry:
+        batch = []
+        while len(batch) < batch_size:
+            try:
+                entry = next(iterator)
+            except StopIteration:
+                entry = None
+            if entry is None:
+                # End of file
+                break
+            batch.append(entry)
+        if batch:
+            yield batch

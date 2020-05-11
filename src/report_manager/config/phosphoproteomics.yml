@@ -1,0 +1,284 @@
+args:
+    imputation: True
+    imputation_method: distribution
+    missing_shift: 1.8
+    missing_nstd: 0.3
+    missing_method: percentage
+    missing_per_group: True
+    missing_max: 0.3
+    value_col: Intensity
+    extra_identifier: name
+    index:
+        - group
+        - sample
+        - subject
+overview: #section
+    overview statistics:
+        data: processed
+        analyses:
+            - summary
+        plots:
+            - multiTable
+        store_analysis: True
+        args:
+            title: Summary Statistics
+    modifications:
+        data: number of modified proteins
+        analyses: []
+        plots:
+            - facetplot
+            - basicTable
+        args:
+            x: x
+            y: y
+            group: group
+            class: type
+            x_title: Analytical sample
+            y_title: number of modified proteins
+            plot_type: bar
+            title: 'Number of modified proteins identified per type'
+    coefficient_variation:
+        data: processed
+        analyses:
+            - coefficient_of_variation
+        plots:
+            - scatterplot_matrix
+        args:
+            drop_columns:
+                - sample
+                - subject
+            columns:
+                - name
+                - y
+            group: group
+            index: True
+            x_title: '%CV'
+            y_title: log2 intensity
+            size: 9
+            height: 900
+            width: 1500
+            title: 'Proteins %CV'
+    ranking:
+        data: 
+            - processed
+        analyses: 
+            - ranking
+        plots:
+            - ranking
+        args:
+            drop_columns: 
+                - sample
+                - subject
+            columns:
+                - name
+                - y
+            data: processed
+            identifier: identifier
+            group: group
+            index: True
+            x_title: Ranking of modified proteins
+            y_title: log2 intensity
+            size: 9
+            height: 900
+            width: 1500
+            title: Modified proteins ranking
+data exploration:
+    stratification:
+        description: '# Principal Component Analysis
+
+                         **Principal component analysis (PCA)** is a statistical procedure that uses an orthogonal transformation to convert a set of observations 
+                         of possibly correlated variables (entities each of which takes on various numerical values) into a set of values of linearly uncorrelated 
+                         variables called principal components. This transformation is defined in such a way that the first principal component has the largest possible variance 
+                         (that is, accounts for as much of the variability in the data as possible), and each succeeding component in turn has the highest variance possible under 
+                         the constraint that it is orthogonal to the preceding components. The resulting vectors (each being a linear combination of the variables and containing n observations) 
+                         are an uncorrelated orthogonal basis set. PCA is sensitive to the relative scaling of the original variables. [Wikipedia](https://en.wikipedia.org/wiki/Principal_component_analysis)'
+        data: processed
+        analyses:
+            - pca
+            #- tsne
+            #- umap
+        plots:
+            - pca
+        args:
+            x_title: PC1
+            y_title: PC2
+            components: 2
+            perplexity: 40
+            n_iter: 1000
+            init: 'pca'
+            width: 1000
+            height: 700
+            loadings: 15
+            title: 'Sample stratification'
+    regulation:
+        description: '# Regulation
+        
+                        **Analysis of variance (ANOVA)** is a collection of statistical models and their associated estimation procedures (such as the "variation" among and between groups) 
+                        used to analyze the differences among group means in a sample. ANOVA was developed by statistician and evolutionary biologist Ronald Fisher. The ANOVA is based on the law of 
+                        total variance, where the observed variance in a particular variable is partitioned into components attributable to different sources of variation. In its simplest form, 
+                        ANOVA provides a statistical test of whether two or more population means are equal, and therefore generalizes the t-test beyond two means.[Wikipedia](https://en.wikipedia.org/wiki/Analysis_of_variance)'
+        data: processed
+        analyses:
+            - anova
+        plots:
+            - basicTable
+            - volcanoplot
+        store_analysis: True
+        args:
+            alpha: 0.05
+            fc: 2.0
+            group: 'group'
+            subject: subject
+            colorscale: 'Blues'
+            showscale: False
+            marker_size: 10
+            permutations: 0
+            num_annotations: 50
+            x_title: log2FC
+            y_title: -log10(pvalue)
+            drop_cols:
+                - sample
+                - subject
+            name: name
+            title: 'Differential regulation ANOVA'
+data associations:
+    substrate_associations:
+        data: regulated
+        analyses: []
+        plots:
+            - network
+        store_analysis: True
+        args:
+            use:
+                columns: identifiers
+            source: node1
+            target: node2
+            title: 'Kinase-substrate network'
+            format: edgelist
+            values: weight
+            dist: False
+            node_properties: {}
+            width: 1600
+            height: 1600
+            maxLinkWidth: 7
+            maxRadius: 20
+            color_weight: False
+            node_size: 'degree'
+            communities_algorithm: louvain
+    kinase_regulation:
+        data: 
+            - regulated
+            - modifier values
+        analyses: 
+            - merge_for_polar
+        plots:
+            - polar
+        store_analysis: True
+        args:
+            regulation_data: regulated
+            regulators: modifier values
+            group_col: 'group'
+            identifier_col: 'identifier'
+            normalize: True
+            aggr_func: 'mean'
+            width: 900
+            height: 800
+            group_by: 
+                - modifier
+                - group 
+            value_col: value
+            theta_col: modifier
+            color_col: group
+            type: line
+            title: 'Intensities by Kinase'
+    reg_go_annotation:
+        data: regulated
+        analyses: []
+        plots:
+            - basicTable
+        store_analysis: True
+        args:
+            use:
+                columns: identifiers
+            height: 700
+            width: 900
+            title: 'GO biological processes associated to regulating Kinases'
+    drug_associations:
+        data: regulated
+        analyses: []
+        plots:
+            - basicTable
+        store_analysis: True
+        args:
+            use:
+                columns: identifiers
+            height: 700
+            width: 900
+            title: 'Drugs targetting proteins with differentially regulated modifications'
+    disease_associations:
+        data: regulated
+        analyses: []
+        plots:
+            - basicTable
+        store_analysis: True
+        args:
+            use:
+                columns: identifiers
+            height: 700
+            width: 900
+            title: 'Diseases associated with the differentially regulated modified proteins'
+    go_annotation_mod:
+        data: regulated
+        analyses: []
+        plots:
+            - basicTable
+        store_analysis: True
+        args:
+            use:
+                columns: identifiers
+            height: 700
+            width: 900
+            title: 'GO biological processes associated with the differentially regulated modified proteins'
+enrichment:
+    go_enrichment:
+        data: 
+            - regulation table
+            - go annotation
+        analyses:
+            - regulation_site_enrichment
+        plots:
+            - basicTable
+        store_analysis: True
+        args:
+            regulation_data: regulation table
+            annotation: go annotation
+            identifier: identifier
+            groups:
+                - group1
+                - group2
+            annotation_type: Biological_processes
+            annotation_col: annotation
+            reject_col: rejected
+            method: fisher
+            title: 'Gene Ontology Enrichment for proteins with differentially regulated modifications'
+    pathway_enrichment:
+        data: 
+            - regulation table
+            - pathway annotation
+        analyses:
+            - regulation_site_enrichment
+        plots:
+            - basicTable
+        store_analysis: True
+        args:
+            regulation_data: regulation table
+            annotation: pathway annotation
+            identifier: identifier
+            groups:
+                - group1
+                - group2
+            annotation_type: Pathways
+            annotation_col: annotation
+            reject_col: rejected
+            method: fisher
+            title: 'Pathway Enrichment for proteins with differentially regulated modifications'

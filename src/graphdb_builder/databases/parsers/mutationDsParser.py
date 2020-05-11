@@ -1,20 +1,18 @@
 import os.path
 import re
-from collections import defaultdict
-import ckg_utils
 from graphdb_builder import builder_utils
 
 ############################
 #    IntAct - MutationDs   # 
 ############################
-def parser(databases_directory, download = True):
+def parser(databases_directory, download=True):
     relationships = set()
     config = builder_utils.get_config(config_name="mutationDsConfig.yml", data_type='databases')
     header = config['header']
     output_file_name = "mutation_curated_affects_interaction_with.tsv"
     regex = r":(\w+)\("
     url = config['mutations_url']
-    directory = os.path.join(databases_directory,"MutationDs")
+    directory = os.path.join(databases_directory, "MutationDs")
     builder_utils.checkDirectory(directory)
     file_name = os.path.join(directory, url.split('/')[-1])
     if download:
@@ -35,7 +33,7 @@ def parser(databases_directory, download = True):
                 organism = data[10]
                 interaction = data[11]
                 evidence = data[12]
-                
+
                 if organism.startswith("9606") and len(protein) > 1:
                     protein = protein[1]
                     pvariant = protein+"_"+pvariant
@@ -43,4 +41,7 @@ def parser(databases_directory, download = True):
                     for matchNum, match in enumerate(matches, start=1):
                         interactor = match.group(1)
                         relationships.add((pvariant, interactor, "CURATED_AFFECTS_INTERACTION_WITH", effect, interaction, evidence, internal_id, "Intact-MutationDs"))
+    
+    builder_utils.remove_directory(directory)
+    
     return (relationships, header, output_file_name)

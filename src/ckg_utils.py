@@ -1,8 +1,8 @@
 import os
-import sys
 import yaml
 import json
 import logging
+
 
 def save_dict_to_yaml(data, yaml_file):
     with open(yaml_file, 'w') as out:
@@ -11,6 +11,7 @@ def save_dict_to_yaml(data, yaml_file):
             out.write(content)
         except yaml.YAMLError as err:
             raise yaml.YAMLError("The yaml file {} could not be parsed. {}".format(yaml_file, err))
+
 
 def read_yaml(yaml_file):
     content = None
@@ -21,8 +22,9 @@ def read_yaml(yaml_file):
             raise yaml.YAMLError("The yaml file {} could not be parsed. {}".format(yaml_file, err))
     return content
 
+
 def get_queries(queries_file):
-    queries  = None
+    queries = None
     if queries_file.endswith("yml"):
         queries = read_yaml(queries_file)
     else:
@@ -30,8 +32,9 @@ def get_queries(queries_file):
 
     return queries
 
+
 def get_configuration(configuration_file):
-    configuration  = None
+    configuration = None
     if configuration_file.endswith("yml"):
         configuration = read_yaml(configuration_file)
     else:
@@ -39,12 +42,14 @@ def get_configuration(configuration_file):
 
     return configuration
 
+
 def get_configuration_variable(configuration_file, variable):
     configuration = get_configuration(configuration_file)
     if variable in configuration:
         return configuration[variable]
     else:
         raise Exception("The varible {} is not found in the configuration file {}. {}".format(variable, configuration_file))
+
 
 def setup_logging(path='log.config', key=None):
     """Setup logging configuration"""
@@ -64,14 +69,12 @@ def listDirectoryFiles(directory):
 
     return onlyfiles
 
+
 def listDirectoryFolders(directory):
     dircontent = [f for f in os.listdir(directory) if os.path.isdir(os.path.join(directory, f)) and not f.startswith('.')]
     return dircontent
 
+
 def checkDirectory(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
-    
-
-
-#Add QR code creation

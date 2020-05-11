@@ -1,6 +1,7 @@
 Disease:
   name: associated diseases in at least two of the proteins specified
   description: get relationships to diseases from a list of proteins. Limit the result to diseases associated to the disease studied and with a score higher than 3 (DISEASES).
+  query_type: knowledge_report
   involved_nodes:
     - Protein
     - Disease
@@ -16,6 +17,7 @@ Disease:
 Drug:
   name: associated drugs in at least two of the proteins specified
   description: get relationships to drugs. Limit the result to drugs associated to at least two proteins with a score higher than 0.9 (STITCH).
+  query_type: knowledge_report
   involved_nodes:
     - Protein
     - Drug
@@ -23,15 +25,32 @@ Drug:
     - ACTS_ON
   query: >
           MATCH (protein:Protein)-[r:ACTS_ON]-(drug:Drug)
-          WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS]) AND toFloat(r.score)>0.9
-          WITH drug, count(r) AS r_count
-          WHERE r_count>1
-          MATCH (protein:Protein)-[r:ACTS_ON]-(drug)
-          WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS]) AND toFloat(r.score)>0.9
+          WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS]) AND toFloat(r.score)>=0.9
+          WITH drug, count(protein) AS r_count
+          WHERE r_count>=LIMIT_COUNT
+          MATCH (protein:Protein)<-[r:ACTS_ON]-(drug)
+          WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS]) AND toFloat(r.score)>=0.9
           RETURN (protein.name+"~"+protein.id) AS node1, drug.name AS node2, r.score AS weight, r.action AS type
+Complex:
+  name: associated complexes in at least two of the proteins specified
+  description: get annotated to complexes. Limit the result to complexes with at least two proteins annotated.
+  query_type: knowledge_report
+  involved_nodes:
+    - Protein
+    - Complex
+  involved_rels:
+    - IS_SUBUNIT_OF
+  query: >
+          MATCH (complex:Complex)<-[:IS_SUBUNIT_OF]-(protein:Protein) 
+          WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS]) 
+          WITH complex, collect(protein) as Proteins WHERE size(Proteins)>=LIMIT_COUNT
+          MATCH (complex)<-[r:IS_SUBUNIT_OF]-(p:Protein)
+          WHERE ((p.name+"~"+p.id) IN [PROTEINIDS])
+          RETURN (p.name+"~"+p.id) as node1, complex.name AS node2, r.score AS weight, type(r) as type
 Pathway:
   name: associated pathways
   description: get relationships to pathways. Limit the result to pathways associated to at least two proteins.
+  query_type: knowledge_report
   involved_nodes:
     - Protein
     - Pathway
@@ -40,32 +59,32 @@ Pathway:
   query: >
           MATCH (protein:Protein)-[r]-(pathway:Pathway)
           WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS]) AND toLower(r.source)="reactome"
-          WITH pathway, count(r) AS r_count
-          WHERE r_count>2
+          WITH pathway, count(protein) AS r_count
+          WHERE r_count>=LIMIT_COUNT
           MATCH (protein:Protein)-[r]-(pathway)
           WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS])
           RETURN (protein.name+"~"+protein.id) AS node1, pathway.name AS node2, r.score AS weight, type(r) AS type
 Publication:
   name: associated publications
-  description: get publications where at least 3 proteins have been mentioned
+  description: get publications where at least LIMIT_COUNT proteins have been mentioned
+  query_type: knowledge_report
   involved_nodes:
     - Protein
     - Publication
   involved_rels:
     - MENTIONED_IN_PUBLICATION
   query: >
-          MATCH (protein:Protein)-[r]-(publication:Publication)
-          WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS])
-          WITH publication, count(r) AS r_count WHERE r_count>3
-          MATCH (project:Project)-[:STUDIES_DISEASE]-(d:Disease)-[:HAS_PARENT]->(parent_disease:Disease)
-          WHERE project.id="PROJECTID"
-          WITH COLLECT(parent_disease) + COLLECT(d) AS parent_diseases, publication
-          MATCH (protein:Protein)-[r]-(publication)-[]-(:Disease)-[:HAS_PARENT]->(parents:Disease)
-          WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS]) AND parents IN parent_diseases
-          RETURN (protein.name+"~"+protein.id) AS node1, ("PMID:"+publication.id) AS node2, type(r) AS type
+        MATCH (project:Project)-[:STUDIES_DISEASE]->(disease:Disease)-[:HAS_PARENT]->(pdisease:Disease)<-[:HAS_PARENT]-(cdiseases:Disease) 
+        WHERE project.id="PROJECTID" 
+        WITH collect(disease)+collect(pdisease)+collect(cdiseases) AS diseases            
+        MATCH (d:Disease)-[:MENTIONED_IN_PUBLICATION]->(publication:Publication)<-[r:MENTIONED_IN_PUBLICATION]-(protein:Protein)
+        WHERE d in diseases AND (protein.name+"~"+protein.id) IN [PROTEINIDS]
+        WITH protein, publication, r, COUNT(r) AS r_count WHERE r_count>=LIMIT_COUNT
+        RETURN DISTINCT (protein.name+"~"+protein.id) AS node1, ("PMID:"+publication.id) AS node2, type(r) as type, r_count ORDER BY r_count DESC LIMIT 70;
 association_disease_score:
   name: specific disease
   description: Return the list of proteins associated to a specific disease with a specific score.
+  query_type: knowledge
   involved_nodes:
     - Protein
     - Disease
@@ -83,6 +102,7 @@ association_disease_score:
 association_drug_intervention_proteins:
   name: drug intervention- protein association
   description: Return associations between a list of proteins and the drug intervention in the project
+  query_type: knowledge
   involved_nodes:
     - Project
     - Protein
@@ -107,6 +127,7 @@ association_drug_intervention_proteins:
 association_drug_interaction_score:
   name: drug interaction association
   description: Return the list of drugs associated to the list of proteins provided with a specific interaction (i.e. inhibition, activation) with a specific score
+  query_type: knowledge
   involved_nodes:
     - Protein
     - Drug
@@ -124,6 +145,7 @@ association_drug_interaction_score:
 association_drug_sideeffects:
   name: drug side effect association
   description: Return the list of side effects linked to drugs
+  query_type: knowledge
   involved_nodes:
     - Phenotype
     - Drug
@@ -139,6 +161,7 @@ association_drug_sideeffects:
 association_drug_disease_publication:
   name: drug co-mentioned with disease in publication
   description: Return the list of publications co-mentioning drugs and a specific disease
+  query_type: knowledge
   involved_nodes:
     - Drug
     - Disease
@@ -156,6 +179,7 @@ association_drug_disease_publication:
 association_combination_drug_disease_publication:
   name: combinations of drugs co-mentioned with disease
   description: Return the list of publications co-mentioning combinations of drugs and a specific disease
+  query_type: knowledge
   involved_nodes:
     - Drug
     - Disease
@@ -176,6 +200,7 @@ association_combination_drug_disease_publication:
 side_effects_jaccard_similarity_intervention_proposed_drugs:
   name: similarity between side effects
   description: Return the jaccard similarity between drugs used and alternative drugs proposed
+  query_type: knowledge
   involved_nodes:
     - Drug
     - Clinical_variable

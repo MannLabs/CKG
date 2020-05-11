@@ -63,10 +63,11 @@ similarity:
         - HAS_QUANTIFIED_PROTEIN
     query_type: pre
     query: >
-        MATCH (project1:Project{id:'PROJECTID'})-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
+        MATCH (project1:Project{id:'PROJECTID'})-[:HAS_ENROLLED]->(:Subject)<-[:BELONGS_TO_SUBJECT]-(:Biological_sample)-[:SPLITTED_INTO]->(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
         WHERE toBoolean(r.is_razor)
         WITH project1, algo.similarity.asVector(protein, r.value) AS p1Vector
-        MATCH (project2:Project)-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) WHERE toBoolean(r.is_razor) AND project1 <> project2
+        MATCH (project2:Project)-[:HAS_ENROLLED]->(:Subject)<-[:BELONGS_TO_SUBJECT]-(:Biological_sample)-[:SPLITTED_INTO]->(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
+        WHERE toBoolean(r.is_razor) AND project1 <> project2
         WITH project1, project2, p1Vector, algo.similarity.asVector(protein, r.value) AS p2Vector
         RETURN project1.id AS current_id, project2.id AS other_id, project1.name AS current, project2.name AS other, project2.description AS description, project2.responsible AS responsible, algo.similarity.pearson(p1Vector, p2Vector, {vectorType: "maps"}) AS similarity_pearson ORDER BY similarity_pearson DESC
 overlap:
@@ -77,7 +78,7 @@ overlap:
     involved_rels:
     query_type: pre
     query: >
-        MATCH (project:Project)-[]-(:Subject)-[]-(:Biological_sample)-[]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
+        MATCH (project:Project)-[:HAS_ENROLLED]->(:Subject)<-[:BELONGS_TO_SUBJECT]-(:Biological_sample)-[:SPLITTED_INTO]->(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
         WHERE toBoolean(r.is_razor)
         WITH {item:id(project), name:project.id, categories: collect(DISTINCT id(protein))} as projectData
         WITH collect(projectData) as data
@@ -87,6 +88,23 @@ overlap:
         RETURN algo.getNodeById(item1).name AS project1_name, algo.getNodeById(item2).name AS project2_name, 
         algo.getNodeById(item1).id AS from, algo.getNodeById(item2).id AS to, count1 AS project1_total, count2 AS project2_total, count1-intersection AS project1_unique, 
         count2-intersection AS project2_unique, intersection, similarity ORDER BY similarity DESC
+project_graph:
+    name: project graph
+    description: full graph for a project
+    involves_nodes:
+        - Project
+        - Biological_samples
+        - Anlytical_samples
+    involved_rels:
+        - HAS_ENROLLED
+        - BELONGS_TO_SUBJECT
+        - SPLITTED_INTO
+    query: >
+        MATCH (p:Project)-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(n:Protein)
+        WHERE p.id="PROJECTID"
+        WITH p.id AS project, COUNT(DISTINCT s.id) AS subjects, COUNT(DISTINCT b.id) AS biological_samples,
+        COUNT(DISTINCT a.id) AS analytical_samples, COUNT(DISTINCT r.proteinGroup) AS groups, COUNT(DISTINCT n.id) AS proteins
+        RETURN project, subjects, biological_samples, analytical_samples, groups, proteins;
 projects_subgraph:
     name: connected projects
     description: returns a subgraph for a list of projects
@@ -101,4 +119,4 @@ projects_subgraph:
         - STUDIES_INTERVENTION
     query_type: post
     query: >
-        MATCH path=(p:Project)-[:STUDIES_DISEASE|:STUDIES_TISSUE|:STUDIES_INTERVENTION]-() WHERE p.id IN [LIST_PROJECTS] RETURN path
+        MATCH path=(p:Project)-[:STUDIES_DISEASE|:STUDIES_TISSUE|:STUDIES_INTERVENTION]->() WHERE p.id IN [LIST_PROJECTS] RETURN path

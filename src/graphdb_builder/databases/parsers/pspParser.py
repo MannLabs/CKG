@@ -1,16 +1,11 @@
 import os.path
 import gzip
-import re
-import pandas as pd
 from collections import defaultdict
-import ckg_utils
 from graphdb_builder import mapping as mp, builder_utils
 
-#############################
-#       PhosphoSitePlus     # 
-#############################
+
 def parser(databases_directory):
-    directory = os.path.join(databases_directory,"PhosphoSitePlus")
+    directory = os.path.join(databases_directory, "PhosphoSitePlus")
     builder_utils.checkDirectory(directory)
     config = builder_utils.get_config(config_name="pspConfig.yml", data_type='databases')
     modifications = config['modifications']
@@ -31,16 +26,17 @@ def parser(databases_directory):
         file_name = os.path.join(directory, annotation_files[er])
         with gzip.open(file_name, 'r') as f:
             if entity == "disease":
-                mapping = mp.getMappingFromOntology(ontology = "Disease", source = None)
-                relationships[(entity,relationship_type)].update(parseDiseaseAnnotations(f, modifications, mapping))
+                mapping = mp.getMappingFromOntology(ontology="Disease", source=None)
+                relationships[(entity, relationship_type)].update(parseDiseaseAnnotations(f, modifications, mapping))
             elif entity == "biological_process":
-                mapping = mp.getMappingFromOntology(ontology = "Gene_ontology", source = None)
-                relationships[(entity,relationship_type)].update(parseRegulationAnnotations(f, modifications, mapping))
+                mapping = mp.getMappingFromOntology(ontology="Gene_ontology", source=None)
+                relationships[(entity, relationship_type)].update(parseRegulationAnnotations(f, modifications, mapping))
             elif entity == "substrate":
-                relationships[(entity,relationship_type)] = parseKinaseSubstrates(f, modifications)
-    
+                relationships[(entity, relationship_type)] = parseKinaseSubstrates(f, modifications)
+
     return entities, relationships, entities_header, relationships_headers
-    
+
+
 def parseSites(fhandler, modifications):
     entities = set()
     relationships = defaultdict(set)
@@ -65,8 +61,9 @@ def parseSites(fhandler, modifications):
                 relationships[("Protein", "has_modified_site")].add((protein, modified_protein_id, "HAS_MODIFIED_SITE", "PhosphositePlus"))
                 relationships[("Peptide", "has_modified_site")].add((seq_window.upper(), modified_protein_id, "HAS_MODIFIED_SITE", "PhosphositePlus"))
                 relationships[("Modified_protein", "has_modification")].add((modified_protein_id, modification, "HAS_MODIFICATION", "PhosphositePlus"))
-    
+
     return entities, relationships
+
 
 def parseKinaseSubstrates(fhandler, modifications):
     relationships = set()
@@ -81,9 +78,10 @@ def parseKinaseSubstrates(fhandler, modifications):
         substrate = data[6]
         modified_protein_id = substrate+'_'+data[9]+'-p'
         if organism == "human":
-            relationships.add((modified_protein_id,kinase,"IS_SUBSTRATE_OF", "NA","CURATED", 5, "PhosphoSitePlus"))
+            relationships.add((modified_protein_id, kinase, "IS_SUBSTRATE_OF", "NA", "CURATED", 5, "PhosphoSitePlus"))
     return relationships
-    
+
+
 def parseRegulationAnnotations(fhandler, modifications, mapping):
     relationships = set()
     i = 0
@@ -103,13 +101,14 @@ def parseRegulationAnnotations(fhandler, modifications, mapping):
             for process in processes:
                 if process.lower() in mapping:
                     process_code = mapping[process.lower()]
-                    relationships.add((modified_protein_id,process_code,"ASSOCIATED_WITH", "CURATED", 5, "PhosphoSitePlus", pmid,"unspecified"))
+                    relationships.add((modified_protein_id, process_code, "ASSOCIATED_WITH", "CURATED", 5, "PhosphoSitePlus", pmid, "unspecified"))
                 elif process.lower().split(',')[0] in mapping:
                     process_code = mapping[process.lower().split(',')[0]]
-                    relationships.add((modified_protein_id,process_code,"ASSOCIATED_WITH", "CURATED", 5, "PhosphoSitePlus", pmid,process.lower().split(',')[1]))
+                    relationships.add((modified_protein_id, process_code, "ASSOCIATED_WITH", "CURATED", 5, "PhosphoSitePlus", pmid, process.lower().split(',')[1]))
                 else:
                     pass
     return relationships
+
 
 def parseDiseaseAnnotations(fhandler, modifications, mapping):
     relationships = set()
@@ -132,8 +131,9 @@ def parseDiseaseAnnotations(fhandler, modifications, mapping):
                 for disease_name in diseases:
                     if disease_name.lower() in mapping:
                         disease_code = mapping[disease_name.lower()]
-                        relationships.add((modified_protein_id,disease_code,"ASSOCIATED_WITH", "CURATED", 5, "PhosphoSitePlus", pmid))
+                        relationships.add((modified_protein_id, disease_code, "ASSOCIATED_WITH", "CURATED", 5, "PhosphoSitePlus", pmid))
     return relationships
+
 
 if __name__ == "__main__":
     pass

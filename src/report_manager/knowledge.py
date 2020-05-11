@@ -12,12 +12,11 @@ from report_manager import report as rp
 from analytics_core import utils
 from analytics_core.viz import viz, color_list
 from networkx.readwrite import json_graph
-import logging
-import logging.config
 
 log_config = ckg_config.report_manager_log
 logger = ckg_utils.setup_logging(log_config, key="knowledge")
 cyto.load_extra_layouts()
+
 
 class Knowledge:
     def __init__(self, identifier, data, nodes={}, relationships={}, queries_file=None, colors={}, graph=None, report={}):
@@ -32,15 +31,16 @@ class Knowledge:
         self._default_color = '#636363'
         self._colors = colors
         if len(colors) == 0:
-            self._colors= {'Protein': '#1a9850', 
-                           'Clinical_variable':'#542788',
-                           'Drug':'#c51b7d', 
-                           'Disease':'#b2182b', 
-                           'Pathway': '#762a83', 
-                           'Publication':'#b35806',
-                           'Biological_process':'#e6f598', 
-                           'Symptom':'#f46d43',
-                           'Project':'#3288bd'}
+            self._colors= {'Protein': '#1a9850',
+                           'Clinical_variable': '#542788',
+                           'Drug': '#c51b7d',
+                           'Disease': '#b2182b',
+                           'Pathway': '#762a83',
+                           'Publication': '#b35806',
+                           'Biological_process': '#e6f598',
+                           'Symptom': '#f46d43',
+                           'Project': '#3288bd',
+                           'Complex': '#31a354'}
 
     @property
     def identifier(self):
@@ -144,8 +144,8 @@ class Knowledge:
                     if row['node1'] not in filter or row['node2'] not in filter:
                         continue
                     if np.abs(row['weight']) >= cutoff:
-                        nodes.update({row['node1']: {'type':entity_node1, 'color':node1_color}, row['node2'] : {'type':entity_node2, 'color':node2_color}})
-                        relationships.update({(row['node1'], row['node2']):{'type': 'correlates', 'weight':row['weight'], 'width':np.abs(row['weight']), 'source_color':node1_color, 'target_color':node2_color}})
+                        nodes.update({row['node1']: {'type': entity_node1, 'color': node1_color}, row['node2']: {'type': entity_node2, 'color': node2_color}})
+                        relationships.update({(row['node1'], row['node2']): {'type': 'correlates', 'weight': row['weight'], 'width': np.abs(row['weight']), 'source_color': node1_color, 'target_color': node2_color}})
             
         return nodes, relationships
         
@@ -157,19 +157,19 @@ class Knowledge:
         node2_color = self.colors[entity2] if entity2 in self.colors else self.default_color
         if 'features_per_module' in data:
             modules = data['features_per_module']
-            for i,row in modules.iterrows():
-                nodes.update({"ME"+row['modColor']: {'type':'Module', 'color':color_dict[row['modColor']], 'parent':'Regulated'}, row['name'] : {'type':entity2, 'color':node2_color, 'parent':"ME"+row['modColor']}})
-                relationships.update({('Regulated', "ME"+row['modColor']):{'type': '', 'weight':5, 'source_color':self.default_color, 'target_color':color_dict[row['modColor']]}})
-                relationships.update({("ME"+row['modColor'], row['name']):{'type': 'CONTAINS', 'weight':5, 'source_color':color_dict[row['modColor']], 'target_color':node2_color}})
+            for i, row in modules.iterrows():
+                nodes.update({"ME"+row['modColor']: {'type': 'Module', 'color': color_dict[row['modColor']], 'parent': 'Regulated'}, row['name']: {'type': entity2, 'color': node2_color, 'parent': "ME"+row['modColor']}})
+                relationships.update({('Regulated', "ME"+row['modColor']): {'type': '', 'weight': 5, 'source_color': self.default_color, 'target_color': color_dict[row['modColor']]}})
+                relationships.update({("ME"+row['modColor'], row['name']): {'type': 'CONTAINS', 'weight': 5, 'source_color': color_dict[row['modColor']], 'target_color': node2_color}})
         if 'module_trait_cor' in data and data['module_trait_cor'] is not None:
             correlations = data['module_trait_cor']
             if not correlations.index.is_numeric():
                 correlations = correlations.reset_index()
             correlations = correlations.set_index('index').stack().reset_index()
-            for i,row in correlations.iterrows():
-                if np.abs(row[0])>=cutoff:
-                    nodes.update({row['level_1'] : {'type':entity1, 'color':node1_color}})
-                    relationships.update({(row['index'], row['level_1']):{'type': 'correlates', 'weight':row[0], 'width':row[0], 'source_color':color_dict[row['index'].replace('ME','')], 'target_color':node1_color}})
+            for i, row in correlations.iterrows():
+                if np.abs(row[0]) >= cutoff:
+                    nodes.update({row['level_1']: {'type': entity1, 'color': node1_color}})
+                    relationships.update({(row['index'], row['level_1']): {'type': 'correlates', 'weight': row[0], 'width': row[0], 'source_color': color_dict[row['index'].replace('ME', '')], 'target_color': node1_color}})
             
         return nodes, relationships
     
@@ -194,9 +194,9 @@ class Knowledge:
         node_color = self.colors[entity] if entity in self.colors else self.default_color
         if 'similar_projects' in self.data:
             similar_projects = pd.DataFrame.from_dict(self.data['similar_projects'])
-            for i,row in similar_projects.iterrows():
-                nodes.update({row['other'] : {'type':entity, 'color':node_color}})
-                relationships.update({(row['current'], row['other']):{'type': 'is_similar', 'weight':row['similarity_pearson'], 'width':row['similarity_pearson'],'source_color':node_color, 'target_color':node_color}})
+            for i, row in similar_projects.iterrows():
+                nodes.update({row['other']: {'type': entity, 'color': node_color}})
+                relationships.update({(row['current'], row['other']): {'type': 'is_similar', 'weight': row['similarity_pearson'], 'width': row['similarity_pearson'], 'source_color': node_color, 'target_color': node_color}})
         
         return nodes, relationships
     
@@ -206,14 +206,14 @@ class Knowledge:
         for node2 in queries_results:
             node1_color = self.colors[entity] if entity in self.colors else self.default_color
             node2_color = self.colors[node2] if node2 in self.colors else self.default_color
-            nodes.update({node2: {'color':node2_color, 'type':'Group'}})
+            nodes.update({node2: {'color': node2_color, 'type': 'Group'}})
             result = queries_results[node2]
             for i, row in result.iterrows():
                 rel_type = row['type'] if 'type' in row else 'associated'
                 weight = row['weight'] if 'weight' in row else 5
-                nodes.update({row['node1']: {'type':entity, 'color':node1_color}, row['node2'].replace("'","").title() : {'type':node2, 'color':node2_color, 'parent':node2}})
-                relationships.update({(row['node1'], row['node2'].replace("'","").title()): {'type': rel_type, 'weight':weight, 'width':weight,'source_color':node1_color, 'target_color':node2_color}})
-                relationships.update({(row['node2'].replace("'","").title(), node2): {'type': 'is_a', 'weight':5, 'width':5,'source_color':node2_color, 'target_color':node2_color}})
+                nodes.update({row['node1']: {'type': entity, 'color': node1_color}, row['node2'].replace("'", "").title(): {'type': node2, 'color': node2_color, 'parent': node2}})
+                relationships.update({(row['node1'], row['node2'].replace("'", "").title()): {'type': rel_type, 'weight': weight, 'width': weight, 'source_color': node1_color, 'target_color': node2_color}})
+                relationships.update({(row['node2'].replace("'", "").title(), node2): {'type': 'is_a', 'weight': 5, 'width': 5, 'source_color': node2_color, 'target_color': node2_color}})
         
         return nodes, relationships
     
@@ -228,15 +228,18 @@ class Knowledge:
         try:
             cwd = os.path.abspath(os.path.dirname(__file__))
             cypher_queries = ckg_utils.get_queries(os.path.join(cwd, self.queries_file))
-            for query_name in cypher_queries:
-                query = cypher_queries[query_name]['query']
-                for r,by in replace:
-                    query = query.replace(r,by)
-                query_data[query_name] = self.send_query(query)
+            if cypher_queries is not None:
+                for query_name in cypher_queries:
+                    if 'query_type' in cypher_queries[query_name]:
+                        if cypher_queries[query_name]['query_type'] == 'knowledge_report':
+                            query = cypher_queries[query_name]['query']
+                            for r, by in replace:
+                                query = query.replace(r, by)
+                            query_data[query_name] = self.send_query(query)
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            logger.error("Reading queries from file {}: {}, file: {},line: {}".format(self.queries_file, sys.exc_info(), fname, exc_tb.tb_lineno))
+            logger.error("Reading queries from file {}: {}, file: {},line: {}, err: {}".format(self.queries_file, sys.exc_info(), fname, exc_tb.tb_lineno, err))
 
         return query_data
     
@@ -253,14 +256,13 @@ class Knowledge:
         self.graph = G
         
     def reduce_to_subgraph(self, nodes):
-        edges = {}
         valid_nodes = set(nodes).intersection(list(self.nodes.keys()))
         valid_nodes.add("Regulated")
         aux = set()
         self.generate_knowledge_graph()
         for n in valid_nodes:
             if n in self.nodes:
-                for n1,n2,attr in self.graph.out_edges(n, data=True):
+                for n1, n2,attr in self.graph.out_edges(n, data=True):
                     aux.add(n1)
                     aux.add(n2)
                 for n1,n2,attr in self.graph.in_edges(n, data=True):
@@ -374,9 +376,9 @@ class ProteomicsKnowledge(Knowledge):
         #self.nodes.update(correlation_knowledge[0])
         self.relationships = regulation_knowledge[1]
         #self.relationships.update(correlation_knowledge[1])
-        
         nodes = self.generate_cypher_nodes_list()
-        queries_results = self.query_data(replace=[('PROTEINIDS',nodes), ('PROJECTID', self.identifier)])
+        limit_count = 3 if len(nodes)>10 else 1
+        queries_results = self.query_data(replace=[('PROTEINIDS',nodes), ('PROJECTID', self.identifier), ('LIMIT_COUNT', str(limit_count))])
         queries_knowledge = self.generate_knowledge_from_queries(entity='Protein', queries_results=queries_results)
         self.nodes.update(queries_knowledge[0])
         self.relationships.update(queries_knowledge[1])

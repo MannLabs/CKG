@@ -28,6 +28,12 @@ separator: '|'
 file_clinical: 'ClinicalData_PROJECTID.xlsx'
 file_project: 'ProjectData_PROJECTID.xlsx'
 file_design: 'ExperimentalDesign_PROJECTID.xlsx'
+file_proteomics:
+    maxquant-protein groups: proteinGroups.txt
+    maxquant-peptides: peptides.txt
+    maxquant-oxidation: Oxidation (M)Sites.txt
+    maxquant-glycation: GlycationSites.txt
+    maxquant-phospho sty sites: Phospho (STY)Sites.txt
 
 download: True
 
@@ -60,9 +66,11 @@ graph:
     - ppi
     - diseases
     - biomarkers
+    - qcmarkers
     - drugs
+    - food
     - known_variants
-    - clinical variants
+    - clinical_variants
     - pathology_expression
     - mentions
     - jensenlab
@@ -70,7 +78,6 @@ graph:
     - side effects
     - metabolite
     - protein_structure
-    - food
     - gwas
     - pathway
     - published
@@ -89,11 +96,19 @@ ontology_entities:
     - 'Clinical_variable'
     - 'Phenotype'
     - 'Experiment'
+    - 'Experimental_factor'
+ontology_mappings:
+    Experimental_factor: 
+        - Disease
+        - Clinical_variable
+        - Phenotype
 #Database resources
 #Modified proteins
 modified_proteins_resources:
     - 'psp'
     - 'signor'
+modified_proteins_annotation_resources:
+    - psp
 #Protein complexes
 complexes_resources:
     - 'CORUM'

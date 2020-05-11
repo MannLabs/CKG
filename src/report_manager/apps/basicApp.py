@@ -9,13 +9,13 @@ class BasicApp:
     Other Apps will inherit basic functionality from this class.
     Attributes: Title, subtitle, description, logo, footer.
     """
-    def __init__(self, title, subtitle, description, page_type, layout = [], logo = None, footer= None):
+    def __init__(self, title, subtitle, description, page_type, layout=[], logo=None, footer=None):
         self._title = title
         self._subtitle = subtitle
         self._description = description
         self._page_type = page_type
         self._logo = logo
-        self._footer = footer 
+        self._footer = footer
         self._layout = layout
     
     @property
@@ -81,26 +81,22 @@ class BasicApp:
         self.layout.extend(sections)
 
     def get_HTML_title(self):
-        return html.H1(children= self.title)
+        return html.H1(children=self.title)
 
     def get_HTML_subtitle(self):
-        return html.H2(children= self.subtitle)
+        return html.H2(children=self.subtitle)
 
     def get_HTML_description(self):
-        return html.Div(children = self.description)
+        return html.Div(children=self.description)
 
-    #Functionality
     def add_basic_layout(self):
         """
         Calls class functions to setup the layout: title, subtitle, description, \
         logo and footer.
         """
-        self.layout.append(html.Div([html.Form([
-                                    html.Button('Logout', type='submit')], 
-                                    action='/apps/logout', method='post', 
-                                    style={'display':'none', 
-                                            'position': 'absolute',
-                                            'right': '0px'}, id='logout_form')]))
+        self.layout.append(html.Div([html.Form([html.Button('Logout', type='submit')], action='/apps/logout', method='post',
+                                               style={'display': 'none', 'position': 'absolute', 'right': '0px'}, id='logout_form')]))
+        self.layout.append(html.Div(html.H2('Invalid user name or password', className='error_msg'), id='error_msg', style={'display': 'none'}))
         if self.title is not None:
             self.layout.append(self.get_HTML_title())
         if self.subtitle is not None:
