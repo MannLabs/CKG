@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>report_manager.apps.dataUpload &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  <title>report_manager.apps.dataUpload &mdash; ClinicalKnowledgeGraph 1.0b1 BETA documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.0b1 BETA
               </div>
             
           
@@ -83,7 +83,7 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../INTRO.html">Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../INTRO.html"><strong>Clinical Knowledge Graph</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">First steps</span></p>
 <ul>
@@ -209,6 +209,7 @@
 <span class="kn">from</span> <span class="nn">graphdb_connector</span> <span class="k">import</span> <span class="n">connector</span>
 <span class="kn">from</span> <span class="nn">graphdb_builder</span> <span class="k">import</span> <span class="n">builder_utils</span>
 <span class="kn">from</span> <span class="nn">graphdb_connector</span> <span class="k">import</span> <span class="n">query_utils</span>
+<span class="kn">from</span> <span class="nn">analytics_core.viz</span> <span class="k">import</span> <span class="n">viz</span>
 
 <span class="n">log_config</span> <span class="o">=</span> <span class="n">ckg_config</span><span class="o">.</span><span class="n">graphdb_builder_log</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">builder_utils</span><span class="o">.</span><span class="n">setup_logging</span><span class="p">(</span><span class="n">log_config</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;data_upload&quot;</span><span class="p">)</span>
@@ -369,6 +370,7 @@
 <div class="viewcode-block" id="remove_samples_nodes_db"><a class="viewcode-back" href="../../../_autosummary/report_manager.apps.html#report_manager.apps.dataUpload.remove_samples_nodes_db">[docs]</a><span class="k">def</span> <span class="nf">remove_samples_nodes_db</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">projectId</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">query_name</span> <span class="o">=</span> <span class="s1">&#39;remove_project&#39;</span>
     <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
     <span class="k">try</span><span class="p">:</span>
@@ -539,6 +541,27 @@
     <span class="n">data</span><span class="p">[</span><span class="s1">&#39;disease id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;disease&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">disease_dict</span><span class="p">)</span>
     <span class="n">data</span><span class="p">[</span><span class="s1">&#39;tissue id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;tissue&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">tissue_dict</span><span class="p">)</span>
     <span class="n">builder_utils</span><span class="o">.</span><span class="n">export_contents</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span></div>
+    
+
+<div class="viewcode-block" id="get_project_information"><a class="viewcode-back" href="../../../_autosummary/report_manager.apps.html#report_manager.apps.dataUpload.get_project_information">[docs]</a><span class="k">def</span> <span class="nf">get_project_information</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">project_id</span><span class="p">):</span>
+    <span class="n">query_name</span> <span class="o">=</span> <span class="s1">&#39;project_graph&#39;</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;project_id&#39;</span><span class="p">:</span> <span class="n">project_id</span><span class="p">}</span>
+        <span class="n">data_upload_cypher</span> <span class="o">=</span> <span class="n">get_data_upload_queries</span><span class="p">()</span>
+        <span class="n">queries</span> <span class="o">=</span> <span class="n">data_upload_cypher</span><span class="p">[</span><span class="n">query_name</span><span class="p">][</span><span class="s1">&#39;query&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">query</span> <span class="ow">in</span> <span class="n">queries</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">connector</span><span class="o">.</span><span class="n">getCursorData</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">query</span><span class="o">+</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_obj</span><span class="p">,</span> <span class="n">exc_tb</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">exc_tb</span><span class="o">.</span><span class="n">tb_frame</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_filename</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error: </span><span class="si">{}</span><span class="s2">. Creating analytical samples: Query name (</span><span class="si">{}</span><span class="s2">) - Query (</span><span class="si">{}</span><span class="s2">), error info: </span><span class="si">{}</span><span class="s2">, file: </span><span class="si">{}</span><span class="s2">,line: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="n">query_name</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">(),</span> <span class="n">fname</span><span class="p">,</span> <span class="n">exc_tb</span><span class="o">.</span><span class="n">tb_lineno</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">viz</span><span class="o">.</span><span class="n">get_table</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="s1">&#39;new_project&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Data Uploaded for Project </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">project_id</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">res</span></div>
 </pre></div>
 
            </div>

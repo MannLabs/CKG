@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Experiments Parsers &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  <title>Experiments Parsers &mdash; ClinicalKnowledgeGraph 1.0b1 BETA documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.0b1 BETA
               </div>
             
           
@@ -85,7 +85,7 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../INTRO.html">Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../INTRO.html"><strong>Clinical Knowledge Graph</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">First steps</span></p>
 <ul>
@@ -381,12 +381,32 @@ right ontology (defined in config), i.e. type = -40 -&gt; SNOMED CT</p>
 <span id="proteomics-parser"></span><h2>Proteomics parser<a class="headerlink" href="#module-graphdb_builder.experiments.parsers.proteomicsParser" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="graphdb_builder.experiments.parsers.proteomicsParser.parser">
-<code class="sig-prename descclassname">graphdb_builder.experiments.parsers.proteomicsParser.</code><code class="sig-name descname">parser</code><span class="sig-paren">(</span><em class="sig-param">projectId</em>, <em class="sig-param">data_type='proteomics'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/experiments/parsers/proteomicsParser.html#parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.experiments.parsers.proteomicsParser.parser" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">graphdb_builder.experiments.parsers.proteomicsParser.</code><code class="sig-name descname">parser</code><span class="sig-paren">(</span><em class="sig-param">projectId</em>, <em class="sig-param">directory=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/experiments/parsers/proteomicsParser.html#parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.experiments.parsers.proteomicsParser.parser" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.experiments.parsers.proteomicsParser.parse_from_directory">
+<code class="sig-prename descclassname">graphdb_builder.experiments.parsers.proteomicsParser.</code><code class="sig-name descname">parse_from_directory</code><span class="sig-paren">(</span><em class="sig-param">projectId</em>, <em class="sig-param">directory</em>, <em class="sig-param">configuration=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/experiments/parsers/proteomicsParser.html#parse_from_directory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.experiments.parsers.proteomicsParser.parse_from_directory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.experiments.parsers.proteomicsParser.parser_from_file">
+<code class="sig-prename descclassname">graphdb_builder.experiments.parsers.proteomicsParser.</code><code class="sig-name descname">parser_from_file</code><span class="sig-paren">(</span><em class="sig-param">file_path</em>, <em class="sig-param">configuration</em>, <em class="sig-param">data_type</em>, <em class="sig-param">is_standard=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/experiments/parsers/proteomicsParser.html#parser_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.experiments.parsers.proteomicsParser.parser_from_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.experiments.parsers.proteomicsParser.update_configuration">
+<code class="sig-prename descclassname">graphdb_builder.experiments.parsers.proteomicsParser.</code><code class="sig-name descname">update_configuration</code><span class="sig-paren">(</span><em class="sig-param">data_type</em>, <em class="sig-param">processing_tool</em>, <em class="sig-param">value_col='LFQ intensity'</em>, <em class="sig-param">columns=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/experiments/parsers/proteomicsParser.html#update_configuration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.experiments.parsers.proteomicsParser.update_configuration" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="graphdb_builder.experiments.parsers.proteomicsParser.parse_dataset">
-<code class="sig-prename descclassname">graphdb_builder.experiments.parsers.proteomicsParser.</code><code class="sig-name descname">parse_dataset</code><span class="sig-paren">(</span><em class="sig-param">projectId</em>, <em class="sig-param">configuration</em>, <em class="sig-param">dataDir</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/experiments/parsers/proteomicsParser.html#parse_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.experiments.parsers.proteomicsParser.parse_dataset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">graphdb_builder.experiments.parsers.proteomicsParser.</code><code class="sig-name descname">parse_dataset</code><span class="sig-paren">(</span><em class="sig-param">filepath</em>, <em class="sig-param">configuration</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/experiments/parsers/proteomicsParser.html#parse_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.experiments.parsers.proteomicsParser.parse_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.experiments.parsers.proteomicsParser.parse_standard_dataset">
+<code class="sig-prename descclassname">graphdb_builder.experiments.parsers.proteomicsParser.</code><code class="sig-name descname">parse_standard_dataset</code><span class="sig-paren">(</span><em class="sig-param">file_path</em>, <em class="sig-param">configuration</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/experiments/parsers/proteomicsParser.html#parse_standard_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.experiments.parsers.proteomicsParser.parse_standard_dataset" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -468,8 +488,18 @@ Output: pandas DataFrame with the columns and filters defined in config.py</p>
 <dd></dd></dl>
 
 <dl class="function">
+<dt id="graphdb_builder.experiments.parsers.proteomicsParser.get_value_cols">
+<code class="sig-prename descclassname">graphdb_builder.experiments.parsers.proteomicsParser.</code><code class="sig-name descname">get_value_cols</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">configuration</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/experiments/parsers/proteomicsParser.html#get_value_cols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.experiments.parsers.proteomicsParser.get_value_cols" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.experiments.parsers.proteomicsParser.extract_subject_replicates_from_regex">
+<code class="sig-prename descclassname">graphdb_builder.experiments.parsers.proteomicsParser.</code><code class="sig-name descname">extract_subject_replicates_from_regex</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">regex</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/experiments/parsers/proteomicsParser.html#extract_subject_replicates_from_regex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.experiments.parsers.proteomicsParser.extract_subject_replicates_from_regex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="graphdb_builder.experiments.parsers.proteomicsParser.extract_subject_replicates">
-<code class="sig-prename descclassname">graphdb_builder.experiments.parsers.proteomicsParser.</code><code class="sig-name descname">extract_subject_replicates</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">regex</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/experiments/parsers/proteomicsParser.html#extract_subject_replicates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.experiments.parsers.proteomicsParser.extract_subject_replicates" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">graphdb_builder.experiments.parsers.proteomicsParser.</code><code class="sig-name descname">extract_subject_replicates</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">value_cols</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/experiments/parsers/proteomicsParser.html#extract_subject_replicates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.experiments.parsers.proteomicsParser.extract_subject_replicates" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">

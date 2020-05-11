@@ -1,2 +1,0 @@
-Mac OS X requirements
-=====================

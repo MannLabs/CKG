@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>graphdb_connector.query_utils &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  <title>graphdb_connector.query_utils &mdash; ClinicalKnowledgeGraph 1.0b1 BETA documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.0b1 BETA
               </div>
             
           
@@ -83,7 +83,7 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../INTRO.html">Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../INTRO.html"><strong>Clinical Knowledge Graph</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">First steps</span></p>
 <ul>
@@ -200,22 +200,25 @@
             
   <h1>Source code for graphdb_connector.query_utils</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">ckg_utils</span>
 <span class="kn">from</span> <span class="nn">graphdb_connector</span> <span class="k">import</span> <span class="n">connector</span>
+
 
 <div class="viewcode-block" id="read_knowledge_queries"><a class="viewcode-back" href="../../_autosummary/graphdb_connector.html#graphdb_connector.query_utils.read_knowledge_queries">[docs]</a><span class="k">def</span> <span class="nf">read_knowledge_queries</span><span class="p">(</span><span class="n">dataset_type</span><span class="o">=</span><span class="s1">&#39;proteomics&#39;</span><span class="p">):</span>
     <span class="n">queries_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
     <span class="n">query_file</span> <span class="o">=</span> <span class="n">dataset_type</span><span class="o">+</span><span class="s2">&quot;_knowledge_cypher.yml&quot;</span>
     <span class="n">queries_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">queries_dir</span><span class="p">,</span> <span class="s2">&quot;../report_manager/queries/&quot;</span><span class="o">+</span><span class="n">query_file</span><span class="p">)</span>
     <span class="n">queries</span> <span class="o">=</span> <span class="n">read_queries</span><span class="p">(</span><span class="n">queries_file_path</span><span class="p">)</span>
-    
+
     <span class="k">return</span> <span class="n">queries</span></div>
+
 
 <div class="viewcode-block" id="read_queries"><a class="viewcode-back" href="../../_autosummary/graphdb_connector.html#graphdb_connector.query_utils.read_queries">[docs]</a><span class="k">def</span> <span class="nf">read_queries</span><span class="p">(</span><span class="n">queries_file</span><span class="p">):</span>
     <span class="n">queries</span> <span class="o">=</span> <span class="n">ckg_utils</span><span class="o">.</span><span class="n">get_queries</span><span class="p">(</span><span class="n">queries_file</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">queries</span></div>
+
 
 <div class="viewcode-block" id="list_queries"><a class="viewcode-back" href="../../_autosummary/graphdb_connector.html#graphdb_connector.query_utils.list_queries">[docs]</a><span class="k">def</span> <span class="nf">list_queries</span><span class="p">(</span><span class="n">queries</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">queries</span><span class="p">:</span>
@@ -225,22 +228,27 @@
 
 <div class="viewcode-block" id="find_queries_involving_nodes"><a class="viewcode-back" href="../../_autosummary/graphdb_connector.html#graphdb_connector.query_utils.find_queries_involving_nodes">[docs]</a><span class="k">def</span> <span class="nf">find_queries_involving_nodes</span><span class="p">(</span><span class="n">queries</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">print_pretty</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">valid_queries</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">query_options</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">queries</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">queries</span><span class="p">[</span><span class="n">q</span><span class="p">][</span><span class="s1">&#39;involved_nodes&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">nodes</span><span class="p">))</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">):</span>
             <span class="n">valid_queries</span><span class="p">[</span><span class="n">q</span><span class="p">]</span> <span class="o">=</span> <span class="n">queries</span><span class="p">[</span><span class="n">q</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">print_pretty</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">valid_queries</span><span class="p">:</span>
             <span class="n">query</span> <span class="o">=</span> <span class="n">valid_queries</span><span class="p">[</span><span class="n">q</span><span class="p">]</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Query id:&quot;</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Query Name: &quot;</span><span class="p">,</span> <span class="n">query</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Description: &quot;</span><span class="p">,</span> <span class="n">query</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">])</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Involves nodes:&quot;</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s1">&#39;involved_nodes&#39;</span><span class="p">]))</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Involves relationships:&quot;</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s1">&#39;involved_rels&#39;</span><span class="p">]))</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Query:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">query</span><span class="p">[</span><span class="s2">&quot;query&quot;</span><span class="p">])</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">query</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
+                   <span class="n">query</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">],</span>
+                   <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s1">&#39;involved_nodes&#39;</span><span class="p">]),</span>
+                   <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s1">&#39;involved_rels&#39;</span><span class="p">]),</span>
+                   <span class="n">query</span><span class="p">[</span><span class="s2">&quot;query&quot;</span><span class="p">])</span>
             <span class="k">if</span> <span class="s2">&quot;example&quot;</span> <span class="ow">in</span> <span class="n">query</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;How to use it:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;example&quot;</span><span class="p">]),</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-            
-    <span class="k">return</span> <span class="n">valid_queries</span></div>
+                <span class="n">row</span> <span class="o">=</span> <span class="n">row</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;example&quot;</span><span class="p">]),)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">row</span> <span class="o">=</span> <span class="n">row</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,)</span>
+            <span class="n">query_options</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    <span class="n">query_options</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">query_options</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="s1">&#39;Description&#39;</span><span class="p">,</span>
+                                                         <span class="s1">&#39;involved_nodes&#39;</span><span class="p">,</span> <span class="s1">&#39;involved_rels&#39;</span><span class="p">,</span>
+                                                         <span class="s1">&#39;query&#39;</span><span class="p">,</span> <span class="s1">&#39;example&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">query_options</span></div>
 
 
 <div class="viewcode-block" id="find_queries_involving_relationships"><a class="viewcode-back" href="../../_autosummary/graphdb_connector.html#graphdb_connector.query_utils.find_queries_involving_relationships">[docs]</a><span class="k">def</span> <span class="nf">find_queries_involving_relationships</span><span class="p">(</span><span class="n">queries</span><span class="p">,</span> <span class="n">rels</span><span class="p">):</span>

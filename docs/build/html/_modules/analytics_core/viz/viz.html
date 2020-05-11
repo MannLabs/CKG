@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>analytics_core.viz.viz &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  <title>analytics_core.viz.viz &mdash; ClinicalKnowledgeGraph 1.0b1 BETA documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.0b1 BETA
               </div>
             
           
@@ -83,7 +83,7 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../INTRO.html">Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../INTRO.html"><strong>Clinical Knowledge Graph</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">First steps</span></p>
 <ul>
@@ -932,7 +932,7 @@
                                     <span class="s1">&#39;ax&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
                                     <span class="s1">&#39;ay&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span>
                                     <span class="s1">&#39;font&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;#2c7bb6&quot;</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)})</span>
-                    <span class="n">color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;rgba(44, 123, 182, 0.4)&#39;</span><span class="p">)</span>
+                    <span class="n">color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;rgba(44, 123, 182, 0.7)&#39;</span><span class="p">)</span>
                     <span class="n">line_colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;#2c7bb6&#39;</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;FC&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">args</span><span class="p">[</span><span class="s1">&#39;fc&#39;</span><span class="p">]:</span>
                     <span class="n">annotations</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;log2FC&#39;</span><span class="p">],</span>
@@ -944,19 +944,19 @@
                                     <span class="s1">&#39;ax&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
                                     <span class="s1">&#39;ay&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span>
                                     <span class="s1">&#39;font&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;#d7191c&quot;</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)})</span>
-                    <span class="n">color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;rgba(215, 25, 28, 0.4)&#39;</span><span class="p">)</span>
+                    <span class="n">color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;rgba(215, 25, 28, 0.7)&#39;</span><span class="p">)</span>
                     <span class="n">line_colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;#d7191c&#39;</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;FC&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">1.</span><span class="p">:</span>
-                    <span class="n">color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;rgba(171, 217, 233, 0.2)&#39;</span><span class="p">)</span>
+                    <span class="n">color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;rgba(171, 217, 233, 0.5)&#39;</span><span class="p">)</span>
                     <span class="n">line_colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;#abd9e9&#39;</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;FC&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">1.</span><span class="p">:</span>
-                    <span class="n">color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;rgba(253, 174, 97, 0.2)&#39;</span><span class="p">)</span>
+                    <span class="n">color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;rgba(253, 174, 97, 0.5)&#39;</span><span class="p">)</span>
                     <span class="n">line_colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;#fdae61&#39;</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;rgba(153, 153, 153, 0.1)&#39;</span><span class="p">)</span>
+                    <span class="n">color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;rgba(153, 153, 153, 0.3)&#39;</span><span class="p">)</span>
                     <span class="n">line_colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;#999999&#39;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;rgba(153, 153, 153, 0.1)&#39;</span><span class="p">)</span>
+                <span class="n">color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;rgba(153, 153, 153, 0.3)&#39;</span><span class="p">)</span>
                 <span class="n">line_colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;#999999&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">annotations</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">num_annotations</span><span class="p">:</span>
@@ -1884,29 +1884,12 @@
     <span class="n">data</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">data_exp</span><span class="p">,</span> <span class="n">data_cli</span><span class="p">,</span> <span class="n">dissTOM</span><span class="p">,</span> <span class="n">moduleColors</span><span class="p">,</span> <span class="n">Features_per_Module</span><span class="p">,</span> <span class="n">MEs</span><span class="p">,</span>\
-        <span class="n">moduleTraitCor</span><span class="p">,</span> <span class="n">textMatrix</span><span class="p">,</span> <span class="n">MM</span><span class="p">,</span> <span class="n">MMPvalue</span><span class="p">,</span> <span class="n">FS</span><span class="p">,</span> <span class="n">FSPvalue</span><span class="p">,</span> <span class="n">METDiss</span><span class="p">,</span> <span class="n">METcor</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="n">dissTOM</span><span class="p">,</span> <span class="n">moduleColors</span><span class="p">,</span> <span class="n">Features_per_Module</span><span class="p">,</span> <span class="n">MEs</span><span class="p">,</span>\
+        <span class="n">moduleTraitCor</span><span class="p">,</span> <span class="n">textMatrix</span><span class="p">,</span> <span class="n">METDiss</span><span class="p">,</span> <span class="n">METcor</span> <span class="o">=</span> <span class="n">data</span>
         <span class="n">plots</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="c1"># plot: sample dendrogram and clinical variables heatmap; input: data_exp, data_cli</span>
-        <span class="c1">#plots.append(wgcnaFigures.plot_complex_dendrogram(data_exp, data_cli, title=&#39;Clinical variables variation by sample&#39;, dendro_labels=data_exp.index, distfun=&#39;euclidean&#39;, linkagefun=&#39;average&#39;, hang=40, subplot=&#39;heatmap&#39;, color_missingvals=True, width=1000, height=800))</span>
-
-        <span class="c1"># plot: gene tree dendrogram and module colors; input: dissTOM, moduleColors</span>
         <span class="n">plots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wgcnaFigures</span><span class="o">.</span><span class="n">plot_complex_dendrogram</span><span class="p">(</span><span class="n">dissTOM</span><span class="p">,</span> <span class="n">moduleColors</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Co-expression: dendrogram and module colors&#39;</span><span class="p">,</span> <span class="n">dendro_labels</span><span class="o">=</span><span class="n">dissTOM</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">distfun</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">linkagefun</span><span class="o">=</span><span class="s1">&#39;ward&#39;</span><span class="p">,</span> <span class="n">hang</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">subplot</span><span class="o">=</span><span class="s1">&#39;module colors&#39;</span><span class="p">,</span> <span class="n">col_annotation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">800</span><span class="p">))</span>
-
-        <span class="c1"># plot: table with features per module; input: df</span>
         <span class="n">plots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_table</span><span class="p">(</span><span class="n">Features_per_Module</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Proteins/Genes module color&#39;</span><span class="p">,</span> <span class="n">colors</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;#C2D4FF&#39;</span><span class="p">,</span><span class="s1">&#39;#F5F8FF&#39;</span><span class="p">),</span> <span class="n">subset</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="n">plot_attr</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;width&#39;</span><span class="p">:</span><span class="mi">1500</span><span class="p">,</span> <span class="s1">&#39;height&#39;</span><span class="p">:</span><span class="mi">1500</span><span class="p">,</span> <span class="s1">&#39;font&#39;</span><span class="p">:</span><span class="mi">12</span><span class="p">},</span> <span class="n">subplot</span> <span class="o">=</span> <span class="kc">False</span><span class="p">))</span>
-
-        <span class="c1">#plot: module-traits correlation with annotations; input: moduleTraitCor, textMatrix</span>
         <span class="n">plots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wgcnaFigures</span><span class="o">.</span><span class="n">plot_labeled_heatmap</span><span class="p">(</span><span class="n">moduleTraitCor</span><span class="p">,</span> <span class="n">textMatrix</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Module-Clinical variable relationships&#39;</span><span class="p">,</span> <span class="n">colorscale</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="s1">&#39;#67a9cf&#39;</span><span class="p">],[</span><span class="mf">0.5</span><span class="p">,</span><span class="s1">&#39;#f7f7f7&#39;</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;#ef8a62&#39;</span><span class="p">]],</span> <span class="n">row_annotation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">800</span><span class="p">))</span>
-
-        <span class="c1">#plot: FS vs. MM correlation per trait/module Scattergl matrix; input: MM, FS, Features_per_Module</span>
-        <span class="c1">#plots.append(wgcnaFigures.plot_intramodular_correlation(MM, FS, Features_per_Module, title=&#39;Intramodular analysis: Feature Significance vs. Module Membership&#39;, width=1000, height=2000))</span>
-
-        <span class="c1">#input: METDiss, METcor</span>
-        <span class="c1"># plots.append(wgcnaFigures.plot_complex_dendrogram(METDiss, METcor, title=&#39;Eigengene network and clinical data associations&#39;, dendro_labels=METDiss.index, distfun=None, linkagefun=&#39;ward&#39;, hang=0.9,</span>
-        <span class="c1">#                          subplot=&#39;heatmap&#39;, subplot_colorscale=[[0,&#39;#67a9cf&#39;],[0.5,&#39;#f7f7f7&#39;],[1,&#39;#ef8a62&#39;]],</span>
-        <span class="c1">#                          color_missingvals=False, row_annotation=True, col_annotation=True, width=1000, height=800))</span>
-
         <span class="n">dendro_tree</span> <span class="o">=</span> <span class="n">wgcnaAnalysis</span><span class="o">.</span><span class="n">get_dendrogram</span><span class="p">(</span><span class="n">METDiss</span><span class="p">,</span> <span class="n">METDiss</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">distfun</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">linkagefun</span><span class="o">=</span><span class="s1">&#39;ward&#39;</span><span class="p">,</span> <span class="n">div_clusters</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">dendro_tree</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dendrogram</span> <span class="o">=</span> <span class="n">Dendrogram</span><span class="o">.</span><span class="n">plot_dendrogram</span><span class="p">(</span><span class="n">dendro_tree</span><span class="p">,</span> <span class="n">hang</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">cutoff_line</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>

@@ -11,25 +11,11 @@ Java
 -------
 
 Similarly to MacOS and Linux, Windows will also need a **Java** installation.
+
 Be aware that different versions of a Neo4j database can have different requirements. For example, Neo4j 3.5 versions require Oracle Java 8, while Neo4j 4.0 versions already require Oracle Java 11.
 When using a new version of Neo4j, always remember to read the respective Operations Manual, and check for the software requirements.
 
-To check if you already have **Java SE Development Kit** installed, run ``java -version`` in your terminal window. This should print out three lines similar to the following, with possible variation in the version:
-
-.. code-block:: python
-	
-	java version "1.8.0_171"
-	Java(TM) SE Runtime Environment (build 1.8.0_171-b11)
-	Java HotSpot(TM) 64-Bit Server VM (build 25.171-b11, mixed mode)
-
-Running ``/usr/libexec/java_home`` in the terminal should print out a path like ``/Library/Java/JavaVirtualMachines/jdk1.8.0_171.jdk/Contents/Home``. Otherwise, please follow the steps below:
-
-1. Go to ``https://www.oracle.com/java/technologies/javase-downloads.html`` and download the version that fits your Neo4j version and OS requirements.
-
-#. Install the package.
-
-#. Run ``/usr/libexec/java_home`` in the terminal to make sure the *Java* package has been installed in ``/Library/Java/JavaVirtualMachines/``.
-
+By default Java SE Development Kit should be installed on the Windows 10. If this is not your case, please follow this `tutorial <https://docs.oracle.com/javase/8/docs/technotes/guides/install/windows_jdk_install.html#A1097936>`__ to install it.
 
 
 R
@@ -43,7 +29,42 @@ You can check if an **R version >= 3.5.2** is already installed by running:
 	
 	> where R
 
-And all R packages can be installed by simply initiating R (command prompt or R shell) and running:
+If R is not installed in your machine, please follow `these tutorial <https://rstudio-education.github.io/hopr/starting.html>`__.
+
+In order to simplify calling R from the command prompt, you can choose to add it to ``PATH`` and to the environmental variables. To do so, follow the steps bellow:
+
+1. Go to the Windows menu, right-click on :guilabel:`Computer` and click on :guilabel:`Properties`.
+
+#. From the computer properties dialog, select ``Advanced system settings`` on the left panel. And from there, click on :guilabel:`Environment variables` button.
+
+#. In the Environment variables dialog, click the :guilabel:`New` button in the top half of the dialog, to make a new user variable.
+
+#. Give the variable name as ``R`` and the value is the path to the R executable, which is usually ``C:\Program Files\R\R-4.0.0\bin\R.exe``.
+
+#. In the bottom half of the Environment variables dialog, find the variable ``Path``, select it and click :guilabel:`Edit`.
+
+#. In the edit dialog window, add ``;`` to the end of the variable value followed by the R path used when creating the previous environmental variable.
+
+#. Click :guilabel:`OK` to save, click :guilabel:`OK` and :guilabel:`OK` again to save the new variable and edit to ``Path``.
+
+
+To confirm that the environment variable is correctly set in command line type: 
+
+.. code-block:: bash
+
+	> echo %R% 
+
+
+This will print the path you used as value (e.g. ``C:\Program Files\R\R-4.0.0\bin\R.exe``).
+
+To run R from the command prompt, run:
+
+.. code-block:: bash
+
+	> R
+
+
+All R packages can be installed by simply initiating R (command prompt or R shell) and running:
 
 .. code-block:: python
 
@@ -52,7 +73,11 @@ And all R packages can be installed by simply initiating R (command prompt or R 
 	BiocManager::install(c('AnnotationDbi', 'GO.db', 'preprocessCore', 'impute'))
 	install.packages(c('flashClust','WGCNA', 'samr'), dependencies=TRUE, repos='http://cran.rstudio.com/')
 
-If R is not installed in your machine, please follow `these tutorial <https://rstudio-education.github.io/hopr/starting.html>`__.
+.. warning:: If the install does not work (cannot write to library), run a new command prompt as administrator:
+
+1. Go to the Windows menu, right-click on :guilabel:`Command Prompt` and select ``Run as administrator``.
+
+In this new prompt, launch R and run the previous R install packages.
 
 
 Neo4j

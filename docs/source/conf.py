@@ -23,10 +23,10 @@ copyright = '2019, Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen'
 author = 'Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen'
 
 # The short X.Y version
-version = '1.0.0'
+version = '1.0b1 BETA'
 
 # The full version, including alpha/beta/rc tags
-release = '1.0.0'
+release = '1.0b1 BETA'
 
 
 # -- General configuration ---------------------------------------------------
@@ -199,7 +199,7 @@ texinfo_documents = [
 # -- Options for intersphinx extension ---------------------------------------
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/3.5/': None}
+intersphinx_mapping = {'https://docs.python.org/3.6/': None}
 
 
 # A string of reStructuredText that will be included at the end of every source 

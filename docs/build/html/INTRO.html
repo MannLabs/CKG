@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Clinical Knowledge Graph &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  <title>Clinical Knowledge Graph &mdash; ClinicalKnowledgeGraph 1.0b1 BETA documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.0b1 BETA
               </div>
             
           
@@ -85,11 +85,12 @@
             
             
               <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Clinical Knowledge Graph</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#"><strong>Clinical Knowledge Graph</strong></a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#abstract">Abstract</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#cloning-and-installing">Cloning and installing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#features">Features</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#disclaimer">Disclaimer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#important-note">Important Note</a></li>
 </ul>
 </li>
 </ul>
@@ -189,7 +190,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Clinical Knowledge Graph</li>
+      <li><strong>Clinical Knowledge Graph</strong></li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -208,18 +209,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="clinical-knowledge-graph">
-<h1>Clinical Knowledge Graph<a class="headerlink" href="#clinical-knowledge-graph" title="Permalink to this headline">¶</a></h1>
+  <img alt="./src/report_manager/assets/banner.jpg" class="align-center" src="./src/report_manager/assets/banner.jpg" />
+<div class="section" id="clinical-knowledge-graph">
+<h1><strong>Clinical Knowledge Graph</strong><a class="headerlink" href="#clinical-knowledge-graph" title="Permalink to this headline">¶</a></h1>
+<p><em>version: 1.0b1</em> <em>BETA</em></p>
 <p>A Python project that allows you to analyse proteomics and clinical data, and integrate and mine knowledge from multiple biomedical databases widely used nowadays.</p>
 <ul class="simple">
 <li><p>Documentation: <a class="reference external" href="https://CKG.readthedocs.io">https://CKG.readthedocs.io</a></p></li>
 <li><p>GitHub: <a class="reference external" href="https://github.com/MannLabs/CKG">https://github.com/MannLabs/CKG</a></p></li>
 <li><p>Free and open source software: <a class="reference external" href="https://github.com/MannLabs/CKG/LICENSE.rst">MIT license</a></p></li>
 </ul>
-<img alt="_images/banner.jpg" class="align-center" src="_images/banner.jpg" />
 <div class="section" id="abstract">
 <h2>Abstract<a class="headerlink" href="#abstract" title="Permalink to this headline">¶</a></h2>
-<img alt="_images/abstract_figure.png" class="align-center" src="_images/abstract_figure.png" />
+<img alt="./src/report_manager/assets/abstract.png" class="align-center" src="./src/report_manager/assets/abstract.png" />
 <p>Several omics data types are already used as diagnostic markers, beacons of possible treatment or prognosis. Advances in technology have paved the way for omics to move into the clinic by generating increasingly larger amounts of high-quality quantitative and qualitative data.  Additionally, knowledge around these data has been collected in diverse public resources, which has facilitated the understanding of these data to some extent. However, there are several challenges that hinder the translation of high-throughput omics data into identifiable, interpretable and actionable clinical markers. One of the main challenges is the interpretation of the multiple hits identified in these experiments. Furthermore, a single omics dimension is often not sufficient to capture the full complexity of disease, which would be aided by integration of several of them. To overcome these challenges, we propose a system that integrates multi-omics data and information spread across a myriad of biomedical databases into a Clinical Knowledge Graph (CKG).  This graph focuses on the data points or entities not as silos but as related components of a graph. To illustrate, in our system an identified protein in a proteomics experiment encompasses also all its related components (other proteins, diseases, drugs, etc.) and their relationships. Thus, our CKG facilitates the interpretation of data and the inference of meaning by providing relevant biological context. Further, ~. Here we describe the current state of the system and depict its use by applying it to use cases such as treatment decisions using cancer genomics and proteomics.</p>
 </div>
 <div class="section" id="cloning-and-installing">
@@ -230,6 +232,10 @@ To get a copy of the GitHub repository on your local machine, please open a term
 </pre></div>
 </div>
 <p>This will create a new folder named “CKG” on your current location. To access the documentation, use the ReadTheDocs link above, or open the html version stored in the <em>CKG</em> folder <cite>CKG/docs/build/html/index.html</cite>. After this, follow the instructions in “First Steps” and “Getting Started”.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If git is not installed in your machine, please follow this <a class="reference external" href="https://www.atlassian.com/git/tutorials/install-git">tutorial</a> to install it.</p>
+</div>
 </div>
 <div class="section" id="features">
 <h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
@@ -241,6 +247,200 @@ To get a copy of the GitHub repository on your local machine, please open a term
 <div class="section" id="disclaimer">
 <h2>Disclaimer<a class="headerlink" href="#disclaimer" title="Permalink to this headline">¶</a></h2>
 <p>This resource is intended for research purposes and must not substitute a doctor’s medical judgement or healthcare professional advice.</p>
+</div>
+<div class="section" id="important-note">
+<h2>Important Note<a class="headerlink" href="#important-note" title="Permalink to this headline">¶</a></h2>
+<p>The databases provided within the Clinical Knowledge Graph (CKG) have their own licenses and the use of CKG still requires compliance with these data use restrictions. Please, visit the data sources directly for more information:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 9%" />
+<col style="width: 22%" />
+<col style="width: 39%" />
+<col style="width: 30%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Source type</p></td>
+<td><p>Source</p></td>
+<td><p>URL</p></td>
+<td><p>Reference</p></td>
+</tr>
+<tr class="row-even"><td><p>Database</p></td>
+<td><p>UniProt</p></td>
+<td><p><a class="reference external" href="https://www.uniprot.org/">https://www.uniprot.org/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/29425356">https://www.ncbi.nlm.nih.gov/pubmed/29425356</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Database</p></td>
+<td><p>TISSUES</p></td>
+<td><p><a class="reference external" href="https://tissues.jensenlab.org/">https://tissues.jensenlab.org/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/29617745">https://www.ncbi.nlm.nih.gov/pubmed/29617745</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Database</p></td>
+<td><p>STRING</p></td>
+<td><p><a class="reference external" href="https://string-db.org/">https://string-db.org/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/30476243">https://www.ncbi.nlm.nih.gov/pubmed/30476243</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Database</p></td>
+<td><p>STITCH</p></td>
+<td><p><a class="reference external" href="http://stitch.embl.de/">http://stitch.embl.de/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/26590256">https://www.ncbi.nlm.nih.gov/pubmed/26590256</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Database</p></td>
+<td><p>SMPDB</p></td>
+<td><p><a class="reference external" href="https://smpdb.ca/">https://smpdb.ca/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/24203708">https://www.ncbi.nlm.nih.gov/pubmed/24203708</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Database</p></td>
+<td><p>SIGNOR</p></td>
+<td><p><a class="reference external" href="https://signor.uniroma2.it/">https://signor.uniroma2.it/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/31665520">https://www.ncbi.nlm.nih.gov/pubmed/31665520</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Database</p></td>
+<td><p>SIDER</p></td>
+<td><p><a class="reference external" href="http://sideeffects.embl.de/">http://sideeffects.embl.de/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/26481350">https://www.ncbi.nlm.nih.gov/pubmed/26481350</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Database</p></td>
+<td><p>RefSeq</p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/refseq/">https://www.ncbi.nlm.nih.gov/refseq/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/26553804">https://www.ncbi.nlm.nih.gov/pubmed/26553804</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Database</p></td>
+<td><p>Reactome</p></td>
+<td><p><a class="reference external" href="https://reactome.org/">https://reactome.org/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/31691815">https://www.ncbi.nlm.nih.gov/pubmed/31691815</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Database</p></td>
+<td><p>PhosphoSitePlus</p></td>
+<td><p><a class="reference external" href="https://www.phosphosite.org/">https://www.phosphosite.org/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/25514926">https://www.ncbi.nlm.nih.gov/pubmed/25514926</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Database</p></td>
+<td><p>Pfam</p></td>
+<td><p><a class="reference external" href="https://pfam.xfam.org/">https://pfam.xfam.org/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/30357350">https://www.ncbi.nlm.nih.gov/pubmed/30357350</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Database</p></td>
+<td><p>OncoKB</p></td>
+<td><p><a class="reference external" href="https://www.oncokb.org/">https://www.oncokb.org/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/28890946">https://www.ncbi.nlm.nih.gov/pubmed/28890946</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Database</p></td>
+<td><p>MutationDs</p></td>
+<td><p><a class="reference external" href="https://www.ebi.ac.uk/intact/resources/datasets#mutationDs">https://www.ebi.ac.uk/intact/resources/datasets#mutationDs</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/30602777">https://www.ncbi.nlm.nih.gov/pubmed/30602777</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Database</p></td>
+<td><p>Intact</p></td>
+<td><p><a class="reference external" href="https://www.ebi.ac.uk/intact/">https://www.ebi.ac.uk/intact/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/24234451">https://www.ncbi.nlm.nih.gov/pubmed/24234451</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Database</p></td>
+<td><p>HPA</p></td>
+<td><p><a class="reference external" href="https://www.proteinatlas.org/">https://www.proteinatlas.org/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/21572409">https://www.ncbi.nlm.nih.gov/pubmed/21572409</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Database</p></td>
+<td><p>HMDB</p></td>
+<td><p><a class="reference external" href="https://hmdb.ca/">https://hmdb.ca/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/29140435">https://www.ncbi.nlm.nih.gov/pubmed/29140435</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Database</p></td>
+<td><p>HGNC</p></td>
+<td><p><a class="reference external" href="https://www.genenames.org/">https://www.genenames.org/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/30304474">https://www.ncbi.nlm.nih.gov/pubmed/30304474</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Database</p></td>
+<td><p>GwasCatalog</p></td>
+<td><p><a class="reference external" href="https://www.ebi.ac.uk/gwas/">https://www.ebi.ac.uk/gwas/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/30445434">https://www.ncbi.nlm.nih.gov/pubmed/30445434</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Database</p></td>
+<td><p>FooDB</p></td>
+<td><p><a class="reference external" href="https://foodb.ca/">https://foodb.ca/</a></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Database</p></td>
+<td><p>DrugBank</p></td>
+<td><p><a class="reference external" href="https://www.drugbank.ca/">https://www.drugbank.ca/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/29126136">https://www.ncbi.nlm.nih.gov/pubmed/29126136</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Database</p></td>
+<td><p>DisGeNET</p></td>
+<td><p><a class="reference external" href="https://www.disgenet.org/">https://www.disgenet.org/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/25877637">https://www.ncbi.nlm.nih.gov/pubmed/25877637</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Database</p></td>
+<td><p>DISEASES</p></td>
+<td><p><a class="reference external" href="https://diseases.jensenlab.org/">https://diseases.jensenlab.org/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/25484339">https://www.ncbi.nlm.nih.gov/pubmed/25484339</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Database</p></td>
+<td><p>DGIdb</p></td>
+<td><p><a class="reference external" href="http://www.dgidb.org/">http://www.dgidb.org/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/29156001">https://www.ncbi.nlm.nih.gov/pubmed/29156001</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Database</p></td>
+<td><p>CORUM</p></td>
+<td><p><a class="reference external" href="https://mips.helmholtz-muenchen.de/corum/">https://mips.helmholtz-muenchen.de/corum/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/30357367">https://www.ncbi.nlm.nih.gov/pubmed/30357367</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Database</p></td>
+<td><p>Cancer Genome Interpreter</p></td>
+<td><p><a class="reference external" href="https://www.cancergenomeinterpreter.org/">https://www.cancergenomeinterpreter.org/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/29592813">https://www.ncbi.nlm.nih.gov/pubmed/29592813</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Ontology</p></td>
+<td><p>Disease Ontology</p></td>
+<td><p><a class="reference external" href="https://disease-ontology.org/">https://disease-ontology.org/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/30407550">https://www.ncbi.nlm.nih.gov/pubmed/30407550</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Ontology</p></td>
+<td><p>Brenda Tissue Ontology</p></td>
+<td><p><a class="reference external" href="https://www.brenda-enzymes.org/ontology.php?ontology_id=3">https://www.brenda-enzymes.org/ontology.php?ontology_id=3</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/25378310">https://www.ncbi.nlm.nih.gov/pubmed/25378310</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Ontology</p></td>
+<td><p>Experimental Factor Ontology</p></td>
+<td><p><a class="reference external" href="https://www.ebi.ac.uk/efo/">https://www.ebi.ac.uk/efo/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/20200009">https://www.ncbi.nlm.nih.gov/pubmed/20200009</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Ontology</p></td>
+<td><p>Gene Ontology</p></td>
+<td><p><a class="reference external" href="http://geneontology.org/">http://geneontology.org/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/27899567">https://www.ncbi.nlm.nih.gov/pubmed/27899567</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Ontology</p></td>
+<td><p>Human Phenotype Ontology</p></td>
+<td><p><a class="reference external" href="https://hpo.jax.org/">https://hpo.jax.org/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/27899602">https://www.ncbi.nlm.nih.gov/pubmed/27899602</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Ontology</p></td>
+<td><p>SNOMED-CT</p></td>
+<td><p><a class="reference external" href="http://www.snomed.org/">http://www.snomed.org/</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/27332304">https://www.ncbi.nlm.nih.gov/pubmed/27332304</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Ontology</p></td>
+<td><p>Protein Modification Ontology</p></td>
+<td><p><a class="reference external" href="https://www.ebi.ac.uk/ols/ontologies/mod">https://www.ebi.ac.uk/ols/ontologies/mod</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/23482073">https://www.ncbi.nlm.nih.gov/pubmed/23482073</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Ontology</p></td>
+<td><p>Molecular Interactions Ontology</p></td>
+<td><p><a class="reference external" href="https://www.ebi.ac.uk/ols/ontologies/mi">https://www.ebi.ac.uk/ols/ontologies/mi</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/23482073">https://www.ncbi.nlm.nih.gov/pubmed/23482073</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Ontology</p></td>
+<td><p>Mass Spectrometry Ontology</p></td>
+<td><p><a class="reference external" href="https://www.ebi.ac.uk/ols/ontologies/ms">https://www.ebi.ac.uk/ols/ontologies/ms</a></p></td>
+<td><p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/23482073">https://www.ncbi.nlm.nih.gov/pubmed/23482073</a></p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 

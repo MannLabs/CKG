@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>analytics_core.analytics.wgcnaAnalysis &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  <title>analytics_core.analytics.wgcnaAnalysis &mdash; ClinicalKnowledgeGraph 1.0b1 BETA documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.0b1 BETA
               </div>
             
           
@@ -83,7 +83,7 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../INTRO.html">Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../INTRO.html"><strong>Clinical Knowledge Graph</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">First steps</span></p>
 <ul>
@@ -261,7 +261,7 @@
                 <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">drop_cols_exp</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">sd_cutoff</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">df</span><span class="o">.</span><span class="n">std</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">sd_cutoff</span><span class="p">]</span>
-
+                    
             <span class="n">wgcna_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span>
 
     <span class="k">return</span> <span class="n">wgcna_data</span></div>

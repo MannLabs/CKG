@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Report Dash Apps &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  <title>Report Dash Apps &mdash; ClinicalKnowledgeGraph 1.0b1 BETA documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.0b1 BETA
               </div>
             
           
@@ -85,7 +85,7 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../INTRO.html">Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../INTRO.html"><strong>Clinical Knowledge Graph</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">First steps</span></p>
 <ul>
@@ -268,14 +268,14 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>driver</strong> (<em>py2neo driver</em>) – py2neo driver, which provides the connection to the neo4j graph database.</p></li>
-<li><p><strong>projectId</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – external project identifier (from the graph database).</p></li>
+<li><p><strong>projectId</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – external project identifier (from the graph database).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Subject identifier.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -314,7 +314,7 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>driver</strong> (<em>py2neo driver</em>) – py2neo driver, which provides the connection to the neo4j graph database.</p></li>
-<li><p><strong>projectId</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – external project identifier (from the graph database).</p></li>
+<li><p><strong>projectId</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – external project identifier (from the graph database).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -403,7 +403,7 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>driver</strong> (<em>py2neo driver</em>) – py2neo driver, which provides the connection to the neo4j graph database.</p></li>
 <li><p><strong>data</strong> – pandas Dataframe with clinical data as columns and samples as rows.</p></li>
-<li><p><strong>separator</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – character used to separate multiple entries in an attribute.</p></li>
+<li><p><strong>separator</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – character used to separate multiple entries in an attribute.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -411,6 +411,11 @@
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="function">
+<dt id="report_manager.apps.dataUpload.get_project_information">
+<code class="sig-prename descclassname">report_manager.apps.dataUpload.</code><code class="sig-name descname">get_project_information</code><span class="sig-paren">(</span><em class="sig-param">driver</em>, <em class="sig-param">project_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/apps/dataUpload.html#get_project_information"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.apps.dataUpload.get_project_information" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </div>
 <div class="section" id="homepage-stats-app">
@@ -424,7 +429,7 @@
 <dd><p>Converts a given value to the highest possible unit, maintaining two decimals.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>or float value</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – </p>
+<dd class="field-odd"><p><strong>or float value</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – </p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>String with converted value and units.</p>
@@ -474,9 +479,9 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dfs</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.5)"><em>dict</em></a>) – dictionary of json objects.</p></li>
-<li><p><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – title of the Dash div where plot is located.</p></li>
-<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.5)"><em>dict</em></a>) – see below.</p></li>
+<li><p><strong>dfs</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – dictionary of json objects.</p></li>
+<li><p><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – title of the Dash div where plot is located.</p></li>
+<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – see below.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Arguments</dt>
@@ -500,8 +505,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dfs</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.5)"><em>dict</em></a>) – dictionary of json objects.</p></li>
-<li><p><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – title of the Dash div where plot is located.</p></li>
+<li><p><strong>dfs</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – dictionary of json objects.</p></li>
+<li><p><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – title of the Dash div where plot is located.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Paeam str focus</dt>
@@ -520,9 +525,9 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>color</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – background color of the container (RGB or Hex colors).</p></li>
-<li><p><strong>text</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name to be plotted inside the container.</p></li>
-<li><p><strong>id_value</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – identifier of the container.</p></li>
+<li><p><strong>color</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – background color of the container (RGB or Hex colors).</p></li>
+<li><p><strong>text</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name to be plotted inside the container.</p></li>
+<li><p><strong>id_value</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – identifier of the container.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -555,8 +560,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to stats file (including filename and ‘.hdf’ extension).</p></li>
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – number of independent imports to plot.</p></li>
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – path to stats file (including filename and ‘.hdf’ extension).</p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – number of independent imports to plot.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -573,7 +578,7 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>stats_file</strong> – pandas DataFrame with stats data.</p></li>
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – number of independent imports to select.</p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – number of independent imports to select.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -601,8 +606,8 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>stats_file</strong> – pandas DataFrame with stats data.</p></li>
-<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – use only full, partial or both kinds of imports (‘full’, ‘partial’, ‘all’).</p></li>
-<li><p><strong>options</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the variables to be used as keys in the output dictionary (‘dates’,                         ‘databases’, ‘entities’ or ‘relationships’).</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – use only full, partial or both kinds of imports (‘full’, ‘partial’, ‘all’).</p></li>
+<li><p><strong>options</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of the variables to be used as keys in the output dictionary (‘dates’,                         ‘databases’, ‘entities’ or ‘relationships’).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -617,7 +622,7 @@
 <dd><p>This function takes the values in a dictionary and attributes them an RGB color.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dictionary</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.5)"><em>dict</em></a>) – dictionary with variables to be attributed a color, as values.</p>
+<dd class="field-odd"><p><strong>dictionary</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – dictionary with variables to be attributed a color, as values.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Dictionary where ‘dictionary’ values are keys and random RGB colors are the values.</p>
@@ -634,9 +639,9 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fig</strong> – plotly graph object figure.</p></li>
 <li><p><strong>options_dict</strong> – dictionary where keys are used as dropdown options and values data points.</p></li>
-<li><p><strong>add_button</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – add option to display all dropdown options simultaneously.</p></li>
-<li><p><strong>equal_traces</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – defines if all dropdown options have the same number of traces each.                                 If True, define ‘number_traces’ as well. If False, number of traces                                 will be the same as the number of values for each ‘options_dict’ key.</p></li>
-<li><p><strong>number_traces</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – number of traces created for each ‘options_dict’ key.</p></li>
+<li><p><strong>add_button</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – add option to display all dropdown options simultaneously.</p></li>
+<li><p><strong>equal_traces</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – defines if all dropdown options have the same number of traces each.                                 If True, define ‘number_traces’ as well. If False, number of traces                                 will be the same as the number of values for each ‘options_dict’ key.</p></li>
+<li><p><strong>number_traces</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – number of traces created for each ‘options_dict’ key.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -653,8 +658,8 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>stats_file</strong> – pandas DataFrame with stats data.</p></li>
-<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – use only full or partial imports (‘full’, ‘partial’).</p></li>
-<li><p><strong>import_types</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – breakdown importing stats into entities or relationships related.</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – use only full or partial imports (‘full’, ‘partial’).</p></li>
+<li><p><strong>import_types</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – breakdown importing stats into entities or relationships related.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -685,7 +690,7 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>stats_file</strong> – pandas DataFrame with stats data.</p></li>
-<li><p><strong>plot_title</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – title of the plot.</p></li>
+<li><p><strong>plot_title</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – title of the plot.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -702,7 +707,7 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>stats_file</strong> – pandas DataFrame with stats data.</p></li>
-<li><p><strong>plot_title</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – title of the plot.</p></li>
+<li><p><strong>plot_title</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – title of the plot.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -719,10 +724,10 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>stats_file</strong> – pandas DataFrame with stats data.</p></li>
-<li><p><strong>plot_title</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – title of the plot.</p></li>
-<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – use only full or partial imports (‘full’, ‘partial’).</p></li>
-<li><p><strong>dropdown</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – add dropdown menu to figure or not.</p></li>
-<li><p><strong>dropdown_options</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the variables to be used as options in the dropdown menu (‘dates’,                         ‘databases’, ‘entities’ or ‘relationships’).</p></li>
+<li><p><strong>plot_title</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – title of the plot.</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – use only full or partial imports (‘full’, ‘partial’).</p></li>
+<li><p><strong>dropdown</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – add dropdown menu to figure or not.</p></li>
+<li><p><strong>dropdown_options</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of the variables to be used as options in the dropdown menu (‘dates’,                         ‘databases’, ‘entities’ or ‘relationships’).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -739,14 +744,14 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>stats_file</strong> – pandas DataFrame with stats data.</p></li>
-<li><p><strong>plot_title</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – title of the plot.</p></li>
-<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – use only full or partial imports (‘full’, ‘partial’).</p></li>
-<li><p><strong>subplot_titles</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.5)"><em>tuple</em></a>) – title of the subplots (tuple of strings, one for each subplot).</p></li>
-<li><p><strong>colors</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – define standard colors for entities and for relationships.</p></li>
-<li><p><strong>plots_1</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the variable plotted.</p></li>
-<li><p><strong>plots_2</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the variable plotted.</p></li>
-<li><p><strong>dropdown</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – add dropdown menu to figure or not.</p></li>
-<li><p><strong>dropdown_options</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the variables to be used as options in the dropdown menu (‘dates’,                         ‘databases’, ‘entities’ or ‘relationships’).</p></li>
+<li><p><strong>plot_title</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – title of the plot.</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – use only full or partial imports (‘full’, ‘partial’).</p></li>
+<li><p><strong>subplot_titles</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)"><em>tuple</em></a>) – title of the subplots (tuple of strings, one for each subplot).</p></li>
+<li><p><strong>colors</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – define standard colors for entities and for relationships.</p></li>
+<li><p><strong>plots_1</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of the variable plotted.</p></li>
+<li><p><strong>plots_2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of the variable plotted.</p></li>
+<li><p><strong>dropdown</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – add dropdown menu to figure or not.</p></li>
+<li><p><strong>dropdown_options</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of the variables to be used as options in the dropdown menu (‘dates’,                         ‘databases’, ‘entities’ or ‘relationships’).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -802,14 +807,14 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>driver</strong> (<em>py2neo driver</em>) – py2neo driver, which provides the connection to the neo4j graph database.</p></li>
-<li><p><strong>projectId</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – internal project identifier (CPxxxxxxxxxxxx).</p></li>
+<li><p><strong>projectId</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – internal project identifier (CPxxxxxxxxxxxx).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Project external identifier.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -822,7 +827,7 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>driver</strong> (<em>py2neo driver</em>) – py2neo driver, which provides the connection to the neo4j graph database.</p></li>
-<li><p><strong>projectId</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – external project identifier (from the graph database).</p></li>
+<li><p><strong>projectId</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – external project identifier (from the graph database).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -845,9 +850,9 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>driver</strong> (<em>py2neo driver</em>) – py2neo driver, which provides the connection to the neo4j graph database.</p></li>
-<li><p><strong>projectId</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – internal project identifier (CPxxxxxxxxxxxx).</p></li>
+<li><p><strong>projectId</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – internal project identifier (CPxxxxxxxxxxxx).</p></li>
 <li><p><strong>data</strong> – pandas Dataframe with project as row and other attributes as columns.</p></li>
-<li><p><strong>separator</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – character used to separate multiple entries in a project attribute.</p></li>
+<li><p><strong>separator</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – character used to separate multiple entries in a project attribute.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

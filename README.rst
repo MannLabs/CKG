@@ -34,6 +34,8 @@ To get a copy of the GitHub repository on your local machine, please open a term
 
 This will create a new folder named "CKG" on your current location. To access the documentation, use the ReadTheDocs link above, or open the html version stored in the *CKG* folder `CKG/docs/build/html/index.html`. After this, follow the instructions in "First Steps" and "Getting Started".
 
+.. warning:: If git is not installed in your machine, please follow this `tutorial <https://www.atlassian.com/git/tutorials/install-git>`__ to install it.
+
 
 Features
 ---------------
