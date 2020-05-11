@@ -1,0 +1,721 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>graphdb_builder.experiments.parsers.proteomicsParser &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> ClinicalKnowledgeGraph
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../INTRO.html">Clinical Knowledge Graph</a></li>
+</ul>
+<p class="caption"><span class="caption-text">First steps</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../intro/getting-started-with-requirements.html">Getting Started with some Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../intro/getting-started-with-windows.html">Getting started with Windows</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/connect-to-ckg.html">Connecting to the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/create-new-user.html">Create a new user in the graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/create-new-project.html">Create a new project in the database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/upload-data.html">Upload project experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/data-analysis-config.html">Define data analysis parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/access-report.html">Accessing the analysis report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/notifications.html">Report notifications</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Project Report</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../project_report/project-report.html">Generating a project report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../project_report/project-tabs.html">Project report tabs</a></li>
+</ul>
+<p class="caption"><span class="caption-text">CKG Builder</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ckg_builder/ontologies.html">Ontology sources and raw file parsers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ckg_builder/databases.html">Biomedical databases and resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ckg_builder/experiments.html">Parsing experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ckg_builder/graphdb-builder.html">Building the graph database from one Python module</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/import-statistics.html">Clinical Knowledge Graph Statistics: Imports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/R-interface.html">Python - R interface</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../system_requirements.html">System Requirements</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../src.html">CKG package API Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../MANIFEST.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../MANIFEST.html#backers">Backers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../MANIFEST.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../MANIFEST.html#history">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../MANIFEST.html#code-of-conduct">Code of Conduct</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">ClinicalKnowledgeGraph</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>graphdb_builder.experiments.parsers.proteomicsParser</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for graphdb_builder.experiments.parsers.proteomicsParser</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">graphdb_builder</span> <span class="k">import</span> <span class="n">builder_utils</span><span class="p">,</span> <span class="n">mapping</span>
+
+
+<div class="viewcode-block" id="parser"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.parser">[docs]</a><span class="k">def</span> <span class="nf">parser</span><span class="p">(</span><span class="n">projectId</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="s2">&quot;proteomics&quot;</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">builder_utils</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;proteomics.yml&quot;</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="s1">&#39;experiments&#39;</span><span class="p">)</span>
+    <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="s1">&#39;../../../../data/experiments/PROJECTID/&#39;</span> <span class="o">+</span> <span class="n">data_type</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;directory&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;directory&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">data_type</span><span class="p">)</span>
+    <span class="n">directory</span> <span class="o">=</span> <span class="n">directory</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;PROJECTID&#39;</span><span class="p">,</span> <span class="n">projectId</span><span class="p">)</span>
+    <span class="n">processing_results</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">directory</span><span class="p">)]</span>
+
+    <span class="k">for</span> <span class="n">results_path</span> <span class="ow">in</span> <span class="n">processing_results</span><span class="p">:</span>
+        <span class="n">processing_tool</span> <span class="o">=</span> <span class="n">results_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">processing_tool</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">sample_mapping</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">get_mapping_analytical_samples</span><span class="p">(</span><span class="n">projectId</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample_mapping</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">mapping</span><span class="o">.</span><span class="n">map_experiment_files</span><span class="p">(</span><span class="n">projectId</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">processing_tool</span><span class="p">),</span> <span class="n">sample_mapping</span><span class="p">)</span>
+            <span class="n">tool_configuration</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="n">processing_tool</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="n">tool_configuration</span><span class="p">:</span>
+                <span class="n">dataset_configuration</span> <span class="o">=</span> <span class="n">tool_configuration</span><span class="p">[</span><span class="n">dtype</span><span class="p">]</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">parse_dataset</span><span class="p">(</span><span class="n">projectId</span><span class="p">,</span> <span class="n">dataset_configuration</span><span class="p">,</span> <span class="n">results_path</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="s2">&quot;proteins&quot;</span><span class="p">:</span>
+                        <span class="n">data</span><span class="p">[(</span><span class="n">dtype</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">extract_protein_subject_rels</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">dataset_configuration</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="s2">&quot;peptides&quot;</span><span class="p">:</span>
+                        <span class="n">data</span><span class="p">[(</span><span class="s1">&#39;subject_peptide&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">extract_peptide_subject_rels</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">dataset_configuration</span><span class="p">)</span>
+                        <span class="n">data</span><span class="p">[(</span><span class="s1">&#39;peptide_protein&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">extract_peptide_protein_rels</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">dataset_configuration</span><span class="p">)</span>
+                        <span class="n">data</span><span class="p">[(</span><span class="n">dtype</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">extract_peptides</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">dataset_configuration</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">data</span><span class="p">[(</span><span class="s1">&#39;modifiedprotein_subject&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">extract_protein_modification_subject_rels</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">dataset_configuration</span><span class="p">)</span>
+                        <span class="n">data</span><span class="p">[(</span><span class="s1">&#39;modifiedprotein_protein&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">extract_protein_protein_modification_rels</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">dataset_configuration</span><span class="p">)</span>
+                        <span class="n">data</span><span class="p">[(</span><span class="s1">&#39;modifiedprotein_peptide&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">extract_peptide_protein_modification_rels</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">dataset_configuration</span><span class="p">)</span>
+                        <span class="n">data</span><span class="p">[(</span><span class="s1">&#39;modifiedprotein&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">extract_protein_modifications_rels</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">dataset_configuration</span><span class="p">)</span>
+                        <span class="n">data</span><span class="p">[(</span><span class="s1">&#39;modifiedprotein_modification&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">extract_protein_modifications_modification_rels</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">dataset_configuration</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="parse_dataset"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.parse_dataset">[docs]</a><span class="k">def</span> <span class="nf">parse_dataset</span><span class="p">(</span><span class="n">projectId</span><span class="p">,</span> <span class="n">configuration</span><span class="p">,</span> <span class="n">dataDir</span><span class="p">):</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">missing_conf</span> <span class="o">=</span> <span class="n">check_minimum_configuration</span><span class="p">(</span><span class="n">configuration</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_conf</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">dfile_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">])</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">dir_content</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">dataDir</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">dir_content</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">dfile_regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+                    <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dataDir</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+                    <span class="k">break</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">regex</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">configuration</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+                <span class="n">log</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;log&#39;</span><span class="p">]</span>
+                <span class="n">subjectDict</span> <span class="o">=</span> <span class="n">extract_subject_replicates</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">regex</span><span class="p">)</span>
+                <span class="n">delCols</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">subject</span> <span class="ow">in</span> <span class="n">subjectDict</span><span class="p">:</span>
+                    <span class="n">delCols</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">subjectDict</span><span class="p">[</span><span class="n">subject</span><span class="p">])</span>
+                    <span class="n">aux</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">subjectDict</span><span class="p">[</span><span class="n">subject</span><span class="p">]]</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">subject</span><span class="p">]</span> <span class="o">=</span> <span class="n">calculate_median_replicates</span><span class="p">(</span><span class="n">aux</span><span class="p">,</span> <span class="n">log</span><span class="p">)</span>
+                <span class="n">dataset</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">delCols</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Error when importing proteomics experiment in project </span><span class="si">{}</span><span class="s2">.</span><span class="se">\n</span><span class="s2"> Missing configuration: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">projectId</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing_conf</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="n">dataset</span></div>
+
+
+<div class="viewcode-block" id="check_columns"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.check_columns">[docs]</a><span class="k">def</span> <span class="nf">check_columns</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">req_columns</span><span class="p">,</span> <span class="n">generated_columns</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">req_columns</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">generated_columns</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="check_minimum_configuration"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.check_minimum_configuration">[docs]</a><span class="k">def</span> <span class="nf">check_minimum_configuration</span><span class="p">(</span><span class="n">configuration</span><span class="p">):</span>
+    <span class="n">minimum_req</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;columns&#39;</span><span class="p">,</span> <span class="s1">&#39;indexCol&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;proteinCol&#39;</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="s1">&#39;valueCol&#39;</span><span class="p">,</span> <span class="s1">&#39;attributes&#39;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">minimum_req</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">configuration</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span></div>
+
+
+<div class="viewcode-block" id="load_dataset"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.load_dataset">[docs]</a><span class="k">def</span> <span class="nf">load_dataset</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">configuration</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; This function gets the molecular data from a proteomics experiment.</span>
+<span class="sd">        Input: uri of the processed file resulting from MQ</span>
+<span class="sd">        Output: pandas DataFrame with the columns and filters defined in config.py &#39;&#39;&#39;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">regexCols</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">filters</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;columns&quot;</span><span class="p">]</span>
+    <span class="n">regexCols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns</span> <span class="k">if</span> <span class="s1">&#39;+&#39;</span> <span class="ow">in</span> <span class="n">c</span><span class="p">]</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">regexCols</span><span class="p">)</span>
+    <span class="n">generated_columns</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="s1">&#39;generated_columns&#39;</span> <span class="ow">in</span> <span class="n">configuration</span><span class="p">:</span>
+        <span class="n">generated_columns</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;generated_columns&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="s1">&#39;filters&#39;</span> <span class="ow">in</span> <span class="n">configuration</span><span class="p">:</span>
+        <span class="n">filters</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;filters&quot;</span><span class="p">]</span>
+
+    <span class="n">indexCol</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;indexCol&quot;</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">builder_utils</span><span class="o">.</span><span class="n">readDataset</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+    <span class="n">missing_cols</span> <span class="o">=</span> <span class="n">check_columns</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="n">generated_columns</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_cols</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">filters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="n">filters</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">filters</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">filters</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;numeric filter&#39;</span> <span class="ow">in</span> <span class="n">configuration</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;numeric filter&#39;</span><span class="p">]:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">value</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Error when applying numeric filter on </span><span class="si">{}</span><span class="s2">. The column is not in the dataset&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;proteinCol&quot;</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">expand_groups</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">configuration</span><span class="p">)</span>
+        <span class="n">columns</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">indexCol</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">regex</span> <span class="ow">in</span> <span class="n">regexCols</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">regex</span><span class="p">)</span>
+            <span class="n">columns</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">match</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)))</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">columns</span><span class="p">)]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Filtered&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">value_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;valueCol&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">c</span><span class="p">]</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">value_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">value_cols</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">))</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Error when importing proteomics experiment.</span><span class="se">\n</span><span class="s2"> Missing columns: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing_cols</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">regexCols</span></div>
+
+
+<div class="viewcode-block" id="remove_contaminant_tag"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.remove_contaminant_tag">[docs]</a><span class="k">def</span> <span class="nf">remove_contaminant_tag</span><span class="p">(</span><span class="n">column</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s1">&#39;CON__&#39;</span><span class="p">):</span>
+    <span class="n">new_column</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">column</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">new_column</span></div>
+
+
+<div class="viewcode-block" id="expand_groups"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.expand_groups">[docs]</a><span class="k">def</span> <span class="nf">expand_groups</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">configuration</span><span class="p">):</span>
+    <span class="n">default_group_col</span> <span class="o">=</span> <span class="s1">&#39;id&#39;</span>
+    <span class="k">if</span> <span class="s2">&quot;groupCol&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">configuration</span> <span class="ow">or</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;groupCol&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">default_group_col</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;groupCol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_group_col</span>
+    <span class="k">elif</span> <span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;groupCol&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;groupCol&#39;</span><span class="p">]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;proteinCol&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">stack</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">del</span> <span class="n">data</span><span class="p">[</span><span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;proteinCol&quot;</span><span class="p">]]</span>
+    <span class="n">pdf</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;proteinCol&quot;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">&quot;multipositions&quot;</span> <span class="ow">in</span> <span class="n">configuration</span><span class="p">:</span>
+        <span class="n">s2</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;multipositions&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">stack</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">data</span><span class="p">[</span><span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;multipositions&quot;</span><span class="p">]]</span>
+        <span class="n">pdf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">s</span><span class="p">,</span> <span class="n">s2</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;proteinCol&quot;</span><span class="p">],</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;multipositions&quot;</span><span class="p">]])</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pdf</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;contaminant_tag&#39;</span> <span class="ow">in</span> <span class="n">configuration</span><span class="p">:</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;proteinCol&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">remove_contaminant_tag</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;proteinCol&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">tag</span><span class="o">=</span><span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;contaminant_tag&#39;</span><span class="p">])</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;is_razor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">~</span> <span class="n">data</span><span class="p">[</span><span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;groupCol&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">duplicated</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;indexCol&quot;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">data</span></div>
+
+<span class="c1">############## ProteinModification entity ####################</span>
+
+
+<div class="viewcode-block" id="extract_modification_protein_rels"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.extract_modification_protein_rels">[docs]</a><span class="k">def</span> <span class="nf">extract_modification_protein_rels</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">configuration</span><span class="p">):</span>
+    <span class="n">modificationId</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;modId&quot;</span><span class="p">]</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;positionCols&quot;</span><span class="p">]</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">aux</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;START_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;position&quot;</span><span class="p">,</span> <span class="s2">&quot;residue&quot;</span><span class="p">]</span>
+    <span class="n">aux</span><span class="p">[</span><span class="s2">&quot;END_ID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">modificationId</span>
+    <span class="n">aux</span><span class="p">[</span><span class="s1">&#39;TYPE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;HAS_MODIFICATION&quot;</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="p">[[</span><span class="s1">&#39;START_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;END_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;TYPE&#39;</span><span class="p">,</span> <span class="s2">&quot;position&quot;</span><span class="p">,</span> <span class="s2">&quot;residue&quot;</span><span class="p">]]</span>
+    <span class="n">aux</span><span class="p">[</span><span class="s1">&#39;position&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aux</span><span class="p">[</span><span class="s1">&#39;position&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">aux</span></div>
+
+
+<div class="viewcode-block" id="extract_protein_modification_subject_rels"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.extract_protein_modification_subject_rels">[docs]</a><span class="k">def</span> <span class="nf">extract_protein_modification_subject_rels</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">configuration</span><span class="p">):</span>
+    <span class="n">positionCols</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;positionCols&quot;</span><span class="p">]</span>
+    <span class="n">proteinCol</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;proteinCol&quot;</span><span class="p">]</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">proteinCol</span><span class="p">]</span>
+    <span class="n">cols</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">positionCols</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;END_ID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">proteinCol</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">data</span><span class="p">[</span><span class="n">positionCols</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="n">data</span><span class="p">[</span><span class="n">positionCols</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;mod_acronym&quot;</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;END_ID&quot;</span><span class="p">)</span>
+    <span class="n">newIndexdf</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;valueCol&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">))</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">stack</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">))]</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;END_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;START_ID&#39;</span><span class="p">,</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
+    <span class="n">attributes</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">]</span>
+    <span class="p">(</span><span class="n">cAttributes</span><span class="p">,</span> <span class="n">cCols</span><span class="p">),</span> <span class="p">(</span><span class="n">rAttributes</span><span class="p">,</span> <span class="n">regexCols</span><span class="p">)</span> <span class="o">=</span> <span class="n">extract_attributes</span><span class="p">(</span><span class="n">newIndexdf</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rAttributes</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">merge_regex_attributes</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">rAttributes</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;c0&quot;</span><span class="p">,</span> <span class="s2">&quot;c1&quot;</span><span class="p">],</span> <span class="n">regexCols</span><span class="p">)</span>
+        <span class="n">columns</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">regexCols</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cAttributes</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">merge_col_attributes</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cAttributes</span><span class="p">,</span> <span class="s2">&quot;c0&quot;</span><span class="p">)</span>
+        <span class="n">columns</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">cCols</span><span class="p">)</span>
+
+    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;TYPE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;HAS_QUANTIFIED_MODIFIED_PROTEIN&quot;</span>
+    <span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;TYPE&quot;</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;START_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;END_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;TYPE&#39;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">regexCols</span> <span class="o">+</span> <span class="n">cCols</span><span class="p">]</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;PG.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="extract_protein_protein_modification_rels"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.extract_protein_protein_modification_rels">[docs]</a><span class="k">def</span> <span class="nf">extract_protein_protein_modification_rels</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">configuration</span><span class="p">):</span>
+    <span class="n">positionCols</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;positionCols&quot;</span><span class="p">]</span>
+    <span class="n">proteinCol</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;proteinCol&quot;</span><span class="p">]</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">proteinCol</span><span class="p">]</span>
+    <span class="n">cols</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">positionCols</span><span class="p">)</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span>
+    <span class="n">aux</span><span class="p">[</span><span class="s2">&quot;END_ID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aux</span><span class="p">[</span><span class="n">proteinCol</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">aux</span><span class="p">[</span><span class="n">positionCols</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="n">aux</span><span class="p">[</span><span class="n">positionCols</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;mod_acronym&quot;</span><span class="p">]</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">positionCols</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;END_ID&quot;</span><span class="p">)</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">aux</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;END_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;START_ID&quot;</span><span class="p">]</span>
+    <span class="n">aux</span><span class="p">[</span><span class="s1">&#39;TYPE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;HAS_MODIFIED_SITE&quot;</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="p">[[</span><span class="s1">&#39;START_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;END_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;TYPE&#39;</span><span class="p">]]</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">aux</span></div>
+
+
+<div class="viewcode-block" id="extract_peptide_protein_modification_rels"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.extract_peptide_protein_modification_rels">[docs]</a><span class="k">def</span> <span class="nf">extract_peptide_protein_modification_rels</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">configuration</span><span class="p">):</span>
+    <span class="n">positionCols</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;positionCols&quot;</span><span class="p">]</span>
+    <span class="n">proteinCol</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;proteinCol&quot;</span><span class="p">]</span>
+    <span class="n">sequenceCol</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;sequenceCol&quot;</span><span class="p">]</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">sequenceCol</span><span class="p">,</span> <span class="n">proteinCol</span><span class="p">]</span>
+    <span class="n">cols</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">positionCols</span><span class="p">)</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span>
+    <span class="n">aux</span><span class="p">[</span><span class="s2">&quot;END_ID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aux</span><span class="p">[</span><span class="n">proteinCol</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">aux</span><span class="p">[</span><span class="n">positionCols</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="n">aux</span><span class="p">[</span><span class="n">positionCols</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;mod_acronym&quot;</span><span class="p">]</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="n">proteinCol</span><span class="p">]</span> <span class="o">+</span> <span class="n">positionCols</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;END_ID&quot;</span><span class="p">)</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">aux</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;END_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;START_ID&quot;</span><span class="p">]</span>
+    <span class="n">aux</span><span class="p">[</span><span class="s2">&quot;START_ID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aux</span><span class="p">[</span><span class="s2">&quot;START_ID&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+    <span class="n">aux</span><span class="p">[</span><span class="s1">&#39;TYPE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;HAS_MODIFIED_SITE&quot;</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="p">[[</span><span class="s1">&#39;START_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;END_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;TYPE&#39;</span><span class="p">]]</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">aux</span></div>
+
+
+<div class="viewcode-block" id="extract_protein_modifications_rels"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.extract_protein_modifications_rels">[docs]</a><span class="k">def</span> <span class="nf">extract_protein_modifications_rels</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">configuration</span><span class="p">):</span>
+    <span class="n">positionCols</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;positionCols&quot;</span><span class="p">]</span>
+    <span class="n">proteinCol</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;proteinCol&quot;</span><span class="p">]</span>
+    <span class="n">sequenceCol</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;sequenceCol&quot;</span><span class="p">]</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">proteinCol</span><span class="p">,</span> <span class="n">sequenceCol</span><span class="p">]</span>
+    <span class="n">cols</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">positionCols</span><span class="p">)</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span>
+    <span class="n">aux</span><span class="p">[</span><span class="s2">&quot;ID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aux</span><span class="p">[</span><span class="n">proteinCol</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">aux</span><span class="p">[</span><span class="n">positionCols</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="n">aux</span><span class="p">[</span><span class="n">positionCols</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;mod_acronym&quot;</span><span class="p">]</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;ID&quot;</span><span class="p">)</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">aux</span><span class="p">[</span><span class="n">sequenceCol</span><span class="p">]</span> <span class="o">=</span> <span class="n">aux</span><span class="p">[</span><span class="n">sequenceCol</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
+    <span class="n">aux</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;experimentally_identified&quot;</span>
+    <span class="n">aux</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="s2">&quot;protein&quot;</span><span class="p">,</span> <span class="s2">&quot;sequence_window&quot;</span><span class="p">,</span> <span class="s2">&quot;position&quot;</span><span class="p">,</span> <span class="s2">&quot;residue&quot;</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">]</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">aux</span></div>
+
+
+<div class="viewcode-block" id="extract_protein_modifications_modification_rels"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.extract_protein_modifications_modification_rels">[docs]</a><span class="k">def</span> <span class="nf">extract_protein_modifications_modification_rels</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">configuration</span><span class="p">):</span>
+    <span class="n">modID</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;modId&quot;</span><span class="p">]</span>
+    <span class="n">positionCols</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;positionCols&quot;</span><span class="p">]</span>
+    <span class="n">proteinCol</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;proteinCol&quot;</span><span class="p">]</span>
+    <span class="n">sequenceCol</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;sequenceCol&quot;</span><span class="p">]</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">proteinCol</span><span class="p">,</span> <span class="n">sequenceCol</span><span class="p">]</span>
+    <span class="n">cols</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">positionCols</span><span class="p">)</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span>
+    <span class="n">aux</span><span class="p">[</span><span class="s2">&quot;START_ID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aux</span><span class="p">[</span><span class="n">proteinCol</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">aux</span><span class="p">[</span><span class="n">positionCols</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="n">aux</span><span class="p">[</span><span class="n">positionCols</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;mod_acronym&quot;</span><span class="p">]</span>
+    <span class="n">aux</span><span class="p">[</span><span class="s2">&quot;END_ID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">modID</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="p">[[</span><span class="s2">&quot;START_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;END_ID&quot;</span><span class="p">]]</span>
+
+    <span class="k">return</span> <span class="n">aux</span></div>
+
+<span class="c1">################# Peptide entity ####################</span>
+
+
+<div class="viewcode-block" id="extract_peptides"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.extract_peptides">[docs]</a><span class="k">def</span> <span class="nf">extract_peptides</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">configuration</span><span class="p">):</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">modid</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
+    <span class="n">aux</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">modid</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">aux</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;count&#39;</span><span class="p">})</span>
+    <span class="n">aux</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;count&quot;</span><span class="p">]</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">aux</span></div>
+
+
+<div class="viewcode-block" id="extract_peptide_subject_rels"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.extract_peptide_subject_rels">[docs]</a><span class="k">def</span> <span class="nf">extract_peptide_subject_rels</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">configuration</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="o">~</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">)]</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;valueCol&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">))</span>
+    <span class="n">attributes</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">]</span>
+    <span class="n">aux</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">aux</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="o">.</span><span class="n">stack</span><span class="p">()</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">aux</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">aux</span><span class="o">.</span><span class="n">columns</span><span class="p">))]</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;END_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;START_ID&#39;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">]</span>
+
+    <span class="p">(</span><span class="n">cAttributes</span><span class="p">,</span> <span class="n">cCols</span><span class="p">),</span> <span class="p">(</span><span class="n">rAttributes</span><span class="p">,</span> <span class="n">regexCols</span><span class="p">)</span> <span class="o">=</span> <span class="n">extract_attributes</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rAttributes</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="n">aux</span> <span class="o">=</span> <span class="n">merge_regex_attributes</span><span class="p">(</span><span class="n">aux</span><span class="p">,</span> <span class="n">rAttributes</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;c0&quot;</span><span class="p">,</span> <span class="s2">&quot;c1&quot;</span><span class="p">],</span> <span class="n">regexCols</span><span class="p">)</span>
+        <span class="n">columns</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">regexCols</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cAttributes</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="n">aux</span> <span class="o">=</span> <span class="n">merge_col_attributes</span><span class="p">(</span><span class="n">aux</span><span class="p">,</span> <span class="n">cAttributes</span><span class="p">,</span> <span class="s2">&quot;c0&quot;</span><span class="p">)</span>
+        <span class="n">columns</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">cCols</span><span class="p">)</span>
+
+    <span class="n">aux</span><span class="p">[</span><span class="s1">&#39;TYPE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;HAS_QUANTIFIED_PEPTIDE&quot;</span>
+    <span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;TYPE&quot;</span><span class="p">)</span>
+    <span class="n">aux</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="p">[[</span><span class="s1">&#39;START_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;END_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;TYPE&#39;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">regexCols</span> <span class="o">+</span> <span class="n">cCols</span><span class="p">]</span>
+    <span class="n">aux</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;PG.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">aux</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">aux</span></div>
+
+
+<div class="viewcode-block" id="extract_peptide_protein_rels"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.extract_peptide_protein_rels">[docs]</a><span class="k">def</span> <span class="nf">extract_peptide_protein_rels</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">configuration</span><span class="p">):</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;proteinCol&quot;</span><span class="p">]]</span>
+    <span class="n">cols</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;positionCols&quot;</span><span class="p">])</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">aux</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Sequence&quot;</span><span class="p">,</span> <span class="s2">&quot;Protein&quot;</span><span class="p">,</span> <span class="s2">&quot;Start&quot;</span><span class="p">,</span> <span class="s2">&quot;End&quot;</span><span class="p">]</span>
+    <span class="n">aux</span><span class="p">[</span><span class="s1">&#39;TYPE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;BELONGS_TO_PROTEIN&quot;</span>
+    <span class="n">aux</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;experimentally_identified&#39;</span>
+    <span class="n">aux</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;START_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;END_ID&#39;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">,</span> <span class="s1">&#39;TYPE&#39;</span><span class="p">,</span> <span class="s1">&#39;source&#39;</span><span class="p">]</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="p">[[</span><span class="s1">&#39;START_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;END_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;TYPE&#39;</span><span class="p">,</span> <span class="s1">&#39;source&#39;</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">aux</span></div>
+
+<span class="c1">################# Protein entity #########################</span>
+
+
+<div class="viewcode-block" id="extract_protein_subject_rels"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.extract_protein_subject_rels">[docs]</a><span class="k">def</span> <span class="nf">extract_protein_subject_rels</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">configuration</span><span class="p">):</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;valueCol&quot;</span><span class="p">])</span>
+    <span class="n">attributes</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">]</span>
+    <span class="n">aux</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;\.?&quot;</span> <span class="o">+</span> <span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;valueCol&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;\s?&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">aux</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="o">.</span><span class="n">stack</span><span class="p">()</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">aux</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">aux</span><span class="o">.</span><span class="n">columns</span><span class="p">))]</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;END_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;START_ID&#39;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">]</span>
+    <span class="p">(</span><span class="n">cAttributes</span><span class="p">,</span> <span class="n">cCols</span><span class="p">),</span> <span class="p">(</span><span class="n">rAttributes</span><span class="p">,</span> <span class="n">regexCols</span><span class="p">)</span> <span class="o">=</span> <span class="n">extract_attributes</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rAttributes</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="n">aux</span> <span class="o">=</span> <span class="n">merge_regex_attributes</span><span class="p">(</span><span class="n">aux</span><span class="p">,</span> <span class="n">rAttributes</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;c0&quot;</span><span class="p">,</span> <span class="s2">&quot;c1&quot;</span><span class="p">],</span> <span class="n">regexCols</span><span class="p">)</span>
+        <span class="n">columns</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">regexCols</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cAttributes</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="n">aux</span> <span class="o">=</span> <span class="n">merge_col_attributes</span><span class="p">(</span><span class="n">aux</span><span class="p">,</span> <span class="n">cAttributes</span><span class="p">,</span> <span class="s2">&quot;c0&quot;</span><span class="p">)</span>
+        <span class="n">columns</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">cCols</span><span class="p">)</span>
+
+    <span class="n">aux</span><span class="p">[</span><span class="s1">&#39;TYPE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;HAS_QUANTIFIED_PROTEIN&quot;</span>
+    <span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;TYPE&quot;</span><span class="p">)</span>
+    <span class="n">aux</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span><span class="p">[[</span><span class="s1">&#39;START_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;END_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;TYPE&#39;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">regexCols</span> <span class="o">+</span> <span class="n">cCols</span><span class="p">]</span>
+    <span class="n">aux</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;PG.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">aux</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">aux</span></div>
+
+
+<div class="viewcode-block" id="extract_subject_replicates"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.extract_subject_replicates">[docs]</a><span class="k">def</span> <span class="nf">extract_subject_replicates</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">regex</span><span class="p">):</span>
+    <span class="n">subjectDict</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">regex</span><span class="p">:</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="n">r</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">subject</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">timepoint</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">timepoint</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">ident</span> <span class="o">=</span> <span class="n">value</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">subject</span> <span class="o">+</span> <span class="n">timepoint</span>
+            <span class="n">subjectDict</span><span class="p">[</span><span class="n">ident</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">subjectDict</span></div>
+
+
+<div class="viewcode-block" id="extract_attributes"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.extract_attributes">[docs]</a><span class="k">def</span> <span class="nf">extract_attributes</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">attributes</span><span class="p">):</span>
+    <span class="n">auxAttr_col</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="n">auxAttr_reg</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="n">cCols</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">regexCols</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">ctype</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ctype</span> <span class="o">==</span> <span class="s2">&quot;regex&quot;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">[</span><span class="n">ctype</span><span class="p">]:</span>
+                <span class="n">attr_col</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="n">r</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">attr_col</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                    <span class="n">regexCols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+                    <span class="n">auxAttr_reg</span> <span class="o">=</span> <span class="n">auxAttr_reg</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">attr_col</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">auxAttr_col</span> <span class="o">=</span> <span class="n">auxAttr_col</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">attributes</span><span class="p">[</span><span class="n">ctype</span><span class="p">]])</span>
+            <span class="n">cCols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">[</span><span class="n">ctype</span><span class="p">]]</span>
+
+    <span class="n">reg_attr_index</span> <span class="o">=</span> <span class="n">auxAttr_reg</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span>
+    <span class="n">col_attr_index</span> <span class="o">=</span> <span class="n">auxAttr_col</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span>
+    <span class="n">auxAttr_reg</span> <span class="o">=</span> <span class="n">auxAttr_reg</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">reg_attr_index</span><span class="p">)</span>
+    <span class="n">auxAttr_col</span> <span class="o">=</span> <span class="n">auxAttr_col</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">col_attr_index</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">auxAttr_col</span><span class="p">,</span> <span class="n">cCols</span><span class="p">),</span> <span class="p">(</span><span class="n">auxAttr_reg</span><span class="p">,</span> <span class="n">regexCols</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="merge_regex_attributes"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.merge_regex_attributes">[docs]</a><span class="k">def</span> <span class="nf">merge_regex_attributes</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">attributes</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">regexCols</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">attributes</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="n">regexCols</span><span class="p">:</span>
+            <span class="n">attr_aux</span> <span class="o">=</span> <span class="n">attributes</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="n">rc</span><span class="p">)</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;\.?&quot;</span> <span class="o">+</span> <span class="n">rc</span> <span class="o">+</span> <span class="s2">&quot;\s?&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">attr_aux</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+            <span class="n">attr_aux</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span>
+            <span class="n">attr_aux</span> <span class="o">=</span> <span class="n">attr_aux</span><span class="o">.</span><span class="n">stack</span><span class="p">()</span>
+            <span class="n">attr_aux</span> <span class="o">=</span> <span class="n">attr_aux</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+            <span class="n">attr_aux</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;c&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">attr_aux</span><span class="o">.</span><span class="n">columns</span><span class="p">))]</span>
+            <span class="n">attr_aux</span> <span class="o">=</span> <span class="n">attr_aux</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">attr_aux</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">index</span><span class="p">),</span> <span class="n">rsuffix</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+            <span class="k">del</span><span class="p">(</span><span class="n">attr_aux</span><span class="p">)</span>
+        <span class="k">del</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="merge_col_attributes"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.merge_col_attributes">[docs]</a><span class="k">def</span> <span class="nf">merge_col_attributes</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">attributes</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">attributes</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+        <span class="k">del</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="calculate_median_replicates"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.calculate_median_replicates">[docs]</a><span class="k">def</span> <span class="nf">calculate_median_replicates</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="s2">&quot;log2&quot;</span><span class="p">):</span>
+    <span class="n">median</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">log</span> <span class="o">==</span> <span class="s2">&quot;log2&quot;</span><span class="p">:</span>
+        <span class="n">median</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">applymap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">log</span> <span class="o">==</span> <span class="s2">&quot;log10&quot;</span><span class="p">:</span>
+        <span class="n">median</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">applymap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">median</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">median</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="update_groups"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.update_groups">[docs]</a><span class="k">def</span> <span class="nf">update_groups</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">groups</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">groups</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(),</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;START_ID&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="get_dataset_configuration"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.get_dataset_configuration">[docs]</a><span class="k">def</span> <span class="nf">get_dataset_configuration</span><span class="p">(</span><span class="n">processing_format</span><span class="p">,</span> <span class="n">data_type</span><span class="p">):</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">builder_utils</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;proteomics.yml&quot;</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="s1">&#39;experiments&#39;</span><span class="p">)</span>
+    <span class="n">dataset_config</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">processing_format</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">data_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">data_type</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="n">processing_format</span><span class="p">]:</span>
+                <span class="n">dataset_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="n">processing_format</span><span class="p">][</span><span class="n">data_type</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dataset_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="n">processing_format</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">dataset_config</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,425 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Upload project experimental data &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Define data analysis parameters" href="data-analysis-config.html" />
+    <link rel="prev" title="Create a new project in the database" href="create-new-project.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> ClinicalKnowledgeGraph
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../INTRO.html">Clinical Knowledge Graph</a></li>
+</ul>
+<p class="caption"><span class="caption-text">First steps</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-requirements.html">Getting Started with some Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-windows.html">Getting started with Windows</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="connect-to-ckg.html">Connecting to the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-new-user.html">Create a new user in the graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-new-project.html">Create a new project in the database</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Upload project experimental data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#prepare-data-for-upload">Prepare data for upload</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#experimental-design">Experimental Design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#clinical-data">Clinical Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#proteomics-data">Proteomics data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#upload">Upload Data</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data-analysis-config.html">Define data analysis parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="access-report.html">Accessing the analysis report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notifications.html">Report notifications</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Project Report</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../project_report/project-report.html">Generating a project report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project_report/project-tabs.html">Project report tabs</a></li>
+</ul>
+<p class="caption"><span class="caption-text">CKG Builder</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/ontologies.html">Ontology sources and raw file parsers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/databases.html">Biomedical databases and resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/experiments.html">Parsing experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/graphdb-builder.html">Building the graph database from one Python module</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/import-statistics.html">Clinical Knowledge Graph Statistics: Imports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/R-interface.html">Python - R interface</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../system_requirements.html">System Requirements</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../src.html">CKG package API Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#backers">Backers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#history">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#code-of-conduct">Code of Conduct</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ClinicalKnowledgeGraph</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Upload project experimental data</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/getting_started/upload-data.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="upload-project-experimental-data">
+<span id="upload-data"></span><h1>Upload project experimental data<a class="headerlink" href="#upload-project-experimental-data" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="prepare-data-for-upload">
+<h2>Prepare data for upload<a class="headerlink" href="#prepare-data-for-upload" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="experimental-design">
+<span id="id1"></span><h3>Experimental Design<a class="headerlink" href="#experimental-design" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-center" id="id3">
+<a class="reference internal image-reference" href="../_images/experimental_design.png"><img alt="../_images/experimental_design.png" src="../_images/experimental_design.png" style="width: 80%;" /></a>
+<p class="caption"><span class="caption-text">Experimental Design file example</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</div>
+<p>Open the Experimental Design excel file, automatically downloaded when the project was created, and fill in the columns for <cite>subject external_id</cite>, <cite>biological_sample external_id</cite> and <cite>analytical_sample external_id</cite>.
+The identifiers provided in this file <strong>must</strong> correspond to the identifiers used in the <em>Clinical Data</em> file, and to the column names in the <em>Proteomics</em> files (see below).</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Make sure, within each column, the identifiers are unique. This means, if you have a subject “KO1”, no other subject can have the same identifier, but you can have a biological sample and/or analytical sample “KO1”.</p>
+</div>
+</div>
+<div class="section" id="clinical-data">
+<h3>Clinical Data<a class="headerlink" href="#clinical-data" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-center" id="id4">
+<a class="reference internal image-reference" href="../_images/clinical_file.png"><img alt="../_images/clinical_file.png" src="../_images/clinical_file.png" style="width: 80%;" /></a>
+<p class="caption"><span class="caption-text">Clinical Data file example</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</div>
+<p>Open the Clinical Data excel file, automatically downloaded when the project was created, and fill in as much information as you can.
+Be aware that the following columns are mandatory to fill in:</p>
+<ul class="simple">
+<li><p><strong>subject external_id</strong>: This is the identifier your subject has in your study so far (same identifiers as used in <a class="reference internal" href="#experimental-design"><span class="std std-ref">Experimental Design</span></a>, <strong>subject external_id</strong>).</p></li>
+<li><p><strong>tissue</strong>: This is the name of the tissue each sample came from. Make sure it is also one of the tissues selected during Project creation.</p></li>
+<li><p><strong>disease</strong>: This should match the disease(s) you selected from the drop-down menu in the <a class="reference internal" href="create-new-project.html#project-creation"><span class="std std-ref">Project creation</span></a>.</p></li>
+<li><p><strong>biological_sample external_id</strong>: This is the identifier of the sample taken from your subject, if you have both blood and urine for every subject, you should correspondingly have two biological sample identifiers for each subject identifier (same identifiers as used in <a class="reference internal" href="#experimental-design"><span class="std std-ref">Experimental Design</span></a>, <strong>biological_sample external_id</strong>).</p></li>
+<li><p><strong>biological_sample quantity</strong>: Amount of biological sample.</p></li>
+<li><p><strong>biological_sample quantity_units</strong>: Unit.</p></li>
+<li><p><strong>analytical_sample external_id</strong>: If multiple analyses were performed on the same biological sample, eg. proteomics and transcriptomics, there should be multiple analytical sample identifiers for every biological sample (same identifiers as used in <a class="reference internal" href="#experimental-design"><span class="std std-ref">Experimental Design</span></a>, <strong>analytical_sample external_id</strong>).</p></li>
+<li><p><strong>analytical_sample quantity</strong>: Amount of sample used in the experiment.</p></li>
+<li><p><strong>analytical_sample quantity_units</strong>: Unit.</p></li>
+<li><p><strong>grouping1</strong>: Annotated grouping of each sample.</p></li>
+<li><p><strong>grouping2</strong>: If there are more than one grouping (two independent variables) use this column to add a second level.</p></li>
+</ul>
+<p>Additional clinical information about your study subjects can be added in the subsequent columns (i.e. columns after “grouping2”).
+Please use SNOWMED terms as headers for every new column you add. This will be used to gather existing information about the type of data you have.
+To find an adequate SNOMED term for your clinical variables, please visit the <a class="reference external" href="https://browser.ihtsdotools.org/?perspective=full&amp;conceptId1=734000001&amp;edition=MAIN/2019-07-31&amp;release=&amp;languages=en">SNOMED browser</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Be aware, the two-independent-variable statistics is not yet implemented in the default analysis pipeline.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To add a column with “Age” search for “age” in the SNOMED browser. This gives multiple matches, with the first one being: “Age (qualifier value), SCTID:397669002”. Please enter this information as your clinical variable column header with the SCTID in brackets: Age (qualifier value) (397669002)</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If an adequate SNOMED term is not available, please write an e-mail to <a class="reference external" href="mailto:annelaura&#46;bach&#37;&#52;&#48;cpr&#46;ku&#46;dk">annelaura<span>&#46;</span>bach<span>&#64;</span>cpr<span>&#46;</span>ku<span>&#46;</span>dk</a> with the subject “Header Creation, CKG”. In the email please provide your “missing” header and a description of what it is. Do this before uploading the Clinical Data.</p>
+</div>
+<p><strong>Additional columns:</strong></p>
+<ul class="simple">
+<li><p><strong>timpeoint</strong>: To be used in the case of a longitudinal study. This is a relative measure within your samples timepoints. For example, if your timepoints are years 2015, 2016, 2017, 2018 and 2019, you would use “0”, “1”, “2”, “3” and “4” as values in this column.</p></li>
+<li><p><strong>timepoint units</strong>: Unit in which your <strong>timepoint</strong> is measured (e.g. “hours”, “days”, “years”).</p></li>
+<li><p><strong>had_intervention</strong>: If a subject has been subjected to a determined medical intervention. For now, select only drugs that have been given to the subject (e.g. “327032007”). Use an appropriate SNOMED SCTID value.</p></li>
+<li><p><strong>had_intervention_type</strong>: This is the type of intervention applied to a subject. “drug treatment” is the only value available for now.</p></li>
+<li><p><strong>had_intervention_in_combination</strong>: Boolean. If True, requires more than one value in <strong>had_intervention</strong>.</p></li>
+<li><p><strong>had_intervention_response</strong>: “positive” or “negative”.</p></li>
+<li><p><strong>studies_intervention</strong>: A medical intervention under study in the project. For example, study subjects before and after stomach bypass (SCTID:442338001). Use an appropriate SNOMED SCTID value.</p></li>
+</ul>
+</div>
+<div class="section" id="proteomics-data">
+<h3>Proteomics data<a class="headerlink" href="#proteomics-data" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>MaxQuant</strong>: Use “proteinGroups.txt”, “peptides.txt” and “Oxidation (M)Sites.txt” files, and any other relevant MaxQuant output files.</p></li>
+<li><p><strong>Spectronaut</strong>: Use “proteinGroupsReport.xlsx”. When exporting the results table from Spectronaut, please select “PG.ProteinAccessions” and “PG.Qvalue” under <cite>Row Labels</cite>, and under <cite>Cell Values</cite> select “PG.Quantity”, “PG.NrOfStrippedSequencesMeasured”, “PG.NrOfStrippedSequencesIdentified”, “PG.NrOfPrecursorsIdentified”, “PG.IsSingleHit”, “PG.NrOfStrippedSequencesUsedForQuantification”, “PG.NrOfModifiedSequencesUsedForQuantification”, “PG.NrOfPrecursorsUsedForQuantification”, “PG.MS1Quantity” and “PG.MS2Quantity”.</p></li>
+</ul>
+</div></blockquote>
+<p>It is very important that all your column names have the following format: “LFQ intensity TechnicalReplicateNumber_AnalyticalSampleIdentifier” or “TechnicalReplicateNumber_AnalyticalSampleIdentifier.PG.Quantity”. Where “TechnicalReplicateNumber_AnalyticalSampleIdentifier” should be replaced as shown in the example table below:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 24%" />
+<col style="width: 22%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Technical
+replicate</p></th>
+<th class="head"><p>Analytical
+sample id</p></th>
+<th class="head"><p>Timepoint</p></th>
+<th class="head"><p>Result</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>KO_plate1</p></td>
+<td></td>
+<td><p>1_KO_plate1</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>KO2_plate1</p></td>
+<td><p>0</p></td>
+<td><p>1_KO_plate1_0</p></td>
+</tr>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>KO3_plate1</p></td>
+<td><p>30</p></td>
+<td><p>1_KO_plate1_30</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>KO4_plate2</p></td>
+<td></td>
+<td><p>1_KO4_plate2</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>KO4_plate2</p></td>
+<td></td>
+<td><p>2_KO4_plate2</p></td>
+</tr>
+</tbody>
+</table>
+<p>As shown in the example table, if your experimental design is a timecourse experiment, you should add “_” followed by the timepoint, right after the analytical sample identifier. Otherwise, you can omit it.</p>
+<p>Do not perform any post-processing filtering, imputations or similar on your data before uploading it. This will be carried out by the CKG. In the case of Spectronaut outputs, the missing values are automatically replaced by the keyword “Filtered”.</p>
+<p>You can proceed to <a class="reference internal" href="#upload"><span class="std std-ref">Upload Data</span></a> when you have prepared your experimental design file, clinical and proteomics data.</p>
+</div>
+</div>
+<div class="section" id="upload">
+<span id="id2"></span><h2>Upload Data<a class="headerlink" href="#upload" title="Permalink to this headline">¶</a></h2>
+<div class="figure align-center" id="id5">
+<a class="reference internal image-reference" href="../_images/data_upload_app.png"><img alt="../_images/data_upload_app.png" src="../_images/data_upload_app.png" style="width: 70%;" /></a>
+<p class="caption"><span class="caption-text">Data Upload App</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</div>
+<p>In order to make data uploading simple, we created an app that takes care of this in only a few steps:</p>
+<p>Go to <a class="reference external" href="http://localhost:5000/apps/dataUploadApp/">dataUploadApp</a> or use the <code class="docutils literal notranslate"><span class="pre">Data</span> <span class="pre">Upload</span></code> button in the <a class="reference external" href="http://localhost:5000/">homepage app</a>, and follow the steps.</p>
+<ol class="arabic">
+<li><p>Fill in <code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">identifier</span></code> with your project external identifier from <a class="reference internal" href="create-new-project.html#project-creation"><span class="std std-ref">Project creation</span></a> and press <em>Enter</em>. <strong>(1)</strong> If the project identifier does not exist in the database, you will get and error. Otherwise, the menus below will unlock.</p></li>
+<li><p>Select the type of data you will upload first. <strong>(2)</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">proteomics</span></code> or <code class="docutils literal notranslate"><span class="pre">longitudinal_proteomics</span></code> is selected, please also select the processing tool used (<code class="docutils literal notranslate"><span class="pre">MaxQuant</span></code> or <code class="docutils literal notranslate"><span class="pre">Spectronaut</span></code>). <strong>(2a)</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Drag and drop or select the files to upload to the selected data type. <strong>(3)</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Multiple files can be selected at once. This is specially important in the case of proteomics files, please make sure you select all of the relevant MS files at once.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Select another data type to upload <strong>(2)</strong>, and drag and drop or select the files to upload <strong>(3)</strong>.</p></li>
+<li><p>When you have uploaded all the relevant files, click <code class="docutils literal notranslate"><span class="pre">UPLOAD</span> <span class="pre">DATA</span> <span class="pre">TO</span> <span class="pre">CKG</span></code>. After this button is clicked, it will deactivate all the menus. To restore its function, insert the project identifier and go through the previous steps again. <strong>(4)</strong></p></li>
+<li><p>Once the data is uploaded, click <code class="docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Uploaded</span> <span class="pre">Files</span> <span class="pre">(.zip)</span></code> to download all the upload files in a compressed format. <strong>(5)</strong></p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When the files are uploaded, the filenames are shown under <code class="docutils literal notranslate"><span class="pre">Uploaded</span> <span class="pre">Files:</span></code>
+To replace the files uploaded, just select the correct data type and processing tool, and reselect the files again.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>It is very important that you select <strong>all</strong> the files that should be uploaded to a certain data type <strong>at once</strong>.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="data-analysis-config.html" class="btn btn-neutral float-right" title="Define data analysis parameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="create-new-project.html" class="btn btn-neutral float-left" title="Create a new project in the database" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -52,7 +52,7 @@ RUN wget -O - http://debian.neo4j.org/neotechnology.gpg.key | apt-key add - && \
 
 ## Setup initial user Neo4j
 RUN rm -f /var/lib/neo4j/data/dbms/auth && \
-    neo4j-admin set-initial-password "bioinfo1112"
+    neo4j-admin set-initial-password "neo4j"
 
 ## Install algorithms Neo4j
 RUN wget -P /var/lib/neo4j/plugins https://s3-eu-west-1.amazonaws.com/com.neo4j.graphalgorithms.dist/neo4j-graph-algorithms-3.5.8.1-standalone.jar
@@ -70,14 +70,14 @@ RUN service neo4j start && \
     cat /var/log/neo4j/neo4j.log
 
 ## Load backup with Clinical Knowledge Graph
-COPY /resources/neo4j_db/backups /var/lib/neo4j/data/backups
+RUN mkdir -p /var/lib/neo4j/data/backup
+RUN wget -P /var/lib/neo4j/data/backup URL_REPOSITORY
 RUN mkdir -p /var/lib/neo4j/data/databases/graph.db
-RUN ls -lrth /var/lib/neo4j/data/
-RUN sudo -u neo4j neo4j-admin load --from=/var/lib/neo4j/data/backups/graph.db/2019_1909.dump --database=graph.db --force
+RUN sudo -u neo4j neo4j-admin load --from=/var/lib/neo4j/data/backup/ckg_080520.dump --database=graph.db --force
 
 ## Remove dump file
 RUN echo "Done with restoring backup, removing backup folder"
-RUN rm -rf /var/lib/neo4j/data/backups 
+RUN rm -rf /var/lib/neo4j/data/backup
 
 RUN ls -lrth  /var/lib/neo4j/data/databases
 RUN [ -e  /var/lib/neo4j/data/databases/store_lock ] && rm /var/lib/neo4j/data/databases/store_lock
@@ -103,7 +103,7 @@ ADD ./requirements.txt /requirements.txt
 ## Install Python libraries
 RUN pip3 install --ignore-installed -r requirements.txt
 RUN mkdir /CKG
-#ADD . /CKG/
+ADD . /CKG/
 ENV PYTHONPATH "${PYTHONPATH}:/CKG/src"
 
 # JupyterHub
@@ -140,7 +140,7 @@ RUN ln -s /etc/uwsgi/apps-available/uwsgi.ini /etc/uwsgi/apps-enabled/uwsgi.ini
 ## Create log directory
 RUN mkdir -p /var/log/uwsgi
 
-# Expose ports (HTTP Neo4j, Bolt Neo4j, jupyterHub, CKG)
-EXPOSE 7474 7687 8090 8050
+# Expose ports (HTTP Neo4j, Bolt Neo4j, jupyterHub, CKG, Redis)
+EXPOSE 7474 7687 8090 8050 6379
 
 ENTRYPOINT [ "/bin/bash", "/CKG/docker_entrypoint.sh"]

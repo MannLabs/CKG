@@ -1,0 +1,462 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>report_manager.report &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> ClinicalKnowledgeGraph
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../INTRO.html">Clinical Knowledge Graph</a></li>
+</ul>
+<p class="caption"><span class="caption-text">First steps</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro/getting-started-with-requirements.html">Getting Started with some Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intro/getting-started-with-windows.html">Getting started with Windows</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started/connect-to-ckg.html">Connecting to the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started/create-new-user.html">Create a new user in the graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started/create-new-project.html">Create a new project in the database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started/upload-data.html">Upload project experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started/data-analysis-config.html">Define data analysis parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started/access-report.html">Accessing the analysis report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started/notifications.html">Report notifications</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Project Report</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../project_report/project-report.html">Generating a project report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_report/project-tabs.html">Project report tabs</a></li>
+</ul>
+<p class="caption"><span class="caption-text">CKG Builder</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ckg_builder/ontologies.html">Ontology sources and raw file parsers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ckg_builder/databases.html">Biomedical databases and resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ckg_builder/experiments.html">Parsing experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ckg_builder/graphdb-builder.html">Building the graph database from one Python module</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced_features/import-statistics.html">Clinical Knowledge Graph Statistics: Imports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced_features/R-interface.html">Python - R interface</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../system_requirements.html">System Requirements</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../src.html">CKG package API Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../MANIFEST.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MANIFEST.html#backers">Backers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MANIFEST.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MANIFEST.html#history">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MANIFEST.html#code-of-conduct">Code of Conduct</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ClinicalKnowledgeGraph</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>report_manager.report</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for report_manager.report</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">plotly.io</span> <span class="k">as</span> <span class="nn">pio</span>
+<span class="kn">import</span> <span class="nn">h5py</span> <span class="k">as</span> <span class="nn">h5</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">natsort</span>
+<span class="kn">import</span> <span class="nn">dash_html_components</span> <span class="k">as</span> <span class="nn">html</span>
+<span class="kn">from</span> <span class="nn">plotly.offline</span> <span class="k">import</span> <span class="n">iplot</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">cyjupyter</span> <span class="k">import</span> <span class="n">Cytoscape</span>
+<span class="kn">from</span> <span class="nn">report_manager</span> <span class="k">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">analytics_core.viz</span> <span class="k">import</span> <span class="n">viz</span>
+<span class="kn">from</span> <span class="nn">analytics_core</span> <span class="k">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">acore_utils</span>
+
+
+<div class="viewcode-block" id="Report"><a class="viewcode-back" href="../../_autosummary/report_manager.html#report_manager.report.Report">[docs]</a><span class="k">class</span> <span class="nc">Report</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">,</span> <span class="n">plots</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_identifier</span> <span class="o">=</span> <span class="n">identifier</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plots</span> <span class="o">=</span> <span class="n">plots</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_identifier</span>
+
+    <span class="nd">@identifier</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_identifier</span> <span class="o">=</span> <span class="n">identifier</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">plots</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plots</span>
+
+    <span class="nd">@plots</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">plots</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plots</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plots</span> <span class="o">=</span> <span class="n">plots</span>
+
+<div class="viewcode-block" id="Report.get_plot"><a class="viewcode-back" href="../../_autosummary/report_manager.html#report_manager.report.Report.get_plot">[docs]</a>    <span class="k">def</span> <span class="nf">get_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">plot</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plots</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plots</span><span class="p">[</span><span class="n">plot</span><span class="p">]</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Report.update_plots"><a class="viewcode-back" href="../../_autosummary/report_manager.html#report_manager.report.Report.update_plots">[docs]</a>    <span class="k">def</span> <span class="nf">update_plots</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plots</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Report.list_plots"><a class="viewcode-back" href="../../_autosummary/report_manager.html#report_manager.report.Report.list_plots">[docs]</a>    <span class="k">def</span> <span class="nf">list_plots</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">plots</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plots</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">plots</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">plots</span></div>
+
+<div class="viewcode-block" id="Report.print_report"><a class="viewcode-back" href="../../_autosummary/report_manager.html#report_manager.report.Report.print_report">[docs]</a>    <span class="k">def</span> <span class="nf">print_report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">plot_format</span><span class="o">=</span><span class="s1">&#39;pdf&#39;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">plot_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plots</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">plot_id</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">plot</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plots</span><span class="p">[</span><span class="n">plot_id</span><span class="p">]:</span>
+                <span class="n">figure</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">figure</span>
+                <span class="n">pio</span><span class="o">.</span><span class="n">write_image</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">plot_format</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Report.save_report"><a class="viewcode-back" href="../../_autosummary/report_manager.html#report_manager.report.Report.save_report">[docs]</a>    <span class="k">def</span> <span class="nf">save_report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">h5</span><span class="o">.</span><span class="n">special_dtype</span><span class="p">(</span><span class="n">vlen</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">h5</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="s2">&quot;report.h5&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">markdown</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">convert_dash_to_json</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">get_markdown_date</span><span class="p">(</span><span class="s2">&quot;Report created on:&quot;</span><span class="p">))</span>
+            <span class="n">figure_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">markdown</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NumpyEncoder</span><span class="p">)</span>
+            <span class="n">figure_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">order</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_date&quot;</span>
+            <span class="n">grp</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">order</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_date&quot;</span><span class="p">)</span>
+            <span class="n">fig_set</span> <span class="o">=</span> <span class="n">grp</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="n">figure_id</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
+            <span class="n">fig_set</span><span class="p">[:]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">figure_json</span><span class="p">)</span>
+            <span class="n">fig_set</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;identifier&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">figure_id</span>
+
+            <span class="k">for</span> <span class="n">plot_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plots</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;~&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">plot_id</span><span class="p">)</span>
+                <span class="n">grp</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">plot</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plots</span><span class="p">[</span><span class="n">plot_id</span><span class="p">]:</span>       
+                    <span class="n">figure_id</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                        <span class="n">figure_json</span> <span class="o">=</span> <span class="p">{}</span>
+                        <span class="k">if</span> <span class="s1">&#39;net_json&#39;</span> <span class="ow">in</span> <span class="n">plot</span><span class="p">:</span>
+                            <span class="n">figure_json</span><span class="p">[</span><span class="s1">&#39;net_json&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">plot</span><span class="p">[</span><span class="s1">&#39;net_json&#39;</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="s1">&#39;notebook&#39;</span> <span class="ow">in</span> <span class="n">plot</span><span class="p">:</span>
+                            <span class="n">figure_json</span><span class="p">[</span><span class="s1">&#39;notebook&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">plot</span><span class="p">[</span><span class="s1">&#39;notebook&#39;</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="s1">&#39;app&#39;</span> <span class="ow">in</span> <span class="n">plot</span><span class="p">:</span>
+                            <span class="n">json_str</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">convert_dash_to_json</span><span class="p">(</span><span class="n">plot</span><span class="p">[</span><span class="s1">&#39;app&#39;</span><span class="p">])</span>
+                            <span class="n">figure_json</span><span class="p">[</span><span class="s1">&#39;app&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">json_str</span>
+                        <span class="k">if</span> <span class="s1">&#39;net_tables&#39;</span> <span class="ow">in</span> <span class="n">plot</span><span class="p">:</span>
+                            <span class="n">json_str_nodes</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">convert_dash_to_json</span><span class="p">(</span><span class="n">plot</span><span class="p">[</span><span class="s1">&#39;net_tables&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+                            <span class="n">json_str_edges</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">convert_dash_to_json</span><span class="p">(</span><span class="n">plot</span><span class="p">[</span><span class="s1">&#39;net_tables&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+                            <span class="n">figure_json</span><span class="p">[</span><span class="s2">&quot;net_tables&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">json_str_nodes</span><span class="p">,</span> <span class="n">json_str_edges</span><span class="p">)</span>
+                        <span class="n">figure_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">figure_json</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NumpyEncoder</span><span class="p">)</span>
+                        <span class="n">figure_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;_net&#39;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">json_str</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">convert_dash_to_json</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
+                        <span class="n">figure_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json_str</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NumpyEncoder</span><span class="p">)</span>
+                        <span class="n">figure_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_figure&#39;</span> 
+                    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">fig_set</span> <span class="o">=</span> <span class="n">grp</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="n">figure_id</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s2">&quot;gzip&quot;</span><span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">fig_set</span><span class="p">[:]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">figure_json</span><span class="p">)</span>
+                        <span class="n">fig_set</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;identifier&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">figure_id</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">figure_json</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+                <span class="n">order</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="Report.read_report"><a class="viewcode-back" href="../../_autosummary/report_manager.html#report_manager.report.Report.read_report">[docs]</a>    <span class="k">def</span> <span class="nf">read_report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
+        <span class="n">report_plots</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="s2">&quot;report.h5&quot;</span><span class="p">)):</span>
+            <span class="k">with</span> <span class="n">h5</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="s2">&quot;report.h5&quot;</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">plot_id</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">figure_id</span> <span class="ow">in</span> <span class="n">f</span><span class="p">[</span><span class="n">name</span><span class="p">]:</span>
+                        <span class="n">figure_json</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">name</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">figure_id</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="n">identifier</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">name</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">figure_id</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;identifier&quot;</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="s1">&#39;net&#39;</span> <span class="ow">in</span> <span class="n">identifier</span><span class="p">:</span>
+                            <span class="n">figure</span> <span class="o">=</span> <span class="p">{}</span>
+                            <span class="n">net_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">figure_json</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">net_json</span><span class="p">:</span>
+                                <span class="n">figure</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">net_json</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">figure</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">figure_json</span><span class="p">)</span>
+                        <span class="n">report_plots</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">figure</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plots</span> <span class="o">=</span> <span class="n">report_plots</span></div>
+
+<div class="viewcode-block" id="Report.visualize_report"><a class="viewcode-back" href="../../_autosummary/report_manager.html#report_manager.report.Report.visualize_report">[docs]</a>    <span class="k">def</span> <span class="nf">visualize_report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environment</span><span class="p">):</span>
+        <span class="n">report_plots</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">plot_type</span> <span class="ow">in</span> <span class="n">natsort</span><span class="o">.</span><span class="n">natsorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plots</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">plot</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plots</span><span class="p">[</span><span class="n">plot_type</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">plot</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">environment</span> <span class="o">==</span> <span class="s2">&quot;notebook&quot;</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="s2">&quot;notebook&quot;</span> <span class="ow">in</span> <span class="n">plot</span><span class="p">:</span>
+                            <span class="n">net</span> <span class="o">=</span> <span class="n">plot</span><span class="p">[</span><span class="s1">&#39;notebook&#39;</span><span class="p">]</span>
+                            <span class="n">report_plots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Cytoscape</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;elements&#39;</span><span class="p">:</span> <span class="n">net</span><span class="p">[</span><span class="mi">0</span><span class="p">]},</span> <span class="n">visual_style</span><span class="o">=</span><span class="n">net</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="s1">&#39;100%&#39;</span><span class="p">,</span> <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="s1">&#39;700px&#39;</span><span class="p">}))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                                <span class="k">if</span> <span class="s1">&#39;props&#39;</span> <span class="ow">in</span> <span class="n">plot</span><span class="p">:</span>
+                                    <span class="k">if</span> <span class="s1">&#39;figure&#39;</span> <span class="ow">in</span> <span class="n">plot</span><span class="p">[</span><span class="s1">&#39;props&#39;</span><span class="p">]:</span>
+                                        <span class="k">try</span><span class="p">:</span>
+                                            <span class="n">iplot</span><span class="p">(</span><span class="n">plot</span><span class="p">[</span><span class="s1">&#39;props&#39;</span><span class="p">][</span><span class="s1">&#39;figure&#39;</span><span class="p">])</span>
+                                        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                                            <span class="k">pass</span>
+                            <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="s1">&#39;figure&#39;</span><span class="p">):</span>
+                                <span class="k">try</span><span class="p">:</span>
+                                    <span class="n">iplot</span><span class="p">(</span><span class="n">plot</span><span class="o">.</span><span class="n">figure</span><span class="p">)</span>
+                                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                                    <span class="k">pass</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">app_plot</span> <span class="o">=</span> <span class="n">plot</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="s2">&quot;app&quot;</span> <span class="ow">in</span> <span class="n">plot</span><span class="p">:</span>
+                                <span class="n">app_plot</span> <span class="o">=</span> <span class="n">plot</span><span class="p">[</span><span class="s2">&quot;app&quot;</span><span class="p">]</span>
+                            <span class="k">if</span> <span class="s1">&#39;net_tables&#39;</span> <span class="ow">in</span> <span class="n">plot</span><span class="p">:</span>
+                                <span class="n">tables</span> <span class="o">=</span> <span class="n">plot</span><span class="p">[</span><span class="s1">&#39;net_tables&#39;</span><span class="p">]</span>
+                                <span class="n">report_plots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                                <span class="n">report_plots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+                        <span class="n">report_plots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span><span class="n">app_plot</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;overflowY&#39;</span><span class="p">:</span> <span class="s1">&#39;scroll&#39;</span><span class="p">,</span> <span class="s1">&#39;overflowX&#39;</span><span class="p">:</span> <span class="s1">&#39;scroll&#39;</span><span class="p">}))</span>
+
+        <span class="k">return</span> <span class="n">report_plots</span></div>
+
+<div class="viewcode-block" id="Report.visualize_plot"><a class="viewcode-back" href="../../_autosummary/report_manager.html#report_manager.report.Report.visualize_plot">[docs]</a>    <span class="k">def</span> <span class="nf">visualize_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environment</span><span class="p">,</span> <span class="n">plot_type</span><span class="p">):</span>
+        <span class="n">report_plots</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">plot</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plots</span><span class="p">[</span><span class="n">plot_type</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">environment</span> <span class="o">==</span> <span class="s2">&quot;notebook&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;notebook&quot;</span> <span class="ow">in</span> <span class="n">plot</span><span class="p">:</span>
+                    <span class="n">net</span> <span class="o">=</span> <span class="n">plot</span><span class="p">[</span><span class="s1">&#39;notebook&#39;</span><span class="p">]</span>
+                    <span class="n">report_plots</span> <span class="o">=</span> <span class="n">viz</span><span class="o">.</span><span class="n">visualize_notebook_network</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s1">&#39;props&#39;</span> <span class="ow">in</span> <span class="n">plot</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="s1">&#39;figure&#39;</span> <span class="ow">in</span> <span class="n">plot</span><span class="p">[</span><span class="s1">&#39;props&#39;</span><span class="p">]:</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="n">iplot</span><span class="p">(</span><span class="n">plot</span><span class="p">[</span><span class="s1">&#39;props&#39;</span><span class="p">][</span><span class="s1">&#39;figure&#39;</span><span class="p">])</span>
+                            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                                <span class="k">pass</span>
+                     
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="s2">&quot;app&quot;</span> <span class="ow">in</span> <span class="n">plot</span><span class="p">:</span>
+                        <span class="n">plot</span> <span class="o">=</span> <span class="n">plot</span><span class="p">[</span><span class="s2">&quot;app&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="s1">&#39;net_tables&#39;</span> <span class="ow">in</span> <span class="n">plot</span><span class="p">:</span>
+                        <span class="n">tables</span> <span class="o">=</span> <span class="n">plot</span><span class="p">[</span><span class="s1">&#39;net_tables&#39;</span><span class="p">]</span>
+                        <span class="n">report_plots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                        <span class="n">report_plots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+                <span class="n">report_plots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">report_plots</span></div>
+
+<div class="viewcode-block" id="Report.download_report"><a class="viewcode-back" href="../../_autosummary/report_manager.html#report_manager.report.Report.download_report">[docs]</a>    <span class="k">def</span> <span class="nf">download_report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
+        <span class="n">saved</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">plot_type</span> <span class="ow">in</span> <span class="n">natsort</span><span class="o">.</span><span class="n">natsorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plots</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">plot_type</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plot_type</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="k">else</span> <span class="n">plot_type</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">plot</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plots</span><span class="p">[</span><span class="n">plot_type</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">plot</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">figure_name</span> <span class="o">=</span> <span class="n">name</span>
+                    <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">saved</span><span class="p">:</span>
+                        <span class="n">figure_name</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="s2">&quot;net_json&quot;</span> <span class="ow">in</span> <span class="n">plot</span><span class="p">:</span>
+                        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">name</span><span class="o">+</span><span class="s1">&#39;.json&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out</span><span class="p">:</span>
+                            <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">plot</span><span class="p">[</span><span class="s2">&quot;net_json&quot;</span><span class="p">]))</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">acore_utils</span><span class="o">.</span><span class="n">json_network_to_gml</span><span class="p">(</span><span class="n">plot</span><span class="p">[</span><span class="s2">&quot;net_json&quot;</span><span class="p">],</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">name</span><span class="o">+</span><span class="s2">&quot;.gml&quot;</span><span class="p">))</span>
+                        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                            <span class="k">pass</span>
+                        <span class="k">if</span> <span class="s2">&quot;app&quot;</span> <span class="ow">in</span> <span class="n">plot</span><span class="p">:</span>
+                            <span class="n">plot</span> <span class="o">=</span> <span class="n">plot</span><span class="p">[</span><span class="s2">&quot;app&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="s1">&#39;props&#39;</span> <span class="ow">in</span> <span class="n">plot</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="s1">&#39;figure&#39;</span> <span class="ow">in</span> <span class="n">plot</span><span class="p">[</span><span class="s1">&#39;props&#39;</span><span class="p">]:</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="n">viz</span><span class="o">.</span><span class="n">save_DASH_plot</span><span class="p">(</span><span class="n">plot</span><span class="p">[</span><span class="s1">&#39;props&#39;</span><span class="p">][</span><span class="s1">&#39;figure&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">figure_name</span><span class="p">,</span> <span class="n">plot_format</span><span class="o">=</span><span class="s1">&#39;svg&#39;</span><span class="p">,</span> <span class="n">directory</span><span class="o">=</span><span class="n">directory</span><span class="p">)</span>
+                                <span class="n">saved</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">figure_name</span><span class="p">)</span>
+                            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                                <span class="k">pass</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">viz</span><span class="o">.</span><span class="n">save_DASH_plot</span><span class="p">(</span><span class="n">plot</span><span class="o">.</span><span class="n">figure</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">figure_name</span><span class="p">,</span> <span class="n">plot_format</span><span class="o">=</span><span class="s1">&#39;svg&#39;</span><span class="p">,</span> <span class="n">directory</span><span class="o">=</span><span class="n">directory</span><span class="p">)</span>
+                            <span class="n">saved</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">figure_name</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                            <span class="k">pass</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

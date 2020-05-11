@@ -1,0 +1,374 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Create a new project in the database &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Upload project experimental data" href="upload-data.html" />
+    <link rel="prev" title="Create a new user in the graph database" href="create-new-user.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> ClinicalKnowledgeGraph
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../INTRO.html">Clinical Knowledge Graph</a></li>
+</ul>
+<p class="caption"><span class="caption-text">First steps</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-requirements.html">Getting Started with some Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-windows.html">Getting started with Windows</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="connect-to-ckg.html">Connecting to the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-new-user.html">Create a new user in the graph database</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Create a new project in the database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#project-creation">Project creation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="upload-data.html">Upload project experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-analysis-config.html">Define data analysis parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="access-report.html">Accessing the analysis report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notifications.html">Report notifications</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Project Report</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../project_report/project-report.html">Generating a project report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project_report/project-tabs.html">Project report tabs</a></li>
+</ul>
+<p class="caption"><span class="caption-text">CKG Builder</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/ontologies.html">Ontology sources and raw file parsers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/databases.html">Biomedical databases and resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/experiments.html">Parsing experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/graphdb-builder.html">Building the graph database from one Python module</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/import-statistics.html">Clinical Knowledge Graph Statistics: Imports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/R-interface.html">Python - R interface</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../system_requirements.html">System Requirements</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../src.html">CKG package API Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#backers">Backers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#history">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#code-of-conduct">Code of Conduct</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ClinicalKnowledgeGraph</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Create a new project in the database</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/getting_started/create-new-project.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="create-a-new-project-in-the-database">
+<h1>Create a new project in the database<a class="headerlink" href="#create-a-new-project-in-the-database" title="Permalink to this headline">¶</a></h1>
+<p>The project creation app in the Clinical Knowledge Graph was designed to make the process straightforward and user-friendly.
+To create a project, please follow the steps below.</p>
+<p><strong>Neo4j</strong></p>
+<ol class="arabic simple">
+<li><p>Open neo4j desktop</p></li>
+<li><p>Start the database</p></li>
+</ol>
+<p><strong>Terminal</strong></p>
+<ol class="arabic simple">
+<li><p>In one terminal window:</p></li>
+</ol>
+<ul class="simple">
+<li><p>Activate the virtual environment (if created beforehand)</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">source</span> /path/to/virtualenvironment/bin/activate<span class="p">;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Start a redis-server:</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ redis-server
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If redis-server is not found, install with <code class="docutils literal notranslate"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">redis</span></code> (Mac) or <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">redis-server</span></code> (Linux).</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>On Windows, redis-server should be installed by default (to check, go to start menu &gt; services.msc &gt; Redis). If that is not the case, go to <code class="docutils literal notranslate"><span class="pre">https://github.com/microsoftarchive/redis/releases</span></code>, download the latest release installer (.msi file), and follow the installation instructions. Let all options as default but remember to select <strong>Add the Redis installation folder to the PATH environment variable.</strong>. To start a redis-server, make sure it is <strong>not running in ``services.msc``</strong>, and run in the command prompt: C:”Program Files”Redisredis-server</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">C:\&quot;Program</span> <span class="pre">Files&quot;</span></code> can be replaced with the correct path where you installed Redis from the installer (.msi file).</p>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>In two separate terminal windows:</p></li>
+</ol>
+<ul class="simple">
+<li><p>Navigate to <code class="docutils literal notranslate"><span class="pre">report_manager</span></code> in both of them</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> CKG/src/report_manager
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Start a celery queue from the report_manager directory, in each window:</p></li>
+</ul>
+<p><strong>Default queue</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ celery -A worker worker -l debug
+</pre></div>
+</div>
+<p><strong>Compute queue - Report generation</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ celery -A worker worker --loglevel<span class="o">=</span>DEBUG --concurrency<span class="o">=</span><span class="m">3</span> -E -Q compute
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>In a fourth terminal window:</p></li>
+</ol>
+<ul class="simple">
+<li><p>Run the report manager index app:</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> CKG/src/report_manager
+$ python index.py
+</pre></div>
+</div>
+<p>This will print some warnings, which should be okay.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Make sure that your virtual environment is always activated in each terminal window, before running any other command.</p>
+</div>
+<a class="reference internal image-reference" href="../_images/homepage_app.png"><img alt="../_images/homepage_app.png" class="align-right" src="../_images/homepage_app.png" style="width: 32%;" /></a>
+<p><strong>Browser</strong></p>
+<ol class="arabic simple">
+<li><p>Copy the url <code class="docutils literal notranslate"><span class="pre">http://localhost:5000/</span></code> into a web browser and you will be directed to a login page.</p></li>
+<li><p>Enter your username and password</p></li>
+</ol>
+<p>This action will redirect you to the CKG home page app. From here, you can navigate to different applications, including the “Project Creation” app.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Username and password will be authenticated in the CKG database. For this reason, you should have been created as a new user in the database before this step.</p>
+</div>
+<div class="section" id="project-creation">
+<span id="id1"></span><h2>Project creation<a class="headerlink" href="#project-creation" title="Permalink to this headline">¶</a></h2>
+<p>From the CKG app home page, you can navigate to the project creation app by clicking <code class="docutils literal notranslate"><span class="pre">PROJECT</span> <span class="pre">CREATION</span></code> or pasting the url <code class="docutils literal notranslate"><span class="pre">http://localhost:5000/apps/projectCreationApp</span></code> in the browser.</p>
+<div class="figure align-right" id="id2">
+<a class="reference internal image-reference" href="../_images/project_creation_app.png"><img alt="../_images/project_creation_app.png" src="../_images/project_creation_app.png" style="width: 240px;" /></a>
+<p class="caption"><span class="caption-text">Project Creation App</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
+<p>Once you have been redirected, please fill in all the information needed to create a project. This includes all the fields marked with <code class="docutils literal notranslate"><span class="pre">*</span></code> (mandatory). <strong>(1)</strong>
+After all fields are filled in, please revise all the information and press <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">Project</span></code>. <strong>(2)</strong>
+The page will refresh and once finished, the project identifier will be depicted in front of the <code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">information</span></code> header. <strong>(3)</strong> Use this identifier to search for data related to your project.</p>
+<p>At this stage, and if your project has been successfully created in the database, a new button will appear and the message will instruct you to download a compressed file with the experimental design and clinical data template files. To do so, please press the button “Download Clinical Data template”. <strong>(4)</strong></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Each field, with the exception of <code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">Acronym</span></code>,``Number of subjects``,  <code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">Description</span></code>, <code class="docutils literal notranslate"><span class="pre">Starting</span> <span class="pre">Date</span></code> and <code class="docutils literal notranslate"><span class="pre">Ending</span> <span class="pre">Date</span></code>, can take multiple values. Select the most appropriate ones for your specific project.</p>
+</div>
+<div class="figure align-right" id="id3">
+<a class="reference internal image-reference" href="../_images/design_file.png"><img alt="../_images/design_file.png" src="../_images/design_file.png" style="width: 240px;" /></a>
+<p class="caption"><span class="caption-text">Experimental Design file example</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</div>
+<p>Fill in the <code class="docutils literal notranslate"><span class="pre">ExperimentalDesign_Pxxxxxxx.xlsx</span></code> file with your subject, biological sample and analytical sample identifiers. Please double-check they are correct, this information is essential to map the results correctly in the database.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">ClinicalData_Pxxxxxxx.xlsx</span></code> file needs to be filled in with all the relevant clinical data and sample information. For more instructions on how to fill in the file, please see <a class="reference internal" href="upload-data.html#upload-data"><span class="std std-ref">Upload project experimental data</span></a>.</p>
+<p>To check your project in the neo4j database interface:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Open the Neo4j desktop app</p></li>
+<li><p>Find the graph database in use and click <span class="guilabel">Manage</span>, followed by <span class="guilabel">Open Browser</span> (opens a new window).</p></li>
+<li><p>In the new Neo4j window, click on the database symbol (top left corner) and, under <span class="guilabel">Node Labels</span>, click <span class="guilabel">Project</span></p></li>
+</ul>
+</div></blockquote>
+<p>At this point, you should be able to see all the nodes corresponding to projects loaded in the database.
+To expand your project information, click on your project node and in the bottom of the window press the <code class="docutils literal notranslate"><span class="pre">&lt;</span></code> symbol. Here you will find all the attributes of the project, including the project identifier (typically “P000000xx”).</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="upload-data.html" class="btn btn-neutral float-right" title="Upload project experimental data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="create-new-user.html" class="btn btn-neutral float-left" title="Create a new user in the graph database" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

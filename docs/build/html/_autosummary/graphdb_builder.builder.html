@@ -1,0 +1,604 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>CKG Builder &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Report Manager" href="report_manager.html" />
+    <link rel="prev" title="User Creation" href="graphdb_builder.users.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> ClinicalKnowledgeGraph
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../INTRO.html">Clinical Knowledge Graph</a></li>
+</ul>
+<p class="caption"><span class="caption-text">First steps</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-requirements.html">Getting Started with some Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-windows.html">Getting started with Windows</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/connect-to-ckg.html">Connecting to the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/create-new-user.html">Create a new user in the graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/create-new-project.html">Create a new project in the database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/upload-data.html">Upload project experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/data-analysis-config.html">Define data analysis parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/access-report.html">Accessing the analysis report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/notifications.html">Report notifications</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Project Report</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../project_report/project-report.html">Generating a project report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project_report/project-tabs.html">Project report tabs</a></li>
+</ul>
+<p class="caption"><span class="caption-text">CKG Builder</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/ontologies.html">Ontology sources and raw file parsers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/databases.html">Biomedical databases and resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/experiments.html">Parsing experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/graphdb-builder.html">Building the graph database from one Python module</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/import-statistics.html">Clinical Knowledge Graph Statistics: Imports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/R-interface.html">Python - R interface</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../system_requirements.html">System Requirements</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../src.html">CKG package API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="graphdb_connector.html">Graph Database Connector</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="graphdb_builder.html">Graph Database Builder</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.ontologies.html">Ontology Databases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.html">Biomedical Databases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.experiments.html">Experimental Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.users.html">User Creation</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">CKG Builder</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-graphdb_builder.builder.create_user">User Creation Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-graphdb_builder.builder.importer">Importer Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-graphdb_builder.builder.loader">Loader Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-graphdb_builder.builder.builder">Builder Module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.html#module-graphdb_builder.builder_utils">builder_utils.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.html#module-graphdb_builder.mapping">mapping.py</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="report_manager.html">Report Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="analytics_core.html">Analytics Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks.html">Notebooks</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#backers">Backers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#history">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#code-of-conduct">Code of Conduct</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ClinicalKnowledgeGraph</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../src.html">CKG package API Reference</a> &raquo;</li>
+        
+          <li><a href="graphdb_builder.html">Graph Database Builder</a> &raquo;</li>
+        
+      <li>CKG Builder</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_autosummary/graphdb_builder.builder.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="ckg-builder">
+<h1>CKG Builder<a class="headerlink" href="#ckg-builder" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-graphdb_builder.builder.create_user">
+<span id="user-creation-module"></span><h2>User Creation Module<a class="headerlink" href="#module-graphdb_builder.builder.create_user" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="graphdb_builder.builder.create_user.create_user_node">
+<code class="sig-prename descclassname">graphdb_builder.builder.create_user.</code><code class="sig-name descname">create_user_node</code><span class="sig-paren">(</span><em class="sig-param">driver</em>, <em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder/create_user.html#create_user_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder.create_user.create_user_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates graph database node for new user and adds respective properties to node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>driver</strong> (<em>py2neo driver</em>) – py2neo driver, which provides the connection to the neo4j graph database.</p></li>
+<li><p><strong>data</strong> (<em>Series</em>) – pandas Series with new user identifier and required user information (see set_arguments()).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder.create_user.create_user_from_command_line">
+<code class="sig-prename descclassname">graphdb_builder.builder.create_user.</code><code class="sig-name descname">create_user_from_command_line</code><span class="sig-paren">(</span><em class="sig-param">args</em>, <em class="sig-param">expiration</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder/create_user.html#create_user_from_command_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder.create_user.create_user_from_command_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates new user in the graph database and corresponding node, from a terminal window (command line),     and adds the new user information to the users excel and import files. Arguments as in set_arguments().</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> (<em>any object with __dict__ attribute</em>) – object. Contains all the parameters neccessary to create a user (‘username’, ‘name’, ‘email’,                 ‘secondary_email’, ‘phone_number’ and ‘affiliation’).</p></li>
+<li><p><strong>expiration</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – number of days users is given access.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function can be used directly with <em>python create_user_from_command_line.py -u username                 -n user_name -e email -s secondary_email -p phone_number -a affiliation</em> .</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder.create_user.create_user_from_file">
+<code class="sig-prename descclassname">graphdb_builder.builder.create_user.</code><code class="sig-name descname">create_user_from_file</code><span class="sig-paren">(</span><em class="sig-param">filepath</em>, <em class="sig-param">expiration</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder/create_user.html#create_user_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder.create_user.create_user_from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates new user in the graph database and corresponding node, from an excel file.     Rows in the file must be users, and columns must follow set_arguments() fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – filepath and filename containing users information.</p></li>
+<li><p><strong>output_file</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to output csv file.</p></li>
+<li><p><strong>expiration</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – number of days users is given access.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function can be used directly with <em>python create_user_from_file.py -f path_to_file</em> .</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder.create_user.create_user">
+<code class="sig-prename descclassname">graphdb_builder.builder.create_user.</code><code class="sig-name descname">create_user</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">output_file</em>, <em class="sig-param">expiration=365</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder/create_user.html#create_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder.create_user.create_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates new user in the graph database and corresponding node, through the following steps:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Checks if a user with given properties already exists in the database. If not:</p></li>
+<li><p>Generates new user identifier</p></li>
+<li><p>Creates new local user (access to graph database)</p></li>
+<li><p>Creates new user node</p></li>
+<li><p>Saves data to users.tsv</p></li>
+</ol>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – pandas dataframe with users as rows and arguments and columns.</p></li>
+<li><p><strong>output_file</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to output csv file.</p></li>
+<li><p><strong>expiration</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – number of days users is given access.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Writes relevant .tsv file for the users in data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder.create_user.set_arguments">
+<code class="sig-prename descclassname">graphdb_builder.builder.create_user.</code><code class="sig-name descname">set_arguments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder/create_user.html#set_arguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder.create_user.set_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function sets the arguments to be used as input for <strong>create_user.py</strong> in the command line.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-graphdb_builder.builder.importer">
+<span id="importer-module"></span><h2>Importer Module<a class="headerlink" href="#module-graphdb_builder.builder.importer" title="Permalink to this headline">¶</a></h2>
+<p>Generates all the import files: Ontologies, Databases and Experiments.
+The module is reponsible for generating all the csv files that will
+be loaded into the Graph database and also updates a stats object
+(hdf table) with the number of entities and relationships from each
+dataset imported. A new stats object is created the first time a
+full import is run.</p>
+<dl class="function">
+<dt id="graphdb_builder.builder.importer.ontologiesImport">
+<code class="sig-prename descclassname">graphdb_builder.builder.importer.</code><code class="sig-name descname">ontologiesImport</code><span class="sig-paren">(</span><em class="sig-param">importDirectory</em>, <em class="sig-param">ontologies=None</em>, <em class="sig-param">download=True</em>, <em class="sig-param">import_type='partial'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder/importer.html#ontologiesImport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder.importer.ontologiesImport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates all the entities and relationships from the provided ontologies. If the ontologies list is    not provided, then all the ontologies listed in the configuration will be imported (full_import).     This function also updates the stats object with numbers from the imported ontologies.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>importDirectory</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path of the import directory where files will be created.</p></li>
+<li><p><strong>ontologies</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – a list of ontology names to be imported.</p></li>
+<li><p><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – wether database is to be downloaded.</p></li>
+<li><p><strong>import_type</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – type of import (´full´ or ´partial´).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder.importer.databasesImport">
+<code class="sig-prename descclassname">graphdb_builder.builder.importer.</code><code class="sig-name descname">databasesImport</code><span class="sig-paren">(</span><em class="sig-param">importDirectory</em>, <em class="sig-param">databases=None</em>, <em class="sig-param">n_jobs=1</em>, <em class="sig-param">download=True</em>, <em class="sig-param">import_type='partial'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder/importer.html#databasesImport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder.importer.databasesImport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates all the entities and relationships from the provided databases. If the databases list is    not provided, then all the databases listed in the configuration will be imported (full_import).    This function also updates the stats object with numbers from the imported databases.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>importDirectory</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path of the import directory where files will be created.</p></li>
+<li><p><strong>databases</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – a list of database names to be imported.</p></li>
+<li><p><strong>n_jobs</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – number of jobs to run in parallel. 1 by default when updating one database.</p></li>
+<li><p><strong>import_type</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – type of import (´full´ or ´partial´).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder.importer.experimentsImport">
+<code class="sig-prename descclassname">graphdb_builder.builder.importer.</code><code class="sig-name descname">experimentsImport</code><span class="sig-paren">(</span><em class="sig-param">projects=None</em>, <em class="sig-param">n_jobs=1</em>, <em class="sig-param">import_type='partial'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder/importer.html#experimentsImport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder.importer.experimentsImport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates all the entities and relationships from the specified Projects. If the projects list is    not provided, then all the projects the experiments directory will be imported (full_import).     Calls function experimentImport.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>projects</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – list of project identifiers to be imported.</p></li>
+<li><p><strong>n_jobs</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – number of jobs to run in parallel. 1 by default when updating one project.</p></li>
+<li><p><strong>import_type</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – type of import (´full´ or ´partial´).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder.importer.experimentImport">
+<code class="sig-prename descclassname">graphdb_builder.builder.importer.</code><code class="sig-name descname">experimentImport</code><span class="sig-paren">(</span><em class="sig-param">importDirectory</em>, <em class="sig-param">experimentsDirectory</em>, <em class="sig-param">project</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder/importer.html#experimentImport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder.importer.experimentImport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates all the entities and relationships from the specified Project. Called from function experimentsImport.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>importDirectory</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to the directory where all the import files are generated.</p></li>
+<li><p><strong>experimentDirectory</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to the directory where all the experiments are located.</p></li>
+<li><p><strong>project</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – identifier of the project to be imported.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder.importer.usersImport">
+<code class="sig-prename descclassname">graphdb_builder.builder.importer.</code><code class="sig-name descname">usersImport</code><span class="sig-paren">(</span><em class="sig-param">importDirectory</em>, <em class="sig-param">import_type='partial'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder/importer.html#usersImport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder.importer.usersImport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates User entities from excel file and grants access of new users to the database.
+This function also writes the relevant information to a tab-delimited file in the import     directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>importDirectory</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to the directory where all the import files are generated.</p></li>
+<li><p><strong>import_type</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – type of import (´full´ or ´partial).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder.importer.fullImport">
+<code class="sig-prename descclassname">graphdb_builder.builder.importer.</code><code class="sig-name descname">fullImport</code><span class="sig-paren">(</span><em class="sig-param">download=True</em>, <em class="sig-param">n_jobs=4</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder/importer.html#fullImport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder.importer.fullImport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls the different importer functions: Ontologies, databases,     experiments. The first step is to check if the stats object exists     and create it otherwise. Calls setupStats.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder.importer.generateStatsDataFrame">
+<code class="sig-prename descclassname">graphdb_builder.builder.importer.</code><code class="sig-name descname">generateStatsDataFrame</code><span class="sig-paren">(</span><em class="sig-param">stats</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder/importer.html#generateStatsDataFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder.importer.generateStatsDataFrame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a dataframe with the stats from each import.
+:param list stats: a list with statistics collected from each importer function.
+:return: Pandas dataframe with the collected statistics.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder.importer.setupStats">
+<code class="sig-prename descclassname">graphdb_builder.builder.importer.</code><code class="sig-name descname">setupStats</code><span class="sig-paren">(</span><em class="sig-param">import_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder/importer.html#setupStats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder.importer.setupStats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a stats object that will collect all the statistics collected from each import.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder.importer.createEmptyStats">
+<code class="sig-prename descclassname">graphdb_builder.builder.importer.</code><code class="sig-name descname">createEmptyStats</code><span class="sig-paren">(</span><em class="sig-param">statsCols</em>, <em class="sig-param">statsFile</em>, <em class="sig-param">statsName</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder/importer.html#createEmptyStats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder.importer.createEmptyStats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a HDFStore object with a empty dataframe with the collected stats columns.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>statsCols</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – a list of columns with the fields collected from the import statistics.</p></li>
+<li><p><strong>statsFile</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path where the object should be stored.</p></li>
+<li><p><strong>statsName</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name if the file containing the stats object.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder.importer.writeStats">
+<code class="sig-prename descclassname">graphdb_builder.builder.importer.</code><code class="sig-name descname">writeStats</code><span class="sig-paren">(</span><em class="sig-param">statsDf</em>, <em class="sig-param">import_type</em>, <em class="sig-param">stats_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder/importer.html#writeStats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder.importer.writeStats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Appends the new collected statistics to the existing stats object.
+:param statsDf: a pandas dataframe with the new statistics from the importing.
+:param str statsName: If the statistics should be stored with a specific name.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder.importer.getStatsName">
+<code class="sig-prename descclassname">graphdb_builder.builder.importer.</code><code class="sig-name descname">getStatsName</code><span class="sig-paren">(</span><em class="sig-param">import_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder/importer.html#getStatsName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder.importer.getStatsName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates the stats object name where to store the importing statistics from the CKG version,     which is defined in the configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>statsName: key used to store in the stats object.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-graphdb_builder.builder.loader">
+<span id="loader-module"></span><h2>Loader Module<a class="headerlink" href="#module-graphdb_builder.builder.loader" title="Permalink to this headline">¶</a></h2>
+<p>Populates the graph database with all the files generated by the importer.py module: 
+Ontologies, Databases and Experiments.
+The module loads all the entities and relationships defined in the importer files. It
+calls Cypher queries defined in the cypher.py module. Further, it generates an hdf object
+with the number of enities and relationships loaded for each Database, Ontology and Experiment.
+This module also generates a compressed backup file of all the loaded files.</p>
+<p>There are two types of updates:</p>
+<ul class="simple">
+<li><p>Full: all the entities and relationships in the graph database are populated</p></li>
+<li><p>Partial: only the specified entities and relationships are loaded</p></li>
+</ul>
+<p>The compressed files for each type of update are named accordingly and saved in the archive/ folder
+in data/.</p>
+<dl class="function">
+<dt id="graphdb_builder.builder.loader.load_into_database">
+<code class="sig-prename descclassname">graphdb_builder.builder.loader.</code><code class="sig-name descname">load_into_database</code><span class="sig-paren">(</span><em class="sig-param">driver</em>, <em class="sig-param">queries</em>, <em class="sig-param">requester</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder/loader.html#load_into_database"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder.loader.load_into_database" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function runs the queries provided in the graph database using a py2neo driver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>driver</strong> (<em>py2neo driver</em>) – py2neo driver, which provides the connection to the neo4j graph database.</p></li>
+<li><p><strong>queries</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.5)"><em>dict</em></a><em>]</em>) – list of queries to be passed to the database.</p></li>
+<li><p><strong>requester</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – identifier of the query.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder.loader.updateDB">
+<code class="sig-prename descclassname">graphdb_builder.builder.loader.</code><code class="sig-name descname">updateDB</code><span class="sig-paren">(</span><em class="sig-param">driver</em>, <em class="sig-param">imports=None</em>, <em class="sig-param">specific=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder/loader.html#updateDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder.loader.updateDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Populates the graph database with information for each Database, Ontology or Experiment     specified in imports. If imports is not defined, the function populates the entire graph     database based on the graph variable defined in the grapher_config.py module.     This function also updates the graph stats object with numbers from the loaded entities and     relationships.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>driver</strong> (<em>py2neo driver</em>) – py2neo driver, which provides the connection to the neo4j graph database.</p></li>
+<li><p><strong>imports</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – a list of entities to be loaded into the graph.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder.loader.fullUpdate">
+<code class="sig-prename descclassname">graphdb_builder.builder.loader.</code><code class="sig-name descname">fullUpdate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder/loader.html#fullUpdate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder.loader.fullUpdate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main method that controls the population of the graph database. Firstly, it gets a connection     to the database (driver) and then initiates the update of the entire database getting     all the graph entities to update from configuration. Once the graph database has been     populated, the imports folder in data/ is compressed and archived in the archive/ folder     so that a backup of the imports files is kept (full).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder.loader.partialUpdate">
+<code class="sig-prename descclassname">graphdb_builder.builder.loader.</code><code class="sig-name descname">partialUpdate</code><span class="sig-paren">(</span><em class="sig-param">imports</em>, <em class="sig-param">specific=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder/loader.html#partialUpdate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder.loader.partialUpdate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method that controls the update of the graph database with the specified entities and     relationships. Firstly, it gets a connection to the database (driver) and then initiates     the update of the specified graph entities.     Once the graph database has been populated, the data files uploaded to the graph are compressed     and archived in the archive/ folder (partial).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>imports</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – list of entities to update</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder.loader.archiveImportDirectory">
+<code class="sig-prename descclassname">graphdb_builder.builder.loader.</code><code class="sig-name descname">archiveImportDirectory</code><span class="sig-paren">(</span><em class="sig-param">archive_type='full'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder/loader.html#archiveImportDirectory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder.loader.archiveImportDirectory" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function creates the compressed backup imports folder with either the whole folder     (full update) or with only the files uploaded (partial update). The folder or files are     compressed into a gzipped tarball file and stored in the archive/ folder defined in the     configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>archive_type</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – whether it is a full update or a partial update.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-graphdb_builder.builder.builder">
+<span id="builder-module"></span><h2>Builder Module<a class="headerlink" href="#module-graphdb_builder.builder.builder" title="Permalink to this headline">¶</a></h2>
+<p>Builds the database in two main steps:</p>
+<ol class="arabic simple">
+<li><p>Imports all the data from ontologies, databases and experiments</p></li>
+<li><p>Loads these data into the database</p></li>
+</ol>
+<p>The module can perform full updates, executing both steps for all the ontologies,
+databases and experiments or a partial update. Partial updates can execute step 1 or
+step 2 for specific data.</p>
+<dl class="function">
+<dt id="graphdb_builder.builder.builder.set_arguments">
+<code class="sig-prename descclassname">graphdb_builder.builder.builder.</code><code class="sig-name descname">set_arguments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder/builder.html#set_arguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder.builder.set_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function sets the arguments to be used as input for <strong>builder.py</strong> in the command line.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="report_manager.html" class="btn btn-neutral float-right" title="Report Manager" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="graphdb_builder.users.html" class="btn btn-neutral float-left" title="User Creation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
