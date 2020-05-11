@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>analytics_core.analytics_factory &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  <title>analytics_core.analytics_factory &mdash; ClinicalKnowledgeGraph 1.0b1 BETA documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.0b1 BETA
               </div>
             
           
@@ -83,7 +83,7 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../INTRO.html">Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../INTRO.html"><strong>Clinical Knowledge Graph</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">First steps</span></p>
 <ul>
@@ -861,10 +861,10 @@
                 <span class="k">if</span> <span class="s1">&#39;sd_cutoff&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
                     <span class="n">sd_cutoff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;sd_cutoff&#39;</span><span class="p">]</span>
                 <span class="k">if</span> <span class="s1">&#39;drop_cols_exp&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="ow">and</span> <span class="s1">&#39;drop_cols_cli&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
-                    <span class="n">dfs</span> <span class="o">=</span> <span class="n">wgcna</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">drop_cols_exp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;drop_cols_exp&#39;</span><span class="p">],</span> <span class="n">drop_cols_cli</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;drop_cols_cli&#39;</span><span class="p">],</span> <span class="n">sd_cutoff</span><span class="o">=</span><span class="n">sd_cutoff</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="s1">&#39;wgcna&#39;</span> <span class="ow">in</span> <span class="n">wgcna_data</span> <span class="ow">and</span> <span class="n">wgcna_data</span><span class="p">[</span><span class="s1">&#39;wgcna&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dfs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1">#dfs = wgcna.get_data(input_data, drop_cols_exp=self.args[&#39;drop_cols_exp&#39;], drop_cols_cli=self.args[&#39;drop_cols_cli&#39;], sd_cutoff=sd_cutoff)</span>
+                    <span class="k">if</span> <span class="s1">&#39;wgcna&#39;</span> <span class="ow">in</span> <span class="n">wgcna_data</span> <span class="ow">and</span> <span class="n">wgcna_data</span><span class="p">[</span><span class="s1">&#39;wgcna&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="k">for</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="n">wgcna_data</span><span class="p">[</span><span class="s1">&#39;wgcna&#39;</span><span class="p">]:</span>
-                            <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">dfs</span><span class="p">,</span> <span class="o">**</span><span class="n">wgcna_data</span><span class="p">[</span><span class="s1">&#39;wgcna&#39;</span><span class="p">][</span><span class="n">dtype</span><span class="p">]}</span>
+                            <span class="n">data</span> <span class="o">=</span> <span class="n">wgcna_data</span><span class="p">[</span><span class="s1">&#39;wgcna&#39;</span><span class="p">][</span><span class="n">dtype</span><span class="p">]</span>
                             <span class="n">plot</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">viz</span><span class="o">.</span><span class="n">get_WGCNAPlots</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">identifier</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="n">dtype</span><span class="p">))</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WGCNA-plot&#39;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;ranking&#39;</span><span class="p">:</span>

@@ -1,2 +1,0 @@
-Proteomics data analysis parameters
-====================================

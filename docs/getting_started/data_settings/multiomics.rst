@@ -1,2 +1,0 @@
-Multiomics data analysis parameters
-=====================================

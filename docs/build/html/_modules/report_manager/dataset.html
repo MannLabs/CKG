@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>report_manager.dataset &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  <title>report_manager.dataset &mdash; ClinicalKnowledgeGraph 1.0b1 BETA documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.0b1 BETA
               </div>
             
           
@@ -83,7 +83,7 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../INTRO.html">Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../INTRO.html"><strong>Clinical Knowledge Graph</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">First steps</span></p>
 <ul>
@@ -613,6 +613,7 @@
                 <span class="n">extra_identifier</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="n">shift</span> <span class="o">=</span> <span class="mf">1.8</span>
                 <span class="n">nstd</span> <span class="o">=</span> <span class="mf">0.3</span>
+                <span class="n">knn_cutoff</span> <span class="o">=</span> <span class="mf">0.6</span>
                 <span class="n">args</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="k">if</span> <span class="s2">&quot;args&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">:</span>
                     <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">]</span>
@@ -636,11 +637,13 @@
                         <span class="n">nstd</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;missing_nstd&quot;</span><span class="p">]</span>
                     <span class="k">if</span> <span class="s2">&quot;missing_shift&quot;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
                         <span class="n">shift</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;missing_shift&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="s2">&quot;knn_cutoff&quot;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+                        <span class="n">knn_cutoff</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;knn_cutoff&quot;</span><span class="p">]</span>
 
                 <span class="n">processed_data</span> <span class="o">=</span> <span class="n">analytics</span><span class="o">.</span><span class="n">get_proteomics_measurements_ready</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index_cols</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">imputation</span><span class="o">=</span><span class="n">imputation</span><span class="p">,</span>
                                                                              <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">missing_method</span><span class="o">=</span><span class="n">missing_method</span><span class="p">,</span> <span class="n">extra_identifier</span><span class="o">=</span><span class="n">extra_identifier</span><span class="p">,</span>
                                                                              <span class="n">missing_per_group</span><span class="o">=</span><span class="n">missing_per_group</span><span class="p">,</span> <span class="n">missing_max</span><span class="o">=</span><span class="n">missing_max</span><span class="p">,</span>
-                                                                             <span class="n">min_valid</span><span class="o">=</span><span class="n">min_valid</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="n">shift</span><span class="p">,</span> <span class="n">nstd</span><span class="o">=</span><span class="n">nstd</span><span class="p">,</span> <span class="n">value_col</span><span class="o">=</span><span class="n">value_col</span><span class="p">)</span>
+                                                                             <span class="n">min_valid</span><span class="o">=</span><span class="n">min_valid</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="n">shift</span><span class="p">,</span> <span class="n">nstd</span><span class="o">=</span><span class="n">nstd</span><span class="p">,</span> <span class="n">value_col</span><span class="o">=</span><span class="n">value_col</span><span class="p">,</span> <span class="n">knn_cutoff</span><span class="o">=</span><span class="n">knn_cutoff</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">processed_data</span></div>
 
 <div class="viewcode-block" id="ProteomicsDataset.generate_knowledge"><a class="viewcode-back" href="../../_autosummary/report_manager.html#report_manager.dataset.ProteomicsDataset.generate_knowledge">[docs]</a>    <span class="k">def</span> <span class="nf">generate_knowledge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -744,6 +747,7 @@
         <span class="k">return</span> <span class="n">kn</span></div></div>
 
 
+<span class="c1">#ToDO</span>
 <div class="viewcode-block" id="DNAseqDataset"><a class="viewcode-back" href="../../_autosummary/report_manager.html#report_manager.dataset.DNAseqDataset">[docs]</a><span class="k">class</span> <span class="nc">DNAseqDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">,</span> <span class="n">dataset_type</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{},</span> <span class="n">configuration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">analyses</span><span class="o">=</span><span class="p">{},</span> <span class="n">analysis_queries</span><span class="o">=</span><span class="p">{},</span> <span class="n">report</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
@@ -755,7 +759,7 @@
 <div class="viewcode-block" id="DNAseqDataset.generate_dataset"><a class="viewcode-back" href="../../_autosummary/report_manager.html#report_manager.dataset.DNAseqDataset.generate_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">generate_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_data</span><span class="p">()</span></div></div>
 
-
+<span class="c1">#ToDO</span>
 <div class="viewcode-block" id="RNAseqDataset"><a class="viewcode-back" href="../../_autosummary/report_manager.html#report_manager.dataset.RNAseqDataset">[docs]</a><span class="k">class</span> <span class="nc">RNAseqDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{},</span> <span class="n">configuration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">analyses</span><span class="o">=</span><span class="p">{},</span> <span class="n">analysis_queries</span><span class="o">=</span><span class="p">{},</span> <span class="n">report</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Graph Database Builder &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  <title>Graph Database Builder &mdash; ClinicalKnowledgeGraph 1.0b1 BETA documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.0b1 BETA
               </div>
             
           
@@ -85,7 +85,7 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../INTRO.html">Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../INTRO.html"><strong>Clinical Knowledge Graph</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">First steps</span></p>
 <ul>
@@ -345,9 +345,9 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>relationships</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#set" title="(in Python v3.5)"><em>set</em></a>) – set of tuples with relationship data: source node, target node,                                 relationship type, source and other attributes.</p></li>
-<li><p><strong>header</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – list of column names.</p></li>
-<li><p><strong>outputfile</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to file to be saved (including filename and extention).</p></li>
+<li><p><strong>relationships</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#set" title="(in Python v3.6)"><em>set</em></a>) – set of tuples with relationship data: source node, target node,                                 relationship type, source and other attributes.</p></li>
+<li><p><strong>header</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – list of column names.</p></li>
+<li><p><strong>outputfile</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – path to file to be saved (including filename and extention).</p></li>
 </ul>
 </dd>
 </dl>
@@ -360,9 +360,9 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>entities</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#set" title="(in Python v3.5)"><em>set</em></a>) – set of tuples with entities data: identifier, label, name                        and other attributes.</p></li>
-<li><p><strong>header</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – list of column names.</p></li>
-<li><p><strong>outputfile</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to file to be saved (including filename and extention).</p></li>
+<li><p><strong>entities</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#set" title="(in Python v3.6)"><em>set</em></a>) – set of tuples with entities data: identifier, label, name                        and other attributes.</p></li>
+<li><p><strong>header</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – list of column names.</p></li>
+<li><p><strong>outputfile</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – path to file to be saved (including filename and extention).</p></li>
 </ul>
 </dd>
 </dl>
@@ -375,8 +375,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>config_name</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the configuration YAML file.</p></li>
-<li><p><strong>data_type</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – configuration type (‘databases’ or ‘ontologies’).</p></li>
+<li><p><strong>config_name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of the configuration YAML file.</p></li>
+<li><p><strong>data_type</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – configuration type (‘databases’ or ‘ontologies’).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -397,8 +397,8 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – dataframe to be expanded</p></li>
-<li><p><strong>col</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column that contains string to be expanded (i.e. ‘P02788;E7EQB2;E7ER44;P02788-2;C9JCF5’)</p></li>
-<li><p><strong>sep</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – separator (i.e. ‘;’)</p></li>
+<li><p><strong>col</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column that contains string to be expanded (i.e. ‘P02788;E7EQB2;E7ER44;P02788-2;C9JCF5’)</p></li>
+<li><p><strong>sep</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – separator (i.e. ‘;’)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -439,9 +439,9 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ftp_url</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – link to access ftp server.</p></li>
-<li><p><strong>user</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – username to access ftp server if required.</p></li>
-<li><p><strong>password</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – password to access ftp server if required.</p></li>
+<li><p><strong>ftp_url</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – link to access ftp server.</p></li>
+<li><p><strong>user</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – username to access ftp server if required.</p></li>
+<li><p><strong>password</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – password to access ftp server if required.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -457,8 +457,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to file containing configuration for logging file.</p></li>
-<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the logger.</p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – path to file containing configuration for logging file.</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of the logger.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -474,11 +474,11 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>databaseURL</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – link to access biomedical database server.</p></li>
-<li><p><strong>directory</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.5/library/constants.html#None" title="(in Python v3.5)"><em>None</em></a>) – </p></li>
-<li><p><strong>file_name</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.5/library/constants.html#None" title="(in Python v3.5)"><em>None</em></a>) – name of the file to dowload. If None, ‘databaseURL’ must contain                         filename after the last ‘/’.</p></li>
-<li><p><strong>user</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – username to access biomedical database server if required.</p></li>
-<li><p><strong>password</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – password to access biomedical database server if required.</p></li>
+<li><p><strong>databaseURL</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – link to access biomedical database server.</p></li>
+<li><p><strong>directory</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – </p></li>
+<li><p><strong>file_name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – name of the file to dowload. If None, ‘databaseURL’ must contain                         filename after the last ‘/’.</p></li>
+<li><p><strong>user</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – username to access biomedical database server if required.</p></li>
+<li><p><strong>password</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – password to access biomedical database server if required.</p></li>
 </ul>
 </dd>
 </dl>
@@ -491,10 +491,10 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>searchFields</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – list of search fields to query for.</p></li>
-<li><p><strong>sortby</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – parameter to use for sorting.</p></li>
-<li><p><strong>num</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – number of PubMed identifiers to return.</p></li>
-<li><p><strong>resultsFormat</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – format of the PubMed result.</p></li>
+<li><p><strong>searchFields</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – list of search fields to query for.</p></li>
+<li><p><strong>sortby</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – parameter to use for sorting.</p></li>
+<li><p><strong>num</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – number of PubMed identifiers to return.</p></li>
+<li><p><strong>resultsFormat</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – format of the PubMed result.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -523,7 +523,7 @@
 <dd><p>This function accesses NCBI over the WWWW and returns Medline data as a handle object,     which is parsed and converted to a Pandas DataFrame.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>idList</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – single identifier or comma-delimited list of identifiers. All the identifiers                     must be from the database PubMed.</p>
+<dd class="field-odd"><p><strong>idList</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – single identifier or comma-delimited list of identifiers. All the identifiers                     must be from the database PubMed.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Pandas DataFrame with columns: ‘title’, ‘authors’, ‘journal’, ‘keywords’, ‘abstract’, ‘PMID’ and ‘url’.</p>
@@ -542,7 +542,7 @@
 <dd><p>Lists all files in a specified directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>directory</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to folder.</p>
+<dd class="field-odd"><p><strong>directory</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – path to folder.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>List of file names.</p>
@@ -556,7 +556,7 @@
 <dd><p>Lists all directories in a specified directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>directory</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to folder.</p>
+<dd class="field-odd"><p><strong>directory</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – path to folder.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>List of folder names.</p>
@@ -570,7 +570,7 @@
 <dd><p>Lists all directories in a specified directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>directory</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to folder.</p>
+<dd class="field-odd"><p><strong>directory</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – path to folder.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>List of folder names.</p>
@@ -584,7 +584,7 @@
 <dd><p>Checks if given directory exists and if not, creates it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>directory</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to folder.</p>
+<dd class="field-odd"><p><strong>directory</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – path to folder.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -618,7 +618,7 @@ Generator flattening the structure</p>
 <dd><p>Takes an .obo file and returns a NetworkX graph representation of the ontology, that holds multiple     edges between two nodes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>ontologyFile</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to ontology file.</p>
+<dd class="field-odd"><p><strong>ontologyFile</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – path to ontology file.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>NetworkX graph.</p>
@@ -659,13 +659,13 @@ Generator flattening the structure</p>
 <dd><p>This function returns the file size.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file_path</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to file.</p>
+<dd class="field-odd"><p><strong>file_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – path to file.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Size in bytes of a plain file.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -677,11 +677,11 @@ Generator flattening the structure</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>count</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – number of entities/relationships.</p></li>
-<li><p><strong>otype</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – ‘entity’ or ‘relationsgips’.</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – entity/relationship label.</p></li>
-<li><p><strong>dataset</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – database/ontology.</p></li>
-<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to file where entities/relationships are stored.</p></li>
+<li><p><strong>count</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – number of entities/relationships.</p></li>
+<li><p><strong>otype</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – ‘entity’ or ‘relationsgips’.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – entity/relationship label.</p></li>
+<li><p><strong>dataset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – database/ontology.</p></li>
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – path to file where entities/relationships are stored.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -697,9 +697,9 @@ Generator flattening the structure</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>folder_to_backup</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to folder to compress and backup.</p></li>
-<li><p><strong>dest_folder</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path where to save compressed folder.</p></li>
-<li><p><strong>file_name</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the compressed file.</p></li>
+<li><p><strong>folder_to_backup</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – path to folder to compress and backup.</p></li>
+<li><p><strong>dest_folder</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – path where to save compressed folder.</p></li>
+<li><p><strong>file_name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of the compressed file.</p></li>
 </ul>
 </dd>
 </dl>
@@ -711,7 +711,7 @@ Generator flattening the structure</p>
 <dd><p>Opens an underlying process to access a gzip file through the creation of a new pipe to the child.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – path to gzip file.</p>
+<dd class="field-odd"><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – path to gzip file.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A bytes sequence that specifies the standard output.</p>
@@ -767,7 +767,7 @@ batch_size entries, although the final list may be shorter.</p>
 <dd><p>Checks if mapping.tsv file exists and removes it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>entity</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – entity label as defined in databases_config.yml</p>
+<dd class="field-odd"><p><strong>entity</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – entity label as defined in databases_config.yml</p>
 </dd>
 </dl>
 </dd></dl>
@@ -778,7 +778,7 @@ batch_size entries, although the final list may be shorter.</p>
 <dd><p>Checks if mapping.tsv file exists and renames it to complete_mapping.tsv.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>entity</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – entity label as defined in databases_config.yml</p>
+<dd class="field-odd"><p><strong>entity</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – entity label as defined in databases_config.yml</p>
 </dd>
 </dl>
 </dd></dl>
@@ -791,8 +791,8 @@ to dictionary with aliases as keys and ontology identifiers as values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ontology</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – ontology label as defined in ontologies_config.yml.</p></li>
-<li><p><strong>source</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.5/library/constants.html#None" title="(in Python v3.5)"><em>None</em></a>) – name of the source database for selecting aliases.</p></li>
+<li><p><strong>ontology</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – ontology label as defined in ontologies_config.yml.</p></li>
+<li><p><strong>source</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – name of the source database for selecting aliases.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -812,7 +812,7 @@ to dictionary with aliases as keys and ontology identifiers as values.</p>
 <dd><p>Converts .tsv file with complete list of entity identifiers and aliases,     to dictionary with aliases as keys and entity identifiers as values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>entity</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – entity label as defined in databases_config.yml.</p>
+<dd class="field-odd"><p><strong>entity</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – entity label as defined in databases_config.yml.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Dictionary of aliases (keys) and entity identifiers (value).</p>
@@ -826,7 +826,7 @@ to dictionary with aliases as keys and ontology identifiers as values.</p>
 <dd><p>Converts .tsv file with complete list of entity identifiers and aliases,     to dictionary with aliases to other databases as keys and entity identifiers as values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>entity</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – entity label as defined in databases_config.yml.</p>
+<dd class="field-odd"><p><strong>entity</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – entity label as defined in databases_config.yml.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Dictionary of aliases (keys) and set of unique entity identifiers (values).</p>
@@ -840,7 +840,7 @@ to dictionary with aliases as keys and ontology identifiers as values.</p>
 <dd><p>Get the url for downloading the mapping file from either STRING or STITCH</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>db</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – Which database to get the url from: STRING or STITCH</p>
+<dd class="field-odd"><p><strong>db</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Which database to get the url from: STRING or STITCH</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>url where to download the mapping file</p>
@@ -855,10 +855,10 @@ to dictionary with aliases as keys and ontology identifiers as values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – link to download database raw file.</p></li>
-<li><p><strong>source</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the source database for selecting aliases.</p></li>
-<li><p><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – wether to download the file or not.</p></li>
-<li><p><strong>db</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the database to be parsed.</p></li>
+<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – link to download database raw file.</p></li>
+<li><p><strong>source</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of the source database for selecting aliases.</p></li>
+<li><p><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – wether to download the file or not.</p></li>
+<li><p><strong>db</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of the database to be parsed.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

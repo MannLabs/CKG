@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>graphdb_builder.databases.parsers.pspParser &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  <title>graphdb_builder.databases.parsers.pspParser &mdash; ClinicalKnowledgeGraph 1.0b1 BETA documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.0b1 BETA
               </div>
             
           
@@ -83,7 +83,7 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../INTRO.html">Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../INTRO.html"><strong>Clinical Knowledge Graph</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">First steps</span></p>
 <ul>
@@ -204,9 +204,7 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">graphdb_builder</span> <span class="k">import</span> <span class="n">mapping</span> <span class="k">as</span> <span class="n">mp</span><span class="p">,</span> <span class="n">builder_utils</span>
 
-<span class="c1">#############################</span>
-<span class="c1">#       PhosphoSitePlus     # </span>
-<span class="c1">#############################</span>
+
 <div class="viewcode-block" id="parser"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.databases.parsers.html#graphdb_builder.databases.parsers.pspParser.parser">[docs]</a><span class="k">def</span> <span class="nf">parser</span><span class="p">(</span><span class="n">databases_directory</span><span class="p">):</span>
     <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">databases_directory</span><span class="p">,</span> <span class="s2">&quot;PhosphoSitePlus&quot;</span><span class="p">)</span>
     <span class="n">builder_utils</span><span class="o">.</span><span class="n">checkDirectory</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
@@ -237,7 +235,6 @@
             <span class="k">elif</span> <span class="n">entity</span> <span class="o">==</span> <span class="s2">&quot;substrate&quot;</span><span class="p">:</span>
                 <span class="n">relationships</span><span class="p">[(</span><span class="n">entity</span><span class="p">,</span> <span class="n">relationship_type</span><span class="p">)]</span> <span class="o">=</span> <span class="n">parseKinaseSubstrates</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">modifications</span><span class="p">)</span>
 
-    
     <span class="k">return</span> <span class="n">entities</span><span class="p">,</span> <span class="n">relationships</span><span class="p">,</span> <span class="n">entities_header</span><span class="p">,</span> <span class="n">relationships_headers</span></div>
 
 

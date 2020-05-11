@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Analysis &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  <title>Analysis &mdash; ClinicalKnowledgeGraph 1.0b1 BETA documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.0b1 BETA
               </div>
             
           
@@ -85,7 +85,7 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../INTRO.html">Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../INTRO.html"><strong>Clinical Knowledge Graph</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">First steps</span></p>
 <ul>
@@ -255,8 +255,8 @@ Generator flattening the structure</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>v1</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.5)"><em>tuple</em></a>) – vector 1</p></li>
-<li><p><strong>v2</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.5)"><em>tuple</em></a>) – vector 2</p></li>
+<li><p><strong>v1</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)"><em>tuple</em></a>) – vector 1</p></li>
+<li><p><strong>v2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)"><em>tuple</em></a>) – vector 2</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return float angle</dt>
@@ -278,10 +278,10 @@ pandas pivot_table() function.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – long-format Pandas DataFrame</p></li>
-<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – columns that will be converted into the index</p></li>
-<li><p><strong>columns</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column name whose unique values will become the new column names</p></li>
-<li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column to aggregate</p></li>
-<li><p><strong>extra</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – additional columns to be kept as columns</p></li>
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – columns that will be converted into the index</p></li>
+<li><p><strong>columns</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column name whose unique values will become the new column names</p></li>
+<li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column to aggregate</p></li>
+<li><p><strong>extra</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – additional columns to be kept as columns</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -303,9 +303,9 @@ function.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – wide-format Pandas DataFrame</p></li>
-<li><p><strong>drop_columns</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – columns to be deleted</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – column(s) to use as identifier variables</p></li>
-<li><p><strong>columns</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – names to use for the 1)variable column, and for the 2)value column</p></li>
+<li><p><strong>drop_columns</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – columns to be deleted</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column(s) to use as identifier variables</p></li>
+<li><p><strong>columns</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – names to use for the 1)variable column, and for the 2)value column</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -326,11 +326,11 @@ function.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – wide-format Pandas DataFrame with samples as rows and features as columns</p></li>
-<li><p><strong>drop_columns</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – columns to be deleted</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column to use as identifier variables</p></li>
-<li><p><strong>columns</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – names to use for the 1)variable column, and for the 2)value column</p></li>
-<li><p><strong>list_markers</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – list of features from data, known to be markers associated to disease.</p></li>
-<li><p><strong>annotation</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.5)"><em>dict</em></a>) – markers, from list_markers, and associated diseases.</p></li>
+<li><p><strong>drop_columns</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – columns to be deleted</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column to use as identifier variables</p></li>
+<li><p><strong>columns</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – names to use for the 1)variable column, and for the 2)value column</p></li>
+<li><p><strong>list_markers</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – list of features from data, known to be markers associated to disease.</p></li>
+<li><p><strong>annotation</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – markers, from list_markers, and associated diseases.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -351,9 +351,9 @@ function.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – pandas DataFrame with group as rows and protein identifier as column.</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing group identifiers. If None, number of valid values is counted across all samples, otherwise is counted per unique group identifier.</p></li>
-<li><p><strong>min_valid</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – minimum number of valid values to be filtered.</p></li>
-<li><p><strong>drop_columns</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – column labels to be dropped.</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing group identifiers. If None, number of valid values is counted across all samples, otherwise is counted per unique group identifier.</p></li>
+<li><p><strong>min_valid</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – minimum number of valid values to be filtered.</p></li>
+<li><p><strong>drop_columns</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column labels to be dropped.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -374,8 +374,8 @@ function.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – pandas dataframe with group as rows and protein identifier as column.</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing group identifiers. If None, ratio is calculated across all samples, otherwise is calculated per unique group identifier.</p></li>
-<li><p><strong>missing_max</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – maximum ratio of missing/valid values to be filtered.</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing group identifiers. If None, ratio is calculated across all samples, otherwise is calculated per unique group identifier.</p></li>
+<li><p><strong>missing_max</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – maximum ratio of missing/valid values to be filtered.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -396,9 +396,9 @@ function.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – pandas dataframe with samples as rows and protein identifiers as columns (with additional columns ‘group’, ‘sample’ and ‘subject’).</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing group identifiers.</p></li>
-<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – column labels to be dropped. Final dataframe should only have gene/protein/etc identifiers as columns.</p></li>
-<li><p><strong>cutoff</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – minimum ratio of missing/valid values required to impute in each column.</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing group identifiers.</p></li>
+<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column labels to be dropped. Final dataframe should only have gene/protein/etc identifiers as columns.</p></li>
+<li><p><strong>cutoff</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – minimum ratio of missing/valid values required to impute in each column.</p></li>
 <li><p><strong>alone</strong> (<em>boolean</em>) – if True removes all columns with any missing values.</p></li>
 </ul>
 </dd>
@@ -420,11 +420,11 @@ function.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – pandas dataframe with samples as rows and protein identifiers as columns (with additional columns ‘group’, ‘sample’ and ‘subject’).</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing group identifiers.</p></li>
-<li><p><strong>index_cols</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – list of column labels to be set as dataframe index.</p></li>
-<li><p><strong>shift</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – specifies the amount by which the distribution used for the random numbers is shifted downwards. This is in units of the                         standard deviation of the valid data.</p></li>
-<li><p><strong>nstd</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – defines the width of the Gaussian distribution relative to the standard deviation of measured values.                         A value of 0.5 would mean that the width of the distribution used for drawing random numbers is half of the standard deviation of the data.</p></li>
-<li><p><strong>cutoff</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – minimum ratio of missing/valid values required to impute in each column.</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing group identifiers.</p></li>
+<li><p><strong>index_cols</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – list of column labels to be set as dataframe index.</p></li>
+<li><p><strong>shift</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – specifies the amount by which the distribution used for the random numbers is shifted downwards. This is in units of the                         standard deviation of the valid data.</p></li>
+<li><p><strong>nstd</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – defines the width of the Gaussian distribution relative to the standard deviation of measured values.                         A value of 0.5 would mean that the width of the distribution used for drawing random numbers is half of the standard deviation of the data.</p></li>
+<li><p><strong>cutoff</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – minimum ratio of missing/valid values required to impute in each column.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -446,9 +446,9 @@ For more information visit <a class="reference external" href="http://www.coxdoc
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – pandas dataframe with samples as rows and protein identifiers as columns (with additional columns ‘group’, ‘sample’ and ‘subject’).</p></li>
-<li><p><strong>index_cols</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – list of column labels to be set as dataframe index.</p></li>
-<li><p><strong>shift</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – specifies the amount by which the distribution used for the random numbers is shifted downwards. This is in units of the standard deviation of the valid data.</p></li>
-<li><p><strong>nstd</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – defines the width of the Gaussian distribution relative to the standard deviation of measured values. A value of 0.5 would mean that the width of the distribution used for drawing random numbers is half of the standard deviation of the data.</p></li>
+<li><p><strong>index_cols</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – list of column labels to be set as dataframe index.</p></li>
+<li><p><strong>shift</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – specifies the amount by which the distribution used for the random numbers is shifted downwards. This is in units of the standard deviation of the valid data.</p></li>
+<li><p><strong>nstd</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – defines the width of the Gaussian distribution relative to the standard deviation of measured values. A value of 0.5 would mean that the width of the distribution used for drawing random numbers is half of the standard deviation of the data.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -540,7 +540,7 @@ median until medians converge.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – </p></li>
-<li><p><strong>max_iter</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – number of maximum iterations to prevent infinite loop.</p></li>
+<li><p><strong>max_iter</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – number of maximum iterations to prevent infinite loop.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -579,8 +579,8 @@ median until medians converge.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – pandas dataframe with samples as rows and features as columns.</p></li>
-<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – norm to use to normalize each non-zero sample or non-zero feature (depends on axis).</p></li>
-<li><p><strong>axis</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – axis used to normalize the data along. If 1, independently normalize each sample, otherwise (if 0) normalize each feature.</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – norm to use to normalize each non-zero sample or non-zero feature (depends on axis).</p></li>
+<li><p><strong>axis</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – axis used to normalize the data along. If 1, independently normalize each sample, otherwise (if 0) normalize each feature.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -642,9 +642,9 @@ visit <a class="reference external" href="https://docs.scipy.org/doc/scipy/refer
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – pandas dataframe with samples as rows and protein identifiers as columns (with additional columns ‘group’, ‘sample’ and ‘subject’).</p></li>
-<li><p><strong>drop_columns</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – column labels to be dropped from the dataframe</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing group identifiers.</p></li>
-<li><p><strong>columns</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – names to use for the variable column(s), and for the value column(s)</p></li>
+<li><p><strong>drop_columns</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column labels to be dropped from the dataframe</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing group identifiers.</p></li>
+<li><p><strong>columns</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – names to use for the variable column(s), and for the value column(s)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -666,21 +666,21 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – long-format pandas dataframe with columns ‘group’, ‘sample’, ‘subject’, ‘identifier’ (protein), ‘name’ (gene) and ‘LFQ_intensity’.</p></li>
-<li><p><strong>index_cols</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – column labels to be be kept as index identifiers.</p></li>
-<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – column labels to be dropped from the dataframe.</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing group identifiers.</p></li>
-<li><p><strong>identifier</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing feature identifiers.</p></li>
-<li><p><strong>extra_identifier</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing additional protein identifiers (e.g. gene names).</p></li>
-<li><p><strong>imputation</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – if True performs imputation of missing values.</p></li>
-<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – method for missing values imputation (‘KNN’, ‘distribuition’, or ‘mixed’)</p></li>
-<li><p><strong>missing_method</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – defines which expression rows are counted to determine if a column has enough valid values to survive the filtering process.</p></li>
-<li><p><strong>missing_per_group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – if True filter proteins based on valid values per group; if False filter across all samples.</p></li>
-<li><p><strong>missing_max</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – maximum ratio of missing/valid values to be filtered.</p></li>
-<li><p><strong>min_valid</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – minimum number of valid values to be filtered.</p></li>
-<li><p><strong>value_col</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing expression values.</p></li>
-<li><p><strong>shift</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – when using distribution imputation, the down-shift</p></li>
-<li><p><strong>nstd</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – when using distribution imputation, the width of the distribution</p></li>
-<li><p><strong>knn_cutoff</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – when using KNN imputation, the minimum percentage of valid values for which to use KNN imputation (i.e. 0.6 -&gt; if 60% valid values use KNN, otherwise MinProb)</p></li>
+<li><p><strong>index_cols</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column labels to be be kept as index identifiers.</p></li>
+<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column labels to be dropped from the dataframe.</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing group identifiers.</p></li>
+<li><p><strong>identifier</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing feature identifiers.</p></li>
+<li><p><strong>extra_identifier</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing additional protein identifiers (e.g. gene names).</p></li>
+<li><p><strong>imputation</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if True performs imputation of missing values.</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – method for missing values imputation (‘KNN’, ‘distribuition’, or ‘mixed’)</p></li>
+<li><p><strong>missing_method</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – defines which expression rows are counted to determine if a column has enough valid values to survive the filtering process.</p></li>
+<li><p><strong>missing_per_group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if True filter proteins based on valid values per group; if False filter across all samples.</p></li>
+<li><p><strong>missing_max</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – maximum ratio of missing/valid values to be filtered.</p></li>
+<li><p><strong>min_valid</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – minimum number of valid values to be filtered.</p></li>
+<li><p><strong>value_col</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing expression values.</p></li>
+<li><p><strong>shift</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – when using distribution imputation, the down-shift</p></li>
+<li><p><strong>nstd</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – when using distribution imputation, the width of the distribution</p></li>
+<li><p><strong>knn_cutoff</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – when using KNN imputation, the minimum percentage of valid values for which to use KNN imputation (i.e. 0.6 -&gt; if 60% valid values use KNN, otherwise MinProb)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -705,14 +705,14 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – long-format pandas dataframe with columns ‘group’, ‘biological_sample’, ‘subject’, ‘clinical_variable’, ‘value’.</p></li>
-<li><p><strong>subject_id</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing subject identifiers.</p></li>
-<li><p><strong>sample_id</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing biological sample identifiers.</p></li>
-<li><p><strong>group_id</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing group identifiers.</p></li>
-<li><p><strong>columns</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – column name whose unique values will become the new column names</p></li>
-<li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing clinical variable values.</p></li>
-<li><p><strong>extra</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – additional column labels to be kept as columns</p></li>
-<li><p><strong>imputation</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – if True performs imputation of missing values.</p></li>
-<li><p><strong>imputation_method</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – method for missing values imputation (‘KNN’, ‘distribuition’, or ‘mixed’).</p></li>
+<li><p><strong>subject_id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing subject identifiers.</p></li>
+<li><p><strong>sample_id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing biological sample identifiers.</p></li>
+<li><p><strong>group_id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing group identifiers.</p></li>
+<li><p><strong>columns</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column name whose unique values will become the new column names</p></li>
+<li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing clinical variable values.</p></li>
+<li><p><strong>extra</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – additional column labels to be kept as columns</p></li>
+<li><p><strong>imputation</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if True performs imputation of missing values.</p></li>
+<li><p><strong>imputation_method</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – method for missing values imputation (‘KNN’, ‘distribuition’, or ‘mixed’).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -761,10 +761,10 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – pandas dataframe with samples as rows and protein identifiers as columns (with additional columns ‘group’, ‘sample’ and ‘subject’).</p></li>
-<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – column labels to be dropped from the dataframe.</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing group identifiers.</p></li>
-<li><p><strong>components</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – number of components to keep.</p></li>
-<li><p><strong>dropna</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – if True removes all columns with any missing values.</p></li>
+<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column labels to be dropped from the dataframe.</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing group identifiers.</p></li>
+<li><p><strong>components</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – number of components to keep.</p></li>
+<li><p><strong>dropna</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if True removes all columns with any missing values.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -785,13 +785,13 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – pandas dataframe with samples as rows and protein identifiers as columns (with additional columns ‘group’, ‘sample’ and ‘subject’).</p></li>
-<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – column labels to be dropped from the dataframe.</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing group identifiers.</p></li>
-<li><p><strong>components</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – dimension of the embedded space.</p></li>
-<li><p><strong>perplexity</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – related to the number of nearest neighbors that is used in other manifold learning algorithms. Consider selecting a value between 5 and 50.</p></li>
-<li><p><strong>n_iter</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – maximum number of iterations for the optimization (at least 250).</p></li>
-<li><p><strong>init</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – initialization of embedding (‘random’, ‘pca’ or numpy array of shape n_samples x n_components).</p></li>
-<li><p><strong>dropna</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – if True removes all columns with any missing values.</p></li>
+<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column labels to be dropped from the dataframe.</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing group identifiers.</p></li>
+<li><p><strong>components</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – dimension of the embedded space.</p></li>
+<li><p><strong>perplexity</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – related to the number of nearest neighbors that is used in other manifold learning algorithms. Consider selecting a value between 5 and 50.</p></li>
+<li><p><strong>n_iter</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – maximum number of iterations for the optimization (at least 250).</p></li>
+<li><p><strong>init</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – initialization of embedding (‘random’, ‘pca’ or numpy array of shape n_samples x n_components).</p></li>
+<li><p><strong>dropna</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if True removes all columns with any missing values.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -812,12 +812,12 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – pandas dataframe with samples as rows and protein identifiers as columns (with additional columns ‘group’, ‘sample’ and ‘subject’).</p></li>
-<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – column labels to be dropped from the dataframe.</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing group identifiers.</p></li>
-<li><p><strong>n_neighbors</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – number of neighboring points used in local approximations of manifold structure.</p></li>
-<li><p><strong>min_dist</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – controls how tightly the embedding is allowed compress points together.</p></li>
-<li><p><strong>metric</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – metric used to measure distance in the input space.</p></li>
-<li><p><strong>dropna</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – if True removes all columns with any missing values.</p></li>
+<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column labels to be dropped from the dataframe.</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing group identifiers.</p></li>
+<li><p><strong>n_neighbors</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – number of neighboring points used in local approximations of manifold structure.</p></li>
+<li><p><strong>min_dist</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – controls how tightly the embedding is allowed compress points together.</p></li>
+<li><p><strong>metric</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – metric used to measure distance in the input space.</p></li>
+<li><p><strong>dropna</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if True removes all columns with any missing values.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -839,7 +839,7 @@ For more information on imputation method visit <a class="reference external" hr
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<em>ndarray</em>) – array 1</p></li>
 <li><p><strong>y</strong> (<em>ndarray</em>) – array 2</p></li>
-<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – chooses which kind of correlation method to run</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – chooses which kind of correlation method to run</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -860,8 +860,8 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>pvalues</strong> (<em>ndarray</em>) – et of p-values of the individual tests.</p></li>
-<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – error rate.</p></li>
-<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – method of p-value correction:
+<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – error rate.</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – method of p-value correction:
 - bonferroni : one-step correction
 - sidak : one-step correction
 - holm-sidak : step down method using Sidak adjustments
@@ -892,8 +892,8 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>pvalues</strong> (<em>ndarray</em>) – et of p-values of the individual tests.</p></li>
-<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – error rate.</p></li>
-<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – method of p-value correction (‘indep’, ‘negcorr’).</p></li>
+<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – error rate.</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – method of p-value correction (‘indep’, ‘negcorr’).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -914,8 +914,8 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>pvalues</strong> (<em>ndarray</em>) – et of p-values of the individual tests.</p></li>
-<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – error rate.</p></li>
-<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – method of p-value correction (‘bky’, ‘bh’).</p></li>
+<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – error rate.</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – method of p-value correction (‘bky’, ‘bh’).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -937,9 +937,9 @@ For more information on imputation method visit <a class="reference external" hr
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with samples as rows and features as columns.</p></li>
 <li><p><strong>oberved_pvalues</strong> – pandas Series with p-values calculated on the originally measured data.</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the column containing group identifiers.</p></li>
-<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – error rate. Values velow alpha are considered significant.</p></li>
-<li><p><strong>permutations</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – number of permutations to be applied.</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of the column containing group identifiers.</p></li>
+<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – error rate. Values velow alpha are considered significant.</p></li>
+<li><p><strong>permutations</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – number of permutations to be applied.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -959,11 +959,11 @@ For more information on imputation method visit <a class="reference external" hr
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – computed p-value on measured data for a feature.</p></li>
+<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – computed p-value on measured data for a feature.</p></li>
 <li><p><strong>random</strong> (<em>ndarray</em>) – p-values computed on the permuted data.</p></li>
 <li><p><strong>observed</strong> – pandas Series with p-values calculated on the originally measured data.</p></li>
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – number of permutations to be applied.</p></li>
-<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – error rate. Values velow alpha are considered significant.</p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – number of permutations to be applied.</p></li>
+<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – error rate. Values velow alpha are considered significant.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -984,7 +984,7 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – pandas dataframe.</p></li>
-<li><p><strong>cols</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – names for dataframe columns.</p></li>
+<li><p><strong>cols</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – names for dataframe columns.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1001,9 +1001,9 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with samples as rows and features as columns.</p></li>
-<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of column containing subject identifiers.</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of column containing group identifiers.</p></li>
-<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – method to use for correlation calculation (‘pearson’, ‘spearman’).</p></li>
+<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of column containing subject identifiers.</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of column containing group identifiers.</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – method to use for correlation calculation (‘pearson’, ‘spearman’).</p></li>
 <li><p><strong>alpha</strong> (<em>floar</em>) – error rate. Values velow alpha are considered significant.</p></li>
 <li><p><strong>correction</strong> (<em>string</em>) – type of correction see apply_pvalue_correction for methods</p></li>
 </ul>
@@ -1025,12 +1025,12 @@ For more information on imputation method visit <a class="reference external" hr
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>df_dict</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.5)"><em>dict</em></a>) – dictionary of pandas dataframes with samples as rows and features as columns.</p></li>
-<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the column containing subject identifiers.</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the column containing group identifiers.</p></li>
-<li><p><strong>on</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – column names to join dataframes on (must be found in all dataframes).</p></li>
-<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – method to use for correlation calculation (‘pearson’, ‘spearman’).</p></li>
-<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – error rate. Values velow alpha are considered significant.</p></li>
+<li><p><strong>df_dict</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – dictionary of pandas dataframes with samples as rows and features as columns.</p></li>
+<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of the column containing subject identifiers.</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of the column containing group identifiers.</p></li>
+<li><p><strong>on</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column names to join dataframes on (must be found in all dataframes).</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – method to use for correlation calculation (‘pearson’, ‘spearman’).</p></li>
+<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – error rate. Values velow alpha are considered significant.</p></li>
 <li><p><strong>correction</strong> (<em>string</em>) – type of correction see apply_pvalue_correction for methods</p></li>
 </ul>
 </dd>
@@ -1052,8 +1052,8 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with subjects as rows and two features and columns.</p></li>
-<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – feature a name.</p></li>
-<li><p><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – feature b name.</p></li>
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – feature a name.</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – feature b name.</p></li>
 <li><p><strong>subject</strong> – column name containing the covariate variable.</p></li>
 </ul>
 </dd>
@@ -1075,8 +1075,8 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with samples as rows and features as columns.</p></li>
-<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of column containing subject identifiers.</p></li>
-<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – error rate. Values velow alpha are considered significant.</p></li>
+<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of column containing subject identifiers.</p></li>
+<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – error rate. Values velow alpha are considered significant.</p></li>
 <li><p><strong>correction</strong> (<em>string</em>) – type of correction type see apply_pvalue_correction for methods</p></li>
 </ul>
 </dd>
@@ -1098,7 +1098,7 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – pandas dataframe with samples as index and features as columns (numeric data only).</p></li>
-<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – method to use for correlation calculation (‘pearson’, ‘spearman’).</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – method to use for correlation calculation (‘pearson’, ‘spearman’).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1119,10 +1119,10 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with group as columns and protein identifier as rows</p></li>
-<li><p><strong>abels</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – integers reflecting the group each sample belongs to (e.g. group1 = 1, group2 = 2)</p></li>
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – number of samples</p></li>
-<li><p><strong>s0</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – exchangeability factor for denominator of test statistic</p></li>
-<li><p><strong>paired</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – True if samples are paired</p></li>
+<li><p><strong>abels</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – integers reflecting the group each sample belongs to (e.g. group1 = 1, group2 = 2)</p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – number of samples</p></li>
+<li><p><strong>s0</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – exchangeability factor for denominator of test statistic</p></li>
+<li><p><strong>paired</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – True if samples are paired</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1143,10 +1143,10 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with groups and subjects as rows and protein identifier as column.</p></li>
-<li><p><strong>condition1</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – identifier of first group.</p></li>
-<li><p><strong>condition2</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – ientifier of second group.</p></li>
-<li><p><strong>is_logged</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – data is logged transformed</p></li>
-<li><p><strong>non_par</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – if True, normality and variance equality assumptions are checked and non-parametric test Mann Whitney U test if not passed</p></li>
+<li><p><strong>condition1</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – identifier of first group.</p></li>
+<li><p><strong>condition2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – ientifier of second group.</p></li>
+<li><p><strong>is_logged</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – data is logged transformed</p></li>
+<li><p><strong>non_par</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if True, normality and variance equality assumptions are checked and non-parametric test Mann Whitney U test if not passed</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1167,9 +1167,9 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with group and protein identifier as columns</p></li>
-<li><p><strong>column</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column containing the protein identifier</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing the between factor</p></li>
-<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – significance level</p></li>
+<li><p><strong>column</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column containing the protein identifier</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing the between factor</p></li>
+<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – significance level</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1190,10 +1190,10 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with subject and group as rows and protein identifier as column.</p></li>
-<li><p><strong>column</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing the dependant variable</p></li>
-<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing subject identifiers</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing the between factor</p></li>
-<li><p><strong>correction</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – method used for testing and adjustment of p-values.</p></li>
+<li><p><strong>column</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing the dependant variable</p></li>
+<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing subject identifiers</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing the between factor</p></li>
+<li><p><strong>correction</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – method used for testing and adjustment of p-values.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1214,7 +1214,7 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>posthoc</strong> – pandas dataframe from posthoc test. Should have at least columns ‘mean(group1)’ and ‘mean(group2)’.</p></li>
-<li><p><strong>identifier</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – feature identifier.</p></li>
+<li><p><strong>identifier</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – feature identifier.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1252,8 +1252,8 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with group as columns and protein identifier as rows</p></li>
-<li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – integers reflecting the group each sample belongs to (e.g. group1 = 1, group2 = 2, group3 = 3)</p></li>
-<li><p><strong>s0</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – exchangeability factor for denominator of test statistic</p></li>
+<li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – integers reflecting the group each sample belongs to (e.g. group1 = 1, group2 = 2, group3 = 3)</p></li>
+<li><p><strong>s0</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – exchangeability factor for denominator of test statistic</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1274,8 +1274,8 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with group as rows and protein identifier as column</p></li>
-<li><p><strong>column</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the column in df to run ANOVA on</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column with group identifiers</p></li>
+<li><p><strong>column</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of the column in df to run ANOVA on</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column with group identifiers</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1292,9 +1292,9 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with samples as rows and protein identifier as column. Data must be in long-format for two-way repeated measures.</p></li>
-<li><p><strong>column</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing the dependant variable</p></li>
-<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing subject identifiers</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing the within factor</p></li>
+<li><p><strong>column</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing the dependant variable</p></li>
+<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing subject identifiers</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing the within factor</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1315,14 +1315,14 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with samples as rows and protein identifiers as columns</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column with group identifiers</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column with group identifiers</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Maximum number of permutations.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)">int</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1335,15 +1335,15 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with samples as rows and protein identifiers as columns (with additional columns ‘group’, ‘sample’ and ‘subject’).</p></li>
-<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column with subject identifiers</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column with group identifiers</p></li>
+<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column with subject identifiers</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column with group identifiers</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>True if paired samples.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1355,10 +1355,10 @@ For more information on imputation method visit <a class="reference external" hr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – </p></li>
-<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – </p></li>
-<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – </p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – </p></li>
-<li><p><strong>test</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – </p></li>
+<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – </p></li>
+<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – </p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – </p></li>
+<li><p><strong>test</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1377,12 +1377,12 @@ Multiple hypothesis correction uses permutation-based if permutations&gt;0 and B
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with samples as rows and protein identifiers as columns (with additional columns ‘group’, ‘sample’ and ‘subject’).</p></li>
-<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column with subject identifiers</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column with group identifiers</p></li>
-<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – column labels to be dropped from the dataframe</p></li>
-<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – error rate for multiple hypothesis correction</p></li>
-<li><p><strong>permutations</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – number of permutations used to estimate false discovery rates.</p></li>
-<li><p><strong>non_par</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – if True, normality and variance equality assumptions are checked and non-parametric test Mann Whitney U test if not passed</p></li>
+<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column with subject identifiers</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column with group identifiers</p></li>
+<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column labels to be dropped from the dataframe</p></li>
+<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – error rate for multiple hypothesis correction</p></li>
+<li><p><strong>permutations</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – number of permutations used to estimate false discovery rates.</p></li>
+<li><p><strong>non_par</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if True, normality and variance equality assumptions are checked and non-parametric test Mann Whitney U test if not passed</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1408,11 +1408,11 @@ Multiple hypothesis correction uses permutation-based if permutations&gt;0 and B
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with samples as rows and protein identifiers as columns (with additional columns ‘group’, ‘sample’ and ‘subject’).</p></li>
-<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column with subject identifiers</p></li>
+<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column with subject identifiers</p></li>
 <li><p><strong>group</strong> (<em>srt</em>) – column with group identifiers</p></li>
-<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – column labels to be dropped from the dataframe</p></li>
-<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – error rate for multiple hypothesis correction</p></li>
-<li><p><strong>permutations</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – number of permutations used to estimate false discovery rates</p></li>
+<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column labels to be dropped from the dataframe</p></li>
+<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – error rate for multiple hypothesis correction</p></li>
+<li><p><strong>permutations</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – number of permutations used to estimate false discovery rates</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1433,11 +1433,11 @@ Multiple hypothesis correction uses permutation-based if permutations&gt;0 and B
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with samples as rows and protein identifiers as columns (with additional columns ‘group’, ‘sample’ and ‘subject’).</p></li>
-<li><p><strong>aov_results</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.5)"><em>tuple</em></a><em>]</em>) – list of tuples with anova results (one tuple per feature).</p></li>
-<li><p><strong>pairwise_results</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a><em>[</em><em>dataframes</em><em>]</em>) – list of pandas dataframes with posthoc tests results</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column with group identifiers</p></li>
-<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – error rate for multiple hypothesis correction</p></li>
-<li><p><strong>permutations</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – number of permutations used to estimate false discovery rates</p></li>
+<li><p><strong>aov_results</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)"><em>tuple</em></a><em>]</em>) – list of tuples with anova results (one tuple per feature).</p></li>
+<li><p><strong>pairwise_results</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>[</em><em>dataframes</em><em>]</em>) – list of pandas dataframes with posthoc tests results</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column with group identifiers</p></li>
+<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – error rate for multiple hypothesis correction</p></li>
+<li><p><strong>permutations</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – number of permutations used to estimate false discovery rates</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1454,17 +1454,17 @@ Multiple hypothesis correction uses permutation-based if permutations&gt;0 and B
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with samples as rows and protein identifiers as columns (with additional columns ‘group’, ‘sample’ and ‘subject’).</p></li>
-<li><p><strong>condition1</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – first of two conditions of the independent variable</p></li>
-<li><p><strong>condition2</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – second of two conditions of the independent variable</p></li>
-<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column with subject identifiers</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column with group identifiers (independent variable)</p></li>
-<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – column labels to be dropped from the dataframe</p></li>
-<li><p><strong>paired</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – paired or unpaired samples</p></li>
-<li><p><strong>correction</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – method of pvalue correction see apply_pvalue_correction for methods</p></li>
-<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – error rate for multiple hypothesis correction</p></li>
-<li><p><strong>permutations</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – number of permutations used to estimate false discovery rates.</p></li>
-<li><p><strong>is_logged</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – data is log-transformed</p></li>
-<li><p><strong>non_par</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – if True, normality and variance equality assumptions are checked and non-parametric test Mann Whitney U test if not passed</p></li>
+<li><p><strong>condition1</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – first of two conditions of the independent variable</p></li>
+<li><p><strong>condition2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – second of two conditions of the independent variable</p></li>
+<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column with subject identifiers</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column with group identifiers (independent variable)</p></li>
+<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column labels to be dropped from the dataframe</p></li>
+<li><p><strong>paired</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – paired or unpaired samples</p></li>
+<li><p><strong>correction</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – method of pvalue correction see apply_pvalue_correction for methods</p></li>
+<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – error rate for multiple hypothesis correction</p></li>
+<li><p><strong>permutations</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – number of permutations used to estimate false discovery rates.</p></li>
+<li><p><strong>is_logged</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – data is log-transformed</p></li>
+<li><p><strong>non_par</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if True, normality and variance equality assumptions are checked and non-parametric test Mann Whitney U test if not passed</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1485,9 +1485,9 @@ Multiple hypothesis correction uses permutation-based if permutations&gt;0 and B
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with samples as rows and protein identifiers as columns (with additional columns ‘group’, ‘sample’ and ‘subject’).</p></li>
-<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column with subject identifiers</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column with group identifiers</p></li>
-<li><p><strong>droop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – columns to be dropped</p></li>
+<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column with subject identifiers</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column with group identifiers</p></li>
+<li><p><strong>droop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – columns to be dropped</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1519,13 +1519,13 @@ The method only runs if R is installed and permutations is higher than 0, otherw
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with samples as rows and protein identifiers as columns (with additional columns ‘group’, ‘sample’ and ‘subject’).</p></li>
-<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column with subject identifiers</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column with group identifiers</p></li>
-<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – columnlabels to be dropped from the dataframe</p></li>
-<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – error rate for multiple hypothesis correction</p></li>
-<li><p><strong>s0</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – exchangeability factor for denominator of test statistic</p></li>
-<li><p><strong>permutations</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – number of permutations used to estimate false discovery rates. If number of permutations is equal to zero, the function will run anova with FDR Benjamini/Hochberg correction.</p></li>
-<li><p><strong>fc</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – minimum fold change to define practical significance (needed when computing delta table)</p></li>
+<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column with subject identifiers</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column with group identifiers</p></li>
+<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – columnlabels to be dropped from the dataframe</p></li>
+<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – error rate for multiple hypothesis correction</p></li>
+<li><p><strong>s0</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – exchangeability factor for denominator of test statistic</p></li>
+<li><p><strong>permutations</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – number of permutations used to estimate false discovery rates. If number of permutations is equal to zero, the function will run anova with FDR Benjamini/Hochberg correction.</p></li>
+<li><p><strong>fc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – minimum fold change to define practical significance (needed when computing delta table)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1564,13 +1564,13 @@ group2 = [c, d]</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>regulation_data</strong> – pandas dataframe resulting from differential regulation analysis.</p></li>
 <li><p><strong>annotation</strong> – pandas dataframe with annotations for features (columns: ‘annotation’, ‘identifier’ (feature identifiers), and ‘source’).</p></li>
-<li><p><strong>identifier</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the column from annotation containing feature identifiers.</p></li>
-<li><p><strong>groups</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – column names from regulation_data containing group identifiers.</p></li>
-<li><p><strong>annotation_col</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the column from annotation containing annotation terms.</p></li>
-<li><p><strong>reject_col</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the column from regulatio_data containing boolean for rejected null hypothesis.</p></li>
-<li><p><strong>group_col</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column name for new column in annotation dataframe determining if feature belongs to foreground or background.</p></li>
-<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – method used to compute enrichment (only ‘fisher’ is supported currently).</p></li>
-<li><p><strong>regex</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – how to extract the annotated identifier from the site identifier</p></li>
+<li><p><strong>identifier</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of the column from annotation containing feature identifiers.</p></li>
+<li><p><strong>groups</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column names from regulation_data containing group identifiers.</p></li>
+<li><p><strong>annotation_col</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of the column from annotation containing annotation terms.</p></li>
+<li><p><strong>reject_col</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of the column from regulatio_data containing boolean for rejected null hypothesis.</p></li>
+<li><p><strong>group_col</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column name for new column in annotation dataframe determining if feature belongs to foreground or background.</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – method used to compute enrichment (only ‘fisher’ is supported currently).</p></li>
+<li><p><strong>regex</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – how to extract the annotated identifier from the site identifier</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1592,12 +1592,12 @@ group2 = [c, d]</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>regulation_data</strong> – pandas dataframe resulting from differential regulation analysis.</p></li>
 <li><p><strong>annotation</strong> – pandas dataframe with annotations for features (columns: ‘annotation’, ‘identifier’ (feature identifiers), and ‘source’).</p></li>
-<li><p><strong>identifier</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the column from annotation containing feature identifiers.</p></li>
-<li><p><strong>groups</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – column names from regulation_data containing group identifiers.</p></li>
-<li><p><strong>annotation_col</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the column from annotation containing annotation terms.</p></li>
-<li><p><strong>reject_col</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the column from regulatio_data containing boolean for rejected null hypothesis.</p></li>
-<li><p><strong>group_col</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column name for new column in annotation dataframe determining if feature belongs to foreground or background.</p></li>
-<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – method used to compute enrichment (only ‘fisher’ is supported currently).</p></li>
+<li><p><strong>identifier</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of the column from annotation containing feature identifiers.</p></li>
+<li><p><strong>groups</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column names from regulation_data containing group identifiers.</p></li>
+<li><p><strong>annotation_col</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of the column from annotation containing annotation terms.</p></li>
+<li><p><strong>reject_col</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of the column from regulatio_data containing boolean for rejected null hypothesis.</p></li>
+<li><p><strong>group_col</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column name for new column in annotation dataframe determining if feature belongs to foreground or background.</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – method used to compute enrichment (only ‘fisher’ is supported currently).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1618,12 +1618,12 @@ group2 = [c, d]</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – pandas dataframe with annotations for dataset features (columns: ‘annotation’, ‘identifier’, ‘source’, ‘group’).</p></li>
-<li><p><strong>foreground_id</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – group identifier of features that belong to the foreground.</p></li>
-<li><p><strong>background_id</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – group identifier of features that belong to the background.</p></li>
-<li><p><strong>annotation_col</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of the column containing annotation terms.</p></li>
-<li><p><strong>group_col</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of column containing the group identifiers.</p></li>
-<li><p><strong>identifier_col</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – name of column containing dependent variables identifiers.</p></li>
-<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – method used to compute enrichment (only ‘fisher’ is supported currently).</p></li>
+<li><p><strong>foreground_id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – group identifier of features that belong to the foreground.</p></li>
+<li><p><strong>background_id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – group identifier of features that belong to the background.</p></li>
+<li><p><strong>annotation_col</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of the column containing annotation terms.</p></li>
+<li><p><strong>group_col</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of column containing the group identifiers.</p></li>
+<li><p><strong>identifier_col</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of column containing dependent variables identifiers.</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – method used to compute enrichment (only ‘fisher’ is supported currently).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1644,8 +1644,8 @@ group2 = [c, d]</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with samples as rows and protein identifiers as columns.</p></li>
-<li><p><strong>condition1</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – identifier of first group.</p></li>
-<li><p><strong>condition2</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – identifier of second group.</p></li>
+<li><p><strong>condition1</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – identifier of first group.</p></li>
+<li><p><strong>condition2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – identifier of second group.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1667,9 +1667,9 @@ For more information visit <a class="reference external" href="https://docs.scip
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with samples as rows and protein identifiers as columns.</p></li>
-<li><p><strong>condition1</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – identifier of first group.</p></li>
-<li><p><strong>condition2</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – identifier of second group.</p></li>
-<li><p><strong>ddof</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – means Delta Degrees of Freedom.</p></li>
+<li><p><strong>condition1</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – identifier of first group.</p></li>
+<li><p><strong>condition2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – identifier of second group.</p></li>
+<li><p><strong>ddof</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – means Delta Degrees of Freedom.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1691,9 +1691,9 @@ For more information visit <a class="reference external" href="https://docs.scip
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with samples as rows and protein identifiers as columns.</p></li>
-<li><p><strong>condition1</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – identifier of first group.</p></li>
-<li><p><strong>condition2</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – identifier of second group.</p></li>
-<li><p><strong>ddof</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – means Delta Degrees of Freedom.</p></li>
+<li><p><strong>condition1</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – identifier of first group.</p></li>
+<li><p><strong>condition2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – identifier of second group.</p></li>
+<li><p><strong>ddof</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – means Delta Degrees of Freedom.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1734,17 +1734,17 @@ For more information visit <a class="reference external" href="https://docs.scip
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.5)"><em>dict</em></a>) – dictionary of pandas dataframes with processed clinical and experimental datasets</p></li>
-<li><p><strong>drop_cols_exp</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – column names to be removed from the experimental dataset.</p></li>
-<li><p><strong>drop_cols_cli</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – column names to be removed from the clinical dataset.</p></li>
-<li><p><strong>RsquaredCut</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – desired minimum scale free topology fitting index R^2.</p></li>
-<li><p><strong>networkType</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – network type (‘unsigned’, ‘signed’, ‘signed hybrid’, ‘distance’).</p></li>
-<li><p><strong>minModuleSize</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – minimum module size.</p></li>
-<li><p><strong>deepSplit</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – provides a rough control over sensitivity to cluster splitting, the higher the value (with ‘hybrid’ method) or if True (with ‘tree’ method), the more and smaller modules.</p></li>
-<li><p><strong>pamRespectsDendro</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – only used for method ‘hybrid’. Objects and small modules will only be assigned to modules that belong to the same branch in the dendrogram structure.</p></li>
-<li><p><strong>merge_modules</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – if True, very similar modules are merged.</p></li>
-<li><p><strong>MEDissThres</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – maximum dissimilarity (i.e., 1-correlation) that qualifies modules for merging.</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – integer level of verbosity. Zero means silent, higher values make the output progressively more and more verbose.</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – dictionary of pandas dataframes with processed clinical and experimental datasets</p></li>
+<li><p><strong>drop_cols_exp</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column names to be removed from the experimental dataset.</p></li>
+<li><p><strong>drop_cols_cli</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column names to be removed from the clinical dataset.</p></li>
+<li><p><strong>RsquaredCut</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – desired minimum scale free topology fitting index R^2.</p></li>
+<li><p><strong>networkType</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – network type (‘unsigned’, ‘signed’, ‘signed hybrid’, ‘distance’).</p></li>
+<li><p><strong>minModuleSize</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – minimum module size.</p></li>
+<li><p><strong>deepSplit</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – provides a rough control over sensitivity to cluster splitting, the higher the value (with ‘hybrid’ method) or if True (with ‘tree’ method), the more and smaller modules.</p></li>
+<li><p><strong>pamRespectsDendro</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – only used for method ‘hybrid’. Objects and small modules will only be assigned to modules that belong to the same branch in the dendrogram structure.</p></li>
+<li><p><strong>merge_modules</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if True, very similar modules are merged.</p></li>
+<li><p><strong>MEDissThres</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – maximum dissimilarity (i.e., 1-correlation) that qualifies modules for merging.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – integer level of verbosity. Zero means silent, higher values make the output progressively more and more verbose.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1769,7 +1769,7 @@ For more information visit <a class="reference external" href="https://docs.scip
 <dd class="field-even"><p>Highest eigenvector centrality value.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1782,14 +1782,14 @@ For more information visit <a class="reference external" href="https://docs.scip
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>G</strong> (<em>graph</em>) – networkx graph which is decomposed.</p></li>
-<li><p><strong>weight</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – the key in graph to use as weight.</p></li>
+<li><p><strong>weight</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the key in graph to use as weight.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The partition, with communities numbered from 0 to number of communities.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.5)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1810,7 +1810,7 @@ For more information visit <a class="reference external" href="https://docs.scip
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>graph</strong> (<em>graph</em>) – networkx graph</p></li>
-<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.5)"><em>dict</em></a>) – config file arguments</p></li>
+<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – config file arguments</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1827,9 +1827,9 @@ For more information visit <a class="reference external" href="https://docs.scip
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – pandas dataframe of diseases and publications linked to a list of proteins (columns: ‘Diseases’, ‘Proteins’, ‘linkout’ and ‘publication’).</p></li>
-<li><p><strong>publication_col</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing PubMed ids.</p></li>
-<li><p><strong>join_by</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – column labels to be kept from the input dataframe.</p></li>
-<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column label containing PubMed ids from the NCBI retrieved data.</p></li>
+<li><p><strong>publication_col</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing PubMed ids.</p></li>
+<li><p><strong>join_by</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column labels to be kept from the input dataframe.</p></li>
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing PubMed ids from the NCBI retrieved data.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1878,9 +1878,9 @@ For more information visit <a class="reference external" href="https://docs.scip
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – processed pandas dataframe with samples as rows, and proteins and groups as columns.</p></li>
-<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – column names to drop from dataframe</p></li>
-<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – column name containing subject identifiers.</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – column names corresponding to independent variable groups</p></li>
+<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column names to drop from dataframe</p></li>
+<li><p><strong>subject</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column name containing subject identifiers.</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column names corresponding to independent variable groups</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1931,9 +1931,9 @@ For more information visit <a class="reference external" href="https://docs.scip
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.5)"><em>dict</em></a>) – dictionary with processed clinical and proteomics datasets.</p></li>
-<li><p><strong>drop_cols_exp</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – list of columns to drop from processed experimental (protemics/rna-seq/dna-seq) dataframe.</p></li>
-<li><p><strong>drop_cols_cli</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – list of columns to drop from processed clinical dataframe.</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – dictionary with processed clinical and proteomics datasets.</p></li>
+<li><p><strong>drop_cols_exp</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – list of columns to drop from processed experimental (protemics/rna-seq/dna-seq) dataframe.</p></li>
+<li><p><strong>drop_cols_cli</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – list of columns to drop from processed clinical dataframe.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1950,12 +1950,12 @@ For more information visit <a class="reference external" href="https://docs.scip
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with samples/subjects as index and features as columns.</p></li>
-<li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – labels for the leaves of the tree.</p></li>
-<li><p><strong>distfun</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – distance measure to be used (‘euclidean’, ‘maximum’, ‘manhattan’, ‘canberra’, ‘binary’, ‘minkowski’ or ‘jaccard’).</p></li>
-<li><p><strong>linkagefun</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – hierarchical/agglomeration method to be used (‘single’, ‘complete’, ‘average’, ‘weighted’, ‘centroid’, ‘median’ or ‘ward’).</p></li>
-<li><p><strong>div_clusters</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – dividing dendrogram leaves into clusters (True or False).</p></li>
-<li><p><strong>fcluster_method</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – criterion to use in forming flat clusters.</p></li>
-<li><p><strong>fcluster_cutoff</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – maximum cophenetic distance between observations in each cluster.</p></li>
+<li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – labels for the leaves of the tree.</p></li>
+<li><p><strong>distfun</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – distance measure to be used (‘euclidean’, ‘maximum’, ‘manhattan’, ‘canberra’, ‘binary’, ‘minkowski’ or ‘jaccard’).</p></li>
+<li><p><strong>linkagefun</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – hierarchical/agglomeration method to be used (‘single’, ‘complete’, ‘average’, ‘weighted’, ‘centroid’, ‘median’ or ‘ward’).</p></li>
+<li><p><strong>div_clusters</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – dividing dendrogram leaves into clusters (True or False).</p></li>
+<li><p><strong>fcluster_method</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – criterion to use in forming flat clusters.</p></li>
+<li><p><strong>fcluster_cutoff</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – maximum cophenetic distance between observations in each cluster.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1972,9 +1972,9 @@ For more information visit <a class="reference external" href="https://docs.scip
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>linkage_matrix</strong> (<em>ndarray</em>) – hierarchical clustering encoded with a linkage matrix.</p></li>
-<li><p><strong>fcluster_method</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – criterion to use in forming flat clusters (‘inconsistent’, ‘distance’, ‘maxclust’, ‘monocrit’, ‘maxclust_monocrit’).</p></li>
-<li><p><strong>fcluster_cutoff</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – maximum cophenetic distance between observations in each cluster.</p></li>
-<li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – labels for the leaves of the dendrogram.</p></li>
+<li><p><strong>fcluster_method</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – criterion to use in forming flat clusters (‘inconsistent’, ‘distance’, ‘maxclust’, ‘monocrit’, ‘maxclust_monocrit’).</p></li>
+<li><p><strong>fcluster_cutoff</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – maximum cophenetic distance between observations in each cluster.</p></li>
+<li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – labels for the leaves of the dendrogram.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1991,8 +1991,8 @@ For more information visit <a class="reference external" href="https://docs.scip
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with samples/subjects as index and features as columns.</p></li>
-<li><p><strong>clusters</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.5)"><em>dict</em></a>) – clusters dictionary from get_dendrogram function if div_clusters option was True.</p></li>
-<li><p><strong>number</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – cluster number (key).</p></li>
+<li><p><strong>clusters</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – clusters dictionary from get_dendrogram function if div_clusters option was True.</p></li>
+<li><p><strong>number</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – cluster number (key).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -2009,7 +2009,7 @@ For more information visit <a class="reference external" href="https://docs.scip
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with the labels to be reordered as index.</p></li>
-<li><p><strong>Z_dendrogram</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.5)"><em>dict</em></a>) – dictionary of data structures computed to render the dendrogram. Keys: ‘icoords’, ‘dcoords’, ‘ivl’ and ‘leaves’.</p></li>
+<li><p><strong>Z_dendrogram</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – dictionary of data structures computed to render the dendrogram. Keys: ‘icoords’, ‘dcoords’, ‘ivl’ and ‘leaves’.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -2026,9 +2026,9 @@ For more information visit <a class="reference external" href="https://docs.scip
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> – pandas dataframe with samples/subjects as index and features as columns.</p></li>
-<li><p><strong>Z_dendrogram</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.5)"><em>dict</em></a>) – dictionary of data structures computed to render the dendrogram. Keys: ‘icoords’, ‘dcoords’, ‘ivl’ and ‘leaves’.</p></li>
-<li><p><strong>bydendro</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – if labels should be ordered according to dendrogram list of leaf nodes labels set to True, otherwise set to False.</p></li>
-<li><p><strong>bycols</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – relative values calculated across rows (samples) then set to False. Calculation performed across columns (features) set to True.</p></li>
+<li><p><strong>Z_dendrogram</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – dictionary of data structures computed to render the dendrogram. Keys: ‘icoords’, ‘dcoords’, ‘ivl’ and ‘leaves’.</p></li>
+<li><p><strong>bydendro</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if labels should be ordered according to dendrogram list of leaf nodes labels set to True, otherwise set to False.</p></li>
+<li><p><strong>bycols</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – relative values calculated across rows (samples) then set to False. Calculation performed across columns (features) set to True.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -2076,12 +2076,12 @@ For more information visit <a class="reference external" href="https://docs.scip
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – pandas dataframe.</p></li>
-<li><p><strong>distfun</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – distance measure to be used (‘euclidean’, ‘maximum’, ‘manhattan’, ‘canberra’, ‘binary’, ‘minkowski’ or ‘jaccard’).</p></li>
-<li><p><strong>linkagefun</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – hierarchical/agglomeration method to be used (‘single’, ‘complete’, ‘average’, ‘weighted’, ‘centroid’, ‘median’ or ‘ward’).</p></li>
-<li><p><strong>minModuleSize</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – minimum module size.</p></li>
-<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – method to use (‘hybrid’ or ‘tree’).</p></li>
-<li><p><strong>deepSplit</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – provides a rough control over sensitivity to cluster splitting, the higher the value (with ‘hybrid’ method) or if True (with ‘tree’ method), the more and smaller modules.</p></li>
-<li><p><strong>pamRespectsDendro</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – only used for method ‘hybrid’. Objects and small modules will only be assigned to modules that belong to the same branch in the dendrogram structure.</p></li>
+<li><p><strong>distfun</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – distance measure to be used (‘euclidean’, ‘maximum’, ‘manhattan’, ‘canberra’, ‘binary’, ‘minkowski’ or ‘jaccard’).</p></li>
+<li><p><strong>linkagefun</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – hierarchical/agglomeration method to be used (‘single’, ‘complete’, ‘average’, ‘weighted’, ‘centroid’, ‘median’ or ‘ward’).</p></li>
+<li><p><strong>minModuleSize</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – minimum module size.</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – method to use (‘hybrid’ or ‘tree’).</p></li>
+<li><p><strong>deepSplit</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – provides a rough control over sensitivity to cluster splitting, the higher the value (with ‘hybrid’ method) or if True (with ‘tree’ method), the more and smaller modules.</p></li>
+<li><p><strong>pamRespectsDendro</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – only used for method ‘hybrid’. Objects and small modules will only be assigned to modules that belong to the same branch in the dendrogram structure.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -2098,15 +2098,15 @@ For more information visit <a class="reference external" href="https://docs.scip
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.</p></li>
-<li><p><strong>softPower</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – soft-thresholding power.</p></li>
-<li><p><strong>networkType</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – network type (‘unsigned’, ‘signed’, ‘signed hybrid’, ‘distance’).</p></li>
-<li><p><strong>linkagefun</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – hierarchical/agglomeration method to be used (‘single’, ‘complete’, ‘average’, ‘weighted’, ‘centroid’, ‘median’ or ‘ward’).</p></li>
-<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – method to use (‘hybrid’ or ‘tree’).</p></li>
-<li><p><strong>minModuleSize</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – minimum module size.</p></li>
-<li><p><strong>pamRespectsDendro</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – only used for method ‘hybrid’. Objects and small modules will only be assigned to modules that belong to the same branch in the dendrogram structure.</p></li>
-<li><p><strong>merge_modules</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – if True, very similar modules are merged.</p></li>
-<li><p><strong>MEDissThres</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – maximum dissimilarity (i.e., 1-correlation) that qualifies modules for merging.</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – integer level of verbosity. Zero means silent, higher values make the output progressively more and more verbose.</p></li>
+<li><p><strong>softPower</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – soft-thresholding power.</p></li>
+<li><p><strong>networkType</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – network type (‘unsigned’, ‘signed’, ‘signed hybrid’, ‘distance’).</p></li>
+<li><p><strong>linkagefun</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – hierarchical/agglomeration method to be used (‘single’, ‘complete’, ‘average’, ‘weighted’, ‘centroid’, ‘median’ or ‘ward’).</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – method to use (‘hybrid’ or ‘tree’).</p></li>
+<li><p><strong>minModuleSize</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – minimum module size.</p></li>
+<li><p><strong>pamRespectsDendro</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – only used for method ‘hybrid’. Objects and small modules will only be assigned to modules that belong to the same branch in the dendrogram structure.</p></li>
+<li><p><strong>merge_modules</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – if True, very similar modules are merged.</p></li>
+<li><p><strong>MEDissThres</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – maximum dissimilarity (i.e., 1-correlation) that qualifies modules for merging.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – integer level of verbosity. Zero means silent, higher values make the output progressively more and more verbose.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Paran int deepSplit</dt>
@@ -2126,16 +2126,16 @@ For more information visit <a class="reference external" href="https://docs.scip
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.</p></li>
-<li><p><strong>RsquaredCut</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.5)"><em>float</em></a>) – desired minimum scale free topology fitting index R^2.</p></li>
-<li><p><strong>networkType</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – network type (‘unsigned’, ‘signed’, ‘signed hybrid’, ‘distance’).</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – integer level of verbosity. Zero means silent, higher values make the output progressively more and more verbose.</p></li>
+<li><p><strong>RsquaredCut</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – desired minimum scale free topology fitting index R^2.</p></li>
+<li><p><strong>networkType</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – network type (‘unsigned’, ‘signed’, ‘signed hybrid’, ‘distance’).</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – integer level of verbosity. Zero means silent, higher values make the output progressively more and more verbose.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Estimated appropriate soft-thresholding power: the lowest power for which the scale free topology fit R^2 exceeds RsquaredCut.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)">int</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2148,9 +2148,9 @@ For more information visit <a class="reference external" href="https://docs.scip
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>matrix</strong> – dissimilarity structure as produced by R.stats dist.</p></li>
-<li><p><strong>minModuleSize</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – minimum module size.</p></li>
-<li><p><strong>deepSplit</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – provides a rough control over sensitivity to cluster splitting, the higher the value (with ‘hybrid’ method) or if True (with ‘tree’ method), the more and smaller modules.</p></li>
-<li><p><strong>pamRespectsDendro</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – only used for method ‘hybrid’. Objects and small modules will only be assigned to modules that belong to the same branch in the dendrogram structure.</p></li>
+<li><p><strong>minModuleSize</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – minimum module size.</p></li>
+<li><p><strong>deepSplit</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – provides a rough control over sensitivity to cluster splitting, the higher the value (with ‘hybrid’ method) or if True (with ‘tree’ method), the more and smaller modules.</p></li>
+<li><p><strong>pamRespectsDendro</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – only used for method ‘hybrid’. Objects and small modules will only be assigned to modules that belong to the same branch in the dendrogram structure.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -2168,7 +2168,7 @@ For more information visit <a class="reference external" href="https://docs.scip
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.</p></li>
 <li><p><strong>modColors</strong> (<em>ndarray</em>) – array (numeric, character or a factor) attributing module colors to each feature in the experimental dataframe.</p></li>
-<li><p><strong>softPower</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – soft-thresholding power.</p></li>
+<li><p><strong>softPower</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – soft-thresholding power.</p></li>
 <li><p><strong>dissimilarity</strong> – calculates dissimilarity of module eigengenes.</p></li>
 </ul>
 </dd>
@@ -2187,7 +2187,7 @@ For more information visit <a class="reference external" href="https://docs.scip
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.</p></li>
 <li><p><strong>modColors</strong> (<em>ndarray</em>) – array (numeric, character or a factor) attributing module colors to each feature in the experimental dataframe.</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) – integer level of verbosity. Zero means silent, higher values make the output progressively more and more verbose.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – integer level of verbosity. Zero means silent, higher values make the output progressively more and more verbose.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Para, float MEDissThres</dt>
@@ -2260,7 +2260,7 @@ For more information visit <a class="reference external" href="https://docs.scip
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.</p></li>
 <li><p><strong>modColors</strong> (<em>ndarray</em>) – array (numeric, character or a factor) attributing module colors to each feature in the experimental dataframe.</p></li>
-<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – type of the value returned by the function (‘dictionary’ or ‘dataframe’).</p></li>
+<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – type of the value returned by the function (‘dictionary’ or ‘dataframe’).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -2278,7 +2278,7 @@ For more information visit <a class="reference external" href="https://docs.scip
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – pandas dataframe containing experimental data, with samples/subjects as rows and features as columns.</p></li>
 <li><p><strong>modColors</strong> (<em>ndarray</em>) – array (numeric, character or a factor) attributing module colors to each feature in the experimental dataframe.</p></li>
-<li><p><strong>modules</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – list of module colors of interest.</p></li>
+<li><p><strong>modules</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – list of module colors of interest.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
