@@ -1,0 +1,345 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>graphdb_builder.databases.parsers.disgenetParser &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> ClinicalKnowledgeGraph
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../INTRO.html">Clinical Knowledge Graph</a></li>
+</ul>
+<p class="caption"><span class="caption-text">First steps</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../intro/getting-started-with-requirements.html">Getting Started with some Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../intro/getting-started-with-windows.html">Getting started with Windows</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/connect-to-ckg.html">Connecting to the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/create-new-user.html">Create a new user in the graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/create-new-project.html">Create a new project in the database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/upload-data.html">Upload project experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/data-analysis-config.html">Define data analysis parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/access-report.html">Accessing the analysis report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/notifications.html">Report notifications</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Project Report</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../project_report/project-report.html">Generating a project report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../project_report/project-tabs.html">Project report tabs</a></li>
+</ul>
+<p class="caption"><span class="caption-text">CKG Builder</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ckg_builder/ontologies.html">Ontology sources and raw file parsers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ckg_builder/databases.html">Biomedical databases and resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ckg_builder/experiments.html">Parsing experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ckg_builder/graphdb-builder.html">Building the graph database from one Python module</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/import-statistics.html">Clinical Knowledge Graph Statistics: Imports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/R-interface.html">Python - R interface</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../system_requirements.html">System Requirements</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../src.html">CKG package API Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../MANIFEST.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../MANIFEST.html#backers">Backers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../MANIFEST.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../MANIFEST.html#history">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../MANIFEST.html#code-of-conduct">Code of Conduct</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">ClinicalKnowledgeGraph</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>graphdb_builder.databases.parsers.disgenetParser</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for graphdb_builder.databases.parsers.disgenetParser</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">gzip</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">graphdb_builder</span> <span class="k">import</span> <span class="n">builder_utils</span>
+
+<span class="c1">#########################</span>
+<span class="c1">#       DisGeNet        # </span>
+<span class="c1">#########################</span>
+<div class="viewcode-block" id="parser"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.databases.parsers.html#graphdb_builder.databases.parsers.disgenetParser.parser">[docs]</a><span class="k">def</span> <span class="nf">parser</span><span class="p">(</span><span class="n">databases_directory</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">relationships</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">builder_utils</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;disgenetConfig.yml&quot;</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="s1">&#39;databases&#39;</span><span class="p">)</span>
+
+    <span class="n">files</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;disgenet_files&#39;</span><span class="p">]</span>
+    <span class="n">mapping_files</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;disgenet_mapping_files&#39;</span><span class="p">]</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;disgenet_url&#39;</span><span class="p">]</span>
+    <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">databases_directory</span><span class="p">,</span> <span class="s2">&quot;disgenet&quot;</span><span class="p">)</span>
+    <span class="n">builder_utils</span><span class="o">.</span><span class="n">checkDirectory</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;disgenet_header&#39;</span><span class="p">]</span>
+    <span class="n">output_file</span> <span class="o">=</span> <span class="s1">&#39;disgenet_associated_with.tsv&#39;</span>
+
+    <span class="k">if</span> <span class="n">download</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="n">builder_utils</span><span class="o">.</span><span class="n">downloadDB</span><span class="p">(</span><span class="n">url</span><span class="o">+</span><span class="n">files</span><span class="p">[</span><span class="n">f</span><span class="p">],</span> <span class="n">directory</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">mapping_files</span><span class="p">:</span>
+            <span class="n">builder_utils</span><span class="o">.</span><span class="n">downloadDB</span><span class="p">(</span><span class="n">url</span><span class="o">+</span><span class="n">mapping_files</span><span class="p">[</span><span class="n">f</span><span class="p">],</span> <span class="n">directory</span><span class="p">)</span>
+
+    <span class="n">proteinMapping</span> <span class="o">=</span> <span class="n">readDisGeNetProteinMapping</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">directory</span><span class="p">)</span>
+    <span class="n">diseaseMapping</span> <span class="o">=</span> <span class="n">readDisGeNetDiseaseMapping</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">directory</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="n">first</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">associations</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">files</span><span class="p">[</span><span class="n">f</span><span class="p">]),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">dtype</span><span class="p">,</span> <span class="n">atype</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;gene&#39;</span><span class="p">:</span>
+            <span class="n">idType</span> <span class="o">=</span> <span class="s2">&quot;Protein&quot;</span>
+            <span class="n">scorePos</span> <span class="o">=</span> <span class="mi">9</span>
+        <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;variant&#39;</span><span class="p">:</span>
+            <span class="n">idType</span> <span class="o">=</span> <span class="s2">&quot;Transcript&quot;</span>
+            <span class="n">scorePos</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">associations</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">first</span><span class="p">:</span>
+                <span class="n">first</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">continue</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">geneId</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                <span class="c1">#disease_specificity_index =  data[2]</span>
+                <span class="c1">#disease_pleiotropy_index = data[3]</span>
+                <span class="n">diseaseId</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+                <span class="n">score</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">scorePos</span><span class="p">])</span>
+                <span class="n">pmids</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">13</span><span class="p">]</span>
+                <span class="n">source</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">geneId</span> <span class="ow">in</span> <span class="n">proteinMapping</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">identifier</span> <span class="ow">in</span> <span class="n">proteinMapping</span><span class="p">[</span><span class="n">geneId</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="n">diseaseId</span> <span class="ow">in</span> <span class="n">diseaseMapping</span><span class="p">:</span>
+                            <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">diseaseMapping</span><span class="p">[</span><span class="n">diseaseId</span><span class="p">]:</span>
+                                <span class="n">code</span> <span class="o">=</span> <span class="s2">&quot;DOID:&quot;</span><span class="o">+</span><span class="n">code</span>
+                                <span class="n">relationships</span><span class="p">[</span><span class="n">idType</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">identifier</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="s2">&quot;ASSOCIATED_WITH&quot;</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="n">atype</span><span class="p">,</span> <span class="s2">&quot;DisGeNet: &quot;</span><span class="o">+</span><span class="n">source</span><span class="p">,</span> <span class="n">pmids</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
+                <span class="k">continue</span>
+        <span class="n">associations</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="n">builder_utils</span><span class="o">.</span><span class="n">remove_directory</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">relationships</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">output_file</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="readDisGeNetProteinMapping"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.databases.parsers.html#graphdb_builder.databases.parsers.disgenetParser.readDisGeNetProteinMapping">[docs]</a><span class="k">def</span> <span class="nf">readDisGeNetProteinMapping</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;disgenet_mapping_files&#39;</span><span class="p">]</span>
+    <span class="n">first</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;protein_mapping&quot;</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="n">mappingFile</span> <span class="o">=</span> <span class="n">files</span><span class="p">[</span><span class="s2">&quot;protein_mapping&quot;</span><span class="p">]</span>
+        <span class="k">with</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">mappingFile</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">first</span><span class="p">:</span>
+                    <span class="n">first</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">continue</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">identifier</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">intIdentifier</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">mapping</span><span class="p">[</span><span class="n">intIdentifier</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">identifier</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mapping</span></div>
+
+
+<div class="viewcode-block" id="readDisGeNetDiseaseMapping"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.databases.parsers.html#graphdb_builder.databases.parsers.disgenetParser.readDisGeNetDiseaseMapping">[docs]</a><span class="k">def</span> <span class="nf">readDisGeNetDiseaseMapping</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;disgenet_mapping_files&#39;</span><span class="p">]</span>
+    <span class="n">first</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;disease_mapping&quot;</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="n">mappingFile</span> <span class="o">=</span> <span class="n">files</span><span class="p">[</span><span class="s2">&quot;disease_mapping&quot;</span><span class="p">]</span>
+        <span class="k">with</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">mappingFile</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">first</span><span class="p">:</span>
+                    <span class="n">first</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">continue</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)</span>
+                <span class="n">identifier</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">vocabulary</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">code</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">vocabulary</span> <span class="o">==</span> <span class="s2">&quot;DO&quot;</span><span class="p">:</span>
+                    <span class="n">mapping</span><span class="p">[</span><span class="n">identifier</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mapping</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,353 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Ontology Databases &mdash; ClinicalKnowledgeGraph 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Ontologies Parsers" href="graphdb_builder.ontologies.parsers.html" />
+    <link rel="prev" title="Graph Database Builder" href="graphdb_builder.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> ClinicalKnowledgeGraph
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../INTRO.html">Clinical Knowledge Graph</a></li>
+</ul>
+<p class="caption"><span class="caption-text">First steps</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-requirements.html">Getting Started with some Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-windows.html">Getting started with Windows</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/connect-to-ckg.html">Connecting to the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/create-new-user.html">Create a new user in the graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/create-new-project.html">Create a new project in the database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/upload-data.html">Upload project experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/data-analysis-config.html">Define data analysis parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/access-report.html">Accessing the analysis report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/notifications.html">Report notifications</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Project Report</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../project_report/project-report.html">Generating a project report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project_report/project-tabs.html">Project report tabs</a></li>
+</ul>
+<p class="caption"><span class="caption-text">CKG Builder</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/ontologies.html">Ontology sources and raw file parsers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/databases.html">Biomedical databases and resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/experiments.html">Parsing experimental data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ckg_builder/graphdb-builder.html">Building the graph database from one Python module</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/import-statistics.html">Clinical Knowledge Graph Statistics: Imports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/R-interface.html">Python - R interface</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../system_requirements.html">System Requirements</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../src.html">CKG package API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="graphdb_connector.html">Graph Database Connector</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="graphdb_builder.html">Graph Database Builder</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Ontology Databases</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="graphdb_builder.ontologies.parsers.html">Ontologies Parsers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-graphdb_builder.ontologies.ontologies_controller">Ontologies Controller</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.databases.html">Biomedical Databases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.experiments.html">Experimental Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.users.html">User Creation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.builder.html">CKG Builder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.html#module-graphdb_builder.builder_utils">builder_utils.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graphdb_builder.html#module-graphdb_builder.mapping">mapping.py</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="report_manager.html">Report Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="analytics_core.html">Analytics Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks.html">Notebooks</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#backers">Backers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#history">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.html#code-of-conduct">Code of Conduct</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ClinicalKnowledgeGraph</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../src.html">CKG package API Reference</a> &raquo;</li>
+        
+          <li><a href="graphdb_builder.html">Graph Database Builder</a> &raquo;</li>
+        
+      <li>Ontology Databases</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_autosummary/graphdb_builder.ontologies.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="ontology-databases">
+<h1>Ontology Databases<a class="headerlink" href="#ontology-databases" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="graphdb_builder.ontologies.parsers.html">Ontologies Parsers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="graphdb_builder.ontologies.parsers.html#module-graphdb_builder.ontologies.parsers.icdParser">icdParser.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graphdb_builder.ontologies.parsers.html#module-graphdb_builder.ontologies.parsers.oboParser">oboParser.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graphdb_builder.ontologies.parsers.html#module-graphdb_builder.ontologies.parsers.reflectParser">reflectParser.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graphdb_builder.ontologies.parsers.html#module-graphdb_builder.ontologies.parsers.snomedParser">snomedParser.py</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="module-graphdb_builder.ontologies.ontologies_controller">
+<span id="ontologies-controller"></span><h2>Ontologies Controller<a class="headerlink" href="#module-graphdb_builder.ontologies.ontologies_controller" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="graphdb_builder.ontologies.ontologies_controller.entries_to_remove">
+<code class="sig-prename descclassname">graphdb_builder.ontologies.ontologies_controller.</code><code class="sig-name descname">entries_to_remove</code><span class="sig-paren">(</span><em class="sig-param">entries</em>, <em class="sig-param">the_dict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/ontologies/ontologies_controller.html#entries_to_remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.ontologies.ontologies_controller.entries_to_remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function removes pairs from a given dictionary, based on a list of provided keys.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>entries</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a>) – list of keys to be deleted from dictionary.</p></li>
+<li><p><strong>the_dict</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.5)"><em>dict</em></a>) – dictionary.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The original dictionary minus the key,value pairs from the provided entries list.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.ontologies.ontologies_controller.get_extra_entities_rels">
+<code class="sig-prename descclassname">graphdb_builder.ontologies.ontologies_controller.</code><code class="sig-name descname">get_extra_entities_rels</code><span class="sig-paren">(</span><em class="sig-param">ontology_directory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/ontologies/ontologies_controller.html#get_extra_entities_rels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.ontologies.ontologies_controller.get_extra_entities_rels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.ontologies.ontologies_controller.parse_ontology">
+<code class="sig-prename descclassname">graphdb_builder.ontologies.ontologies_controller.</code><code class="sig-name descname">parse_ontology</code><span class="sig-paren">(</span><em class="sig-param">ontology</em>, <em class="sig-param">download=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/ontologies/ontologies_controller.html#parse_ontology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.ontologies.ontologies_controller.parse_ontology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses and extracts data from a given ontology file(s), and returns a tuple with multiple dictionaries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ontology</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – acronym of the ontology to be parsed (e.g. Disease Ontology:’DO’).</p></li>
+<li><p><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – wether database is to be downloaded.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Tuple with three nested dictionaries: terms, relationships between terms, and definitions of the terms.            For more information on the returned dictionaries, see the documentation for any ontology parser.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.ontologies.ontologies_controller.generate_graphFiles">
+<code class="sig-prename descclassname">graphdb_builder.ontologies.ontologies_controller.</code><code class="sig-name descname">generate_graphFiles</code><span class="sig-paren">(</span><em class="sig-param">import_directory</em>, <em class="sig-param">ontologies=None</em>, <em class="sig-param">download=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/ontologies/ontologies_controller.html#generate_graphFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.ontologies.ontologies_controller.generate_graphFiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function parses and extracts data from a given list of ontologies. If no ontologies are provided,     all availables ontologies are used. Terms, relationships and definitions are saved as .tsv files to be loaded into     the graph database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>import_directory</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) – relative path from current python module to ‘imports’ directory.</p></li>
+<li><p><strong>ontologies</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.5)"><em>list</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.5/library/constants.html#None" title="(in Python v3.5)"><em>None</em></a>) – list of ontologies to be imported. If None, all available ontologies are imported.</p></li>
+<li><p><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.5)"><em>bool</em></a>) – wether database is to be downloaded.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary of tuples. Each tuple corresponds to a unique label/relationship type, date, time,             database, and number of nodes and relationships.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="graphdb_builder.ontologies.parsers.html" class="btn btn-neutral float-right" title="Ontologies Parsers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="graphdb_builder.html" class="btn btn-neutral float-left" title="Graph Database Builder" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
