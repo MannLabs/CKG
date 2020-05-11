@@ -11,6 +11,7 @@ A Python project that allows you to analyse proteomics and clinical data, and in
 
 * GitHub: `https://github.com/MannLabs/CKG <https://github.com/MannLabs/CKG>`_
 * Free and open source software: `MIT license <https://github.com/MannLabs/CKG/LICENSE.rst>`_
+* Reference: https://www.biorxiv.org/content/10.1101/2020.05.09.084897v1
 
 
 Abstract
