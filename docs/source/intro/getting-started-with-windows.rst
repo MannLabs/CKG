@@ -89,7 +89,7 @@ The installation of Neo4j on Windows follows the same steps as :ref:`Getting Sta
 
 #. Install Neo4j by following the instructions automatically opened in the browser.
 
-#. Open the Neo4j Desktop App and create a database by clicking :guilabel:`Add graph`, followed by :guilabel:`Create a Local Graph`, using the password "bioinfo1112".
+#. Open the Neo4j Desktop App and create a database by clicking :guilabel:`Add graph`, followed by :guilabel:`Create a Local Graph`, using the password "neo4j".
 
 #. Click :guilabel:`Manage` and then :guilabel:`Plugins`. Install "**APOC**" and "**GRAPH ALGORITHMS**".
 
