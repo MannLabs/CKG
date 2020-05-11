@@ -88,7 +88,7 @@ HMDB_associations:
     'tissue_locations':
         - 'ASSOCIATED_WITH'
         - 'hmdb_associated_with_tissue'
-
+    
 HMDB_attributes: 
     - 'name'
     - 'description'
@@ -101,7 +101,7 @@ HMDB_attributes:
     - 'average_molecular_weight'
     - 'monoisotopic_molecular_weight'
     - 'pubchem_compound_id'
-    - 'food_id'
+    - 'foodb_id'
     - 'status'
     - 'knapsack_id'
     - 'chemspider_id'

@@ -1,6 +1,5 @@
+from graphdb_connector import connector
 from graphdb_builder import builder_utils
-import config.ckg_config as ckg_config
-import ckg_utils
 import os.path
 import time
 from collections import defaultdict
@@ -22,9 +21,10 @@ def reset_mapping(entity):
     """
     if entity in dbconfig["sources"]:
         directory = os.path.join(dbconfig["databasesDir"], dbconfig["sources"][entity])
-        mapping_file = os.path.join(directory,"complete_mapping.tsv")
+        mapping_file = os.path.join(directory, "complete_mapping.tsv")
         if os.path.exists(mapping_file):
             os.remove(mapping_file) 
+
 
 def mark_complete_mapping(entity):
     """
@@ -34,14 +34,15 @@ def mark_complete_mapping(entity):
     """
     if entity in dbconfig["sources"]:
         directory = os.path.join(dbconfig["databasesDir"], dbconfig["sources"][entity])
-        mapping_file = os.path.join(directory,"mapping.tsv")
-        new_mapping_file = os.path.join(directory,"complete_mapping.tsv")
+        mapping_file = os.path.join(directory, "mapping.tsv")
+        new_mapping_file = os.path.join(directory, "complete_mapping.tsv")
         if os.path.exists(mapping_file):
             os.rename(mapping_file, new_mapping_file)
 
-def getMappingFromOntology(ontology, source = None):
+
+def getMappingFromOntology(ontology, source=None):
     """
-    Converts .tsv file with complete list of ontology identifiers and aliases, \
+    Converts .tsv file with complete list of ontology identifiers and aliases,
     to dictionary with aliases as keys and ontology identifiers as values.
 
     :param str ontology: ontology label as defined in ontologies_config.yml.
@@ -51,8 +52,8 @@ def getMappingFromOntology(ontology, source = None):
     """
     mapping = {}
     ont = oconfig["ontologies"][ontology]
-    dirFile = os.path.join(oconfig["ontologies_directory"],ont)
-    mapping_file = os.path.join(dirFile,"complete_mapping.tsv")
+    dirFile = os.path.join(oconfig["ontologies_directory"], ont)
+    mapping_file = os.path.join(dirFile, "complete_mapping.tsv")
     max_wait = 0
     while not os.path.isfile(mapping_file) and max_wait < 5000:
         time.sleep(5)
@@ -64,10 +65,22 @@ def getMappingFromOntology(ontology, source = None):
                 data = line.rstrip("\r\n").split("\t")
                 if data[1] == source or source is None:
                     mapping[data[2].lower()] = data[0]
-    except:
+    except Exception:
         raise Exception("mapping - No mapping file {} for entity {}".format(mapping_file, ontology))
 
     return mapping
+
+
+def getMappingFromDatabase(id_list, node, attribute_from='id', attribute_to='name'):
+    id_list = ["'{}'".format(i) for i in id_list]
+    driver = connector.getGraphDatabaseConnectionConfiguration()
+    mapping_query = "MATCH (n:{}) WHERE n.{} IN [{}] RETURN n.{} AS from, n.{} AS to"
+    mapping = connector.getCursorData(driver, mapping_query.format(node, attribute_from, ','.join(id_list), attribute_from, attribute_to))
+    if not mapping.empty:
+        mapping = dict(zip(mapping['from'], mapping['to']))
+
+    return mapping
+
 
 def getMappingForEntity(entity):
     """
@@ -79,23 +92,25 @@ def getMappingForEntity(entity):
     """
     mapping = {}
     if entity in dbconfig["sources"]:
-        mapping_file = os.path.join(dbconfig["databasesDir"], os.path.join(dbconfig["sources"][entity],"complete_mapping.tsv"))
+        mapping_file = os.path.join(dbconfig["databasesDir"], os.path.join(dbconfig["sources"][entity], "complete_mapping.tsv"))
         max_wait = 0
         while not os.path.isfile(mapping_file) and max_wait < 5000:
             time.sleep(5)
             max_wait += 1
+
         try:
-            with open(mapping_file, 'r') as mf:
+            with open(mapping_file, 'r', encoding='utf-8') as mf:
                 for line in mf:
                     data = line.rstrip("\r\n").split("\t")
                     if len(data) > 1:
                         ident = data[0]
                         alias = data[1]
                         mapping[alias] = ident
-        except:
-            raise Exception("mapping - No mapping file {} for entity {}".format(mapping_file, entity))
+        except Exception as err:
+            raise Exception("mapping - No mapping file {} for entity {}. Error: {}".format(mapping_file, entity, err))
 
     return mapping
+
 
 def getMultipleMappingForEntity(entity):
     """
@@ -107,12 +122,12 @@ def getMultipleMappingForEntity(entity):
     """
     mapping = defaultdict(set)
     if entity in dbconfig["sources"]:
-        mapping_file = os.path.join(dbconfig["databasesDir"], os.path.join(dbconfig["sources"][entity],"complete_mapping.tsv"))
+        mapping_file = os.path.join(dbconfig["databasesDir"], os.path.join(dbconfig["sources"][entity], "complete_mapping.tsv"))
         max_wait = 0
         while not os.path.isfile(mapping_file) and max_wait < 5000:
             time.sleep(5)
             max_wait += 1
-        
+
         try:
             with open(mapping_file, 'r') as mf:
                 for line in mf:
@@ -121,10 +136,11 @@ def getMultipleMappingForEntity(entity):
                         ident = data[0]
                         alias = data[1]
                         mapping[alias].add(ident)
-        except:
+        except Exception:
             raise Exception("mapping - No mapping file {} for entity {}".format(mapping, entity))
-    
+
     return mapping
+
 
 def get_STRING_mapping_url(db="STRING"):
     """
@@ -135,15 +151,15 @@ def get_STRING_mapping_url(db="STRING"):
     """
     url = None
     config = builder_utils.get_config(config_name="stringConfig.yml", data_type='databases')
-    if db.upper() == "STRING":        
+    if db.upper() == "STRING":
         url = config['STRING_mapping_url']
     elif db.upper() == "STITCH":
         url = config['STITCH_mapping_url']
-        
-    return url
-        
 
-def getSTRINGMapping(source = "BLAST_UniProt_AC", download = True, db = "STRING"):
+    return url
+
+
+def getSTRINGMapping(source="BLAST_UniProt_AC", download=True, db="STRING"):
     """
     Parses database (db) and extracts relationships between identifiers to order databases (source).
 
@@ -161,7 +177,7 @@ def getSTRINGMapping(source = "BLAST_UniProt_AC", download = True, db = "STRING"
 
     if download:
         builder_utils.downloadDB(url, directory)
-    
+
     f = os.path.join(directory, file_name)
     first = True
     with gzip.open(f, 'rb') as mf:
@@ -180,17 +196,17 @@ def getSTRINGMapping(source = "BLAST_UniProt_AC", download = True, db = "STRING"
                 sources = data[3].split(' ')
                 if not alias.startswith('DB'):
                     continue
-            
+
             if source in sources:
                 mapping[stringID].add(alias)
-        
+
     return mapping
+
 
 def buildMappingFromOBO(oboFile, ontology):
     """
     Parses and extracts ontology idnetifiers, names and synonyms from raw file, and writes all the information \
     to a .tsv file.
-    
     :param str oboFile: path to ontology raw file.
     :param str ontology: ontology database acronym as defined in ontologies_config.yml.
     """
@@ -199,9 +215,9 @@ def buildMappingFromOBO(oboFile, ontology):
     mapping_file = os.path.join(outputDir, "mapping.tsv")
     identifiers = defaultdict(list)
     re_synonyms = r'\"(.+)\"'
-    
+
     if os.path.exists(cmapping_file):
-            os.remove(cmapping_file)
+        os.remove(cmapping_file)
 
     with open(oboFile, 'r') as f:
         for line in f:
@@ -218,7 +234,7 @@ def buildMappingFromOBO(oboFile, ontology):
                 synonym_type = "".join(line.rstrip("\r\n").split(":")[1:])
                 matches = re.search(re_synonyms, synonym_type)
                 if matches:
-                     identifiers[ident.strip()].append(("SYN",matches.group(1).lstrip()))
+                    identifiers[ident.strip()].append(("SYN", matches.group(1).lstrip()))
     with open(mapping_file, 'w') as out:
         for ident in identifiers:
             for source, ref in identifiers[ident]:
@@ -226,29 +242,32 @@ def buildMappingFromOBO(oboFile, ontology):
 
     os.rename(mapping_file, cmapping_file)
 
+
 def map_experiment_files(project_id, datasetPath, mapping):
     files = builder_utils.listDirectoryFiles(datasetPath)
-    
+
     for file in files:
         outputfile = os.path.join(datasetPath, file)
         data = builder_utils.readDataset(outputfile)
-        data = map_experimental_data(data, mapping)        
-        with open(outputfile, 'w') as f:
-            data.to_csv(path_or_buf = f, sep='\t',
-                        header=True, index=False, quotechar='"',
-                        line_terminator='\n', escapechar='\\')
+        data = map_experimental_data(data, mapping)
+        builder_utils.export_contents(data, datasetPath, file)
+
 
 def map_experimental_data(data, mapping):
     mapping_cols = {}
-
+    regex = "({})".format("|".join(list(mapping.keys())))
     if not data.empty:
         for column in data.columns:
-            for external_id in mapping:
-                if external_id in column:
-                    mapping_cols[column] = column.replace(external_id, mapping[external_id])
+            ids = re.search(regex, column)
+            if ids is not None:
+                ids = ids.group(1)
+                mapping_cols[column] = column.replace(ids, mapping[ids])
+            else:
+                continue
         data = data.rename(columns=mapping_cols)
-
+   
     return data
+
 
 def get_mapping_analytical_samples(project_id):
     from graphdb_connector import connector
@@ -256,13 +275,12 @@ def get_mapping_analytical_samples(project_id):
 
     mapping = {}
     query = "MATCH (p:Project)-[:HAS_ENROLLED]-(:Subject)-[:BELONGS_TO_SUBJECT]-()-[:SPLITTED_INTO]-(a:Analytical_sample) WHERE p.id='{}' RETURN a.external_id, a.id".format(project_id)
-    mapping = connector.getCursorData(driver,query)
+    mapping = connector.getCursorData(driver, query)
     if not mapping.empty:
         mapping = mapping.set_index("a.external_id").to_dict(orient='dict')["a.id"]
-    
+
     return mapping
 
 
 if __name__ == "__main__":
     pass
-    #buildMappingFromOBO(oboFile = '../../data/ontologies/DO/do.obo', ontology='DO')

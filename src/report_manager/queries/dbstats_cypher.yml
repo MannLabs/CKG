@@ -6,7 +6,7 @@ db_schema:
   involved_rels:
     - all
   query_type: post
-  query: CALL db.schema()
+  query: CALL db.schema.visualization
 unique_projects:
     name:
     description:

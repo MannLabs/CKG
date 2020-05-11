@@ -1,7 +1,5 @@
 import os.path
-import gzip
 from collections import defaultdict
-import ckg_utils
 from graphdb_builder import builder_utils
 
 #########################
@@ -13,19 +11,19 @@ def parser(databases_directory, download=True):
     ftp_dir = config['refseq_ftp_dir']
     entities = defaultdict(set)
     relationships = defaultdict(set)
-    directory = os.path.join(databases_directory,"RefSeq")
+    directory = os.path.join(databases_directory, "RefSeq")
     builder_utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     headers = config['headerEntities']
     taxid = 9606
-    
+
     if download:
         file_dir = builder_utils.list_ftp_directory(ftp_dir)[0]
         new_file = file_dir.split('/')[-1]+"_feature_table.txt.gz"
-        url = ftp_dir + file_dir.split('/')[-1] +"/"+ new_file
+        url = ftp_dir + file_dir.split('/')[-1] + "/" + new_file
         builder_utils.downloadDB(url, directory)
-        fileName = os.path.join(directory,new_file)
-    
+        fileName = os.path.join(directory, new_file)
+
     if os.path.isfile(fileName):
         df = builder_utils.read_gzipped_file(fileName)
         first = True
@@ -33,7 +31,7 @@ def parser(databases_directory, download=True):
             if first:
                 first = False
                 continue
-            data = line.decode('utf-8').rstrip("\r\n").split("\t")
+            data = line.rstrip("\r\n").split("\t")
             tclass = data[1]
             assembly = data[2]
             chrom = data[5]
@@ -44,7 +42,7 @@ def parser(databases_directory, download=True):
             protAcc = data[10]
             name = data[13]
             symbol = data[14]
-            
+
             if protAcc != "":
                 entities["Transcript"].add((protAcc, "Transcript", name, tclass, assembly, taxid))
                 if chrom != "":
@@ -58,7 +56,11 @@ def parser(databases_directory, download=True):
                     entities["Chromosome"].add((chrom, "Chromosome", chrom, taxid))
                     relationships["LOCATED_IN"].add((protAcc, chrom, "LOCATED_IN", start, end, strand, "RefSeq"))
         df.close()
+
+    builder_utils.remove_directory(directory)
+
     return (entities, relationships, headers)
+
 
 if __name__ == "__main__":
     parser("../../../../data/databases")

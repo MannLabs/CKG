@@ -1,18 +1,9 @@
 import os.path
 import sys
-import gzip
 import config.ckg_config as ckg_config
-import ckg_utils
 from graphdb_builder import builder_utils
-from collections import defaultdict
-import pandas as pd
-import re
-from lxml import etree
-import zipfile
 from graphdb_builder.databases.parsers import *
 from joblib import Parallel, delayed
-import logging
-import logging.config
 from datetime import date
 
 log_config = ckg_config.graphdb_builder_log
@@ -22,6 +13,7 @@ try:
     dbconfig = builder_utils.setup_config('databases')
 except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
+
 
 def parseDatabase(importDirectory, database, download=True):
     stats = set()
@@ -86,11 +78,11 @@ def parseDatabase(importDirectory, database, download=True):
         elif database.lower() == "string":
             #STRING
             proteinMapping, drugMapping = stringParser.parser(dbconfig["databasesDir"], importDirectory, download=download)
-            stringParser.parseActions(dbconfig["databasesDir"], importDirectory, proteinMapping, drugMapping, download = download, db="STRING")
+            stringParser.parseActions(dbconfig["databasesDir"], importDirectory, proteinMapping, drugMapping, download=download, db="STRING")
         elif database.lower() == "stitch":
             #STITCH
             proteinMapping, drugMapping = stringParser.parser(dbconfig["databasesDir"], importDirectory, drug_source=dbconfig["sources"]["Drug"], download=download, db="STITCH")
-            stringParser.parseActions(dbconfig["databasesDir"], importDirectory, proteinMapping, drugMapping, download = download, db="STITCH")
+            stringParser.parseActions(dbconfig["databasesDir"], importDirectory, proteinMapping, drugMapping, download=download, db="STITCH")
         elif database.lower() == "disgenet":
             #DisGeNet
             relationships, header, outputfileName = disgenetParser.parser(dbconfig["databasesDir"], download)
@@ -209,8 +201,11 @@ def parseDatabase(importDirectory, database, download=True):
             logger.info("Database {} - Number of {} entities: {}".format(database, "GWAS_study", len(entities)))
             stats.add(builder_utils.buildStats(len(entities), "entity", "GWAS_study", database, entity_outputfile, updated_on))
             for relationship in relationships:
+                header = ['START_ID', 'END_ID','TYPE', 'source']
+                if relationship in relationships_header:
+                    header = relationships_header[relationship]
                 outputfile = os.path.join(importDirectory, "GWAS_study_"+relationship+".tsv")
-                builder_utils.write_relationships(relationships[relationship], relationships_header, outputfile)
+                builder_utils.write_relationships(relationships[relationship], header, outputfile)
                 logger.info("Database {} - Number of {} relationships: {}".format(database, relationship, len(relationships[relationship])))
                 stats.add(builder_utils.buildStats(len(relationships[relationship]), "relationships", relationship, database, outputfile, updated_on))
         elif database.lower() == "phosphositeplus":
@@ -284,7 +279,6 @@ def parseDatabase(importDirectory, database, download=True):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         logger.error("Database {}: {}, file: {},line: {}".format(database, sys.exc_info(), fname, exc_tb.tb_lineno))
-        #raise Exception("Error when importing database {}.\n {}".format(database, err))
     return stats
     
 

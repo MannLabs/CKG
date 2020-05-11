@@ -1,7 +1,6 @@
 import os.path
 import gzip
 import re
-import ckg_utils
 from graphdb_builder import mapping as mp, builder_utils
 
 #############################################
@@ -14,11 +13,11 @@ def parser(databases_directory, drug_source, download=True):
 
     output_file = 'sider_has_side_effect.tsv'
 
-    drugmapping = mp.getSTRINGMapping(source = drug_source, download = download, db = "STITCH")
-    phenotypemapping = mp.getMappingFromOntology(ontology="Phenotype", source = config['SIDER_source'])
-    
+    drugmapping = mp.getSTRINGMapping(source=drug_source, download=download, db="STITCH")
+    phenotypemapping = mp.getMappingFromOntology(ontology="Phenotype", source=config['SIDER_source'])
+
     relationships = set()
-    directory = os.path.join(databases_directory,"SIDER")
+    directory = os.path.join(databases_directory, "SIDER")
     builder_utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
@@ -38,6 +37,8 @@ def parser(databases_directory, drug_source, download=True):
                 relationships.add((d, p, "HAS_SIDE_EFFECT", "SIDER", se, evidence_from, freq, lower_bound, upper_bound))
     associations.close()
 
+    builder_utils.remove_directory(directory)
+
     return (relationships, header, output_file, drugmapping, phenotypemapping)
 
 
@@ -48,7 +49,7 @@ def parserIndications(databases_directory, drugMapping, phenotypeMapping, downlo
     output_file = 'sider_is_indicated_for.tsv'
 
     relationships = set()
-    directory = os.path.join(databases_directory,"SIDER")
+    directory = os.path.join(databases_directory, "SIDER")
     builder_utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
@@ -63,7 +64,9 @@ def parserIndications(databases_directory, drugMapping, phenotypeMapping, downlo
             for d in drugMapping[drug]:
                 p = phenotypeMapping[se.lower()]
                 relationships.add((d, p, "IS_INDICATED_FOR", evidence, "SIDER", se))
-    
+
     associations.close()
-    
+
+    builder_utils.remove_directory(directory)
+
     return (relationships, header, output_file)

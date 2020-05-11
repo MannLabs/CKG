@@ -107,16 +107,23 @@ extract_samples_numbers:
         - BELONGS_TO_SUBJECT
         - SPLITTED_INTO
     query: >
-        MATCH (p:Project)-[:HAS_ENROLLED]-(s:Subject)-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)
-        WHERE p.id=$external_id
+        MATCH (p:Project {id:$external_id})-[:HAS_ENROLLED]-(s:Subject)-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)
         RETURN COUNT(DISTINCT(s.id)) AS subjects, COUNT(DISTINCT(b.id)) AS biological_samples, COUNT(DISTINCT(a.id)) AS analytical_samples;
 check_external_ids:
     name:
     description:
     involved_nodes:
+        - Project
+        - Subject
+        - Biological_sample
+        - Analytical_sample
     involved_rels:
+        - HAS_ENROLLED
+        - BELONGS_TO_SUBJECT
+        - SPLITTED_INTO
     query: >
-        MATCH (project:Project {id:$external_id})-[:HAS_ENROLLED]-(subject:Subject)-[:BELONGS_TO_SUBJECT]-(biological_sample:Biological_sample)-[:SPLITTED_INTO]-(analytical_sample:Analytical_sample)
+        MATCH (project:Project)-[:HAS_ENROLLED]-(subject:Subject)-[:BELONGS_TO_SUBJECT]-(biological_sample:Biological_sample)-[:SPLITTED_INTO]-(analytical_sample:Analytical_sample)
+        WHERE project.id=$external_id
         RETURN DISTINCT subject.external_id AS subjects, biological_sample.external_id AS biological_samples, analytical_sample.external_id AS analytical_samples;
 create_project_subject:
     name: create a new subject in a project
@@ -166,3 +173,20 @@ create_asamples_biosamples:
         MATCH (bs:Biological_sample {id:$biosample_id})
         MERGE (bs)-[r:SPLITTED_INTO]->(as)
         RETURN COUNT(as) AS PROJECTID_asamples, COUNT(r) AS PROJECTID_bisamples_splitted_into_asample;
+project_graph:
+    name: project graph
+    description: full graph for a project
+    involves_nodes:
+        - Project
+        - Biological_samples
+        - Anlytical_samples
+    involved_rels:
+        - HAS_ENROLLED
+        - BELONGS_TO_SUBJECT
+        - SPLITTED_INTO
+    query: >
+        MATCH (p:Project)-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(n:Protein)
+        WHERE p.id=$project_id
+        WITH p.id AS project, COUNT(DISTINCT s.id) AS subjects, COUNT(DISTINCT b.id) AS biological_samples,
+        COUNT(DISTINCT a.id) AS analytical_samples, COUNT(DISTINCT r.proteinGroup) AS groups, COUNT(DISTINCT n.id) AS proteins
+        RETURN project, subjects, biological_samples, analytical_samples, groups, proteins;

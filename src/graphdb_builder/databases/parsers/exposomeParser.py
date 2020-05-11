@@ -1,16 +1,14 @@
 import os.path
 import zipfile
-import ckg_utils
 from graphdb_builder import mapping as mp, builder_utils
 from collections import defaultdict
 import pandas as pd
-import re
 
 ###############################
 #       Exposome Explorer     # 
 ###############################
 def parser(databases_directory, download=True):
-    directory = os.path.join(databases_directory,"ExposomeExplorer")
+    directory = os.path.join(databases_directory, "ExposomeExplorer")
     builder_utils.checkDirectory(directory)
     config = builder_utils.get_config(config_name="exposomeConfig.yml", data_type='databases')
     database_urls = config['database_urls']
@@ -29,8 +27,10 @@ def parser(databases_directory, download=True):
             elif file_name == "correlations.csv":
                 correlations = parseCorrelationsFile(z, file_name, biomarkers, mapping)
 
+    builder_utils.remove_directory(directory)
+
     return correlations, relationships_header
-        
+
 
 def parseBiomarkersFile(fhandler, file_name):
     biomarkers = {}
@@ -80,10 +80,9 @@ def parseCorrelationsFile(fhandler, file_name, biomarkers, mapping):
                     if biomarker in biomarkers:
                         biomarker_id = biomarkers[biomarker]
                         correlations[("food", "correlated_with_metabolite")].add((food_id, biomarker_id, "CORRELATED_WITH_METABOLITE",intake_median, intake_units, biosample, method, corr, ci_low, ci_high, pvalue, significant, publication, "Exposome Explorer" ))
-    
-    
+
     return correlations
-    
+
+
 if __name__ == "__main__":
     pass
-

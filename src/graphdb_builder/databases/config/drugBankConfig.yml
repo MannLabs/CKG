@@ -91,7 +91,10 @@
     - 'toxicity'
     - 'synonyms'
     - 'absorption'
-    #- 'alt_drugbank-id',
+    - 'kingdom'
+    - 'superclass'
+    - 'class'
+    - 'subclass'
     - 'half-life'
     - 'groups'
     - 'experimental-properties'# NEEDS TO BE THE LAST ATTRIBUTE

@@ -1,4 +1,5 @@
-__all__ = ["icdParser", 
+__all__ = ["icdParser",
            "oboParser",
+           "efoParser",
            "reflectParser",
            "snomedParser"]

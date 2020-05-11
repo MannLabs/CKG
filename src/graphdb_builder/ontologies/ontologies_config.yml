@@ -11,6 +11,7 @@ ontologies:
     'Modification': 'PSI-MOD'
     'Molecular_interactions': 'PSI-MI'
     'Gene_ontology': 'GO'
+    'Experimental_factor': 'EFO'
 
 entities:
     'DO': 'Disease'
@@ -23,6 +24,7 @@ entities:
     'biological_process': 'Biological_process'
     'molecular_function': 'Molecular_function'
     'cellular_component': 'Cellular_component'
+    'EFO': 'Experimental_factor'
     
 ontology_types: 
     'DO': '-26' 
@@ -35,6 +37,7 @@ ontology_types:
     'HPO': '-44'
     'SMASH': '-42'
     'GO': '-21'
+    'EFO': '-45'
     
 parser_filters:
     '-40':
@@ -60,12 +63,14 @@ urls:
         - 'https://raw.githubusercontent.com/HUPO-PSI/psi-mi-CV/master/psi-mi.obo'
     '-44': 
         - 'http://purl.obolibrary.org/obo/hp.obo'
-        - 'http://compbio.charite.de/jenkins/job/hpo.annotations/lastStableBuild/artifact/misc/phenotype_annotation_hpoteam.tab'
-        - 'http://compbio.charite.de/jenkins/job/hpo.annotations.monthly/lastSuccessfulBuild/artifact/annotation/ALL_SOURCES_ALL_FREQUENCIES_genes_to_phenotype.txt'
+        #- 'http://compbio.charite.de/jenkins/job/hpo.annotations/lastStableBuild/artifact/misc/phenotype_annotation.tab'
+        #- 'http://compbio.charite.de/jenkins/job/hpo.annotations/lastStableBuild/artifact/util/annotation/genes_to_phenotype.txt'
+    '-45':
+        - 'https://www.ebi.ac.uk/efo/efo.obo'
 
 files:
     '-40': 
-        - 'SNOMED-CT/Full/Terminology/sct2_Concept_Full_INT_20170731.txt'
-        - 'SNOMED-CT/Full/Terminology/sct2_Description_Full-en_INT_20170731.txt'
-        - 'SNOMED-CT/Full/Terminology/sct2_Relationship_Full_INT_20170731.txt' 
-        - 'SNOMED-CT/Full/Terminology/sct2_TextDefinition_Full-en_INT_20170731.txt'
+        - 'SNOMED-CT/Full/Terminology/sct2_Concept_Full_INT_*.txt'
+        - 'SNOMED-CT/Full/Terminology/sct2_Description_Full-en_INT_*.txt'
+        - 'SNOMED-CT/Full/Terminology/sct2_Relationship_Full_INT_*.txt' 
+        - 'SNOMED-CT/Full/Terminology/sct2_TextDefinition_Full-en_INT_*.txt'

@@ -1,18 +1,16 @@
 import os.path
-import numpy as np
 import pandas as pd
 import zipfile
 from collections import defaultdict
-import ckg_utils
 from graphdb_builder import mapping as mp, builder_utils
 
 ##########################################
 #   Human Protein Atlas (pathology)      # 
 ##########################################
-def parser(databases_directory, download = True):
+def parser(databases_directory, download=True):
     config = builder_utils.get_config(config_name="hpaConfig.yml", data_type='databases')
     url = config['hpa_pathology_url']
-    disease_mapping = mp.getMappingFromOntology(ontology = "Disease", source = None)
+    disease_mapping = mp.getMappingFromOntology(ontology="Disease", source=None)
     protein_mapping = mp.getMultipleMappingForEntity("Protein")
     directory = os.path.join(databases_directory, "HPA")
     builder_utils.checkDirectory(directory)
@@ -22,12 +20,15 @@ def parser(databases_directory, download = True):
 
     if download:
         builder_utils.downloadDB(url, directory)
-    
+
     with zipfile.ZipFile(compressed_fileName) as z:
         if file_name == "pathology.tsv":
             pathology = parsePathologyFile(config, z, file_name, protein_mapping, disease_mapping)
-    
+
+    builder_utils.remove_directory(directory)
+
     return (pathology, relationships_headers)
+
 
 def parsePathologyFile(config, fhandler, file_name, protein_mapping, disease_mapping):
     url = config['linkout_url']

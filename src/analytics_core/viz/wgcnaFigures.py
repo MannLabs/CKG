@@ -1,21 +1,12 @@
-import os
 import pandas as pd
 import numpy as np
 import scipy as scp
-from scipy.cluster.hierarchy import distance, linkage, dendrogram, fcluster
-from collections import OrderedDict, defaultdict
-from natsort import natsorted, index_natsorted, order_by_index
 from analytics_core.viz import color_list
-import urllib.request
-
-import matplotlib.pyplot as plt
-from matplotlib.pyplot import figure
-import matplotlib.colors
-import chart_studio.plotly as py
 import plotly.graph_objs as go
 import plotly.subplots as tools
 from analytics_core.viz import Dendrogram
 from analytics_core.analytics import wgcnaAnalysis
+
 
 def get_module_color_annotation(map_list, col_annotation=False, row_annotation=False, bygene=False, module_colors=[], dendrogram=[]):
     """
@@ -95,8 +86,7 @@ def get_module_color_annotation(map_list, col_annotation=False, row_annotation=F
     return None
 
 
-
-def get_heatmap(df, colorscale=None , color_missing=True):
+def get_heatmap(df, colorscale=None, color_missing=True):
     """
     This function plots a simple Plotly heatmap.
 
@@ -112,13 +102,10 @@ def get_heatmap(df, colorscale=None , color_missing=True):
         else:
             colors = [[0, 'rgb(255,255,255)'], [1, 'rgb(255,51,0)']]
 
-        figure = {'layout':{'template':None}, 'data':[]}
+        figure = {'layout': {'template': None}, 'data': []}
         figure['layout']['template'] = 'plotly_white'
-        figure['data'].append(go.Heatmap(z=df.values.tolist(),
-                                        y=list(df.index),
-                                        x=list(df.columns),
-                                        colorscale=colors,
-                                        showscale=True,
+        figure['data'].append(go.Heatmap(z=df.values.tolist(), y=list(df.index), x=list(df.columns),
+                                        colorscale=colors, showscale=True, 
                                         colorbar=dict(x=1, y=0, xanchor='left', yanchor='bottom', len=0.35, thickness=15)))
         if color_missing:
             df_missing = wgcnaAnalysis.get_miss_values_df(df)
@@ -131,7 +118,7 @@ def get_heatmap(df, colorscale=None , color_missing=True):
     return figure
 
 
-def plot_labeled_heatmap(df, textmatrix, title, colorscale=[[0,'rgb(0,255,0)'],[0.5,'rgb(255,255,255)'],[1,'rgb(255,0,0)']], width=1200, height=800, row_annotation=False, col_annotation=False):
+def plot_labeled_heatmap(df, textmatrix, title, colorscale=[[0, 'rgb(0,255,0)'], [0.5, 'rgb(255,255,255)'], [1, 'rgb(255,0,0)']], width=1200, height=800, row_annotation=False, col_annotation=False):
     """
     This function plots a simple Plotly heatmap with column and/or row annotations and heatmap annotations.
 
@@ -202,6 +189,7 @@ def plot_dendrogram_guidelines(Z_tree, dendrogram):
 
     return shapes
 
+
 def plot_intramodular_correlation(MM, FS, feature_module_df, title, width=1000, height=800):
     """
     This function uses the Feature significance and Module Membership measures, and plots a multi-scatter plot of all modules against all clinical traits.
@@ -222,10 +210,10 @@ def plot_intramodular_correlation(MM, FS, feature_module_df, title, width=1000, 
     """
     figure = {}
     if MM is not None:
-        MM = MM.iloc[:,-6]
+        MM = MM.iloc[:, -6]
         MM['modColor'] = MM.index.map(feature_module_df.set_index('name')['modColor'].get)
 
-        figure = tools.make_subplots(rows=len(FS.columns), cols=len(MM.columns)-1, shared_xaxes=False, shared_yaxes=False, vertical_spacing = 0.015, horizontal_spacing = 0.1, print_grid=True)
+        figure = tools.make_subplots(rows=len(FS.columns), cols=len(MM.columns) - 1, shared_xaxes=False, shared_yaxes=False, vertical_spacing=0.015, horizontal_spacing=0.1, print_grid=True)
 
         figure.layout.template = 'plotly_white'
         layout = dict(width=width, height=height, showlegend=False, title=title)
@@ -234,7 +222,7 @@ def plot_intramodular_correlation(MM, FS, feature_module_df, title, width=1000, 
         axis_dict = {}
         for i, j in enumerate(MM.columns[MM.columns.str.startswith('MM')]):
             n_p = len(FS.columns) * (len(MM.columns)-1)-len(MM.columns[MM.columns.str.startswith('MM')])
-            axis_dict['xaxis{}'.format(n_p+i+1)] = dict(title = j, titlefont = dict(size=13))
+            axis_dict['xaxis{}'.format(n_p+i+1)] = dict(title=j, titlefont=dict(size=13))
         print(axis_dict)
         n = 1
         for a, b in enumerate(FS.columns):
@@ -243,9 +231,8 @@ def plot_intramodular_correlation(MM, FS, feature_module_df, title, width=1000, 
                 label = ['<br>'.join(name[i:i+3]) for i in range(0, len(name), 3)][0]
             else:
                 label = name[0]
-            axis_dict['yaxis{}'.format(a+n)] = dict(title = label, titlefont = dict(size=13))
+            axis_dict['yaxis{}'.format(a+n)] = dict(title=label, titlefont=dict(size=13))
             n += len(MM.columns[MM.columns.str.startswith('MM')])-1
-
 
         annotation = []
         x_axis = 1

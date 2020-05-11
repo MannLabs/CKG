@@ -1,11 +1,10 @@
 import os.path
-import ckg_utils
 from graphdb_builder import mapping as mp, builder_utils
 
 ############################################
 #   The Drug Gene Interaction Database     # 
 ############################################
-def parser(databases_directory, download = True):
+def parser(databases_directory, download=True):
     config = builder_utils.get_config(config_name="drugGeneInteractionDBConfig.yml", data_type='databases')
     url = config['DGIdb_url']
     header = config['header']
@@ -13,12 +12,12 @@ def parser(databases_directory, download = True):
     drugmapping = mp.getMappingForEntity("Drug")
 
     relationships = set()
-    directory = os.path.join(databases_directory,"DGIdb")
+    directory = os.path.join(databases_directory, "DGIdb")
     builder_utils.checkDirectory(directory)
     fileName = os.path.join(directory, url.split('/')[-1])
     if download:
         builder_utils.downloadDB(url, directory)
-    with open(fileName, 'r') as associations:
+    with open(fileName, 'r', encoding='utf-8') as associations:
         first = True
         for line in associations:
             if first:
@@ -39,5 +38,7 @@ def parser(databases_directory, download = True):
                 if drug in drugmapping:
                     drug = drugmapping[drug]
                     relationships.add((drug, gene, "TARGETS", "NA", "NA", "NA", interactionType, "DGIdb: "+source))
-
+    
+    builder_utils.remove_directory(directory)
+    
     return (relationships, header, output_file)

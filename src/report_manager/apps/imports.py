@@ -1,23 +1,13 @@
 from analytics_core.viz import viz
-#Dash
-import dash
 import dash_core_components as dcc
-import dash_html_components as html
-
-#Plotly imports
-import chart_studio.plotly as py
-# from IPython.display import display
 import plotly.graph_objs as go
-# from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 import plotly.subplots as tools
-
-#Data manipulation imports
 import pandas as pd
 import numpy as np
-from operator import itemgetter
 from itertools import chain
 from collections import defaultdict
-from natsort import natsorted, ns
+from natsort import natsorted
+
 
 def get_stats_data(filename, n=3):
     """
@@ -28,6 +18,7 @@ def get_stats_data(filename, n=3):
     :param int n: number of independent imports to plot.
     :return: Pandas Dataframe with different entities and relationships as rows and columns:
     """
+    
     store = pd.HDFStore(filename, 'r')
     full, partial = list(store.keys())
     df_full = store[full]
@@ -42,6 +33,7 @@ def get_stats_data(filename, n=3):
     df = df[df['import_id'].isin(imp)].reset_index(drop=True)
     return df
 
+
 def select_last_n_imports(stats_file, n=3):
     """
     Selects which independent full and partial imports should be plotted based on n.
@@ -52,10 +44,11 @@ def select_last_n_imports(stats_file, n=3):
     """
     df = stats_file[['datetime', 'import_id', 'Import_flag']].sort_values('datetime', ascending=False).drop_duplicates(['import_id'], keep = 'first', inplace = False) 
     f = df[df['Import_flag'] == 'full']
-    f = f.iloc[:n,1].tolist()
+    f = f.iloc[:n, 1].tolist()
     p = df[df['Import_flag'] == 'partial']
-    p = p.iloc[:n,1].tolist()
+    p = p.iloc[:n, 1].tolist()
     return p+f
+
 
 def remove_legend_duplicates(figure):
     """
@@ -106,33 +99,44 @@ def get_databases_entities_relationships(stats_file, key='full', options='databa
             dat.append((date, i))
 
     d_dat = defaultdict(list)
-    for k, v in dat: d_dat[k].append(v)
-    d_dat = {k:tuple(v) for k, v in d_dat.items()}
+    for k, v in dat:
+        d_dat[k].append(v)
+    d_dat = {k: tuple(v) for k, v in d_dat.items()}
     d_dat = dict(natsorted(d_dat.items()))
 
     d_ent = defaultdict(list)
-    for k, v in ent: d_ent[v].append(k)
-    d_ent = {k:tuple(v) for k, v in d_ent.items()}
+    for k, v in ent:
+        d_ent[v].append(k)
+    d_ent = {k: tuple(v) for k, v in d_ent.items()}
     d_ent = dict(natsorted(d_ent.items()))
 
     d_rel = defaultdict(list)
-    for k, v in rel: d_rel[v].append(k)
-    d_rel = {k:tuple(v) for k, v in d_rel.items()}
+    for k, v in rel:
+        d_rel[v].append(k)
+    d_rel = {k: tuple(v) for k, v in d_rel.items()}
     d_rel = dict(natsorted(d_rel.items()))
 
     for i in stats_file['dataset'].unique():
-        if i not in d_ent.keys(): d_ent[i] = ''
-        if i not in d_rel.keys(): d_rel[i] = ''
+        if i not in d_ent.keys():
+            d_ent[i] = ''
+        if i not in d_rel.keys():
+            d_rel[i] = ''
 
     d_dbs_filename = defaultdict(list)
-    for k,v in chain(d_ent.items(), d_rel.items()): d_dbs_filename[k].append(v)
-    d_dbs_filename = {k:tuple(v) for k, v in d_dbs_filename.items()}
+    for k, v in chain(d_ent.items(), d_rel.items()):
+        d_dbs_filename[k].append(v)
+    d_dbs_filename = {k: tuple(v) for k, v in d_dbs_filename.items()}
     d_dbs_filename = dict(natsorted(d_dbs_filename.items()))
 
-    if options == 'entities': return d_ent
-    if options == 'relationships': return d_rel
-    if options == 'databases': return d_dbs_filename
-    if options == 'dates': return d_dat
+    if options == 'entities':
+        return d_ent
+    if options == 'relationships':
+        return d_rel
+    if options == 'databases':
+        return d_dbs_filename
+    if options == 'dates':
+        return d_dat
+
 
 def set_colors(dictionary):
     """
@@ -148,6 +152,7 @@ def set_colors(dictionary):
     colors = dict(colors)
 
     return colors
+
 
 def get_dropdown_menu(fig, options_dict, add_button=True, equal_traces=True, number_traces=2):
     """
@@ -180,25 +185,27 @@ def get_dropdown_menu(fig, options_dict, add_button=True, equal_traces=True, num
             end = start + number_traces
             visible[start:end] = [True] * number_traces
             start += number_traces    
-        temp_dict = dict(label = str(i),
-                         method = 'update',
-                         args = [{'visible': visible},
+        temp_dict = dict(label=str(i),
+                         method='update',
+                         args=[{'visible': visible},
                                  {'title': 'Date: '+i}])
         list_updatemenus.append(temp_dict)
 
     if add_button:
-        button = [dict(label = 'All',
-                        method = 'update',
-                        args = [{'visible': [True]*len(fig['data'])}, {'title': 'All'}])]
+        button = [dict(label='All',
+                        method='update',
+                        args=[{'visible': [True] * len(fig['data'])}, {'title': 'All'}])]
         list_updatemenus = list_updatemenus + button
-    else: pass
+    else: 
+        pass
 
-    updatemenus = list([dict(active = len(list_updatemenus)-1,
-                             buttons = list_updatemenus,
+    updatemenus = list([dict(active=len(list_updatemenus)-1,
+                             buttons=list_updatemenus,
                              direction='down',
-                             showactive=True,x=-0.17,xanchor='left',y=1.1,yanchor='top'),])
+                             showactive=True, x=-0.17, xanchor='left', y=1.1, yanchor='top'), ])
 
     return updatemenus
+
 
 def get_totals_per_date(stats_file, key='full', import_types=False):
     """
@@ -239,6 +246,7 @@ def get_totals_per_date(stats_file, key='full', import_types=False):
 
     return df
 
+
 def get_imports_per_database_date(stats_file):
     """
     Summarizes stats file to a Pandas DataFrame with import dates, databases and total number of \
@@ -258,11 +266,12 @@ def get_imports_per_database_date(stats_file):
             stats_sum.append((date, a, ent, rel, total))
 
     df = pd.DataFrame(stats_sum, columns=cols)
-    df = df.sort_values(['date','total'])
+    df = df.sort_values(['date', 'total'])
     df = df.set_index(['date', 'dataset'])
     df = df.drop('total', axis=1)
 
     return df
+
 
 def plot_total_number_imported(stats_file, plot_title):
     """
@@ -283,15 +292,16 @@ def plot_total_number_imported(stats_file, plot_title):
         traces = list(chain.from_iterable(traces))
     else: pass
 
-    layout = go.Layout(title='', xaxis=dict(title=''), yaxis={'title':'Number of imports'},
-                       legend={'font':{'size':11}}, margin=go.layout.Margin(l=80,r=40,t=100,b=50),
-                       annotations=[dict(text='<b>{}<b>'.format(plot_title), font=dict(family='Arial', size = 18),
+    layout = go.Layout(title='', xaxis=dict(title=''), yaxis={'title': 'Number of imports'},
+                       legend={'font': {'size': 11}}, margin=go.layout.Margin(l=80, r=40, t=100, b=50),
+                       annotations=[dict(text='<b>{}<b>'.format(plot_title), font=dict(family='Arial', size=18),
                        showarrow=False, xref='paper', x=-0.06, xanchor='left', yref='paper', y=1.15, yanchor='top')])
 
     fig = go.Figure(data=traces, layout=layout)
     fig['layout']['template'] = 'plotly_white'
 
-    return dcc.Graph(id = 'total imports', figure = fig)
+    return dcc.Graph(id='total imports', figure=fig)
+
 
 def plot_total_numbers_per_date(stats_file, plot_title):
     """
@@ -310,21 +320,23 @@ def plot_total_numbers_per_date(stats_file, plot_title):
 
     if type(traces[0]) == list:
         traces = list(chain.from_iterable(traces))
-    else: pass
+    else: 
+        pass
 
     layout = go.Layout(title='', 
-                    xaxis={'showgrid':True}, 
-                    yaxis={'title':'Imported entities/relationships'},
-                    legend={'font':{'size':11}}, 
-                    height=550, 
-                    margin=go.layout.Margin(l=80,r=40,t=100,b=100),
-                    annotations=[dict(text='<b>{}<b>'.format(plot_title), font=dict(family='Arial', size = 18),
-                        showarrow=False, xref='paper', x=-0.06, xanchor='left', yref='paper', y=1.15, yanchor='top')])
+                    xaxis={'showgrid': True},
+                    yaxis={'title': 'Imported entities/relationships'},
+                    legend={'font': {'size':11}},
+                    height=550,
+                    margin=go.layout.Margin(l=80, r=40, t=100, b=100),
+                    annotations=[dict(text='<b>{}<b>'.format(plot_title), font=dict(family='Arial', size=18),
+                    showarrow=False, xref='paper', x=-0.06, xanchor='left', yref='paper', y=1.15, yanchor='top')])
 
     fig = go.Figure(data=traces, layout=layout)
     fig['layout']['template'] = 'plotly_white'
 
-    return dcc.Graph(id = 'entities-relationships per date', figure = fig)
+    return dcc.Graph(id='entities-relationships per date', figure=fig)
+
 
 def plot_databases_numbers_per_date(stats_file, plot_title, key='full', dropdown=False, dropdown_options='dates'):
     """
@@ -351,14 +363,14 @@ def plot_databases_numbers_per_date(stats_file, plot_title, key='full', dropdown
     traces = []
     for i in dropdown_options.keys():
         df = data.iloc[data.index.get_level_values(0).str.contains(i)].droplevel(0)
-        traces.append(viz.getPlotTraces(df, key=key, type = 'bars', horizontal=True))
+        traces.append(viz.getPlotTraces(df, key=key, type='bars', horizontal=True))
 
     if type(traces[0]) == list:
         traces = list(chain.from_iterable(traces))
     else:
         pass
 
-    layout = go.Layout(title = '', xaxis = {'showgrid':True, 'type':'log','title':'Imported entities/relationships'},
+    layout = go.Layout(title='', xaxis = {'showgrid':True, 'type':'log','title':'Imported entities/relationships'},
                         legend={'font':{'size':11}}, height=600, margin=go.layout.Margin(l=40,r=40,t=80,b=100),
                         annotations=[dict(text='<b>{}<b>'.format(plot_title), font = dict(family='Arial', size = 18),
                         showarrow=False, xref = 'paper', x=-0.17, xanchor='left', yref = 'paper', y=1.2, yanchor='top')])

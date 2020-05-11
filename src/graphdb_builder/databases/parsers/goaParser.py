@@ -1,18 +1,18 @@
 import os
 import pandas as pd
-import gzip
 from collections import defaultdict
 from graphdb_builder import mapping as mp, builder_utils
+
 
 def parser(databases_dir, download=True):
     config = builder_utils.get_config(config_name="goaConfig.yml", data_type='databases')
     url = config['url']
     rel_header = config['header']
-    
+
     protein_mapping = mp.getMappingForEntity(entity="Protein")    
     valid_proteins = list(set(protein_mapping.values))
 
-    directory = os.path.join(databases_dir,"GOA")
+    directory = os.path.join(databases_dir, "GOA")
     builder_utils.checkDirectory(directory)
     file_name = os.path.join(directory, url.split('/')[-1])
     if download:
@@ -20,10 +20,13 @@ def parser(databases_dir, download=True):
 
     annotations = parse_annotations_with_pandas(file_name, valid_proteins)
 
+    builder_utils.remove_directory(directory)
+
     return annotations, rel_header
 
+
 def parse_annotations_with_pandas(annotation_file, valid_proteins=None):
-    roots = {'F':'Molecular_function', 'C':'Cellular_component', 'P':'Biological_process'}
+    roots = {'F': 'Molecular_function', 'C': 'Cellular_component', 'P': 'Biological_process'}
     selected_columns = [0, 1, 4, 6, 8, 14]
     new_columns = ['source', 'START_ID', 'END_ID', 'evidence', 'root', 'original_source']
     annotations = defaultdict(set)
@@ -41,10 +44,10 @@ def parse_annotations_with_pandas(annotation_file, valid_proteins=None):
             annotations_df = annotations_df.append(data.reset_index(), ignore_index=True)
     for name, group in annotations_df.groupby('root'):
         group['TYPE'] = "ASSOCIATED_WITH"
-        group = group[['START_ID', 'END_ID', 'TYPE', 'evidence','source']]
+        group = group[['START_ID', 'END_ID', 'TYPE', 'evidence', 'source']]
         annotations[name] = group.to_records(index=False).tolist()
     return annotations
-            
+
+
 if __name__ == '__main__':
     parser(databases_dir='../../data/databases', download=True)
-

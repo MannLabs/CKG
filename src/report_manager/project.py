@@ -4,24 +4,20 @@ import time
 import h5py as h5
 import json
 from collections import defaultdict
-from plotly.offline import iplot
-from IPython.display import IFrame, display
-import tempfile
 from json import dumps
 import pandas as pd
 import ckg_utils
 import config.ckg_config as ckg_config
-from report_manager.dataset import Dataset, ProteomicsDataset, ClinicalDataset, DNAseqDataset, RNAseqDataset, LongitudinalProteomicsDataset, MultiOmicsDataset
+from report_manager.dataset import Dataset, DNAseqDataset, ProteomicsDataset, InteractomicsDataset, PhosphoproteomicsDataset, ClinicalDataset, LongitudinalProteomicsDataset, MultiOmicsDataset
 from analytics_core.viz import viz
 from analytics_core import utils as acore_utils
 from report_manager import report as rp, utils, knowledge
 from graphdb_connector import query_utils
 from graphdb_connector import connector
-import logging
-import logging.config
 
 log_config = ckg_config.report_manager_log
 logger = ckg_utils.setup_logging(log_config, key="project")
+
 
 class Project:
     """
@@ -50,7 +46,7 @@ class Project:
         self._num_subjects = None
         self._similar_projects = None
         self._overlap = None
-        
+
     @property
     def identifier(self):
         return self._identifier
@@ -58,7 +54,7 @@ class Project:
     @identifier.setter
     def identifier(self, identifier):
         self._identifier = identifier
-    
+
     @property
     def configuration_files(self):
         return self._configuration_files
@@ -184,7 +180,7 @@ class Project:
 
     def update_report(self, new):
         self.report.update(new)
-        
+
     def remove_project(self, host="localhost", port=7687, user="neo4j", password="password"):
         try:
             cwd = os.path.abspath(os.path.dirname(__file__))
@@ -201,24 +197,22 @@ class Project:
             logger.error("Error removing project {}. Query file: {},line: {}, error: {}".format(self.identifier, fname, exc_tb.tb_lineno, err))
 
     def get_report_directory(self):
-        reports_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),"../../data/reports/"), self.identifier)
+        reports_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../data/reports/"), self.identifier)
         if not os.path.isdir(reports_dir):
             os.makedirs(reports_dir)
-            
         return reports_dir
 
     def get_downloads_directory(self):
-        downloads_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),"../../data/downloads/"), self.identifier)
+        downloads_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../data/downloads/"), self.identifier)
         if not os.path.isdir(downloads_dir):
             os.makedirs(downloads_dir)
-            
         return downloads_dir
 
     def set_attributes(self, project_info):
         if "attributes" in project_info:
             attributes = project_info["attributes"].to_dict('r')[0]
             self.from_dict(attributes)
-                
+
     def from_dict(self, attributes):
         if "name" in attributes:
             self.name = attributes["name"]
@@ -252,18 +246,18 @@ class Project:
             similarity_dict = self.similar_projects.to_dict(orient='records')
         if self.overlap is not None:
             overlap_dict = self.overlap.to_dict(orient='records')
-        d = {"identifier" : self.identifier,
-             "queries_file":self._queries_file,
-            "name" : self.name,
-            "acronym" : self.acronym,
-            "description" : self.description,
-            "data_types" : self.data_types,
-            "responsible": self.responsible,
-            "status": self.status,
-            "number_subjects": self.num_subjects,
-            "similar_projects": similarity_dict,
-            "overlap": overlap_dict
-            }
+        d = {"identifier": self.identifier,
+             "queries_file": self._queries_file,
+             "name": self.name,
+             "acronym": self.acronym,
+             "description": self.description,
+             "data_types": self.data_types,
+             "responsible": self.responsible,
+             "status": self.status,
+             "number_subjects": self.num_subjects,
+             "similar_projects": similarity_dict,
+             "overlap": overlap_dict
+             }
 
         return d
 
@@ -292,19 +286,19 @@ class Project:
 
     def query_data(self):
         data = {}
-        try:            
+        try:
             cwd = os.path.abspath(os.path.dirname(__file__))
             queries_path = os.path.join(cwd, self.queries_file)
             project_cypher = query_utils.read_queries(queries_path)
-            
+
             driver = connector.getGraphDatabaseConnectionConfiguration()
             replace = [("PROJECTID", self.identifier)]
             for query_name in project_cypher:
-                title = query_name.lower().replace('_',' ')
+                title = query_name.lower().replace('_', ' ')
                 query = project_cypher[query_name]['query']
                 query_type = project_cypher[query_name]['query_type']
-                for r,by in replace:
-                    query = query.replace(r,by)
+                for r, by in replace:
+                    query = query.replace(r, by)
                 if query_type == "pre":
                     data[title] = connector.getCursorData(driver, query)
         except Exception as err:
@@ -316,30 +310,30 @@ class Project:
 
     def check_report_exists(self):
         exists = True
-        report_dir = os .path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),"../../data/reports/"), self.identifier)
+        report_dir = os .path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../data/reports/"), self.identifier)
         if not os.path.isdir(report_dir):
             return False
         for dataset in self.report:
             if os.path.isdir(os.path.join(report_dir, dataset)):
                 continue
             exists = False
-        
+
         return exists
 
     def load_project_report(self):
         self.load_project_data()
-        project_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),"../../data/reports/"), self.identifier)
+        project_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../data/reports/"), self.identifier)
         self.report = {}
         for root, data_types, files in os.walk(project_dir):
             for data_type in data_types:
-                r = rp.Report(data_type,{})
+                r = rp.Report(data_type, {})
                 r.read_report(os.path.join(root, data_type))
                 if data_type in self.datasets:
                     self.datasets[data_type].report = r
                 elif data_type == "Knowledge":
-                    self.knowledge = knowledge.Knowledge(self.identifier, {'name':self.name}, report=r)
+                    self.knowledge = knowledge.Knowledge(self.identifier, {'name': self.name}, report=r)
                 else:
-                    self.update_report({data_type:r})
+                    self.update_report({data_type: r})
                     
     def load_project(self, directory):
         dataset_store = os.path.join(directory, "project_information_dataset.h5")
@@ -349,7 +343,7 @@ class Project:
                     self.from_json(f["Project_information"][0])
 
     def load_project_data(self):
-        project_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),"../../data/reports/"), self.identifier)
+        project_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../data/reports/"), self.identifier)
         self.load_project(os.path.join(project_dir, "Project information"))
         for root, data_types, files in os.walk(project_dir):
             for data_type in data_types:
@@ -360,22 +354,26 @@ class Project:
                     dataset = ClinicalDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
                 elif data_type == "wes" or data_type == "wgs":
                     dataset = DNAseqDataset(self.identifier, dataset_type=data_type, data={}, analyses={}, analysis_queries={}, report=None)
+                elif data_type == "interactomics":
+                    dataset = InteractomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
+                elif data_type == "phosphoproteomics":
+                    dataset = PhosphoproteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
                 elif data_type == "longitudinal_proteomics":
                     dataset = LongitudinalProteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
                 elif data_type == "multiomics":
                     dataset = MultiOmicsDataset(self.identifier, data={}, analyses={}, report=None)
-                
+
                 if dataset is not None:
-                    dataset.load_dataset(os.path.join(root,data_type))
-                    self.update_dataset({data_type:dataset})
-            
+                    dataset.load_dataset(os.path.join(root, data_type))
+                    self.update_dataset({data_type: dataset})
+
     def build_project(self, force=False):
         if self.check_report_exists() and not force:
             self.load_project_report()
         elif force:
             self.report = {}
             self.datasets = {}
-        
+
         if len(self.report) == 0 or len(self.datasets) == 0:
             project_info = self.query_data()
             if len(project_info) > 0:
@@ -399,20 +397,28 @@ class Project:
                         elif "wgs" in self.configuration_files:
                             configuration = ckg_utils.get_configuration(self.configuration_files["wgs"])
                         dataset = DNAseqDataset(self.identifier, dataset_type=data_type, data={}, configuration=configuration, analyses={}, analysis_queries={}, report=None)
+                    elif data_type == "interactomics":
+                        if "interactomics" in self.configuration_files:
+                            configuration = ckg_utils.get_configuration(self.configuration_files["interactomics"])
+                        dataset = InteractomicsDataset(self.identifier, data={}, configuration=configuration, analyses={}, analysis_queries={}, report=None)
+                    elif data_type == "phosphoproteomics":
+                        if "phosphoproteomics" in self.configuration_files:
+                            configuration = ckg_utils.get_configuration(self.configuration_files["phosphoproteomics"])
+                        dataset = PhosphoproteomicsDataset(self.identifier, data={}, configuration=configuration, analyses={}, analysis_queries={}, report=None)
                     elif data_type == "longitudinal_proteomics":
                         if "longitudinal_proteomics" in self.configuration_files:
                             configuration = ckg_utils.get_configuration(self.configuration_files["longitudinal_proteomics"])
                         dataset = LongitudinalProteomicsDataset(self.identifier, data={}, configuration=configuration, analyses={}, analysis_queries={}, report=None)
-                
+
                     if dataset is not None:
                         dataset.generate_dataset()
-                        self.update_dataset({data_type:dataset})
-                
+                        self.update_dataset({data_type: dataset})
+
                 if len(self.datasets) > 1:
                     if "multiomics" in self.configuration_files:
                         configuration = ckg_utils.get_configuration(self.configuration_files["multiomics"])
                     dataset = MultiOmicsDataset(self.identifier, data=self.datasets, configuration=configuration, analyses={}, report=None)
-                    self.update_dataset({'multiomics':dataset})
+                    self.update_dataset({'multiomics': dataset})
                     self.append_data_type('multiomics')
             else:
                 logger.error("Project {} could not be built. Error retrieving information for this project or no information associated to this project".format(self.identifier))
@@ -422,14 +428,14 @@ class Project:
         if 'overlap' in project_info:
             self.overlap = project_info['overlap']
             if 'from' in self.overlap and 'to' in self.overlap:
-                self.overlap = self.overlap[(self.overlap['from']==self.identifier) | (self.overlap['to']==self.identifier)]
+                self.overlap = self.overlap[(self.overlap['from'] == self.identifier) | (self.overlap['to'] == self.identifier)]
 
     def get_similar_projects(self, project_info):
         if 'similarity' in project_info:
             self.similar_projects = project_info['similarity']
             if 'similarity_pearson' in self.similar_projects:
                 self.similar_projects = self.similar_projects[self.similar_projects['similarity_pearson'] > 0.5]
-        
+
     def generate_project_attributes_plot(self):
         project_df = self.to_dataframe()
         project_df = project_df.drop(['similar_projects', 'overlap'], axis=1)
@@ -444,12 +450,12 @@ class Project:
         identifier = "Similarities"
         title = "Similarities to other Projects"
         plots.append(viz.get_table(self.similar_projects, identifier+' table', title+' table'))
-        plots.append(viz.get_sankey_plot(self.similar_projects, identifier, args={'source':'current', 'target':'other', 'weight':'similarity_pearson', 'orientation': 'h', 'valueformat': '.0f', 'width':800, 'height':800, 'font':12, 'title':title}))
+        plots.append(viz.get_sankey_plot(self.similar_projects, identifier, args={'source': 'current', 'target': 'other', 'weight': 'similarity_pearson', 'orientation': 'h', 'valueformat': '.0f', 'width': 800, 'height': 800, 'font': 12, 'title': title}))
 
         plots.append(self.get_similarity_network())
-        
+
         return plots
-        
+
     def generate_overlap_plots(self):
         plots = []
         identifier = "Overlap"
@@ -464,37 +470,34 @@ class Project:
         return plots
 
     def get_similarity_network_style(self):
-        #color_selector = "{'selector': '[name = \"KEY\"]', 'style': {'background-color': 'VALUE'}}"
-        stylesheet=[{'selector': 'node', 
-                     'style': {'label': 'data(name)',
-                               'text-valign': 'center',
-                               'text-halign': 'center',
-                               'opacity':0.8,
-                               'font-size': '12'}},
-                    {'selector':'edge',
-                     'style':{'label':'data(label)', 
-                              'curve-style': 'bezier',
-                              'opacity':0.7,
-                              'width':0.4,
-                              'font-size': '5'}}]
+        stylesheet = [{'selector': 'node',
+                       'style': {'label': 'data(name)',
+                                 'text-valign': 'center',
+                                 'text-halign': 'center',
+                                 'opacity': 0.8,
+                                 'font-size': '12'}},
+                      {'selector': 'edge',
+                       'style': {'label': 'data(label)',
+                                 'curve-style': 'bezier',
+                                 'opacity': 0.7,
+                                 'width': 0.4,
+                                 'font-size': '5'}}]
         layout = {'name': 'cose',
-                'idealEdgeLength': 100,
-                'nodeOverlap': 20,
-                'refresh': 20,
-                #'fit': True,
-                #'padding': 30,
-                'randomize': False,
-                'componentSpacing': 100,
-                'nodeRepulsion': 400000,
-                'edgeElasticity': 100,
-                'nestingFactor': 5,
-                'gravity': 80,
-                'numIter': 1000,
-                'initialTemp': 200,
-                'coolingFactor': 0.95,
-                'minTemp': 1.0}
-        #for k,v in node_colors.items():
-        #    stylesheet.append(ast.literal_eval(color_selector.replace("KEY", k).replace("VALUE",v)))
+                  'idealEdgeLength': 100,
+                  'nodeOverlap': 20,
+                  'refresh': 20,
+                  #'fit': True,
+                  #'padding': 30,
+                  'randomize': False,
+                  'componentSpacing': 100,
+                  'nodeRepulsion': 400000,
+                  'edgeElasticity': 100,
+                  'nestingFactor': 5,
+                  'gravity': 80,
+                  'numIter': 1000,
+                  'initialTemp': 200,
+                  'coolingFactor': 0.95,
+                  'minTemp': 1.0}
         
         return stylesheet, layout
 
@@ -505,12 +508,13 @@ class Project:
             query_path = os.path.join(cwd, self.queries_file)
             project_cypher = query_utils.read_queries(query_path)
             query = query_utils.get_query(project_cypher, query_id="projects_subgraph")
-
+            list_projects = []
             driver = connector.getGraphDatabaseConnectionConfiguration()
-            list_projects = self.similar_projects["other_id"].values.tolist()
+            if "other_id" in self.similar_projects:
+                list_projects = self.similar_projects["other_id"].values.tolist()
             list_projects.append(self.identifier)
             list_projects = ",".join(['"{}"'.format(i) for i in list_projects])
-            query = query.replace("LIST_PROJECTS",list_projects)
+            query = query.replace("LIST_PROJECTS", list_projects)
             path = connector.sendQuery(driver, query, parameters={}).data()
             G = acore_utils.neo4j_path_to_networkx(path, key='path')
             args = {}
@@ -520,33 +524,31 @@ class Project:
             args['title'] = "Projects subgraph"
             net, mouseover = acore_utils.networkx_to_cytoscape(G)
             plot = viz.get_cytoscape_network(net, "projects_subgraph", args)
-        
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            logger.error("Reading queries from file {}: {}, file: {},line: {}".format(query_path, sys.exc_info(), fname, exc_tb.tb_lineno))
+            logger.error("Error: {}. Reading queries from file {}: {}, file: {},line: {}".format(err, query_path, sys.exc_info(), fname, exc_tb.tb_lineno))
 
         return plot
-    
+
     def generate_knowledge(self):
         nodes = {}
         relationships = {}
-        kn = knowledge.ProjectKnowledge(identifier=self.identifier, data=self.to_dict(), nodes={self.name:{'id':'#0', 'type':'Project'}}, relationships={}, colors={}, graph=None, report={})
+        kn = knowledge.ProjectKnowledge(identifier=self.identifier, data=self.to_dict(), nodes={self.name: {'id': '#0', 'type': 'Project'}}, relationships={}, colors={}, graph=None, report={})
         kn.generate_knowledge()
         nodes.update(kn.nodes)
         relationships.update(kn.relationships)
-        types = ["clinical", "proteomics", "longitudinal_proteomics", "wes", "wgs", "rnaseq", "multiomics"]
+        types = ["clinical", "proteomics", "interactomics", "phosphoproteomics", "longitudinal_proteomics", "wes", "wgs", "rnaseq", "multiomics"]
         for dataset_type in types:
             if dataset_type in self.datasets:
-                print(dataset_type)
                 dataset = self.datasets[dataset_type]
                 kn = dataset.generate_knowledge()
-                if dataset_type ==  "multiomics":
+                if dataset_type == "multiomics":
                     kn.reduce_to_subgraph(nodes.keys())
                 nodes.update(kn.nodes)
                 relationships.update(kn.relationships)
         
-        self.knowledge = knowledge.Knowledge(self.identifier, {'name':self.name}, nodes=nodes, relationships=relationships)
+        self.knowledge = knowledge.Knowledge(self.identifier, {'name': self.name}, nodes=nodes, relationships=relationships)
 
     def generate_project_info_report(self):
         
@@ -556,22 +558,20 @@ class Project:
         plots.extend(self.generate_project_similarity_plots())
         plots.extend(self.generate_overlap_plots())       
                
-        report.plots = {("Project info","Project Information"): plots}
+        report.plots = {("Project info", "Project Information"): plots}
 
         return report
 
     def generate_report(self):
         if len(self.report) == 0:
             project_report = self.generate_project_info_report()
-            self.update_report({"Project information":project_report})            
+            self.update_report({"Project information": project_report})
             for dataset_type in self.data_types:
                 dataset = self.get_dataset(dataset_type)
                 if dataset is not None:
                     dataset.generate_report()
-                    #self.update_report({dataset.dataset_type:dataset.report})            
             self.generate_knowledge()
             self.knowledge.generate_report()
-            
             self.save_project_report()
             self.save_project()
             self.save_project_datasets_data()
@@ -613,10 +613,11 @@ class Project:
             dataset_directory = os.path.join(directory, dataset_type)
             if isinstance(dataset, Dataset):
                 dataset.save_report(dataset_directory)
+                dataset = None
         print('save dataset report', time.time() - start)
         
     def save_project(self):
-        directory = os.path.join(self.get_report_directory(),"Project information")
+        directory = os.path.join(self.get_report_directory(), "Project information")
         if not os.path.isdir(directory):
             os.makedirs(directory)
         dt = h5.special_dtype(vlen=str) 
@@ -631,10 +632,11 @@ class Project:
             dataset_directory = os.path.join(directory, dataset_type)
             if isinstance(dataset, Dataset):
                 dataset.save_dataset(dataset_directory)
+                dataset = None
         print('save datasets', time.time() - start)
 
     def show_report(self, environment):
-        types = ["Project information", "clinical", "proteomics", "longitudinal_proteomics", "wes", "wgs", "rnaseq", "multiomics", "Knowledge Graph"]
+        types = ["Project information", "clinical", "proteomics", "interactomics", "phosphoproteomics", "longitudinal_proteomics", "wes", "wgs", "rnaseq", "multiomics", "Knowledge Graph"]
         app_plots = defaultdict(list)
         for dataset in types:
             if dataset in self.report:
@@ -646,7 +648,7 @@ class Project:
             elif dataset == "Knowledge Graph":
                 report = self.knowledge.report
                 app_plots[dataset.upper()] = report.visualize_report(environment)
-        
+
         return app_plots
 
     def download_project(self):
@@ -654,7 +656,7 @@ class Project:
         self.download_project_report()
         self.download_project_datasets()
         utils.compress_directory(directory, directory, compression_format='zip')
-        
+
 
     def download_project_report(self):
         directory = self.get_downloads_directory()
@@ -671,7 +673,7 @@ class Project:
                 if not os.path.exists(dataset_dir):
                     os.makedirs(dataset_dir)
                 report.download_report(dataset_dir)
-        
+
         self.download_knowledge(os.path.join(directory, "Knowledge"))
         
     def download_knowledge(self, directory):

@@ -8,8 +8,23 @@ entities_header:
     - 'sample_size'
     - 'replication_size'
     - 'trait'
-relationships_header: 
-    - 'START_ID'
-    - 'END_ID'
-    - 'TYPE'
-    - 'source'
+relationships_header:
+    published_in_publication: 
+        - 'START_ID'
+        - 'END_ID'
+        - 'TYPE'
+        - 'source'
+    variant_found_in_gwas:
+        - START_ID
+        - END_ID 
+        - TYPE
+        - frequency
+        - pvalue
+        - odds_ratio
+        - trait
+        - source
+    studies_trait:
+        - START_ID
+        - END_ID 
+        - TYPE
+        - source

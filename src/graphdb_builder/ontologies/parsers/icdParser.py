@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 #########################
 # Diagnose entity - ICD # 
 #########################
@@ -38,17 +40,17 @@ def parser(ICDfile):
             definitions[chapId] = "chapter"
             terms[blockId].add(block)
             definitions[blockId] = "block"
-            
+
             if len(icdCode) > 3:
                 order = len(icdCode) - 1
                 i = 3
-                while i<=order:
+                while i <= order:
                     if icdCode[0:i] in terms:
                         relationships.add((icdCode, icdCode[0:i], "HAS_PARENT"))
                         i += 1
-    
-            relationships.add((icdCode,chapId, "HAS_PARENT"))
-            relationships.add((icdCode,blockId, "HAS_PARENT"))
+
+            relationships.add((icdCode, chapId, "HAS_PARENT"))
+            relationships.add((icdCode, blockId, "HAS_PARENT"))
             relationships.add((blockId, chapId, "HAS_PARENT"))
 
     return terms, relationships, definitions

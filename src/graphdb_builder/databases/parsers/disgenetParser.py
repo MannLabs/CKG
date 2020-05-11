@@ -1,21 +1,19 @@
 import os.path
 import gzip
-import ckg_utils
 from collections import defaultdict
 from graphdb_builder import builder_utils
 
 #########################
 #       DisGeNet        # 
 #########################
-def parser(databases_directory, download = True):
+def parser(databases_directory, download=True):
     relationships = defaultdict(set)
-    
     config = builder_utils.get_config(config_name="disgenetConfig.yml", data_type='databases')
-    
+
     files = config['disgenet_files']
     mapping_files = config['disgenet_mapping_files']
     url = config['disgenet_url']
-    directory = os.path.join(databases_directory,"disgenet")
+    directory = os.path.join(databases_directory, "disgenet")
     builder_utils.checkDirectory(directory)
     header = config['disgenet_header']
     output_file = 'disgenet_associated_with.tsv'
@@ -26,12 +24,12 @@ def parser(databases_directory, download = True):
         for f in mapping_files:
             builder_utils.downloadDB(url+mapping_files[f], directory)
 
-    proteinMapping = readDisGeNetProteinMapping(config, databases_directory) 
-    diseaseMapping = readDisGeNetDiseaseMapping(config, databases_directory)
+    proteinMapping = readDisGeNetProteinMapping(config, directory)
+    diseaseMapping = readDisGeNetDiseaseMapping(config, directory)
     for f in files:
         first = True
-        associations = gzip.open(os.path.join(directory,files[f]), 'r')
-        dtype, atype = f.split('_') 
+        associations = gzip.open(os.path.join(directory, files[f]), 'r')
+        dtype, atype = f.split('_')
         if dtype == 'gene':
             idType = "Protein"
             scorePos = 9
@@ -56,22 +54,23 @@ def parser(databases_directory, download = True):
                         if diseaseId in diseaseMapping:
                             for code in diseaseMapping[diseaseId]:
                                 code = "DOID:"+code
-                                relationships[idType].add((identifier, code,"ASSOCIATED_WITH", score, atype, "DisGeNet: "+source, pmids))
+                                relationships[idType].add((identifier, code, "ASSOCIATED_WITH", score, atype, "DisGeNet: "+source, pmids))
             except UnicodeDecodeError:
                 continue
         associations.close()
 
-    return (relationships,header,output_file)
-    
-def readDisGeNetProteinMapping(config, databases_directory):
+    builder_utils.remove_directory(directory)
+
+    return (relationships, header, output_file)
+
+
+def readDisGeNetProteinMapping(config, directory):
     files = config['disgenet_mapping_files']
-    directory = os.path.join(databases_directory,"disgenet")
-   
     first = True
     mapping = defaultdict(set)
     if "protein_mapping" in files:
         mappingFile = files["protein_mapping"]
-        with gzip.open(os.path.join(directory,mappingFile), 'r') as f:
+        with gzip.open(os.path.join(directory, mappingFile), 'r') as f:
             for line in f:
                 if first:
                     first = False
@@ -82,15 +81,14 @@ def readDisGeNetProteinMapping(config, databases_directory):
                 mapping[intIdentifier].add(identifier)
     return mapping
 
-def readDisGeNetDiseaseMapping(config, databases_directory):
-    files = config['disgenet_mapping_files']
-    directory = os.path.join(databases_directory,"disgenet")
 
+def readDisGeNetDiseaseMapping(config, directory):
+    files = config['disgenet_mapping_files']
     first = True
     mapping = defaultdict(set)
     if "disease_mapping" in files:
         mappingFile = files["disease_mapping"]
-        with gzip.open(os.path.join(directory,mappingFile), 'r') as f:
+        with gzip.open(os.path.join(directory, mappingFile), 'r') as f:
             for line in f:
                 if first:
                     first = False

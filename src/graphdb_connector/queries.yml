@@ -13,5 +13,5 @@ map_node_name:
     involved_nodes:
     involved_rels:
     query: >
-        MATCH (n:NODE {name:$name})
+        MATCH (n:NODE) WHERE toLower(n.name)=$name
         RETURN n.id;

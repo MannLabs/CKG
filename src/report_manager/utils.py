@@ -1,16 +1,15 @@
 import os
 import dash_html_components as html
 import dash_core_components as dcc
-from datetime import date
+from datetime import datetime
 import bs4 as bs
 import random
 import numpy as np
-import dash_html_components as html
 import chart_studio.plotly as py
 import base64
 from xhtml2pdf import pisa
-import requests, json
-from urllib import request, parse, error
+import json
+from urllib import request
 import shutil
 import smtplib
 from email.message import EmailMessage
@@ -19,24 +18,24 @@ from email.message import EmailMessage
 def copy_file_to_destination(cfile, destination):
     if os.path.exists(destination):
         shutil.copyfile(cfile, destination)
-        
+
+
 def send_message_to_slack_webhook(message, message_to, username='albsantosdel'):
     cwd = os.path.abspath(os.path.dirname(__file__))
     webhook_file = os.path.join(cwd, "../config/wh.txt")
     if os.path.exists(webhook_file):
         with open(webhook_file, 'r') as hf:
             webhook_url = hf.read()
-    
-        post = {"text": "@{} : {}".format(message_to, message), "username":username, "icon_url": "https://slack.com/img/icons/app-57.png"}
-    
+        post = {"text": "@{} : {}".format(message_to, message), "username": username, "icon_url": "https://slack.com/img/icons/app-57.png"}
         try:
             json_data = json.dumps(post)
             req = request.Request(webhook_url,
                                 data=json_data.encode('ascii'),
-                                headers={'Content-Type': 'application/json'}) 
+                                headers={'Content-Type': 'application/json'})
             resp = request.urlopen(req)
         except Exception as em:
             print("EXCEPTION: " + str(em))
+
 
 def send_email(message, subject, message_from, message_to):
     msg = EmailMessage()    
@@ -49,38 +48,48 @@ def send_email(message, subject, message_from, message_to):
     s.send_message(msg)
     s.quit()
 
+
 def compress_directory(name, directory, compression_format='zip'):
     try:
         if os.path.exists(directory) and os.path.isdir(directory):
+            if os.path.exists(directory+'.zip'):
+                os.remove(directory+'.zip')
             shutil.make_archive(name, compression_format, directory)
             shutil.rmtree(directory)
+        else:
+            print("The directory {} failed. Exists?{} Is dir?{}".format(directory, os.path.exists(directory) and os.path.isdir(directory)))
     except Exception as err:
         print("Could not compress file {} in directory {}. Error: {}".format(name, directory, err))
 
+
 def get_markdown_date(extra_text):
-    today = date.today()
-    current_date = today.strftime("%B %d, %Y")
-    markdown =  html.Div([dcc.Markdown('### *{} {}* ###'.format(extra_text,current_date))],style={'color': '#6a51a3'})
+    now = datetime.now()
+    current_date = now.strftime("%B %d, %Y (%H:%M:%S)")
+    markdown = html.Div([dcc.Markdown('### *{} {}* ###'.format(extra_text, current_date))], style={'color': '#6a51a3'})
     return markdown
 
-def convert_html_to_dash(el,style = None):
+
+def convert_html_to_dash(el, style=None):
     if type(el) == bs.element.NavigableString:
         return str(el)
     else:
         name = el.name
         style = extract_style(el) if style is None else style
         contents = [convert_html_to_dash(x) for x in el.contents]
-        return getattr(html,name.title())(contents,style = style)
+        return getattr(html, name.title())(contents, style=style)
+
 
 def extract_style(el):
-    return {k.strip():v.strip() for k,v in [x.split(": ") for x in el.attrs["style"].split(";")]}
+    return {k.strip(): v.strip() for k, v in [x.split(": ") for x in el.attrs["style"].split(";")]}
+
 
 def is_jsonable(x):
     try:
         json.dumps(x)
         return True
-    except:
+    except Exception:
         return False
+
 
 def convert_dash_to_json(dash_object):
     if not hasattr(dash_object, 'to_plotly_json'):
@@ -91,13 +100,13 @@ def convert_dash_to_json(dash_object):
             if isinstance(dash_json[key], dict):
                 for element in dash_json[key]:
                     children = dash_json[key][element]
-                    ch = {element:[]}
-                    if is_jsonable(children) or isinstance(children, np.ndarray): 
+                    ch = {element: []}
+                    if is_jsonable(children) or isinstance(children, np.ndarray):
                         ch[element] = children
                     elif isinstance(children, dict):
                         ch[element] = {}
                         for c in children:
-                            ch[element].update({c:[]})
+                            ch[element].update({c: []})
                             if isinstance(children[c], list):
                                 for f in children[c]:
                                     if is_jsonable(f) or isinstance(f, np.ndarray):
@@ -120,20 +129,25 @@ def convert_dash_to_json(dash_object):
                     dash_json[key].update(ch)
     return dash_json 
 
+
 def get_image(figure, width, height):
     img = base64.b64encode(py.image.get(figure, width=width, height=height)).decode('utf-8')
 
     return img
-    
+
+
 def parse_html(html_snippet):
     html_parsed = bs.BeautifulSoup(html_snippet)
+
     return html_parsed    
+
 
 def hex2rgb(color):
     hex = color.lstrip('#')
-    rgb = tuple(int(hex[i:i+2], 16) for i in (0, 2 ,4))
+    rgb = tuple(int(hex[i:i+2], 16) for i in (0, 2, 4))
     rgba = rgb + (0.6,)
     return rgba
+
 
 def getNumberText(num):
     numbers = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
@@ -143,6 +157,7 @@ def getNumberText(num):
         return numbers[num]
     else:
         return None
+
 
 def get_rgb_colors(n):
     colors = []
@@ -157,8 +172,9 @@ def get_rgb_colors(n):
         r = int(r) % 256
         g = int(g) % 256
         b = int(b) % 256
-        colors.append((r,g,b)) 
+        colors.append((r, g, b))
     return colors
+
 
 def get_hex_colors(n):
     initial_seed = 123
@@ -170,7 +186,7 @@ def get_hex_colors(n):
 
     return colors
 
-# Utility function
+
 def convert_html_to_pdf(source_html, output_filename):
     # open output file for writing (truncated binary)
     result_file = open(output_filename, "w+b")
@@ -186,11 +202,13 @@ def convert_html_to_pdf(source_html, output_filename):
     # return True on success and False on errors
     return pisa_status.err
 
+
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         return json.JSONEncoder.default(self, obj)
+
 
 class DictDFEncoder(json.JSONEncoder):
     def default(self, obj):

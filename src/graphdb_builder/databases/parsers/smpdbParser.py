@@ -2,8 +2,7 @@ import os.path
 import zipfile
 import pandas as pd
 from collections import defaultdict
-import ckg_utils
-from graphdb_builder import mapping as mp, builder_utils
+from graphdb_builder import builder_utils
 
 #########################
 #     SMPDB database    #
@@ -17,7 +16,7 @@ def parser(databases_directory, download=True):
     relationships_headers = config['relationships_header']
     directory = os.path.join(databases_directory, "SMPDB")
     builder_utils.checkDirectory(directory)
-    
+
     for dataset in urls:
         url = urls[dataset]
         file_name = url.split('/')[-1]
@@ -31,9 +30,12 @@ def parser(databases_directory, download=True):
                 relationships.update(parsePathwayProteinRelationships(rf))
             elif dataset == "metabolite":
                 relationships.update(parsePathwayMetaboliteDrugRelationships(rf))
-    
+
+    builder_utils.remove_directory(directory)
+
     return entities, relationships, entities_header, relationships_headers
-        
+
+
 def parsePathways(config, fhandler):
     entities = set()
     url = config['linkout_url']
@@ -48,8 +50,9 @@ def parsePathways(config, fhandler):
                     description = row[3]
                     linkout = url.replace("PATHWAY", identifier)
                     entities.add((identifier, "Pathway", name, description, organism, linkout, "SMPDB"))
-                
+
     return entities
+
 
 def parsePathwayProteinRelationships(fhandler):
     relationships = defaultdict(set)
@@ -65,8 +68,9 @@ def parsePathwayProteinRelationships(fhandler):
                     protein = row[3] 
                     if protein != '':
                         relationships[("protein", "annotated_to_pathway")].add((protein, identifier, "ANNOTATED_TO_PATHWAY", evidence, organism, loc, "SMPDB"))
-    
+
     return relationships
+
 
 def parsePathwayMetaboliteDrugRelationships(fhandler):
     relationships = defaultdict(set)
@@ -85,6 +89,5 @@ def parsePathwayMetaboliteDrugRelationships(fhandler):
                         relationships[("metabolite", "annotated_to_pathway")].add((metabolite, identifier, "ANNOTATED_TO_PATHWAY", evidence, organism, loc, "SMPDB"))
                     if drug != "":
                         relationships[("drug", "annotated_to_pathway")].add((drug, identifier, "ANNOTATED_TO_PATHWAY", evidence, organism, loc, "SMPDB"))
-    
-    return relationships
 
+    return relationships

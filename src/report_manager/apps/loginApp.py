@@ -2,12 +2,13 @@ from apps import basicApp
 import dash_core_components as dcc
 import dash_html_components as html
 
+
 class LoginApp(basicApp.BasicApp):
     """
     Defines the login App
     Enables user to access the reports
     """
-    def __init__(self, title, subtitle, description, layout = [], logo = None, footer = None):
+    def __init__(self, title, subtitle, description, layout=[], logo=None, footer=None):
         self.pageType = "loginPage"
         basicApp.BasicApp.__init__(self, title, subtitle, description, self.pageType, layout, logo, footer)
         self.buildPage()

@@ -38,7 +38,7 @@ def parseUsersFile(importDirectory, expiration=365):
     usersFile = os.path.join(usersDir, config['usersFile'])
     usersImportFile = os.path.join(importDirectory, config['import_file'])
 
-    driver = connector.getGraphDatabaseConnectionConfiguration()
+    driver = connector.getGraphDatabaseConnectionConfiguration(database=None)
 
     data = pd.read_excel(usersFile).applymap(str)
     date = datetime.today() + timedelta(days=expiration)
@@ -59,7 +59,7 @@ def parseUsersFile(importDirectory, expiration=365):
                 row['rolename'] = 'reader'
                 row['expiration_date'] = date.strftime('%Y-%m-%d')
                 row['image'] = ''
-                create_db_user(driver, row)
+                #create_db_user(driver, row)
                 row['password'] = bcrypt.encrypt(row['password'])
                 df.append(row)
                 new_id += 1

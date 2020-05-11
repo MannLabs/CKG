@@ -52,6 +52,9 @@ overview: #section
             - violinplot
             - basicTable
         args:
+            drop_cols:
+                - subject
+                - biological_sample 
             group: group
             x_title: clinical variables
             y_title: value
@@ -66,6 +69,7 @@ overview: #section
         args:
             alpha: 0.05
             fc: 2.0
+            is_logged: False
             permutations: 0
             group: group
             subject: subject
@@ -78,30 +82,31 @@ overview: #section
                 - subject
                 - biological_sample
             name: clinical_variable
-            title: 'Volcano plot'
+            title: 'ANOVA analysis'
     correlation:
         data: processed
         analyses:
             - correlation
         plots:
             - network
-            #- heatmap
         store_analysis: True
         args:
             source: node1
             target: node2
-            title: 'Features correlation network'
+            title: 'Clinical Features correlation network'
             format: edgelist
             values: weight
+            method: spearman
             dist: False
             node_properties: {}
             maxLinkWidth: 6
             maxRadius: 20
             node_size: 'degree'
-            cutoff: 0.2
+            cutoff: 0.0
             subject: subject
             cutoff_abs: True
             color_weight: True
             communities_algorithm: louvain
             width: 1600
             height: 1600
+
