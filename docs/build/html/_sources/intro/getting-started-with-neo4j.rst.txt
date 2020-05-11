@@ -16,7 +16,7 @@ Once the file has downloaded, you can install Neo4j by following the instruction
 .. image:: ../_static/images/neo4j_app3.png
     :width: 32%
 
-Open the Neo4j Desktop App and create a database by clicking :guilabel:`Add graph`, followed by :guilabel:`Create a Local Graph`, using the password "bioinfo1112".
+Open the Neo4j Desktop App and create a database by clicking :guilabel:`Add graph`, followed by :guilabel:`Create a Local Graph`, using the password "neo4j".
 Now that your database is created:
 
 .. image:: ../_static/images/neo4j_app4.png
