@@ -204,10 +204,14 @@ To build the graph database, run ``builder.py``:
 This action will take aproximately 6 hours but depending on a multitude of factors, it can take up to 10 hours.
 
 
-From a backup dump file
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+From the provided dump file **(Testing)**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A dump file of the database is also made available in `add link to the dump file!!` and alternatively, you can use it to load the graph database contained in it:
+A dump file of the database is also made available in this `link <https://data.mendeley.com/datasets/mrcf7f4tc2/1>`__ and alternatively, you can use it to load the graph database contained in it. To do so, download both files contained in it. 
+
+The ``.dump`` file will be used to load the Neo4j graph database:
+
+1. Create ``backups`` and ``graph.db`` folders:
 
 .. code-block:: bash
 
@@ -217,7 +221,7 @@ A dump file of the database is also made available in `add link to the dump file
 	$ cp 2019-11-04.dump backups/graph.db/.
 
 
-After copying the dump file to backups/graph.db/, make sure the graph database is shutdown and run:
+2. After copying the dump file to backups/graph.db/, make sure the graph database is shutdown and run:
 
 .. code-block:: bash
 	
@@ -233,19 +237,16 @@ In some systems you might have to run this as root:
 	$ sudo chown -R username data/databases/graph.db/
 
 
-Once you are done, start the database and you will have a functional graph database.
+3. Once you are done, start the database and you will have a functional graph database.
 
 However, be aware the database contained in the dump file **does NOT** include the licensed databases (**PhosphoSitePlus**, **DrugBank** and **SNOMED-CT**).
 
-To add the missing ontology and databases, as well as their dependencies (relationships to other nodes), please manually download the files as explained in :ref:`Build Neo4j graph database`, and run the following commands:
+To add the missing ontology and databases, as well as their dependencies (relationships to other nodes), please manually download the files as explained in :ref:`Build Neo4j graph database`, unzip the downloaded file ``data.tar.gz`` and place its contents in ``CKG/data/``, and run the following commands:
 
 .. code-block:: bash
 	
 	$ cd CKG/src/graphdb_builder/builder
-	$ python builder.py -b import -i ontologies -d Clinical_variable -w False -u username
-	$ python builder.py -b import -i databases -d phosphositeplus drugbank -n 2 -w False -u username
-	$ python builder.py -b load -l ontologies -s SNOMED_CT -u username
-	$ python builder.py -b load -l modified_proteins drugs mentions side effects pathway project experiment -u username
+	$ python builder.py -b minimal -u username
 
 
 .. note:: Remember of replace the ``username`` in each command, with your own neo4j username.

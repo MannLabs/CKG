@@ -72,7 +72,7 @@
 
 
 \title{Clinical Knowledge Graph Documentation}
-\date{May 11, 2020}
+\date{May 12, 2020}
 \release{1.0b1 BETA}
 \author{Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -929,9 +929,17 @@ Before running \sphinxcode{\sphinxupquote{builder.py}}, please make sure your Ne
 This action will take aproximately 6 hours but depending on a multitude of factors, it can take up to 10 hours.
 
 
-\subsubsection{From a backup dump file}
-\label{\detokenize{intro/getting-started-with-build:from-a-backup-dump-file}}
-A dump file of the database is also made available in \sphinxtitleref{add link to the dump file!!} and alternatively, you can use it to load the graph database contained in it:
+\subsubsection{From the provided dump file \sphinxstylestrong{(Testing)}}
+\label{\detokenize{intro/getting-started-with-build:from-the-provided-dump-file-testing}}
+A dump file of the database is also made available in this \sphinxhref{https://data.mendeley.com/datasets/mrcf7f4tc2/1}{link} and alternatively, you can use it to load the graph database contained in it. To do so, download both files contained in it.
+
+The \sphinxcode{\sphinxupquote{.dump}} file will be used to load the Neo4j graph database:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+Create \sphinxcode{\sphinxupquote{backups}} and \sphinxcode{\sphinxupquote{graph.db}} folders:
+
+\end{enumerate}
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYGZdl{} \PYG{n+nb}{cd} /path/to/neo4jDatabases/database\PYGZhy{}identifier/installation\PYGZhy{}x.x.x/
@@ -939,8 +947,13 @@ A dump file of the database is also made available in \sphinxtitleref{add link t
 \PYGZdl{} mkdir backups/graph.db
 \PYGZdl{} cp \PYG{l+m}{2019}\PYGZhy{}11\PYGZhy{}04.dump backups/graph.db/.
 \end{sphinxVerbatim}
-
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\setcounter{enumi}{1}
+\item {} 
 After copying the dump file to backups/graph.db/, make sure the graph database is shutdown and run:
+
+\end{enumerate}
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYGZdl{} bin/neo4j\PYGZhy{}admin load \PYGZhy{}\PYGZhy{}from\PYG{o}{=}backups/graph.db/2019\PYGZhy{}11\PYGZhy{}04.dump \PYGZhy{}\PYGZhy{}database\PYG{o}{=}graph.db \PYGZhy{}\PYGZhy{}force
@@ -956,19 +969,21 @@ In some systems you might have to run this as root:
 \PYGZdl{} sudo bin/neo4j\PYGZhy{}admin load \PYGZhy{}\PYGZhy{}from\PYG{o}{=}backups/graph.db/2019\PYGZhy{}11\PYGZhy{}04.dump \PYGZhy{}\PYGZhy{}database\PYG{o}{=}graph.db \PYGZhy{}\PYGZhy{}force
 \PYGZdl{} sudo chown \PYGZhy{}R username data/databases/graph.db/
 \end{sphinxVerbatim}
-
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\setcounter{enumi}{2}
+\item {} 
 Once you are done, start the database and you will have a functional graph database.
+
+\end{enumerate}
 
 However, be aware the database contained in the dump file \sphinxstylestrong{does NOT} include the licensed databases (\sphinxstylestrong{PhosphoSitePlus}, \sphinxstylestrong{DrugBank} and \sphinxstylestrong{SNOMED\sphinxhyphen{}CT}).
 
-To add the missing ontology and databases, as well as their dependencies (relationships to other nodes), please manually download the files as explained in {\hyperref[\detokenize{intro/getting-started-with-build:build-neo4j-graph-database}]{\sphinxcrossref{\DUrole{std,std-ref}{Build Neo4j graph database}}}}, and run the following commands:
+To add the missing ontology and databases, as well as their dependencies (relationships to other nodes), please manually download the files as explained in {\hyperref[\detokenize{intro/getting-started-with-build:build-neo4j-graph-database}]{\sphinxcrossref{\DUrole{std,std-ref}{Build Neo4j graph database}}}}, unzip the downloaded file \sphinxcode{\sphinxupquote{data.tar.gz}} and place its contents in \sphinxcode{\sphinxupquote{CKG/data/}}, and run the following commands:
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYGZdl{} \PYG{n+nb}{cd} CKG/src/graphdb\PYGZus{}builder/builder
-\PYGZdl{} python builder.py \PYGZhy{}b import \PYGZhy{}i ontologies \PYGZhy{}d Clinical\PYGZus{}variable \PYGZhy{}w False \PYGZhy{}u username
-\PYGZdl{} python builder.py \PYGZhy{}b import \PYGZhy{}i databases \PYGZhy{}d phosphositeplus drugbank \PYGZhy{}n \PYG{l+m}{2} \PYGZhy{}w False \PYGZhy{}u username
-\PYGZdl{} python builder.py \PYGZhy{}b load \PYGZhy{}l ontologies \PYGZhy{}s SNOMED\PYGZus{}CT \PYGZhy{}u username
-\PYGZdl{} python builder.py \PYGZhy{}b load \PYGZhy{}l modified\PYGZus{}proteins drugs mentions side effects pathway project experiment \PYGZhy{}u username
+\PYGZdl{} python builder.py \PYGZhy{}b minimal \PYGZhy{}u username
 \end{sphinxVerbatim}
 
 \begin{sphinxadmonition}{note}{Note:}

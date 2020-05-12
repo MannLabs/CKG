@@ -97,7 +97,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#add-ckg-to-bashrc">Add CKG to <em>.bashrc</em></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#build-neo4j-graph-database">Build Neo4j graph database</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#from-builder-py">From builder.py</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#from-a-backup-dump-file">From a backup dump file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#from-the-provided-dump-file-testing">From the provided dump file <strong>(Testing)</strong></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#more-on-the-dump-file">More on the dump file</a></li>
 </ul>
 </li>
@@ -374,16 +374,22 @@ $ python builder.py -b full -u neo4j
 </div>
 <p>This action will take aproximately 6 hours but depending on a multitude of factors, it can take up to 10 hours.</p>
 </div>
-<div class="section" id="from-a-backup-dump-file">
-<h3>From a backup dump file<a class="headerlink" href="#from-a-backup-dump-file" title="Permalink to this headline">¶</a></h3>
-<p>A dump file of the database is also made available in <cite>add link to the dump file!!</cite> and alternatively, you can use it to load the graph database contained in it:</p>
+<div class="section" id="from-the-provided-dump-file-testing">
+<h3>From the provided dump file <strong>(Testing)</strong><a class="headerlink" href="#from-the-provided-dump-file-testing" title="Permalink to this headline">¶</a></h3>
+<p>A dump file of the database is also made available in this <a class="reference external" href="https://data.mendeley.com/datasets/mrcf7f4tc2/1">link</a> and alternatively, you can use it to load the graph database contained in it. To do so, download both files contained in it.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">.dump</span></code> file will be used to load the Neo4j graph database:</p>
+<ol class="arabic simple">
+<li><p>Create <code class="docutils literal notranslate"><span class="pre">backups</span></code> and <code class="docutils literal notranslate"><span class="pre">graph.db</span></code> folders:</p></li>
+</ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /path/to/neo4jDatabases/database-identifier/installation-x.x.x/
 $ mkdir backups
 $ mkdir backups/graph.db
 $ cp <span class="m">2019</span>-11-04.dump backups/graph.db/.
 </pre></div>
 </div>
-<p>After copying the dump file to backups/graph.db/, make sure the graph database is shutdown and run:</p>
+<ol class="arabic simple" start="2">
+<li><p>After copying the dump file to backups/graph.db/, make sure the graph database is shutdown and run:</p></li>
+</ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ bin/neo4j-admin load --from<span class="o">=</span>backups/graph.db/2019-11-04.dump --database<span class="o">=</span>graph.db --force
 </pre></div>
 </div>
@@ -396,14 +402,13 @@ $ cp <span class="m">2019</span>-11-04.dump backups/graph.db/.
 $ sudo chown -R username data/databases/graph.db/
 </pre></div>
 </div>
-<p>Once you are done, start the database and you will have a functional graph database.</p>
+<ol class="arabic simple" start="3">
+<li><p>Once you are done, start the database and you will have a functional graph database.</p></li>
+</ol>
 <p>However, be aware the database contained in the dump file <strong>does NOT</strong> include the licensed databases (<strong>PhosphoSitePlus</strong>, <strong>DrugBank</strong> and <strong>SNOMED-CT</strong>).</p>
-<p>To add the missing ontology and databases, as well as their dependencies (relationships to other nodes), please manually download the files as explained in <a class="reference internal" href="#build-neo4j-graph-database"><span class="std std-ref">Build Neo4j graph database</span></a>, and run the following commands:</p>
+<p>To add the missing ontology and databases, as well as their dependencies (relationships to other nodes), please manually download the files as explained in <a class="reference internal" href="#build-neo4j-graph-database"><span class="std std-ref">Build Neo4j graph database</span></a>, unzip the downloaded file <code class="docutils literal notranslate"><span class="pre">data.tar.gz</span></code> and place its contents in <code class="docutils literal notranslate"><span class="pre">CKG/data/</span></code>, and run the following commands:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> CKG/src/graphdb_builder/builder
-$ python builder.py -b import -i ontologies -d Clinical_variable -w False -u username
-$ python builder.py -b import -i databases -d phosphositeplus drugbank -n <span class="m">2</span> -w False -u username
-$ python builder.py -b load -l ontologies -s SNOMED_CT -u username
-$ python builder.py -b load -l modified_proteins drugs mentions side effects pathway project experiment -u username
+$ python builder.py -b minimal -u username
 </pre></div>
 </div>
 <div class="admonition note">
