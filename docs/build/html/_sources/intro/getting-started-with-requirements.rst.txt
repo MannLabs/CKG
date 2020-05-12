@@ -8,7 +8,7 @@ The following instructions on installation of software requirements and setting 
 Java
 -------
 
-Before starting setting up Neo4j and, later on, the Clinical Knowledge Graph, it is very important that you have *Java* installed in your machine.
+Before starting setting up Neo4j and, later on, the Clinical Knowledge Graph, it is very important that you have *Java* installed in your machine, including **Java SE Runtime Environment**.
 
 Different versions of a Neo4j database can have different requirements. For example, Neo4j 3.5 versions require Oracle Java 8, while Neo4j 4.0 versions already require Oracle Java 11.
 When using a new version of Neo4j, always remember to read the respective Operations Manual, and check for the software requirements.

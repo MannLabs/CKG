@@ -10,12 +10,12 @@ In this section we describe how to install all the neccessary requirements and s
 Java
 -------
 
-Similarly to MacOS and Linux, Windows will also need a **Java** installation.
+Similarly to MacOS and Linux, Windows will also need a **Java** installation (Java SE Runtime Environment and Java SE Development Kit).
 
 Be aware that different versions of a Neo4j database can have different requirements. For example, Neo4j 3.5 versions require Oracle Java 8, while Neo4j 4.0 versions already require Oracle Java 11.
 When using a new version of Neo4j, always remember to read the respective Operations Manual, and check for the software requirements.
 
-By default Java SE Development Kit should be installed on the Windows 10. If this is not your case, please follow this `tutorial <https://docs.oracle.com/javase/8/docs/technotes/guides/install/windows_jdk_install.html#A1097936>`__ to install it.
+By default Java should be installed on the Windows 10. If this is not your case, please follow this `tutorial <https://docs.oracle.com/javase/8/docs/technotes/guides/install/windows_jdk_install.html#A1097936>`__ to install it.
 
 
 R

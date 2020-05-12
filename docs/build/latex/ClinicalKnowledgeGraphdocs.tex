@@ -524,7 +524,7 @@ The following instructions on installation of software requirements and setting 
 
 \subsection{Java}
 \label{\detokenize{intro/getting-started-with-requirements:java}}
-Before starting setting up Neo4j and, later on, the Clinical Knowledge Graph, it is very important that you have \sphinxstyleemphasis{Java} installed in your machine.
+Before starting setting up Neo4j and, later on, the Clinical Knowledge Graph, it is very important that you have \sphinxstyleemphasis{Java} installed in your machine, including \sphinxstylestrong{Java SE Runtime Environment}.
 
 Different versions of a Neo4j database can have different requirements. For example, Neo4j 3.5 versions require Oracle Java 8, while Neo4j 4.0 versions already require Oracle Java 11.
 When using a new version of Neo4j, always remember to read the respective Operations Manual, and check for the software requirements.
@@ -932,7 +932,7 @@ This action will take aproximately 6 hours but depending on a multitude of facto
 
 \subsubsection{From the provided dump file \sphinxstylestrong{(Testing)}}
 \label{\detokenize{intro/getting-started-with-build:from-the-provided-dump-file-testing}}
-A dump file of the database is also made available in this \sphinxhref{https://data.mendeley.com/datasets/mrcf7f4tc2/1}{link} and alternatively, you can use it to load the graph database contained in it. To do so, download both files contained in it.
+A dump file of the database is also made available in this \sphinxhref{https://data.mendeley.com/datasets/mrcf7f4tc2/1}{link} and alternatively, you can use it to load the graph database contained in it. To do so, download both files (\sphinxcode{\sphinxupquote{ckg\_080520.dump}} and \sphinxcode{\sphinxupquote{data.tar.gz}}).
 
 The \sphinxcode{\sphinxupquote{.dump}} file will be used to load the Neo4j graph database:
 \begin{enumerate}
@@ -960,16 +960,16 @@ After copying the dump file to backups/graph.db/, make sure the graph database i
 \PYGZdl{} bin/neo4j\PYGZhy{}admin load \PYGZhy{}\PYGZhy{}from\PYG{o}{=}backups/graph.db/2019\PYGZhy{}11\PYGZhy{}04.dump \PYGZhy{}\PYGZhy{}database\PYG{o}{=}graph.db \PYGZhy{}\PYGZhy{}force
 \end{sphinxVerbatim}
 
-\begin{sphinxadmonition}{warning}{Warning:}
-Make sure the dump file naming in the command above, matches the one provided to you.
-\end{sphinxadmonition}
-
 In some systems you might have to run this as root:
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYGZdl{} sudo bin/neo4j\PYGZhy{}admin load \PYGZhy{}\PYGZhy{}from\PYG{o}{=}backups/graph.db/2019\PYGZhy{}11\PYGZhy{}04.dump \PYGZhy{}\PYGZhy{}database\PYG{o}{=}graph.db \PYGZhy{}\PYGZhy{}force
 \PYGZdl{} sudo chown \PYGZhy{}R username data/databases/graph.db/
 \end{sphinxVerbatim}
+
+\begin{sphinxadmonition}{warning}{Warning:}
+Make sure the dump file naming in the command above, matches the one provided to you.
+\end{sphinxadmonition}
 \begin{enumerate}
 \sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
 \setcounter{enumi}{2}
@@ -978,9 +978,15 @@ Once you are done, start the database and you will have a functional graph datab
 
 \end{enumerate}
 
-However, be aware the database contained in the dump file \sphinxstylestrong{does NOT} include the licensed databases (\sphinxstylestrong{PhosphoSitePlus}, \sphinxstylestrong{DrugBank} and \sphinxstylestrong{SNOMED\sphinxhyphen{}CT}).
+Be aware the database contained in the dump file \sphinxstylestrong{does NOT} include the licensed databases (\sphinxstylestrong{PhosphoSitePlus}, \sphinxstylestrong{DrugBank} and \sphinxstylestrong{SNOMED\sphinxhyphen{}CT}).
+\begin{wrapfigure}{r}{240\sphinxpxdimen}
+\centering
+\noindent\sphinxincludegraphics[width=240\sphinxpxdimen]{{data_folder}.png}
+\caption{Final CKG/data folder architecture.}\label{\detokenize{intro/getting-started-with-build:id5}}\end{wrapfigure}
 
-To add the missing ontology and databases, as well as their dependencies (relationships to other nodes), please manually download the files as explained in {\hyperref[\detokenize{intro/getting-started-with-build:build-neo4j-graph-database}]{\sphinxcrossref{\DUrole{std,std-ref}{Build Neo4j graph database}}}}, unzip the downloaded file \sphinxcode{\sphinxupquote{data.tar.gz}} and place its contents in \sphinxcode{\sphinxupquote{CKG/data/}}, and run the following commands:
+To add the missing ontology and databases, as well as their dependencies (relationships to other nodes), please manually download the files as explained in {\hyperref[\detokenize{intro/getting-started-with-build:build-neo4j-graph-database}]{\sphinxcrossref{\DUrole{std,std-ref}{Build Neo4j graph database}}}}, unzip the downloaded file \sphinxcode{\sphinxupquote{data.tar.gz}} and place its contents in \sphinxcode{\sphinxupquote{CKG/data/}}. The folder \sphinxcode{\sphinxupquote{data}} should look like the figure depicted.
+
+Once this is done, run the following commands:
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYGZdl{} \PYG{n+nb}{cd} CKG/src/graphdb\PYGZus{}builder/builder
@@ -1014,12 +1020,12 @@ In this section we describe how to install all the neccessary requirements and s
 
 \subsection{Java}
 \label{\detokenize{intro/getting-started-with-windows:java}}
-Similarly to MacOS and Linux, Windows will also need a \sphinxstylestrong{Java} installation.
+Similarly to MacOS and Linux, Windows will also need a \sphinxstylestrong{Java} installation (Java SE Runtime Environment and Java SE Development Kit).
 
 Be aware that different versions of a Neo4j database can have different requirements. For example, Neo4j 3.5 versions require Oracle Java 8, while Neo4j 4.0 versions already require Oracle Java 11.
 When using a new version of Neo4j, always remember to read the respective Operations Manual, and check for the software requirements.
 
-By default Java SE Development Kit should be installed on the Windows 10. If this is not your case, please follow this \sphinxhref{https://docs.oracle.com/javase/8/docs/technotes/guides/install/windows\_jdk\_install.html\#A1097936}{tutorial} to install it.
+By default Java should be installed on the Windows 10. If this is not your case, please follow this \sphinxhref{https://docs.oracle.com/javase/8/docs/technotes/guides/install/windows\_jdk\_install.html\#A1097936}{tutorial} to install it.
 
 
 \subsection{R}

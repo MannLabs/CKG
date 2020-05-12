@@ -207,7 +207,7 @@ This action will take aproximately 6 hours but depending on a multitude of facto
 From the provided dump file **(Testing)**
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A dump file of the database is also made available in this `link <https://data.mendeley.com/datasets/mrcf7f4tc2/1>`__ and alternatively, you can use it to load the graph database contained in it. To do so, download both files contained in it. 
+A dump file of the database is also made available in this `link <https://data.mendeley.com/datasets/mrcf7f4tc2/1>`__ and alternatively, you can use it to load the graph database contained in it. To do so, download both files (``ckg_080520.dump`` and ``data.tar.gz``). 
 
 The ``.dump`` file will be used to load the Neo4j graph database:
 
@@ -227,7 +227,6 @@ The ``.dump`` file will be used to load the Neo4j graph database:
 	
 	$ bin/neo4j-admin load --from=backups/graph.db/2019-11-04.dump --database=graph.db --force
 
-.. warning:: Make sure the dump file naming in the command above, matches the one provided to you.
 
 In some systems you might have to run this as root:
 
@@ -237,11 +236,24 @@ In some systems you might have to run this as root:
 	$ sudo chown -R username data/databases/graph.db/
 
 
+.. warning:: Make sure the dump file naming in the command above, matches the one provided to you.
+
+
 3. Once you are done, start the database and you will have a functional graph database.
 
-However, be aware the database contained in the dump file **does NOT** include the licensed databases (**PhosphoSitePlus**, **DrugBank** and **SNOMED-CT**).
 
-To add the missing ontology and databases, as well as their dependencies (relationships to other nodes), please manually download the files as explained in :ref:`Build Neo4j graph database`, unzip the downloaded file ``data.tar.gz`` and place its contents in ``CKG/data/``, and run the following commands:
+Be aware the database contained in the dump file **does NOT** include the licensed databases (**PhosphoSitePlus**, **DrugBank** and **SNOMED-CT**).
+
+.. figure:: ../_static/images/data_folder.png
+    :width: 240px
+    :align: right
+
+    Final CKG/data folder architecture.
+
+
+To add the missing ontology and databases, as well as their dependencies (relationships to other nodes), please manually download the files as explained in :ref:`Build Neo4j graph database`, unzip the downloaded file ``data.tar.gz`` and place its contents in ``CKG/data/``. The folder ``data`` should look like the figure depicted.
+
+Once this is done, run the following commands:
 
 .. code-block:: bash
 	
