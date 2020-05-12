@@ -376,7 +376,7 @@ $ python builder.py -b full -u neo4j
 </div>
 <div class="section" id="from-the-provided-dump-file-testing">
 <h3>From the provided dump file <strong>(Testing)</strong><a class="headerlink" href="#from-the-provided-dump-file-testing" title="Permalink to this headline">¶</a></h3>
-<p>A dump file of the database is also made available in this <a class="reference external" href="https://data.mendeley.com/datasets/mrcf7f4tc2/1">link</a> and alternatively, you can use it to load the graph database contained in it. To do so, download both files contained in it.</p>
+<p>A dump file of the database is also made available in this <a class="reference external" href="https://data.mendeley.com/datasets/mrcf7f4tc2/1">link</a> and alternatively, you can use it to load the graph database contained in it. To do so, download both files (<code class="docutils literal notranslate"><span class="pre">ckg_080520.dump</span></code> and <code class="docutils literal notranslate"><span class="pre">data.tar.gz</span></code>).</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">.dump</span></code> file will be used to load the Neo4j graph database:</p>
 <ol class="arabic simple">
 <li><p>Create <code class="docutils literal notranslate"><span class="pre">backups</span></code> and <code class="docutils literal notranslate"><span class="pre">graph.db</span></code> folders:</p></li>
@@ -393,20 +393,25 @@ $ cp <span class="m">2019</span>-11-04.dump backups/graph.db/.
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ bin/neo4j-admin load --from<span class="o">=</span>backups/graph.db/2019-11-04.dump --database<span class="o">=</span>graph.db --force
 </pre></div>
 </div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Make sure the dump file naming in the command above, matches the one provided to you.</p>
-</div>
 <p>In some systems you might have to run this as root:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo bin/neo4j-admin load --from<span class="o">=</span>backups/graph.db/2019-11-04.dump --database<span class="o">=</span>graph.db --force
 $ sudo chown -R username data/databases/graph.db/
 </pre></div>
 </div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Make sure the dump file naming in the command above, matches the one provided to you.</p>
+</div>
 <ol class="arabic simple" start="3">
 <li><p>Once you are done, start the database and you will have a functional graph database.</p></li>
 </ol>
-<p>However, be aware the database contained in the dump file <strong>does NOT</strong> include the licensed databases (<strong>PhosphoSitePlus</strong>, <strong>DrugBank</strong> and <strong>SNOMED-CT</strong>).</p>
-<p>To add the missing ontology and databases, as well as their dependencies (relationships to other nodes), please manually download the files as explained in <a class="reference internal" href="#build-neo4j-graph-database"><span class="std std-ref">Build Neo4j graph database</span></a>, unzip the downloaded file <code class="docutils literal notranslate"><span class="pre">data.tar.gz</span></code> and place its contents in <code class="docutils literal notranslate"><span class="pre">CKG/data/</span></code>, and run the following commands:</p>
+<p>Be aware the database contained in the dump file <strong>does NOT</strong> include the licensed databases (<strong>PhosphoSitePlus</strong>, <strong>DrugBank</strong> and <strong>SNOMED-CT</strong>).</p>
+<div class="figure align-right" id="id5">
+<a class="reference internal image-reference" href="../_images/data_folder.png"><img alt="../_images/data_folder.png" src="../_images/data_folder.png" style="width: 240px;" /></a>
+<p class="caption"><span class="caption-text">Final CKG/data folder architecture.</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</div>
+<p>To add the missing ontology and databases, as well as their dependencies (relationships to other nodes), please manually download the files as explained in <a class="reference internal" href="#build-neo4j-graph-database"><span class="std std-ref">Build Neo4j graph database</span></a>, unzip the downloaded file <code class="docutils literal notranslate"><span class="pre">data.tar.gz</span></code> and place its contents in <code class="docutils literal notranslate"><span class="pre">CKG/data/</span></code>. The folder <code class="docutils literal notranslate"><span class="pre">data</span></code> should look like the figure depicted.</p>
+<p>Once this is done, run the following commands:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> CKG/src/graphdb_builder/builder
 $ python builder.py -b minimal -u username
 </pre></div>

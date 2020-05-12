@@ -5,6 +5,9 @@ Getting started with Docker **(Testing)**
 In this section we describe how to set up the Clinical Knowledge Graph from a Docker container.
 This container will install all the requirements needed, download source databases and build the CKG graph database, and open 5 ports through which to interact with the CKG.
 
+A requirement to run the Docker is **Java SE Runtime Environment**.
+Please go to ``https://www.oracle.com/java/technologies/javase-jre8-downloads.html`` and download the ``jre-8u221-linux-x64.tar.gz`` file. Once downloaded, place it in ``CKG/resources/``.
+
 To run the Docker, simply:
 
 1. Build the docker
