@@ -51,32 +51,32 @@ def get_query():
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        raise Exception("Reading queries from file {}: {}, file: {},line: {}".format(
-            queries_path, sys.exc_info(), fname, exc_tb.tb_lineno))
+        raise Exception("Erro: {}. Reading queries from file {}: {}, file: {},line: {}".format(err, queries_path, sys.exc_info(), fname, exc_tb.tb_lineno))
     return data_upload_cypher
+
 
 def get_db_schema():
     """
     Retrieves the database schema
-    
+
     :return: network with all the database nodes and how they are related
     """
-    style=[{'selector': 'node', 
+    style = [{'selector': 'node', 
             'style': {'label': 'data(name)', 
                       'background-color': 'data(color)',
                       'text-valign': 'center',
                       'text-halign': 'center',
-                      'border-color':'gray',
+                      'border-color': 'gray',
                       'border-width': '1px',
                       'width': 55,
                       'height': 55,
-                      'opacity':0.8,
+                      'opacity': 0.8,
                       'font-size': '14'}},
-           {'selector':'edge',
-            'style':{'label':'data(label)', 
+           {'selector': 'edge',
+            'style': {'label': 'data(label)', 
                      'curve-style': 'bezier', 
-                     'opacity':0.7,
-                     'width':0.4,
+                     'opacity': 0.7,
+                     'width': 0.4,
                      'font-size': '5'}}]
     layout = {'name': 'cose',
               'idealEdgeLength': 100,
@@ -100,15 +100,16 @@ def get_db_schema():
             query = cypher[query_name]['query']
             path = connector.sendQuery(driver, query, parameters={}).data()
             G = utils.neo4j_schema_to_networkx(path)
-            args = {'height':'1000px'}
+            args = {'height': '1000px'}
             args['stylesheet'] = style
             args['layout'] = layout
             args['title'] = "Database Schema"
             net, mouseover = utils.networkx_to_cytoscape(G)
             plot = viz.get_cytoscape_network(net, "db_schema", args)
-            
+
     return plot
-            
+
+
 def get_db_stats_data():
     """
     Retrieves all the stats data from the graph database and returns them as a dictionary.
@@ -171,24 +172,21 @@ def plot_node_rel_per_label(dfs, title, args, focus='nodes'):
     if focus == 'nodes':
         data = pd.DataFrame.from_dict(data['labels'][0], orient='index', columns=[
                                       'number']).reset_index()
-        xaxis_name = 'Labels'
     elif focus == 'relationships':
         data = pd.DataFrame.from_dict(
             data['relTypesCount'][0], orient='index', columns=['number']).reset_index()
-        xaxis_name = 'Types'
 
     data = data.sort_values('number')
 
     fig = viz.get_barplot(data, identifier='node_rel_per_label_{}'.format(focus), args=args)
-    
     fig.figure['layout'] = go.Layout(barmode='relative',
-                                    height=args['height'],
-                                    xaxis={'type':'log', 'range':[0, np.log10(data['number'].iloc[-1])]},
-                                    yaxis={'showline':True, 'linewidth':1, 'linecolor':'black'},
-                                    font={'family':'MyriadPro-Regular', 'size':12},
-                                    template='plotly_white',
-                                    bargap=0.2)
-    
+                                     height=args['height'],
+                                     xaxis={'type': 'log', 'range': [0, np.log10(data['number'].iloc[-1])]},
+                                     yaxis={'showline': True, 'linewidth': 1, 'linecolor': 'black'},
+                                     font={'family': 'MyriadPro-Regular', 'size': 12},
+                                     template='plotly_white',
+                                     bargap=0.2)
+
     return html.Div([html.H3(title), fig], style={'margin': '0%', 'padding': '0%'})
 
 
@@ -222,8 +220,14 @@ def quick_numbers_panel():
 
     :return: List of Dash components.
     """
-    project_ids = [(d['name'], d['id']) for d in driver.nodes.match("Project")]
-    project_links = [html.H4('Available Projects:')]
+    project_ids = []
+    project_links = [html.H4('No available Projects')]
+    try:
+        project_ids = [(d['name'], d['id']) for d in driver.nodes.match("Project")]
+        project_links = [html.H4('Available Projects:')]
+    except AttributeError:
+        pass
+
     for project_name, project_id in project_ids:
         project_links.append(html.A(project_name.title(),
                                     id='link-internal',
@@ -231,22 +235,22 @@ def quick_numbers_panel():
                                     target='', 
                                     n_clicks=0,
                                     className="button_link"))
-        
+
     project_dropdown = [html.H6('Project finder:'),
-                        dcc.Dropdown(id='project_option', 
-                                     options=[{'label':name, 'value':(name, value)} for name,value in project_ids], 
-                                     value='', 
-                                     multi=False, 
-                                     clearable=True, 
-                                     placeholder='Search...', 
-                                     style={'width':'50%'}),
-                        html.H4('',id='project_url')]
-    
+                        dcc.Dropdown(id='project_option',
+                                     options=[{'label': name, 'value': (name, value)} for name, value in project_ids],
+                                     value='',
+                                     multi=False,
+                                     clearable=True,
+                                     placeholder='Search...',
+                                     style={'width': '50%'}),
+                        html.H4('', id='project_url')]
+
     navigation_links = [html.H4('Navigate to:'),
-        				html.A("Database Imports", href="/apps/imports", className="nav_link"),
+                        html.A("Database Imports", href="/apps/imports", className="nav_link"),
                         html.A("Project Creation", href="/apps/projectCreationApp", className="nav_link"),
                         html.A("Data Upload", href="/apps/dataUploadApp", className="nav_link")]
-    
+
     layout = [html.Div(children=navigation_links),
               html.Div(children=project_links[0:5]),
               html.Div(children=project_dropdown),
