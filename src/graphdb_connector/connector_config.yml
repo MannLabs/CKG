@@ -3,5 +3,4 @@ db_url: "0.0.0.0"
 #dbPort = 7688 #Production environment
 db_port: 7687 #Test environment
 db_user: "neo4j"
-db_password: "neo4j"
-
+db_password: "NeO4J"
