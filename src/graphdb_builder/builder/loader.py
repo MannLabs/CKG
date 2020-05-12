@@ -184,7 +184,7 @@ def updateDB(driver, imports=None, specific=[]):
                 code = cypher_queries['IMPORT_DRUG_ACTS_ON']['query']
                 for resource in config["drug_action_resources"]:
                     queries.extend(code.replace("IMPORTDIR", import_dir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
-            elif i == "side effects":
+            elif i == "side_effects":
                 code = cypher_queries['IMPORT_DRUG_SIDE_EFFECTS']['query']
                 for resource in config["side_effects_resources"]:
                     queries.extend(code.replace("IMPORTDIR", import_dir).replace("RESOURCE", resource.lower()).split(';')[0:-1])

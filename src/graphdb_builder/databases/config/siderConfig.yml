@@ -1,5 +1,5 @@
 #### SIDER database #####
-SIDER_url: 'http://sideeffects.embl.de/media/download/meddra_freq.tsv.gz'
+SIDER_url: 'http://sideeffects.embl.de/media/download/meddra_all_se.tsv.gz'
 SIDER_indications: 'http://sideeffects.embl.de/media/download/meddra_all_indications.tsv.gz'
 SIDER_source: 'UMLS'
 
@@ -10,10 +10,7 @@ header:
     - 'source'
     - 'original_side_effect'
     - 'evidence_from'
-    - 'frequency'
-    - 'lower_bound'
-    - 'upper_bound'
-
+    
 indications_header: 
     - 'START_ID'
     - 'END_ID'
