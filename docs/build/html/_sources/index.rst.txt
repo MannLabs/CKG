@@ -24,7 +24,8 @@ all the possibilities.
   :doc:`With Requirements <intro/getting-started-with-requirements>` |
   :doc:`With Neo4j <intro/getting-started-with-neo4j>` |
   :doc:`With Clinical Knowledge Graph <intro/getting-started-with-build>` |
-  :doc:`With Windows <intro/getting-started-with-windows>`
+  :doc:`With Windows <intro/getting-started-with-windows>` |
+  :doc:`With Docker <intro/getting-started-with-docker>`
 
 
 .. toctree::
@@ -134,7 +135,7 @@ Advanced featues
   :doc:`Notebooks <advanced_features/ckg-notebooks>`
 
 * **Retrieving data from the CKG**:
-  :doc:`DB Querying <advanced_features/ckg-queries>`  >>>>> query_utils.find_queries_involving_nodes + query_utils.read_knowledge_queries()
+  :doc:`DB Querying <advanced_features/ckg-queries>`
 
 * **Data Analysis**:
   :doc:`Analysis <advanced_features/standard-analysis>`
