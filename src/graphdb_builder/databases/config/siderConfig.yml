@@ -10,7 +10,7 @@ header:
     - 'source'
     - 'original_side_effect'
     - 'evidence_from'
-    
+
 indications_header: 
     - 'START_ID'
     - 'END_ID'
