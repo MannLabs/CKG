@@ -3,9 +3,7 @@ import gzip
 import re
 from graphdb_builder import mapping as mp, builder_utils
 
-#############################################
-#              SIDER database               # 
-#############################################
+
 def parser(databases_directory, drug_source, download=True):
     config = builder_utils.get_config(config_name="siderConfig.yml", data_type='databases')
     url = config['SIDER_url']
@@ -36,8 +34,6 @@ def parser(databases_directory, drug_source, download=True):
                 p = phenotypemapping[se.lower()]
                 relationships.add((d, p, "HAS_SIDE_EFFECT", "SIDER", se, evidence_from))
     associations.close()
-
-    builder_utils.remove_directory(directory)
 
     return (relationships, header, output_file, drugmapping, phenotypemapping)
 
