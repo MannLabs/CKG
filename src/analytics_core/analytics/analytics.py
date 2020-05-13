@@ -723,23 +723,24 @@ def run_pca(data, drop_cols=['sample', 'subject'], group='group', components=2, 
         var_exp = pca.explained_variance_ratio_
         loadings = pd.DataFrame(pca.components_.transpose())
         loadings.index = df.columns
-        loadings.columns = ['x', 'y']
-        loadings['value'] = np.sqrt(np.power(loadings['x'],2) + np.power(loadings['y'],2))
+        values = {index:np.sqrt(np.power(row, 2).sum()) for index, row in loadings.iterrows()}
+        loadings['value'] = loadings.index.map(values.get)
         loadings = loadings.sort_values(by='value', ascending=False)
         args = {"x_title":"PC1"+" ({0:.2f})".format(var_exp[0]),"y_title":"PC2"+" ({0:.2f})".format(var_exp[1])}
         if components == 2:
             resultDf = pd.DataFrame(X, index = y, columns = ["x","y"])
             resultDf = resultDf.reset_index()
             resultDf.columns = ["name", "x", "y"]
+            loadings.columns = ['x', 'y', 'value']
         if components > 2:
-            args.update({"z_title":"PC3"+str(var_exp[2])})
+            args.update({"z_title":"PC3"+" ({0:.2f})".format(var_exp[2])})
             resultDf = pd.DataFrame(X, index = y)
             resultDf = resultDf.reset_index()
             cols = []
             if components>3:
-                cols = resultDf.columns[4:]
-                cols = [str(i) for i in cols]
+                cols = [str(i) for i in resultDf.columns[4:]]
             resultDf.columns = ["name", "x", "y", "z"] + cols
+            loadings.columns = ['x', 'y', 'z'] + cols + ['value']
 
         result['pca'] = (resultDf, loadings)
     return result, args
@@ -1435,7 +1436,7 @@ def calculate_repeated_measures_anova(df, column, subject='subject', group='grou
         result = calculate_repeated_measures_anova(df, 'protein a', subject='subject', group='group')
     """
     aov_result = pg.rm_anova(data=df, dv=column, within=group,subject=subject, detailed=True, correction=True)
-    t, pvalue = aov_result.loc[0, ['F', 'p-unc']].values.tolist()[0]
+    t, pvalue = aov_result.loc[0, ['F', 'p-unc']].values.tolist()
     df1, df2 = aov_result['DF']
     
     return (column, df1, df2, t, pvalue)
