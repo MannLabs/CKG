@@ -71,7 +71,7 @@ RUN service neo4j start && \
 
 ## Load backup with Clinical Knowledge Graph
 RUN mkdir -p /var/lib/neo4j/data/backup
-RUN wget -P /var/lib/neo4j/data/backup https://data.mendeley.com/datasets/mrcf7f4tc2/1/files/bf08667b-588f-4f40-b5fd-930f4e05368f/ckg_080520.dump?dl=1
+RUN wget -O /var/lib/neo4j/data/backup/ckg_080520.dump https://data.mendeley.com/datasets/mrcf7f4tc2/1/files/bf08667b-588f-4f40-b5fd-930f4e05368f/ckg_080520.dump?dl=1
 RUN mkdir -p /var/lib/neo4j/data/databases/graph.db
 RUN sudo -u neo4j neo4j-admin load --from=/var/lib/neo4j/data/backup/ckg_080520.dump --database=graph.db --force
 
