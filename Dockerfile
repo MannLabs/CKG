@@ -101,6 +101,7 @@ RUN Rscript R_packages.R
 ADD ./requirements.txt /requirements.txt
 
 ## Install Python libraries
+RUN pip3 install --upgrade pip
 RUN pip3 install --ignore-installed -r requirements.txt
 RUN mkdir /CKG
 RUN wget -P /CKG https://data.mendeley.com/datasets/mrcf7f4tc2/1/files/c0d058a2-adfa-4b96-97d9-c9ec7fc5adb9/data.tar.gz?dl=1
