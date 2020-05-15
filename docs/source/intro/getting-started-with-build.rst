@@ -97,7 +97,8 @@ To install all the packages required, simply run:
 .. code-block:: bash
 	
 	$ cd CKG/
-	$ pip install -r requirements.txt
+	$ pip3 install --upgrade pip
+	$ pip3 install --ignore-installed -r requirements.txt
 
 .. warning:: Make sure the virtual environment previously created is active before installing ``requirements.txt``.
 
