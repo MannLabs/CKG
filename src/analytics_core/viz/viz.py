@@ -1646,12 +1646,12 @@ def get_parallel_plot(data, identifier, args):
         color = '#de77ae'
         if 'color' in args:
             color = args['color']
-        min_val = round(data._get_numeric_data().min().min())
-        max_val = round(data._get_numeric_data().max().max())
-        df = data.groupby(group)
+        group_values = data.groupby(group).mean()
+        min_val = group_values._get_numeric_data().min().min()
+        max_val = group_values._get_numeric_data().max().max()
         dims = []
-        for i in df.groups:
-            values = df.get_group(i).values.tolist()[0][1:]
+        for i in group_values.index:
+            values = group_values.loc[i].values.tolist()
 
             dim = dict(label=i, range=[min_val, max_val], values=values)
             dims.append(dim)
