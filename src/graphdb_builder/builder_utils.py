@@ -280,8 +280,53 @@ def setup_logging(path='log.config', key=None):
     else:
         logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger(key)
- 
+
     return logger
+
+
+def download_from_ftp(ftp_url, user, password, to, file_name):
+    try:
+        domain = ftp_url.split('/')[2]
+        ftp_file = '/'.join(ftp_url.split('/')[3:])
+        with ftplib.FTP(domain) as ftp:
+            ftp.login(user=user, passwd=password)
+            with open(os.path.join(to, file_name), 'wb') as fp:
+                ftp.retrbinary("RETR " + ftp_file,  fp.write)
+    except ftplib.error_reply as err:
+        raise ftplib.error_reply("Exception raised when an unexpected reply is received from the server. {}.\nURL:{}".format(err,ftp_url))
+    except ftplib.error_temp as err:
+        raise ftplib.error_temp("Exception raised when an error code signifying a temporary error. {}.\nURL:{}".format(err,ftp_url))
+    except ftplib.error_perm as err:
+        raise ftplib.error_perm("Exception raised when an error code signifying a permanent error. {}.\nURL:{}".format(err,ftp_url))
+    except ftplib.error_proto:
+        raise ftplib.error_proto("Exception raised when a reply is received from the server that does not fit the response specifications of the File Transfer Protocol. {}.\nURL:{}".format(err,ftp_url))
+
+
+def download_PRIDE_data(pxd_id, file_name, to='.', user='', password=''):
+    """
+    This function downloads a project file from the PRIDE repository
+
+    :param str pxd_id: PRIDE project identifier (id. PXD013599).
+    :param str file_name: name of the file to dowload
+    :param str to: local directory where the file should be downloaded
+    :param str user: username to access biomedical database server if required.
+    :param str password: password to access biomedical database server if required.
+    """
+    ftp_PRIDE = 'ftp://ftp.pride.ebi.ac.uk/pride/data/archive/YEAR/MONTH/PXDID/FILE_NAME'
+    url_PRIDE_API = 'http://www.ebi.ac.uk/pride/ws/archive/project/' + pxd_id
+    data = None
+    try:
+        r = requests.get(url_PRIDE_API)
+        data = r.json()
+        submission_date = data['submissionDate']
+        year, month, day = submission_date.split('-')
+
+        ftp_url = ftp_PRIDE.replace('YEAR', year).replace('MONTH', month).replace('PXDID', pxd_id).replace('FILE_NAME', file_name)
+        download_from_ftp(ftp_url, user, password, to, file_name)
+    except Exception as err:
+        print(err)
+
+    return data
 
 
 def downloadDB(databaseURL, directory=None, file_name=None, user="", password=""):
@@ -301,16 +346,11 @@ def downloadDB(databaseURL, directory=None, file_name=None, user="", password=""
     if directory is None:
         directory = dbconfig["databasesDir"]
     if file_name is None:
-        file_name = databaseURL.split('/')[-1].replace('?','_').replace('=','_')
+        file_name = databaseURL.split('/')[-1].replace('?', '_').replace('=', '_')
     header = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36'}
     try:
-        mode = 'wb'
         if databaseURL.startswith('ftp:'):
-            domain = databaseURL.split('/')[2]
-            ftp_file = '/'.join(databaseURL.split('/')[3:])
-            with ftplib.FTP(domain) as ftp:
-                ftp.login(user=user, passwd=password)
-                ftp.retrbinary("RETR " + ftp_file,  open(os.path.join(directory, file_name), mode).write)
+            download_from_ftp(databaseURL, user, password, directory, file_name)
         else:
             if os.path.exists(os.path.join(directory, file_name)):
                 os.remove(os.path.join(directory, file_name))
@@ -320,17 +360,8 @@ def downloadDB(databaseURL, directory=None, file_name=None, user="", password=""
                 r = requests.get(databaseURL, headers=header)
                 with open(os.path.join(directory, file_name), 'wb') as out:
                     out.write(r.content)
-            #os.system("wget -O {0} {1}".format(os.path.join(directory, file_name), databaseURL))
-    except ftplib.error_reply as err:
-        raise ftplib.error_reply("Exception raised when an unexpected reply is received from the server. {}.\nURL:{}".format(err,databaseURL))
-    except ftplib.error_temp as err:
-        raise ftplib.error_temp("Exception raised when an error code signifying a temporary error. {}.\nURL:{}".format(err,databaseURL))
-    except ftplib.error_perm as err:
-        raise ftplib.error_perm("Exception raised when an error code signifying a permanent error. {}.\nURL:{}".format(err,databaseURL))
-    except ftplib.error_proto:
-        raise ftplib.error_proto("Exception raised when a reply is received from the server that does not fit the response specifications of the File Transfer Protocol. {}.\nURL:{}".format(err,databaseURL))
     except Exception as err:
-        raise Exception("Something went wrong. {}.\nURL:{}".format(err,databaseURL))
+        raise Exception("Something went wrong. {}.\nURL:{}".format(err, databaseURL))
 
 
 def searchPubmed(searchFields, sortby='relevance', num="10", resultsFormat='json'):
