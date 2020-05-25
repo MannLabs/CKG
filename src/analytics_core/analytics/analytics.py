@@ -1,3 +1,4 @@
+import time
 import pandas as pd
 import collections
 import re
@@ -211,17 +212,17 @@ def extract_number_missing(data, min_valid, drop_cols=['sample'], group='group')
     return groups.columns.unique().tolist()
 
 
-def extract_percentage_missing(data, missing_max, drop_cols=['sample'], group='group'):
+def extract_percentage_missing(data, missing_max, drop_cols=['sample'], group='group', how='all'):
     """
     Extracts ratio of missing/valid values in each column and filters column labels with lower ratio than the minimum threshold defined.
 
     :param data: pandas dataframe with group as rows and protein identifier as column.
     :param str group: column label containing group identifiers. If None, ratio is calculated across all samples, otherwise is calculated per unique group identifier.
     :param float missing_max: maximum ratio of missing/valid values to be filtered.
+    :param str how: define if labels with a higher percentage of missing values than the threshold in any group ('any') or in all groups ('all') should be filtered
     :return: List of column labels below the threshold.
 
     Example::
-
         result = extract_percentage_missing(data, missing_max=0.3, drop_cols=['sample'], group='group')
     """
     if group is None:
@@ -232,7 +233,13 @@ def extract_percentage_missing(data, missing_max, drop_cols=['sample'], group='g
         groups = groups.set_index(group)
         groups = groups.isnull().groupby(level=0).mean()
         groups = groups[groups <= missing_max]
-        groups = groups.dropna(how='all', axis=1).columns.unique().tolist()
+        if how == 'all':
+            groups = groups.dropna(how='all', axis=1).columns.unique().tolist()
+        elif how == 'any':
+            groups = groups.dropna(how='any', axis=1).columns.unique().tolist()
+        else:
+            if how in groups.index:
+                groups = groups.loc[how, :].dropna().index.unique().tolist()
 
     return groups
 
@@ -250,7 +257,7 @@ def imputation_KNN(data, drop_cols=['group', 'sample', 'subject'], group='group'
 
     Example::
 
-        result = imputation_KNN(data, drop_cols=['group', 'sample', 'subject'], group='group', cutoff=0.6, alone = True)
+        result = imputation_KNN(data, drop_cols=['group', 'sample', 'subject'], group='group', cutoff=0.6, alone=True)
     """
     df = data.copy()
     cols = df.columns
@@ -542,7 +549,39 @@ def get_coefficient_variation(data, drop_columns, group, columns=['name', 'y']):
     return cvs_df
 
 
-def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation=True, method='distribution', missing_method='percentage', missing_per_group=True, missing_max=0.3, min_valid=1, value_col='LFQ_intensity', shift=1.8, nstd=0.3, knn_cutoff=0.6):
+def transform_proteomics_edgelist(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', value_col='LFQ_intensity'):
+    """
+    Transforms a long format proteomics matrix into a wide format
+
+    :param df: long-format pandas dataframe with columns 'group', 'sample', 'subject', 'identifier' (protein), 'name' (gene) and 'LFQ_intensity'.
+    :param list index_cols: column labels to be be kept as index identifiers.
+    :param list drop_cols: column labels to be dropped from the dataframe.
+    :param str group: column label containing group identifiers.
+    :param str identifier: column label containing feature identifiers.
+    :param str extra_identifier: column label containing additional protein identifiers (e.g. gene names).
+    :param str value_col: column label containing expression values.
+
+    :return: Pandas dataframe with samples as rows and protein identifiers (UniprotID~GeneName) as columns (with additional columns 'group', 'sample' and 'subject').
+
+    Example:
+        df = transform_proteomics_edgelist(original, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', value_col='LFQ_intensity')
+    """
+    wdf = None
+    if df.columns.isin(index_cols).sum() == len(index_cols):
+        wdf = df[df[group].notna()]
+        wdf[group] = wdf[group].astype(str)
+        wdf = wdf.set_index(index_cols)
+        if extra_identifier is not None and extra_identifier in wdf.columns:
+            wdf[identifier] = wdf[extra_identifier].map(str) + "~" + wdf[identifier].map(str)
+        wdf = wdf.pivot_table(values=value_col, index=wdf.index, columns=identifier, aggfunc='first')
+        wdf = wdf.reset_index()
+        wdf[index_cols] = wdf["index"].apply(pd.Series)
+        wdf = wdf.drop(["index"], axis=1)
+
+    return wdf
+
+
+def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation=True, method='distribution', missing_method='percentage', missing_per_group=True, missing_max=0.3, min_valid=1, value_col='LFQ_intensity', shift=1.8, nstd=0.3, knn_cutoff=0.6, normalize=False, normalization_method='median'):
     """
     Processes proteomics data extracted from the database: 1) filter proteins with high number of missing values (> missing_max or min_valid), 2) impute missing values.
     For more information on imputation method visit http://www.coxdocs.org/doku.php?id=perseus:user:activities:matrixprocessing:filterrows:filtervalidvaluesrows.
@@ -567,41 +606,36 @@ def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subjec
 
     Example 1::
 
-        result = get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation = True, method = 'distribution', missing_method = 'percentage', missing_per_group=True, missing_max = 0.3, value_col='LFQ_intensity')
+        result = get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation=True, method = 'distribution', missing_method = 'percentage', missing_per_group=True, missing_max = 0.3, value_col='LFQ_intensity')
 
     Example 2::
 
         result = get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation = True, method = 'mixed', missing_method = 'at_least_x', missing_per_group=False, min_valid=5, value_col='LFQ_intensity')
     """
-    if df.columns.isin(index_cols).sum() == len(index_cols):
-        df = df[df[group].notna()]
-        df[group] = df[group].astype(str)
-        df = df.set_index(index_cols)
-        if extra_identifier is not None and extra_identifier in df.columns:
-            df[identifier] = df[extra_identifier].map(str) + "~" + df[identifier].map(str)
-        df = df.pivot_table(values=value_col, index=df.index, columns=identifier, aggfunc='first')
-        df = df.reset_index()
-        df[index_cols] = df["index"].apply(pd.Series)
-        df = df.drop(["index"], axis=1)
+    df = transform_proteomics_edgelist(df, index_cols=index_cols, drop_cols=drop_cols, group=group, identifier=identifier, extra_identifier=extra_identifier, value_col=value_col)
+    if df is not None:
+        if normalize:
+            df = normalize_data(df, method=normalization_method)
         aux = []
         aux.extend(index_cols)
+        g = group
         if not missing_per_group:
-            group = None
+            g = None
         if missing_method == 'at_least_x':
-            aux.extend(extract_number_missing(df, min_valid, drop_cols, group=group))
+            aux.extend(extract_number_missing(df, min_valid, drop_cols, group=g))
         elif missing_method == 'percentage':
-            aux.extend(extract_percentage_missing(df,  missing_max, drop_cols, group=group))
+            aux.extend(extract_percentage_missing(df,  missing_max, drop_cols, group=g))
 
         df = df[list(set(aux))]
         if imputation:
-            if method == "KNN":
+            if method.lower() == "knn":
                 df = imputation_KNN(df, drop_cols=index_cols, group=group, cutoff=knn_cutoff, alone=True)
             elif method == "distribution":
                 df = imputation_normal_distribution(df, index_cols=index_cols, shift=shift, nstd=nstd)
+                df = df.reset_index()
             elif method == 'mixed':
                 df = imputation_mixed_norm_KNN(df, index_cols=index_cols, shift=shift, nstd=nstd, group=group, cutoff=knn_cutoff)
-
-            df = df.reset_index()
+                df = df.reset_index()
 
     return df
 
@@ -1220,7 +1254,8 @@ def calculate_ttest_samr(df, labels, n=2, s0=0, paired=False):
     result['group1'] = conditions[0]
     result['group2'] = conditions[1]
     cols = ['identifier', 'group1', 'group2', 'mean(group1)', 'mean(group2)', 'log2FC', 'FC', 't-statistics', 'pvalue']
-    result['FC'] = [np.power(2,np.abs(x)) * -1 if x < 0 else np.power(2,np.abs(x)) for x in result['log2FC'].values]
+    result['FC'] = result['log2FC'].apply(lambda x: np.power(2,x))
+    
     result = result[cols]
 
     return result
@@ -1313,12 +1348,10 @@ def calculate_pairwise_ttest(df, column, subject='subject', group='group', corre
 
         result = calculate_pairwise_ttest(df, 'protein a', subject='subject', group='group', correction='none')
     """
-
+    
     posthoc_columns = ['Contrast', 'group1', 'group2', 'mean(group1)', 'std(group1)', 'mean(group2)', 'std(group2)', 'posthoc Paired', 'posthoc Parametric', 'posthoc T-Statistics', 'posthoc dof', 'posthoc tail', 'posthoc pvalue', 'posthoc BF10', 'posthoc effsize']
     valid_cols = ['group1', 'group2', 'mean(group1)', 'std(group1)', 'mean(group2)', 'std(group2)', 'posthoc Paired', 'posthoc Parametric', 'posthoc T-Statistics', 'posthoc dof', 'posthoc tail', 'posthoc pvalue', 'posthoc BF10', 'posthoc effsize']
-    
-    posthoc = pg.pairwise_ttests(data=df, dv=column, between=group, subject=subject, effsize='hedges', return_desc=True, padjust=correction)
-
+    posthoc = df.pairwise_ttests(dv=column, between=group, subject=subject, effsize='hedges', return_desc=True, padjust=correction)
     posthoc.columns =  posthoc_columns
     posthoc = posthoc[valid_cols]
     posthoc = complement_posthoc(posthoc, column, is_logged)
@@ -1338,7 +1371,7 @@ def complement_posthoc(posthoc, identifier, is_logged):
     posthoc['identifier'] = identifier
     if is_logged:
         posthoc['log2FC'] = posthoc['mean(group1)'] - posthoc['mean(group2)']
-        posthoc['FC'] = posthoc['log2FC'].apply(lambda x: np.power(2,np.abs(x)) * -1 if x < 0 else np.power(2,np.abs(x)))
+        posthoc['FC'] = posthoc['log2FC'].apply(lambda x: np.power(2,x))
     else:
         posthoc['FC'] = posthoc['mean(group1)']/posthoc['mean(group2)']
 
@@ -1723,7 +1756,7 @@ def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], su
     scores['group1'] = condition1
     scores['group2'] = condition2
     if is_logged:
-        scores['FC'] = [np.power(2,np.abs(x)) * -1 if x < 0 else np.power(2,np.abs(x)) for x in scores['log2FC'].values]
+        scores['FC'] = scores['log2FC'].apply(lambda x: np.power(2,x))
     else:
         scores = scores.rename(columns={'log2FC':'FC'})
 
@@ -1866,7 +1899,7 @@ def run_samr(df, subject='subject', group='group', drop_cols=['subject', 'sample
             result = pairwise_results.set_index("identifier").join(result)
             if method != 'Multiclass':
                 result = result.drop(['posthoc Paired', 'posthoc Parametric', 'posthoc T-Statistics',
-                                    'posthoc dof', 'posthoc tail', 'posthoc pvalue', 'posthoc BF10', ], axis=1)
+                                    'posthoc dof', 'posthoc tail', 'posthoc pvalue', 'posthoc BF10'], axis=1)
                 result = result.rename(columns={'F-statistics': 'T-statistics', 'posthoc effsize': 'effsize'})
             result = correct_pairwise_ttest(result.reset_index(), alpha)
             result = result.set_index('identifier')
@@ -1920,6 +1953,29 @@ def run_fisher(group1, group2, alternative='two-sided'):
     odds, pvalue = stats.fisher_exact([group1, group2], alternative)
 
     return (odds, pvalue)
+
+
+def run_kolmogorov_smirnov(dist1, dist2, alternative='two-sided'):
+    """
+    Compute the Kolmogorov-Smirnov statistic on 2 samples. See https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ks_2samp.html
+
+    :param list dist1: sequence of 1-D ndarray (first distribution to compare) drawn from a continuous distribution
+    :param list dist2: sequence of 1-D ndarray (second distribution to compare) drawn from a continuous distribution
+    :param str alternative: defines the alternative hypothesis (default is ‘two-sided’):
+        * **'two-sided'**
+        * **'less'**
+        * **'greater'**
+    :return: statistic float and KS statistic pvalue float Two-tailed p-value.
+    Example::
+
+        result = run_kolmogorov_smirnov(dist1, dist2, alternative='two-sided')
+    
+    """
+
+    result = stats.ks_2samp(dist1, dist2, alternative=alternative, mode='auto')
+
+    return result
+
 
 def run_site_regulation_enrichment(regulation_data, annotation, identifier='identifier', groups=['group1', 'group2'], annotation_col='annotation', reject_col='rejected', group_col='group', method='fisher', regex="(\w+~.+)_\w\d+\-\w+", correction='fdr_bh'):
     """
