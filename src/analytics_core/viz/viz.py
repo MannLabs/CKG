@@ -159,9 +159,11 @@ def get_boxplot_grid(data, identifier, args):
         result = get_boxplot_grid(data, identifier='Boxplot', args:{"Title":"Boxplot", 'x':'sample', 'y':'identifier', 'color':'group', 'facet':'qc_class', 'axis':'cols'})
     """
     fig = {}
-    if 'x' in args and 'y' in args and 'color' in args and 'facet' in args:
+    if 'x' in args and 'y' in args and 'color' in args:
         if 'axis' not in args:
             args['axis'] = 'cols'
+        if 'facet' not in args:
+            args["facet"] = None
         if 'width' not in args:
             args['width'] = 2500
         if 'height' not in args:
@@ -255,6 +257,58 @@ def get_barplot(data, identifier, args):
                             annotations=[dict(xref='paper', yref='paper', showarrow=False, text='')],
                             template='plotly_white'
                         )
+
+    return dcc.Graph(id=identifier, figure=figure)
+
+
+def get_histogram(data, identifier, args):
+    """
+    Basic histogram figure allows facets cols and rows
+
+    param data: pandas dataframe with at least values to be plotted.
+    :param str identifier: id used to identify the div where the figure will be generated.
+    :param ditc args: see below.
+    :Arguments:
+        * **x** (str) -- name of the column containing values to plot in the x axis.
+        * **y** (str) -- name of the column containing values to plot in the y axis (if used).
+        * **color** (str) -- name of the column that defines how the histogram is colored (if used).
+        * **facet_row** (str) -- name of the column to be used as 'facet' row (if used).
+        * **facet_col** (str) -- name of the column to be used as 'facet' column (if used).
+        * **height** (int) -- height of the plot
+        * **width** (int) -- width of the plot
+        * **title** (str) -- plot title.
+    :return: dash componenet with histogram figure
+
+    Example::
+
+        result = get_histogram(data, identifier='histogram', args={'x':'a', 'color':'group', 'facet_row':'sample', 'title':'Facet Grid Plot'})
+    """
+    figure = None
+    if 'x' in args and args['x'] in data:
+        if 'y' not in args:
+            args['y'] = None
+        elif args['y'] not in data:
+            args['y'] = None
+        if 'color' not in args:
+            args['color'] = None
+        elif args['color'] not in data:
+            args['color'] = None
+        if 'facet_row' not in args:
+            args['facet_row'] = None
+        elif args['facet_row'] not in data:
+            args['facet_row'] = None
+        if 'facet_col' not in args:
+            args['facet_col'] = None
+        elif args['facet_col'] not in data:
+            args['facet_col'] = None
+        if 'height' not in args:
+            args['height'] = 800
+        if 'width' not in args:
+            args['width'] = None
+        if 'title' not in args:
+            args['title'] = None
+
+        figure = px.histogram(data, x=args['x'], y=args['y'], color=args['color'], facet_row=args['facet_row'], facet_col=args['facet_col'], height=args['height'], width=args['width'])
 
     return dcc.Graph(id=identifier, figure=figure)
 
@@ -2041,14 +2095,17 @@ def save_DASH_plot(plot, name, plot_format='svg', directory='.'):
 
         result = save_DASH_plot(plot, name='Plot example', plot_format='svg', directory='/data/plots')
     """
-    if not os.path.exists(directory):
-        os.mkdir(directory)
-    if plot_format in ['svg', 'pdf', 'png', 'jpeg', 'jpg']:
-        plot_file = os.path.join(directory, str(name)+'.'+str(plot_format))
-        if hasattr(plot, 'figure'):
-            pio.write_image(plot.figure, plot_file)
-        else:
-            pio.write_image(plot, plot_file)
+    try:
+        if not os.path.exists(directory):
+            os.mkdir(directory)
+        if plot_format in ['svg', 'pdf', 'png', 'jpeg', 'jpg']:
+            plot_file = os.path.join(directory, str(name)+'.'+str(plot_format))
+            if hasattr(plot, 'figure'):
+                pio.write_image(plot.figure, plot_file)
+            else:
+                pio.write_image(plot, plot_file)
+    except ValueError as err:
+        print("Plot could not be saved. Error: {}".format(err))
             
             
 def mpl_to_plotly(fig, ci=True, legend=True):
