@@ -775,7 +775,7 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
             if row[padj_col] < args['alpha']:
                 pvals.append(row['-log10 pvalue'])
                 sig_pval = True
-                if row['FC'] <= -args['fc']:
+                if row['log2FC'] <= -np.log2(args['fc']):
                     annotations.append({'x': row['log2FC'],
                                     'y': row['-log10 pvalue'],
                                     'xref':'x',
@@ -787,7 +787,7 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
                                     'font': dict(color = "#2c7bb6", size = 10)})
                     color.append('rgba(44, 123, 182, 0.7)')
                     line_colors.append('#2c7bb6')
-                elif row['FC'] >= args['fc']:
+                elif row['log2FC'] >= np.log2(args['fc']):
                     annotations.append({'x': row['log2FC'],
                                     'y': row['-log10 pvalue'],
                                     'xref':'x',
@@ -799,10 +799,10 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
                                     'font': dict(color = "#d7191c", size = 10)})
                     color.append('rgba(215, 25, 28, 0.7)')
                     line_colors.append('#d7191c')
-                elif row['FC'] < -1.:
+                elif row['log2FC'] < 0.:
                     color.append('rgba(171, 217, 233, 0.5)')
                     line_colors.append('#abd9e9')
-                elif row['FC'] > 1.:
+                elif row['log2FC'] > 0.:
                     color.append('rgba(253, 174, 97, 0.5)')
                     line_colors.append('#fdae61')
                 else:
