@@ -1187,6 +1187,9 @@ def get_network(data, identifier, args):
 
         min_node_size = 0
         max_node_size = 0
+        if 'node_size' not in args:
+            args['node_size'] = 'degree'
+
         if args['node_size'] == 'betweenness' and betweenness is not None:
             min_node_size = min(betweenness.values())
             max_node_size = max(betweenness.values())
