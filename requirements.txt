@@ -205,3 +205,4 @@ sphinx-rtd-theme>=0.4.3
 recommonmark>=0.6.0
 eventlet==0.25.1
 lifelines==0.23.1
+rarfile==3.1

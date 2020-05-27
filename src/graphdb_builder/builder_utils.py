@@ -22,6 +22,7 @@ import logging
 import logging.config
 from config import ckg_config
 import ckg_utils
+import rarfile
 
 
 def readDataset(uri):
@@ -318,7 +319,7 @@ def download_PRIDE_data(pxd_id, file_name, to='.', user='', password=''):
     try:
         r = requests.get(url_PRIDE_API)
         data = r.json()
-        submission_date = data['submissionDate']
+        submission_date = data['publicationDate']
         year, month, day = submission_date.split('-')
 
         ftp_url = ftp_PRIDE.replace('YEAR', year).replace('MONTH', month).replace('PXDID', pxd_id).replace('FILE_NAME', file_name)
@@ -329,7 +330,7 @@ def download_PRIDE_data(pxd_id, file_name, to='.', user='', password=''):
     return data
 
 
-def downloadDB(databaseURL, directory=None, file_name=None, user="", password=""):
+def downloadDB(databaseURL, directory=None, file_name=None, user="", password="", avoid_wget=False):
     """
     This function downloads the raw files from a biomedical database server when a link is provided.
 
@@ -355,7 +356,12 @@ def downloadDB(databaseURL, directory=None, file_name=None, user="", password=""
             if os.path.exists(os.path.join(directory, file_name)):
                 os.remove(os.path.join(directory, file_name))
             try:
-                wget.download(databaseURL, os.path.join(directory, file_name))
+                if not avoid_wget:
+                    wget.download(databaseURL, os.path.join(directory, file_name))
+                else:
+                    r = requests.get(databaseURL, headers=header)
+                    with open(os.path.join(directory, file_name), 'wb') as out:
+                        out.write(r.content)
             except Exception:
                 r = requests.get(databaseURL, headers=header)
                 with open(os.path.join(directory, file_name), 'wb') as out:
@@ -477,6 +483,7 @@ def remove_directory(directory):
             shutil.rmtree(directory, ignore_errors=False, onerror=None)
     else:
         print("Done")
+
 
 def listDirectoryFiles(directory):
     """
@@ -634,6 +641,19 @@ def buildStats(count, otype, name, dataset, filename, updated_on=None):
     filename = filename.split('/')[-1]
     
     return(str(y), str(t), dataset, filename, size, count, otype, name, updated_on)
+
+def unrar(filepath, to):
+    """
+    Decompress RAR file
+    :param str filepath: path to rar file
+    :param str to: where to extract all files
+    
+    """
+    try:
+        with rarfile.RarFile(filepath) as opened_rar:
+            opened_rar.extractall(to)
+    except Exception as err:
+        print("Error: {}. Could not unrar file {}".format(filepath, err))
 
 
 def compress_directory(folder_to_backup, dest_folder, file_name):
