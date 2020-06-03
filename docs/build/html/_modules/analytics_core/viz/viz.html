@@ -91,6 +91,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../intro/getting-started-with-windows.html">Getting started with Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro/getting-started-with-docker.html">Getting started with Docker <strong>(Testing)</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
@@ -120,8 +121,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/standard-analysis.html">Standardising the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/visualization-plots.html">Visualisation plots</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/R-interface.html">Python - R interface</a></li>
 </ul>
 <ul>
@@ -360,9 +361,11 @@
 <span class="sd">        result = get_boxplot_grid(data, identifier=&#39;Boxplot&#39;, args:{&quot;Title&quot;:&quot;Boxplot&quot;, &#39;x&#39;:&#39;sample&#39;, &#39;y&#39;:&#39;identifier&#39;, &#39;color&#39;:&#39;group&#39;, &#39;facet&#39;:&#39;qc_class&#39;, &#39;axis&#39;:&#39;cols&#39;})</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">if</span> <span class="s1">&#39;x&#39;</span> <span class="ow">in</span> <span class="n">args</span> <span class="ow">and</span> <span class="s1">&#39;y&#39;</span> <span class="ow">in</span> <span class="n">args</span> <span class="ow">and</span> <span class="s1">&#39;color&#39;</span> <span class="ow">in</span> <span class="n">args</span> <span class="ow">and</span> <span class="s1">&#39;facet&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s1">&#39;x&#39;</span> <span class="ow">in</span> <span class="n">args</span> <span class="ow">and</span> <span class="s1">&#39;y&#39;</span> <span class="ow">in</span> <span class="n">args</span> <span class="ow">and</span> <span class="s1">&#39;color&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
         <span class="k">if</span> <span class="s1">&#39;axis&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
             <span class="n">args</span><span class="p">[</span><span class="s1">&#39;axis&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;cols&#39;</span>
+        <span class="k">if</span> <span class="s1">&#39;facet&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">args</span><span class="p">[</span><span class="s2">&quot;facet&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="s1">&#39;width&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
             <span class="n">args</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2500</span>
         <span class="k">if</span> <span class="s1">&#39;height&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
@@ -456,6 +459,58 @@
                             <span class="n">annotations</span><span class="o">=</span><span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">xref</span><span class="o">=</span><span class="s1">&#39;paper&#39;</span><span class="p">,</span> <span class="n">yref</span><span class="o">=</span><span class="s1">&#39;paper&#39;</span><span class="p">,</span> <span class="n">showarrow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)],</span>
                             <span class="n">template</span><span class="o">=</span><span class="s1">&#39;plotly_white&#39;</span>
                         <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dcc</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">identifier</span><span class="p">,</span> <span class="n">figure</span><span class="o">=</span><span class="n">figure</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_histogram"><a class="viewcode-back" href="../../../_autosummary/analytics_core.viz.html#analytics_core.viz.viz.get_histogram">[docs]</a><span class="k">def</span> <span class="nf">get_histogram</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">identifier</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Basic histogram figure allows facets cols and rows</span>
+
+<span class="sd">    param data: pandas dataframe with at least values to be plotted.</span>
+<span class="sd">    :param str identifier: id used to identify the div where the figure will be generated.</span>
+<span class="sd">    :param ditc args: see below.</span>
+<span class="sd">    :Arguments:</span>
+<span class="sd">        * **x** (str) -- name of the column containing values to plot in the x axis.</span>
+<span class="sd">        * **y** (str) -- name of the column containing values to plot in the y axis (if used).</span>
+<span class="sd">        * **color** (str) -- name of the column that defines how the histogram is colored (if used).</span>
+<span class="sd">        * **facet_row** (str) -- name of the column to be used as &#39;facet&#39; row (if used).</span>
+<span class="sd">        * **facet_col** (str) -- name of the column to be used as &#39;facet&#39; column (if used).</span>
+<span class="sd">        * **height** (int) -- height of the plot</span>
+<span class="sd">        * **width** (int) -- width of the plot</span>
+<span class="sd">        * **title** (str) -- plot title.</span>
+<span class="sd">    :return: dash componenet with histogram figure</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        result = get_histogram(data, identifier=&#39;histogram&#39;, args={&#39;x&#39;:&#39;a&#39;, &#39;color&#39;:&#39;group&#39;, &#39;facet_row&#39;:&#39;sample&#39;, &#39;title&#39;:&#39;Facet Grid Plot&#39;})</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">figure</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="s1">&#39;x&#39;</span> <span class="ow">in</span> <span class="n">args</span> <span class="ow">and</span> <span class="n">args</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;y&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">args</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">args</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="s1">&#39;color&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">args</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">args</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="s1">&#39;facet_row&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">args</span><span class="p">[</span><span class="s1">&#39;facet_row&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="s1">&#39;facet_row&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">args</span><span class="p">[</span><span class="s1">&#39;facet_row&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="s1">&#39;facet_col&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">args</span><span class="p">[</span><span class="s1">&#39;facet_col&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="s1">&#39;facet_col&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">args</span><span class="p">[</span><span class="s1">&#39;facet_col&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="s1">&#39;height&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">args</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">800</span>
+        <span class="k">if</span> <span class="s1">&#39;width&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">args</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="s1">&#39;title&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">args</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">figure</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">],</span> <span class="n">facet_row</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;facet_row&#39;</span><span class="p">],</span> <span class="n">facet_col</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;facet_col&#39;</span><span class="p">],</span> <span class="n">height</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">],</span> <span class="n">width</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">dcc</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">identifier</span><span class="p">,</span> <span class="n">figure</span><span class="o">=</span><span class="n">figure</span><span class="p">)</span></div>
 
@@ -922,7 +977,7 @@
             <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="n">padj_col</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">args</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">]:</span>
                 <span class="n">pvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;-log10 pvalue&#39;</span><span class="p">])</span>
                 <span class="n">sig_pval</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;FC&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;fc&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;log2FC&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;fc&#39;</span><span class="p">]):</span>
                     <span class="n">annotations</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;log2FC&#39;</span><span class="p">],</span>
                                     <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;-log10 pvalue&#39;</span><span class="p">],</span>
                                     <span class="s1">&#39;xref&#39;</span><span class="p">:</span><span class="s1">&#39;x&#39;</span><span class="p">,</span>
@@ -934,7 +989,7 @@
                                     <span class="s1">&#39;font&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;#2c7bb6&quot;</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)})</span>
                     <span class="n">color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;rgba(44, 123, 182, 0.7)&#39;</span><span class="p">)</span>
                     <span class="n">line_colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;#2c7bb6&#39;</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;FC&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">args</span><span class="p">[</span><span class="s1">&#39;fc&#39;</span><span class="p">]:</span>
+                <span class="k">elif</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;log2FC&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;fc&#39;</span><span class="p">]):</span>
                     <span class="n">annotations</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;log2FC&#39;</span><span class="p">],</span>
                                     <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;-log10 pvalue&#39;</span><span class="p">],</span>
                                     <span class="s1">&#39;xref&#39;</span><span class="p">:</span><span class="s1">&#39;x&#39;</span><span class="p">,</span>
@@ -946,10 +1001,10 @@
                                     <span class="s1">&#39;font&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;#d7191c&quot;</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)})</span>
                     <span class="n">color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;rgba(215, 25, 28, 0.7)&#39;</span><span class="p">)</span>
                     <span class="n">line_colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;#d7191c&#39;</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;FC&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">1.</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;log2FC&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.</span><span class="p">:</span>
                     <span class="n">color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;rgba(171, 217, 233, 0.5)&#39;</span><span class="p">)</span>
                     <span class="n">line_colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;#abd9e9&#39;</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;FC&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">1.</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;log2FC&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">:</span>
                     <span class="n">color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;rgba(253, 174, 97, 0.5)&#39;</span><span class="p">)</span>
                     <span class="n">line_colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;#fdae61&#39;</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -1334,6 +1389,9 @@
 
         <span class="n">min_node_size</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">max_node_size</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="s1">&#39;node_size&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">args</span><span class="p">[</span><span class="s1">&#39;node_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;degree&#39;</span>
+
         <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s1">&#39;node_size&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;betweenness&#39;</span> <span class="ow">and</span> <span class="n">betweenness</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">min_node_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">betweenness</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
             <span class="n">max_node_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">betweenness</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
@@ -1847,12 +1905,12 @@
         <span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;#de77ae&#39;</span>
         <span class="k">if</span> <span class="s1">&#39;color&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
             <span class="n">color</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span>
-        <span class="n">min_val</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">_get_numeric_data</span><span class="p">()</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
-        <span class="n">max_val</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">_get_numeric_data</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+        <span class="n">group_values</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">group</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="n">min_val</span> <span class="o">=</span> <span class="n">group_values</span><span class="o">.</span><span class="n">_get_numeric_data</span><span class="p">()</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="n">max_val</span> <span class="o">=</span> <span class="n">group_values</span><span class="o">.</span><span class="n">_get_numeric_data</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
         <span class="n">dims</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">groups</span><span class="p">:</span>
-            <span class="n">values</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">group_values</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">group_values</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 
             <span class="n">dim</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">],</span> <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">)</span>
             <span class="n">dims</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
@@ -2242,14 +2300,17 @@
 
 <span class="sd">        result = save_DASH_plot(plot, name=&#39;Plot example&#39;, plot_format=&#39;svg&#39;, directory=&#39;/data/plots&#39;)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">plot_format</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;svg&#39;</span><span class="p">,</span> <span class="s1">&#39;pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;png&#39;</span><span class="p">,</span> <span class="s1">&#39;jpeg&#39;</span><span class="p">,</span> <span class="s1">&#39;jpg&#39;</span><span class="p">]:</span>
-        <span class="n">plot_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">plot_format</span><span class="p">))</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="s1">&#39;figure&#39;</span><span class="p">):</span>
-            <span class="n">pio</span><span class="o">.</span><span class="n">write_image</span><span class="p">(</span><span class="n">plot</span><span class="o">.</span><span class="n">figure</span><span class="p">,</span> <span class="n">plot_file</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">pio</span><span class="o">.</span><span class="n">write_image</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="n">plot_file</span><span class="p">)</span></div>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">plot_format</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;svg&#39;</span><span class="p">,</span> <span class="s1">&#39;pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;png&#39;</span><span class="p">,</span> <span class="s1">&#39;jpeg&#39;</span><span class="p">,</span> <span class="s1">&#39;jpg&#39;</span><span class="p">]:</span>
+            <span class="n">plot_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">plot_format</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="s1">&#39;figure&#39;</span><span class="p">):</span>
+                <span class="n">pio</span><span class="o">.</span><span class="n">write_image</span><span class="p">(</span><span class="n">plot</span><span class="o">.</span><span class="n">figure</span><span class="p">,</span> <span class="n">plot_file</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pio</span><span class="o">.</span><span class="n">write_image</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="n">plot_file</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Plot could not be saved. Error: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">err</span><span class="p">))</span></div>
             
             
 <div class="viewcode-block" id="mpl_to_plotly"><a class="viewcode-back" href="../../../_autosummary/analytics_core.viz.html#analytics_core.viz.viz.mpl_to_plotly">[docs]</a><span class="k">def</span> <span class="nf">mpl_to_plotly</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ci</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>

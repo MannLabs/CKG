@@ -72,7 +72,7 @@
 
 
 \title{Clinical Knowledge Graph Documentation}
-\date{May 12, 2020}
+\date{Jun 03, 2020}
 \release{1.0b1 BETA}
 \author{Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -512,14 +512,14 @@ all the possibilities.
 {\hyperref[\detokenize{intro/getting-started-with-neo4j::doc}]{\sphinxcrossref{\DUrole{doc}{With Neo4j}}}} |
 {\hyperref[\detokenize{intro/getting-started-with-build::doc}]{\sphinxcrossref{\DUrole{doc}{With Clinical Knowledge Graph}}}} |
 {\hyperref[\detokenize{intro/getting-started-with-windows::doc}]{\sphinxcrossref{\DUrole{doc}{With Windows}}}} |
-\DUrole{xref,std,std-doc}{With Docker}
+{\hyperref[\detokenize{intro/getting-started-with-docker::doc}]{\sphinxcrossref{\DUrole{doc}{With Docker}}}}
 
 \end{itemize}
 
 
 \section{Getting Started with some Requirements}
 \label{\detokenize{intro/getting-started-with-requirements:getting-started-with-some-requirements}}\label{\detokenize{intro/getting-started-with-requirements::doc}}
-The following instructions on installation of software requirements and setting up the Clinical Knowledge graph, are optimized for operating systems MacOS and Linux. For more detailed instructions on how to set up the CKG in Windows, pleaso go to {\hyperref[\detokenize{intro/getting-started-with-windows:windows-installation}]{\sphinxcrossref{\DUrole{std,std-ref}{Getting started with Windows}}}}.
+The following instructions on installation of software requirements and setting up the Clinical Knowledge graph, are optimised for operating systems MacOS and Linux. For more detailed instructions on how to set up the CKG in Windows, please go to {\hyperref[\detokenize{intro/getting-started-with-windows:windows-installation}]{\sphinxcrossref{\DUrole{std,std-ref}{Getting started with Windows}}}}.
 
 
 \subsection{Java}
@@ -568,7 +568,7 @@ And that R is installed in \sphinxcode{\sphinxupquote{/usr/local/bin/R}}:
 \PYGZdl{} which R
 \end{sphinxVerbatim}
 
-To install the neccessary R packages, simply initiate R (terminal or shell) and run:
+To install the necessary R packages, simply initiate R (terminal or shell) and run:
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{n}{install}\PYG{o}{.}\PYG{n}{packages}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{BiocManager}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
@@ -582,7 +582,7 @@ If you need to install R, follow \sphinxhref{https://web.stanford.edu/~kjytay/co
 \end{sphinxadmonition}
 
 \begin{sphinxadmonition}{warning}{Warning:}
-In Mac OS, make sure you have \sphinxstylestrong{XQuartz} installed.
+In Mac OS, make sure you have \sphinxstylestrong{XQuartz} installed, as well as \sphinxstylestrong{Xcode}. For more information on how to install R on OS X, you can follow this \sphinxhref{https://www.r-bloggers.com/installing-r-on-os-x/}{link}.
 \end{sphinxadmonition}
 
 Now that you are all set, you can move on and start with Neo4j.
@@ -602,7 +602,7 @@ Once the file has downloaded, you can install Neo4j by following the instruction
 
 \noindent\sphinxincludegraphics[width=0.320\linewidth]{{neo4j_app3}.png}
 
-Open the Neo4j Desktop App and create a database by clicking \sphinxguilabel{Add graph}, followed by \sphinxguilabel{Create a Local Graph}, using the password “neo4j”.
+Open the Neo4j Desktop App and create a database by clicking \sphinxguilabel{Add graph}, followed by \sphinxguilabel{Create a Local Graph}, using the password “NeO4J”.
 Now that your database is created:
 
 \noindent\sphinxincludegraphics[width=0.320\linewidth]{{neo4j_app4}.png}
@@ -626,68 +626,11 @@ Start the Graph by clicking the play sign, at the top of the window.
 
 \end{enumerate}
 
-If the database starts and no errors are reported in the tab \sphinxguilabel{Logs}, you are redy go to!
-
-
-\subsection{Add Neo4j graph database to \sphinxstyleemphasis{.bashrc}}
-\label{\detokenize{intro/getting-started-with-neo4j:add-neo4j-graph-database-to-bashrc}}
-In order run the graph database, add the path to the database to your \sphinxcode{\sphinxupquote{.bashrc}} (or \sphinxcode{\sphinxupquote{.bash\_profile}}) file.
-
-To find out which of the files your machine uses, go to the terminal and type \sphinxcode{\sphinxupquote{more \textasciitilde{}/.bash}} and double press the tab key on your keyboard for auto\sphinxhyphen{}complete.
-Immediately below, multiple filenames will be printed, check if among those, is \sphinxcode{\sphinxupquote{.bashrc}} or \sphinxcode{\sphinxupquote{.bash\_profile}}.
+If the database starts and no errors are reported in the tab \sphinxguilabel{Logs}, you are ready go to!
 
 \begin{sphinxadmonition}{note}{Note:}
-The bash file can be name \sphinxcode{\sphinxupquote{.bashrc}} or \sphinxcode{\sphinxupquote{.bash\_profile}}. if your system does not have either, created one of them (e.g. vi \textasciitilde{}/.bash\_profile).
+Be aware, at the time of release of this version, “\sphinxstylestrong{GRAPH ALGORITHMS}” was only available for Neo4j database version \sphinxstylestrong{=\textless{} 3.14}.
 \end{sphinxadmonition}
-\begin{enumerate}
-\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
-\item {} 
-Open the \sphinxcode{\sphinxupquote{.bash\_profile}} (or \sphinxcode{\sphinxupquote{.bashrc}}) with your favourite text editor. In this case, we use the \sphinxstylestrong{vi} editor:
-
-\end{enumerate}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYGZdl{} vi \PYGZti{}/.bash\PYGZus{}profile
-\end{sphinxVerbatim}
-
-\begin{sphinxadmonition}{note}{Note:}
-To edit with \sphinxstylestrong{vi} press \sphinxcode{\sphinxupquote{i}} on your keyboard.
-\end{sphinxadmonition}
-\begin{enumerate}
-\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
-\item {} 
-Add the path to the previously created Neo4j database to the file:
-
-\end{enumerate}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n+nv}{NEO4J\PYGZus{}HOME}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}/Users/username/Library/Application Support/Neo4j Desktop/Application/neo4jDatabases/database\PYGZhy{}identifier/installation\PYGZhy{}3.X.X/\PYGZdq{}}
-\PYG{n+nb}{export} NEO4J\PYGZus{}HOME
-\end{sphinxVerbatim}
-
-\begin{sphinxadmonition}{note}{Note:}
-To save and close a file with \sphinxstylestrong{vi} editor, press \sphinxcode{\sphinxupquote{Esc}} followed by \sphinxcode{\sphinxupquote{:wq}}.
-\end{sphinxadmonition}
-
-\begin{sphinxadmonition}{warning}{Warning:}
-Depending on your system, the path may vary. To check the path to the database go to \sphinxcode{\sphinxupquote{Logs}} in the Neo4j Desktop interface.
-\end{sphinxadmonition}
-\begin{enumerate}
-\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
-\item {} 
-Reload the \sphinxcode{\sphinxupquote{.bashrc}} (or \sphinxcode{\sphinxupquote{.bash\_profile}})  file:
-
-\end{enumerate}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYGZdl{} \PYG{n+nb}{source} \PYGZti{}/.bashrc
-\end{sphinxVerbatim}
-
-or
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYGZdl{} \PYG{n+nb}{source} \PYGZti{}/.bash\PYGZus{}profile
-\end{sphinxVerbatim}
 
 
 \section{Getting Started with the CKG Build}
@@ -755,7 +698,7 @@ Virtualenv is not installed by default on Macbook machines. To install it, run:
 \PYGZdl{} python3 \PYGZhy{}m pip install virtualenv
 \end{sphinxVerbatim}
 
-To create a new virtual environment using a costum version of Python, follow the steps:
+To create a new virtual environment using a custom version of Python, follow the steps:
 \begin{enumerate}
 \sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
 \item {} 
@@ -914,24 +857,8 @@ If the respective database folder is not created, please do it manually.
 The last step is to build the database, which can be done using the \sphinxcode{\sphinxupquote{builder.py}} module or a \sphinxcode{\sphinxupquote{dump file}}.
 
 
-\subsubsection{From builder.py}
-\label{\detokenize{intro/getting-started-with-build:from-builder-py}}
-To build the graph database, run \sphinxcode{\sphinxupquote{builder.py}}:
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYGZdl{} \PYG{n+nb}{cd} src/graphdb\PYGZus{}builder/builder
-\PYGZdl{} python builder.py \PYGZhy{}b full \PYGZhy{}u neo4j
-\end{sphinxVerbatim}
-
-\begin{sphinxadmonition}{warning}{Warning:}
-Before running \sphinxcode{\sphinxupquote{builder.py}}, please make sure your Neo4j graph is running. The builder will fail otherwise.
-\end{sphinxadmonition}
-
-This action will take aproximately 6 hours but depending on a multitude of factors, it can take up to 10 hours.
-
-
-\subsubsection{From the provided dump file \sphinxstylestrong{(Testing)}}
-\label{\detokenize{intro/getting-started-with-build:from-the-provided-dump-file-testing}}
+\subsubsection{From the provided dump file}
+\label{\detokenize{intro/getting-started-with-build:from-the-provided-dump-file}}
 A dump file of the database is also made available in this \sphinxhref{https://data.mendeley.com/datasets/mrcf7f4tc2/1}{link} and alternatively, you can use it to load the graph database contained in it. To do so, download both files (\sphinxcode{\sphinxupquote{ckg\_080520.dump}} and \sphinxcode{\sphinxupquote{data.tar.gz}}).
 
 The \sphinxcode{\sphinxupquote{.dump}} file will be used to load the Neo4j graph database:
@@ -957,13 +884,13 @@ After copying the dump file to backups/graph.db/, make sure the graph database i
 \end{enumerate}
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYGZdl{} bin/neo4j\PYGZhy{}admin load \PYGZhy{}\PYGZhy{}from\PYG{o}{=}backups/graph.db/2019\PYGZhy{}11\PYGZhy{}04.dump \PYGZhy{}\PYGZhy{}database\PYG{o}{=}graph.db \PYGZhy{}\PYGZhy{}force
+\PYGZdl{} bin/neo4j\PYGZhy{}admin load \PYGZhy{}\PYGZhy{}from\PYG{o}{=}backups/graph.db/ckg\PYGZus{}080520.dump \PYGZhy{}\PYGZhy{}database\PYG{o}{=}graph.db \PYGZhy{}\PYGZhy{}force
 \end{sphinxVerbatim}
 
 In some systems you might have to run this as root:
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYGZdl{} sudo bin/neo4j\PYGZhy{}admin load \PYGZhy{}\PYGZhy{}from\PYG{o}{=}backups/graph.db/2019\PYGZhy{}11\PYGZhy{}04.dump \PYGZhy{}\PYGZhy{}database\PYG{o}{=}graph.db \PYGZhy{}\PYGZhy{}force
+\PYGZdl{} sudo bin/neo4j\PYGZhy{}admin load \PYGZhy{}\PYGZhy{}from\PYG{o}{=}backups/graph.db/ckg\PYGZus{}080520.dump \PYGZhy{}\PYGZhy{}database\PYG{o}{=}graph.db \PYGZhy{}\PYGZhy{}force
 \PYGZdl{} sudo chown \PYGZhy{}R username data/databases/graph.db/
 \end{sphinxVerbatim}
 
@@ -998,6 +925,22 @@ Remember of replace the \sphinxcode{\sphinxupquote{username}} in each command, w
 \end{sphinxadmonition}
 
 
+\subsubsection{From builder.py}
+\label{\detokenize{intro/getting-started-with-build:from-builder-py}}
+To build the graph database, run \sphinxcode{\sphinxupquote{builder.py}}:
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYGZdl{} \PYG{n+nb}{cd} src/graphdb\PYGZus{}builder/builder
+\PYGZdl{} python builder.py \PYGZhy{}b full \PYGZhy{}u neo4j
+\end{sphinxVerbatim}
+
+\begin{sphinxadmonition}{warning}{Warning:}
+Before running \sphinxcode{\sphinxupquote{builder.py}}, please make sure your Neo4j graph is running. The builder will fail otherwise.
+\end{sphinxadmonition}
+
+This action will take approximately 6 hours but depending on a multitude of factors, it can take up to 10 hours.
+
+
 \subsubsection{More on the dump file}
 \label{\detokenize{intro/getting-started-with-build:more-on-the-dump-file}}
 Another great use for the dump file, is to generate backups of the database (e.g. different versions of the imported biomedical databases).
@@ -1015,7 +958,7 @@ Remember to replace \sphinxcode{\sphinxupquote{name\_of\_the\_file}} with the na
 
 \section{Getting started with Windows}
 \label{\detokenize{intro/getting-started-with-windows:getting-started-with-windows}}\label{\detokenize{intro/getting-started-with-windows:windows-installation}}\label{\detokenize{intro/getting-started-with-windows::doc}}
-In this section we describe how to install all the neccessary requirements and set up the Clinical Knowledge Graph on a Windows operating system.
+In this section we describe how to install all the necessary requirements and set up the Clinical Knowledge Graph on a Windows operating system.
 
 
 \subsection{Java}
@@ -1114,7 +1057,7 @@ Download a copy of the Neo4j desktop version from the \sphinxhref{https://neo4j.
 Install Neo4j by following the instructions automatically opened in the browser.
 
 \item {} 
-Open the Neo4j Desktop App and create a database by clicking \sphinxguilabel{Add graph}, followed by \sphinxguilabel{Create a Local Graph}, using the password “neo4j”.
+Open the Neo4j Desktop App and create a database by clicking \sphinxguilabel{Add graph}, followed by \sphinxguilabel{Create a Local Graph}, using the password “NeO4J”.
 
 \item {} 
 Click \sphinxguilabel{Manage} and then \sphinxguilabel{Plugins}. Install “\sphinxstylestrong{APOC}” and “\sphinxstylestrong{GRAPH ALGORITHMS}”.
@@ -1171,7 +1114,7 @@ Depending on your system, the path may vary. To check the path to the database g
 \subsection{Getting Started with the CKG Build}
 \label{\detokenize{intro/getting-started-with-windows:getting-started-with-the-ckg-build}}
 Setting up the Clinical Knowledge Graph is thoroughly described here.
-Assuming you have \sphinxstylestrong{Python 3.6} already installed, you can choose to create a virtual environment where all the packges with the specific versions will installed.
+Assuming you have \sphinxstylestrong{Python 3.6} already installed, you can choose to create a virtual environment where all the packages with the specific versions will installed.
 
 To check which Python version is currently installed, run in the command prompt (cmd.exe):
 
@@ -1238,7 +1181,7 @@ If you are finished working in the virtual environment for the moment, you can d
 \end{sphinxVerbatim}
 
 \begin{sphinxadmonition}{warning}{Warning:}
-Remember, everytime you are working with the CKG, the virtual environment needs to be activated first.
+Remember, every time you are working with the CKG, the virtual environment needs to be activated first.
 \end{sphinxadmonition}
 
 
@@ -1311,6 +1254,43 @@ This will print the path you used as value (e.g. \sphinxcode{\sphinxupquote{C:\t
 Building the CKG database in Windows follows the same steps as in MacOS and Linux so, from here on, please follow the tutorial {\hyperref[\detokenize{intro/getting-started-with-build:build-neo4j-graph-database}]{\sphinxcrossref{\DUrole{std,std-ref}{Build Neo4j graph database}}}}.
 
 
+\section{Getting started with Docker \sphinxstylestrong{(Testing)}}
+\label{\detokenize{intro/getting-started-with-docker:getting-started-with-docker-testing}}\label{\detokenize{intro/getting-started-with-docker::doc}}
+In this section we describe how to set up the Clinical Knowledge Graph from a Docker container.
+This container will install all the requirements needed, download source databases and build the CKG graph database, and open 5 ports through which to interact with the CKG.
+
+A requirement to run the Docker is \sphinxstylestrong{Java SE Runtime Environment}.
+Please go to \sphinxcode{\sphinxupquote{https://www.oracle.com/java/technologies/javase\sphinxhyphen{}jre8\sphinxhyphen{}downloads.html}} and download the \sphinxcode{\sphinxupquote{jre\sphinxhyphen{}8u221\sphinxhyphen{}linux\sphinxhyphen{}x64.tar.gz}} file. Once downloaded, place it in \sphinxcode{\sphinxupquote{CKG/resources/}}.
+
+To run the Docker, simply:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+Build the docker
+
+\end{enumerate}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYGZdl{} \PYG{n+nb}{cd} CKG/
+\PYGZdl{} docker build \PYGZhy{}t docker\PYGZhy{}ckg:latest .
+\end{sphinxVerbatim}
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\setcounter{enumi}{1}
+\item {} 
+Run the docker
+
+\end{enumerate}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYGZdl{} docker run \PYGZhy{}d \PYGZhy{}\PYGZhy{}name ckgapp \PYGZhy{}d \PYGZhy{}v log:/CKG/log \PYGZhy{}v data:/CKG/data \PYGZhy{}e \PYG{n+nv}{EXEC\PYGZus{}MODE}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}minimal\PYGZdq{}} \PYGZhy{}\PYGZhy{}restart\PYG{o}{=}always \PYGZhy{}p \PYG{l+m}{8050}:8050 \PYGZhy{}p \PYG{l+m}{7470}:7474 \PYGZhy{}p \PYG{l+m}{8090}:8090 \PYGZhy{}p \PYG{l+m}{7680}:7687 \PYGZhy{}p \PYG{l+m}{6379}:6379 docker\PYGZhy{}ckg:latest
+\end{sphinxVerbatim}
+
+\begin{sphinxadmonition}{note}{Note:}
+Be aware, this requires Docker to be previously installed.
+\end{sphinxadmonition}
+
+
 \chapter{Getting started}
 \label{\detokenize{index:getting-started}}\begin{itemize}
 \item {} 
@@ -1373,6 +1353,24 @@ Once the connection is established, we can start querying the database. For exam
 This query searches the database for all the available projects and counts how many subjects have been enrolled in each one, returning a pandas DataFrame with “project\_id” and “n\_subjects” as columns.
 
 
+\subsection{Changing/Updating database connection}
+\label{\detokenize{getting_started/connect-to-ckg:changing-updating-database-connection}}
+The connection to the graph database requires credentials, which are stored in \sphinxcode{\sphinxupquote{graphdb\_connector/connector\_config.yml}}.
+This files includes the following lines:
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{db\PYGZus{}url}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{0.0.0.0}\PYG{l+s+s2}{\PYGZdq{}}
+\PYG{c+c1}{\PYGZsh{}dbPort = 7688 \PYGZsh{}Production environment}
+\PYG{n}{db\PYGZus{}port}\PYG{p}{:} \PYG{l+m+mi}{7687} \PYG{c+c1}{\PYGZsh{}Test environment}
+\PYG{n}{db\PYGZus{}user}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{neo4j}\PYG{l+s+s2}{\PYGZdq{}}
+\PYG{n}{db\PYGZus{}password}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{NeO4J}\PYG{l+s+s2}{\PYGZdq{}}
+\end{sphinxVerbatim}
+
+The initial password to create a new Neo4j database is set to \sphinxstylestrong{NeO4J}. If you would like to use another password when creating the database, you can edit the mentioned file and replace \sphinxstylestrong{NeO4J} with any other password of your choosing.
+Another option is to change the password directly in the database by accessing \sphinxguilabel{Manage} in the Neo4j desktop window, select the tab \sphinxguilabel{Administration} and then set the new password.
+Ultimately, make sure that the password in \sphinxcode{\sphinxupquote{graphdb\_connector/connector\_config.yml}} and in the Neo4j database are the same.
+
+
 \section{Create a new user in the graph database}
 \label{\detokenize{getting_started/create-new-user:create-a-new-user-in-the-graph-database}}\label{\detokenize{getting_started/create-new-user::doc}}
 The creation of a new user includes two steps:
@@ -1408,8 +1406,9 @@ For help on how to use \sphinxcode{\sphinxupquote{create\_user.py}}, run:
 \PYGZdl{} python create\PYGZus{}user.py \PYGZhy{}h
 \end{sphinxVerbatim}
 
-For each new user, an access password is set be the same the the \sphinxcode{\sphinxupquote{username}}. All users are advised
-to modify the default password as soon as they are granted access.
+\begin{sphinxadmonition}{warning}{Warning:}
+If you want to have spaces (” “) in any of the arguments (e.g. \sphinxhyphen{}n name), you need to have the argument value within quotes “” (e.g. \sphinxhyphen{}n “John Smith”). The same applies to other arguments like affiliation.
+\end{sphinxadmonition}
 
 
 \section{Create a new project in the database}
@@ -1656,7 +1655,7 @@ Be aware that the following columns are mandatory to fill in:
 \end{itemize}
 
 Additional clinical information about your study subjects can be added in the subsequent columns (i.e. columns after “grouping2”).
-Please use SNOWMED terms as headers for every new column you add. This will be used to gather existing information about the type of data you have.
+Please use SNOMED terms as headers for every new column you add. This will be used to gather existing information about the type of data you have.
 To find an adequate SNOMED term for your clinical variables, please visit the \sphinxhref{https://browser.ihtsdotools.org/?perspective=full\&conceptId1=734000001\&edition=MAIN/2019-07-31\&release=\&languages=en}{SNOMED browser}.
 
 \begin{sphinxadmonition}{note}{Note:}
@@ -1664,7 +1663,7 @@ Be aware, the two\sphinxhyphen{}independent\sphinxhyphen{}variable statistics is
 \end{sphinxadmonition}
 
 \begin{sphinxadmonition}{note}{Note:}
-To add a column with “Age” search for “age” in the SNOMED browser. This gives multiple matches, with the first one being: “Age (qualifier value), SCTID:397669002”. Please enter this information as your clinical variable column header with the SCTID in brackets: Age (qualifier value) (397669002)
+To add a column with “Age” search for “age” in the SNOMED browser. This gives multiple matches, with the first one being: “Age (qualifier value), SCTID:397669002”. Please enter this information as your clinical variable column header with the SCTID in parenthesis: Age (qualifier value) (397669002)
 \end{sphinxadmonition}
 
 \begin{sphinxadmonition}{warning}{Warning:}
@@ -1797,26 +1796,29 @@ Fill in \sphinxcode{\sphinxupquote{Project identifier}} with your project extern
 Select the type of data you will upload first. \sphinxstylestrong{(2)}
 \begin{itemize}
 \item {} 
-If \sphinxcode{\sphinxupquote{proteomics}} or \sphinxcode{\sphinxupquote{longitudinal\_proteomics}} is selected, please also select the processing tool used (\sphinxcode{\sphinxupquote{MaxQuant}} or \sphinxcode{\sphinxupquote{Spectronaut}}). \sphinxstylestrong{(2a)}
+If \sphinxcode{\sphinxupquote{proteomics}}, \sphinxcode{\sphinxupquote{interactomics}} or \sphinxcode{\sphinxupquote{phosphoproteomics}} is selected, please also select the processing tool used (\sphinxcode{\sphinxupquote{MaxQuant}} or \sphinxcode{\sphinxupquote{Spectronaut}}) \sphinxstylestrong{(2a)}, as well as the type of file to be uploaded (\sphinxcode{\sphinxupquote{Protein groups}}, \sphinxcode{\sphinxupquote{Peptides}} or \sphinxcode{\sphinxupquote{Phospho STY sites}}) \sphinxstylestrong{(2b)}.
 
 \end{itemize}
 
 \item {} 
-Drag and drop or select the files to upload to the selected data type. \sphinxstylestrong{(3)}
+Drag and drop or select the file to upload to the selected data type and file type. \sphinxstylestrong{(3)}
+
+\end{enumerate}
 \begin{itemize}
 \item {} 
-Multiple files can be selected at once. This is specially important in the case of proteomics files, please make sure you select all of the relevant MS files at once.
+If you want to upload, for example, both protein groups and peptides from a proteomics experiment, follow the steps \sphinxstylestrong{2.} and \sphinxstylestrong{3.} for each file type to be uploaded.
 
 \end{itemize}
-
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
 \item {} 
 Select another data type to upload \sphinxstylestrong{(2)}, and drag and drop or select the files to upload \sphinxstylestrong{(3)}.
 
 \item {} 
-When you have uploaded all the relevant files, click \sphinxcode{\sphinxupquote{UPLOAD DATA TO CKG}}. After this button is clicked, it will deactivate all the menus. To restore its function, insert the project identifier and go through the previous steps again. \sphinxstylestrong{(4)}
+When you have uploaded all the relevant files, click \sphinxcode{\sphinxupquote{UPLOAD DATA TO CKG}} \sphinxstylestrong{(4)}. After this button is clicked, it will deactivate all the menus. To restore its function, insert the project identifier and go through the previous steps again.
 
 \item {} 
-Once the data is uploaded, click \sphinxcode{\sphinxupquote{Download Uploaded Files (.zip)}} to download all the upload files in a compressed format. \sphinxstylestrong{(5)}
+Once the data is uploaded, a new button will show under \sphinxcode{\sphinxupquote{UPLOAD DATA TO CKG}}. Click \sphinxcode{\sphinxupquote{Download Uploaded Files (.zip)}} to download all the upload files in a compressed format.
 
 \end{enumerate}
 
@@ -1825,14 +1827,10 @@ When the files are uploaded, the filenames are shown under \sphinxcode{\sphinxup
 To replace the files uploaded, just select the correct data type and processing tool, and reselect the files again.
 \end{sphinxadmonition}
 
-\begin{sphinxadmonition}{warning}{Warning:}
-It is very important that you select \sphinxstylestrong{all} the files that should be uploaded to a certain data type \sphinxstylestrong{at once}.
-\end{sphinxadmonition}
-
 
 \section{Define data analysis parameters}
 \label{\detokenize{getting_started/data-analysis-config:define-data-analysis-parameters}}\label{\detokenize{getting_started/data-analysis-config::doc}}
-A multitude of different analysis methods and visualization plots have been implemented within the \sphinxcode{\sphinxupquote{analytics core}} of the Clinical Knowledge Graph.
+A multitude of different analysis methods and visualisation plots have been implemented within the \sphinxcode{\sphinxupquote{analytics\_core}} of the Clinical Knowledge Graph.
 The default workflow makes use of these resources and runs, for each data type, the analysis pipeline defined in a configuration file. In the CKG, we have
 default analysis defined for Clinical data, Proteomics, and Multiomics. All the analysis configuration files can be modified to fit your project or data.
 
@@ -2147,8 +2145,8 @@ Biognosys
 \section{Building the graph database from one Python module}
 \label{\detokenize{ckg_builder/graphdb-builder:building-the-graph-database-from-one-python-module}}\label{\detokenize{ckg_builder/graphdb-builder::doc}}
 
-\chapter{Advanced featues}
-\label{\detokenize{index:advanced-featues}}\begin{itemize}
+\chapter{Advanced features}
+\label{\detokenize{index:advanced-features}}\begin{itemize}
 \item {} 
 \sphinxstylestrong{CKG Statistics}:
 {\hyperref[\detokenize{advanced_features/import-statistics::doc}]{\sphinxcrossref{\DUrole{doc}{Imports stats}}}} |
@@ -2186,9 +2184,9 @@ Biognosys
 \section{Using Jupyter Notebooks with the Clinical Knowledge Graph}
 \label{\detokenize{advanced_features/ckg-notebooks:using-jupyter-notebooks-with-the-clinical-knowledge-graph}}\label{\detokenize{advanced_features/ckg-notebooks::doc}}
 The Jupyter Notebook is used to interact with the notebooks provided in the Clinical Knowledge Graph.
-This open\sphinxhyphen{}source application allows you to create and share code, vizualize outputs and integrated multiple big data tools.
+This open\sphinxhyphen{}source application allows you to create and share code, visualise outputs and integrated multiple big data tools.
 
-In order to get started, make sure you have Python installed (3.3 or greater) as well as Jupyter Notebook. The latter can be installed using pip (see below).For more detailed instructions, visit the \sphinxhref{https://jupyter.org/install.html}{offical guide}.
+In order to get started, make sure you have Python installed (3.3 or greater) as well as Jupyter Notebook. The latter can be installed using pip (see below).For more detailed instructions, visit the \sphinxhref{https://jupyter.org/install.html}{official guide}.
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYGZdl{} python3 \PYGZhy{}m pip install \PYGZhy{}\PYGZhy{}upgrade pip
@@ -2207,10 +2205,10 @@ Or,
 \PYGZdl{} jupyter\PYGZhy{}notebook
 \end{sphinxVerbatim}
 
-As part of the Clinical Knowledge Graph package, we provide a series of Jupyter notebooks to facilitate the analysis of data, database querying and the use of multiple visualization tools. These notebooks can be found in \sphinxcode{\sphinxupquote{src/notebooks}}, under \sphinxcode{\sphinxupquote{reporting}} or \sphinxcode{\sphinxupquote{development}}.
+As part of the Clinical Knowledge Graph package, we provide a series of Jupyter notebooks to facilitate the analysis of data, database querying and the use of multiple visualisation tools. These notebooks can be found in \sphinxcode{\sphinxupquote{src/notebooks}}, under \sphinxcode{\sphinxupquote{reporting}} or \sphinxcode{\sphinxupquote{development}}.
 
 \begin{sphinxadmonition}{note}{Note:}
-If you would like to use two instances of the same notebook, just duplicate inplace and modify the name accordingly.
+If you would like to use two instances of the same notebook, just duplicate in\sphinxhyphen{}place and modify the name accordingly.
 \end{sphinxadmonition}
 
 \begin{sphinxadmonition}{warning}{Warning:}
@@ -2220,7 +2218,7 @@ If the Clinical Knowledge Graph is deployed in a server, please set up a Jupyter
 
 \subsection{Reporting notebooks}
 \label{\detokenize{advanced_features/ckg-notebooks:reporting-notebooks}}
-Reporting notebooks referes to Jupyter notebooks that have been finished and properly tested by the devleopers, and are ready to be used by the community.
+Reporting notebooks refers to Jupyter notebooks that have been finished and properly tested by the developers, and are ready to be used by the community.
 \begin{itemize}
 \item {} 
 \sphinxstylestrong{project\_reporting.ipynb}
@@ -2228,8 +2226,8 @@ Reporting notebooks referes to Jupyter notebooks that have been finished and pro
 \end{itemize}
 
 Easy access to all the projects in the graph database. Loads all the data from a specific project (e.g. “P0000001”) and shows the report in the notebook.
-This notebook enables the visualization of all the plots and tables that constitue a report, as well as all the dataframes used and produced during its generation.
-By accessing the data directly, you can use the python functionality to further the analysis or visualization.
+This notebook enables the visualisation of all the plots and tables that constitute a report, as well as all the dataframes used and produced during its generation.
+By accessing the data directly, you can use the python functionality to further the analysis or visualisation.
 \begin{itemize}
 \item {} 
 \sphinxstylestrong{working\_with\_R.ipynb}
@@ -2239,7 +2237,7 @@ By accessing the data directly, you can use the python functionality to further 
 Notebook entirely written in R. One of the many advantages of using Jupyter notebooks is the possibility of writing in different programming languages.
 In this notebook, we demonstrate how R can be used to, similarly to \sphinxstyleemphasis{project\_reporting.ipynb}, load a project and explore the analysis and plots.
 
-In the beginning of the notebook, we create costum functions to load a project, read the report, read a dataset, and plot and network from a json file.
+In the beginning of the notebook, we create custom functions to load a project, read the report, read a dataset, and plot and network from a json file.
 Other R functions like these can be developed by the users according to their needs.
 \begin{itemize}
 \item {} 
@@ -2247,9 +2245,9 @@ Other R functions like these can be developed by the users according to their ne
 
 \end{itemize}
 
-An example of a new interactive visualization method, not currently implemented in the Clinical Knowledge Graph, but using data from a stored project. We start by loading all the data and the report of a specific project (e.g. “P0000001”), and accessing diferent dataframes within the proteomics dataset, as well as, the correlation network. This plot is then converted into a Pandas DataFrame and used as input for the interactive Parallel plot.
+An example of a new interactive visualisation method, not currently implemented in the Clinical Knowledge Graph, but using data from a stored project. We start by loading all the data and the report of a specific project (e.g. “P0000001”), and accessing different dataframes within the proteomics dataset, as well as, the correlation network. This plot is then converted into a Pandas DataFrame and used as input for the interactive Parallel plot.
 
-The function is created and made interactive with Jupyter Widgets \sphinxcode{\sphinxupquote{interact}} function (\sphinxcode{\sphinxupquote{ipywidgets.interact}}), which automatically creates user interface (UI) controlos within the notebook. In this case, the user can select different clusters of proteins (from the correlation network) and observe their variation across groups.
+The function is created and made interactive with Jupyter Widgets \sphinxcode{\sphinxupquote{interact}} function (\sphinxcode{\sphinxupquote{ipywidgets.interact}}), which automatically creates user interface (UI) controls within the notebook. In this case, the user can select different clusters of proteins (from the correlation network) and observe their variation across groups.
 \begin{itemize}
 \item {} 
 \sphinxstylestrong{Urachal Carcinoma Case Study.ipynb}
@@ -2258,7 +2256,7 @@ The function is created and made interactive with Jupyter Widgets \sphinxcode{\s
 
 Jupyter notebook depicting the use of the Clinical Knowledge Graph database and the analytics core as a decision support tool, proposing a drug candidate in a specific subject case.
 
-The project is analysed with the standard analytics workflow and a list of significantly differentially expressed proteins is returned. To further this analysis we first filter for regulated proteins that have been associated to the disease in study (lung cancer); we then search the database for known inhibitory drugs for these proteins; and to narrow down the list, we can query the database for each drug’s side effects. The treatment regimens are also available in the database and their side effects can be used to rank the proposed drugs. We can prioritize drugs with side effects dissimilar to the ones that caused an adverse reaction in the patient, and identify papers where these drugs have already been associated to the studied disease, further reducing the list of potential drugs candidates.
+The project is analysed with the standard analytics workflow and a list of significantly differentially expressed proteins is returned. To further this analysis we first filter for regulated proteins that have been associated to the disease in study (lung cancer); we then search the database for known inhibitory drugs for these proteins; and to narrow down the list, we can query the database for each drug’s side effects. The treatment regimens are also available in the database and their side effects can be used to rank the proposed drugs. We can prioritise drugs with side effects dissimilar to the ones that caused an adverse reaction in the patient, and identify papers where these drugs have already been associated to the studied disease, further reducing the list of potential drugs candidates.
 
 
 \subsection{Development notebooks}
@@ -2271,11 +2269,11 @@ When a notebook in this folder is functional and successfully benchmarked, the n
 \section{Retrieving data from the Clinical Knowledge Graph database}
 \label{\detokenize{advanced_features/ckg-queries:retrieving-data-from-the-clinical-knowledge-graph-database}}\label{\detokenize{advanced_features/ckg-queries::doc}}
 
-\section{Standardizing the data analysis}
-\label{\detokenize{advanced_features/standard-analysis:standardizing-the-data-analysis}}\label{\detokenize{advanced_features/standard-analysis::doc}}
+\section{Standardising the data analysis}
+\label{\detokenize{advanced_features/standard-analysis:standardising-the-data-analysis}}\label{\detokenize{advanced_features/standard-analysis::doc}}
 
-\section{Visualization plots}
-\label{\detokenize{advanced_features/visualization-plots:visualization-plots}}\label{\detokenize{advanced_features/visualization-plots::doc}}
+\section{Visualisation plots}
+\label{\detokenize{advanced_features/visualization-plots:visualisation-plots}}\label{\detokenize{advanced_features/visualization-plots::doc}}
 
 \section{Python \sphinxhyphen{} R interface}
 \label{\detokenize{advanced_features/R-interface:python-r-interface}}\label{\detokenize{advanced_features/R-interface::doc}}
@@ -2326,7 +2324,10 @@ Python 3.6
 Redis server
 
 \item {} 
-Neo4j =\textless{} 3.15
+Neo4j Desktop
+
+\item {} 
+Neo4j database =\textless{} 3.14
 
 \end{itemize}
 
@@ -3495,7 +3496,7 @@ right ontology (defined in config), i.e. type = \sphinxhyphen{}40 \sphinxhyphen{
 \index{update\_configuration() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{update\_configuration()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/graphdb_builder.experiments.parsers:graphdb_builder.experiments.parsers.proteomicsParser.update_configuration}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{graphdb\_builder.experiments.parsers.proteomicsParser.}}\sphinxbfcode{\sphinxupquote{update\_configuration}}}{\emph{data\_type}, \emph{processing\_tool}, \emph{value\_col=\textquotesingle{}LFQ intensity\textquotesingle{}}, \emph{columns={[}{]}}}{}
+\phantomsection\label{\detokenize{_autosummary/graphdb_builder.experiments.parsers:graphdb_builder.experiments.parsers.proteomicsParser.update_configuration}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{graphdb\_builder.experiments.parsers.proteomicsParser.}}\sphinxbfcode{\sphinxupquote{update\_configuration}}}{\emph{data\_type}, \emph{processing\_tool}, \emph{value\_col=\textquotesingle{}LFQ intensity\textquotesingle{}}, \emph{columns={[}{]}}, \emph{drop\_cols={[}{]}}, \emph{filters=None}}{}
 \end{fulllineitems}
 
 \index{parse\_dataset() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{parse\_dataset()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}}
@@ -4518,10 +4519,44 @@ Logger with the specified name from ‘key’. If key is \sphinxstyleemphasis{No
 
 \end{fulllineitems}
 
+\index{download\_from\_ftp() (in module graphdb\_builder.builder\_utils)@\spxentry{download\_from\_ftp()}\spxextra{in module graphdb\_builder.builder\_utils}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/graphdb_builder:graphdb_builder.builder_utils.download_from_ftp}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{graphdb\_builder.builder\_utils.}}\sphinxbfcode{\sphinxupquote{download\_from\_ftp}}}{\emph{ftp\_url}, \emph{user}, \emph{password}, \emph{to}, \emph{file\_name}}{}
+\end{fulllineitems}
+
+\index{download\_PRIDE\_data() (in module graphdb\_builder.builder\_utils)@\spxentry{download\_PRIDE\_data()}\spxextra{in module graphdb\_builder.builder\_utils}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/graphdb_builder:graphdb_builder.builder_utils.download_PRIDE_data}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{graphdb\_builder.builder\_utils.}}\sphinxbfcode{\sphinxupquote{download\_PRIDE\_data}}}{\emph{pxd\_id}, \emph{file\_name}, \emph{to=\textquotesingle{}.\textquotesingle{}}, \emph{user=\textquotesingle{}\textquotesingle{}}, \emph{password=\textquotesingle{}\textquotesingle{}}}{}
+This function downloads a project file from the PRIDE repository
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{pxd\_id}} (\sphinxhref{https://docs.python.org/3.6/library/stdtypes.html\#str}{\sphinxstyleliteralemphasis{\sphinxupquote{str}}}) \textendash{} PRIDE project identifier (id. PXD013599).
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{file\_name}} (\sphinxhref{https://docs.python.org/3.6/library/stdtypes.html\#str}{\sphinxstyleliteralemphasis{\sphinxupquote{str}}}) \textendash{} name of the file to dowload
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{to}} (\sphinxhref{https://docs.python.org/3.6/library/stdtypes.html\#str}{\sphinxstyleliteralemphasis{\sphinxupquote{str}}}) \textendash{} local directory where the file should be downloaded
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{user}} (\sphinxhref{https://docs.python.org/3.6/library/stdtypes.html\#str}{\sphinxstyleliteralemphasis{\sphinxupquote{str}}}) \textendash{} username to access biomedical database server if required.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{password}} (\sphinxhref{https://docs.python.org/3.6/library/stdtypes.html\#str}{\sphinxstyleliteralemphasis{\sphinxupquote{str}}}) \textendash{} password to access biomedical database server if required.
+
+\end{itemize}
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
 \index{downloadDB() (in module graphdb\_builder.builder\_utils)@\spxentry{downloadDB()}\spxextra{in module graphdb\_builder.builder\_utils}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/graphdb_builder:graphdb_builder.builder_utils.downloadDB}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{graphdb\_builder.builder\_utils.}}\sphinxbfcode{\sphinxupquote{downloadDB}}}{\emph{databaseURL}, \emph{directory=None}, \emph{file\_name=None}, \emph{user=\textquotesingle{}\textquotesingle{}}, \emph{password=\textquotesingle{}\textquotesingle{}}}{}
+\phantomsection\label{\detokenize{_autosummary/graphdb_builder:graphdb_builder.builder_utils.downloadDB}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{graphdb\_builder.builder\_utils.}}\sphinxbfcode{\sphinxupquote{downloadDB}}}{\emph{databaseURL}, \emph{directory=None}, \emph{file\_name=None}, \emph{user=\textquotesingle{}\textquotesingle{}}, \emph{password=\textquotesingle{}\textquotesingle{}}, \emph{avoid\_wget=False}}{}
 This function downloads the raw files from a biomedical database server when a link is provided.
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode\begin{itemize}
@@ -4796,6 +4831,16 @@ Returns a tuple with all the information needed to build a stats file.
 Tuple with date, time, database name, file where entities/relationships are stored,     file size, number of entities/relationships imported, type and label.
 
 \end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{unrar() (in module graphdb\_builder.builder\_utils)@\spxentry{unrar()}\spxextra{in module graphdb\_builder.builder\_utils}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/graphdb_builder:graphdb_builder.builder_utils.unrar}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{graphdb\_builder.builder\_utils.}}\sphinxbfcode{\sphinxupquote{unrar}}}{\emph{filepath}, \emph{to}}{}
+Decompress RAR file
+:param str filepath: path to rar file
+:param str to: where to extract all files
 
 \end{fulllineitems}
 
@@ -6262,10 +6307,22 @@ Bases: \sphinxhref{https://docs.python.org/3.6/library/functions.html\#object}{\
 \phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.knowledge.Knowledge.nodes}}\pysigline{\sphinxbfcode{\sphinxupquote{property }}\sphinxbfcode{\sphinxupquote{nodes}}}
 \end{fulllineitems}
 
+\index{update\_nodes() (report\_manager.knowledge.Knowledge method)@\spxentry{update\_nodes()}\spxextra{report\_manager.knowledge.Knowledge method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.knowledge.Knowledge.update_nodes}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{update\_nodes}}}{\emph{nodes}}{}
+\end{fulllineitems}
+
 \index{relationships() (report\_manager.knowledge.Knowledge property)@\spxentry{relationships()}\spxextra{report\_manager.knowledge.Knowledge property}}
 
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.knowledge.Knowledge.relationships}}\pysigline{\sphinxbfcode{\sphinxupquote{property }}\sphinxbfcode{\sphinxupquote{relationships}}}
+\end{fulllineitems}
+
+\index{update\_relationships() (report\_manager.knowledge.Knowledge method)@\spxentry{update\_relationships()}\spxextra{report\_manager.knowledge.Knowledge method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.knowledge.Knowledge.update_relationships}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{update\_relationships}}}{\emph{relationships}}{}
 \end{fulllineitems}
 
 \index{queries\_file() (report\_manager.knowledge.Knowledge property)@\spxentry{queries\_file()}\spxextra{report\_manager.knowledge.Knowledge property}}
@@ -6314,6 +6371,12 @@ Bases: \sphinxhref{https://docs.python.org/3.6/library/functions.html\#object}{\
 
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.knowledge.Knowledge.generate_knowledge_from_wgcna}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{generate\_knowledge\_from\_wgcna}}}{\emph{data}, \emph{entity1}, \emph{entity2}, \emph{cutoff=0.2}}{}
+\end{fulllineitems}
+
+\index{generate\_knowledge\_from\_edgelist() (report\_manager.knowledge.Knowledge method)@\spxentry{generate\_knowledge\_from\_edgelist()}\spxextra{report\_manager.knowledge.Knowledge method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.knowledge.Knowledge.generate_knowledge_from_edgelist}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{generate\_knowledge\_from\_edgelist}}}{\emph{edgelist}, \emph{entity1}, \emph{entity2}, \emph{source}, \emph{target}, \emph{rtype}, \emph{weight}}{}
 \end{fulllineitems}
 
 \index{generate\_knowledge\_from\_annotations() (report\_manager.knowledge.Knowledge method)@\spxentry{generate\_knowledge\_from\_annotations()}\spxextra{report\_manager.knowledge.Knowledge method}}
@@ -7283,7 +7346,7 @@ Example:
 \index{extract\_percentage\_missing() (in module analytics\_core.analytics.analytics)@\spxentry{extract\_percentage\_missing()}\spxextra{in module analytics\_core.analytics.analytics}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/analytics_core.analytics:analytics_core.analytics.analytics.extract_percentage_missing}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{analytics\_core.analytics.analytics.}}\sphinxbfcode{\sphinxupquote{extract\_percentage\_missing}}}{\emph{data, missing\_max, drop\_cols={[}\textquotesingle{}sample\textquotesingle{}{]}, group=\textquotesingle{}group\textquotesingle{}}}{}
+\phantomsection\label{\detokenize{_autosummary/analytics_core.analytics:analytics_core.analytics.analytics.extract_percentage_missing}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{analytics\_core.analytics.analytics.}}\sphinxbfcode{\sphinxupquote{extract\_percentage\_missing}}}{\emph{data, missing\_max, drop\_cols={[}\textquotesingle{}sample\textquotesingle{}{]}, group=\textquotesingle{}group\textquotesingle{}, how=\textquotesingle{}all\textquotesingle{}}}{}
 Extracts ratio of missing/valid values in each column and filters column labels with lower ratio than the minimum threshold defined.
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode\begin{itemize}
@@ -7296,18 +7359,20 @@ Extracts ratio of missing/valid values in each column and filters column labels 
 \item {} 
 \sphinxstyleliteralstrong{\sphinxupquote{missing\_max}} (\sphinxhref{https://docs.python.org/3.6/library/functions.html\#float}{\sphinxstyleliteralemphasis{\sphinxupquote{float}}}) \textendash{} maximum ratio of missing/valid values to be filtered.
 
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{how}} (\sphinxhref{https://docs.python.org/3.6/library/stdtypes.html\#str}{\sphinxstyleliteralemphasis{\sphinxupquote{str}}}) \textendash{} define if labels with a higher percentage of missing values than the threshold in any group (‘any’) or in all groups (‘all’) should be filtered
+
 \end{itemize}
 
 \item[{Returns}] \leavevmode
 List of column labels below the threshold.
 
 \end{description}\end{quote}
+\begin{description}
+\item[{Example::}] \leavevmode
+result = extract\_percentage\_missing(data, missing\_max=0.3, drop\_cols={[}‘sample’{]}, group=’group’)
 
-Example:
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{result} \PYG{o}{=} \PYG{n}{extract\PYGZus{}percentage\PYGZus{}missing}\PYG{p}{(}\PYG{n}{data}\PYG{p}{,} \PYG{n}{missing\PYGZus{}max}\PYG{o}{=}\PYG{l+m+mf}{0.3}\PYG{p}{,} \PYG{n}{drop\PYGZus{}cols}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{sample}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{,} \PYG{n}{group}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{group}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
-\end{sphinxVerbatim}
+\end{description}
 
 \end{fulllineitems}
 
@@ -7343,7 +7408,7 @@ Pandas dataframe with samples as rows and protein identifiers as columns.
 Example:
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{result} \PYG{o}{=} \PYG{n}{imputation\PYGZus{}KNN}\PYG{p}{(}\PYG{n}{data}\PYG{p}{,} \PYG{n}{drop\PYGZus{}cols}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{group}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{sample}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{subject}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{,} \PYG{n}{group}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{group}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{cutoff}\PYG{o}{=}\PYG{l+m+mf}{0.6}\PYG{p}{,} \PYG{n}{alone} \PYG{o}{=} \PYG{k+kc}{True}\PYG{p}{)}
+\PYG{n}{result} \PYG{o}{=} \PYG{n}{imputation\PYGZus{}KNN}\PYG{p}{(}\PYG{n}{data}\PYG{p}{,} \PYG{n}{drop\PYGZus{}cols}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{group}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{sample}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{subject}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{,} \PYG{n}{group}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{group}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{cutoff}\PYG{o}{=}\PYG{l+m+mf}{0.6}\PYG{p}{,} \PYG{n}{alone}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
 \end{sphinxVerbatim}
 
 \end{fulllineitems}
@@ -7674,10 +7739,52 @@ Exmaple:
 
 \end{fulllineitems}
 
+\index{transform\_proteomics\_edgelist() (in module analytics\_core.analytics.analytics)@\spxentry{transform\_proteomics\_edgelist()}\spxextra{in module analytics\_core.analytics.analytics}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/analytics_core.analytics:analytics_core.analytics.analytics.transform_proteomics_edgelist}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{analytics\_core.analytics.analytics.}}\sphinxbfcode{\sphinxupquote{transform\_proteomics\_edgelist}}}{\emph{df, index\_cols={[}\textquotesingle{}group\textquotesingle{}, \textquotesingle{}sample\textquotesingle{}, \textquotesingle{}subject\textquotesingle{}{]}, drop\_cols={[}\textquotesingle{}sample\textquotesingle{}{]}, group=\textquotesingle{}group\textquotesingle{}, identifier=\textquotesingle{}identifier\textquotesingle{}, extra\_identifier=\textquotesingle{}name\textquotesingle{}, value\_col=\textquotesingle{}LFQ\_intensity\textquotesingle{}}}{}
+Transforms a long format proteomics matrix into a wide format
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{df}} \textendash{} long\sphinxhyphen{}format pandas dataframe with columns ‘group’, ‘sample’, ‘subject’, ‘identifier’ (protein), ‘name’ (gene) and ‘LFQ\_intensity’.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{index\_cols}} (\sphinxhref{https://docs.python.org/3.6/library/stdtypes.html\#list}{\sphinxstyleliteralemphasis{\sphinxupquote{list}}}) \textendash{} column labels to be be kept as index identifiers.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{drop\_cols}} (\sphinxhref{https://docs.python.org/3.6/library/stdtypes.html\#list}{\sphinxstyleliteralemphasis{\sphinxupquote{list}}}) \textendash{} column labels to be dropped from the dataframe.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{group}} (\sphinxhref{https://docs.python.org/3.6/library/stdtypes.html\#str}{\sphinxstyleliteralemphasis{\sphinxupquote{str}}}) \textendash{} column label containing group identifiers.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{identifier}} (\sphinxhref{https://docs.python.org/3.6/library/stdtypes.html\#str}{\sphinxstyleliteralemphasis{\sphinxupquote{str}}}) \textendash{} column label containing feature identifiers.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{extra\_identifier}} (\sphinxhref{https://docs.python.org/3.6/library/stdtypes.html\#str}{\sphinxstyleliteralemphasis{\sphinxupquote{str}}}) \textendash{} column label containing additional protein identifiers (e.g. gene names).
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{value\_col}} (\sphinxhref{https://docs.python.org/3.6/library/stdtypes.html\#str}{\sphinxstyleliteralemphasis{\sphinxupquote{str}}}) \textendash{} column label containing expression values.
+
+\end{itemize}
+
+\item[{Returns}] \leavevmode
+Pandas dataframe with samples as rows and protein identifiers (UniprotID\textasciitilde{}GeneName) as columns (with additional columns ‘group’, ‘sample’ and ‘subject’).
+
+\end{description}\end{quote}
+\begin{description}
+\item[{Example:}] \leavevmode
+df = transform\_proteomics\_edgelist(original, index\_cols={[}‘group’, ‘sample’, ‘subject’{]}, drop\_cols={[}‘sample’{]}, group=’group’, identifier=’identifier’, value\_col=’LFQ\_intensity’)
+
+\end{description}
+
+\end{fulllineitems}
+
 \index{get\_proteomics\_measurements\_ready() (in module analytics\_core.analytics.analytics)@\spxentry{get\_proteomics\_measurements\_ready()}\spxextra{in module analytics\_core.analytics.analytics}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/analytics_core.analytics:analytics_core.analytics.analytics.get_proteomics_measurements_ready}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{analytics\_core.analytics.analytics.}}\sphinxbfcode{\sphinxupquote{get\_proteomics\_measurements\_ready}}}{\emph{df, index\_cols={[}\textquotesingle{}group\textquotesingle{}, \textquotesingle{}sample\textquotesingle{}, \textquotesingle{}subject\textquotesingle{}{]}, drop\_cols={[}\textquotesingle{}sample\textquotesingle{}{]}, group=\textquotesingle{}group\textquotesingle{}, identifier=\textquotesingle{}identifier\textquotesingle{}, extra\_identifier=\textquotesingle{}name\textquotesingle{}, imputation=True, method=\textquotesingle{}distribution\textquotesingle{}, missing\_method=\textquotesingle{}percentage\textquotesingle{}, missing\_per\_group=True, missing\_max=0.3, min\_valid=1, value\_col=\textquotesingle{}LFQ\_intensity\textquotesingle{}, shift=1.8, nstd=0.3, knn\_cutoff=0.6}}{}
+\phantomsection\label{\detokenize{_autosummary/analytics_core.analytics:analytics_core.analytics.analytics.get_proteomics_measurements_ready}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{analytics\_core.analytics.analytics.}}\sphinxbfcode{\sphinxupquote{get\_proteomics\_measurements\_ready}}}{\emph{df, index\_cols={[}\textquotesingle{}group\textquotesingle{}, \textquotesingle{}sample\textquotesingle{}, \textquotesingle{}subject\textquotesingle{}{]}, drop\_cols={[}\textquotesingle{}sample\textquotesingle{}{]}, group=\textquotesingle{}group\textquotesingle{}, identifier=\textquotesingle{}identifier\textquotesingle{}, extra\_identifier=\textquotesingle{}name\textquotesingle{}, imputation=True, method=\textquotesingle{}distribution\textquotesingle{}, missing\_method=\textquotesingle{}percentage\textquotesingle{}, missing\_per\_group=True, missing\_max=0.3, min\_valid=1, value\_col=\textquotesingle{}LFQ\_intensity\textquotesingle{}, shift=1.8, nstd=0.3, knn\_cutoff=0.6, normalize=False, normalization\_method=\textquotesingle{}median\textquotesingle{}}}{}
 Processes proteomics data extracted from the database: 1) filter proteins with high number of missing values (\textgreater{} missing\_max or min\_valid), 2) impute missing values.
 For more information on imputation method visit \sphinxurl{http://www.coxdocs.org/doku.php?id=perseus:user:activities:matrixprocessing:filterrows:filtervalidvaluesrows}.
 \begin{quote}\begin{description}
@@ -7740,7 +7847,7 @@ Pandas dataframe with samples as rows and protein identifiers (UniprotID\textasc
 Example 1:
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{result} \PYG{o}{=} \PYG{n}{get\PYGZus{}proteomics\PYGZus{}measurements\PYGZus{}ready}\PYG{p}{(}\PYG{n}{df}\PYG{p}{,} \PYG{n}{index\PYGZus{}cols}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{group}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{sample}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{subject}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{,} \PYG{n}{drop\PYGZus{}cols}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{sample}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{,} \PYG{n}{group}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{group}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{identifier}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{identifier}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{extra\PYGZus{}identifier}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{name}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{imputation} \PYG{o}{=} \PYG{k+kc}{True}\PYG{p}{,} \PYG{n}{method} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{distribution}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{missing\PYGZus{}method} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{percentage}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{missing\PYGZus{}per\PYGZus{}group}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{,} \PYG{n}{missing\PYGZus{}max} \PYG{o}{=} \PYG{l+m+mf}{0.3}\PYG{p}{,} \PYG{n}{value\PYGZus{}col}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{LFQ\PYGZus{}intensity}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{result} \PYG{o}{=} \PYG{n}{get\PYGZus{}proteomics\PYGZus{}measurements\PYGZus{}ready}\PYG{p}{(}\PYG{n}{df}\PYG{p}{,} \PYG{n}{index\PYGZus{}cols}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{group}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{sample}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{subject}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{,} \PYG{n}{drop\PYGZus{}cols}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{sample}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{,} \PYG{n}{group}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{group}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{identifier}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{identifier}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{extra\PYGZus{}identifier}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{name}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{imputation}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{,} \PYG{n}{method} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{distribution}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{missing\PYGZus{}method} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{percentage}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{missing\PYGZus{}per\PYGZus{}group}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{,} \PYG{n}{missing\PYGZus{}max} \PYG{o}{=} \PYG{l+m+mf}{0.3}\PYG{p}{,} \PYG{n}{value\PYGZus{}col}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{LFQ\PYGZus{}intensity}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
 \end{sphinxVerbatim}
 
 Example 2:
@@ -9039,6 +9146,40 @@ group1 = {[}a, b{]}
 group2 = {[}c, d{]}
 
 odds, pvalue = stats.fisher\_exact({[}{[}a, b{]}, {[}c, d{]}{]})
+
+\end{fulllineitems}
+
+\index{run\_kolmogorov\_smirnov() (in module analytics\_core.analytics.analytics)@\spxentry{run\_kolmogorov\_smirnov()}\spxextra{in module analytics\_core.analytics.analytics}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/analytics_core.analytics:analytics_core.analytics.analytics.run_kolmogorov_smirnov}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{analytics\_core.analytics.analytics.}}\sphinxbfcode{\sphinxupquote{run\_kolmogorov\_smirnov}}}{\emph{dist1}, \emph{dist2}, \emph{alternative=\textquotesingle{}two\sphinxhyphen{}sided\textquotesingle{}}}{}
+Compute the Kolmogorov\sphinxhyphen{}Smirnov statistic on 2 samples. See \sphinxurl{https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ks\_2samp.html}
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{dist1}} (\sphinxhref{https://docs.python.org/3.6/library/stdtypes.html\#list}{\sphinxstyleliteralemphasis{\sphinxupquote{list}}}) \textendash{} sequence of 1\sphinxhyphen{}D ndarray (first distribution to compare) drawn from a continuous distribution
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{dist2}} (\sphinxhref{https://docs.python.org/3.6/library/stdtypes.html\#list}{\sphinxstyleliteralemphasis{\sphinxupquote{list}}}) \textendash{} sequence of 1\sphinxhyphen{}D ndarray (second distribution to compare) drawn from a continuous distribution
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{alternative}} (\sphinxhref{https://docs.python.org/3.6/library/stdtypes.html\#str}{\sphinxstyleliteralemphasis{\sphinxupquote{str}}}) \textendash{} defines the alternative hypothesis (default is ‘two\sphinxhyphen{}sided’):
+* \sphinxstylestrong{‘two\sphinxhyphen{}sided’}
+* \sphinxstylestrong{‘less’}
+* \sphinxstylestrong{‘greater’}
+
+\end{itemize}
+
+\item[{Returns}] \leavevmode
+statistic float and KS statistic pvalue float Two\sphinxhyphen{}tailed p\sphinxhyphen{}value.
+
+\end{description}\end{quote}
+
+Example:
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{result} \PYG{o}{=} \PYG{n}{run\PYGZus{}kolmogorov\PYGZus{}smirnov}\PYG{p}{(}\PYG{n}{dist1}\PYG{p}{,} \PYG{n}{dist2}\PYG{p}{,} \PYG{n}{alternative}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{two\PYGZhy{}sided}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\end{sphinxVerbatim}
 
 \end{fulllineitems}
 
@@ -10370,6 +10511,56 @@ Example:
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{n}{result} \PYG{o}{=} \PYG{n}{get\PYGZus{}barplot}\PYG{p}{(}\PYG{n}{data}\PYG{p}{,} \PYG{n}{identifier}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{barplot}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{args}\PYG{o}{=}\PYG{p}{\PYGZob{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{title}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{:}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Figure with Barplot}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\end{fulllineitems}
+
+\index{get\_histogram() (in module analytics\_core.viz.viz)@\spxentry{get\_histogram()}\spxextra{in module analytics\_core.viz.viz}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/analytics_core.viz:analytics_core.viz.viz.get_histogram}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{analytics\_core.viz.viz.}}\sphinxbfcode{\sphinxupquote{get\_histogram}}}{\emph{data}, \emph{identifier}, \emph{args}}{}
+Basic histogram figure allows facets cols and rows
+
+param data: pandas dataframe with at least values to be plotted.
+:param str identifier: id used to identify the div where the figure will be generated.
+:param ditc args: see below.
+:Arguments:
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{x} (str) \textendash{} name of the column containing values to plot in the x axis.
+
+\item {} 
+\sphinxstylestrong{y} (str) \textendash{} name of the column containing values to plot in the y axis (if used).
+
+\item {} 
+\sphinxstylestrong{color} (str) \textendash{} name of the column that defines how the histogram is colored (if used).
+
+\item {} 
+\sphinxstylestrong{facet\_row} (str) \textendash{} name of the column to be used as ‘facet’ row (if used).
+
+\item {} 
+\sphinxstylestrong{facet\_col} (str) \textendash{} name of the column to be used as ‘facet’ column (if used).
+
+\item {} 
+\sphinxstylestrong{height} (int) \textendash{} height of the plot
+
+\item {} 
+\sphinxstylestrong{width} (int) \textendash{} width of the plot
+
+\item {} 
+\sphinxstylestrong{title} (str) \textendash{} plot title.
+
+\end{itemize}
+\begin{quote}\begin{description}
+\item[{Returns}] \leavevmode
+dash componenet with histogram figure
+
+\end{description}\end{quote}
+
+Example:
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{result} \PYG{o}{=} \PYG{n}{get\PYGZus{}histogram}\PYG{p}{(}\PYG{n}{data}\PYG{p}{,} \PYG{n}{identifier}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{histogram}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{args}\PYG{o}{=}\PYG{p}{\PYGZob{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{x}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{:}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{a}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{color}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{:}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{group}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{facet\PYGZus{}row}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{:}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{sample}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{title}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{:}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Facet Grid Plot}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{)}
 \end{sphinxVerbatim}
 
 \end{fulllineitems}

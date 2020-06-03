@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-windows.html">Getting started with Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-docker.html">Getting started with Docker <strong>(Testing)</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
@@ -122,8 +123,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardising the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualisation plots</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/R-interface.html">Python - R interface</a></li>
 </ul>
 <ul>
@@ -468,8 +469,30 @@
 </dd></dl>
 
 <dl class="function">
+<dt id="graphdb_builder.builder_utils.download_from_ftp">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">download_from_ftp</code><span class="sig-paren">(</span><em class="sig-param">ftp_url</em>, <em class="sig-param">user</em>, <em class="sig-param">password</em>, <em class="sig-param">to</em>, <em class="sig-param">file_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#download_from_ftp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.download_from_ftp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.download_PRIDE_data">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">download_PRIDE_data</code><span class="sig-paren">(</span><em class="sig-param">pxd_id</em>, <em class="sig-param">file_name</em>, <em class="sig-param">to='.'</em>, <em class="sig-param">user=''</em>, <em class="sig-param">password=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#download_PRIDE_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.download_PRIDE_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function downloads a project file from the PRIDE repository</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pxd_id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – PRIDE project identifier (id. PXD013599).</p></li>
+<li><p><strong>file_name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – name of the file to dowload</p></li>
+<li><p><strong>to</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – local directory where the file should be downloaded</p></li>
+<li><p><strong>user</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – username to access biomedical database server if required.</p></li>
+<li><p><strong>password</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – password to access biomedical database server if required.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
 <dt id="graphdb_builder.builder_utils.downloadDB">
-<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">downloadDB</code><span class="sig-paren">(</span><em class="sig-param">databaseURL</em>, <em class="sig-param">directory=None</em>, <em class="sig-param">file_name=None</em>, <em class="sig-param">user=''</em>, <em class="sig-param">password=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#downloadDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.downloadDB" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">downloadDB</code><span class="sig-paren">(</span><em class="sig-param">databaseURL</em>, <em class="sig-param">directory=None</em>, <em class="sig-param">file_name=None</em>, <em class="sig-param">user=''</em>, <em class="sig-param">password=''</em>, <em class="sig-param">avoid_wget=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#downloadDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.downloadDB" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function downloads the raw files from a biomedical database server when a link is provided.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -688,6 +711,14 @@ Generator flattening the structure</p>
 <dd class="field-even"><p>Tuple with date, time, database name, file where entities/relationships are stored,     file size, number of entities/relationships imported, type and label.</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="graphdb_builder.builder_utils.unrar">
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">unrar</code><span class="sig-paren">(</span><em class="sig-param">filepath</em>, <em class="sig-param">to</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#unrar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.unrar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decompress RAR file
+:param str filepath: path to rar file
+:param str to: where to extract all files</p>
 </dd></dl>
 
 <dl class="function">

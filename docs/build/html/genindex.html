@@ -92,6 +92,7 @@
 <li class="toctree-l1"><a class="reference internal" href="intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro/getting-started-with-windows.html">Getting started with Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro/getting-started-with-docker.html">Getting started with Docker <strong>(Testing)</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
@@ -121,8 +122,8 @@
 <li class="toctree-l1"><a class="reference internal" href="advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
 <li class="toctree-l1"><a class="reference internal" href="advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_features/standard-analysis.html">Standardising the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_features/visualization-plots.html">Visualisation plots</a></li>
 <li class="toctree-l1"><a class="reference internal" href="advanced_features/R-interface.html">Python - R interface</a></li>
 </ul>
 <ul>
@@ -492,10 +493,10 @@
 </li>
       <li><a href="_autosummary/analytics_core.analytics.html#analytics_core.analytics.analytics.define_samr_method">define_samr_method() (in module analytics_core.analytics.analytics)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/analytics_core.viz.html#analytics_core.viz.Dendrogram.Dendrogram">Dendrogram (class in analytics_core.viz.Dendrogram)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/report_manager.html#report_manager.project.Project.description">description() (report_manager.project.Project property)</a>
 </li>
       <li><a href="_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.df_sort_by_dendrogram">df_sort_by_dendrogram() (in module analytics_core.analytics.wgcnaAnalysis)</a>
@@ -504,7 +505,11 @@
 </li>
       <li><a href="_autosummary/report_manager.html#report_manager.dataset.DNAseqDataset">DNAseqDataset (class in report_manager.dataset)</a>
 </li>
+      <li><a href="_autosummary/graphdb_builder.html#graphdb_builder.builder_utils.download_from_ftp">download_from_ftp() (in module graphdb_builder.builder_utils)</a>
+</li>
       <li><a href="_autosummary/report_manager.html#report_manager.project.Project.download_knowledge">download_knowledge() (report_manager.project.Project method)</a>
+</li>
+      <li><a href="_autosummary/graphdb_builder.html#graphdb_builder.builder_utils.download_PRIDE_data">download_PRIDE_data() (in module graphdb_builder.builder_utils)</a>
 </li>
       <li><a href="_autosummary/report_manager.html#report_manager.project.Project.download_project">download_project() (report_manager.project.Project method)</a>
 </li>
@@ -722,6 +727,8 @@
       </ul></li>
       <li><a href="_autosummary/report_manager.html#report_manager.knowledge.Knowledge.generate_knowledge_from_annotations">generate_knowledge_from_annotations() (report_manager.knowledge.Knowledge method)</a>
 </li>
+      <li><a href="_autosummary/report_manager.html#report_manager.knowledge.Knowledge.generate_knowledge_from_edgelist">generate_knowledge_from_edgelist() (report_manager.knowledge.Knowledge method)</a>
+</li>
       <li><a href="_autosummary/report_manager.html#report_manager.knowledge.Knowledge.generate_knowledge_from_queries">generate_knowledge_from_queries() (report_manager.knowledge.Knowledge method)</a>
 </li>
       <li><a href="_autosummary/report_manager.html#report_manager.knowledge.Knowledge.generate_knowledge_from_regulation">generate_knowledge_from_regulation() (report_manager.knowledge.Knowledge method)</a>
@@ -848,6 +855,8 @@
         <li><a href="_autosummary/report_manager.html#report_manager.utils.get_hex_colors">(in module report_manager.utils)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/analytics_core.viz.html#analytics_core.viz.viz.get_histogram">get_histogram() (in module analytics_core.viz.viz)</a>
+</li>
       <li><a href="_autosummary/report_manager.html#report_manager.utils.get_image">get_image() (in module report_manager.utils)</a>
 </li>
       <li><a href="_autosummary/report_manager.apps.html#report_manager.apps.imports.get_imports_per_database_date">get_imports_per_database_date() (in module report_manager.apps.imports)</a>
@@ -890,10 +899,10 @@
 </li>
       <li><a href="_autosummary/report_manager.apps.html#report_manager.apps.dataUpload.get_new_subject_identifier">get_new_subject_identifier() (in module report_manager.apps.dataUpload)</a>
 </li>
-      <li><a href="_autosummary/graphdb_builder.users.html#graphdb_builder.users.users_controller.get_new_user_identifier">get_new_user_identifier() (in module graphdb_builder.users.users_controller)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/graphdb_builder.users.html#graphdb_builder.users.users_controller.get_new_user_identifier">get_new_user_identifier() (in module graphdb_builder.users.users_controller)</a>
+</li>
       <li><a href="_autosummary/graphdb_connector.html#graphdb_connector.query_utils.get_nodes">get_nodes() (in module graphdb_connector.query_utils)</a>
 </li>
       <li><a href="_autosummary/analytics_core.viz.html#analytics_core.viz.viz.get_notebook_network_pyvis">get_notebook_network_pyvis() (in module analytics_core.viz.viz)</a>
@@ -1692,6 +1701,8 @@
 </li>
       <li><a href="_autosummary/analytics_core.analytics.html#analytics_core.analytics.analytics.run_km">run_km() (in module analytics_core.analytics.analytics)</a>
 </li>
+      <li><a href="_autosummary/analytics_core.analytics.html#analytics_core.analytics.analytics.run_kolmogorov_smirnov">run_kolmogorov_smirnov() (in module analytics_core.analytics.analytics)</a>
+</li>
       <li><a href="_autosummary/analytics_core.analytics.html#analytics_core.analytics.analytics.run_mapper">run_mapper() (in module analytics_core.analytics.analytics)</a>
 </li>
       <li><a href="_autosummary/analytics_core.analytics.html#analytics_core.analytics.analytics.run_multi_correlation">run_multi_correlation() (in module analytics_core.analytics.analytics)</a>
@@ -1814,13 +1825,15 @@
 </li>
       <li><a href="_autosummary/report_manager.html#report_manager.project.Project.to_dict">to_dict() (report_manager.project.Project method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/report_manager.html#report_manager.project.Project.to_json">to_json() (report_manager.project.Project method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/analytics_core.analytics.html#analytics_core.analytics.analytics.transform_into_long_format">transform_into_long_format() (in module analytics_core.analytics.analytics)</a>
 </li>
       <li><a href="_autosummary/analytics_core.analytics.html#analytics_core.analytics.analytics.transform_into_wide_format">transform_into_wide_format() (in module analytics_core.analytics.analytics)</a>
+</li>
+      <li><a href="_autosummary/analytics_core.analytics.html#analytics_core.analytics.analytics.transform_proteomics_edgelist">transform_proteomics_edgelist() (in module analytics_core.analytics.analytics)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1829,6 +1842,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/analytics_core.analytics.html#analytics_core.analytics.analytics.unit_vector">unit_vector() (in module analytics_core.analytics.analytics)</a>
+</li>
+      <li><a href="_autosummary/graphdb_builder.html#graphdb_builder.builder_utils.unrar">unrar() (in module graphdb_builder.builder_utils)</a>
 </li>
       <li><a href="_autosummary/report_manager.html#report_manager.dataset.Dataset.update_analyses">update_analyses() (report_manager.dataset.Dataset method)</a>
 </li>
@@ -1846,7 +1861,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.update_groups">update_groups() (in module graphdb_builder.experiments.parsers.proteomicsParser)</a>
 </li>
+      <li><a href="_autosummary/report_manager.html#report_manager.knowledge.Knowledge.update_nodes">update_nodes() (report_manager.knowledge.Knowledge method)</a>
+</li>
       <li><a href="_autosummary/report_manager.html#report_manager.report.Report.update_plots">update_plots() (report_manager.report.Report method)</a>
+</li>
+      <li><a href="_autosummary/report_manager.html#report_manager.knowledge.Knowledge.update_relationships">update_relationships() (report_manager.knowledge.Knowledge method)</a>
 </li>
       <li><a href="_autosummary/report_manager.html#report_manager.dataset.Dataset.update_report">update_report() (report_manager.dataset.Dataset method)</a>
 

@@ -37,9 +37,10 @@ all the possibilities.
    intro/getting-started-with-neo4j
    intro/getting-started-with-build
    intro/getting-started-with-windows
+   intro/getting-started-with-docker
 
 
-Getting started 
+Getting started
 -------------------------------------------------
 
 * **Connecting to the CKG**:
@@ -124,8 +125,8 @@ CKG Builder
    ckg_builder/graphdb-builder
 
 
-Advanced featues
-----------------
+Advanced features
+------------------
 
 * **CKG Statistics**:
   :doc:`Imports stats <advanced_features/import-statistics>` |
