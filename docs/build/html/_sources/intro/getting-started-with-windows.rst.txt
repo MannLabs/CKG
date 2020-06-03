@@ -4,7 +4,7 @@
 Getting started with Windows
 ===============================
 
-In this section we describe how to install all the neccessary requirements and set up the Clinical Knowledge Graph on a Windows operating system.
+In this section we describe how to install all the necessary requirements and set up the Clinical Knowledge Graph on a Windows operating system.
 
 
 Java
@@ -26,7 +26,7 @@ Another essential package for the functioning of the Clinical Knowledge Graph is
 You can check if an **R version >= 3.5.2** is already installed by running:
 
 .. code-block:: bash
-	
+
 	> where R
 
 If R is not installed in your machine, please follow `these tutorial <https://rstudio-education.github.io/hopr/starting.html>`__.
@@ -48,11 +48,11 @@ In order to simplify calling R from the command prompt, you can choose to add it
 #. Click :guilabel:`OK` to save, click :guilabel:`OK` and :guilabel:`OK` again to save the new variable and edit to ``Path``.
 
 
-To confirm that the environment variable is correctly set in command line type: 
+To confirm that the environment variable is correctly set in command line type:
 
 .. code-block:: bash
 
-	> echo %R% 
+	> echo %R%
 
 
 This will print the path you used as value (e.g. ``C:\Program Files\R\R-4.0.0\bin\R.exe``).
@@ -89,7 +89,7 @@ The installation of Neo4j on Windows follows the same steps as :ref:`Getting Sta
 
 #. Install Neo4j by following the instructions automatically opened in the browser.
 
-#. Open the Neo4j Desktop App and create a database by clicking :guilabel:`Add graph`, followed by :guilabel:`Create a Local Graph`, using the password "neo4j".
+#. Open the Neo4j Desktop App and create a database by clicking :guilabel:`Add graph`, followed by :guilabel:`Create a Local Graph`, using the password "NeO4J".
 
 #. Click :guilabel:`Manage` and then :guilabel:`Plugins`. Install "**APOC**" and "**GRAPH ALGORITHMS**".
 
@@ -120,11 +120,11 @@ To add the Neo4j database you just created to your Windows environment variables
 #. Click :guilabel:`OK` and :guilabel:`OK` again to save this variable.
 
 
-To confirm that the environment variable is correctly set in command line type: 
+To confirm that the environment variable is correctly set in command line type:
 
 .. code-block:: bash
 
-	> echo %NEO4J_HOME% 
+	> echo %NEO4J_HOME%
 
 
 This will print the path you used as value (e.g. ``C:\Neo4J\neo4jDatabases\database-bab515f2-ffe7-4282-9bb5-648a53b8b566\installation-3.5.2\``).
@@ -138,7 +138,7 @@ Getting Started with the CKG Build
 ------------------------------------
 
 Setting up the Clinical Knowledge Graph is thoroughly described here.
-Assuming you have **Python 3.6** already installed, you can choose to create a virtual environment where all the packges with the specific versions will installed.
+Assuming you have **Python 3.6** already installed, you can choose to create a virtual environment where all the packages with the specific versions will installed.
 
 To check which Python version is currently installed, run in the command prompt (cmd.exe):
 
@@ -149,7 +149,7 @@ To check which Python version is currently installed, run in the command prompt 
 And to find your this Python version is installed:
 
 .. code-block:: bash
-	
+
 	> where python
 
 
@@ -184,11 +184,11 @@ The key word ``python`` specifies which version of Python the virtual environmen
 4. If you are finished working in the virtual environment for the moment, you can deactivate it by running:
 
 .. code-block:: bash
-	
+
 	> conda deactivate
 
 
-.. warning:: Remember, everytime you are working with the CKG, the virtual environment needs to be activated first.
+.. warning:: Remember, every time you are working with the CKG, the virtual environment needs to be activated first.
 
 
 
@@ -208,7 +208,7 @@ To do so, open the mentioned file in your preferred text editor tool (e.g. Notep
 To install all the required packages, simply run:
 
 .. code-block:: bash
-	
+
 	> cd CKG/
 	> conda install --file requirements.txt
 
@@ -219,7 +219,7 @@ To install all the required packages, simply run:
 Now that all the packages are correctly installed, you will have to create the appropriate directory architecture within the local copy of the cloned repository:
 
 .. code-block:: bash
-	
+
 	> python setup_CKG.py
 	> python setup_config_files.py
 
@@ -243,11 +243,11 @@ Similarly to :ref:`Add Neo4j graph database to environmental variables`, CKG als
 #. Click :guilabel:`OK` and :guilabel:`OK` again to save this variable.
 
 
-To confirm that the environment variable is correctly set in command line type: 
+To confirm that the environment variable is correctly set in command line type:
 
 .. code-block:: bash
 
-	> echo %PYTHONPATH% 
+	> echo %PYTHONPATH%
 
 This will print the path you used as value (e.g. ``C:\CKG\src``).
 
@@ -257,18 +257,3 @@ Build Neo4j graph database (Windows)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Building the CKG database in Windows follows the same steps as in MacOS and Linux so, from here on, please follow the tutorial :ref:`Build Neo4j graph database`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-windows.html">Getting started with Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-docker.html">Getting started with Docker <strong>(Testing)</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
@@ -122,8 +123,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardising the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualisation plots</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/R-interface.html">Python - R interface</a></li>
 </ul>
 <ul>
@@ -380,6 +381,37 @@ For more information visit <a class="reference external" href="https://dash.plot
 </dl>
 <p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">get_barplot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="s1">&#39;barplot&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span><span class="s1">&#39;Figure with Barplot&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="analytics_core.viz.viz.get_histogram">
+<code class="sig-prename descclassname">analytics_core.viz.viz.</code><code class="sig-name descname">get_histogram</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">identifier</em>, <em class="sig-param">args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/viz/viz.html#get_histogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.viz.viz.get_histogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basic histogram figure allows facets cols and rows</p>
+<p>param data: pandas dataframe with at least values to be plotted.
+:param str identifier: id used to identify the div where the figure will be generated.
+:param ditc args: see below.
+:Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>x</strong> (str) – name of the column containing values to plot in the x axis.</p></li>
+<li><p><strong>y</strong> (str) – name of the column containing values to plot in the y axis (if used).</p></li>
+<li><p><strong>color</strong> (str) – name of the column that defines how the histogram is colored (if used).</p></li>
+<li><p><strong>facet_row</strong> (str) – name of the column to be used as ‘facet’ row (if used).</p></li>
+<li><p><strong>facet_col</strong> (str) – name of the column to be used as ‘facet’ column (if used).</p></li>
+<li><p><strong>height</strong> (int) – height of the plot</p></li>
+<li><p><strong>width</strong> (int) – width of the plot</p></li>
+<li><p><strong>title</strong> (str) – plot title.</p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>dash componenet with histogram figure</p>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">get_histogram</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="s1">&#39;histogram&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">:</span><span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="s1">&#39;facet_row&#39;</span><span class="p">:</span><span class="s1">&#39;sample&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">:</span><span class="s1">&#39;Facet Grid Plot&#39;</span><span class="p">})</span>
 </pre></div>
 </div>
 </dd></dl>

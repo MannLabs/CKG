@@ -58,12 +58,12 @@ Be aware that the following columns are mandatory to fill in:
 - **grouping2**: If there are more than one grouping (two independent variables) use this column to add a second level.
 
 Additional clinical information about your study subjects can be added in the subsequent columns (i.e. columns after "grouping2").
-Please use SNOWMED terms as headers for every new column you add. This will be used to gather existing information about the type of data you have.
+Please use SNOMED terms as headers for every new column you add. This will be used to gather existing information about the type of data you have.
 To find an adequate SNOMED term for your clinical variables, please visit the `SNOMED browser <https://browser.ihtsdotools.org/?perspective=full&conceptId1=734000001&edition=MAIN/2019-07-31&release=&languages=en>`__.
 
 .. note:: Be aware, the two-independent-variable statistics is not yet implemented in the default analysis pipeline.
 
-.. note:: To add a column with "Age" search for "age" in the SNOMED browser. This gives multiple matches, with the first one being: "Age (qualifier value), SCTID:397669002". Please enter this information as your clinical variable column header with the SCTID in brackets: Age (qualifier value) (397669002)
+.. note:: To add a column with "Age" search for "age" in the SNOMED browser. This gives multiple matches, with the first one being: "Age (qualifier value), SCTID:397669002". Please enter this information as your clinical variable column header with the SCTID in parenthesis: Age (qualifier value) (397669002)
 
 .. warning:: If an adequate SNOMED term is not available, please write an e-mail to annelaura.bach@cpr.ku.dk with the subject "Header Creation, CKG". In the email please provide your "missing" header and a description of what it is. Do this before uploading the Clinical Data.
 
@@ -87,15 +87,15 @@ To find an adequate SNOMED term for your clinical variables, please visit the `S
 
 Proteomics data
 ^^^^^^^^^^^^^^^^^^
-	
+
 	- **MaxQuant**: Use "proteinGroups.txt", "peptides.txt" and "Oxidation (M)Sites.txt" files, and any other relevant MaxQuant output files.
-	
+
 	- **Spectronaut**: Use "proteinGroupsReport.xlsx". When exporting the results table from Spectronaut, please select "PG.ProteinAccessions" and "PG.Qvalue" under `Row Labels`, and under `Cell Values` select "PG.Quantity", "PG.NrOfStrippedSequencesMeasured", "PG.NrOfStrippedSequencesIdentified", "PG.NrOfPrecursorsIdentified", "PG.IsSingleHit", "PG.NrOfStrippedSequencesUsedForQuantification", "PG.NrOfModifiedSequencesUsedForQuantification", "PG.NrOfPrecursorsUsedForQuantification", "PG.MS1Quantity" and "PG.MS2Quantity".
 
 It is very important that all your column names have the following format: "LFQ intensity TechnicalReplicateNumber_AnalyticalSampleIdentifier" or "TechnicalReplicateNumber_AnalyticalSampleIdentifier.PG.Quantity". Where "TechnicalReplicateNumber_AnalyticalSampleIdentifier" should be replaced as shown in the example table below:
 
 +-----------+------------+-----------+----------------+
-| Technical | Analytical |           |                |     
+| Technical | Analytical |           |                |
 | replicate | sample id  | Timepoint |       Result   |
 +===========+============+===========+================+
 |  1        | KO_plate1  |           | 1_KO_plate1    |
@@ -111,7 +111,7 @@ It is very important that all your column names have the following format: "LFQ 
 
 As shown in the example table, if your experimental design is a timecourse experiment, you should add "_" followed by the timepoint, right after the analytical sample identifier. Otherwise, you can omit it.
 
-Do not perform any post-processing filtering, imputations or similar on your data before uploading it. This will be carried out by the CKG. In the case of Spectronaut outputs, the missing values are automatically replaced by the keyword "Filtered". 
+Do not perform any post-processing filtering, imputations or similar on your data before uploading it. This will be carried out by the CKG. In the case of Spectronaut outputs, the missing values are automatically replaced by the keyword "Filtered".
 
 
 You can proceed to :ref:`Upload` when you have prepared your experimental design file, clinical and proteomics data.
@@ -136,24 +136,18 @@ Go to `dataUploadApp <http://localhost:5000/apps/dataUploadApp/>`__ or use the `
 
 #. Select the type of data you will upload first. **(2)**
 
-	- If ``proteomics`` or ``longitudinal_proteomics`` is selected, please also select the processing tool used (``MaxQuant`` or ``Spectronaut``). **(2a)**
+	- If ``proteomics``, ``interactomics`` or ``phosphoproteomics`` is selected, please also select the processing tool used (``MaxQuant`` or ``Spectronaut``) **(2a)**, as well as the type of file to be uploaded (``Protein groups``, ``Peptides`` or ``Phospho STY sites``) **(2b)**.
 
-#. Drag and drop or select the files to upload to the selected data type. **(3)**
-	
-	- Multiple files can be selected at once. This is specially important in the case of proteomics files, please make sure you select all of the relevant MS files at once.
+#. Drag and drop or select the file to upload to the selected data type and file type. **(3)**
+
+  - If you want to upload, for example, both protein groups and peptides from a proteomics experiment, follow the steps **2.** and **3.** for each file type to be uploaded.
 
 #. Select another data type to upload **(2)**, and drag and drop or select the files to upload **(3)**.
 
-#. When you have uploaded all the relevant files, click ``UPLOAD DATA TO CKG``. After this button is clicked, it will deactivate all the menus. To restore its function, insert the project identifier and go through the previous steps again. **(4)**
+#. When you have uploaded all the relevant files, click ``UPLOAD DATA TO CKG`` **(4)**. After this button is clicked, it will deactivate all the menus. To restore its function, insert the project identifier and go through the previous steps again.
 
-#. Once the data is uploaded, click ``Download Uploaded Files (.zip)`` to download all the upload files in a compressed format. **(5)**
+#. Once the data is uploaded, a new button will show under ``UPLOAD DATA TO CKG``. Click ``Download Uploaded Files (.zip)`` to download all the upload files in a compressed format.
 
 
-.. note:: When the files are uploaded, the filenames are shown under ``Uploaded Files:`` 
+.. note:: When the files are uploaded, the filenames are shown under ``Uploaded Files:``
 			To replace the files uploaded, just select the correct data type and processing tool, and reselect the files again.
-
-
-.. warning:: It is very important that you select **all** the files that should be uploaded to a certain data type **at once**.
-
-
-

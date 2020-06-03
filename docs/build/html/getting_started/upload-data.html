@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-windows.html">Getting started with Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-docker.html">Getting started with Docker <strong>(Testing)</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul class="current">
@@ -131,8 +132,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardising the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualisation plots</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/R-interface.html">Python - R interface</a></li>
 </ul>
 <ul>
@@ -250,7 +251,7 @@ Be aware that the following columns are mandatory to fill in:</p>
 <li><p><strong>grouping2</strong>: If there are more than one grouping (two independent variables) use this column to add a second level.</p></li>
 </ul>
 <p>Additional clinical information about your study subjects can be added in the subsequent columns (i.e. columns after “grouping2”).
-Please use SNOWMED terms as headers for every new column you add. This will be used to gather existing information about the type of data you have.
+Please use SNOMED terms as headers for every new column you add. This will be used to gather existing information about the type of data you have.
 To find an adequate SNOMED term for your clinical variables, please visit the <a class="reference external" href="https://browser.ihtsdotools.org/?perspective=full&amp;conceptId1=734000001&amp;edition=MAIN/2019-07-31&amp;release=&amp;languages=en">SNOMED browser</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -258,7 +259,7 @@ To find an adequate SNOMED term for your clinical variables, please visit the <a
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>To add a column with “Age” search for “age” in the SNOMED browser. This gives multiple matches, with the first one being: “Age (qualifier value), SCTID:397669002”. Please enter this information as your clinical variable column header with the SCTID in brackets: Age (qualifier value) (397669002)</p>
+<p>To add a column with “Age” search for “age” in the SNOMED browser. This gives multiple matches, with the first one being: “Age (qualifier value), SCTID:397669002”. Please enter this information as your clinical variable column header with the SCTID in parenthesis: Age (qualifier value) (397669002)</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -346,29 +347,26 @@ sample id</p></th>
 <li><p>Select the type of data you will upload first. <strong>(2)</strong></p>
 <blockquote>
 <div><ul class="simple">
-<li><p>If <code class="docutils literal notranslate"><span class="pre">proteomics</span></code> or <code class="docutils literal notranslate"><span class="pre">longitudinal_proteomics</span></code> is selected, please also select the processing tool used (<code class="docutils literal notranslate"><span class="pre">MaxQuant</span></code> or <code class="docutils literal notranslate"><span class="pre">Spectronaut</span></code>). <strong>(2a)</strong></p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">proteomics</span></code>, <code class="docutils literal notranslate"><span class="pre">interactomics</span></code> or <code class="docutils literal notranslate"><span class="pre">phosphoproteomics</span></code> is selected, please also select the processing tool used (<code class="docutils literal notranslate"><span class="pre">MaxQuant</span></code> or <code class="docutils literal notranslate"><span class="pre">Spectronaut</span></code>) <strong>(2a)</strong>, as well as the type of file to be uploaded (<code class="docutils literal notranslate"><span class="pre">Protein</span> <span class="pre">groups</span></code>, <code class="docutils literal notranslate"><span class="pre">Peptides</span></code> or <code class="docutils literal notranslate"><span class="pre">Phospho</span> <span class="pre">STY</span> <span class="pre">sites</span></code>) <strong>(2b)</strong>.</p></li>
 </ul>
 </div></blockquote>
 </li>
-<li><p>Drag and drop or select the files to upload to the selected data type. <strong>(3)</strong></p>
+<li><p>Drag and drop or select the file to upload to the selected data type and file type. <strong>(3)</strong></p></li>
+</ol>
 <blockquote>
 <div><ul class="simple">
-<li><p>Multiple files can be selected at once. This is specially important in the case of proteomics files, please make sure you select all of the relevant MS files at once.</p></li>
+<li><p>If you want to upload, for example, both protein groups and peptides from a proteomics experiment, follow the steps <strong>2.</strong> and <strong>3.</strong> for each file type to be uploaded.</p></li>
 </ul>
 </div></blockquote>
-</li>
+<ol class="arabic simple">
 <li><p>Select another data type to upload <strong>(2)</strong>, and drag and drop or select the files to upload <strong>(3)</strong>.</p></li>
-<li><p>When you have uploaded all the relevant files, click <code class="docutils literal notranslate"><span class="pre">UPLOAD</span> <span class="pre">DATA</span> <span class="pre">TO</span> <span class="pre">CKG</span></code>. After this button is clicked, it will deactivate all the menus. To restore its function, insert the project identifier and go through the previous steps again. <strong>(4)</strong></p></li>
-<li><p>Once the data is uploaded, click <code class="docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Uploaded</span> <span class="pre">Files</span> <span class="pre">(.zip)</span></code> to download all the upload files in a compressed format. <strong>(5)</strong></p></li>
+<li><p>When you have uploaded all the relevant files, click <code class="docutils literal notranslate"><span class="pre">UPLOAD</span> <span class="pre">DATA</span> <span class="pre">TO</span> <span class="pre">CKG</span></code> <strong>(4)</strong>. After this button is clicked, it will deactivate all the menus. To restore its function, insert the project identifier and go through the previous steps again.</p></li>
+<li><p>Once the data is uploaded, a new button will show under <code class="docutils literal notranslate"><span class="pre">UPLOAD</span> <span class="pre">DATA</span> <span class="pre">TO</span> <span class="pre">CKG</span></code>. Click <code class="docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Uploaded</span> <span class="pre">Files</span> <span class="pre">(.zip)</span></code> to download all the upload files in a compressed format.</p></li>
 </ol>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>When the files are uploaded, the filenames are shown under <code class="docutils literal notranslate"><span class="pre">Uploaded</span> <span class="pre">Files:</span></code>
 To replace the files uploaded, just select the correct data type and processing tool, and reselect the files again.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>It is very important that you select <strong>all</strong> the files that should be uploaded to a certain data type <strong>at once</strong>.</p>
 </div>
 </div>
 </div>

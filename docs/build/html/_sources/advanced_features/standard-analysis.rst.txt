@@ -1,2 +1,2 @@
-Standardizing the data analysis
+Standardising the data analysis
 ===============================

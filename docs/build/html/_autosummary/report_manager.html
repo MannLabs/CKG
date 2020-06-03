@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-windows.html">Getting started with Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-docker.html">Getting started with Docker <strong>(Testing)</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
@@ -122,8 +123,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardising the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualisation plots</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/R-interface.html">Python - R interface</a></li>
 </ul>
 <ul>
@@ -570,8 +571,18 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="report_manager.knowledge.Knowledge.update_nodes">
+<code class="sig-name descname">update_nodes</code><span class="sig-paren">(</span><em class="sig-param">nodes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#Knowledge.update_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.Knowledge.update_nodes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="report_manager.knowledge.Knowledge.relationships">
 <em class="property">property </em><code class="sig-name descname">relationships</code><a class="headerlink" href="#report_manager.knowledge.Knowledge.relationships" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.update_relationships">
+<code class="sig-name descname">update_relationships</code><span class="sig-paren">(</span><em class="sig-param">relationships</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#Knowledge.update_relationships"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.Knowledge.update_relationships" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -612,6 +623,11 @@
 <dl class="method">
 <dt id="report_manager.knowledge.Knowledge.generate_knowledge_from_wgcna">
 <code class="sig-name descname">generate_knowledge_from_wgcna</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">entity1</em>, <em class="sig-param">entity2</em>, <em class="sig-param">cutoff=0.2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#Knowledge.generate_knowledge_from_wgcna"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.Knowledge.generate_knowledge_from_wgcna" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.knowledge.Knowledge.generate_knowledge_from_edgelist">
+<code class="sig-name descname">generate_knowledge_from_edgelist</code><span class="sig-paren">(</span><em class="sig-param">edgelist</em>, <em class="sig-param">entity1</em>, <em class="sig-param">entity2</em>, <em class="sig-param">source</em>, <em class="sig-param">target</em>, <em class="sig-param">rtype</em>, <em class="sig-param">weight</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/knowledge.html#Knowledge.generate_knowledge_from_edgelist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.knowledge.Knowledge.generate_knowledge_from_edgelist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">

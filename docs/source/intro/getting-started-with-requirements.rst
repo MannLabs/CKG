@@ -2,7 +2,7 @@
 Getting Started with some Requirements
 ========================================
 
-The following instructions on installation of software requirements and setting up the Clinical Knowledge graph, are optimized for operating systems MacOS and Linux. For more detailed instructions on how to set up the CKG in Windows, pleaso go to :ref:`Windows installation`.
+The following instructions on installation of software requirements and setting up the Clinical Knowledge graph, are optimised for operating systems MacOS and Linux. For more detailed instructions on how to set up the CKG in Windows, please go to :ref:`Windows installation`.
 
 
 Java
@@ -16,7 +16,7 @@ When using a new version of Neo4j, always remember to read the respective Operat
 To check if you already have **Java SE Development Kit** installed, run ``java -version`` in your terminal window. This should print out three lines similar to the following, with possible variation in the version:
 
 .. code-block:: python
-	
+
 	java version "1.8.0_171"
 	Java(TM) SE Runtime Environment (build 1.8.0_171-b11)
 	Java HotSpot(TM) 64-Bit Server VM (build 25.171-b11, mixed mode)
@@ -30,7 +30,7 @@ Running ``/usr/libexec/java_home`` in the terminal should print out a path like 
 #. Run ``/usr/libexec/java_home`` in the terminal to make sure the *Java* package has been installed in ``/Library/Java/JavaVirtualMachines/``.
 
 
-R 
+R
 -----------
 
 Another essential package for the functioning of the Clinical Knowledge Graph is R.
@@ -42,15 +42,15 @@ Make sure you have installed **R version >= 3.5.2**:
 	$ R --version
 
 And that R is installed in ``/usr/local/bin/R``:
-	
+
 .. code-block:: bash
-	
+
 	$ which R
 
-To install the neccessary R packages, simply initiate R (terminal or shell) and run:
+To install the necessary R packages, simply initiate R (terminal or shell) and run:
 
 .. code-block:: python
-	
+
 	install.packages('BiocManager')
 	BiocManager::install()
 	BiocManager::install(c('AnnotationDbi', 'GO.db', 'preprocessCore', 'impute'))
@@ -59,6 +59,6 @@ To install the neccessary R packages, simply initiate R (terminal or shell) and 
 
 .. note:: If you need to install R, follow `these <https://web.stanford.edu/~kjytay/courses/stats32-aut2018/Session%201/Installation%20for%20Mac.html>`__ tutorial.
 
-.. warning:: In Mac OS, make sure you have **XQuartz** installed.
+.. warning:: In Mac OS, make sure you have **XQuartz** installed, as well as **Xcode**. For more information on how to install R on OS X, you can follow this `link <https://www.r-bloggers.com/installing-r-on-os-x/>`_.
 
 Now that you are all set, you can move on and start with Neo4j.
