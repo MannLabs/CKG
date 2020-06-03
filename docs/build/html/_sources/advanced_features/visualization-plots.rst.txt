@@ -1,2 +1,2 @@
-Visualization plots
+Visualisation plots
 ===================

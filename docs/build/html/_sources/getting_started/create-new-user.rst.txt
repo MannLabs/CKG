@@ -29,6 +29,4 @@ For help on how to use ``create_user.py``, run:
 
 	$ python create_user.py -h
 
-For each new user, an access password is set be the same the the ``username``. All users are advised
-to modify the default password as soon as they are granted access.
-
+.. warning:: If you want to have spaces (" ") in any of the arguments (e.g. -n name), you need to have the argument value within quotes "" (e.g. -n "John Smith"). The same applies to other arguments like affiliation.
