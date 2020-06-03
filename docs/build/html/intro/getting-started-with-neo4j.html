@@ -90,12 +90,10 @@
 <p class="caption"><span class="caption-text">First steps</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting-started-with-requirements.html">Getting Started with some Requirements</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started with Neo4j</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#add-neo4j-graph-database-to-bashrc">Add Neo4j graph database to <em>.bashrc</em></a></li>
-</ul>
-</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started with Neo4j</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting-started-with-build.html">Getting Started with the CKG Build</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting-started-with-windows.html">Getting started with Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started-with-docker.html">Getting started with Docker <strong>(Testing)</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
@@ -125,8 +123,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardising the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualisation plots</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/R-interface.html">Python - R interface</a></li>
 </ul>
 <ul>
@@ -214,7 +212,7 @@ Once the file has downloaded, you can install Neo4j by following the instruction
 <a class="reference internal image-reference" href="../_images/neo4j_app1.png"><img alt="../_images/neo4j_app1.png" src="../_images/neo4j_app1.png" style="width: 32%;" /></a>
 <a class="reference internal image-reference" href="../_images/neo4j_app2.png"><img alt="../_images/neo4j_app2.png" src="../_images/neo4j_app2.png" style="width: 32%;" /></a>
 <a class="reference internal image-reference" href="../_images/neo4j_app3.png"><img alt="../_images/neo4j_app3.png" src="../_images/neo4j_app3.png" style="width: 32%;" /></a>
-<p>Open the Neo4j Desktop App and create a database by clicking <span class="guilabel">Add graph</span>, followed by <span class="guilabel">Create a Local Graph</span>, using the password “neo4j”.
+<p>Open the Neo4j Desktop App and create a database by clicking <span class="guilabel">Add graph</span>, followed by <span class="guilabel">Create a Local Graph</span>, using the password “NeO4J”.
 Now that your database is created:</p>
 <a class="reference internal image-reference" href="../_images/neo4j_app4.png"><img alt="../_images/neo4j_app4.png" src="../_images/neo4j_app4.png" style="width: 32%;" /></a>
 <a class="reference internal image-reference" href="../_images/neo4j_app5.png"><img alt="../_images/neo4j_app5.png" src="../_images/neo4j_app5.png" style="width: 32%;" /></a>
@@ -225,51 +223,10 @@ Now that your database is created:</p>
 <li><p>Click <span class="guilabel">Apply</span> at the bottom of the window.</p></li>
 <li><p>Start the Graph by clicking the play sign, at the top of the window.</p></li>
 </ol>
-<p>If the database starts and no errors are reported in the tab <span class="guilabel">Logs</span>, you are redy go to!</p>
-<div class="section" id="add-neo4j-graph-database-to-bashrc">
-<h2>Add Neo4j graph database to <em>.bashrc</em><a class="headerlink" href="#add-neo4j-graph-database-to-bashrc" title="Permalink to this headline">¶</a></h2>
-<p>In order run the graph database, add the path to the database to your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> (or <code class="docutils literal notranslate"><span class="pre">.bash_profile</span></code>) file.</p>
-<p>To find out which of the files your machine uses, go to the terminal and type <code class="docutils literal notranslate"><span class="pre">more</span> <span class="pre">~/.bash</span></code> and double press the tab key on your keyboard for auto-complete.
-Immediately below, multiple filenames will be printed, check if among those, is <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> or <code class="docutils literal notranslate"><span class="pre">.bash_profile</span></code>.</p>
+<p>If the database starts and no errors are reported in the tab <span class="guilabel">Logs</span>, you are ready go to!</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The bash file can be name <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> or <code class="docutils literal notranslate"><span class="pre">.bash_profile</span></code>. if your system does not have either, created one of them (e.g. vi ~/.bash_profile).</p>
-</div>
-<ol class="arabic simple">
-<li><p>Open the <code class="docutils literal notranslate"><span class="pre">.bash_profile</span></code> (or <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code>) with your favourite text editor. In this case, we use the <strong>vi</strong> editor:</p></li>
-</ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ vi ~/.bash_profile
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>To edit with <strong>vi</strong> press <code class="docutils literal notranslate"><span class="pre">i</span></code> on your keyboard.</p>
-</div>
-<ol class="arabic simple">
-<li><p>Add the path to the previously created Neo4j database to the file:</p></li>
-</ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">NEO4J_HOME</span><span class="o">=</span><span class="s2">&quot;/Users/username/Library/Application Support/Neo4j Desktop/Application/neo4jDatabases/database-identifier/installation-3.X.X/&quot;</span>
-<span class="nb">export</span> NEO4J_HOME
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>To save and close a file with <strong>vi</strong> editor, press <code class="docutils literal notranslate"><span class="pre">Esc</span></code> followed by <code class="docutils literal notranslate"><span class="pre">:wq</span></code>.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Depending on your system, the path may vary. To check the path to the database go to <code class="docutils literal notranslate"><span class="pre">Logs</span></code> in the Neo4j Desktop interface.</p>
-</div>
-<ol class="arabic simple">
-<li><p>Reload the <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> (or <code class="docutils literal notranslate"><span class="pre">.bash_profile</span></code>)  file:</p></li>
-</ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">source</span> ~/.bashrc
-</pre></div>
-</div>
-<p>or</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">source</span> ~/.bash_profile
-</pre></div>
-</div>
+<p>Be aware, at the time of release of this version, “<strong>GRAPH ALGORITHMS</strong>” was only available for Neo4j database version <strong>=&lt; 3.14</strong>.</p>
 </div>
 </div>
 

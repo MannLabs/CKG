@@ -27,3 +27,22 @@ Once the connection is established, we can start querying the database. For exam
 	results = connector.getCursorData(driver=driver, query=example_query, parameters={})
 
 This query searches the database for all the available projects and counts how many subjects have been enrolled in each one, returning a pandas DataFrame with "project_id" and "n_subjects" as columns.
+
+
+Changing/Updating database connection
+---------------------------------------
+
+The connection to the graph database requires credentials, which are stored in ``graphdb_connector/connector_config.yml``.
+This files includes the following lines:
+
+.. code-block:: python
+
+	db_url: "0.0.0.0"
+	#dbPort = 7688 #Production environment
+	db_port: 7687 #Test environment
+	db_user: "neo4j"
+	db_password: "NeO4J"
+
+The initial password to create a new Neo4j database is set to **NeO4J**. If you would like to use another password when creating the database, you can edit the mentioned file and replace **NeO4J** with any other password of your choosing.
+Another option is to change the password directly in the database by accessing :guilabel:`Manage` in the Neo4j desktop window, select the tab :guilabel:`Administration` and then set the new password.
+Ultimately, make sure that the password in ``graphdb_connector/connector_config.yml`` and in the Neo4j database are the same.

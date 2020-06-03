@@ -7,7 +7,7 @@ Assuming you have **Python 3.6** already installed and added to ``PATH``, you ca
 To check which Python version is currently installed:
 
 .. code-block:: bash
-	
+
 	$ python3.6 --version
 
 And where this Python version is:
@@ -21,13 +21,13 @@ If this does not correspond to the correct Python version you want to run, you c
 1. Open the bash file:
 
 .. code-block:: bash
-	
+
 	$ vi ~/.bash_profile
 
 #. Add at the end of the file:
 
 .. code-block:: bash
-	
+
 	alias python3.6="/path/to/correct/python3.6"
 
 #. Save and close the bash file
@@ -35,7 +35,7 @@ If this does not correspond to the correct Python version you want to run, you c
 #. Make the alias available in the current session:
 
 .. code-block:: bash
-	
+
 	$ source ~/.bash_profile
 
 .. note:: If you don't have **Python 3.6** installed, `download <https://www.python.org/>`__ the Python 3.6 version appropriate for your machine, and run the installer package. Python should be installed in ``/Library/Frameworks/Python.framework/Versions/3.6/bin/python3.6`` and also found in ``/usr/local/bin/python3.6``.
@@ -51,7 +51,7 @@ Virtualenv is not installed by default on Macbook machines. To install it, run:
 
 	$ python3 -m pip install virtualenv
 
-To create a new virtual environment using a costum version of Python, follow the steps:
+To create a new virtual environment using a custom version of Python, follow the steps:
 
 1. Take note of the full path to the Python version you would like to use inside the virtual environment.
 
@@ -88,14 +88,14 @@ Setting up the Clinical Knowledge Graph
 The first step in setting up the CKG, is to obtain the complete code by clone the GitHub repository:
 
 .. code-block:: bash
-	
+
 	$ git clone https://github.com/MannLabs/CKG.git
 
 Once this is finished, you can find all the Python modules necessary to run the Clinical Knowledge Graph in ``requirements.txt``.
 To install all the packages required, simply run:
 
 .. code-block:: bash
-	
+
 	$ cd CKG/
 	$ pip3 install --upgrade pip
 	$ pip3 install --ignore-installed -r requirements.txt
@@ -122,7 +122,7 @@ In order run the the Clinical Knowledge Graph, add the path to the code to your 
 #. Add the following lines to the file and save it:
 
 .. code-block:: bash
-	
+
 	PYTHONPATH="${PYTHONPATH}:/path/to/folder/CKG/src/"
 	export PYTHONPATH
 
@@ -132,7 +132,7 @@ Notice that the path should always finish with "/CKG/src/".
 #. To reload the bash file, first deactivate the virtual environment, reload ~/.bashrc, and activate the virtual environment again:
 
 .. code-block:: bash
-	
+
 	$ deactivate
 	$ source ~/.bashrc
 	$ source path/to/env_name/bin/activate
@@ -190,25 +190,10 @@ In the case of SNOMED-CT, unzip the downloaded file and copy all the subfolders 
 The last step is to build the database, which can be done using the ``builder.py`` module or a ``dump file``.
 
 
-From builder.py
-^^^^^^^^^^^^^^^^^^
-
-To build the graph database, run ``builder.py``:
-
-.. code-block:: bash
-	
-	$ cd src/graphdb_builder/builder
-	$ python builder.py -b full -u neo4j
-
-.. warning:: Before running ``builder.py``, please make sure your Neo4j graph is running. The builder will fail otherwise.
-
-This action will take aproximately 6 hours but depending on a multitude of factors, it can take up to 10 hours.
-
-
-From the provided dump file **(Testing)**
+From the provided dump file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A dump file of the database is also made available in this `link <https://data.mendeley.com/datasets/mrcf7f4tc2/1>`__ and alternatively, you can use it to load the graph database contained in it. To do so, download both files (``ckg_080520.dump`` and ``data.tar.gz``). 
+A dump file of the database is also made available in this `link <https://data.mendeley.com/datasets/mrcf7f4tc2/1>`__ and alternatively, you can use it to load the graph database contained in it. To do so, download both files (``ckg_080520.dump`` and ``data.tar.gz``).
 
 The ``.dump`` file will be used to load the Neo4j graph database:
 
@@ -225,15 +210,15 @@ The ``.dump`` file will be used to load the Neo4j graph database:
 2. After copying the dump file to backups/graph.db/, make sure the graph database is shutdown and run:
 
 .. code-block:: bash
-	
-	$ bin/neo4j-admin load --from=backups/graph.db/2019-11-04.dump --database=graph.db --force
+
+	$ bin/neo4j-admin load --from=backups/graph.db/ckg_080520.dump --database=graph.db --force
 
 
 In some systems you might have to run this as root:
 
 .. code-block:: bash
-	
-	$ sudo bin/neo4j-admin load --from=backups/graph.db/2019-11-04.dump --database=graph.db --force
+
+	$ sudo bin/neo4j-admin load --from=backups/graph.db/ckg_080520.dump --database=graph.db --force
 	$ sudo chown -R username data/databases/graph.db/
 
 
@@ -257,12 +242,28 @@ To add the missing ontology and databases, as well as their dependencies (relati
 Once this is done, run the following commands:
 
 .. code-block:: bash
-	
+
 	$ cd CKG/src/graphdb_builder/builder
 	$ python builder.py -b minimal -u username
 
 
 .. note:: Remember of replace the ``username`` in each command, with your own neo4j username.
+
+
+
+From builder.py
+^^^^^^^^^^^^^^^^^^
+
+To build the graph database, run ``builder.py``:
+
+.. code-block:: bash
+
+	$ cd src/graphdb_builder/builder
+	$ python builder.py -b full -u neo4j
+
+.. warning:: Before running ``builder.py``, please make sure your Neo4j graph is running. The builder will fail otherwise.
+
+This action will take approximately 6 hours but depending on a multitude of factors, it can take up to 10 hours.
 
 
 More on the dump file
@@ -278,11 +279,3 @@ To generate a dump file of a specific Neo4j database, simply run:
 
 
 .. warning:: Remember to replace ``name_of_the_file`` with the name of the dump file you want to create.
-
-
-
-
-
-
-
-

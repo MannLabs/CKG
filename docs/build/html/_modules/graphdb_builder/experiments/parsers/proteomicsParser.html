@@ -91,6 +91,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../intro/getting-started-with-windows.html">Getting started with Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../intro/getting-started-with-docker.html">Getting started with Docker <strong>(Testing)</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
@@ -120,8 +121,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/standard-analysis.html">Standardising the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/visualization-plots.html">Visualisation plots</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/R-interface.html">Python - R interface</a></li>
 </ul>
 <ul>
@@ -275,7 +276,7 @@
     <span class="k">return</span> <span class="n">data</span></div>
 
 
-<div class="viewcode-block" id="update_configuration"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.update_configuration">[docs]</a><span class="k">def</span> <span class="nf">update_configuration</span><span class="p">(</span><span class="n">data_type</span><span class="p">,</span> <span class="n">processing_tool</span><span class="p">,</span> <span class="n">value_col</span><span class="o">=</span><span class="s1">&#39;LFQ intensity&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[]):</span>
+<div class="viewcode-block" id="update_configuration"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.experiments.parsers.html#graphdb_builder.experiments.parsers.proteomicsParser.update_configuration">[docs]</a><span class="k">def</span> <span class="nf">update_configuration</span><span class="p">(</span><span class="n">data_type</span><span class="p">,</span> <span class="n">processing_tool</span><span class="p">,</span> <span class="n">value_col</span><span class="o">=</span><span class="s1">&#39;LFQ intensity&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[],</span> <span class="n">drop_cols</span><span class="o">=</span><span class="p">[],</span> <span class="n">filters</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">configuration</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="n">processing_tool</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">config</span> <span class="o">=</span> <span class="n">builder_utils</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;proteomics.yml&quot;</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="s1">&#39;experiments&#39;</span><span class="p">)</span>
@@ -285,6 +286,15 @@
                 <span class="n">configuration</span> <span class="o">=</span> <span class="n">tool_configuration</span><span class="p">[</span><span class="n">data_type</span><span class="p">]</span>
                 <span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;columns&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
                 <span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;valueCol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value_col</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">drop_cols</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;columns&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;columns&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">drop_cols</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="s1">&#39;attributes&#39;</span> <span class="ow">in</span> <span class="n">configuration</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="s1">&#39;cols&#39;</span> <span class="ow">in</span> <span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;attributes&#39;</span><span class="p">]:</span>
+                            <span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="s1">&#39;cols&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="s1">&#39;cols&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">drop_cols</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="s1">&#39;regex&#39;</span> <span class="ow">in</span> <span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;attributes&#39;</span><span class="p">]:</span>
+                            <span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="s1">&#39;regex&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="s1">&#39;regex&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">drop_cols</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">filters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;filters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filters</span>
 
     <span class="k">return</span> <span class="n">configuration</span></div>
 

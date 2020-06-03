@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-windows.html">Getting started with Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-docker.html">Getting started with Docker <strong>(Testing)</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
@@ -126,8 +127,8 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="standard-analysis.html">Standardizing the data analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="standard-analysis.html">Standardising the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization-plots.html">Visualisation plots</a></li>
 <li class="toctree-l1"><a class="reference internal" href="R-interface.html">Python - R interface</a></li>
 </ul>
 <ul>
@@ -209,8 +210,8 @@
   <div class="section" id="using-jupyter-notebooks-with-the-clinical-knowledge-graph">
 <h1>Using Jupyter Notebooks with the Clinical Knowledge Graph<a class="headerlink" href="#using-jupyter-notebooks-with-the-clinical-knowledge-graph" title="Permalink to this headline">¶</a></h1>
 <p>The Jupyter Notebook is used to interact with the notebooks provided in the Clinical Knowledge Graph.
-This open-source application allows you to create and share code, vizualize outputs and integrated multiple big data tools.</p>
-<p>In order to get started, make sure you have Python installed (3.3 or greater) as well as Jupyter Notebook. The latter can be installed using pip (see below).For more detailed instructions, visit the <a class="reference external" href="https://jupyter.org/install.html">offical guide</a>.</p>
+This open-source application allows you to create and share code, visualise outputs and integrated multiple big data tools.</p>
+<p>In order to get started, make sure you have Python installed (3.3 or greater) as well as Jupyter Notebook. The latter can be installed using pip (see below).For more detailed instructions, visit the <a class="reference external" href="https://jupyter.org/install.html">official guide</a>.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python3 -m pip install --upgrade pip
 $ python3 -m pip install jupyter
 </pre></div>
@@ -223,10 +224,10 @@ $ python3 -m pip install jupyter
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ jupyter-notebook
 </pre></div>
 </div>
-<p>As part of the Clinical Knowledge Graph package, we provide a series of Jupyter notebooks to facilitate the analysis of data, database querying and the use of multiple visualization tools. These notebooks can be found in <code class="docutils literal notranslate"><span class="pre">src/notebooks</span></code>, under <code class="docutils literal notranslate"><span class="pre">reporting</span></code> or <code class="docutils literal notranslate"><span class="pre">development</span></code>.</p>
+<p>As part of the Clinical Knowledge Graph package, we provide a series of Jupyter notebooks to facilitate the analysis of data, database querying and the use of multiple visualisation tools. These notebooks can be found in <code class="docutils literal notranslate"><span class="pre">src/notebooks</span></code>, under <code class="docutils literal notranslate"><span class="pre">reporting</span></code> or <code class="docutils literal notranslate"><span class="pre">development</span></code>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If you would like to use two instances of the same notebook, just duplicate inplace and modify the name accordingly.</p>
+<p>If you would like to use two instances of the same notebook, just duplicate in-place and modify the name accordingly.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -234,30 +235,30 @@ $ python3 -m pip install jupyter
 </div>
 <div class="section" id="reporting-notebooks">
 <h2>Reporting notebooks<a class="headerlink" href="#reporting-notebooks" title="Permalink to this headline">¶</a></h2>
-<p>Reporting notebooks referes to Jupyter notebooks that have been finished and properly tested by the devleopers, and are ready to be used by the community.</p>
+<p>Reporting notebooks refers to Jupyter notebooks that have been finished and properly tested by the developers, and are ready to be used by the community.</p>
 <ul class="simple">
 <li><p><strong>project_reporting.ipynb</strong></p></li>
 </ul>
 <p>Easy access to all the projects in the graph database. Loads all the data from a specific project (e.g. “P0000001”) and shows the report in the notebook.
-This notebook enables the visualization of all the plots and tables that constitue a report, as well as all the dataframes used and produced during its generation.
-By accessing the data directly, you can use the python functionality to further the analysis or visualization.</p>
+This notebook enables the visualisation of all the plots and tables that constitute a report, as well as all the dataframes used and produced during its generation.
+By accessing the data directly, you can use the python functionality to further the analysis or visualisation.</p>
 <ul class="simple">
 <li><p><strong>working_with_R.ipynb</strong></p></li>
 </ul>
 <p>Notebook entirely written in R. One of the many advantages of using Jupyter notebooks is the possibility of writing in different programming languages.
 In this notebook, we demonstrate how R can be used to, similarly to <em>project_reporting.ipynb</em>, load a project and explore the analysis and plots.</p>
-<p>In the beginning of the notebook, we create costum functions to load a project, read the report, read a dataset, and plot and network from a json file.
+<p>In the beginning of the notebook, we create custom functions to load a project, read the report, read a dataset, and plot and network from a json file.
 Other R functions like these can be developed by the users according to their needs.</p>
 <ul class="simple">
 <li><p><strong>Parallel plots.ipynb</strong></p></li>
 </ul>
-<p>An example of a new interactive visualization method, not currently implemented in the Clinical Knowledge Graph, but using data from a stored project. We start by loading all the data and the report of a specific project (e.g. “P0000001”), and accessing diferent dataframes within the proteomics dataset, as well as, the correlation network. This plot is then converted into a Pandas DataFrame and used as input for the interactive Parallel plot.</p>
-<p>The function is created and made interactive with Jupyter Widgets <code class="docutils literal notranslate"><span class="pre">interact</span></code> function (<code class="docutils literal notranslate"><span class="pre">ipywidgets.interact</span></code>), which automatically creates user interface (UI) controlos within the notebook. In this case, the user can select different clusters of proteins (from the correlation network) and observe their variation across groups.</p>
+<p>An example of a new interactive visualisation method, not currently implemented in the Clinical Knowledge Graph, but using data from a stored project. We start by loading all the data and the report of a specific project (e.g. “P0000001”), and accessing different dataframes within the proteomics dataset, as well as, the correlation network. This plot is then converted into a Pandas DataFrame and used as input for the interactive Parallel plot.</p>
+<p>The function is created and made interactive with Jupyter Widgets <code class="docutils literal notranslate"><span class="pre">interact</span></code> function (<code class="docutils literal notranslate"><span class="pre">ipywidgets.interact</span></code>), which automatically creates user interface (UI) controls within the notebook. In this case, the user can select different clusters of proteins (from the correlation network) and observe their variation across groups.</p>
 <ul class="simple">
 <li><p><strong>Urachal Carcinoma Case Study.ipynb</strong></p></li>
 </ul>
 <p>Jupyter notebook depicting the use of the Clinical Knowledge Graph database and the analytics core as a decision support tool, proposing a drug candidate in a specific subject case.</p>
-<p>The project is analysed with the standard analytics workflow and a list of significantly differentially expressed proteins is returned. To further this analysis we first filter for regulated proteins that have been associated to the disease in study (lung cancer); we then search the database for known inhibitory drugs for these proteins; and to narrow down the list, we can query the database for each drug’s side effects. The treatment regimens are also available in the database and their side effects can be used to rank the proposed drugs. We can prioritize drugs with side effects dissimilar to the ones that caused an adverse reaction in the patient, and identify papers where these drugs have already been associated to the studied disease, further reducing the list of potential drugs candidates.</p>
+<p>The project is analysed with the standard analytics workflow and a list of significantly differentially expressed proteins is returned. To further this analysis we first filter for regulated proteins that have been associated to the disease in study (lung cancer); we then search the database for known inhibitory drugs for these proteins; and to narrow down the list, we can query the database for each drug’s side effects. The treatment regimens are also available in the database and their side effects can be used to rank the proposed drugs. We can prioritise drugs with side effects dissimilar to the ones that caused an adverse reaction in the patient, and identify papers where these drugs have already been associated to the studied disease, further reducing the list of potential drugs candidates.</p>
 </div>
 <div class="section" id="development-notebooks">
 <h2>Development notebooks<a class="headerlink" href="#development-notebooks" title="Permalink to this headline">¶</a></h2>

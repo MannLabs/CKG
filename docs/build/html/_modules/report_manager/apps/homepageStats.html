@@ -91,6 +91,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../intro/getting-started-with-windows.html">Getting started with Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro/getting-started-with-docker.html">Getting started with Docker <strong>(Testing)</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
@@ -120,8 +121,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/standard-analysis.html">Standardising the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/visualization-plots.html">Visualisation plots</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced_features/R-interface.html">Python - R interface</a></li>
 </ul>
 <ul>
@@ -252,32 +253,32 @@
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
         <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_obj</span><span class="p">,</span> <span class="n">exc_tb</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span>
         <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">exc_tb</span><span class="o">.</span><span class="n">tb_frame</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_filename</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Reading queries from file </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">, file: </span><span class="si">{}</span><span class="s2">,line: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">queries_path</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">(),</span> <span class="n">fname</span><span class="p">,</span> <span class="n">exc_tb</span><span class="o">.</span><span class="n">tb_lineno</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Erro: </span><span class="si">{}</span><span class="s2">. Reading queries from file </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">, file: </span><span class="si">{}</span><span class="s2">,line: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="n">queries_path</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">(),</span> <span class="n">fname</span><span class="p">,</span> <span class="n">exc_tb</span><span class="o">.</span><span class="n">tb_lineno</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">data_upload_cypher</span></div>
+
 
 <div class="viewcode-block" id="get_db_schema"><a class="viewcode-back" href="../../../_autosummary/report_manager.apps.html#report_manager.apps.homepageStats.get_db_schema">[docs]</a><span class="k">def</span> <span class="nf">get_db_schema</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Retrieves the database schema</span>
-<span class="sd">    </span>
+
 <span class="sd">    :return: network with all the database nodes and how they are related</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">style</span><span class="o">=</span><span class="p">[{</span><span class="s1">&#39;selector&#39;</span><span class="p">:</span> <span class="s1">&#39;node&#39;</span><span class="p">,</span> 
+    <span class="n">style</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;selector&#39;</span><span class="p">:</span> <span class="s1">&#39;node&#39;</span><span class="p">,</span> 
             <span class="s1">&#39;style&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;data(name)&#39;</span><span class="p">,</span> 
                       <span class="s1">&#39;background-color&#39;</span><span class="p">:</span> <span class="s1">&#39;data(color)&#39;</span><span class="p">,</span>
                       <span class="s1">&#39;text-valign&#39;</span><span class="p">:</span> <span class="s1">&#39;center&#39;</span><span class="p">,</span>
                       <span class="s1">&#39;text-halign&#39;</span><span class="p">:</span> <span class="s1">&#39;center&#39;</span><span class="p">,</span>
-                      <span class="s1">&#39;border-color&#39;</span><span class="p">:</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;border-color&#39;</span><span class="p">:</span> <span class="s1">&#39;gray&#39;</span><span class="p">,</span>
                       <span class="s1">&#39;border-width&#39;</span><span class="p">:</span> <span class="s1">&#39;1px&#39;</span><span class="p">,</span>
                       <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="mi">55</span><span class="p">,</span>
                       <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="mi">55</span><span class="p">,</span>
-                      <span class="s1">&#39;opacity&#39;</span><span class="p">:</span><span class="mf">0.8</span><span class="p">,</span>
+                      <span class="s1">&#39;opacity&#39;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span>
                       <span class="s1">&#39;font-size&#39;</span><span class="p">:</span> <span class="s1">&#39;14&#39;</span><span class="p">}},</span>
-           <span class="p">{</span><span class="s1">&#39;selector&#39;</span><span class="p">:</span><span class="s1">&#39;edge&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;style&#39;</span><span class="p">:{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span><span class="s1">&#39;data(label)&#39;</span><span class="p">,</span> 
+           <span class="p">{</span><span class="s1">&#39;selector&#39;</span><span class="p">:</span> <span class="s1">&#39;edge&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;style&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;data(label)&#39;</span><span class="p">,</span> 
                      <span class="s1">&#39;curve-style&#39;</span><span class="p">:</span> <span class="s1">&#39;bezier&#39;</span><span class="p">,</span> 
-                     <span class="s1">&#39;opacity&#39;</span><span class="p">:</span><span class="mf">0.7</span><span class="p">,</span>
-                     <span class="s1">&#39;width&#39;</span><span class="p">:</span><span class="mf">0.4</span><span class="p">,</span>
+                     <span class="s1">&#39;opacity&#39;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span>
+                     <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span>
                      <span class="s1">&#39;font-size&#39;</span><span class="p">:</span> <span class="s1">&#39;5&#39;</span><span class="p">}}]</span>
     <span class="n">layout</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;cose&#39;</span><span class="p">,</span>
               <span class="s1">&#39;idealEdgeLength&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
@@ -301,15 +302,16 @@
             <span class="n">query</span> <span class="o">=</span> <span class="n">cypher</span><span class="p">[</span><span class="n">query_name</span><span class="p">][</span><span class="s1">&#39;query&#39;</span><span class="p">]</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">connector</span><span class="o">.</span><span class="n">sendQuery</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="p">{})</span><span class="o">.</span><span class="n">data</span><span class="p">()</span>
             <span class="n">G</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">neo4j_schema_to_networkx</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-            <span class="n">args</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;height&#39;</span><span class="p">:</span><span class="s1">&#39;1000px&#39;</span><span class="p">}</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="s1">&#39;1000px&#39;</span><span class="p">}</span>
             <span class="n">args</span><span class="p">[</span><span class="s1">&#39;stylesheet&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">style</span>
             <span class="n">args</span><span class="p">[</span><span class="s1">&#39;layout&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layout</span>
             <span class="n">args</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Database Schema&quot;</span>
             <span class="n">net</span><span class="p">,</span> <span class="n">mouseover</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">networkx_to_cytoscape</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
             <span class="n">plot</span> <span class="o">=</span> <span class="n">viz</span><span class="o">.</span><span class="n">get_cytoscape_network</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="s2">&quot;db_schema&quot;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
-            
+
     <span class="k">return</span> <span class="n">plot</span></div>
-            
+
+
 <div class="viewcode-block" id="get_db_stats_data"><a class="viewcode-back" href="../../../_autosummary/report_manager.apps.html#report_manager.apps.homepageStats.get_db_stats_data">[docs]</a><span class="k">def</span> <span class="nf">get_db_stats_data</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Retrieves all the stats data from the graph database and returns them as a dictionary.</span>
@@ -372,24 +374,21 @@
     <span class="k">if</span> <span class="n">focus</span> <span class="o">==</span> <span class="s1">&#39;nodes&#39;</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
                                       <span class="s1">&#39;number&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-        <span class="n">xaxis_name</span> <span class="o">=</span> <span class="s1">&#39;Labels&#39;</span>
     <span class="k">elif</span> <span class="n">focus</span> <span class="o">==</span> <span class="s1">&#39;relationships&#39;</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
             <span class="n">data</span><span class="p">[</span><span class="s1">&#39;relTypesCount&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;number&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-        <span class="n">xaxis_name</span> <span class="o">=</span> <span class="s1">&#39;Types&#39;</span>
 
     <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;number&#39;</span><span class="p">)</span>
 
     <span class="n">fig</span> <span class="o">=</span> <span class="n">viz</span><span class="o">.</span><span class="n">get_barplot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="s1">&#39;node_rel_per_label_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">focus</span><span class="p">),</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
-    
     <span class="n">fig</span><span class="o">.</span><span class="n">figure</span><span class="p">[</span><span class="s1">&#39;layout&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">barmode</span><span class="o">=</span><span class="s1">&#39;relative&#39;</span><span class="p">,</span>
-                                    <span class="n">height</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">],</span>
-                                    <span class="n">xaxis</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="s1">&#39;range&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;number&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])]},</span>
-                                    <span class="n">yaxis</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;showline&#39;</span><span class="p">:</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;linewidth&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;linecolor&#39;</span><span class="p">:</span><span class="s1">&#39;black&#39;</span><span class="p">},</span>
-                                    <span class="n">font</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;family&#39;</span><span class="p">:</span><span class="s1">&#39;MyriadPro-Regular&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">:</span><span class="mi">12</span><span class="p">},</span>
-                                    <span class="n">template</span><span class="o">=</span><span class="s1">&#39;plotly_white&#39;</span><span class="p">,</span>
-                                    <span class="n">bargap</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
-    
+                                     <span class="n">height</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">],</span>
+                                     <span class="n">xaxis</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="s1">&#39;range&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;number&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])]},</span>
+                                     <span class="n">yaxis</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;showline&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;linewidth&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;linecolor&#39;</span><span class="p">:</span> <span class="s1">&#39;black&#39;</span><span class="p">},</span>
+                                     <span class="n">font</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;family&#39;</span><span class="p">:</span> <span class="s1">&#39;MyriadPro-Regular&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">},</span>
+                                     <span class="n">template</span><span class="o">=</span><span class="s1">&#39;plotly_white&#39;</span><span class="p">,</span>
+                                     <span class="n">bargap</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">([</span><span class="n">html</span><span class="o">.</span><span class="n">H3</span><span class="p">(</span><span class="n">title</span><span class="p">),</span> <span class="n">fig</span><span class="p">],</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;margin&#39;</span><span class="p">:</span> <span class="s1">&#39;0%&#39;</span><span class="p">,</span> <span class="s1">&#39;padding&#39;</span><span class="p">:</span> <span class="s1">&#39;0%&#39;</span><span class="p">})</span></div>
 
 
@@ -423,8 +422,14 @@
 
 <span class="sd">    :return: List of Dash components.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">project_ids</span> <span class="o">=</span> <span class="p">[(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">driver</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;Project&quot;</span><span class="p">)]</span>
-    <span class="n">project_links</span> <span class="o">=</span> <span class="p">[</span><span class="n">html</span><span class="o">.</span><span class="n">H4</span><span class="p">(</span><span class="s1">&#39;Available Projects:&#39;</span><span class="p">)]</span>
+    <span class="n">project_ids</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">project_links</span> <span class="o">=</span> <span class="p">[</span><span class="n">html</span><span class="o">.</span><span class="n">H4</span><span class="p">(</span><span class="s1">&#39;No available Projects&#39;</span><span class="p">)]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">project_ids</span> <span class="o">=</span> <span class="p">[(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">driver</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;Project&quot;</span><span class="p">)]</span>
+        <span class="n">project_links</span> <span class="o">=</span> <span class="p">[</span><span class="n">html</span><span class="o">.</span><span class="n">H4</span><span class="p">(</span><span class="s1">&#39;Available Projects:&#39;</span><span class="p">)]</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">pass</span>
+
     <span class="k">for</span> <span class="n">project_name</span><span class="p">,</span> <span class="n">project_id</span> <span class="ow">in</span> <span class="n">project_ids</span><span class="p">:</span>
         <span class="n">project_links</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">html</span><span class="o">.</span><span class="n">A</span><span class="p">(</span><span class="n">project_name</span><span class="o">.</span><span class="n">title</span><span class="p">(),</span>
                                     <span class="nb">id</span><span class="o">=</span><span class="s1">&#39;link-internal&#39;</span><span class="p">,</span>
@@ -432,22 +437,22 @@
                                     <span class="n">target</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> 
                                     <span class="n">n_clicks</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                                     <span class="n">className</span><span class="o">=</span><span class="s2">&quot;button_link&quot;</span><span class="p">))</span>
-        
+
     <span class="n">project_dropdown</span> <span class="o">=</span> <span class="p">[</span><span class="n">html</span><span class="o">.</span><span class="n">H6</span><span class="p">(</span><span class="s1">&#39;Project finder:&#39;</span><span class="p">),</span>
-                        <span class="n">dcc</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;project_option&#39;</span><span class="p">,</span> 
-                                     <span class="n">options</span><span class="o">=</span><span class="p">[{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)}</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span><span class="n">value</span> <span class="ow">in</span> <span class="n">project_ids</span><span class="p">],</span> 
-                                     <span class="n">value</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> 
-                                     <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
-                                     <span class="n">clearable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
-                                     <span class="n">placeholder</span><span class="o">=</span><span class="s1">&#39;Search...&#39;</span><span class="p">,</span> 
-                                     <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;width&#39;</span><span class="p">:</span><span class="s1">&#39;50%&#39;</span><span class="p">}),</span>
-                        <span class="n">html</span><span class="o">.</span><span class="n">H4</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;project_url&#39;</span><span class="p">)]</span>
-    
+                        <span class="n">dcc</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;project_option&#39;</span><span class="p">,</span>
+                                     <span class="n">options</span><span class="o">=</span><span class="p">[{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)}</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">project_ids</span><span class="p">],</span>
+                                     <span class="n">value</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                                     <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                     <span class="n">clearable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                     <span class="n">placeholder</span><span class="o">=</span><span class="s1">&#39;Search...&#39;</span><span class="p">,</span>
+                                     <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="s1">&#39;50%&#39;</span><span class="p">}),</span>
+                        <span class="n">html</span><span class="o">.</span><span class="n">H4</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s1">&#39;project_url&#39;</span><span class="p">)]</span>
+
     <span class="n">navigation_links</span> <span class="o">=</span> <span class="p">[</span><span class="n">html</span><span class="o">.</span><span class="n">H4</span><span class="p">(</span><span class="s1">&#39;Navigate to:&#39;</span><span class="p">),</span>
-        				<span class="n">html</span><span class="o">.</span><span class="n">A</span><span class="p">(</span><span class="s2">&quot;Database Imports&quot;</span><span class="p">,</span> <span class="n">href</span><span class="o">=</span><span class="s2">&quot;/apps/imports&quot;</span><span class="p">,</span> <span class="n">className</span><span class="o">=</span><span class="s2">&quot;nav_link&quot;</span><span class="p">),</span>
+                        <span class="n">html</span><span class="o">.</span><span class="n">A</span><span class="p">(</span><span class="s2">&quot;Database Imports&quot;</span><span class="p">,</span> <span class="n">href</span><span class="o">=</span><span class="s2">&quot;/apps/imports&quot;</span><span class="p">,</span> <span class="n">className</span><span class="o">=</span><span class="s2">&quot;nav_link&quot;</span><span class="p">),</span>
                         <span class="n">html</span><span class="o">.</span><span class="n">A</span><span class="p">(</span><span class="s2">&quot;Project Creation&quot;</span><span class="p">,</span> <span class="n">href</span><span class="o">=</span><span class="s2">&quot;/apps/projectCreationApp&quot;</span><span class="p">,</span> <span class="n">className</span><span class="o">=</span><span class="s2">&quot;nav_link&quot;</span><span class="p">),</span>
                         <span class="n">html</span><span class="o">.</span><span class="n">A</span><span class="p">(</span><span class="s2">&quot;Data Upload&quot;</span><span class="p">,</span> <span class="n">href</span><span class="o">=</span><span class="s2">&quot;/apps/dataUploadApp&quot;</span><span class="p">,</span> <span class="n">className</span><span class="o">=</span><span class="s2">&quot;nav_link&quot;</span><span class="p">)]</span>
-    
+
     <span class="n">layout</span> <span class="o">=</span> <span class="p">[</span><span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="n">navigation_links</span><span class="p">),</span>
               <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="n">project_links</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]),</span>
               <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="n">project_dropdown</span><span class="p">),</span>
