@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-windows.html">Getting started with Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/getting-started-with-docker.html">Getting started with Docker <strong>(Testing)</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
@@ -122,8 +123,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardising the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualisation plots</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/R-interface.html">Python - R interface</a></li>
 </ul>
 <ul>
@@ -368,7 +369,7 @@ function.</p>
 
 <dl class="function">
 <dt id="analytics_core.analytics.analytics.extract_percentage_missing">
-<code class="sig-prename descclassname">analytics_core.analytics.analytics.</code><code class="sig-name descname">extract_percentage_missing</code><span class="sig-paren">(</span><em class="sig-param">data, missing_max, drop_cols=['sample'], group='group'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/analytics/analytics.html#extract_percentage_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.analytics.analytics.extract_percentage_missing" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">analytics_core.analytics.analytics.</code><code class="sig-name descname">extract_percentage_missing</code><span class="sig-paren">(</span><em class="sig-param">data, missing_max, drop_cols=['sample'], group='group', how='all'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/analytics/analytics.html#extract_percentage_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.analytics.analytics.extract_percentage_missing" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extracts ratio of missing/valid values in each column and filters column labels with lower ratio than the minimum threshold defined.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -376,16 +377,17 @@ function.</p>
 <li><p><strong>data</strong> – pandas dataframe with group as rows and protein identifier as column.</p></li>
 <li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing group identifiers. If None, ratio is calculated across all samples, otherwise is calculated per unique group identifier.</p></li>
 <li><p><strong>missing_max</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – maximum ratio of missing/valid values to be filtered.</p></li>
+<li><p><strong>how</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – define if labels with a higher percentage of missing values than the threshold in any group (‘any’) or in all groups (‘all’) should be filtered</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>List of column labels below the threshold.</p>
 </dd>
 </dl>
-<p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">extract_percentage_missing</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">missing_max</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">drop_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sample&#39;</span><span class="p">],</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;group&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
+<dl class="simple">
+<dt>Example::</dt><dd><p>result = extract_percentage_missing(data, missing_max=0.3, drop_cols=[‘sample’], group=’group’)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -407,7 +409,7 @@ function.</p>
 </dd>
 </dl>
 <p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">imputation_KNN</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">drop_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="s1">&#39;sample&#39;</span><span class="p">,</span> <span class="s1">&#39;subject&#39;</span><span class="p">],</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">alone</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">imputation_KNN</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">drop_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="s1">&#39;sample&#39;</span><span class="p">,</span> <span class="s1">&#39;subject&#39;</span><span class="p">],</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">alone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -658,8 +660,34 @@ visit <a class="reference external" href="https://docs.scipy.org/doc/scipy/refer
 </dd></dl>
 
 <dl class="function">
+<dt id="analytics_core.analytics.analytics.transform_proteomics_edgelist">
+<code class="sig-prename descclassname">analytics_core.analytics.analytics.</code><code class="sig-name descname">transform_proteomics_edgelist</code><span class="sig-paren">(</span><em class="sig-param">df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', value_col='LFQ_intensity'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/analytics/analytics.html#transform_proteomics_edgelist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.analytics.analytics.transform_proteomics_edgelist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms a long format proteomics matrix into a wide format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – long-format pandas dataframe with columns ‘group’, ‘sample’, ‘subject’, ‘identifier’ (protein), ‘name’ (gene) and ‘LFQ_intensity’.</p></li>
+<li><p><strong>index_cols</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column labels to be be kept as index identifiers.</p></li>
+<li><p><strong>drop_cols</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – column labels to be dropped from the dataframe.</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing group identifiers.</p></li>
+<li><p><strong>identifier</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing feature identifiers.</p></li>
+<li><p><strong>extra_identifier</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing additional protein identifiers (e.g. gene names).</p></li>
+<li><p><strong>value_col</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – column label containing expression values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pandas dataframe with samples as rows and protein identifiers (UniprotID~GeneName) as columns (with additional columns ‘group’, ‘sample’ and ‘subject’).</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Example:</dt><dd><p>df = transform_proteomics_edgelist(original, index_cols=[‘group’, ‘sample’, ‘subject’], drop_cols=[‘sample’], group=’group’, identifier=’identifier’, value_col=’LFQ_intensity’)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
 <dt id="analytics_core.analytics.analytics.get_proteomics_measurements_ready">
-<code class="sig-prename descclassname">analytics_core.analytics.analytics.</code><code class="sig-name descname">get_proteomics_measurements_ready</code><span class="sig-paren">(</span><em class="sig-param">df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation=True, method='distribution', missing_method='percentage', missing_per_group=True, missing_max=0.3, min_valid=1, value_col='LFQ_intensity', shift=1.8, nstd=0.3, knn_cutoff=0.6</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/analytics/analytics.html#get_proteomics_measurements_ready"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.analytics.analytics.get_proteomics_measurements_ready" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">analytics_core.analytics.analytics.</code><code class="sig-name descname">get_proteomics_measurements_ready</code><span class="sig-paren">(</span><em class="sig-param">df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation=True, method='distribution', missing_method='percentage', missing_per_group=True, missing_max=0.3, min_valid=1, value_col='LFQ_intensity', shift=1.8, nstd=0.3, knn_cutoff=0.6, normalize=False, normalization_method='median'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/analytics/analytics.html#get_proteomics_measurements_ready"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.analytics.analytics.get_proteomics_measurements_ready" title="Permalink to this definition">¶</a></dt>
 <dd><p>Processes proteomics data extracted from the database: 1) filter proteins with high number of missing values (&gt; missing_max or min_valid), 2) impute missing values.
 For more information on imputation method visit <a class="reference external" href="http://www.coxdocs.org/doku.php?id=perseus:user:activities:matrixprocessing:filterrows:filtervalidvaluesrows">http://www.coxdocs.org/doku.php?id=perseus:user:activities:matrixprocessing:filterrows:filtervalidvaluesrows</a>.</p>
 <dl class="field-list simple">
@@ -688,7 +716,7 @@ For more information on imputation method visit <a class="reference external" hr
 </dd>
 </dl>
 <p>Example 1:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">get_proteomics_measurements_ready</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">index_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="s1">&#39;sample&#39;</span><span class="p">,</span> <span class="s1">&#39;subject&#39;</span><span class="p">],</span> <span class="n">drop_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sample&#39;</span><span class="p">],</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="s1">&#39;identifier&#39;</span><span class="p">,</span> <span class="n">extra_identifier</span><span class="o">=</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">imputation</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;distribution&#39;</span><span class="p">,</span> <span class="n">missing_method</span> <span class="o">=</span> <span class="s1">&#39;percentage&#39;</span><span class="p">,</span> <span class="n">missing_per_group</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">missing_max</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span> <span class="n">value_col</span><span class="o">=</span><span class="s1">&#39;LFQ_intensity&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">get_proteomics_measurements_ready</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">index_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="s1">&#39;sample&#39;</span><span class="p">,</span> <span class="s1">&#39;subject&#39;</span><span class="p">],</span> <span class="n">drop_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sample&#39;</span><span class="p">],</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="s1">&#39;identifier&#39;</span><span class="p">,</span> <span class="n">extra_identifier</span><span class="o">=</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">imputation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;distribution&#39;</span><span class="p">,</span> <span class="n">missing_method</span> <span class="o">=</span> <span class="s1">&#39;percentage&#39;</span><span class="p">,</span> <span class="n">missing_per_group</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">missing_max</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span> <span class="n">value_col</span><span class="o">=</span><span class="s1">&#39;LFQ_intensity&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Example 2:</p>
@@ -1553,6 +1581,31 @@ group2      c               d
 <p>group1 = [a, b]
 group2 = [c, d]</p>
 <p>odds, pvalue = stats.fisher_exact([[a, b], [c, d]])</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="analytics_core.analytics.analytics.run_kolmogorov_smirnov">
+<code class="sig-prename descclassname">analytics_core.analytics.analytics.</code><code class="sig-name descname">run_kolmogorov_smirnov</code><span class="sig-paren">(</span><em class="sig-param">dist1</em>, <em class="sig-param">dist2</em>, <em class="sig-param">alternative='two-sided'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/analytics/analytics.html#run_kolmogorov_smirnov"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.analytics.analytics.run_kolmogorov_smirnov" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the Kolmogorov-Smirnov statistic on 2 samples. See <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ks_2samp.html">https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ks_2samp.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dist1</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – sequence of 1-D ndarray (first distribution to compare) drawn from a continuous distribution</p></li>
+<li><p><strong>dist2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – sequence of 1-D ndarray (second distribution to compare) drawn from a continuous distribution</p></li>
+<li><p><strong>alternative</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – defines the alternative hypothesis (default is ‘two-sided’):
+* <strong>‘two-sided’</strong>
+* <strong>‘less’</strong>
+* <strong>‘greater’</strong></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>statistic float and KS statistic pvalue float Two-tailed p-value.</p>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">run_kolmogorov_smirnov</span><span class="p">(</span><span class="n">dist1</span><span class="p">,</span> <span class="n">dist2</span><span class="p">,</span> <span class="n">alternative</span><span class="o">=</span><span class="s1">&#39;two-sided&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="function">

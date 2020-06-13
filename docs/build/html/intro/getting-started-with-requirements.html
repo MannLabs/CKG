@@ -97,6 +97,7 @@
 <li class="toctree-l1"><a class="reference internal" href="getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting-started-with-build.html">Getting Started with the CKG Build</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting-started-with-windows.html">Getting started with Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started-with-docker.html">Getting started with Docker <strong>(Testing)</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
@@ -126,8 +127,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardising the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualisation plots</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/R-interface.html">Python - R interface</a></li>
 </ul>
 <ul>
@@ -208,7 +209,7 @@
             
   <div class="section" id="getting-started-with-some-requirements">
 <h1>Getting Started with some Requirements<a class="headerlink" href="#getting-started-with-some-requirements" title="Permalink to this headline">¶</a></h1>
-<p>The following instructions on installation of software requirements and setting up the Clinical Knowledge graph, are optimized for operating systems MacOS and Linux. For more detailed instructions on how to set up the CKG in Windows, pleaso go to <a class="reference internal" href="getting-started-with-windows.html#windows-installation"><span class="std std-ref">Getting started with Windows</span></a>.</p>
+<p>The following instructions on installation of software requirements and setting up the Clinical Knowledge graph, are optimised for operating systems MacOS and Linux. For more detailed instructions on how to set up the CKG in Windows, please go to <a class="reference internal" href="getting-started-with-windows.html#windows-installation"><span class="std std-ref">Getting started with Windows</span></a>.</p>
 <div class="section" id="java">
 <h2>Java<a class="headerlink" href="#java" title="Permalink to this headline">¶</a></h2>
 <p>Before starting setting up Neo4j and, later on, the Clinical Knowledge Graph, it is very important that you have <em>Java</em> installed in your machine, including <strong>Java SE Runtime Environment</strong>.</p>
@@ -238,7 +239,7 @@ When using a new version of Neo4j, always remember to read the respective Operat
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ which R
 </pre></div>
 </div>
-<p>To install the neccessary R packages, simply initiate R (terminal or shell) and run:</p>
+<p>To install the necessary R packages, simply initiate R (terminal or shell) and run:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">install</span><span class="o">.</span><span class="n">packages</span><span class="p">(</span><span class="s1">&#39;BiocManager&#39;</span><span class="p">)</span>
 <span class="n">BiocManager</span><span class="p">::</span><span class="n">install</span><span class="p">()</span>
 <span class="n">BiocManager</span><span class="p">::</span><span class="n">install</span><span class="p">(</span><span class="n">c</span><span class="p">(</span><span class="s1">&#39;AnnotationDbi&#39;</span><span class="p">,</span> <span class="s1">&#39;GO.db&#39;</span><span class="p">,</span> <span class="s1">&#39;preprocessCore&#39;</span><span class="p">,</span> <span class="s1">&#39;impute&#39;</span><span class="p">))</span>
@@ -251,7 +252,7 @@ When using a new version of Neo4j, always remember to read the respective Operat
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>In Mac OS, make sure you have <strong>XQuartz</strong> installed.</p>
+<p>In Mac OS, make sure you have <strong>XQuartz</strong> installed, as well as <strong>Xcode</strong>. For more information on how to install R on OS X, you can follow this <a class="reference external" href="https://www.r-bloggers.com/installing-r-on-os-x/">link</a>.</p>
 </div>
 <p>Now that you are all set, you can move on and start with Neo4j.</p>
 </div>
