@@ -91,6 +91,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../intro/getting-started-with-neo4j.html">Getting Started with Neo4j</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../intro/getting-started-with-build.html">Getting Started with the CKG Build</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../intro/getting-started-with-windows.html">Getting started with Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../intro/getting-started-with-docker.html">Getting started with Docker <strong>(Testing)</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
@@ -120,8 +121,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/standard-analysis.html">Standardising the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/visualization-plots.html">Visualisation plots</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced_features/R-interface.html">Python - R interface</a></li>
 </ul>
 <ul>
@@ -204,9 +205,7 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">graphdb_builder</span> <span class="k">import</span> <span class="n">mapping</span> <span class="k">as</span> <span class="n">mp</span><span class="p">,</span> <span class="n">builder_utils</span>
 
-<span class="c1">#############################################</span>
-<span class="c1">#              SIDER database               # </span>
-<span class="c1">#############################################</span>
+
 <div class="viewcode-block" id="parser"><a class="viewcode-back" href="../../../../_autosummary/graphdb_builder.databases.parsers.html#graphdb_builder.databases.parsers.siderParser.parser">[docs]</a><span class="k">def</span> <span class="nf">parser</span><span class="p">(</span><span class="n">databases_directory</span><span class="p">,</span> <span class="n">drug_source</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="n">config</span> <span class="o">=</span> <span class="n">builder_utils</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;siderConfig.yml&quot;</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="s1">&#39;databases&#39;</span><span class="p">)</span>
     <span class="n">url</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;SIDER_url&#39;</span><span class="p">]</span>
@@ -237,8 +236,6 @@
                 <span class="n">p</span> <span class="o">=</span> <span class="n">phenotypemapping</span><span class="p">[</span><span class="n">se</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span>
                 <span class="n">relationships</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">d</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="s2">&quot;HAS_SIDE_EFFECT&quot;</span><span class="p">,</span> <span class="s2">&quot;SIDER&quot;</span><span class="p">,</span> <span class="n">se</span><span class="p">,</span> <span class="n">evidence_from</span><span class="p">))</span>
     <span class="n">associations</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-    <span class="n">builder_utils</span><span class="o">.</span><span class="n">remove_directory</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="p">(</span><span class="n">relationships</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">output_file</span><span class="p">,</span> <span class="n">drugmapping</span><span class="p">,</span> <span class="n">phenotypemapping</span><span class="p">)</span></div>
 

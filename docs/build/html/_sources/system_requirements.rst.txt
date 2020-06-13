@@ -4,7 +4,7 @@ System Requirements
 The Clinical Knowledge Graph was conceived as a multi-user platform and therefore requires installation in a server-like setup and data systems administration knowledge. However, individual users can have local instances of the CKG, making sure data, software and hardware requirements are fulfilled.
 
 
-Data 
+Data
 ------------------
 
 Licensed databases used by the CKG package require login and authentication in order to download their data. This is the case of **SNOMED-CT**, **DrugBank** and **PhosphoSitePlus**.
@@ -23,14 +23,15 @@ Once you have been given authorization to access the data, please download the f
 These files will be later used in :ref:`Build Neo4j graph database`.
 
 
-Software 
+Software
 -------------------
 
 - Java, version compatible with chosen Neo4j version (check Neo4j requirements)
 - R >= 3.5.2
 - Python 3.6
 - Redis server
-- Neo4j =< 3.15
+- Neo4j Desktop
+- Neo4j database =< 3.14
 
 
 Hardware

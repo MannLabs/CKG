@@ -96,14 +96,15 @@
 <li class="toctree-l2"><a class="reference internal" href="#setting-up-the-clinical-knowledge-graph">Setting up the Clinical Knowledge Graph</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#add-ckg-to-bashrc">Add CKG to <em>.bashrc</em></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#build-neo4j-graph-database">Build Neo4j graph database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#from-the-provided-dump-file">From the provided dump file</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#from-builder-py">From builder.py</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#from-the-provided-dump-file-testing">From the provided dump file <strong>(Testing)</strong></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#more-on-the-dump-file">More on the dump file</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="getting-started-with-windows.html">Getting started with Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started-with-docker.html">Getting started with Docker <strong>(Testing)</strong></a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
@@ -133,8 +134,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/graphdb-statistics.html">Clinical Knowledge Graph Statistics: Database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-notebooks.html">Using Jupyter Notebooks with the Clinical Knowledge Graph</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/ckg-queries.html">Retrieving data from the Clinical Knowledge Graph database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardizing the data analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualization plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/standard-analysis.html">Standardising the data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_features/visualization-plots.html">Visualisation plots</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_features/R-interface.html">Python - R interface</a></li>
 </ul>
 <ul>
@@ -255,7 +256,7 @@ Assuming you have <strong>Python 3.6</strong> already installed and added to <co
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python3 -m pip install virtualenv
 </pre></div>
 </div>
-<p>To create a new virtual environment using a costum version of Python, follow the steps:</p>
+<p>To create a new virtual environment using a custom version of Python, follow the steps:</p>
 <ol class="arabic simple">
 <li><p>Take note of the full path to the Python version you would like to use inside the virtual environment.</p></li>
 <li><p>Navigate to the directory where you would like your virtual environment to be (e.g. user’s root).</p></li>
@@ -361,21 +362,8 @@ $ <span class="nb">source</span> path/to/env_name/bin/activate
 <p>If the respective database folder is not created, please do it manually.</p>
 </div>
 <p>The last step is to build the database, which can be done using the <code class="docutils literal notranslate"><span class="pre">builder.py</span></code> module or a <code class="docutils literal notranslate"><span class="pre">dump</span> <span class="pre">file</span></code>.</p>
-<div class="section" id="from-builder-py">
-<h3>From builder.py<a class="headerlink" href="#from-builder-py" title="Permalink to this headline">¶</a></h3>
-<p>To build the graph database, run <code class="docutils literal notranslate"><span class="pre">builder.py</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> src/graphdb_builder/builder
-$ python builder.py -b full -u neo4j
-</pre></div>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Before running <code class="docutils literal notranslate"><span class="pre">builder.py</span></code>, please make sure your Neo4j graph is running. The builder will fail otherwise.</p>
-</div>
-<p>This action will take aproximately 6 hours but depending on a multitude of factors, it can take up to 10 hours.</p>
-</div>
-<div class="section" id="from-the-provided-dump-file-testing">
-<h3>From the provided dump file <strong>(Testing)</strong><a class="headerlink" href="#from-the-provided-dump-file-testing" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="from-the-provided-dump-file">
+<h3>From the provided dump file<a class="headerlink" href="#from-the-provided-dump-file" title="Permalink to this headline">¶</a></h3>
 <p>A dump file of the database is also made available in this <a class="reference external" href="https://data.mendeley.com/datasets/mrcf7f4tc2/1">link</a> and alternatively, you can use it to load the graph database contained in it. To do so, download both files (<code class="docutils literal notranslate"><span class="pre">ckg_080520.dump</span></code> and <code class="docutils literal notranslate"><span class="pre">data.tar.gz</span></code>).</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">.dump</span></code> file will be used to load the Neo4j graph database:</p>
 <ol class="arabic simple">
@@ -390,11 +378,11 @@ $ cp <span class="m">2019</span>-11-04.dump backups/graph.db/.
 <ol class="arabic simple" start="2">
 <li><p>After copying the dump file to backups/graph.db/, make sure the graph database is shutdown and run:</p></li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ bin/neo4j-admin load --from<span class="o">=</span>backups/graph.db/2019-11-04.dump --database<span class="o">=</span>graph.db --force
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ bin/neo4j-admin load --from<span class="o">=</span>backups/graph.db/ckg_080520.dump --database<span class="o">=</span>graph.db --force
 </pre></div>
 </div>
 <p>In some systems you might have to run this as root:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo bin/neo4j-admin load --from<span class="o">=</span>backups/graph.db/2019-11-04.dump --database<span class="o">=</span>graph.db --force
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo bin/neo4j-admin load --from<span class="o">=</span>backups/graph.db/ckg_080520.dump --database<span class="o">=</span>graph.db --force
 $ sudo chown -R username data/databases/graph.db/
 </pre></div>
 </div>
@@ -420,6 +408,19 @@ $ python builder.py -b minimal -u username
 <p class="admonition-title">Note</p>
 <p>Remember of replace the <code class="docutils literal notranslate"><span class="pre">username</span></code> in each command, with your own neo4j username.</p>
 </div>
+</div>
+<div class="section" id="from-builder-py">
+<h3>From builder.py<a class="headerlink" href="#from-builder-py" title="Permalink to this headline">¶</a></h3>
+<p>To build the graph database, run <code class="docutils literal notranslate"><span class="pre">builder.py</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> src/graphdb_builder/builder
+$ python builder.py -b full -u neo4j
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Before running <code class="docutils literal notranslate"><span class="pre">builder.py</span></code>, please make sure your Neo4j graph is running. The builder will fail otherwise.</p>
+</div>
+<p>This action will take approximately 6 hours but depending on a multitude of factors, it can take up to 10 hours.</p>
 </div>
 <div class="section" id="more-on-the-dump-file">
 <h3>More on the dump file<a class="headerlink" href="#more-on-the-dump-file" title="Permalink to this headline">¶</a></h3>
