@@ -17,13 +17,25 @@ RUN apt-get update && \
     apt-get install -yq locales && \
     apt-get install -yq wget && \
     apt-get install -yq unzip && \
-    apt-get install -yq python3.6 python3-pip python3-setuptools python3-dev libxml2 libxml2-dev zlib1g-dev && \
+    apt-get install -yq build-essential libxml2 libxml2-dev zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev llvm-7 llvm-7-dev && \
     apt-get install -yq nginx uwsgi uwsgi-plugin-python3 && \
     apt-get install -yq redis-server && \
     apt-get install -yq git && \
     apt-get -y install sudo && \
     rm -rf /var/lib/apt/lists/*
 
+# Python 3.6.8 installation
+RUN wget https://www.python.org/ftp/python/3.6.8/Python-3.6.8.tgz
+RUN tar -xzf Python-3.6.8.tgz
+WORKDIR Python-3.6.8
+RUN ./configure
+RUN make altinstall
+RUN make install
+## pip upgrade
+RUN wget https://bootstrap.pypa.io/get-pip.py
+RUN python3 get-pip.py
+
+WORKDIR /
 # Set the locale
 RUN locale-gen en_US.UTF-8
 
@@ -36,27 +48,25 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 51716619E084DAB9
 
 RUN echo "deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/" > /etc/apt/sources.list.d/cran.list
 
-# JAVA
-RUN mkdir -p /usr/local/oracle-jre8-installer-local
+# Installation openJDK
+RUN wget -P /usr/local/ https://download.java.net/java/GA/jdk14.0.1/664493ef4a6946b186ff29eb326336a2/7/GPL/openjdk-14.0.1_linux-x64_bin.tar.gz
+RUN tar xf /usr/local/openjdk-14.0.1_linux-x64_bin.tar.gz -C /usr/local
+RUN update-alternatives --install "/usr/bin/java" "java" "/usr/local/jdk-14.0.1/bin/java" 1500 && \
+    update-alternatives --install "/usr/bin/javac" "javac" "/usr/local/jdk-14.0.1/bin/javac" 1500
 
-ADD /resources/jre-8u221-linux-x64.tar.gz /usr/local/oracle-jre8-installer-local
-
-RUN update-alternatives --install "/usr/bin/java" "java" "/usr/local/oracle-jre8-installer-local/jre1.8.0_221/bin/java" 1500 && \
-    update-alternatives --install "/usr/bin/javac" "javac" "/usr/local/oracle-jre8-installer-local/jre1.8.0_221/bin/javaws" 1500 
-
-# NEO4J
+# NEO4J 3.5.14
 RUN wget -O - http://debian.neo4j.org/neotechnology.gpg.key | apt-key add - && \
     echo "deb [trusted=yes] https://debian.neo4j.org/repo stable/" > /etc/apt/sources.list.d/neo4j.list && \
     apt-get update && \
-    apt-get install -yq neo4j=1:3.5.8
+    apt-get install -yq neo4j=1:3.5.14
 
 ## Setup initial user Neo4j
 RUN rm -f /var/lib/neo4j/data/dbms/auth && \
     neo4j-admin set-initial-password "neo4j"
 
-## Install algorithms Neo4j
-RUN wget -P /var/lib/neo4j/plugins https://s3-eu-west-1.amazonaws.com/com.neo4j.graphalgorithms.dist/neo4j-graph-algorithms-3.5.8.1-standalone.jar
-RUN wget -P /var/lib/neo4j/plugins https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.5.0.5/apoc-3.5.0.5-all.jar
+## Install graph algorithms and APOC
+RUN wget -P /var/lib/neo4j/plugins https://s3-eu-west-1.amazonaws.com/com.neo4j.graphalgorithms.dist/neo4j-graph-algorithms-3.5.14.0-standalone.jar
+RUN wget -P /var/lib/neo4j/plugins https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.5.0.9/apoc-3.5.0.9-all.jar
 
 RUN ls -lrth /var/lib/neo4j/plugins
 
@@ -79,7 +89,7 @@ RUN sudo -u neo4j neo4j-admin load --from=/var/lib/neo4j/data/backup/ckg_080520.
 RUN echo "Done with restoring backup, removing backup folder"
 RUN rm -rf /var/lib/neo4j/data/backup
 
-RUN ls -lrth  /var/lib/neo4j/data/databases
+#RUN ls -lrth  /var/lib/neo4j/data/databases
 RUN [ -e  /var/lib/neo4j/data/databases/store_lock ] && rm /var/lib/neo4j/data/databases/store_lock
 
 # R
@@ -98,14 +108,14 @@ RUN Rscript R_packages.R
 
 # Python
 ## Copy Requirements
+RUN python3 --version
 ADD ./requirements.txt /requirements.txt
 
 ## Install Python libraries
-RUN pip3 install --upgrade pip
 RUN pip3 install --ignore-installed -r requirements.txt
 RUN mkdir /CKG
 RUN wget -O /CKG/data.tar.gz https://data.mendeley.com/datasets/mrcf7f4tc2/1/files/c0d058a2-adfa-4b96-97d9-c9ec7fc5adb9/data.tar.gz?dl=1
-RUN tar -xzf data.tar.gz
+RUN tar -xzf /CKG/data.tar.gz -C /CKG/.
 ADD . /CKG/
 ENV PYTHONPATH "${PYTHONPATH}:/CKG/src"
 
@@ -116,9 +126,6 @@ RUN apt-get -y install npm nodejs && \
 RUN pip3 install jupyterhub && \
     pip3 install --upgrade notebook
 
-RUN apt-get remove -y python-pip curl && \
-         rm -rf /var/lib/apt/lists/
-
 ## Add a user without password in JupyterHub
 RUN adduser --quiet --disabled-password --shell /bin/bash --home /home/adminhub --gecos "User" adminhub && \
     echo "adminhub:adminhub" | chpasswd
@@ -127,7 +134,6 @@ RUN mkdir /etc/jupyterhub
 COPY /resources/jupyterhub.py /etc/jupyterhub/.
 
 # NGINX and UWSGI
-
 ## Copy configuration file
 COPY /resources/nginx.conf /etc/nginx/nginx.conf
 
@@ -147,3 +153,4 @@ RUN mkdir -p /var/log/uwsgi
 EXPOSE 7474 7687 8090 8050 6379
 
 ENTRYPOINT [ "/bin/bash", "/CKG/docker_entrypoint.sh"]
+
