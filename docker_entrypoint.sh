@@ -4,7 +4,7 @@ echo $DUMP_PATH
 echo $EXEC_MODE
 
 if [[ -e $EXEC_MODE ]]; then
-  echo "Mode:: $EXEC_MODE"  
+  echo "Mode:: $EXEC_MODE"
   if [ $EXEC_MODE == "load" ]; then
     if [[ -z $DUMP_PATH ]]; then
       echo "Loading database dump: $DUMP_PATH"
@@ -17,7 +17,6 @@ if [[ -e $EXEC_MODE ]]; then
     echo "Building CKG graph database after loading database dump"
     cd /CKG/src/graphdb_builder/builder
     python3 builder.py -b minimal -u ckg
-  fi
   elif [ $EXEC_MODE == "build" ]; then
     echo "Setting up the config files"
     python3 /CKG/setup_CKG.py
