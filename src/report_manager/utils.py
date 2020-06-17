@@ -83,53 +83,6 @@ def extract_style(el):
     return {k.strip(): v.strip() for k, v in [x.split(": ") for x in el.attrs["style"].split(";")]}
 
 
-def is_jsonable(x):
-    try:
-        json.dumps(x)
-        return True
-    except Exception:
-        return False
-
-
-def convert_dash_to_json(dash_object):
-    if not hasattr(dash_object, 'to_plotly_json'):
-        dash_json = dash_object
-    else:
-        dash_json = dash_object.to_plotly_json()
-        for key in dash_json:
-            if isinstance(dash_json[key], dict):
-                for element in dash_json[key]:
-                    children = dash_json[key][element]
-                    ch = {element: []}
-                    if is_jsonable(children) or isinstance(children, np.ndarray):
-                        ch[element] = children
-                    elif isinstance(children, dict):
-                        ch[element] = {}
-                        for c in children:
-                            ch[element].update({c: []})
-                            if isinstance(children[c], list):
-                                for f in children[c]:
-                                    if is_jsonable(f) or isinstance(f, np.ndarray):
-                                        ch[element][c].append(f)
-                                    else:
-                                        ch[element][c].append(convert_dash_to_json(f))
-                            else:
-                                if is_jsonable(children[c]) or isinstance(children[c], np.ndarray):
-                                    ch[element][c] = children[c]
-                                else:
-                                    ch[element][c] = convert_dash_to_json(children[c])
-                    elif isinstance(children, list): 
-                        for c in children: 
-                            if is_jsonable(c) or isinstance(c, np.ndarray):
-                                ch[element].append(c)
-                            else: 
-                                ch[element].append(convert_dash_to_json(c))
-                    else:
-                        ch[element] = convert_dash_to_json(children)
-                    dash_json[key].update(ch)
-    return dash_json 
-
-
 def get_image(figure, width, height):
     img = base64.b64encode(py.image.get(figure, width=width, height=height)).decode('utf-8')
 
@@ -201,17 +154,3 @@ def convert_html_to_pdf(source_html, output_filename):
 
     # return True on success and False on errors
     return pisa_status.err
-
-
-class NumpyEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        return json.JSONEncoder.default(self, obj)
-
-
-class DictDFEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if hasattr(obj, 'to_json'):
-            return obj.to_json(orient='records')
-        return json.JSONEncoder.default(self, obj)

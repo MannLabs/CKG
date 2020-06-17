@@ -303,7 +303,7 @@ def download_from_ftp(ftp_url, user, password, to, file_name):
         raise ftplib.error_proto("Exception raised when a reply is received from the server that does not fit the response specifications of the File Transfer Protocol. {}.\nURL:{}".format(err,ftp_url))
 
 
-def download_PRIDE_data(pxd_id, file_name, to='.', user='', password=''):
+def download_PRIDE_data(pxd_id, file_name, to='.', user='', password='', date_field='publicationDate'):
     """
     This function downloads a project file from the PRIDE repository
 
@@ -312,6 +312,8 @@ def download_PRIDE_data(pxd_id, file_name, to='.', user='', password=''):
     :param str to: local directory where the file should be downloaded
     :param str user: username to access biomedical database server if required.
     :param str password: password to access biomedical database server if required.
+    :param str date_field: projects deposited in PRIDE are search based on date, either 
+        submissionData or publicationDate (default)
     """
     ftp_PRIDE = 'ftp://ftp.pride.ebi.ac.uk/pride/data/archive/YEAR/MONTH/PXDID/FILE_NAME'
     url_PRIDE_API = 'http://www.ebi.ac.uk/pride/ws/archive/project/' + pxd_id
@@ -319,7 +321,7 @@ def download_PRIDE_data(pxd_id, file_name, to='.', user='', password=''):
     try:
         r = requests.get(url_PRIDE_API)
         data = r.json()
-        submission_date = data['publicationDate']
+        submission_date = data[date_field]
         year, month, day = submission_date.split('-')
 
         ftp_url = ftp_PRIDE.replace('YEAR', year).replace('MONTH', month).replace('PXDID', pxd_id).replace('FILE_NAME', file_name)
