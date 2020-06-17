@@ -345,6 +345,28 @@ def imputation_normal_distribution(data, index_cols=['group', 'sample', 'subject
     return data_imputed.T
 
 
+def normalize_data_per_group(data, group, method='median'):
+    """
+    This function normalizes the data by group using the selected method
+
+    :param data: DataFrame with the data to be normalized (samples x features)
+    :param group_col: Column containing the groups
+    :param string method: normalization method to choose among: median_polish, median,
+                        quantile, linear
+    :return: Pandas dataframe.
+
+    Example::
+
+        result = normalize_data_per_group(data, group='group' method='median')
+    """
+    ndf = pd.DataFrame(columns=data.columns)
+    for n, gdf in data.groupby(group):
+        norm_group = normalize_data(gdf, method=method)
+        ndf = ndf.append(norm_group)
+
+    return ndf
+
+
 def normalize_data(data, method='median_polish'):
     """
     This function normalizes the data using the selected method
@@ -391,7 +413,7 @@ def median_normalization(data):
         result = median_normalization(data)
     """
 
-    normData = data.sub(data.median(axis=1), axis=0)
+    normData = data.sub(data.median(axis=0), axis=1)
 
     return normData
 
@@ -414,7 +436,7 @@ def zscore_normalization(data):
                 3 -0.927173 -0.132453  1.059626
                 4 -0.577350 -0.577350  1.154701        
     """
-    normData = data.sub(data.mean(axis=1), axis=0).div(data.std(axis=1), axis=0)
+    normData = data.sub(data.mean(axis=0), axis=1).div(data.std(axis=0), axis=1)
 
     return normData
 
@@ -450,15 +472,15 @@ def quantile_normalization(data):
     """
     Applies quantile normalization to each column in pandas dataframe.
 
-    :param data: pandas dataframe with features as rows and samples as columns.
+    :param data: pandas dataframe with features as columns and samples as rows.
     :return: Pandas dataframe
 
     Example::
 
         result = quantile_normalization(data)
     """
-    rank_mean = data.stack().groupby(data.rank(method='first').stack().astype(int)).mean()
-    normdf = data.rank(method='min').stack().astype(int).map(rank_mean).unstack()
+    rank_mean = data.T.stack().groupby(data.T.rank(method='first').stack().astype(int)).mean()
+    normdf = data.T.rank(method='min').stack().astype(int).map(rank_mean).unstack().T
 
     return normdf
 
@@ -581,7 +603,7 @@ def transform_proteomics_edgelist(df, index_cols=['group', 'sample', 'subject'],
     return wdf
 
 
-def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation=True, method='distribution', missing_method='percentage', missing_per_group=True, missing_max=0.3, min_valid=1, value_col='LFQ_intensity', shift=1.8, nstd=0.3, knn_cutoff=0.6, normalize=False, normalization_method='median'):
+def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation=True, method='distribution', missing_method='percentage', missing_per_group=True, missing_max=0.3, min_valid=1, value_col='LFQ_intensity', shift=1.8, nstd=0.3, knn_cutoff=0.6, normalize=False, normalization_method='median', normalize_group=False):
     """
     Processes proteomics data extracted from the database: 1) filter proteins with high number of missing values (> missing_max or min_valid), 2) impute missing values.
     For more information on imputation method visit http://www.coxdocs.org/doku.php?id=perseus:user:activities:matrixprocessing:filterrows:filtervalidvaluesrows.
@@ -615,7 +637,10 @@ def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subjec
     df = transform_proteomics_edgelist(df, index_cols=index_cols, drop_cols=drop_cols, group=group, identifier=identifier, extra_identifier=extra_identifier, value_col=value_col)
     if df is not None:
         if normalize:
-            df = normalize_data(df, method=normalization_method)
+            if not normalize_group:
+                df = normalize_data(df, method=normalization_method)
+            else:
+                df = normalize_data_per_group(df, group=group, method=normalization_method)
         aux = []
         aux.extend(index_cols)
         g = group
@@ -1468,7 +1493,7 @@ def calculate_repeated_measures_anova(df, column, subject='subject', group='grou
 
         result = calculate_repeated_measures_anova(df, 'protein a', subject='subject', group='group')
     """
-    aov_result = pg.rm_anova(data=df, dv=column, within=group,subject=subject, detailed=True, correction=True)
+    aov_result = pg.rm_anova(data=df, dv=column, within=group, subject=subject, detailed=True, correction=True)
     t, pvalue = aov_result.loc[0, ['F', 'p-unc']].values.tolist()
     df1, df2 = aov_result['DF']
     
