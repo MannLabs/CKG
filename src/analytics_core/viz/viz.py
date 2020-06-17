@@ -6,6 +6,7 @@ from collections import defaultdict
 import dash_core_components as dcc
 import dash_html_components as html
 import matplotlib.pyplot as plt
+import plotly
 import plotly.tools as tls
 import plotly.graph_objs as go
 import plotly.figure_factory as FF
@@ -21,6 +22,7 @@ from cyjupyter import Cytoscape
 from pyvis.network import Network as visnet
 from webweb import Web
 from networkx.readwrite import json_graph
+import json
 from analytics_core import utils
 from analytics_core.analytics import analytics
 from wordcloud import WordCloud, STOPWORDS
@@ -1229,8 +1231,8 @@ def get_network(data, identifier, args):
             vis_graph = vis_graph.subgraph(valid_nodes)
 
         nodes_table, edges_table = network_to_tables(graph)
-        nodes_fig_table = get_table(nodes_table, identifier=identifier+"_nodes_table", title=args['title']+" nodes table")
-        edges_fig_table = get_table(edges_table, identifier=identifier+"_edges_table", title=args['title']+" edges table")
+        nodes_fig_table = get_table(nodes_table, identifier=identifier+"_nodes_table", args={'title':args['title']+" nodes table"})
+        edges_fig_table = get_table(edges_table, identifier=identifier+"_edges_table", args={'title':args['title']+" edges table"})
 
         stylesheet, layout = get_network_style(colors, args['color_weight'])
         stylesheet.append({'selector':'edge','style':{'width':'mapData(edgewidth,'+ str(min_edge_value) +','+ str(max_edge_value) +', .5, 8)'}})
@@ -1372,9 +1374,12 @@ def get_pca_plot(data, identifier, args):
     traces.extend(sct['data'])
     figure['layout'] = sct['layout']
     figure['layout'].template='plotly_white'
+    factor = 50
+    if 'factor' in args:
+        factor = args['factor']
     for index in list(loadings.index)[0:args['loadings']]:
-        x = loadings.loc[index,'x'] * 50.
-        y = loadings.loc[index, 'y'] * 50.
+        x = loadings.loc[index,'x'] * factor
+        y = loadings.loc[index, 'y'] * factor
         value = loadings.loc[index, 'value']
 
         trace = go.Scattergl(x= [0,x],
@@ -1490,7 +1495,8 @@ def get_sankey_plot(data, identifier, args={'source':'source', 'target':'target'
 
     return dcc.Graph(id = identifier, figure = figure)
 
-def get_table(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':2500, 'font':12}, subplot = False):
+
+def get_table(data, identifier, args):
     """
     This function converts a pandas dataframe into an interactive table for viewing, editing and exploring large datasets. For more information visit https://dash.plot.ly/datatable.
 
@@ -1506,9 +1512,32 @@ def get_table(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = 
         result = get_table(data, identifier='table', title='Table Figure', subset = None)
     """
     if data is not None and isinstance(data, pd.DataFrame) and not data.empty:
-        if subset is not None:
-            data = data[subset]
-
+        cols = []
+        title = "Table"
+        if 'title' in args:
+            title = args['title']
+        if 'index' in args:
+            if isinstance(args['index'], list):
+                cols = args['index']
+            else:
+                cols.append(args['index'])
+        if 'cols' in args:
+            if args['cols'] is not None and len(args['cols']) > 0:
+                selected_cols = list(set(args['cols']).intersection(data.columns))
+                if len(selected_cols) > 0:           
+                    data = data[selected_cols + cols]
+                else:
+                    return html.div(id='cols_not_found', children=[dcc.Markdown("Columns not found {}".format(','.join(args['cols'])))])
+        if 'rows' in args:
+            if args['rows'] is not None and len(args['rows']) > 0:
+                selected_rows = list(set(args['rows']).intersection(data.index))
+                if len(selected_rows) > 0:
+                    data = data.loc[selected_rows]
+                else:
+                    return html.div(id='rows_not_found', children=[dcc.Markdown("Rows not found {}".format(','.join(args['rows'])))])
+        if 'head' in args:
+            if len(args['head']) > 1:
+                data = data.iloc[:args['head'][0], :args['head'][1]]
         list_cols = data.applymap(lambda x: isinstance(x, list)).all()
         list_cols = list_cols.index[list_cols].tolist()
 
@@ -1531,7 +1560,7 @@ def get_table(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = 
                                             },
                                             style_cell_conditional=[{
                                                 'if': {'column_id': i},
-                                                'width': str(50 + round(len(i)*50))+'px'} for i in data.columns],
+                                                'width': str(20 + round(len(i)*20))+'px'} for i in data.columns],
                                             style_table={
                                                 "height": "fit-content",
                                             #    "max-height": "500px",
@@ -1554,6 +1583,7 @@ def get_table(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = 
                                                 ],
                                             fixed_rows={ 'headers': True, 'data': 0},
                                             filter_action='native',
+                                            row_selectable='multi',
                                             page_current= 0,
                                             page_size = 25,
                                             page_action='native',
@@ -1565,6 +1595,7 @@ def get_table(data, identifier, title, colors = ('#C2D4FF','#F5F8FF'), subset = 
 
     return html.Div(table)
 
+
 def get_multi_table(data,identifier, title):
     tables = [html.H2(title)]
     if data is not None and isinstance(data, dict):
@@ -1572,7 +1603,7 @@ def get_multi_table(data,identifier, title):
             df = data[subtitle]
             if len(df.columns) > 10:
                 df = df.transpose()
-            table = get_table(df, identifier=identifier+"_"+subtitle, title=subtitle)
+            table = get_table(df, identifier=identifier+"_"+subtitle, args={'title':subtitle})
             if table is not None:
                 tables.append(table)
     
@@ -1694,6 +1725,7 @@ def get_parallel_plot(data, identifier, args):
 
         result = get_parallel_plot(data, identifier='parallel plot', args={'group':'group', 'zscore':True, 'color':'blue', 'title':'Parallel Plot'})
     """
+    fig = None
     if 'group' in args:
         group = args['group']
         if 'zscore' in args:
@@ -1744,7 +1776,7 @@ def get_WGCNAPlots(data, identifier):
         moduleTraitCor, textMatrix, METDiss, METcor = data
         plots = []
         plots.append(wgcnaFigures.plot_complex_dendrogram(dissTOM, moduleColors, title='Co-expression: dendrogram and module colors', dendro_labels=dissTOM.columns, distfun=None, linkagefun='ward', hang=0.1, subplot='module colors', col_annotation=True, width=1000, height=800))
-        plots.append(get_table(Features_per_Module, identifier='', title='Proteins/Genes module color', colors = ('#C2D4FF','#F5F8FF'), subset = None,  plot_attr = {'width':1500, 'height':1500, 'font':12}, subplot = False))
+        plots.append(get_table(Features_per_Module, identifier='', args={'title':'Proteins/Genes module color', 'colors': ('#C2D4FF','#F5F8FF'), 'cols': None, 'rows': None}))
         plots.append(wgcnaFigures.plot_labeled_heatmap(moduleTraitCor, textMatrix, title='Module-Clinical variable relationships', colorscale=[[0,'#67a9cf'],[0.5,'#f7f7f7'],[1,'#ef8a62']], row_annotation=True, width=1000, height=800))
         dendro_tree = wgcnaAnalysis.get_dendrogram(METDiss, METDiss.index, distfun=None, linkagefun='ward', div_clusters=False)
         if dendro_tree is not None:
@@ -2101,16 +2133,20 @@ def save_DASH_plot(plot, name, plot_format='svg', directory='.'):
     try:
         if not os.path.exists(directory):
             os.mkdir(directory)
+        plot_file = os.path.join(directory, str(name)+'.'+str(plot_format))
         if plot_format in ['svg', 'pdf', 'png', 'jpeg', 'jpg']:
-            plot_file = os.path.join(directory, str(name)+'.'+str(plot_format))
             if hasattr(plot, 'figure'):
                 pio.write_image(plot.figure, plot_file)
             else:
                 pio.write_image(plot, plot_file)
+        elif plot_format == 'json':
+            figure_json = json.dumps(plot.figure, cls=plotly.utils.PlotlyJSONEncoder)
+            with open(plot_file, 'w') as f:
+                f.write(figure_json)
     except ValueError as err:
         print("Plot could not be saved. Error: {}".format(err))
-            
-            
+
+
 def mpl_to_plotly(fig, ci=True, legend=True):
     ##ToDo Test how it works for multiple groups
     ##ToDo Allow visualization of CI

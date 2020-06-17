@@ -349,19 +349,19 @@ class Project:
             for data_type in data_types:
                 dataset = None
                 if data_type == "proteomics":
-                    dataset = ProteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
+                    dataset = ProteomicsDataset(self.identifier, data={}, analysis_queries={}, report=None)
                 elif data_type == "clinical":
-                    dataset = ClinicalDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
+                    dataset = ClinicalDataset(self.identifier, data={}, analysis_queries={}, report=None)
                 elif data_type == "wes" or data_type == "wgs":
-                    dataset = DNAseqDataset(self.identifier, dataset_type=data_type, data={}, analyses={}, analysis_queries={}, report=None)
+                    dataset = DNAseqDataset(self.identifier, dataset_type=data_type, data={}, analysis_queries={}, report=None)
                 elif data_type == "interactomics":
-                    dataset = InteractomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
+                    dataset = InteractomicsDataset(self.identifier, data={}, analysis_queries={}, report=None)
                 elif data_type == "phosphoproteomics":
-                    dataset = PhosphoproteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
+                    dataset = PhosphoproteomicsDataset(self.identifier, data={}, analysis_queries={}, report=None)
                 elif data_type == "longitudinal_proteomics":
-                    dataset = LongitudinalProteomicsDataset(self.identifier, data={}, analyses={}, analysis_queries={}, report=None)
+                    dataset = LongitudinalProteomicsDataset(self.identifier, data={}, analysis_queries={}, report=None)
                 elif data_type == "multiomics":
-                    dataset = MultiOmicsDataset(self.identifier, data={}, analyses={}, report=None)
+                    dataset = MultiOmicsDataset(self.identifier, data={}, report=None)
 
                 if dataset is not None:
                     dataset.load_dataset(os.path.join(root, data_type))
@@ -386,29 +386,29 @@ class Project:
                     if data_type == "proteomics":
                         if "proteomics" in self.configuration_files:
                             configuration = ckg_utils.get_configuration(self.configuration_files["proteomics"])
-                        dataset = ProteomicsDataset(self.identifier, data={}, configuration=configuration, analyses={}, analysis_queries={}, report=None)
+                        dataset = ProteomicsDataset(self.identifier, data={}, configuration=configuration, analysis_queries={}, report=None)
                     elif data_type == "clinical":
                         if "clinical" in self.configuration_files:
                             configuration = ckg_utils.get_configuration(self.configuration_files["clinical"])
-                        dataset = ClinicalDataset(self.identifier, data={}, configuration=configuration, analyses={}, analysis_queries={}, report=None)
+                        dataset = ClinicalDataset(self.identifier, data={}, configuration=configuration, analysis_queries={}, report=None)
                     elif data_type == "wes" or data_type == "wgs":
                         if "wes" in self.configuration_files:
                             configuration = ckg_utils.get_configuration(self.configuration_files["wes"])
                         elif "wgs" in self.configuration_files:
                             configuration = ckg_utils.get_configuration(self.configuration_files["wgs"])
-                        dataset = DNAseqDataset(self.identifier, dataset_type=data_type, data={}, configuration=configuration, analyses={}, analysis_queries={}, report=None)
+                        dataset = DNAseqDataset(self.identifier, dataset_type=data_type, data={}, configuration=configuration, analysis_queries={}, report=None)
                     elif data_type == "interactomics":
                         if "interactomics" in self.configuration_files:
                             configuration = ckg_utils.get_configuration(self.configuration_files["interactomics"])
-                        dataset = InteractomicsDataset(self.identifier, data={}, configuration=configuration, analyses={}, analysis_queries={}, report=None)
+                        dataset = InteractomicsDataset(self.identifier, data={}, configuration=configuration, analysis_queries={}, report=None)
                     elif data_type == "phosphoproteomics":
                         if "phosphoproteomics" in self.configuration_files:
                             configuration = ckg_utils.get_configuration(self.configuration_files["phosphoproteomics"])
-                        dataset = PhosphoproteomicsDataset(self.identifier, data={}, configuration=configuration, analyses={}, analysis_queries={}, report=None)
+                        dataset = PhosphoproteomicsDataset(self.identifier, data={}, configuration=configuration, analysis_queries={}, report=None)
                     elif data_type == "longitudinal_proteomics":
                         if "longitudinal_proteomics" in self.configuration_files:
                             configuration = ckg_utils.get_configuration(self.configuration_files["longitudinal_proteomics"])
-                        dataset = LongitudinalProteomicsDataset(self.identifier, data={}, configuration=configuration, analyses={}, analysis_queries={}, report=None)
+                        dataset = LongitudinalProteomicsDataset(self.identifier, data={}, configuration=configuration, analysis_queries={}, report=None)
 
                     if dataset is not None:
                         dataset.generate_dataset()
@@ -417,7 +417,7 @@ class Project:
                 if len(self.datasets) > 1:
                     if "multiomics" in self.configuration_files:
                         configuration = ckg_utils.get_configuration(self.configuration_files["multiomics"])
-                    dataset = MultiOmicsDataset(self.identifier, data=self.datasets, configuration=configuration, analyses={}, report=None)
+                    dataset = MultiOmicsDataset(self.identifier, data=self.datasets, configuration=configuration, report=None)
                     self.update_dataset({'multiomics': dataset})
                     self.append_data_type('multiomics')
             else:
