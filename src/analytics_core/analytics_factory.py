@@ -1,4 +1,7 @@
-from analytics_core.analytics import wgcnaAnalysis as wgcna
+import os
+import json
+from graphdb_builder import builder_utils
+import ckg_utils
 from analytics_core.analytics import analytics
 from analytics_core.viz import viz
 import pandas as pd
@@ -7,12 +10,13 @@ import time
 
 
 class Analysis:
-    def __init__(self, identifier, analysis_type, args, data, result=None):
+    def __init__(self, identifier, analysis_type, args, data, result=None, plots={}):
         self._identifier = identifier
         self._analysis_type = analysis_type
         self._args = args
         self._data = data
         self._result = result
+        self._plots = plots
         if self._result is None:
             self._result = {}
             self.generate_result()
@@ -57,12 +61,22 @@ class Analysis:
     def result(self, result):
         self._result = result
 
+    @property
+    def plots(self):
+        return self._plots
+
+    @plots.setter
+    def plot(self, plots):
+        self._plots = plots
+
+    def update_plots(self, plots):
+        self._plots.update(plots)
+
     def generate_result(self):
         if self.analysis_type == "wide_format":
             r = analytics.transform_into_wide_format(self.data, self.args['index'], self.args['columns'], self.args['values'], extra=[self.args['extra']])
             self.result[self.analysis_type] = r
         if self.analysis_type == "summary":
-            value_cols = None
             r = analytics.get_summary_data_matrix(self.data)
             self.result[self.analysis_type] = r
         if self.analysis_type == "normalization":
@@ -487,22 +501,22 @@ class Analysis:
         if len(self.result) >= 1:
             if name == "basicTable":
                 colors = ('#C2D4FF', '#F5F8FF')
-                attr = {'width': 800, 'height': 1500, 'font': 12}
-                subset = None
+                columns = None
+                rows = None
                 figure_title = 'Basic table'
                 if "colors" in self.args:
                     colors = self.args["colors"]
-                if "attr" in self.args:
-                    attr = self.args["attr"]
-                if "subset" in self.args:
-                    subset = self.args["subset"]
+                if "cols" in self.args:
+                    columns = self.args["cols"]
+                if "rows" in self.args:
+                    rows = self.args["rows"]
                 if "title" in self.args:
                     figure_title = self.args["title"]
                 for id in self.result:
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
                         figure_title = self.args["title"] + id[0]+" vs "+id[1]
-                    plot.append(viz.get_table(self.result[id], identifier, figure_title, colors=colors, subset=subset, plot_attr=attr))
+                    plot.append(viz.get_table(self.result[id], identifier, args={'title': figure_title, 'colors': colors, 'cols': columns, 'rows': rows,'width': 800, 'height': 1500, 'font': 12}))
             if name == "multiTable":
                 for id in self.result:
                     plot.append(viz.get_multi_table(self.result[id], identifier, self.args["title"]))
@@ -654,13 +668,8 @@ class Analysis:
             elif name == "wgcnaplots":
                 start = time.time()
                 data = {}
-                sd_cutoff = 0
-                input_data = self.data
                 wgcna_data = self.result
-                if 'sd_cutoff' in self.args:
-                    sd_cutoff = self.args['sd_cutoff']
                 if 'drop_cols_exp' in self.args and 'drop_cols_cli' in self.args:
-                    #dfs = wgcna.get_data(input_data, drop_cols_exp=self.args['drop_cols_exp'], drop_cols_cli=self.args['drop_cols_cli'], sd_cutoff=sd_cutoff)
                     if 'wgcna' in wgcna_data and wgcna_data['wgcna'] is not None:
                         for dtype in wgcna_data['wgcna']:
                             data = wgcna_data['wgcna'][dtype]
@@ -682,4 +691,73 @@ class Analysis:
                 for id in self.result:
                     plot.append(viz.get_wordcloud(self.result[id], identifier, self.args))
 
+        self.update_plots({identifier: plot})
+
         return plot
+
+    def publish_analysis(self, directory):
+        builder_utils.checkDirectory(directory)
+        plots_directory = os.path.join(directory, 'figures')
+        results_directory = os.path.join(directory, 'results')
+        builder_utils.checkDirectory(plots_directory)
+        builder_utils.checkDirectory(results_directory)
+        self.save_analysis_plots(plots_directory)
+        self.save_analysis_result(results_directory)
+
+    def save_analysis_result(self, results_directory):
+        if self.result is not None:
+            for analysis_type in self.result:
+                result_json = {'args': self.args}
+                result_str = ''
+                if isinstance(self.result[analysis_type], dict):
+                    for key in self.result[analysis_type]:
+                        if isinstance(self.result[analysis_type][key], pd.DataFrame):
+                            result_str[key] = self.result[analysis_type][key].to_json()
+                elif isinstance(self.result[analysis_type], list) or isinstance(self.result[analysis_type], tuple):
+                    result_str = []
+                    for res in self.result[analysis_type]:
+                        result_str.append(res.to_json())
+                else:
+                    result_str = self.result[analysis_type].to_json()
+
+                result_json.update({'result': result_str})
+
+                with open(os.path.join(results_directory, self.identifier+'_'+analysis_type+'.json'), 'w') as rf:
+                    rf.write(json.dumps(result_json))
+
+    def save_analysis_plots(self, plots_directory):
+        for figure_id in self.plots:
+            plot_format = 'json'
+            plot = self.plots[figure_id]
+            if isinstance(plot, dict):
+                figure_json = {}
+                if 'net_json' in plot:
+                    figure_json['net_json'] = plot['net_json']
+                if 'notebook' in plot:
+                    figure_json['notebook'] = plot['notebook']
+                if 'app' in plot:
+                    json_str = ckg_utils.convert_dash_to_json(plot['app'])
+                    figure_json['app'] = json_str
+                if 'net_tables' in plot:
+                    json_str_nodes = ckg_utils.convert_dash_to_json(plot['net_tables'][0])
+                    json_str_edges = ckg_utils.convert_dash_to_json(plot['net_tables'][1])
+                    figure_json["net_tables"] = (json_str_nodes, json_str_edges)
+                figure_json = json.dumps(figure_json, cls=ckg_utils.NumpyEncoder)
+            elif isinstance(plot, list):
+                json_items = []
+                for p in plot:
+                    json_items.append(ckg_utils.convert_dash_to_json(p))
+                figure_json = json.dumps(json_items, cls=ckg_utils.NumpyEncoder)
+            elif isinstance(plot, str):
+                figure_json = plot
+                plot_format = 'html'
+            else:
+                json_str = ckg_utils.convert_dash_to_json(plot)
+                figure_json = json.dumps(json_str, cls=ckg_utils.NumpyEncoder)
+
+            with open(os.path.join(plots_directory, figure_id+'.'+plot_format), 'w') as ff:
+                ff.write(figure_json)
+
+    def make_interactive(self, name, identifier):
+        if name == "volcanoplot":
+            pass

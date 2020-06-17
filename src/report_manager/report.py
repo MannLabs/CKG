@@ -8,6 +8,7 @@ from plotly.offline import iplot
 from collections import defaultdict
 from cyjupyter import Cytoscape
 from report_manager import utils
+import ckg_utils
 from analytics_core.viz import viz
 from analytics_core import utils as acore_utils
 
@@ -59,8 +60,8 @@ class Report:
         dt = h5.special_dtype(vlen=str)
         with h5.File(os.path.join(directory, "report.h5"), "w") as f:
             order = 0
-            markdown = utils.convert_dash_to_json(utils.get_markdown_date("Report created on:"))
-            figure_json = json.dumps(markdown, cls=utils.NumpyEncoder)
+            markdown = ckg_utils.convert_dash_to_json(utils.get_markdown_date("Report created on:"))
+            figure_json = json.dumps(markdown, cls=ckg_utils.NumpyEncoder)
             figure_id = str(order) + "_date"
             grp = f.create_group(str(order) + "_date")
             fig_set = grp.create_dataset(figure_id, (1,), dtype=dt)
@@ -80,17 +81,17 @@ class Report:
                         if 'notebook' in plot:
                             figure_json['notebook'] = plot['notebook']
                         if 'app' in plot:
-                            json_str = utils.convert_dash_to_json(plot['app'])
+                            json_str = ckg_utils.convert_dash_to_json(plot['app'])
                             figure_json['app'] = json_str
                         if 'net_tables' in plot:
-                            json_str_nodes = utils.convert_dash_to_json(plot['net_tables'][0])
-                            json_str_edges = utils.convert_dash_to_json(plot['net_tables'][1])
+                            json_str_nodes = ckg_utils.convert_dash_to_json(plot['net_tables'][0])
+                            json_str_edges = ckg_utils.convert_dash_to_json(plot['net_tables'][1])
                             figure_json["net_tables"] = (json_str_nodes, json_str_edges)
-                        figure_json = json.dumps(figure_json, cls=utils.NumpyEncoder)
+                        figure_json = json.dumps(figure_json, cls=ckg_utils.NumpyEncoder)
                         figure_id = str(i)+'_net'
                     else:
-                        json_str = utils.convert_dash_to_json(plot)
-                        figure_json = json.dumps(json_str, cls=utils.NumpyEncoder)
+                        json_str = ckg_utils.convert_dash_to_json(plot)
+                        figure_json = json.dumps(json_str, cls=ckg_utils.NumpyEncoder)
                         figure_id = str(i) + '_figure' 
                     i += 1
                     fig_set = grp.create_dataset(figure_id, (1,), dtype=dt, compression="gzip")
@@ -170,7 +171,6 @@ class Report:
                                 iplot(plot['props']['figure'])
                             except Exception:
                                 pass
-                     
             else:
                 if isinstance(plot, dict):
                     if "app" in plot:

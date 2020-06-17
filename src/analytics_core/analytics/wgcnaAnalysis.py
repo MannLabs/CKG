@@ -1,27 +1,21 @@
-import os
-import sys
 import numpy as np
 import pandas as pd
-import scipy as scp
-from scipy.cluster.hierarchy import distance, linkage, dendrogram, fcluster
-from collections import OrderedDict, defaultdict
-from natsort import natsorted, index_natsorted, order_by_index
-import urllib.request
+from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
+from collections import defaultdict
+from natsort import natsorted
 
 try:
     from rpy2 import robjects as ro
     from rpy2.robjects import pandas2ri
     from rpy2.robjects.packages import importr
     from rpy2.rinterface_lib import embedded
-    from rpy2.robjects.vectors import StrVector, FloatVector
-    import rpy2.robjects.packages as rpacks
     pandas2ri.activate()
     # sys.setrecursionlimit(10000)
 
     #Call R
     R = ro.r
     R('options(stringsAsFactors = FALSE)')
-    
+
     #Call R packages
     base = importr('base')
     stats = importr('stats')
@@ -29,6 +23,8 @@ try:
     flashClust = importr('flashClust')
 except ImportError:
     print("WGCNA functions will not work. Module Rpy2 not installed.")
+except Exception as err:
+    print("WGCNA functions will not work. Missing installation. Error: {}".format(err))
 
 
 def get_data(data, drop_cols_exp=['subject', 'group', 'sample', 'index'], drop_cols_cli=['subject', 'group', 'biological_sample', 'index'], sd_cutoff=0):
@@ -97,6 +93,7 @@ def get_dendrogram(df, labels, distfun='euclidean', linkagefun='ward', div_clust
             return Z_dendrogram
 
     return None
+
 
 def get_clusters_elements(linkage_matrix, fcluster_method, fcluster_cutoff, labels):
     """ 
@@ -366,8 +363,6 @@ def calculate_ModuleTrait_correlation(df_exp, df_traits, MEs):
     nSamples = len(df_exp.index)
     moduleTraitCor = None 
     textMatrix = None
-    print(type(MEs))
-    print(type(df_traits))
     
     df_traits.columns = df_traits.columns.str.replace(' ', 'space')
     df_traits.columns = df_traits.columns.str.replace('(', 'parentheses1')
