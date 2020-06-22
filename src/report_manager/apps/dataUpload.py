@@ -358,6 +358,9 @@ def get_project_information(driver, project_id):
         logger.error("Error: {}. Creating analytical samples: Query name ({}) - Query ({}), error info: {}, file: {},line: {}".format(err, query_name, query, sys.exc_info(), fname, exc_tb.tb_lineno))
 
     if not res.empty:
-        res = viz.get_table(res, identifier='new_project', title='Data Uploaded for Project {}'.format(project_id))
+        res = viz.get_table(res, identifier='new_project', args={'title':'Data Uploaded for Project {}'.format(project_id)})
+    else:
+        res = None
+        logger.error("Error: No data was uploaded for project: {}. Review your experimental design and data files and the logs for errors.".format(project_id))
 
     return res
