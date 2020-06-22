@@ -40,9 +40,16 @@ driver = connector.getGraphDatabaseConnectionConfiguration()
 separator = config["separator"]
 
 app.layout = dcc.Loading(children=[html.Div([dcc.Location(id='url', refresh=False),
-                                             html.Div(id='page-content', style={'padding-top': 10}, className='container-fluid')])], 
-                         style={'text-align': 'center', 'margin-top': '70px', 'margin-bottom': '-60px', 'position': 'absolute',
-                                'top': '50%', 'left': '50%', 'height': '200px'},
+                                             html.Div(id='page-content',
+                                                      style={'padding-top': 10}, 
+                                                      className='container-fluid')])],
+                         style={'text-align': 'center',
+                                'margin-top': '70px',
+                                'margin-bottom': '-60px',
+                                'position': 'absolute',
+                                'top': '50%',
+                                'left': '50%',
+                                'height': '200px'},
                          type='circle', color='#2b8cbe')
 
 
@@ -86,7 +93,7 @@ def display_page(pathname):
                                             'position': 'absolute',
                                             'right': '50px'}, error)
             else:
-                print("session_id",session_id)
+                print("session_id", session_id)
                 project = projectApp.ProjectApp(session_id, project_id, project_id, "", "", layout=[], logo=None, footer=None, force=force)
                 return (project.layout, {'display': 'block',
                                          'position': 'absolute',
@@ -186,6 +193,7 @@ def update_db_date(df):
     kernel = pd.read_json(df['kernel_monitor'], orient='records')
     db_date = kernel['storeCreationDate'][0]
     return html.H3('Store Creation date: {}'.format(db_date))
+
 
 @app.callback([Output("db_indicator_1", "children"),
                Output("db_indicator_2", "children"),
@@ -640,6 +648,8 @@ def run_processing(n_clicks, project_id):
             style = {'display':'block'}
             message = 'Files successfully uploaded.'
             table = dataUpload.get_project_information(driver, project_id)
+            if table is None:
+                message = 'Error: No data was uploaded for project: {}. Review your experimental design and data files.'.format(project_id)
         except Exception as err:
             style = {'display':'block'}
             message = str(err)
