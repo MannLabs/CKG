@@ -2553,7 +2553,7 @@ def run_qc_markers_analysis(data, qc_markers, sample_col='sample', group_col='gr
     """
     """
     bdf = None
-    if qc_markers is not None:
+    if data is not None and qc_markers is not None:
         if not data.empty and not qc_markers.empty:
             cols = list(set(data.columns.tolist()).intersection(qc_markers[qcidentifier_col].tolist()))
             
