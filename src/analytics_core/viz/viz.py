@@ -1511,6 +1511,7 @@ def get_table(data, identifier, args):
 
         result = get_table(data, identifier='table', title='Table Figure', subset = None)
     """
+    table = []
     if data is not None and isinstance(data, pd.DataFrame) and not data.empty:
         cols = []
         title = "Table"
@@ -1527,14 +1528,16 @@ def get_table(data, identifier, args):
                 if len(selected_cols) > 0:           
                     data = data[selected_cols + cols]
                 else:
-                    return html.div(id='cols_not_found', children=[dcc.Markdown("Columns not found {}".format(','.join(args['cols'])))])
+                    data = pd.DataFrame()
+                    table.append(html.Div(children=[dcc.Markdown("### Columns not found: {}".format(','.join(args['cols'])))]))
         if 'rows' in args:
             if args['rows'] is not None and len(args['rows']) > 0:
                 selected_rows = list(set(args['rows']).intersection(data.index))
                 if len(selected_rows) > 0:
                     data = data.loc[selected_rows]
                 else:
-                    return html.div(id='rows_not_found', children=[dcc.Markdown("Rows not found {}".format(','.join(args['rows'])))])
+                    data = pd.DataFrame()
+                    table.append(html.Div(children=[dcc.Markdown("### Rows not found: {}".format(','.join(args['rows'])))]))
         if 'head' in args:
             if len(args['head']) > 1:
                 data = data.iloc[:args['head'][0], :args['head'][1]]
@@ -1589,11 +1592,9 @@ def get_table(data, identifier, args):
                                             page_action='native',
                                             sort_action='custom',
                                             )
-        table = [html.H2(title),data_trace]
-    else:
-        table = None
-
-    return html.Div(table)
+        table.extend([html.H2(title),data_trace])
+    
+    return html.Div(id=identifier, children=table)
 
 
 def get_multi_table(data,identifier, title):
