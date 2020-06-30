@@ -32,7 +32,6 @@ dash_cytoscape>=0.1.1
 decorator==4.4.0
 defusedxml==0.6.0
 django>=2.2.10
-django-class==2019.4.13
 ecos==2.0.7.post1
 entrypoints==0.3
 fancyimpute==0.5.2
