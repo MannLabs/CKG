@@ -1,4 +1,4 @@
-#Download base image ubuntu 16.04
+#Download base image ubuntu
 FROM ubuntu:latest
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -13,16 +13,23 @@ USER root
 RUN apt-get update && \
     apt-get -yq dist-upgrade && \
     apt-get install -yq --no-install-recommends && \
-    apt-get install -yq apt-utils && \
+    apt-get install -yq apt-utils software-properties-common && \
     apt-get install -yq locales && \
     apt-get install -yq wget && \
     apt-get install -yq unzip && \
-    apt-get install -yq build-essential libxml2 libxml2-dev zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev llvm-7 llvm-7-dev && \
-    apt-get install -yq nginx uwsgi uwsgi-plugin-python3 && \
+    apt-get install -yq build-essential sqlite3 libsqlite3-dev libxml2 libxml2-dev zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libcurl4-openssl-dev && \
+    apt-get install -yq nginx && \
     apt-get install -yq redis-server && \
     apt-get install -yq git && \
     apt-get -y install sudo && \
     rm -rf /var/lib/apt/lists/*
+
+## User management
+RUN adduser --quiet --disabled-password --shell /bin/bash --home /home/adminhub --gecos "User" adminhub && \
+    echo "adminhub:adminhub" | chpasswd && \
+    adduser --quiet --disabled-password --shell /bin/bash --home /home/ckguser --gecos "User" ckguser && \
+    echo "ckguser:ckguser" | chpasswd && \
+    adduser --disabled-password --gecos '' --uid 1500 nginx
 
 # Python 3.6.8 installation
 RUN wget https://www.python.org/ftp/python/3.6.8/Python-3.6.8.tgz
@@ -34,8 +41,11 @@ RUN make install
 ## pip upgrade
 RUN wget https://bootstrap.pypa.io/get-pip.py
 RUN python3 get-pip.py
+RUN pip3 install --upgrade pip
+RUN pip3 install setuptools
 
 WORKDIR /
+
 # Set the locale
 RUN locale-gen en_US.UTF-8
 
@@ -48,11 +58,12 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 51716619E084DAB9
 
 RUN echo "deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/" > /etc/apt/sources.list.d/cran.list
 
-# Installation openJDK
-RUN wget -P /usr/local/ https://download.java.net/java/GA/jdk14.0.1/664493ef4a6946b186ff29eb326336a2/7/GPL/openjdk-14.0.1_linux-x64_bin.tar.gz
-RUN tar xf /usr/local/openjdk-14.0.1_linux-x64_bin.tar.gz -C /usr/local
-RUN update-alternatives --install "/usr/bin/java" "java" "/usr/local/jdk-14.0.1/bin/java" 1500 && \
-    update-alternatives --install "/usr/bin/javac" "javac" "/usr/local/jdk-14.0.1/bin/javac" 1500
+# Installation openJDK 8
+RUN add-apt-repository ppa:openjdk-r/ppa
+RUN apt-get update
+RUN apt-get install -yq openjdk-8-jdk
+RUN java -version
+RUN javac -version 
 
 # NEO4J 3.5.14
 RUN wget -O - http://debian.neo4j.org/neotechnology.gpg.key | apt-key add - && \
@@ -62,7 +73,7 @@ RUN wget -O - http://debian.neo4j.org/neotechnology.gpg.key | apt-key add - && \
 
 ## Setup initial user Neo4j
 RUN rm -f /var/lib/neo4j/data/dbms/auth && \
-    neo4j-admin set-initial-password "neo4j"
+    neo4j-admin set-initial-password "NeO4J"
 
 ## Install graph algorithms and APOC
 RUN wget -P /var/lib/neo4j/plugins https://s3-eu-west-1.amazonaws.com/com.neo4j.graphalgorithms.dist/neo4j-graph-algorithms-3.5.14.0-standalone.jar
@@ -71,6 +82,7 @@ RUN wget -P /var/lib/neo4j/plugins https://github.com/neo4j-contrib/neo4j-apoc-p
 RUN ls -lrth /var/lib/neo4j/plugins
 
 ## Change configuration
+RUN cat /etc/neo4j/neo4j.conf
 COPY /resources/neo4j_db/neo4j.conf  /etc/neo4j/.
 
 ## Test the service Neo4j
@@ -102,21 +114,20 @@ RUN apt-get update && \
     r-recommended=${R_BASE_VERSION}* && \
     echo 'options(repos = c(CRAN = "https://cloud.r-project.org/"), download.file.method = "libcurl")' >> /etc/R/Rprofile.site
     
-# Install packages
+## Install packages
 ADD /resources/R_packages.R /R_packages.R
 RUN Rscript R_packages.R
 
 # Python
 ## Copy Requirements
-RUN python3 --version
-ADD ./requirements.txt /requirements.txt
+COPY ./requirements.txt /requirements.txt
 
 ## Install Python libraries
 RUN pip3 install --ignore-installed -r requirements.txt
 RUN mkdir /CKG
-RUN wget -O /CKG/data.tar.gz https://data.mendeley.com/datasets/mrcf7f4tc2/1/files/c0d058a2-adfa-4b96-97d9-c9ec7fc5adb9/data.tar.gz?dl=1
-RUN tar -xzf /CKG/data.tar.gz -C /CKG/.
-ADD . /CKG/
+COPY --chown=nginx . /CKG
+RUN chown -R nginx /CKG
+RUN chmod +x /CKG/docker_entrypoint.sh
 ENV PYTHONPATH "${PYTHONPATH}:/CKG/src"
 
 # JupyterHub
@@ -126,31 +137,42 @@ RUN apt-get -y install npm nodejs && \
 RUN pip3 install jupyterhub && \
     pip3 install --upgrade notebook
 
-## Add a user without password in JupyterHub
-RUN adduser --quiet --disabled-password --shell /bin/bash --home /home/adminhub --gecos "User" adminhub && \
-    echo "adminhub:adminhub" | chpasswd
-
 RUN mkdir /etc/jupyterhub
 COPY /resources/jupyterhub.py /etc/jupyterhub/.
+RUN cp -r /CKG/src/notebooks /home/adminhub/.
+RUN cp -r /CKG/src/notebooks /home/ckguser/.
+RUN chown -R adminhub /home/adminhub/notebooks
+RUN chown -R ckguser /home/ckguser/notebooks
+
+RUN ls -alrth /home/ckguser
+RUN ls -alrth /home/ckguser/notebooks
 
 # NGINX and UWSGI
 ## Copy configuration file
-COPY /resources/nginx.conf /etc/nginx/nginx.conf
+COPY /resources/nginx.conf /etc/nginx/.
 
-RUN adduser --disabled-password --gecos '' nginx\
-  && chown -R nginx:nginx /CKG \
-  && chmod 777 /run/ -R \
-  && chmod 777 /root/ -R
+RUN chmod 777 /run/ -R && \
+    chmod 777 /root/ -R
+
+## Install uWSGI
+RUN pip3 install uwsgi
 
 ## Copy the base uWSGI ini file
 COPY /resources/uwsgi.ini /etc/uwsgi/apps-available/uwsgi.ini
-RUN ln -s /etc/uwsgi/apps-available/uwsgi.ini /etc/uwsgi/apps-enabled/uwsgi.ini
+COPY /resources/uwsgi.ini /etc/uwsgi/apps-enabled/uwsgi.ini
+
 
 ## Create log directory
 RUN mkdir -p /var/log/uwsgi
 
-# Expose ports (HTTP Neo4j, Bolt Neo4j, jupyterHub, CKG, Redis)
-EXPOSE 7474 7687 8090 8050 6379
+# Remove apt cache to make the image smaller
+RUN rm -rf /var/lib/apt/lists/*
+
+RUN ls -alrth /
+RUN ls -alrth /CKG
+RUN ls -alrth /CKG/src/notebooks
+
+# Expose ports (HTTP Neo4j, Bolt Neo4j, jupyterHub, CKG prod, CKG dev, Redis)
+EXPOSE 7474 7687 8090 8050 5000 6379
 
 ENTRYPOINT [ "/bin/bash", "/CKG/docker_entrypoint.sh"]
-

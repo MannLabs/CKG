@@ -32,7 +32,6 @@ dash_cytoscape>=0.1.1
 decorator==4.4.0
 defusedxml==0.6.0
 django>=2.2.10
-django-class==2019.4.13
 ecos==2.0.7.post1
 entrypoints==0.3
 fancyimpute==0.5.2
@@ -112,7 +111,7 @@ percy==2.0.2
 pexpect==4.7.0
 pickleshare==0.7.5
 pillow>=6.2.2
-pingouin==0.2.9
+pingouin==0.3.5
 plotly==4.5.0
 pluggy==0.12.0
 prometheus-client==0.7.1
