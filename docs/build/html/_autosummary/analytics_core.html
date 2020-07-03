@@ -254,7 +254,7 @@
 <span id="analytics-factory"></span><h2>Analytics factory<a class="headerlink" href="#module-analytics_core.analytics_factory" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="analytics_core.analytics_factory.Analysis">
-<em class="property">class </em><code class="sig-prename descclassname">analytics_core.analytics_factory.</code><code class="sig-name descname">Analysis</code><span class="sig-paren">(</span><em class="sig-param">identifier</em>, <em class="sig-param">analysis_type</em>, <em class="sig-param">args</em>, <em class="sig-param">data</em>, <em class="sig-param">result=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/analytics_factory.html#Analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.analytics_factory.Analysis" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">analytics_core.analytics_factory.</code><code class="sig-name descname">Analysis</code><span class="sig-paren">(</span><em class="sig-param">identifier</em>, <em class="sig-param">analysis_type</em>, <em class="sig-param">args</em>, <em class="sig-param">data</em>, <em class="sig-param">result=None</em>, <em class="sig-param">plots={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/analytics_factory.html#Analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.analytics_factory.Analysis" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="method">
 <dt id="analytics_core.analytics_factory.Analysis.identifier">
@@ -282,6 +282,21 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="analytics_core.analytics_factory.Analysis.plots">
+<em class="property">property </em><code class="sig-name descname">plots</code><a class="headerlink" href="#analytics_core.analytics_factory.Analysis.plots" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analytics_core.analytics_factory.Analysis.plot">
+<em class="property">property </em><code class="sig-name descname">plot</code><a class="headerlink" href="#analytics_core.analytics_factory.Analysis.plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analytics_core.analytics_factory.Analysis.update_plots">
+<code class="sig-name descname">update_plots</code><span class="sig-paren">(</span><em class="sig-param">plots</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/analytics_factory.html#Analysis.update_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.analytics_factory.Analysis.update_plots" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="analytics_core.analytics_factory.Analysis.generate_result">
 <code class="sig-name descname">generate_result</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/analytics_factory.html#Analysis.generate_result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.analytics_factory.Analysis.generate_result" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -289,6 +304,26 @@
 <dl class="method">
 <dt id="analytics_core.analytics_factory.Analysis.get_plot">
 <code class="sig-name descname">get_plot</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">identifier</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/analytics_factory.html#Analysis.get_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.analytics_factory.Analysis.get_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analytics_core.analytics_factory.Analysis.publish_analysis">
+<code class="sig-name descname">publish_analysis</code><span class="sig-paren">(</span><em class="sig-param">directory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/analytics_factory.html#Analysis.publish_analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.analytics_factory.Analysis.publish_analysis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analytics_core.analytics_factory.Analysis.save_analysis_result">
+<code class="sig-name descname">save_analysis_result</code><span class="sig-paren">(</span><em class="sig-param">results_directory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/analytics_factory.html#Analysis.save_analysis_result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.analytics_factory.Analysis.save_analysis_result" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analytics_core.analytics_factory.Analysis.save_analysis_plots">
+<code class="sig-name descname">save_analysis_plots</code><span class="sig-paren">(</span><em class="sig-param">plots_directory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/analytics_factory.html#Analysis.save_analysis_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.analytics_factory.Analysis.save_analysis_plots" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analytics_core.analytics_factory.Analysis.make_interactive">
+<code class="sig-name descname">make_interactive</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">identifier</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/analytics_factory.html#Analysis.make_interactive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.analytics_factory.Analysis.make_interactive" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -353,6 +388,11 @@ and options and updates the pyvis html template holding the visualization.</p>
 <dl class="function">
 <dt id="analytics_core.utils.parse_html">
 <code class="sig-prename descclassname">analytics_core.utils.</code><code class="sig-name descname">parse_html</code><span class="sig-paren">(</span><em class="sig-param">html_snippet</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/utils.html#parse_html"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.utils.parse_html" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="analytics_core.utils.convert_html_to_dash">
+<code class="sig-prename descclassname">analytics_core.utils.</code><code class="sig-name descname">convert_html_to_dash</code><span class="sig-paren">(</span><em class="sig-param">el</em>, <em class="sig-param">style=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/utils.html#convert_html_to_dash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.utils.convert_html_to_dash" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">

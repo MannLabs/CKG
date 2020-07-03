@@ -72,7 +72,7 @@
 
 
 \title{Clinical Knowledge Graph Documentation}
-\date{Jun 03, 2020}
+\date{Jul 03, 2020}
 \release{1.0b1 BETA}
 \author{Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -691,7 +691,7 @@ If you don’t have \sphinxstylestrong{Python 3.6} installed, \sphinxhref{https:
 
 
 \subsection{Create a virtual environment}
-\label{\detokenize{intro/getting-started-with-build:create-a-virtual-environment}}
+\label{\detokenize{intro/getting-started-with-build:create-a-virtual-environment}}\label{\detokenize{intro/getting-started-with-build:create-virtual-environment}}
 Virtualenv is not installed by default on Macbook machines. To install it, run:
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
@@ -752,7 +752,8 @@ To install all the packages required, simply run:
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYGZdl{} \PYG{n+nb}{cd} CKG/
-\PYGZdl{} pip install \PYGZhy{}r requirements.txt
+\PYGZdl{} pip3 install \PYGZhy{}\PYGZhy{}upgrade pip
+\PYGZdl{} pip3 install \PYGZhy{}\PYGZhy{}ignore\PYGZhy{}installed \PYGZhy{}r requirements.txt
 \end{sphinxVerbatim}
 
 \begin{sphinxadmonition}{warning}{Warning:}
@@ -971,6 +972,76 @@ When using a new version of Neo4j, always remember to read the respective Operat
 By default Java should be installed on the Windows 10. If this is not your case, please follow this \sphinxhref{https://docs.oracle.com/javase/8/docs/technotes/guides/install/windows\_jdk\_install.html\#A1097936}{tutorial} to install it.
 
 
+\subsection{Neo4j}
+\label{\detokenize{intro/getting-started-with-windows:neo4j}}
+The installation of Neo4j on Windows follows the same steps as {\hyperref[\detokenize{intro/getting-started-with-neo4j:getting-started-with-neo4j}]{\sphinxcrossref{\DUrole{std,std-ref}{Getting Started with Neo4j}}}}:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+Download a copy of the Neo4j desktop version from the \sphinxhref{https://neo4j.com/download/}{Neo4j download page}.
+
+\item {} 
+Install Neo4j by following the instructions automatically opened in the browser.
+
+\item {} 
+Open the Neo4j Desktop App and create a database by clicking \sphinxguilabel{Add graph}, followed by \sphinxguilabel{Create a Local Graph}, using the password “NeO4J”.
+
+\item {} 
+Click \sphinxguilabel{Manage} and then \sphinxguilabel{Plugins}. Install “\sphinxstylestrong{APOC}” and “\sphinxstylestrong{GRAPH ALGORITHMS}”.
+
+\item {} 
+Click the tab \sphinxguilabel{Settings}, and comment the option \sphinxcode{\sphinxupquote{dbms.directories.import=import}} by adding \sphinxcode{\sphinxupquote{\#}} at the beginning of the line.
+
+\item {} 
+Click \sphinxguilabel{Apply} at the bottom of the window.
+
+\item {} 
+Start the Graph by clicking the play sign, at the top of the window.
+
+\end{enumerate}
+
+To check for errors, please go to tab \sphinxguilabel{Logs}.
+
+
+\subsection{Python}
+\label{\detokenize{intro/getting-started-with-windows:python}}
+Installing Python 3.6.8 is an essential part of setting up the CKG.
+To do so, simply use the \sphinxhref{https://www.python.org/downloads/windows/}{link} to download a python 3.6 version executable installer (e.g. Python 3.6.8 \sphinxhyphen{} Dec. 24, 2018).
+Follow the steps and select the option \sphinxcode{\sphinxupquote{Add Python 3.6 to PATH}}.
+
+Once finished, you can check if python was successfully added to PATH, by opening the environment variables window:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+Go to the Windows menu, right\sphinxhyphen{}click on \sphinxguilabel{Computer} and click on \sphinxguilabel{Properties}.
+
+\item {} 
+From the computer properties dialog, select \sphinxcode{\sphinxupquote{Advanced system settings}} on the left panel. And from there, click on \sphinxguilabel{Environment variables} button.
+
+\item {} 
+In the top half of the new window (\sphinxstylestrong{User variables}), look for a variable with the name \sphinxcode{\sphinxupquote{Path}}. If you select it and click \sphinxguilabel{Edit}, the full path to Python36 should be included in the variable value. Besides this, you can also add the paths to python 3.6 \sphinxcode{\sphinxupquote{site\sphinxhyphen{}packages}} and \sphinxcode{\sphinxupquote{Scripts}} folders, to the \sphinxcode{\sphinxupquote{Path}} variable.
+
+\item {} 
+When you are done, click \sphinxguilabel{OK} to save, and click \sphinxguilabel{OK} in all the opened windows.
+
+\end{enumerate}
+
+
+\subsection{Microsoft Visual C++ Build Tools}
+\label{\detokenize{intro/getting-started-with-windows:microsoft-visual-c-build-tools}}
+Running python on Windows can sometimes result in the following error:
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{error} \PYG{n}{Microsoft} \PYG{n}{Visual} \PYG{n}{C}\PYG{o}{+}\PYG{o}{+} \PYG{l+m+mf}{14.0} \PYG{o+ow}{is} \PYG{n}{required}
+\end{sphinxVerbatim}
+
+To fix this error, you will need to download and install Microsoft \sphinxhref{https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools\&rel=16}{Build Tools for Visual Studio}.
+
+Once installed, click \sphinxcode{\sphinxupquote{Workloads}}, select all the packages available and install them. This will require several Gigabytes of disk space so, as an alternative and if your machine has limited space, you can install only \sphinxcode{\sphinxupquote{C++ build tools}} under \sphinxcode{\sphinxupquote{Workloads}}, and \sphinxcode{\sphinxupquote{Windows 10 SDK}} and the latest version of \sphinxcode{\sphinxupquote{MSVC v142 \sphinxhyphen{} VS 2019 C++ x64/x86 build tools}} under \sphinxcode{\sphinxupquote{Individual Components}}.
+
+The build tools allow Python packages to be built in Windows, from the command line (MSVC cl.exe module is used as a C/C++ compiler).
+
+
 \subsection{R}
 \label{\detokenize{intro/getting-started-with-windows:r}}
 Another essential package for the functioning of the Clinical Knowledge Graph is R.
@@ -983,7 +1054,7 @@ You can check if an \sphinxstylestrong{R version \textgreater{}= 3.5.2} is alrea
 
 If R is not installed in your machine, please follow \sphinxhref{https://rstudio-education.github.io/hopr/starting.html}{these tutorial}.
 
-In order to simplify calling R from the command prompt, you can choose to add it to \sphinxcode{\sphinxupquote{PATH}} and to the environmental variables. To do so, follow the steps bellow:
+In order to simplify calling R from the command prompt, you can choose to add it to \sphinxcode{\sphinxupquote{PATH}} and to the environment variables. To do so, follow the steps bellow:
 \begin{enumerate}
 \sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
 \item {} 
@@ -1045,72 +1116,6 @@ Go to the Windows menu, right\sphinxhyphen{}click on \sphinxguilabel{Command Pro
 In this new prompt, launch R and run the previous R install packages.
 
 
-\subsection{Neo4j}
-\label{\detokenize{intro/getting-started-with-windows:neo4j}}
-The installation of Neo4j on Windows follows the same steps as {\hyperref[\detokenize{intro/getting-started-with-neo4j:getting-started-with-neo4j}]{\sphinxcrossref{\DUrole{std,std-ref}{Getting Started with Neo4j}}}}:
-\begin{enumerate}
-\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
-\item {} 
-Download a copy of the Neo4j desktop version from the \sphinxhref{https://neo4j.com/download/}{Neo4j download page}.
-
-\item {} 
-Install Neo4j by following the instructions automatically opened in the browser.
-
-\item {} 
-Open the Neo4j Desktop App and create a database by clicking \sphinxguilabel{Add graph}, followed by \sphinxguilabel{Create a Local Graph}, using the password “NeO4J”.
-
-\item {} 
-Click \sphinxguilabel{Manage} and then \sphinxguilabel{Plugins}. Install “\sphinxstylestrong{APOC}” and “\sphinxstylestrong{GRAPH ALGORITHMS}”.
-
-\item {} 
-Click the tab \sphinxguilabel{Settings}, and comment the option \sphinxcode{\sphinxupquote{dbms.directories.import=import}} by adding \sphinxcode{\sphinxupquote{\#}} at the beginning of the line.
-
-\item {} 
-Click \sphinxguilabel{Apply} at the bottom of the window.
-
-\item {} 
-Start the Graph by clicking the play sign, at the top of the window.
-
-\end{enumerate}
-
-To check for errors, please go to tab \sphinxguilabel{Logs}.
-
-
-\subsubsection{Add Neo4j graph database to environmental variables}
-\label{\detokenize{intro/getting-started-with-windows:add-neo4j-graph-database-to-environmental-variables}}\label{\detokenize{intro/getting-started-with-windows:id1}}
-To add the Neo4j database you just created to your Windows environment variables:
-\begin{enumerate}
-\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
-\item {} 
-Go to the Windows menu, right\sphinxhyphen{}click on \sphinxguilabel{Computer} and click on \sphinxguilabel{Properties}.
-
-\item {} 
-From the computer properties dialog, select \sphinxcode{\sphinxupquote{Advanced system settings}} on the left panel. And from there, click on \sphinxguilabel{Environment variables} button.
-
-\item {} 
-In the Environment variables dialog, click the \sphinxguilabel{New} button in the top half of the dialog, to make a new user variable
-
-\item {} 
-Give the variable name as \sphinxcode{\sphinxupquote{NEO4J\_HOME}} and the value is the path to the previously created Neo4j database to the file, for example \sphinxcode{\sphinxupquote{C:\textbackslash{}Neo4J\textbackslash{}neo4jDatabases\textbackslash{}database\sphinxhyphen{}bab515f2\sphinxhyphen{}ffe7\sphinxhyphen{}4282\sphinxhyphen{}9bb5\sphinxhyphen{}648a53b8b566\textbackslash{}installation\sphinxhyphen{}3.5.2\textbackslash{}}}
-
-\item {} 
-Click \sphinxguilabel{OK} and \sphinxguilabel{OK} again to save this variable.
-
-\end{enumerate}
-
-To confirm that the environment variable is correctly set in command line type:
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYGZgt{} \PYG{n+nb}{echo} \PYGZpc{}NEO4J\PYGZus{}HOME\PYGZpc{}
-\end{sphinxVerbatim}
-
-This will print the path you used as value (e.g. \sphinxcode{\sphinxupquote{C:\textbackslash{}Neo4J\textbackslash{}neo4jDatabases\textbackslash{}database\sphinxhyphen{}bab515f2\sphinxhyphen{}ffe7\sphinxhyphen{}4282\sphinxhyphen{}9bb5\sphinxhyphen{}648a53b8b566\textbackslash{}installation\sphinxhyphen{}3.5.2\textbackslash{}}}).
-
-\begin{sphinxadmonition}{warning}{Warning:}
-Depending on your system, the path may vary. To check the path to the database go to \sphinxcode{\sphinxupquote{Logs}} in the Neo4j Desktop interface.
-\end{sphinxadmonition}
-
-
 \subsection{Getting Started with the CKG Build}
 \label{\detokenize{intro/getting-started-with-windows:getting-started-with-the-ckg-build}}
 Setting up the Clinical Knowledge Graph is thoroughly described here.
@@ -1128,56 +1133,39 @@ And to find your this Python version is installed:
 \PYGZgt{} where python
 \end{sphinxVerbatim}
 
-If you don’t have \sphinxstylestrong{Python 3.6} installed in Windows, we recommend installing and using the Anaconda distribution of Python. Download at \sphinxcode{\sphinxupquote{https://www.anaconda.com/products/individual\#Downloads}}, and follow the instructions from \sphinxcode{\sphinxupquote{https://docs.anaconda.com/anaconda/install/windows/\#}}.
-
 
 \subsubsection{Create a virtual environment}
 \label{\detokenize{intro/getting-started-with-windows:create-a-virtual-environment}}
-To create a new Python virtual environment, please use Anaconda conda installation.
-\begin{enumerate}
-\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
-\item {} 
-In the command prompt (cmd.exe) type:
+To create a new Python virtual environment, you can choose to use \sphinxcode{\sphinxupquote{virtualenv}} or \sphinxcode{\sphinxupquote{venv}}.
 
-\end{enumerate}
+The usage of \sphinxcode{\sphinxupquote{virtualenv}} is exemplified in ref:\sphinxtitleref{Create virtual environment}.
+
+To use \sphinxcode{\sphinxupquote{venv}}, open a command prompt (cmd.exe) window and type:
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYGZgt{} conda create \PYGZhy{}n env\PYGZus{}name \PYG{n+nv}{python}\PYG{o}{=}\PYG{l+m}{3}.6
+\PYGZgt{} python \PYGZhy{}m venv path\PYG{l+s+se}{\PYGZbs{}t}o\PYG{l+s+se}{\PYGZbs{}e}nv\PYGZus{}name
 \end{sphinxVerbatim}
 
-The key word \sphinxcode{\sphinxupquote{python}} specifies which version of Python the virtual environment is requested to use, while \sphinxcode{\sphinxupquote{env\_name}} is the name of the virtual environment and can be set to anything you like.
-\begin{enumerate}
-\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
-\setcounter{enumi}{1}
-\item {} 
-Activate the virtual environment by running:
+\begin{sphinxadmonition}{note}{Note:}
+\sphinxcode{\sphinxupquote{path\textbackslash{}to\textbackslash{}env\_name}} should be replaced with the relative or full path to where you want to place your virtual environment, while the \sphinxcode{\sphinxupquote{env\_name}} part is to be replaced with the name you want to attribute to the virtual environment.
+\end{sphinxadmonition}
 
-\end{enumerate}
+Whichever way you create the virtual environment, the activation method is the same:
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYGZgt{} conda activate env\PYGZus{}name
+\PYGZgt{} path\PYG{l+s+se}{\PYGZbs{}t}o\PYG{l+s+se}{\PYGZbs{}e}nv\PYGZus{}name\PYG{l+s+se}{\PYGZbs{}S}cripts\PYG{l+s+se}{\PYGZbs{}a}ctivate.bat
 \end{sphinxVerbatim}
-\begin{enumerate}
-\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
-\setcounter{enumi}{2}
-\item {} 
+
 After this, the name of the virtual environment will now appear on the left of the prompt:
-
-\end{enumerate}
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{o}{(}env\PYGZus{}name\PYG{o}{)} C:\PYG{l+s+se}{\PYGZbs{}\PYGZgt{}}
 \end{sphinxVerbatim}
-\begin{enumerate}
-\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
-\setcounter{enumi}{3}
-\item {} 
+
 If you are finished working in the virtual environment for the moment, you can deactivate it by running:
 
-\end{enumerate}
-
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYGZgt{} conda deactivate
+\PYGZgt{} deactivate
 \end{sphinxVerbatim}
 
 \begin{sphinxadmonition}{warning}{Warning:}
@@ -1189,9 +1177,9 @@ Remember, every time you are working with the CKG, the virtual environment needs
 \label{\detokenize{intro/getting-started-with-windows:setting-up-the-ckg}}
 Once you have cloned the master branch of the CKG GitHub repository, all the Python packages necessary to run the Clinical Knowledge Graph can be found in \sphinxcode{\sphinxupquote{requirements.txt}}.
 
-Unfortunately, due to incompatibilities of the current Anaconda version of the \sphinxcode{\sphinxupquote{rpy2}} package, this package needs to be removed from \sphinxcode{\sphinxupquote{requirements.txt}} before installing all other packages.
+Unfortunately, due to incompatibilities of the current versions \sphinxcode{\sphinxupquote{celery}} and \sphinxcode{\sphinxupquote{rpy2}} packages need to be removed from \sphinxcode{\sphinxupquote{requirements.txt}} before installing all other packages.
 
-To do so, open the mentioned file in your preferred text editor tool (e.g. Notepad) and remove the line \sphinxcode{\sphinxupquote{rpy2==3.0.5}}. Save and close the file, making sure it is saved as a plain text file.
+To do so, open the mentioned file in your preferred text editor tool (e.g. Notepad) and add \sphinxcode{\sphinxupquote{\#}} in the beginning of the lines \sphinxcode{\sphinxupquote{celery==4.3.0}} and \sphinxcode{\sphinxupquote{rpy2==3.0.5}}. Save and close the file, making sure it is saved as a plain text file.
 
 \begin{sphinxadmonition}{warning}{Warning:}
 Part of the CKG functionality includes interfacing Python and R, and seemingly use R functions for data analysis. The python package \sphinxcode{\sphinxupquote{rpy2}} is used as this interface and unfortunately, the current release of this package for Windows is not compatible with CKG. Installation of the CKG on Windows machines, will therefore \sphinxstylestrong{not} allow the usage of R packages (SAMR and WGCNA) within the CKG.
@@ -1200,13 +1188,21 @@ Part of the CKG functionality includes interfacing Python and R, and seemingly u
 To install all the required packages, simply run:
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYGZgt{} \PYG{n+nb}{cd} CKG/
-\PYGZgt{} conda install \PYGZhy{}\PYGZhy{}file requirements.txt
+\PYGZgt{} \PYG{n+nb}{cd} CKG\PYG{l+s+se}{\PYGZbs{}}
+\PYGZgt{} pip3 install \PYGZhy{}\PYGZhy{}upgrade pip
+\PYGZgt{} pip3 install \PYGZhy{}\PYGZhy{}ignore\PYGZhy{}installed \PYGZhy{}r requirements.txt
+
+.. warning:: Make sure the virtual environment previously created is active before installing \PYG{l+s+sb}{`}\PYG{l+s+sb}{`}requirements.txt\PYG{l+s+sb}{`}\PYG{l+s+sb}{`}.
 \end{sphinxVerbatim}
 
-\begin{sphinxadmonition}{warning}{Warning:}
-Make sure the virtual environment previously created is active before installing \sphinxcode{\sphinxupquote{requirements.txt}}.
-\end{sphinxadmonition}
+When these packages are installed, you can proceed to install a functinal version of celery 4 for Windows:
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYGZgt{} \PYG{n+nb}{cd} ..\PYG{l+s+se}{\PYGZbs{}}
+\PYGZgt{} git clone https://github.com/bstiel/celery\PYGZhy{}4\PYGZhy{}windows.git
+\PYGZgt{} \PYG{n+nb}{cd} celery\PYGZhy{}4\PYGZhy{}windows
+\PYGZgt{} pip install requirements.txt
+\end{sphinxVerbatim}
 
 Now that all the packages are correctly installed, you will have to create the appropriate directory architecture within the local copy of the cloned repository:
 
@@ -1220,7 +1216,7 @@ This will automatically create the \sphinxcode{\sphinxupquote{data}} folder and 
 
 \subsubsection{Add CKG to environmental variables}
 \label{\detokenize{intro/getting-started-with-windows:add-ckg-to-environmental-variables}}
-Similarly to {\hyperref[\detokenize{intro/getting-started-with-windows:add-neo4j-graph-database-to-environmental-variables}]{\sphinxcrossref{\DUrole{std,std-ref}{Add Neo4j graph database to environmental variables}}}}, CKG also needs to be added to the environmental variables.
+In order to run CKG modules, the package needs to be added to the environmental variables.
 \begin{enumerate}
 \sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
 \item {} 
@@ -1259,12 +1255,18 @@ Building the CKG database in Windows follows the same steps as in MacOS and Linu
 In this section we describe how to set up the Clinical Knowledge Graph from a Docker container.
 This container will install all the requirements needed, download source databases and build the CKG graph database, and open 5 ports through which to interact with the CKG.
 
-A requirement to run the Docker is \sphinxstylestrong{Java SE Runtime Environment}.
-Please go to \sphinxcode{\sphinxupquote{https://www.oracle.com/java/technologies/javase\sphinxhyphen{}jre8\sphinxhyphen{}downloads.html}} and download the \sphinxcode{\sphinxupquote{jre\sphinxhyphen{}8u221\sphinxhyphen{}linux\sphinxhyphen{}x64.tar.gz}} file. Once downloaded, place it in \sphinxcode{\sphinxupquote{CKG/resources/}}.
-
 To run the Docker, simply:
 \begin{enumerate}
 \sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+Allocate resources:
+
+\end{enumerate}
+
+The docker build requires more resources (memory and disk) than the ones set as default. Make sure to allocate at least 8Gb memory and at least 60Gb of Disk space. To change these settings: Docker Preferences \sphinxhyphen{}\textgreater{} Resources.
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\setcounter{enumi}{1}
 \item {} 
 Build the docker
 
@@ -1276,7 +1278,10 @@ Build the docker
 \end{sphinxVerbatim}
 \begin{enumerate}
 \sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
-\setcounter{enumi}{1}
+\setcounter{enumi}{2}
+\item {} 
+Make sure to download manually the licensed databases ({\hyperref[\detokenize{intro/getting-started-with-build:build-neo4j-graph-database}]{\sphinxcrossref{\DUrole{std,std-ref}{Build Neo4j graph database}}}})
+
 \item {} 
 Run the docker
 
@@ -3493,10 +3498,16 @@ right ontology (defined in config), i.e. type = \sphinxhyphen{}40 \sphinxhyphen{
 \phantomsection\label{\detokenize{_autosummary/graphdb_builder.experiments.parsers:graphdb_builder.experiments.parsers.proteomicsParser.parser_from_file}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{graphdb\_builder.experiments.parsers.proteomicsParser.}}\sphinxbfcode{\sphinxupquote{parser\_from\_file}}}{\emph{file\_path}, \emph{configuration}, \emph{data\_type}, \emph{is\_standard=True}}{}
 \end{fulllineitems}
 
+\index{get\_configuration() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{get\_configuration()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/graphdb_builder.experiments.parsers:graphdb_builder.experiments.parsers.proteomicsParser.get_configuration}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{graphdb\_builder.experiments.parsers.proteomicsParser.}}\sphinxbfcode{\sphinxupquote{get\_configuration}}}{\emph{processing\_tool}, \emph{data\_type}}{}
+\end{fulllineitems}
+
 \index{update\_configuration() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{update\_configuration()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/graphdb_builder.experiments.parsers:graphdb_builder.experiments.parsers.proteomicsParser.update_configuration}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{graphdb\_builder.experiments.parsers.proteomicsParser.}}\sphinxbfcode{\sphinxupquote{update\_configuration}}}{\emph{data\_type}, \emph{processing\_tool}, \emph{value\_col=\textquotesingle{}LFQ intensity\textquotesingle{}}, \emph{columns={[}{]}}, \emph{drop\_cols={[}{]}}, \emph{filters=None}}{}
+\phantomsection\label{\detokenize{_autosummary/graphdb_builder.experiments.parsers:graphdb_builder.experiments.parsers.proteomicsParser.update_configuration}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{graphdb\_builder.experiments.parsers.proteomicsParser.}}\sphinxbfcode{\sphinxupquote{update\_configuration}}}{\emph{data\_type}, \emph{processing\_tool}, \emph{value\_col=\textquotesingle{}LFQ intensity\textquotesingle{}}, \emph{columns={[}{]}}, \emph{drop\_cols={[}{]}}, \emph{filters=None}, \emph{new\_config=\{\}}}{}
 \end{fulllineitems}
 
 \index{parse\_dataset() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{parse\_dataset()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}}
@@ -4528,7 +4539,7 @@ Logger with the specified name from ‘key’. If key is \sphinxstyleemphasis{No
 \index{download\_PRIDE\_data() (in module graphdb\_builder.builder\_utils)@\spxentry{download\_PRIDE\_data()}\spxextra{in module graphdb\_builder.builder\_utils}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/graphdb_builder:graphdb_builder.builder_utils.download_PRIDE_data}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{graphdb\_builder.builder\_utils.}}\sphinxbfcode{\sphinxupquote{download\_PRIDE\_data}}}{\emph{pxd\_id}, \emph{file\_name}, \emph{to=\textquotesingle{}.\textquotesingle{}}, \emph{user=\textquotesingle{}\textquotesingle{}}, \emph{password=\textquotesingle{}\textquotesingle{}}}{}
+\phantomsection\label{\detokenize{_autosummary/graphdb_builder:graphdb_builder.builder_utils.download_PRIDE_data}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{graphdb\_builder.builder\_utils.}}\sphinxbfcode{\sphinxupquote{download\_PRIDE\_data}}}{\emph{pxd\_id}, \emph{file\_name}, \emph{to=\textquotesingle{}.\textquotesingle{}}, \emph{user=\textquotesingle{}\textquotesingle{}}, \emph{password=\textquotesingle{}\textquotesingle{}}, \emph{date\_field=\textquotesingle{}publicationDate\textquotesingle{}}}{}
 This function downloads a project file from the PRIDE repository
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode\begin{itemize}
@@ -4546,6 +4557,10 @@ This function downloads a project file from the PRIDE repository
 
 \item {} 
 \sphinxstyleliteralstrong{\sphinxupquote{password}} (\sphinxhref{https://docs.python.org/3.6/library/stdtypes.html\#str}{\sphinxstyleliteralemphasis{\sphinxupquote{str}}}) \textendash{} password to access biomedical database server if required.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{date\_field}} (\sphinxhref{https://docs.python.org/3.6/library/stdtypes.html\#str}{\sphinxstyleliteralemphasis{\sphinxupquote{str}}}) \textendash{} projects deposited in PRIDE are search based on date, either 
+submissionData or publicationDate (default)
 
 \end{itemize}
 
@@ -5102,7 +5117,107 @@ Parses and extracts ontology idnetifiers, names and synonyms from raw file, and 
 \label{\detokenize{_autosummary/report_manager.apps:report-dash-apps}}\label{\detokenize{_autosummary/report_manager.apps::doc}}
 
 \paragraph{Basic App}
-\label{\detokenize{_autosummary/report_manager.apps:basic-app}}
+\label{\detokenize{_autosummary/report_manager.apps:module-report_manager.apps.basicApp}}\label{\detokenize{_autosummary/report_manager.apps:basic-app}}\index{report\_manager.apps.basicApp (module)@\spxentry{report\_manager.apps.basicApp}\spxextra{module}}\index{BasicApp (class in report\_manager.apps.basicApp)@\spxentry{BasicApp}\spxextra{class in report\_manager.apps.basicApp}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/report_manager.apps:report_manager.apps.basicApp.BasicApp}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.apps.basicApp.}}\sphinxbfcode{\sphinxupquote{BasicApp}}}{\emph{title}, \emph{subtitle}, \emph{description}, \emph{page\_type}, \emph{layout={[}{]}}, \emph{logo=None}, \emph{footer=None}}{}
+Bases: \sphinxhref{https://docs.python.org/3.6/library/functions.html\#object}{\sphinxcode{\sphinxupquote{object}}}
+
+Defines what an App is in the report\_manager.
+Other Apps will inherit basic functionality from this class.
+Attributes: Title, subtitle, description, logo, footer.
+\index{title() (report\_manager.apps.basicApp.BasicApp property)@\spxentry{title()}\spxextra{report\_manager.apps.basicApp.BasicApp property}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/report_manager.apps:report_manager.apps.basicApp.BasicApp.title}}\pysigline{\sphinxbfcode{\sphinxupquote{property }}\sphinxbfcode{\sphinxupquote{title}}}
+\end{fulllineitems}
+
+\index{subtitle() (report\_manager.apps.basicApp.BasicApp property)@\spxentry{subtitle()}\spxextra{report\_manager.apps.basicApp.BasicApp property}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/report_manager.apps:report_manager.apps.basicApp.BasicApp.subtitle}}\pysigline{\sphinxbfcode{\sphinxupquote{property }}\sphinxbfcode{\sphinxupquote{subtitle}}}
+\end{fulllineitems}
+
+\index{description() (report\_manager.apps.basicApp.BasicApp property)@\spxentry{description()}\spxextra{report\_manager.apps.basicApp.BasicApp property}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/report_manager.apps:report_manager.apps.basicApp.BasicApp.description}}\pysigline{\sphinxbfcode{\sphinxupquote{property }}\sphinxbfcode{\sphinxupquote{description}}}
+\end{fulllineitems}
+
+\index{page\_type() (report\_manager.apps.basicApp.BasicApp property)@\spxentry{page\_type()}\spxextra{report\_manager.apps.basicApp.BasicApp property}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/report_manager.apps:report_manager.apps.basicApp.BasicApp.page_type}}\pysigline{\sphinxbfcode{\sphinxupquote{property }}\sphinxbfcode{\sphinxupquote{page\_type}}}
+\end{fulllineitems}
+
+\index{logo() (report\_manager.apps.basicApp.BasicApp property)@\spxentry{logo()}\spxextra{report\_manager.apps.basicApp.BasicApp property}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/report_manager.apps:report_manager.apps.basicApp.BasicApp.logo}}\pysigline{\sphinxbfcode{\sphinxupquote{property }}\sphinxbfcode{\sphinxupquote{logo}}}
+\end{fulllineitems}
+
+\index{footer() (report\_manager.apps.basicApp.BasicApp property)@\spxentry{footer()}\spxextra{report\_manager.apps.basicApp.BasicApp property}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/report_manager.apps:report_manager.apps.basicApp.BasicApp.footer}}\pysigline{\sphinxbfcode{\sphinxupquote{property }}\sphinxbfcode{\sphinxupquote{footer}}}
+\end{fulllineitems}
+
+\index{layout() (report\_manager.apps.basicApp.BasicApp property)@\spxentry{layout()}\spxextra{report\_manager.apps.basicApp.BasicApp property}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/report_manager.apps:report_manager.apps.basicApp.BasicApp.layout}}\pysigline{\sphinxbfcode{\sphinxupquote{property }}\sphinxbfcode{\sphinxupquote{layout}}}
+\end{fulllineitems}
+
+\index{add\_to\_layout() (report\_manager.apps.basicApp.BasicApp method)@\spxentry{add\_to\_layout()}\spxextra{report\_manager.apps.basicApp.BasicApp method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/report_manager.apps:report_manager.apps.basicApp.BasicApp.add_to_layout}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{add\_to\_layout}}}{\emph{section}}{}
+\end{fulllineitems}
+
+\index{extend\_layout() (report\_manager.apps.basicApp.BasicApp method)@\spxentry{extend\_layout()}\spxextra{report\_manager.apps.basicApp.BasicApp method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/report_manager.apps:report_manager.apps.basicApp.BasicApp.extend_layout}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{extend\_layout}}}{\emph{sections}}{}
+\end{fulllineitems}
+
+\index{get\_HTML\_title() (report\_manager.apps.basicApp.BasicApp method)@\spxentry{get\_HTML\_title()}\spxextra{report\_manager.apps.basicApp.BasicApp method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/report_manager.apps:report_manager.apps.basicApp.BasicApp.get_HTML_title}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{get\_HTML\_title}}}{}{}
+\end{fulllineitems}
+
+\index{get\_HTML\_subtitle() (report\_manager.apps.basicApp.BasicApp method)@\spxentry{get\_HTML\_subtitle()}\spxextra{report\_manager.apps.basicApp.BasicApp method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/report_manager.apps:report_manager.apps.basicApp.BasicApp.get_HTML_subtitle}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{get\_HTML\_subtitle}}}{}{}
+\end{fulllineitems}
+
+\index{get\_HTML\_description() (report\_manager.apps.basicApp.BasicApp method)@\spxentry{get\_HTML\_description()}\spxextra{report\_manager.apps.basicApp.BasicApp method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/report_manager.apps:report_manager.apps.basicApp.BasicApp.get_HTML_description}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{get\_HTML\_description}}}{}{}
+\end{fulllineitems}
+
+\index{add\_basic\_layout() (report\_manager.apps.basicApp.BasicApp method)@\spxentry{add\_basic\_layout()}\spxextra{report\_manager.apps.basicApp.BasicApp method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/report_manager.apps:report_manager.apps.basicApp.BasicApp.add_basic_layout}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{add\_basic\_layout}}}{}{}
+Calls class functions to setup the layout: title, subtitle, description,         logo and footer.
+
+\end{fulllineitems}
+
+\index{build\_page() (report\_manager.apps.basicApp.BasicApp method)@\spxentry{build\_page()}\spxextra{report\_manager.apps.basicApp.BasicApp method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/report_manager.apps:report_manager.apps.basicApp.BasicApp.build_page}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{build\_page}}}{}{}
+Builds page basic layout.
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+
 
 \paragraph{Data Upload App}
 \label{\detokenize{_autosummary/report_manager.apps:data-upload-app}}
@@ -5913,13 +6028,13 @@ Two strings: number of projects created and the project external identifier.
 
 
 \subsubsection{app.py}
-\label{\detokenize{_autosummary/report_manager:app-py}}
+\label{\detokenize{_autosummary/report_manager:module-report_manager.app}}\label{\detokenize{_autosummary/report_manager:app-py}}\index{report\_manager.app (module)@\spxentry{report\_manager.app}\spxextra{module}}
 
 \subsubsection{dataset.py}
 \label{\detokenize{_autosummary/report_manager:module-report_manager.dataset}}\label{\detokenize{_autosummary/report_manager:dataset-py}}\index{report\_manager.dataset (module)@\spxentry{report\_manager.dataset}\spxextra{module}}\index{Dataset (class in report\_manager.dataset)@\spxentry{Dataset}\spxextra{class in report\_manager.dataset}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.Dataset}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.dataset.}}\sphinxbfcode{\sphinxupquote{Dataset}}}{\emph{identifier}, \emph{dataset\_type}, \emph{configuration=None}, \emph{data=\{\}}, \emph{analyses=\{\}}, \emph{analysis\_queries=\{\}}, \emph{report=None}}{}
+\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.Dataset}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.dataset.}}\sphinxbfcode{\sphinxupquote{Dataset}}}{\emph{identifier}, \emph{dataset\_type}, \emph{configuration=None}, \emph{data=\{\}}, \emph{analysis\_queries=\{\}}, \emph{report=None}}{}
 Bases: \sphinxhref{https://docs.python.org/3.6/library/functions.html\#object}{\sphinxcode{\sphinxupquote{object}}}
 \index{identifier() (report\_manager.dataset.Dataset property)@\spxentry{identifier()}\spxextra{report\_manager.dataset.Dataset property}}
 
@@ -5937,12 +6052,6 @@ Bases: \sphinxhref{https://docs.python.org/3.6/library/functions.html\#object}{\
 
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.Dataset.data}}\pysigline{\sphinxbfcode{\sphinxupquote{property }}\sphinxbfcode{\sphinxupquote{data}}}
-\end{fulllineitems}
-
-\index{analyses() (report\_manager.dataset.Dataset property)@\spxentry{analyses()}\spxextra{report\_manager.dataset.Dataset property}}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.Dataset.analyses}}\pysigline{\sphinxbfcode{\sphinxupquote{property }}\sphinxbfcode{\sphinxupquote{analyses}}}
 \end{fulllineitems}
 
 \index{configuration() (report\_manager.dataset.Dataset property)@\spxentry{configuration()}\spxextra{report\_manager.dataset.Dataset property}}
@@ -5999,22 +6108,10 @@ Bases: \sphinxhref{https://docs.python.org/3.6/library/functions.html\#object}{\
 \phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.Dataset.list_dataframes}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{list\_dataframes}}}{}{}
 \end{fulllineitems}
 
-\index{get\_analysis() (report\_manager.dataset.Dataset method)@\spxentry{get\_analysis()}\spxextra{report\_manager.dataset.Dataset method}}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.Dataset.get_analysis}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{get\_analysis}}}{\emph{analysis}}{}
-\end{fulllineitems}
-
 \index{update\_data() (report\_manager.dataset.Dataset method)@\spxentry{update\_data()}\spxextra{report\_manager.dataset.Dataset method}}
 
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.Dataset.update_data}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{update\_data}}}{\emph{new}}{}
-\end{fulllineitems}
-
-\index{update\_analyses() (report\_manager.dataset.Dataset method)@\spxentry{update\_analyses()}\spxextra{report\_manager.dataset.Dataset method}}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.Dataset.update_analyses}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{update\_analyses}}}{\emph{new}}{}
 \end{fulllineitems}
 
 \index{set\_configuration\_from\_file() (report\_manager.dataset.Dataset method)@\spxentry{set\_configuration\_from\_file()}\spxextra{report\_manager.dataset.Dataset method}}
@@ -6125,7 +6222,7 @@ Bases: \sphinxhref{https://docs.python.org/3.6/library/functions.html\#object}{\
 \index{MultiOmicsDataset (class in report\_manager.dataset)@\spxentry{MultiOmicsDataset}\spxextra{class in report\_manager.dataset}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.MultiOmicsDataset}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.dataset.}}\sphinxbfcode{\sphinxupquote{MultiOmicsDataset}}}{\emph{identifier}, \emph{data}, \emph{configuration=None}, \emph{analyses=\{\}}, \emph{analysis\_queries=\{\}}, \emph{report=None}}{}
+\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.MultiOmicsDataset}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.dataset.}}\sphinxbfcode{\sphinxupquote{MultiOmicsDataset}}}{\emph{identifier}, \emph{data}, \emph{configuration=None}, \emph{analysis\_queries=\{\}}, \emph{report=None}}{}
 Bases: {\hyperref[\detokenize{_autosummary/report_manager:report_manager.dataset.Dataset}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{report\_manager.dataset.Dataset}}}}}
 \index{get\_dataframes() (report\_manager.dataset.MultiOmicsDataset method)@\spxentry{get\_dataframes()}\spxextra{report\_manager.dataset.MultiOmicsDataset method}}
 
@@ -6145,7 +6242,7 @@ Bases: {\hyperref[\detokenize{_autosummary/report_manager:report_manager.dataset
 \index{ProteomicsDataset (class in report\_manager.dataset)@\spxentry{ProteomicsDataset}\spxextra{class in report\_manager.dataset}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.ProteomicsDataset}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.dataset.}}\sphinxbfcode{\sphinxupquote{ProteomicsDataset}}}{\emph{identifier}, \emph{dataset\_type=\textquotesingle{}proteomics\textquotesingle{}}, \emph{data=\{\}}, \emph{configuration=None}, \emph{analyses=\{\}}, \emph{analysis\_queries=\{\}}, \emph{report=None}}{}
+\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.ProteomicsDataset}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.dataset.}}\sphinxbfcode{\sphinxupquote{ProteomicsDataset}}}{\emph{identifier}, \emph{dataset\_type=\textquotesingle{}proteomics\textquotesingle{}}, \emph{data=\{\}}, \emph{configuration=None}, \emph{analysis\_queries=\{\}}, \emph{report=None}}{}
 Bases: {\hyperref[\detokenize{_autosummary/report_manager:report_manager.dataset.Dataset}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{report\_manager.dataset.Dataset}}}}}
 \index{generate\_dataset() (report\_manager.dataset.ProteomicsDataset method)@\spxentry{generate\_dataset()}\spxextra{report\_manager.dataset.ProteomicsDataset method}}
 
@@ -6177,7 +6274,7 @@ Bases: {\hyperref[\detokenize{_autosummary/report_manager:report_manager.dataset
 \index{PTMDataset (class in report\_manager.dataset)@\spxentry{PTMDataset}\spxextra{class in report\_manager.dataset}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.PTMDataset}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.dataset.}}\sphinxbfcode{\sphinxupquote{PTMDataset}}}{\emph{identifier}, \emph{data=\{\}}, \emph{configuration=None}, \emph{analyses=\{\}}, \emph{analysis\_queries=\{\}}, \emph{report=None}}{}
+\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.PTMDataset}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.dataset.}}\sphinxbfcode{\sphinxupquote{PTMDataset}}}{\emph{identifier}, \emph{data=\{\}}, \emph{configuration=None}, \emph{analysis\_queries=\{\}}, \emph{report=None}}{}
 Bases: {\hyperref[\detokenize{_autosummary/report_manager:report_manager.dataset.ProteomicsDataset}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{report\_manager.dataset.ProteomicsDataset}}}}}
 
 \end{fulllineitems}
@@ -6185,7 +6282,7 @@ Bases: {\hyperref[\detokenize{_autosummary/report_manager:report_manager.dataset
 \index{PhosphoproteomicsDataset (class in report\_manager.dataset)@\spxentry{PhosphoproteomicsDataset}\spxextra{class in report\_manager.dataset}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.PhosphoproteomicsDataset}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.dataset.}}\sphinxbfcode{\sphinxupquote{PhosphoproteomicsDataset}}}{\emph{identifier}, \emph{data=\{\}}, \emph{configuration=None}, \emph{analyses=\{\}}, \emph{analysis\_queries=\{\}}, \emph{report=None}}{}
+\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.PhosphoproteomicsDataset}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.dataset.}}\sphinxbfcode{\sphinxupquote{PhosphoproteomicsDataset}}}{\emph{identifier}, \emph{data=\{\}}, \emph{configuration=None}, \emph{analysis\_queries=\{\}}, \emph{report=None}}{}
 Bases: {\hyperref[\detokenize{_autosummary/report_manager:report_manager.dataset.PTMDataset}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{report\_manager.dataset.PTMDataset}}}}}
 
 \end{fulllineitems}
@@ -6193,7 +6290,7 @@ Bases: {\hyperref[\detokenize{_autosummary/report_manager:report_manager.dataset
 \index{InteractomicsDataset (class in report\_manager.dataset)@\spxentry{InteractomicsDataset}\spxextra{class in report\_manager.dataset}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.InteractomicsDataset}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.dataset.}}\sphinxbfcode{\sphinxupquote{InteractomicsDataset}}}{\emph{identifier}, \emph{data=\{\}}, \emph{configuration=None}, \emph{analyses=\{\}}, \emph{analysis\_queries=\{\}}, \emph{report=None}}{}
+\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.InteractomicsDataset}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.dataset.}}\sphinxbfcode{\sphinxupquote{InteractomicsDataset}}}{\emph{identifier}, \emph{data=\{\}}, \emph{configuration=None}, \emph{analysis\_queries=\{\}}, \emph{report=None}}{}
 Bases: {\hyperref[\detokenize{_autosummary/report_manager:report_manager.dataset.ProteomicsDataset}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{report\_manager.dataset.ProteomicsDataset}}}}}
 
 \end{fulllineitems}
@@ -6201,7 +6298,7 @@ Bases: {\hyperref[\detokenize{_autosummary/report_manager:report_manager.dataset
 \index{LongitudinalProteomicsDataset (class in report\_manager.dataset)@\spxentry{LongitudinalProteomicsDataset}\spxextra{class in report\_manager.dataset}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.LongitudinalProteomicsDataset}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.dataset.}}\sphinxbfcode{\sphinxupquote{LongitudinalProteomicsDataset}}}{\emph{identifier}, \emph{data=\{\}}, \emph{configuration=None}, \emph{analyses=\{\}}, \emph{analysis\_queries=\{\}}, \emph{report=None}}{}
+\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.LongitudinalProteomicsDataset}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.dataset.}}\sphinxbfcode{\sphinxupquote{LongitudinalProteomicsDataset}}}{\emph{identifier}, \emph{data=\{\}}, \emph{configuration=None}, \emph{analysis\_queries=\{\}}, \emph{report=None}}{}
 Bases: {\hyperref[\detokenize{_autosummary/report_manager:report_manager.dataset.ProteomicsDataset}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{report\_manager.dataset.ProteomicsDataset}}}}}
 
 \end{fulllineitems}
@@ -6209,7 +6306,7 @@ Bases: {\hyperref[\detokenize{_autosummary/report_manager:report_manager.dataset
 \index{ClinicalDataset (class in report\_manager.dataset)@\spxentry{ClinicalDataset}\spxextra{class in report\_manager.dataset}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.ClinicalDataset}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.dataset.}}\sphinxbfcode{\sphinxupquote{ClinicalDataset}}}{\emph{identifier}, \emph{data=\{\}}, \emph{configuration=None}, \emph{analyses=\{\}}, \emph{analysis\_queries=\{\}}, \emph{report=None}}{}
+\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.ClinicalDataset}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.dataset.}}\sphinxbfcode{\sphinxupquote{ClinicalDataset}}}{\emph{identifier}, \emph{data=\{\}}, \emph{configuration=None}, \emph{analysis\_queries=\{\}}, \emph{report=None}}{}
 Bases: {\hyperref[\detokenize{_autosummary/report_manager:report_manager.dataset.Dataset}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{report\_manager.dataset.Dataset}}}}}
 \index{generate\_dataset() (report\_manager.dataset.ClinicalDataset method)@\spxentry{generate\_dataset()}\spxextra{report\_manager.dataset.ClinicalDataset method}}
 
@@ -6247,7 +6344,7 @@ Bases: {\hyperref[\detokenize{_autosummary/report_manager:report_manager.dataset
 \index{DNAseqDataset (class in report\_manager.dataset)@\spxentry{DNAseqDataset}\spxextra{class in report\_manager.dataset}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.DNAseqDataset}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.dataset.}}\sphinxbfcode{\sphinxupquote{DNAseqDataset}}}{\emph{identifier}, \emph{dataset\_type}, \emph{data=\{\}}, \emph{configuration=None}, \emph{analyses=\{\}}, \emph{analysis\_queries=\{\}}, \emph{report=None}}{}
+\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.DNAseqDataset}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.dataset.}}\sphinxbfcode{\sphinxupquote{DNAseqDataset}}}{\emph{identifier}, \emph{dataset\_type}, \emph{data=\{\}}, \emph{configuration=None}, \emph{analysis\_queries=\{\}}, \emph{report=None}}{}
 Bases: {\hyperref[\detokenize{_autosummary/report_manager:report_manager.dataset.Dataset}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{report\_manager.dataset.Dataset}}}}}
 \index{generate\_dataset() (report\_manager.dataset.DNAseqDataset method)@\spxentry{generate\_dataset()}\spxextra{report\_manager.dataset.DNAseqDataset method}}
 
@@ -6261,7 +6358,7 @@ Bases: {\hyperref[\detokenize{_autosummary/report_manager:report_manager.dataset
 \index{RNAseqDataset (class in report\_manager.dataset)@\spxentry{RNAseqDataset}\spxextra{class in report\_manager.dataset}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.RNAseqDataset}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.dataset.}}\sphinxbfcode{\sphinxupquote{RNAseqDataset}}}{\emph{identifier}, \emph{data=\{\}}, \emph{configuration=None}, \emph{analyses=\{\}}, \emph{analysis\_queries=\{\}}, \emph{report=None}}{}
+\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.dataset.RNAseqDataset}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.dataset.}}\sphinxbfcode{\sphinxupquote{RNAseqDataset}}}{\emph{identifier}, \emph{data=\{\}}, \emph{configuration=None}, \emph{analysis\_queries=\{\}}, \emph{report=None}}{}
 Bases: {\hyperref[\detokenize{_autosummary/report_manager:report_manager.dataset.Dataset}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{report\_manager.dataset.Dataset}}}}}
 \index{generate\_dataset() (report\_manager.dataset.RNAseqDataset method)@\spxentry{generate\_dataset()}\spxextra{report\_manager.dataset.RNAseqDataset method}}
 
@@ -7012,18 +7109,6 @@ Bases: \sphinxhref{https://docs.python.org/3.6/library/functions.html\#object}{\
 \phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.utils.extract_style}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{report\_manager.utils.}}\sphinxbfcode{\sphinxupquote{extract\_style}}}{\emph{el}}{}
 \end{fulllineitems}
 
-\index{is\_jsonable() (in module report\_manager.utils)@\spxentry{is\_jsonable()}\spxextra{in module report\_manager.utils}}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.utils.is_jsonable}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{report\_manager.utils.}}\sphinxbfcode{\sphinxupquote{is\_jsonable}}}{\emph{x}}{}
-\end{fulllineitems}
-
-\index{convert\_dash\_to\_json() (in module report\_manager.utils)@\spxentry{convert\_dash\_to\_json()}\spxextra{in module report\_manager.utils}}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.utils.convert_dash_to_json}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{report\_manager.utils.}}\sphinxbfcode{\sphinxupquote{convert\_dash\_to\_json}}}{\emph{dash\_object}}{}
-\end{fulllineitems}
-
 \index{get\_image() (in module report\_manager.utils)@\spxentry{get\_image()}\spxextra{in module report\_manager.utils}}
 
 \begin{fulllineitems}
@@ -7064,72 +7149,6 @@ Bases: \sphinxhref{https://docs.python.org/3.6/library/functions.html\#object}{\
 
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.utils.convert_html_to_pdf}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{report\_manager.utils.}}\sphinxbfcode{\sphinxupquote{convert\_html\_to\_pdf}}}{\emph{source\_html}, \emph{output\_filename}}{}
-\end{fulllineitems}
-
-\index{NumpyEncoder (class in report\_manager.utils)@\spxentry{NumpyEncoder}\spxextra{class in report\_manager.utils}}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.utils.NumpyEncoder}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.utils.}}\sphinxbfcode{\sphinxupquote{NumpyEncoder}}}{\emph{*}, \emph{skipkeys=False}, \emph{ensure\_ascii=True}, \emph{check\_circular=True}, \emph{allow\_nan=True}, \emph{sort\_keys=False}, \emph{indent=None}, \emph{separators=None}, \emph{default=None}}{}
-Bases: \sphinxcode{\sphinxupquote{json.encoder.JSONEncoder}}
-\index{default() (report\_manager.utils.NumpyEncoder method)@\spxentry{default()}\spxextra{report\_manager.utils.NumpyEncoder method}}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.utils.NumpyEncoder.default}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{default}}}{\emph{obj}}{}
-Implement this method in a subclass such that it returns
-a serializable object for \sphinxcode{\sphinxupquote{o}}, or calls the base implementation
-(to raise a \sphinxcode{\sphinxupquote{TypeError}}).
-
-For example, to support arbitrary iterators, you could
-implement default like this:
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k}{def} \PYG{n+nf}{default}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{o}\PYG{p}{)}\PYG{p}{:}
-    \PYG{k}{try}\PYG{p}{:}
-        \PYG{n}{iterable} \PYG{o}{=} \PYG{n+nb}{iter}\PYG{p}{(}\PYG{n}{o}\PYG{p}{)}
-    \PYG{k}{except} \PYG{n+ne}{TypeError}\PYG{p}{:}
-        \PYG{k}{pass}
-    \PYG{k}{else}\PYG{p}{:}
-        \PYG{k}{return} \PYG{n+nb}{list}\PYG{p}{(}\PYG{n}{iterable}\PYG{p}{)}
-    \PYG{c+c1}{\PYGZsh{} Let the base class default method raise the TypeError}
-    \PYG{k}{return} \PYG{n}{JSONEncoder}\PYG{o}{.}\PYG{n}{default}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{o}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\end{fulllineitems}
-
-
-\end{fulllineitems}
-
-\index{DictDFEncoder (class in report\_manager.utils)@\spxentry{DictDFEncoder}\spxextra{class in report\_manager.utils}}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.utils.DictDFEncoder}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{report\_manager.utils.}}\sphinxbfcode{\sphinxupquote{DictDFEncoder}}}{\emph{*}, \emph{skipkeys=False}, \emph{ensure\_ascii=True}, \emph{check\_circular=True}, \emph{allow\_nan=True}, \emph{sort\_keys=False}, \emph{indent=None}, \emph{separators=None}, \emph{default=None}}{}
-Bases: \sphinxcode{\sphinxupquote{json.encoder.JSONEncoder}}
-\index{default() (report\_manager.utils.DictDFEncoder method)@\spxentry{default()}\spxextra{report\_manager.utils.DictDFEncoder method}}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/report_manager:report_manager.utils.DictDFEncoder.default}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{default}}}{\emph{obj}}{}
-Implement this method in a subclass such that it returns
-a serializable object for \sphinxcode{\sphinxupquote{o}}, or calls the base implementation
-(to raise a \sphinxcode{\sphinxupquote{TypeError}}).
-
-For example, to support arbitrary iterators, you could
-implement default like this:
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k}{def} \PYG{n+nf}{default}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{o}\PYG{p}{)}\PYG{p}{:}
-    \PYG{k}{try}\PYG{p}{:}
-        \PYG{n}{iterable} \PYG{o}{=} \PYG{n+nb}{iter}\PYG{p}{(}\PYG{n}{o}\PYG{p}{)}
-    \PYG{k}{except} \PYG{n+ne}{TypeError}\PYG{p}{:}
-        \PYG{k}{pass}
-    \PYG{k}{else}\PYG{p}{:}
-        \PYG{k}{return} \PYG{n+nb}{list}\PYG{p}{(}\PYG{n}{iterable}\PYG{p}{)}
-    \PYG{c+c1}{\PYGZsh{} Let the base class default method raise the TypeError}
-    \PYG{k}{return} \PYG{n}{JSONEncoder}\PYG{o}{.}\PYG{n}{default}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{o}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\end{fulllineitems}
-
-
 \end{fulllineitems}
 
 
@@ -7488,6 +7507,38 @@ Example:
 
 \end{fulllineitems}
 
+\index{normalize\_data\_per\_group() (in module analytics\_core.analytics.analytics)@\spxentry{normalize\_data\_per\_group()}\spxextra{in module analytics\_core.analytics.analytics}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/analytics_core.analytics:analytics_core.analytics.analytics.normalize_data_per_group}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{analytics\_core.analytics.analytics.}}\sphinxbfcode{\sphinxupquote{normalize\_data\_per\_group}}}{\emph{data}, \emph{group}, \emph{method=\textquotesingle{}median\textquotesingle{}}}{}
+This function normalizes the data by group using the selected method
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{data}} \textendash{} DataFrame with the data to be normalized (samples x features)
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{group\_col}} \textendash{} Column containing the groups
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{method}} (\sphinxstyleliteralemphasis{\sphinxupquote{string}}) \textendash{} normalization method to choose among: median\_polish, median,
+quantile, linear
+
+\end{itemize}
+
+\item[{Returns}] \leavevmode
+Pandas dataframe.
+
+\end{description}\end{quote}
+
+Example:
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{result} \PYG{o}{=} \PYG{n}{normalize\PYGZus{}data\PYGZus{}per\PYGZus{}group}\PYG{p}{(}\PYG{n}{data}\PYG{p}{,} \PYG{n}{group}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{group}\PYG{l+s+s1}{\PYGZsq{}} \PYG{n}{method}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{median}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\end{fulllineitems}
+
 \index{normalize\_data() (in module analytics\_core.analytics.analytics)@\spxentry{normalize\_data()}\spxextra{in module analytics\_core.analytics.analytics}}
 
 \begin{fulllineitems}
@@ -7610,7 +7661,7 @@ Example:
 Applies quantile normalization to each column in pandas dataframe.
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode
-\sphinxstyleliteralstrong{\sphinxupquote{data}} \textendash{} pandas dataframe with features as rows and samples as columns.
+\sphinxstyleliteralstrong{\sphinxupquote{data}} \textendash{} pandas dataframe with features as columns and samples as rows.
 
 \item[{Returns}] \leavevmode
 Pandas dataframe
@@ -7784,7 +7835,7 @@ df = transform\_proteomics\_edgelist(original, index\_cols={[}‘group’, ‘sa
 \index{get\_proteomics\_measurements\_ready() (in module analytics\_core.analytics.analytics)@\spxentry{get\_proteomics\_measurements\_ready()}\spxextra{in module analytics\_core.analytics.analytics}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/analytics_core.analytics:analytics_core.analytics.analytics.get_proteomics_measurements_ready}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{analytics\_core.analytics.analytics.}}\sphinxbfcode{\sphinxupquote{get\_proteomics\_measurements\_ready}}}{\emph{df, index\_cols={[}\textquotesingle{}group\textquotesingle{}, \textquotesingle{}sample\textquotesingle{}, \textquotesingle{}subject\textquotesingle{}{]}, drop\_cols={[}\textquotesingle{}sample\textquotesingle{}{]}, group=\textquotesingle{}group\textquotesingle{}, identifier=\textquotesingle{}identifier\textquotesingle{}, extra\_identifier=\textquotesingle{}name\textquotesingle{}, imputation=True, method=\textquotesingle{}distribution\textquotesingle{}, missing\_method=\textquotesingle{}percentage\textquotesingle{}, missing\_per\_group=True, missing\_max=0.3, min\_valid=1, value\_col=\textquotesingle{}LFQ\_intensity\textquotesingle{}, shift=1.8, nstd=0.3, knn\_cutoff=0.6, normalize=False, normalization\_method=\textquotesingle{}median\textquotesingle{}}}{}
+\phantomsection\label{\detokenize{_autosummary/analytics_core.analytics:analytics_core.analytics.analytics.get_proteomics_measurements_ready}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{analytics\_core.analytics.analytics.}}\sphinxbfcode{\sphinxupquote{get\_proteomics\_measurements\_ready}}}{\emph{df, index\_cols={[}\textquotesingle{}group\textquotesingle{}, \textquotesingle{}sample\textquotesingle{}, \textquotesingle{}subject\textquotesingle{}{]}, drop\_cols={[}\textquotesingle{}sample\textquotesingle{}{]}, group=\textquotesingle{}group\textquotesingle{}, identifier=\textquotesingle{}identifier\textquotesingle{}, extra\_identifier=\textquotesingle{}name\textquotesingle{}, imputation=True, method=\textquotesingle{}distribution\textquotesingle{}, missing\_method=\textquotesingle{}percentage\textquotesingle{}, missing\_per\_group=True, missing\_max=0.3, min\_valid=1, value\_col=\textquotesingle{}LFQ\_intensity\textquotesingle{}, shift=1.8, nstd=0.3, knn\_cutoff=0.6, normalize=False, normalization\_method=\textquotesingle{}median\textquotesingle{}, normalize\_group=False}}{}
 Processes proteomics data extracted from the database: 1) filter proteins with high number of missing values (\textgreater{} missing\_max or min\_valid), 2) impute missing values.
 For more information on imputation method visit \sphinxurl{http://www.coxdocs.org/doku.php?id=perseus:user:activities:matrixprocessing:filterrows:filtervalidvaluesrows}.
 \begin{quote}\begin{description}
@@ -11362,7 +11413,7 @@ Example:
 \index{get\_table() (in module analytics\_core.viz.viz)@\spxentry{get\_table()}\spxextra{in module analytics\_core.viz.viz}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/analytics_core.viz:analytics_core.viz.viz.get_table}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{analytics\_core.viz.viz.}}\sphinxbfcode{\sphinxupquote{get\_table}}}{\emph{data}, \emph{identifier}, \emph{title}, \emph{colors=(\textquotesingle{}\#C2D4FF\textquotesingle{}}, \emph{\textquotesingle{}\#F5F8FF\textquotesingle{})}, \emph{subset=None}, \emph{plot\_attr=\{\textquotesingle{}font\textquotesingle{}: 12}, \emph{\textquotesingle{}height\textquotesingle{}: 2500}, \emph{\textquotesingle{}width\textquotesingle{}: 1500\}}, \emph{subplot=False}}{}
+\phantomsection\label{\detokenize{_autosummary/analytics_core.viz:analytics_core.viz.viz.get_table}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{analytics\_core.viz.viz.}}\sphinxbfcode{\sphinxupquote{get\_table}}}{\emph{data}, \emph{identifier}, \emph{args}}{}
 This function converts a pandas dataframe into an interactive table for viewing, editing and exploring large datasets. For more information visit \sphinxurl{https://dash.plot.ly/datatable}.
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode\begin{itemize}
@@ -12337,7 +12388,7 @@ returns: dict
 \label{\detokenize{_autosummary/analytics_core:module-analytics_core.analytics_factory}}\label{\detokenize{_autosummary/analytics_core:analytics-factory}}\index{analytics\_core.analytics\_factory (module)@\spxentry{analytics\_core.analytics\_factory}\spxextra{module}}\index{Analysis (class in analytics\_core.analytics\_factory)@\spxentry{Analysis}\spxextra{class in analytics\_core.analytics\_factory}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{_autosummary/analytics_core:analytics_core.analytics_factory.Analysis}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{analytics\_core.analytics\_factory.}}\sphinxbfcode{\sphinxupquote{Analysis}}}{\emph{identifier}, \emph{analysis\_type}, \emph{args}, \emph{data}, \emph{result=None}}{}
+\phantomsection\label{\detokenize{_autosummary/analytics_core:analytics_core.analytics_factory.Analysis}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{analytics\_core.analytics\_factory.}}\sphinxbfcode{\sphinxupquote{Analysis}}}{\emph{identifier}, \emph{analysis\_type}, \emph{args}, \emph{data}, \emph{result=None}, \emph{plots=\{\}}}{}
 Bases: \sphinxhref{https://docs.python.org/3.6/library/functions.html\#object}{\sphinxcode{\sphinxupquote{object}}}
 \index{identifier() (analytics\_core.analytics\_factory.Analysis property)@\spxentry{identifier()}\spxextra{analytics\_core.analytics\_factory.Analysis property}}
 
@@ -12369,6 +12420,24 @@ Bases: \sphinxhref{https://docs.python.org/3.6/library/functions.html\#object}{\
 \phantomsection\label{\detokenize{_autosummary/analytics_core:analytics_core.analytics_factory.Analysis.result}}\pysigline{\sphinxbfcode{\sphinxupquote{property }}\sphinxbfcode{\sphinxupquote{result}}}
 \end{fulllineitems}
 
+\index{plots() (analytics\_core.analytics\_factory.Analysis property)@\spxentry{plots()}\spxextra{analytics\_core.analytics\_factory.Analysis property}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/analytics_core:analytics_core.analytics_factory.Analysis.plots}}\pysigline{\sphinxbfcode{\sphinxupquote{property }}\sphinxbfcode{\sphinxupquote{plots}}}
+\end{fulllineitems}
+
+\index{plot() (analytics\_core.analytics\_factory.Analysis property)@\spxentry{plot()}\spxextra{analytics\_core.analytics\_factory.Analysis property}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/analytics_core:analytics_core.analytics_factory.Analysis.plot}}\pysigline{\sphinxbfcode{\sphinxupquote{property }}\sphinxbfcode{\sphinxupquote{plot}}}
+\end{fulllineitems}
+
+\index{update\_plots() (analytics\_core.analytics\_factory.Analysis method)@\spxentry{update\_plots()}\spxextra{analytics\_core.analytics\_factory.Analysis method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/analytics_core:analytics_core.analytics_factory.Analysis.update_plots}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{update\_plots}}}{\emph{plots}}{}
+\end{fulllineitems}
+
 \index{generate\_result() (analytics\_core.analytics\_factory.Analysis method)@\spxentry{generate\_result()}\spxextra{analytics\_core.analytics\_factory.Analysis method}}
 
 \begin{fulllineitems}
@@ -12379,6 +12448,30 @@ Bases: \sphinxhref{https://docs.python.org/3.6/library/functions.html\#object}{\
 
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{_autosummary/analytics_core:analytics_core.analytics_factory.Analysis.get_plot}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{get\_plot}}}{\emph{name}, \emph{identifier}}{}
+\end{fulllineitems}
+
+\index{publish\_analysis() (analytics\_core.analytics\_factory.Analysis method)@\spxentry{publish\_analysis()}\spxextra{analytics\_core.analytics\_factory.Analysis method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/analytics_core:analytics_core.analytics_factory.Analysis.publish_analysis}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{publish\_analysis}}}{\emph{directory}}{}
+\end{fulllineitems}
+
+\index{save\_analysis\_result() (analytics\_core.analytics\_factory.Analysis method)@\spxentry{save\_analysis\_result()}\spxextra{analytics\_core.analytics\_factory.Analysis method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/analytics_core:analytics_core.analytics_factory.Analysis.save_analysis_result}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{save\_analysis\_result}}}{\emph{results\_directory}}{}
+\end{fulllineitems}
+
+\index{save\_analysis\_plots() (analytics\_core.analytics\_factory.Analysis method)@\spxentry{save\_analysis\_plots()}\spxextra{analytics\_core.analytics\_factory.Analysis method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/analytics_core:analytics_core.analytics_factory.Analysis.save_analysis_plots}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{save\_analysis\_plots}}}{\emph{plots\_directory}}{}
+\end{fulllineitems}
+
+\index{make\_interactive() (analytics\_core.analytics\_factory.Analysis method)@\spxentry{make\_interactive()}\spxextra{analytics\_core.analytics\_factory.Analysis method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/analytics_core:analytics_core.analytics_factory.Analysis.make_interactive}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{make\_interactive}}}{\emph{name}, \emph{identifier}}{}
 \end{fulllineitems}
 
 
@@ -12456,6 +12549,12 @@ and options and updates the pyvis html template holding the visualization.
 
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{_autosummary/analytics_core:analytics_core.utils.parse_html}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{analytics\_core.utils.}}\sphinxbfcode{\sphinxupquote{parse\_html}}}{\emph{html\_snippet}}{}
+\end{fulllineitems}
+
+\index{convert\_html\_to\_dash() (in module analytics\_core.utils)@\spxentry{convert\_html\_to\_dash()}\spxextra{in module analytics\_core.utils}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{_autosummary/analytics_core:analytics_core.utils.convert_html_to_dash}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{analytics\_core.utils.}}\sphinxbfcode{\sphinxupquote{convert\_html\_to\_dash}}}{\emph{el}, \emph{style=None}}{}
 \end{fulllineitems}
 
 \index{hex2rgb() (in module analytics\_core.utils)@\spxentry{hex2rgb()}\spxextra{in module analytics\_core.utils}}
@@ -13033,6 +13132,8 @@ chat rooms, and mailing lists is expected to follow the \sphinxhref{https://www.
 \item\relax\sphinxstyleindexentry{notebooks.development.vis}\sphinxstyleindexpageref{_autosummary/notebooks:\detokenize{module-notebooks.development.vis}}
 \indexspace
 \bigletter{r}
+\item\relax\sphinxstyleindexentry{report\_manager.app}\sphinxstyleindexpageref{_autosummary/report_manager:\detokenize{module-report_manager.app}}
+\item\relax\sphinxstyleindexentry{report\_manager.apps.basicApp}\sphinxstyleindexpageref{_autosummary/report_manager.apps:\detokenize{module-report_manager.apps.basicApp}}
 \item\relax\sphinxstyleindexentry{report\_manager.apps.dataUpload}\sphinxstyleindexpageref{_autosummary/report_manager.apps:\detokenize{module-report_manager.apps.dataUpload}}
 \item\relax\sphinxstyleindexentry{report\_manager.apps.homepageStats}\sphinxstyleindexpageref{_autosummary/report_manager.apps:\detokenize{module-report_manager.apps.homepageStats}}
 \item\relax\sphinxstyleindexentry{report\_manager.apps.imports}\sphinxstyleindexpageref{_autosummary/report_manager.apps:\detokenize{module-report_manager.apps.imports}}

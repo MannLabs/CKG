@@ -94,11 +94,10 @@
 <li class="toctree-l1"><a class="reference internal" href="getting-started-with-build.html">Getting Started with the CKG Build</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting started with Windows</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#java">Java</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#neo4j">Neo4j</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#python">Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#microsoft-visual-c-build-tools">Microsoft Visual C++ Build Tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#r">R</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#neo4j">Neo4j</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#add-neo4j-graph-database-to-environmental-variables">Add Neo4j graph database to environmental variables</a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="#getting-started-with-the-ckg-build">Getting Started with the CKG Build</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#create-a-virtual-environment">Create a virtual environment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#setting-up-the-ckg">Setting up the CKG</a></li>
@@ -228,6 +227,43 @@
 When using a new version of Neo4j, always remember to read the respective Operations Manual, and check for the software requirements.</p>
 <p>By default Java should be installed on the Windows 10. If this is not your case, please follow this <a class="reference external" href="https://docs.oracle.com/javase/8/docs/technotes/guides/install/windows_jdk_install.html#A1097936">tutorial</a> to install it.</p>
 </div>
+<div class="section" id="neo4j">
+<h2>Neo4j<a class="headerlink" href="#neo4j" title="Permalink to this headline">¶</a></h2>
+<p>The installation of Neo4j on Windows follows the same steps as <a class="reference internal" href="getting-started-with-neo4j.html#getting-started-with-neo4j"><span class="std std-ref">Getting Started with Neo4j</span></a>:</p>
+<ol class="arabic simple">
+<li><p>Download a copy of the Neo4j desktop version from the <a class="reference external" href="https://neo4j.com/download/">Neo4j download page</a>.</p></li>
+<li><p>Install Neo4j by following the instructions automatically opened in the browser.</p></li>
+<li><p>Open the Neo4j Desktop App and create a database by clicking <span class="guilabel">Add graph</span>, followed by <span class="guilabel">Create a Local Graph</span>, using the password “NeO4J”.</p></li>
+<li><p>Click <span class="guilabel">Manage</span> and then <span class="guilabel">Plugins</span>. Install “<strong>APOC</strong>” and “<strong>GRAPH ALGORITHMS</strong>”.</p></li>
+<li><p>Click the tab <span class="guilabel">Settings</span>, and comment the option <code class="docutils literal notranslate"><span class="pre">dbms.directories.import=import</span></code> by adding <code class="docutils literal notranslate"><span class="pre">#</span></code> at the beginning of the line.</p></li>
+<li><p>Click <span class="guilabel">Apply</span> at the bottom of the window.</p></li>
+<li><p>Start the Graph by clicking the play sign, at the top of the window.</p></li>
+</ol>
+<p>To check for errors, please go to tab <span class="guilabel">Logs</span>.</p>
+</div>
+<div class="section" id="python">
+<h2>Python<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h2>
+<p>Installing Python 3.6.8 is an essential part of setting up the CKG.
+To do so, simply use the <a class="reference external" href="https://www.python.org/downloads/windows/">link</a> to download a python 3.6 version executable installer (e.g. Python 3.6.8 - Dec. 24, 2018).
+Follow the steps and select the option <code class="docutils literal notranslate"><span class="pre">Add</span> <span class="pre">Python</span> <span class="pre">3.6</span> <span class="pre">to</span> <span class="pre">PATH</span></code>.</p>
+<p>Once finished, you can check if python was successfully added to PATH, by opening the environment variables window:</p>
+<ol class="arabic simple">
+<li><p>Go to the Windows menu, right-click on <span class="guilabel">Computer</span> and click on <span class="guilabel">Properties</span>.</p></li>
+<li><p>From the computer properties dialog, select <code class="docutils literal notranslate"><span class="pre">Advanced</span> <span class="pre">system</span> <span class="pre">settings</span></code> on the left panel. And from there, click on <span class="guilabel">Environment variables</span> button.</p></li>
+<li><p>In the top half of the new window (<strong>User variables</strong>), look for a variable with the name <code class="docutils literal notranslate"><span class="pre">Path</span></code>. If you select it and click <span class="guilabel">Edit</span>, the full path to Python36 should be included in the variable value. Besides this, you can also add the paths to python 3.6 <code class="docutils literal notranslate"><span class="pre">site-packages</span></code> and <code class="docutils literal notranslate"><span class="pre">Scripts</span></code> folders, to the <code class="docutils literal notranslate"><span class="pre">Path</span></code> variable.</p></li>
+<li><p>When you are done, click <span class="guilabel">OK</span> to save, and click <span class="guilabel">OK</span> in all the opened windows.</p></li>
+</ol>
+</div>
+<div class="section" id="microsoft-visual-c-build-tools">
+<h2>Microsoft Visual C++ Build Tools<a class="headerlink" href="#microsoft-visual-c-build-tools" title="Permalink to this headline">¶</a></h2>
+<p>Running python on Windows can sometimes result in the following error:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">error</span> <span class="n">Microsoft</span> <span class="n">Visual</span> <span class="n">C</span><span class="o">++</span> <span class="mf">14.0</span> <span class="ow">is</span> <span class="n">required</span>
+</pre></div>
+</div>
+<p>To fix this error, you will need to download and install Microsoft <a class="reference external" href="https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools&amp;rel=16">Build Tools for Visual Studio</a>.</p>
+<p>Once installed, click <code class="docutils literal notranslate"><span class="pre">Workloads</span></code>, select all the packages available and install them. This will require several Gigabytes of disk space so, as an alternative and if your machine has limited space, you can install only <code class="docutils literal notranslate"><span class="pre">C++</span> <span class="pre">build</span> <span class="pre">tools</span></code> under <code class="docutils literal notranslate"><span class="pre">Workloads</span></code>, and <code class="docutils literal notranslate"><span class="pre">Windows</span> <span class="pre">10</span> <span class="pre">SDK</span></code> and the latest version of <code class="docutils literal notranslate"><span class="pre">MSVC</span> <span class="pre">v142</span> <span class="pre">-</span> <span class="pre">VS</span> <span class="pre">2019</span> <span class="pre">C++</span> <span class="pre">x64/x86</span> <span class="pre">build</span> <span class="pre">tools</span></code> under <code class="docutils literal notranslate"><span class="pre">Individual</span> <span class="pre">Components</span></code>.</p>
+<p>The build tools allow Python packages to be built in Windows, from the command line (MSVC cl.exe module is used as a C/C++ compiler).</p>
+</div>
 <div class="section" id="r">
 <h2>R<a class="headerlink" href="#r" title="Permalink to this headline">¶</a></h2>
 <p>Another essential package for the functioning of the Clinical Knowledge Graph is R.</p>
@@ -236,7 +272,7 @@ When using a new version of Neo4j, always remember to read the respective Operat
 </pre></div>
 </div>
 <p>If R is not installed in your machine, please follow <a class="reference external" href="https://rstudio-education.github.io/hopr/starting.html">these tutorial</a>.</p>
-<p>In order to simplify calling R from the command prompt, you can choose to add it to <code class="docutils literal notranslate"><span class="pre">PATH</span></code> and to the environmental variables. To do so, follow the steps bellow:</p>
+<p>In order to simplify calling R from the command prompt, you can choose to add it to <code class="docutils literal notranslate"><span class="pre">PATH</span></code> and to the environment variables. To do so, follow the steps bellow:</p>
 <ol class="arabic simple">
 <li><p>Go to the Windows menu, right-click on <span class="guilabel">Computer</span> and click on <span class="guilabel">Properties</span>.</p></li>
 <li><p>From the computer properties dialog, select <code class="docutils literal notranslate"><span class="pre">Advanced</span> <span class="pre">system</span> <span class="pre">settings</span></code> on the left panel. And from there, click on <span class="guilabel">Environment variables</span> button.</p></li>
@@ -271,40 +307,6 @@ When using a new version of Neo4j, always remember to read the respective Operat
 </ol>
 <p>In this new prompt, launch R and run the previous R install packages.</p>
 </div>
-<div class="section" id="neo4j">
-<h2>Neo4j<a class="headerlink" href="#neo4j" title="Permalink to this headline">¶</a></h2>
-<p>The installation of Neo4j on Windows follows the same steps as <a class="reference internal" href="getting-started-with-neo4j.html#getting-started-with-neo4j"><span class="std std-ref">Getting Started with Neo4j</span></a>:</p>
-<ol class="arabic simple">
-<li><p>Download a copy of the Neo4j desktop version from the <a class="reference external" href="https://neo4j.com/download/">Neo4j download page</a>.</p></li>
-<li><p>Install Neo4j by following the instructions automatically opened in the browser.</p></li>
-<li><p>Open the Neo4j Desktop App and create a database by clicking <span class="guilabel">Add graph</span>, followed by <span class="guilabel">Create a Local Graph</span>, using the password “NeO4J”.</p></li>
-<li><p>Click <span class="guilabel">Manage</span> and then <span class="guilabel">Plugins</span>. Install “<strong>APOC</strong>” and “<strong>GRAPH ALGORITHMS</strong>”.</p></li>
-<li><p>Click the tab <span class="guilabel">Settings</span>, and comment the option <code class="docutils literal notranslate"><span class="pre">dbms.directories.import=import</span></code> by adding <code class="docutils literal notranslate"><span class="pre">#</span></code> at the beginning of the line.</p></li>
-<li><p>Click <span class="guilabel">Apply</span> at the bottom of the window.</p></li>
-<li><p>Start the Graph by clicking the play sign, at the top of the window.</p></li>
-</ol>
-<p>To check for errors, please go to tab <span class="guilabel">Logs</span>.</p>
-<div class="section" id="add-neo4j-graph-database-to-environmental-variables">
-<span id="id1"></span><h3>Add Neo4j graph database to environmental variables<a class="headerlink" href="#add-neo4j-graph-database-to-environmental-variables" title="Permalink to this headline">¶</a></h3>
-<p>To add the Neo4j database you just created to your Windows environment variables:</p>
-<ol class="arabic simple">
-<li><p>Go to the Windows menu, right-click on <span class="guilabel">Computer</span> and click on <span class="guilabel">Properties</span>.</p></li>
-<li><p>From the computer properties dialog, select <code class="docutils literal notranslate"><span class="pre">Advanced</span> <span class="pre">system</span> <span class="pre">settings</span></code> on the left panel. And from there, click on <span class="guilabel">Environment variables</span> button.</p></li>
-<li><p>In the Environment variables dialog, click the <span class="guilabel">New</span> button in the top half of the dialog, to make a new user variable</p></li>
-<li><p>Give the variable name as <code class="docutils literal notranslate"><span class="pre">NEO4J_HOME</span></code> and the value is the path to the previously created Neo4j database to the file, for example <code class="docutils literal notranslate"><span class="pre">C:\Neo4J\neo4jDatabases\database-bab515f2-ffe7-4282-9bb5-648a53b8b566\installation-3.5.2\</span></code></p></li>
-<li><p>Click <span class="guilabel">OK</span> and <span class="guilabel">OK</span> again to save this variable.</p></li>
-</ol>
-<p>To confirm that the environment variable is correctly set in command line type:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt; <span class="nb">echo</span> %NEO4J_HOME%
-</pre></div>
-</div>
-<p>This will print the path you used as value (e.g. <code class="docutils literal notranslate"><span class="pre">C:\Neo4J\neo4jDatabases\database-bab515f2-ffe7-4282-9bb5-648a53b8b566\installation-3.5.2\</span></code>).</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Depending on your system, the path may vary. To check the path to the database go to <code class="docutils literal notranslate"><span class="pre">Logs</span></code> in the Neo4j Desktop interface.</p>
-</div>
-</div>
-</div>
 <div class="section" id="getting-started-with-the-ckg-build">
 <h2>Getting Started with the CKG Build<a class="headerlink" href="#getting-started-with-the-ckg-build" title="Permalink to this headline">¶</a></h2>
 <p>Setting up the Clinical Knowledge Graph is thoroughly described here.
@@ -317,33 +319,28 @@ Assuming you have <strong>Python 3.6</strong> already installed, you can choose 
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt; where python
 </pre></div>
 </div>
-<p>If you don’t have <strong>Python 3.6</strong> installed in Windows, we recommend installing and using the Anaconda distribution of Python. Download at <code class="docutils literal notranslate"><span class="pre">https://www.anaconda.com/products/individual#Downloads</span></code>, and follow the instructions from <code class="docutils literal notranslate"><span class="pre">https://docs.anaconda.com/anaconda/install/windows/#</span></code>.</p>
 <div class="section" id="create-a-virtual-environment">
 <h3>Create a virtual environment<a class="headerlink" href="#create-a-virtual-environment" title="Permalink to this headline">¶</a></h3>
-<p>To create a new Python virtual environment, please use Anaconda conda installation.</p>
-<ol class="arabic simple">
-<li><p>In the command prompt (cmd.exe) type:</p></li>
-</ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt; conda create -n env_name <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.6
+<p>To create a new Python virtual environment, you can choose to use <code class="docutils literal notranslate"><span class="pre">virtualenv</span></code> or <code class="docutils literal notranslate"><span class="pre">venv</span></code>.</p>
+<p>The usage of <code class="docutils literal notranslate"><span class="pre">virtualenv</span></code> is exemplified in ref:<cite>Create virtual environment</cite>.</p>
+<p>To use <code class="docutils literal notranslate"><span class="pre">venv</span></code>, open a command prompt (cmd.exe) window and type:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt; python -m venv path<span class="se">\t</span>o<span class="se">\e</span>nv_name
 </pre></div>
 </div>
-<p>The key word <code class="docutils literal notranslate"><span class="pre">python</span></code> specifies which version of Python the virtual environment is requested to use, while <code class="docutils literal notranslate"><span class="pre">env_name</span></code> is the name of the virtual environment and can be set to anything you like.</p>
-<ol class="arabic simple" start="2">
-<li><p>Activate the virtual environment by running:</p></li>
-</ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt; conda activate env_name
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">path\to\env_name</span></code> should be replaced with the relative or full path to where you want to place your virtual environment, while the <code class="docutils literal notranslate"><span class="pre">env_name</span></code> part is to be replaced with the name you want to attribute to the virtual environment.</p>
+</div>
+<p>Whichever way you create the virtual environment, the activation method is the same:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt; path<span class="se">\t</span>o<span class="se">\e</span>nv_name<span class="se">\S</span>cripts<span class="se">\a</span>ctivate.bat
 </pre></div>
 </div>
-<ol class="arabic simple" start="3">
-<li><p>After this, the name of the virtual environment will now appear on the left of the prompt:</p></li>
-</ol>
+<p>After this, the name of the virtual environment will now appear on the left of the prompt:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>env_name<span class="o">)</span> C:<span class="se">\&gt;</span>
 </pre></div>
 </div>
-<ol class="arabic simple" start="4">
-<li><p>If you are finished working in the virtual environment for the moment, you can deactivate it by running:</p></li>
-</ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt; conda deactivate
+<p>If you are finished working in the virtual environment for the moment, you can deactivate it by running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt; deactivate
 </pre></div>
 </div>
 <div class="admonition warning">
@@ -354,20 +351,26 @@ Assuming you have <strong>Python 3.6</strong> already installed, you can choose 
 <div class="section" id="setting-up-the-ckg">
 <h3>Setting up the CKG<a class="headerlink" href="#setting-up-the-ckg" title="Permalink to this headline">¶</a></h3>
 <p>Once you have cloned the master branch of the CKG GitHub repository, all the Python packages necessary to run the Clinical Knowledge Graph can be found in <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code>.</p>
-<p>Unfortunately, due to incompatibilities of the current Anaconda version of the <code class="docutils literal notranslate"><span class="pre">rpy2</span></code> package, this package needs to be removed from <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> before installing all other packages.</p>
-<p>To do so, open the mentioned file in your preferred text editor tool (e.g. Notepad) and remove the line <code class="docutils literal notranslate"><span class="pre">rpy2==3.0.5</span></code>. Save and close the file, making sure it is saved as a plain text file.</p>
+<p>Unfortunately, due to incompatibilities of the current versions <code class="docutils literal notranslate"><span class="pre">celery</span></code> and <code class="docutils literal notranslate"><span class="pre">rpy2</span></code> packages need to be removed from <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> before installing all other packages.</p>
+<p>To do so, open the mentioned file in your preferred text editor tool (e.g. Notepad) and add <code class="docutils literal notranslate"><span class="pre">#</span></code> in the beginning of the lines <code class="docutils literal notranslate"><span class="pre">celery==4.3.0</span></code> and <code class="docutils literal notranslate"><span class="pre">rpy2==3.0.5</span></code>. Save and close the file, making sure it is saved as a plain text file.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Part of the CKG functionality includes interfacing Python and R, and seemingly use R functions for data analysis. The python package <code class="docutils literal notranslate"><span class="pre">rpy2</span></code> is used as this interface and unfortunately, the current release of this package for Windows is not compatible with CKG. Installation of the CKG on Windows machines, will therefore <strong>not</strong> allow the usage of R packages (SAMR and WGCNA) within the CKG.</p>
 </div>
 <p>To install all the required packages, simply run:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt; <span class="nb">cd</span> CKG/
-&gt; conda install --file requirements.txt
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt; <span class="nb">cd</span> CKG<span class="se">\</span>
+&gt; pip3 install --upgrade pip
+&gt; pip3 install --ignore-installed -r requirements.txt
+
+.. warning:: Make sure the virtual environment previously created is active before installing <span class="sb">``</span>requirements.txt<span class="sb">``</span>.
 </pre></div>
 </div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Make sure the virtual environment previously created is active before installing <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code>.</p>
+<p>When these packages are installed, you can proceed to install a functinal version of celery 4 for Windows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt; <span class="nb">cd</span> ..<span class="se">\</span>
+&gt; git clone https://github.com/bstiel/celery-4-windows.git
+&gt; <span class="nb">cd</span> celery-4-windows
+&gt; pip install requirements.txt
+</pre></div>
 </div>
 <p>Now that all the packages are correctly installed, you will have to create the appropriate directory architecture within the local copy of the cloned repository:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt; python setup_CKG.py
@@ -378,7 +381,7 @@ Assuming you have <strong>Python 3.6</strong> already installed, you can choose 
 </div>
 <div class="section" id="add-ckg-to-environmental-variables">
 <h3>Add CKG to environmental variables<a class="headerlink" href="#add-ckg-to-environmental-variables" title="Permalink to this headline">¶</a></h3>
-<p>Similarly to <a class="reference internal" href="#add-neo4j-graph-database-to-environmental-variables"><span class="std std-ref">Add Neo4j graph database to environmental variables</span></a>, CKG also needs to be added to the environmental variables.</p>
+<p>In order to run CKG modules, the package needs to be added to the environmental variables.</p>
 <ol class="arabic simple">
 <li><p>Go to the Windows menu, right-click on <span class="guilabel">Computer</span> and click on <span class="guilabel">Properties</span>.</p></li>
 <li><p>From the computer properties dialog, select <code class="docutils literal notranslate"><span class="pre">Advanced</span> <span class="pre">system</span> <span class="pre">settings</span></code> on the left panel. And from there, click on <span class="guilabel">Environment variables</span>.</p></li>

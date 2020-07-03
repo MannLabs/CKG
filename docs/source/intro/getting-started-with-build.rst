@@ -41,6 +41,7 @@ If this does not correspond to the correct Python version you want to run, you c
 .. note:: If you don't have **Python 3.6** installed, `download <https://www.python.org/>`__ the Python 3.6 version appropriate for your machine, and run the installer package. Python should be installed in ``/Library/Frameworks/Python.framework/Versions/3.6/bin/python3.6`` and also found in ``/usr/local/bin/python3.6``.
 
 
+.. _Create virtual environment:
 
 Create a virtual environment
 -----------------------------

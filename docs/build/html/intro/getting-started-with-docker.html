@@ -207,17 +207,20 @@
 <h1>Getting started with Docker <strong>(Testing)</strong><a class="headerlink" href="#getting-started-with-docker-testing" title="Permalink to this headline">¶</a></h1>
 <p>In this section we describe how to set up the Clinical Knowledge Graph from a Docker container.
 This container will install all the requirements needed, download source databases and build the CKG graph database, and open 5 ports through which to interact with the CKG.</p>
-<p>A requirement to run the Docker is <strong>Java SE Runtime Environment</strong>.
-Please go to <code class="docutils literal notranslate"><span class="pre">https://www.oracle.com/java/technologies/javase-jre8-downloads.html</span></code> and download the <code class="docutils literal notranslate"><span class="pre">jre-8u221-linux-x64.tar.gz</span></code> file. Once downloaded, place it in <code class="docutils literal notranslate"><span class="pre">CKG/resources/</span></code>.</p>
 <p>To run the Docker, simply:</p>
 <ol class="arabic simple">
+<li><p>Allocate resources:</p></li>
+</ol>
+<p>The docker build requires more resources (memory and disk) than the ones set as default. Make sure to allocate at least 8Gb memory and at least 60Gb of Disk space. To change these settings: Docker Preferences -&gt; Resources.</p>
+<ol class="arabic simple" start="2">
 <li><p>Build the docker</p></li>
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> CKG/
 $ docker build -t docker-ckg:latest .
 </pre></div>
 </div>
-<ol class="arabic simple" start="2">
+<ol class="arabic simple" start="3">
+<li><p>Make sure to download manually the licensed databases (<a class="reference internal" href="getting-started-with-build.html#build-neo4j-graph-database"><span class="std std-ref">Build Neo4j graph database</span></a>)</p></li>
 <li><p>Run the docker</p></li>
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ docker run -d --name ckgapp -d -v log:/CKG/log -v data:/CKG/data -e <span class="nv">EXEC_MODE</span><span class="o">=</span><span class="s2">&quot;minimal&quot;</span> --restart<span class="o">=</span>always -p <span class="m">8050</span>:8050 -p <span class="m">7470</span>:7474 -p <span class="m">8090</span>:8090 -p <span class="m">7680</span>:7687 -p <span class="m">6379</span>:6379 docker-ckg:latest

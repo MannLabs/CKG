@@ -464,6 +464,29 @@ For more information visit <a class="reference external" href="http://www.coxdoc
 </dd></dl>
 
 <dl class="function">
+<dt id="analytics_core.analytics.analytics.normalize_data_per_group">
+<code class="sig-prename descclassname">analytics_core.analytics.analytics.</code><code class="sig-name descname">normalize_data_per_group</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">group</em>, <em class="sig-param">method='median'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/analytics/analytics.html#normalize_data_per_group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.analytics.analytics.normalize_data_per_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function normalizes the data by group using the selected method</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – DataFrame with the data to be normalized (samples x features)</p></li>
+<li><p><strong>group_col</strong> – Column containing the groups</p></li>
+<li><p><strong>method</strong> (<em>string</em>) – normalization method to choose among: median_polish, median,
+quantile, linear</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pandas dataframe.</p>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">normalize_data_per_group</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;group&#39;</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;median&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
 <dt id="analytics_core.analytics.analytics.normalize_data">
 <code class="sig-prename descclassname">analytics_core.analytics.analytics.</code><code class="sig-name descname">normalize_data</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">method='median_polish'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/analytics/analytics.html#normalize_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.analytics.analytics.normalize_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function normalizes the data using the selected method</p>
@@ -561,7 +584,7 @@ median until medians converge.</p>
 <dd><p>Applies quantile normalization to each column in pandas dataframe.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>data</strong> – pandas dataframe with features as rows and samples as columns.</p>
+<dd class="field-odd"><p><strong>data</strong> – pandas dataframe with features as columns and samples as rows.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Pandas dataframe</p>
@@ -687,7 +710,7 @@ visit <a class="reference external" href="https://docs.scipy.org/doc/scipy/refer
 
 <dl class="function">
 <dt id="analytics_core.analytics.analytics.get_proteomics_measurements_ready">
-<code class="sig-prename descclassname">analytics_core.analytics.analytics.</code><code class="sig-name descname">get_proteomics_measurements_ready</code><span class="sig-paren">(</span><em class="sig-param">df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation=True, method='distribution', missing_method='percentage', missing_per_group=True, missing_max=0.3, min_valid=1, value_col='LFQ_intensity', shift=1.8, nstd=0.3, knn_cutoff=0.6, normalize=False, normalization_method='median'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/analytics/analytics.html#get_proteomics_measurements_ready"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.analytics.analytics.get_proteomics_measurements_ready" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">analytics_core.analytics.analytics.</code><code class="sig-name descname">get_proteomics_measurements_ready</code><span class="sig-paren">(</span><em class="sig-param">df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation=True, method='distribution', missing_method='percentage', missing_per_group=True, missing_max=0.3, min_valid=1, value_col='LFQ_intensity', shift=1.8, nstd=0.3, knn_cutoff=0.6, normalize=False, normalization_method='median', normalize_group=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/analytics_core/analytics/analytics.html#get_proteomics_measurements_ready"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytics_core.analytics.analytics.get_proteomics_measurements_ready" title="Permalink to this definition">¶</a></dt>
 <dd><p>Processes proteomics data extracted from the database: 1) filter proteins with high number of missing values (&gt; missing_max or min_valid), 2) impute missing values.
 For more information on imputation method visit <a class="reference external" href="http://www.coxdocs.org/doku.php?id=perseus:user:activities:matrixprocessing:filterrows:filtervalidvaluesrows">http://www.coxdocs.org/doku.php?id=perseus:user:activities:matrixprocessing:filterrows:filtervalidvaluesrows</a>.</p>
 <dl class="field-list simple">
