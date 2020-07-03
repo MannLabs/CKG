@@ -136,7 +136,7 @@
 <li class="toctree-l2"><a class="reference internal" href="graphdb_builder.html">Graph Database Builder</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="report_manager.html">Report Manager</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Report Dash Apps</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#basic-app">Basic App</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-report_manager.apps.basicApp">Basic App</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data-upload-app">Data Upload App</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-report_manager.apps.dataUpload">Data Upload</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#homepage-stats-app">HomePage Stats App</a></li>
@@ -150,7 +150,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-report_manager.apps.projectCreation">Project Creation</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="report_manager.html#app-py">app.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="report_manager.html#module-report_manager.app">app.py</a></li>
 <li class="toctree-l3"><a class="reference internal" href="report_manager.html#module-report_manager.dataset">dataset.py</a></li>
 <li class="toctree-l3"><a class="reference internal" href="report_manager.html#index-py">index.py</a></li>
 <li class="toctree-l3"><a class="reference internal" href="report_manager.html#module-report_manager.knowledge">knowledge.py</a></li>
@@ -242,8 +242,89 @@
             
   <div class="section" id="report-dash-apps">
 <h1>Report Dash Apps<a class="headerlink" href="#report-dash-apps" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="basic-app">
-<h2>Basic App<a class="headerlink" href="#basic-app" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-report_manager.apps.basicApp">
+<span id="basic-app"></span><h2>Basic App<a class="headerlink" href="#module-report_manager.apps.basicApp" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="report_manager.apps.basicApp.BasicApp">
+<em class="property">class </em><code class="sig-prename descclassname">report_manager.apps.basicApp.</code><code class="sig-name descname">BasicApp</code><span class="sig-paren">(</span><em class="sig-param">title</em>, <em class="sig-param">subtitle</em>, <em class="sig-param">description</em>, <em class="sig-param">page_type</em>, <em class="sig-param">layout=[]</em>, <em class="sig-param">logo=None</em>, <em class="sig-param">footer=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/apps/basicApp.html#BasicApp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.apps.basicApp.BasicApp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Defines what an App is in the report_manager.
+Other Apps will inherit basic functionality from this class.
+Attributes: Title, subtitle, description, logo, footer.</p>
+<dl class="method">
+<dt id="report_manager.apps.basicApp.BasicApp.title">
+<em class="property">property </em><code class="sig-name descname">title</code><a class="headerlink" href="#report_manager.apps.basicApp.BasicApp.title" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.apps.basicApp.BasicApp.subtitle">
+<em class="property">property </em><code class="sig-name descname">subtitle</code><a class="headerlink" href="#report_manager.apps.basicApp.BasicApp.subtitle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.apps.basicApp.BasicApp.description">
+<em class="property">property </em><code class="sig-name descname">description</code><a class="headerlink" href="#report_manager.apps.basicApp.BasicApp.description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.apps.basicApp.BasicApp.page_type">
+<em class="property">property </em><code class="sig-name descname">page_type</code><a class="headerlink" href="#report_manager.apps.basicApp.BasicApp.page_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.apps.basicApp.BasicApp.logo">
+<em class="property">property </em><code class="sig-name descname">logo</code><a class="headerlink" href="#report_manager.apps.basicApp.BasicApp.logo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.apps.basicApp.BasicApp.footer">
+<em class="property">property </em><code class="sig-name descname">footer</code><a class="headerlink" href="#report_manager.apps.basicApp.BasicApp.footer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.apps.basicApp.BasicApp.layout">
+<em class="property">property </em><code class="sig-name descname">layout</code><a class="headerlink" href="#report_manager.apps.basicApp.BasicApp.layout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.apps.basicApp.BasicApp.add_to_layout">
+<code class="sig-name descname">add_to_layout</code><span class="sig-paren">(</span><em class="sig-param">section</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/apps/basicApp.html#BasicApp.add_to_layout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.apps.basicApp.BasicApp.add_to_layout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.apps.basicApp.BasicApp.extend_layout">
+<code class="sig-name descname">extend_layout</code><span class="sig-paren">(</span><em class="sig-param">sections</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/apps/basicApp.html#BasicApp.extend_layout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.apps.basicApp.BasicApp.extend_layout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.apps.basicApp.BasicApp.get_HTML_title">
+<code class="sig-name descname">get_HTML_title</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/apps/basicApp.html#BasicApp.get_HTML_title"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.apps.basicApp.BasicApp.get_HTML_title" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.apps.basicApp.BasicApp.get_HTML_subtitle">
+<code class="sig-name descname">get_HTML_subtitle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/apps/basicApp.html#BasicApp.get_HTML_subtitle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.apps.basicApp.BasicApp.get_HTML_subtitle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.apps.basicApp.BasicApp.get_HTML_description">
+<code class="sig-name descname">get_HTML_description</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/apps/basicApp.html#BasicApp.get_HTML_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.apps.basicApp.BasicApp.get_HTML_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="report_manager.apps.basicApp.BasicApp.add_basic_layout">
+<code class="sig-name descname">add_basic_layout</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/apps/basicApp.html#BasicApp.add_basic_layout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.apps.basicApp.BasicApp.add_basic_layout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls class functions to setup the layout: title, subtitle, description,         logo and footer.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="report_manager.apps.basicApp.BasicApp.build_page">
+<code class="sig-name descname">build_page</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/report_manager/apps/basicApp.html#BasicApp.build_page"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#report_manager.apps.basicApp.BasicApp.build_page" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds page basic layout.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="data-upload-app">
 <h2>Data Upload App<a class="headerlink" href="#data-upload-app" title="Permalink to this headline">¶</a></h2>

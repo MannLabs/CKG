@@ -475,7 +475,7 @@
 
 <dl class="function">
 <dt id="graphdb_builder.builder_utils.download_PRIDE_data">
-<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">download_PRIDE_data</code><span class="sig-paren">(</span><em class="sig-param">pxd_id</em>, <em class="sig-param">file_name</em>, <em class="sig-param">to='.'</em>, <em class="sig-param">user=''</em>, <em class="sig-param">password=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#download_PRIDE_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.download_PRIDE_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">graphdb_builder.builder_utils.</code><code class="sig-name descname">download_PRIDE_data</code><span class="sig-paren">(</span><em class="sig-param">pxd_id</em>, <em class="sig-param">file_name</em>, <em class="sig-param">to='.'</em>, <em class="sig-param">user=''</em>, <em class="sig-param">password=''</em>, <em class="sig-param">date_field='publicationDate'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/graphdb_builder/builder_utils.html#download_PRIDE_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphdb_builder.builder_utils.download_PRIDE_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function downloads a project file from the PRIDE repository</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -485,6 +485,8 @@
 <li><p><strong>to</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – local directory where the file should be downloaded</p></li>
 <li><p><strong>user</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – username to access biomedical database server if required.</p></li>
 <li><p><strong>password</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – password to access biomedical database server if required.</p></li>
+<li><p><strong>date_field</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – projects deposited in PRIDE are search based on date, either 
+submissionData or publicationDate (default)</p></li>
 </ul>
 </dd>
 </dl>

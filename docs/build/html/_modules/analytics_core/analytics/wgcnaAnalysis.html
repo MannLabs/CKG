@@ -200,30 +200,24 @@
            <div itemprop="articleBody">
             
   <h1>Source code for analytics_core.analytics.wgcnaAnalysis</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">scp</span>
-<span class="kn">from</span> <span class="nn">scipy.cluster.hierarchy</span> <span class="k">import</span> <span class="n">distance</span><span class="p">,</span> <span class="n">linkage</span><span class="p">,</span> <span class="n">dendrogram</span><span class="p">,</span> <span class="n">fcluster</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span><span class="p">,</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">natsort</span> <span class="k">import</span> <span class="n">natsorted</span><span class="p">,</span> <span class="n">index_natsorted</span><span class="p">,</span> <span class="n">order_by_index</span>
-<span class="kn">import</span> <span class="nn">urllib.request</span>
+<span class="kn">from</span> <span class="nn">scipy.cluster.hierarchy</span> <span class="k">import</span> <span class="n">linkage</span><span class="p">,</span> <span class="n">dendrogram</span><span class="p">,</span> <span class="n">fcluster</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">natsort</span> <span class="k">import</span> <span class="n">natsorted</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">rpy2</span> <span class="k">import</span> <span class="n">robjects</span> <span class="k">as</span> <span class="n">ro</span>
     <span class="kn">from</span> <span class="nn">rpy2.robjects</span> <span class="k">import</span> <span class="n">pandas2ri</span>
     <span class="kn">from</span> <span class="nn">rpy2.robjects.packages</span> <span class="k">import</span> <span class="n">importr</span>
     <span class="kn">from</span> <span class="nn">rpy2.rinterface_lib</span> <span class="k">import</span> <span class="n">embedded</span>
-    <span class="kn">from</span> <span class="nn">rpy2.robjects.vectors</span> <span class="k">import</span> <span class="n">StrVector</span><span class="p">,</span> <span class="n">FloatVector</span>
-    <span class="kn">import</span> <span class="nn">rpy2.robjects.packages</span> <span class="k">as</span> <span class="nn">rpacks</span>
     <span class="n">pandas2ri</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
     <span class="c1"># sys.setrecursionlimit(10000)</span>
 
     <span class="c1">#Call R</span>
     <span class="n">R</span> <span class="o">=</span> <span class="n">ro</span><span class="o">.</span><span class="n">r</span>
     <span class="n">R</span><span class="p">(</span><span class="s1">&#39;options(stringsAsFactors = FALSE)&#39;</span><span class="p">)</span>
-    
+
     <span class="c1">#Call R packages</span>
     <span class="n">base</span> <span class="o">=</span> <span class="n">importr</span><span class="p">(</span><span class="s1">&#39;base&#39;</span><span class="p">)</span>
     <span class="n">stats</span> <span class="o">=</span> <span class="n">importr</span><span class="p">(</span><span class="s1">&#39;stats&#39;</span><span class="p">)</span>
@@ -231,6 +225,8 @@
     <span class="n">flashClust</span> <span class="o">=</span> <span class="n">importr</span><span class="p">(</span><span class="s1">&#39;flashClust&#39;</span><span class="p">)</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WGCNA functions will not work. Module Rpy2 not installed.&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WGCNA functions will not work. Missing installation. Error: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
 
 
 <div class="viewcode-block" id="get_data"><a class="viewcode-back" href="../../../_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.get_data">[docs]</a><span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">drop_cols_exp</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">,</span> <span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="s1">&#39;sample&#39;</span><span class="p">,</span> <span class="s1">&#39;index&#39;</span><span class="p">],</span> <span class="n">drop_cols_cli</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">,</span> <span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="s1">&#39;biological_sample&#39;</span><span class="p">,</span> <span class="s1">&#39;index&#39;</span><span class="p">],</span> <span class="n">sd_cutoff</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
@@ -299,6 +295,7 @@
             <span class="k">return</span> <span class="n">Z_dendrogram</span>
 
     <span class="k">return</span> <span class="kc">None</span></div>
+
 
 <div class="viewcode-block" id="get_clusters_elements"><a class="viewcode-back" href="../../../_autosummary/analytics_core.analytics.html#analytics_core.analytics.wgcnaAnalysis.get_clusters_elements">[docs]</a><span class="k">def</span> <span class="nf">get_clusters_elements</span><span class="p">(</span><span class="n">linkage_matrix</span><span class="p">,</span> <span class="n">fcluster_method</span><span class="p">,</span> <span class="n">fcluster_cutoff</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; </span>
@@ -568,8 +565,6 @@
     <span class="n">nSamples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_exp</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
     <span class="n">moduleTraitCor</span> <span class="o">=</span> <span class="kc">None</span> 
     <span class="n">textMatrix</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">MEs</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">df_traits</span><span class="p">))</span>
     
     <span class="n">df_traits</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df_traits</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;space&#39;</span><span class="p">)</span>
     <span class="n">df_traits</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df_traits</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s1">&#39;parentheses1&#39;</span><span class="p">)</span>
