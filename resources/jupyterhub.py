@@ -2,15 +2,20 @@
 # Configuration file for jupyterhub.
 #------------------------------------------------------------------------------
 
+import os
+os.umask(0o002)
+
 # set of users who can administer the Hub itself 
 c.Authenticator.admin_users = {'adminhub'}
+c.Authenticator.whitelist = {'ckguser'}
 
 # set the Clinical Knowledge Graph logo
 c.JupyterHub.logo_file = '/CKG/src/report_manager/assets/logo_small.jpg'
 
 ## The public facing port of the proxy.
 c.JupyterHub.port = 8090
-c.Spawner.notebook_dir='/CKG/src/notebooks'
+c.Spawner.notebook_dir = '~/notebooks'
+c.Spawner.debug = True
 
 #  Supports Linux and BSD variants only.
 c.LocalAuthenticator.create_system_users = True

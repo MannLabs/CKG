@@ -74,25 +74,35 @@ def parser_from_file(file_path, configuration, data_type, is_standard=True):
     return data
 
 
-def update_configuration(data_type, processing_tool, value_col='LFQ intensity', columns=[], drop_cols=[], filters=None):
-    configuration = {}
+def get_configuration(processing_tool, data_type):
+    configuration = None
     if processing_tool is not None:
         config = builder_utils.get_config(config_name="proteomics.yml", data_type='experiments')
         if processing_tool in config:
             tool_configuration = config[processing_tool]
             if data_type in tool_configuration:
                 configuration = tool_configuration[data_type]
-                configuration['columns'].extend(columns)
-                configuration['valueCol'] = value_col
-                if len(drop_cols) > 0:
-                    configuration['columns'] = [c for c in configuration['columns'] if c not in drop_cols]
-                    if 'attributes' in configuration:
-                        if 'cols' in configuration['attributes']:
-                            configuration['attributes']['cols'] = [c for c in configuration['attributes']['cols'] if c not in drop_cols]
-                        if 'regex' in configuration['attributes']:
-                            configuration['attributes']['regex'] = [c for c in configuration['attributes']['regex'] if c not in drop_cols]
-                if filters is not None:
-                    configuration['filters'] = filters
+
+    return configuration
+
+
+def update_configuration(data_type, processing_tool, value_col='LFQ intensity', columns=[], drop_cols=[], filters=None, new_config={}):
+    configuration = get_configuration(processing_tool, data_type)
+    if configuration is not None:
+        configuration['columns'].extend(columns)
+        configuration['valueCol'] = value_col
+        if len(drop_cols) > 0:
+            configuration['columns'] = [c for c in configuration['columns'] if c not in drop_cols]
+            if 'attributes' in configuration:
+                if 'cols' in configuration['attributes']:
+                    configuration['attributes']['cols'] = [c for c in configuration['attributes']['cols'] if c not in drop_cols]
+                if 'regex' in configuration['attributes']:
+                    configuration['attributes']['regex'] = [c for c in configuration['attributes']['regex'] if c not in drop_cols]
+        if filters is not None:
+            configuration['filters'] = filters
+
+        for key in new_config:
+            configuration[key] = new_config[key]
 
     return configuration
 
