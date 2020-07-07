@@ -165,10 +165,11 @@
 \indexentry{parser() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{parser()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{60}
 \indexentry{parse\_from\_directory() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{parse\_from\_directory()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{60}
 \indexentry{parser\_from\_file() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{parser\_from\_file()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{60}
+\indexentry{get\_configuration() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{get\_configuration()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{60}
 \indexentry{update\_configuration() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{update\_configuration()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{60}
 \indexentry{parse\_dataset() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{parse\_dataset()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{60}
 \indexentry{parse\_standard\_dataset() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{parse\_standard\_dataset()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{60}
-\indexentry{check\_columns() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{check\_columns()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{60}
+\indexentry{check\_columns() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{check\_columns()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{61}
 \indexentry{check\_minimum\_configuration() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{check\_minimum\_configuration()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{61}
 \indexentry{load\_dataset() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{load\_dataset()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{61}
 \indexentry{remove\_contaminant\_tag() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{remove\_contaminant\_tag()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{61}
@@ -179,7 +180,7 @@
 \indexentry{extract\_peptide\_protein\_modification\_rels() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{extract\_peptide\_protein\_modification\_rels()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{61}
 \indexentry{extract\_protein\_modifications\_rels() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{extract\_protein\_modifications\_rels()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{61}
 \indexentry{extract\_protein\_modifications\_modification\_rels() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{extract\_protein\_modifications\_modification\_rels()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{61}
-\indexentry{extract\_peptides() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{extract\_peptides()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{61}
+\indexentry{extract\_peptides() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{extract\_peptides()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{62}
 \indexentry{extract\_peptide\_subject\_rels() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{extract\_peptide\_subject\_rels()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{62}
 \indexentry{extract\_peptide\_protein\_rels() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{extract\_peptide\_protein\_rels()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{62}
 \indexentry{extract\_protein\_subject\_rels() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{extract\_protein\_subject\_rels()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{62}
@@ -190,8 +191,8 @@
 \indexentry{merge\_regex\_attributes() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{merge\_regex\_attributes()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{62}
 \indexentry{merge\_col\_attributes() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{merge\_col\_attributes()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{62}
 \indexentry{calculate\_median\_replicates() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{calculate\_median\_replicates()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{62}
-\indexentry{update\_groups() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{update\_groups()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{62}
-\indexentry{get\_dataset\_configuration() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{get\_dataset\_configuration()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{62}
+\indexentry{update\_groups() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{update\_groups()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{63}
+\indexentry{get\_dataset\_configuration() (in module graphdb\_builder.experiments.parsers.proteomicsParser)@\spxentry{get\_dataset\_configuration()}\spxextra{in module graphdb\_builder.experiments.parsers.proteomicsParser}|hyperpage}{63}
 \indexentry{graphdb\_builder.experiments.parsers.wesParser (module)@\spxentry{graphdb\_builder.experiments.parsers.wesParser}\spxextra{module}|hyperpage}{63}
 \indexentry{parser() (in module graphdb\_builder.experiments.parsers.wesParser)@\spxentry{parser()}\spxextra{in module graphdb\_builder.experiments.parsers.wesParser}|hyperpage}{63}
 \indexentry{parseWESDataset() (in module graphdb\_builder.experiments.parsers.wesParser)@\spxentry{parseWESDataset()}\spxextra{in module graphdb\_builder.experiments.parsers.wesParser}|hyperpage}{63}
@@ -202,37 +203,37 @@
 \indexentry{generate\_graph\_files() (in module graphdb\_builder.experiments.experiments\_controller)@\spxentry{generate\_graph\_files()}\spxextra{in module graphdb\_builder.experiments.experiments\_controller}|hyperpage}{63}
 \indexentry{graphdb\_builder.users.users\_controller (module)@\spxentry{graphdb\_builder.users.users\_controller}\spxextra{module}|hyperpage}{63}
 \indexentry{parseUsersFile() (in module graphdb\_builder.users.users\_controller)@\spxentry{parseUsersFile()}\spxextra{in module graphdb\_builder.users.users\_controller}|hyperpage}{63}
-\indexentry{get\_user\_creation\_queries() (in module graphdb\_builder.users.users\_controller)@\spxentry{get\_user\_creation\_queries()}\spxextra{in module graphdb\_builder.users.users\_controller}|hyperpage}{63}
+\indexentry{get\_user\_creation\_queries() (in module graphdb\_builder.users.users\_controller)@\spxentry{get\_user\_creation\_queries()}\spxextra{in module graphdb\_builder.users.users\_controller}|hyperpage}{64}
 \indexentry{get\_new\_user\_identifier() (in module graphdb\_builder.users.users\_controller)@\spxentry{get\_new\_user\_identifier()}\spxextra{in module graphdb\_builder.users.users\_controller}|hyperpage}{64}
 \indexentry{check\_if\_node\_exists() (in module graphdb\_builder.users.users\_controller)@\spxentry{check\_if\_node\_exists()}\spxextra{in module graphdb\_builder.users.users\_controller}|hyperpage}{64}
 \indexentry{create\_db\_user() (in module graphdb\_builder.users.users\_controller)@\spxentry{create\_db\_user()}\spxextra{in module graphdb\_builder.users.users\_controller}|hyperpage}{64}
 \indexentry{GenerateGraphFiles() (in module graphdb\_builder.users.users\_controller)@\spxentry{GenerateGraphFiles()}\spxextra{in module graphdb\_builder.users.users\_controller}|hyperpage}{64}
-\indexentry{graphdb\_builder.builder.create\_user (module)@\spxentry{graphdb\_builder.builder.create\_user}\spxextra{module}|hyperpage}{64}
-\indexentry{create\_user\_node() (in module graphdb\_builder.builder.create\_user)@\spxentry{create\_user\_node()}\spxextra{in module graphdb\_builder.builder.create\_user}|hyperpage}{64}
+\indexentry{graphdb\_builder.builder.create\_user (module)@\spxentry{graphdb\_builder.builder.create\_user}\spxextra{module}|hyperpage}{65}
+\indexentry{create\_user\_node() (in module graphdb\_builder.builder.create\_user)@\spxentry{create\_user\_node()}\spxextra{in module graphdb\_builder.builder.create\_user}|hyperpage}{65}
 \indexentry{create\_user\_from\_command\_line() (in module graphdb\_builder.builder.create\_user)@\spxentry{create\_user\_from\_command\_line()}\spxextra{in module graphdb\_builder.builder.create\_user}|hyperpage}{65}
 \indexentry{create\_user\_from\_file() (in module graphdb\_builder.builder.create\_user)@\spxentry{create\_user\_from\_file()}\spxextra{in module graphdb\_builder.builder.create\_user}|hyperpage}{65}
 \indexentry{create\_user() (in module graphdb\_builder.builder.create\_user)@\spxentry{create\_user()}\spxextra{in module graphdb\_builder.builder.create\_user}|hyperpage}{65}
-\indexentry{set\_arguments() (in module graphdb\_builder.builder.create\_user)@\spxentry{set\_arguments()}\spxextra{in module graphdb\_builder.builder.create\_user}|hyperpage}{65}
+\indexentry{set\_arguments() (in module graphdb\_builder.builder.create\_user)@\spxentry{set\_arguments()}\spxextra{in module graphdb\_builder.builder.create\_user}|hyperpage}{66}
 \indexentry{graphdb\_builder.builder.importer (module)@\spxentry{graphdb\_builder.builder.importer}\spxextra{module}|hyperpage}{66}
 \indexentry{ontologiesImport() (in module graphdb\_builder.builder.importer)@\spxentry{ontologiesImport()}\spxextra{in module graphdb\_builder.builder.importer}|hyperpage}{66}
 \indexentry{databasesImport() (in module graphdb\_builder.builder.importer)@\spxentry{databasesImport()}\spxextra{in module graphdb\_builder.builder.importer}|hyperpage}{66}
 \indexentry{experimentsImport() (in module graphdb\_builder.builder.importer)@\spxentry{experimentsImport()}\spxextra{in module graphdb\_builder.builder.importer}|hyperpage}{66}
 \indexentry{experimentImport() (in module graphdb\_builder.builder.importer)@\spxentry{experimentImport()}\spxextra{in module graphdb\_builder.builder.importer}|hyperpage}{66}
-\indexentry{usersImport() (in module graphdb\_builder.builder.importer)@\spxentry{usersImport()}\spxextra{in module graphdb\_builder.builder.importer}|hyperpage}{66}
+\indexentry{usersImport() (in module graphdb\_builder.builder.importer)@\spxentry{usersImport()}\spxextra{in module graphdb\_builder.builder.importer}|hyperpage}{67}
 \indexentry{fullImport() (in module graphdb\_builder.builder.importer)@\spxentry{fullImport()}\spxextra{in module graphdb\_builder.builder.importer}|hyperpage}{67}
 \indexentry{generateStatsDataFrame() (in module graphdb\_builder.builder.importer)@\spxentry{generateStatsDataFrame()}\spxextra{in module graphdb\_builder.builder.importer}|hyperpage}{67}
 \indexentry{setupStats() (in module graphdb\_builder.builder.importer)@\spxentry{setupStats()}\spxextra{in module graphdb\_builder.builder.importer}|hyperpage}{67}
 \indexentry{createEmptyStats() (in module graphdb\_builder.builder.importer)@\spxentry{createEmptyStats()}\spxextra{in module graphdb\_builder.builder.importer}|hyperpage}{67}
 \indexentry{writeStats() (in module graphdb\_builder.builder.importer)@\spxentry{writeStats()}\spxextra{in module graphdb\_builder.builder.importer}|hyperpage}{67}
 \indexentry{getStatsName() (in module graphdb\_builder.builder.importer)@\spxentry{getStatsName()}\spxextra{in module graphdb\_builder.builder.importer}|hyperpage}{67}
-\indexentry{graphdb\_builder.builder.loader (module)@\spxentry{graphdb\_builder.builder.loader}\spxextra{module}|hyperpage}{67}
-\indexentry{load\_into\_database() (in module graphdb\_builder.builder.loader)@\spxentry{load\_into\_database()}\spxextra{in module graphdb\_builder.builder.loader}|hyperpage}{67}
+\indexentry{graphdb\_builder.builder.loader (module)@\spxentry{graphdb\_builder.builder.loader}\spxextra{module}|hyperpage}{68}
+\indexentry{load\_into\_database() (in module graphdb\_builder.builder.loader)@\spxentry{load\_into\_database()}\spxextra{in module graphdb\_builder.builder.loader}|hyperpage}{68}
 \indexentry{updateDB() (in module graphdb\_builder.builder.loader)@\spxentry{updateDB()}\spxextra{in module graphdb\_builder.builder.loader}|hyperpage}{68}
 \indexentry{fullUpdate() (in module graphdb\_builder.builder.loader)@\spxentry{fullUpdate()}\spxextra{in module graphdb\_builder.builder.loader}|hyperpage}{68}
 \indexentry{partialUpdate() (in module graphdb\_builder.builder.loader)@\spxentry{partialUpdate()}\spxextra{in module graphdb\_builder.builder.loader}|hyperpage}{68}
 \indexentry{archiveImportDirectory() (in module graphdb\_builder.builder.loader)@\spxentry{archiveImportDirectory()}\spxextra{in module graphdb\_builder.builder.loader}|hyperpage}{68}
-\indexentry{graphdb\_builder.builder.builder (module)@\spxentry{graphdb\_builder.builder.builder}\spxextra{module}|hyperpage}{68}
-\indexentry{set\_arguments() (in module graphdb\_builder.builder.builder)@\spxentry{set\_arguments()}\spxextra{in module graphdb\_builder.builder.builder}|hyperpage}{68}
+\indexentry{graphdb\_builder.builder.builder (module)@\spxentry{graphdb\_builder.builder.builder}\spxextra{module}|hyperpage}{69}
+\indexentry{set\_arguments() (in module graphdb\_builder.builder.builder)@\spxentry{set\_arguments()}\spxextra{in module graphdb\_builder.builder.builder}|hyperpage}{69}
 \indexentry{graphdb\_builder.builder\_utils (module)@\spxentry{graphdb\_builder.builder\_utils}\spxextra{module}|hyperpage}{69}
 \indexentry{readDataset() (in module graphdb\_builder.builder\_utils)@\spxentry{readDataset()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{69}
 \indexentry{readDataFromCSV() (in module graphdb\_builder.builder\_utils)@\spxentry{readDataFromCSV()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{69}
@@ -245,21 +246,21 @@
 \indexentry{write\_relationships() (in module graphdb\_builder.builder\_utils)@\spxentry{write\_relationships()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{69}
 \indexentry{write\_entities() (in module graphdb\_builder.builder\_utils)@\spxentry{write\_entities()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{69}
 \indexentry{get\_config() (in module graphdb\_builder.builder\_utils)@\spxentry{get\_config()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{69}
-\indexentry{expand\_cols() (in module graphdb\_builder.builder\_utils)@\spxentry{expand\_cols()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{69}
+\indexentry{expand\_cols() (in module graphdb\_builder.builder\_utils)@\spxentry{expand\_cols()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{70}
 \indexentry{setup\_config() (in module graphdb\_builder.builder\_utils)@\spxentry{setup\_config()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{70}
 \indexentry{get\_full\_path\_directories() (in module graphdb\_builder.builder\_utils)@\spxentry{get\_full\_path\_directories()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{70}
 \indexentry{list\_ftp\_directory() (in module graphdb\_builder.builder\_utils)@\spxentry{list\_ftp\_directory()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{70}
 \indexentry{setup\_logging() (in module graphdb\_builder.builder\_utils)@\spxentry{setup\_logging()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{70}
 \indexentry{download\_from\_ftp() (in module graphdb\_builder.builder\_utils)@\spxentry{download\_from\_ftp()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{70}
-\indexentry{download\_PRIDE\_data() (in module graphdb\_builder.builder\_utils)@\spxentry{download\_PRIDE\_data()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{70}
-\indexentry{downloadDB() (in module graphdb\_builder.builder\_utils)@\spxentry{downloadDB()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{70}
+\indexentry{download\_PRIDE\_data() (in module graphdb\_builder.builder\_utils)@\spxentry{download\_PRIDE\_data()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{71}
+\indexentry{downloadDB() (in module graphdb\_builder.builder\_utils)@\spxentry{downloadDB()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{71}
 \indexentry{searchPubmed() (in module graphdb\_builder.builder\_utils)@\spxentry{searchPubmed()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{71}
 \indexentry{is\_number() (in module graphdb\_builder.builder\_utils)@\spxentry{is\_number()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{71}
 \indexentry{getMedlineAbstracts() (in module graphdb\_builder.builder\_utils)@\spxentry{getMedlineAbstracts()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{71}
-\indexentry{remove\_directory() (in module graphdb\_builder.builder\_utils)@\spxentry{remove\_directory()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{71}
-\indexentry{listDirectoryFiles() (in module graphdb\_builder.builder\_utils)@\spxentry{listDirectoryFiles()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{71}
-\indexentry{listDirectoryFolders() (in module graphdb\_builder.builder\_utils)@\spxentry{listDirectoryFolders()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{71}
-\indexentry{listDirectoryFoldersNotEmpty() (in module graphdb\_builder.builder\_utils)@\spxentry{listDirectoryFoldersNotEmpty()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{71}
+\indexentry{remove\_directory() (in module graphdb\_builder.builder\_utils)@\spxentry{remove\_directory()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{72}
+\indexentry{listDirectoryFiles() (in module graphdb\_builder.builder\_utils)@\spxentry{listDirectoryFiles()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{72}
+\indexentry{listDirectoryFolders() (in module graphdb\_builder.builder\_utils)@\spxentry{listDirectoryFolders()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{72}
+\indexentry{listDirectoryFoldersNotEmpty() (in module graphdb\_builder.builder\_utils)@\spxentry{listDirectoryFoldersNotEmpty()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{72}
 \indexentry{checkDirectory() (in module graphdb\_builder.builder\_utils)@\spxentry{checkDirectory()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{72}
 \indexentry{flatten() (in module graphdb\_builder.builder\_utils)@\spxentry{flatten()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{72}
 \indexentry{pretty\_print() (in module graphdb\_builder.builder\_utils)@\spxentry{pretty\_print()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{72}
@@ -268,7 +269,7 @@
 \indexentry{convert\_bytes() (in module graphdb\_builder.builder\_utils)@\spxentry{convert\_bytes()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{72}
 \indexentry{copytree() (in module graphdb\_builder.builder\_utils)@\spxentry{copytree()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{72}
 \indexentry{file\_size() (in module graphdb\_builder.builder\_utils)@\spxentry{file\_size()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{72}
-\indexentry{buildStats() (in module graphdb\_builder.builder\_utils)@\spxentry{buildStats()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{72}
+\indexentry{buildStats() (in module graphdb\_builder.builder\_utils)@\spxentry{buildStats()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{73}
 \indexentry{unrar() (in module graphdb\_builder.builder\_utils)@\spxentry{unrar()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{73}
 \indexentry{compress\_directory() (in module graphdb\_builder.builder\_utils)@\spxentry{compress\_directory()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{73}
 \indexentry{read\_gzipped\_file() (in module graphdb\_builder.builder\_utils)@\spxentry{read\_gzipped\_file()}\spxextra{in module graphdb\_builder.builder\_utils}|hyperpage}{73}
@@ -283,72 +284,86 @@
 \indexentry{getMultipleMappingForEntity() (in module graphdb\_builder.mapping)@\spxentry{getMultipleMappingForEntity()}\spxextra{in module graphdb\_builder.mapping}|hyperpage}{74}
 \indexentry{get\_STRING\_mapping\_url() (in module graphdb\_builder.mapping)@\spxentry{get\_STRING\_mapping\_url()}\spxextra{in module graphdb\_builder.mapping}|hyperpage}{74}
 \indexentry{getSTRINGMapping() (in module graphdb\_builder.mapping)@\spxentry{getSTRINGMapping()}\spxextra{in module graphdb\_builder.mapping}|hyperpage}{74}
-\indexentry{buildMappingFromOBO() (in module graphdb\_builder.mapping)@\spxentry{buildMappingFromOBO()}\spxextra{in module graphdb\_builder.mapping}|hyperpage}{74}
+\indexentry{buildMappingFromOBO() (in module graphdb\_builder.mapping)@\spxentry{buildMappingFromOBO()}\spxextra{in module graphdb\_builder.mapping}|hyperpage}{75}
 \indexentry{map\_experiment\_files() (in module graphdb\_builder.mapping)@\spxentry{map\_experiment\_files()}\spxextra{in module graphdb\_builder.mapping}|hyperpage}{75}
 \indexentry{map\_experimental\_data() (in module graphdb\_builder.mapping)@\spxentry{map\_experimental\_data()}\spxextra{in module graphdb\_builder.mapping}|hyperpage}{75}
 \indexentry{get\_mapping\_analytical\_samples() (in module graphdb\_builder.mapping)@\spxentry{get\_mapping\_analytical\_samples()}\spxextra{in module graphdb\_builder.mapping}|hyperpage}{75}
-\indexentry{report\_manager.apps.dataUpload (module)@\spxentry{report\_manager.apps.dataUpload}\spxextra{module}|hyperpage}{75}
-\indexentry{get\_data\_upload\_queries() (in module report\_manager.apps.dataUpload)@\spxentry{get\_data\_upload\_queries()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{75}
-\indexentry{get\_new\_subject\_identifier() (in module report\_manager.apps.dataUpload)@\spxentry{get\_new\_subject\_identifier()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{75}
-\indexentry{get\_new\_biosample\_identifier() (in module report\_manager.apps.dataUpload)@\spxentry{get\_new\_biosample\_identifier()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{75}
-\indexentry{get\_new\_analytical\_sample\_identifier() (in module report\_manager.apps.dataUpload)@\spxentry{get\_new\_analytical\_sample\_identifier()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{75}
-\indexentry{get\_subjects\_enrolled\_in\_project() (in module report\_manager.apps.dataUpload)@\spxentry{get\_subjects\_enrolled\_in\_project()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{75}
+\indexentry{report\_manager.apps.basicApp (module)@\spxentry{report\_manager.apps.basicApp}\spxextra{module}|hyperpage}{75}
+\indexentry{BasicApp (class in report\_manager.apps.basicApp)@\spxentry{BasicApp}\spxextra{class in report\_manager.apps.basicApp}|hyperpage}{75}
+\indexentry{title() (report\_manager.apps.basicApp.BasicApp property)@\spxentry{title()}\spxextra{report\_manager.apps.basicApp.BasicApp property}|hyperpage}{75}
+\indexentry{subtitle() (report\_manager.apps.basicApp.BasicApp property)@\spxentry{subtitle()}\spxextra{report\_manager.apps.basicApp.BasicApp property}|hyperpage}{75}
+\indexentry{description() (report\_manager.apps.basicApp.BasicApp property)@\spxentry{description()}\spxextra{report\_manager.apps.basicApp.BasicApp property}|hyperpage}{75}
+\indexentry{page\_type() (report\_manager.apps.basicApp.BasicApp property)@\spxentry{page\_type()}\spxextra{report\_manager.apps.basicApp.BasicApp property}|hyperpage}{75}
+\indexentry{logo() (report\_manager.apps.basicApp.BasicApp property)@\spxentry{logo()}\spxextra{report\_manager.apps.basicApp.BasicApp property}|hyperpage}{75}
+\indexentry{footer() (report\_manager.apps.basicApp.BasicApp property)@\spxentry{footer()}\spxextra{report\_manager.apps.basicApp.BasicApp property}|hyperpage}{75}
+\indexentry{layout() (report\_manager.apps.basicApp.BasicApp property)@\spxentry{layout()}\spxextra{report\_manager.apps.basicApp.BasicApp property}|hyperpage}{75}
+\indexentry{add\_to\_layout() (report\_manager.apps.basicApp.BasicApp method)@\spxentry{add\_to\_layout()}\spxextra{report\_manager.apps.basicApp.BasicApp method}|hyperpage}{75}
+\indexentry{extend\_layout() (report\_manager.apps.basicApp.BasicApp method)@\spxentry{extend\_layout()}\spxextra{report\_manager.apps.basicApp.BasicApp method}|hyperpage}{75}
+\indexentry{get\_HTML\_title() (report\_manager.apps.basicApp.BasicApp method)@\spxentry{get\_HTML\_title()}\spxextra{report\_manager.apps.basicApp.BasicApp method}|hyperpage}{75}
+\indexentry{get\_HTML\_subtitle() (report\_manager.apps.basicApp.BasicApp method)@\spxentry{get\_HTML\_subtitle()}\spxextra{report\_manager.apps.basicApp.BasicApp method}|hyperpage}{75}
+\indexentry{get\_HTML\_description() (report\_manager.apps.basicApp.BasicApp method)@\spxentry{get\_HTML\_description()}\spxextra{report\_manager.apps.basicApp.BasicApp method}|hyperpage}{75}
+\indexentry{add\_basic\_layout() (report\_manager.apps.basicApp.BasicApp method)@\spxentry{add\_basic\_layout()}\spxextra{report\_manager.apps.basicApp.BasicApp method}|hyperpage}{75}
+\indexentry{build\_page() (report\_manager.apps.basicApp.BasicApp method)@\spxentry{build\_page()}\spxextra{report\_manager.apps.basicApp.BasicApp method}|hyperpage}{75}
+\indexentry{report\_manager.apps.dataUpload (module)@\spxentry{report\_manager.apps.dataUpload}\spxextra{module}|hyperpage}{76}
+\indexentry{get\_data\_upload\_queries() (in module report\_manager.apps.dataUpload)@\spxentry{get\_data\_upload\_queries()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{76}
+\indexentry{get\_new\_subject\_identifier() (in module report\_manager.apps.dataUpload)@\spxentry{get\_new\_subject\_identifier()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{76}
+\indexentry{get\_new\_biosample\_identifier() (in module report\_manager.apps.dataUpload)@\spxentry{get\_new\_biosample\_identifier()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{76}
+\indexentry{get\_new\_analytical\_sample\_identifier() (in module report\_manager.apps.dataUpload)@\spxentry{get\_new\_analytical\_sample\_identifier()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{76}
+\indexentry{get\_subjects\_enrolled\_in\_project() (in module report\_manager.apps.dataUpload)@\spxentry{get\_subjects\_enrolled\_in\_project()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{76}
 \indexentry{check\_samples\_in\_project() (in module report\_manager.apps.dataUpload)@\spxentry{check\_samples\_in\_project()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{76}
 \indexentry{check\_external\_ids\_in\_db() (in module report\_manager.apps.dataUpload)@\spxentry{check\_external\_ids\_in\_db()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{76}
 \indexentry{remove\_samples\_nodes\_db() (in module report\_manager.apps.dataUpload)@\spxentry{remove\_samples\_nodes\_db()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{76}
 \indexentry{create\_new\_subjects() (in module report\_manager.apps.dataUpload)@\spxentry{create\_new\_subjects()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{76}
-\indexentry{create\_new\_biosamples() (in module report\_manager.apps.dataUpload)@\spxentry{create\_new\_biosamples()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{76}
-\indexentry{create\_new\_ansamples() (in module report\_manager.apps.dataUpload)@\spxentry{create\_new\_ansamples()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{76}
-\indexentry{create\_experiment\_internal\_identifiers() (in module report\_manager.apps.dataUpload)@\spxentry{create\_experiment\_internal\_identifiers()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{76}
-\indexentry{create\_mapping\_cols\_clinical() (in module report\_manager.apps.dataUpload)@\spxentry{create\_mapping\_cols\_clinical()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{76}
+\indexentry{create\_new\_biosamples() (in module report\_manager.apps.dataUpload)@\spxentry{create\_new\_biosamples()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{77}
+\indexentry{create\_new\_ansamples() (in module report\_manager.apps.dataUpload)@\spxentry{create\_new\_ansamples()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{77}
+\indexentry{create\_experiment\_internal\_identifiers() (in module report\_manager.apps.dataUpload)@\spxentry{create\_experiment\_internal\_identifiers()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{77}
+\indexentry{create\_mapping\_cols\_clinical() (in module report\_manager.apps.dataUpload)@\spxentry{create\_mapping\_cols\_clinical()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{77}
 \indexentry{get\_project\_information() (in module report\_manager.apps.dataUpload)@\spxentry{get\_project\_information()}\spxextra{in module report\_manager.apps.dataUpload}|hyperpage}{77}
 \indexentry{report\_manager.apps.homepageStats (module)@\spxentry{report\_manager.apps.homepageStats}\spxextra{module}|hyperpage}{77}
 \indexentry{size\_converter() (in module report\_manager.apps.homepageStats)@\spxentry{size\_converter()}\spxextra{in module report\_manager.apps.homepageStats}|hyperpage}{77}
 \indexentry{get\_query() (in module report\_manager.apps.homepageStats)@\spxentry{get\_query()}\spxextra{in module report\_manager.apps.homepageStats}|hyperpage}{77}
-\indexentry{get\_db\_schema() (in module report\_manager.apps.homepageStats)@\spxentry{get\_db\_schema()}\spxextra{in module report\_manager.apps.homepageStats}|hyperpage}{77}
-\indexentry{get\_db\_stats\_data() (in module report\_manager.apps.homepageStats)@\spxentry{get\_db\_stats\_data()}\spxextra{in module report\_manager.apps.homepageStats}|hyperpage}{77}
-\indexentry{plot\_store\_size\_components() (in module report\_manager.apps.homepageStats)@\spxentry{plot\_store\_size\_components()}\spxextra{in module report\_manager.apps.homepageStats}|hyperpage}{77}
-\indexentry{plot\_node\_rel\_per\_label() (in module report\_manager.apps.homepageStats)@\spxentry{plot\_node\_rel\_per\_label()}\spxextra{in module report\_manager.apps.homepageStats}|hyperpage}{77}
+\indexentry{get\_db\_schema() (in module report\_manager.apps.homepageStats)@\spxentry{get\_db\_schema()}\spxextra{in module report\_manager.apps.homepageStats}|hyperpage}{78}
+\indexentry{get\_db\_stats\_data() (in module report\_manager.apps.homepageStats)@\spxentry{get\_db\_stats\_data()}\spxextra{in module report\_manager.apps.homepageStats}|hyperpage}{78}
+\indexentry{plot\_store\_size\_components() (in module report\_manager.apps.homepageStats)@\spxentry{plot\_store\_size\_components()}\spxextra{in module report\_manager.apps.homepageStats}|hyperpage}{78}
+\indexentry{plot\_node\_rel\_per\_label() (in module report\_manager.apps.homepageStats)@\spxentry{plot\_node\_rel\_per\_label()}\spxextra{in module report\_manager.apps.homepageStats}|hyperpage}{78}
 \indexentry{indicator() (in module report\_manager.apps.homepageStats)@\spxentry{indicator()}\spxextra{in module report\_manager.apps.homepageStats}|hyperpage}{78}
 \indexentry{quick\_numbers\_panel() (in module report\_manager.apps.homepageStats)@\spxentry{quick\_numbers\_panel()}\spxextra{in module report\_manager.apps.homepageStats}|hyperpage}{78}
-\indexentry{report\_manager.apps.imports (module)@\spxentry{report\_manager.apps.imports}\spxextra{module}|hyperpage}{78}
-\indexentry{get\_stats\_data() (in module report\_manager.apps.imports)@\spxentry{get\_stats\_data()}\spxextra{in module report\_manager.apps.imports}|hyperpage}{78}
-\indexentry{select\_last\_n\_imports() (in module report\_manager.apps.imports)@\spxentry{select\_last\_n\_imports()}\spxextra{in module report\_manager.apps.imports}|hyperpage}{78}
-\indexentry{remove\_legend\_duplicates() (in module report\_manager.apps.imports)@\spxentry{remove\_legend\_duplicates()}\spxextra{in module report\_manager.apps.imports}|hyperpage}{78}
-\indexentry{get\_databases\_entities\_relationships() (in module report\_manager.apps.imports)@\spxentry{get\_databases\_entities\_relationships()}\spxextra{in module report\_manager.apps.imports}|hyperpage}{78}
+\indexentry{report\_manager.apps.imports (module)@\spxentry{report\_manager.apps.imports}\spxextra{module}|hyperpage}{79}
+\indexentry{get\_stats\_data() (in module report\_manager.apps.imports)@\spxentry{get\_stats\_data()}\spxextra{in module report\_manager.apps.imports}|hyperpage}{79}
+\indexentry{select\_last\_n\_imports() (in module report\_manager.apps.imports)@\spxentry{select\_last\_n\_imports()}\spxextra{in module report\_manager.apps.imports}|hyperpage}{79}
+\indexentry{remove\_legend\_duplicates() (in module report\_manager.apps.imports)@\spxentry{remove\_legend\_duplicates()}\spxextra{in module report\_manager.apps.imports}|hyperpage}{79}
+\indexentry{get\_databases\_entities\_relationships() (in module report\_manager.apps.imports)@\spxentry{get\_databases\_entities\_relationships()}\spxextra{in module report\_manager.apps.imports}|hyperpage}{79}
 \indexentry{set\_colors() (in module report\_manager.apps.imports)@\spxentry{set\_colors()}\spxextra{in module report\_manager.apps.imports}|hyperpage}{79}
 \indexentry{get\_dropdown\_menu() (in module report\_manager.apps.imports)@\spxentry{get\_dropdown\_menu()}\spxextra{in module report\_manager.apps.imports}|hyperpage}{79}
-\indexentry{get\_totals\_per\_date() (in module report\_manager.apps.imports)@\spxentry{get\_totals\_per\_date()}\spxextra{in module report\_manager.apps.imports}|hyperpage}{79}
-\indexentry{get\_imports\_per\_database\_date() (in module report\_manager.apps.imports)@\spxentry{get\_imports\_per\_database\_date()}\spxextra{in module report\_manager.apps.imports}|hyperpage}{79}
+\indexentry{get\_totals\_per\_date() (in module report\_manager.apps.imports)@\spxentry{get\_totals\_per\_date()}\spxextra{in module report\_manager.apps.imports}|hyperpage}{80}
+\indexentry{get\_imports\_per\_database\_date() (in module report\_manager.apps.imports)@\spxentry{get\_imports\_per\_database\_date()}\spxextra{in module report\_manager.apps.imports}|hyperpage}{80}
 \indexentry{plot\_total\_number\_imported() (in module report\_manager.apps.imports)@\spxentry{plot\_total\_number\_imported()}\spxextra{in module report\_manager.apps.imports}|hyperpage}{80}
 \indexentry{plot\_total\_numbers\_per\_date() (in module report\_manager.apps.imports)@\spxentry{plot\_total\_numbers\_per\_date()}\spxextra{in module report\_manager.apps.imports}|hyperpage}{80}
-\indexentry{plot\_databases\_numbers\_per\_date() (in module report\_manager.apps.imports)@\spxentry{plot\_databases\_numbers\_per\_date()}\spxextra{in module report\_manager.apps.imports}|hyperpage}{80}
-\indexentry{plot\_import\_numbers\_per\_database() (in module report\_manager.apps.imports)@\spxentry{plot\_import\_numbers\_per\_database()}\spxextra{in module report\_manager.apps.imports}|hyperpage}{80}
-\indexentry{report\_manager.apps.initialApp (module)@\spxentry{report\_manager.apps.initialApp}\spxextra{module}|hyperpage}{81}
-\indexentry{report\_manager.apps.projectCreation (module)@\spxentry{report\_manager.apps.projectCreation}\spxextra{module}|hyperpage}{81}
-\indexentry{get\_project\_creation\_queries() (in module report\_manager.apps.projectCreation)@\spxentry{get\_project\_creation\_queries()}\spxextra{in module report\_manager.apps.projectCreation}|hyperpage}{81}
-\indexentry{check\_if\_node\_exists() (in module report\_manager.apps.projectCreation)@\spxentry{check\_if\_node\_exists()}\spxextra{in module report\_manager.apps.projectCreation}|hyperpage}{81}
-\indexentry{get\_new\_project\_identifier() (in module report\_manager.apps.projectCreation)@\spxentry{get\_new\_project\_identifier()}\spxextra{in module report\_manager.apps.projectCreation}|hyperpage}{81}
-\indexentry{get\_subject\_number\_in\_project() (in module report\_manager.apps.projectCreation)@\spxentry{get\_subject\_number\_in\_project()}\spxextra{in module report\_manager.apps.projectCreation}|hyperpage}{81}
+\indexentry{plot\_databases\_numbers\_per\_date() (in module report\_manager.apps.imports)@\spxentry{plot\_databases\_numbers\_per\_date()}\spxextra{in module report\_manager.apps.imports}|hyperpage}{81}
+\indexentry{plot\_import\_numbers\_per\_database() (in module report\_manager.apps.imports)@\spxentry{plot\_import\_numbers\_per\_database()}\spxextra{in module report\_manager.apps.imports}|hyperpage}{81}
+\indexentry{report\_manager.apps.initialApp (module)@\spxentry{report\_manager.apps.initialApp}\spxextra{module}|hyperpage}{82}
+\indexentry{report\_manager.apps.projectCreation (module)@\spxentry{report\_manager.apps.projectCreation}\spxextra{module}|hyperpage}{82}
+\indexentry{get\_project\_creation\_queries() (in module report\_manager.apps.projectCreation)@\spxentry{get\_project\_creation\_queries()}\spxextra{in module report\_manager.apps.projectCreation}|hyperpage}{82}
+\indexentry{check\_if\_node\_exists() (in module report\_manager.apps.projectCreation)@\spxentry{check\_if\_node\_exists()}\spxextra{in module report\_manager.apps.projectCreation}|hyperpage}{82}
+\indexentry{get\_new\_project\_identifier() (in module report\_manager.apps.projectCreation)@\spxentry{get\_new\_project\_identifier()}\spxextra{in module report\_manager.apps.projectCreation}|hyperpage}{82}
+\indexentry{get\_subject\_number\_in\_project() (in module report\_manager.apps.projectCreation)@\spxentry{get\_subject\_number\_in\_project()}\spxextra{in module report\_manager.apps.projectCreation}|hyperpage}{82}
 \indexentry{create\_new\_project() (in module report\_manager.apps.projectCreation)@\spxentry{create\_new\_project()}\spxextra{in module report\_manager.apps.projectCreation}|hyperpage}{82}
-\indexentry{report\_manager.dataset (module)@\spxentry{report\_manager.dataset}\spxextra{module}|hyperpage}{82}
-\indexentry{Dataset (class in report\_manager.dataset)@\spxentry{Dataset}\spxextra{class in report\_manager.dataset}|hyperpage}{82}
-\indexentry{identifier() (report\_manager.dataset.Dataset property)@\spxentry{identifier()}\spxextra{report\_manager.dataset.Dataset property}|hyperpage}{82}
-\indexentry{dataset\_type() (report\_manager.dataset.Dataset property)@\spxentry{dataset\_type()}\spxextra{report\_manager.dataset.Dataset property}|hyperpage}{82}
-\indexentry{data() (report\_manager.dataset.Dataset property)@\spxentry{data()}\spxextra{report\_manager.dataset.Dataset property}|hyperpage}{82}
-\indexentry{analyses() (report\_manager.dataset.Dataset property)@\spxentry{analyses()}\spxextra{report\_manager.dataset.Dataset property}|hyperpage}{82}
-\indexentry{configuration() (report\_manager.dataset.Dataset property)@\spxentry{configuration()}\spxextra{report\_manager.dataset.Dataset property}|hyperpage}{82}
-\indexentry{analysis\_queries() (report\_manager.dataset.Dataset property)@\spxentry{analysis\_queries()}\spxextra{report\_manager.dataset.Dataset property}|hyperpage}{82}
-\indexentry{report() (report\_manager.dataset.Dataset property)@\spxentry{report()}\spxextra{report\_manager.dataset.Dataset property}|hyperpage}{82}
-\indexentry{generate\_dataset() (report\_manager.dataset.Dataset method)@\spxentry{generate\_dataset()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{82}
-\indexentry{update\_report() (report\_manager.dataset.Dataset method)@\spxentry{update\_report()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{82}
-\indexentry{update\_analysis\_queries() (report\_manager.dataset.Dataset method)@\spxentry{update\_analysis\_queries()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{82}
-\indexentry{get\_dataframe() (report\_manager.dataset.Dataset method)@\spxentry{get\_dataframe()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{82}
-\indexentry{get\_dataframes() (report\_manager.dataset.Dataset method)@\spxentry{get\_dataframes()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{82}
-\indexentry{list\_dataframes() (report\_manager.dataset.Dataset method)@\spxentry{list\_dataframes()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{82}
-\indexentry{get\_analysis() (report\_manager.dataset.Dataset method)@\spxentry{get\_analysis()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{82}
+\indexentry{report\_manager.app (module)@\spxentry{report\_manager.app}\spxextra{module}|hyperpage}{83}
+\indexentry{report\_manager.dataset (module)@\spxentry{report\_manager.dataset}\spxextra{module}|hyperpage}{83}
+\indexentry{Dataset (class in report\_manager.dataset)@\spxentry{Dataset}\spxextra{class in report\_manager.dataset}|hyperpage}{83}
+\indexentry{identifier() (report\_manager.dataset.Dataset property)@\spxentry{identifier()}\spxextra{report\_manager.dataset.Dataset property}|hyperpage}{83}
+\indexentry{dataset\_type() (report\_manager.dataset.Dataset property)@\spxentry{dataset\_type()}\spxextra{report\_manager.dataset.Dataset property}|hyperpage}{83}
+\indexentry{data() (report\_manager.dataset.Dataset property)@\spxentry{data()}\spxextra{report\_manager.dataset.Dataset property}|hyperpage}{83}
+\indexentry{configuration() (report\_manager.dataset.Dataset property)@\spxentry{configuration()}\spxextra{report\_manager.dataset.Dataset property}|hyperpage}{83}
+\indexentry{analysis\_queries() (report\_manager.dataset.Dataset property)@\spxentry{analysis\_queries()}\spxextra{report\_manager.dataset.Dataset property}|hyperpage}{83}
+\indexentry{report() (report\_manager.dataset.Dataset property)@\spxentry{report()}\spxextra{report\_manager.dataset.Dataset property}|hyperpage}{83}
+\indexentry{generate\_dataset() (report\_manager.dataset.Dataset method)@\spxentry{generate\_dataset()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{83}
+\indexentry{update\_report() (report\_manager.dataset.Dataset method)@\spxentry{update\_report()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{83}
+\indexentry{update\_analysis\_queries() (report\_manager.dataset.Dataset method)@\spxentry{update\_analysis\_queries()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{83}
+\indexentry{get\_dataframe() (report\_manager.dataset.Dataset method)@\spxentry{get\_dataframe()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{83}
+\indexentry{get\_dataframes() (report\_manager.dataset.Dataset method)@\spxentry{get\_dataframes()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{83}
+\indexentry{list\_dataframes() (report\_manager.dataset.Dataset method)@\spxentry{list\_dataframes()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{83}
 \indexentry{update\_data() (report\_manager.dataset.Dataset method)@\spxentry{update\_data()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{83}
-\indexentry{update\_analyses() (report\_manager.dataset.Dataset method)@\spxentry{update\_analyses()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{83}
 \indexentry{set\_configuration\_from\_file() (report\_manager.dataset.Dataset method)@\spxentry{set\_configuration\_from\_file()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{83}
 \indexentry{update\_configuration\_from\_file() (report\_manager.dataset.Dataset method)@\spxentry{update\_configuration\_from\_file()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{83}
 \indexentry{get\_dataset\_data\_directory() (report\_manager.dataset.Dataset method)@\spxentry{get\_dataset\_data\_directory()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{83}
@@ -359,23 +374,23 @@
 \indexentry{generate\_report() (report\_manager.dataset.Dataset method)@\spxentry{generate\_report()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{83}
 \indexentry{save\_dataset\_recursively() (report\_manager.dataset.Dataset method)@\spxentry{save\_dataset\_recursively()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{83}
 \indexentry{save\_dataset() (report\_manager.dataset.Dataset method)@\spxentry{save\_dataset()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{83}
-\indexentry{save\_dataset\_recursively\_to\_file() (report\_manager.dataset.Dataset method)@\spxentry{save\_dataset\_recursively\_to\_file()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{83}
-\indexentry{save\_dataset\_to\_file() (report\_manager.dataset.Dataset method)@\spxentry{save\_dataset\_to\_file()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{83}
-\indexentry{save\_report() (report\_manager.dataset.Dataset method)@\spxentry{save\_report()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{83}
-\indexentry{load\_dataset\_recursively() (report\_manager.dataset.Dataset method)@\spxentry{load\_dataset\_recursively()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{83}
-\indexentry{load\_dataset() (report\_manager.dataset.Dataset method)@\spxentry{load\_dataset()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{83}
-\indexentry{load\_dataset\_report() (report\_manager.dataset.Dataset method)@\spxentry{load\_dataset\_report()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{83}
-\indexentry{generate\_knowledge() (report\_manager.dataset.Dataset method)@\spxentry{generate\_knowledge()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{83}
-\indexentry{MultiOmicsDataset (class in report\_manager.dataset)@\spxentry{MultiOmicsDataset}\spxextra{class in report\_manager.dataset}|hyperpage}{83}
-\indexentry{get\_dataframes() (report\_manager.dataset.MultiOmicsDataset method)@\spxentry{get\_dataframes()}\spxextra{report\_manager.dataset.MultiOmicsDataset method}|hyperpage}{83}
-\indexentry{generate\_knowledge() (report\_manager.dataset.MultiOmicsDataset method)@\spxentry{generate\_knowledge()}\spxextra{report\_manager.dataset.MultiOmicsDataset method}|hyperpage}{83}
-\indexentry{ProteomicsDataset (class in report\_manager.dataset)@\spxentry{ProteomicsDataset}\spxextra{class in report\_manager.dataset}|hyperpage}{83}
-\indexentry{generate\_dataset() (report\_manager.dataset.ProteomicsDataset method)@\spxentry{generate\_dataset()}\spxextra{report\_manager.dataset.ProteomicsDataset method}|hyperpage}{83}
-\indexentry{process\_dataset() (report\_manager.dataset.ProteomicsDataset method)@\spxentry{process\_dataset()}\spxextra{report\_manager.dataset.ProteomicsDataset method}|hyperpage}{83}
-\indexentry{processing() (report\_manager.dataset.ProteomicsDataset method)@\spxentry{processing()}\spxextra{report\_manager.dataset.ProteomicsDataset method}|hyperpage}{83}
-\indexentry{generate\_knowledge() (report\_manager.dataset.ProteomicsDataset method)@\spxentry{generate\_knowledge()}\spxextra{report\_manager.dataset.ProteomicsDataset method}|hyperpage}{83}
-\indexentry{PTMDataset (class in report\_manager.dataset)@\spxentry{PTMDataset}\spxextra{class in report\_manager.dataset}|hyperpage}{83}
-\indexentry{PhosphoproteomicsDataset (class in report\_manager.dataset)@\spxentry{PhosphoproteomicsDataset}\spxextra{class in report\_manager.dataset}|hyperpage}{83}
+\indexentry{save\_dataset\_recursively\_to\_file() (report\_manager.dataset.Dataset method)@\spxentry{save\_dataset\_recursively\_to\_file()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{84}
+\indexentry{save\_dataset\_to\_file() (report\_manager.dataset.Dataset method)@\spxentry{save\_dataset\_to\_file()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{84}
+\indexentry{save\_report() (report\_manager.dataset.Dataset method)@\spxentry{save\_report()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{84}
+\indexentry{load\_dataset\_recursively() (report\_manager.dataset.Dataset method)@\spxentry{load\_dataset\_recursively()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{84}
+\indexentry{load\_dataset() (report\_manager.dataset.Dataset method)@\spxentry{load\_dataset()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{84}
+\indexentry{load\_dataset\_report() (report\_manager.dataset.Dataset method)@\spxentry{load\_dataset\_report()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{84}
+\indexentry{generate\_knowledge() (report\_manager.dataset.Dataset method)@\spxentry{generate\_knowledge()}\spxextra{report\_manager.dataset.Dataset method}|hyperpage}{84}
+\indexentry{MultiOmicsDataset (class in report\_manager.dataset)@\spxentry{MultiOmicsDataset}\spxextra{class in report\_manager.dataset}|hyperpage}{84}
+\indexentry{get\_dataframes() (report\_manager.dataset.MultiOmicsDataset method)@\spxentry{get\_dataframes()}\spxextra{report\_manager.dataset.MultiOmicsDataset method}|hyperpage}{84}
+\indexentry{generate\_knowledge() (report\_manager.dataset.MultiOmicsDataset method)@\spxentry{generate\_knowledge()}\spxextra{report\_manager.dataset.MultiOmicsDataset method}|hyperpage}{84}
+\indexentry{ProteomicsDataset (class in report\_manager.dataset)@\spxentry{ProteomicsDataset}\spxextra{class in report\_manager.dataset}|hyperpage}{84}
+\indexentry{generate\_dataset() (report\_manager.dataset.ProteomicsDataset method)@\spxentry{generate\_dataset()}\spxextra{report\_manager.dataset.ProteomicsDataset method}|hyperpage}{84}
+\indexentry{process\_dataset() (report\_manager.dataset.ProteomicsDataset method)@\spxentry{process\_dataset()}\spxextra{report\_manager.dataset.ProteomicsDataset method}|hyperpage}{84}
+\indexentry{processing() (report\_manager.dataset.ProteomicsDataset method)@\spxentry{processing()}\spxextra{report\_manager.dataset.ProteomicsDataset method}|hyperpage}{84}
+\indexentry{generate\_knowledge() (report\_manager.dataset.ProteomicsDataset method)@\spxentry{generate\_knowledge()}\spxextra{report\_manager.dataset.ProteomicsDataset method}|hyperpage}{84}
+\indexentry{PTMDataset (class in report\_manager.dataset)@\spxentry{PTMDataset}\spxextra{class in report\_manager.dataset}|hyperpage}{84}
+\indexentry{PhosphoproteomicsDataset (class in report\_manager.dataset)@\spxentry{PhosphoproteomicsDataset}\spxextra{class in report\_manager.dataset}|hyperpage}{84}
 \indexentry{InteractomicsDataset (class in report\_manager.dataset)@\spxentry{InteractomicsDataset}\spxextra{class in report\_manager.dataset}|hyperpage}{84}
 \indexentry{LongitudinalProteomicsDataset (class in report\_manager.dataset)@\spxentry{LongitudinalProteomicsDataset}\spxextra{class in report\_manager.dataset}|hyperpage}{84}
 \indexentry{ClinicalDataset (class in report\_manager.dataset)@\spxentry{ClinicalDataset}\spxextra{class in report\_manager.dataset}|hyperpage}{84}
@@ -383,18 +398,18 @@
 \indexentry{process\_dataset() (report\_manager.dataset.ClinicalDataset method)@\spxentry{process\_dataset()}\spxextra{report\_manager.dataset.ClinicalDataset method}|hyperpage}{84}
 \indexentry{widen\_original\_dataset() (report\_manager.dataset.ClinicalDataset method)@\spxentry{widen\_original\_dataset()}\spxextra{report\_manager.dataset.ClinicalDataset method}|hyperpage}{84}
 \indexentry{processing() (report\_manager.dataset.ClinicalDataset method)@\spxentry{processing()}\spxextra{report\_manager.dataset.ClinicalDataset method}|hyperpage}{84}
-\indexentry{generate\_knowledge() (report\_manager.dataset.ClinicalDataset method)@\spxentry{generate\_knowledge()}\spxextra{report\_manager.dataset.ClinicalDataset method}|hyperpage}{84}
-\indexentry{DNAseqDataset (class in report\_manager.dataset)@\spxentry{DNAseqDataset}\spxextra{class in report\_manager.dataset}|hyperpage}{84}
-\indexentry{generate\_dataset() (report\_manager.dataset.DNAseqDataset method)@\spxentry{generate\_dataset()}\spxextra{report\_manager.dataset.DNAseqDataset method}|hyperpage}{84}
-\indexentry{RNAseqDataset (class in report\_manager.dataset)@\spxentry{RNAseqDataset}\spxextra{class in report\_manager.dataset}|hyperpage}{84}
-\indexentry{generate\_dataset() (report\_manager.dataset.RNAseqDataset method)@\spxentry{generate\_dataset()}\spxextra{report\_manager.dataset.RNAseqDataset method}|hyperpage}{84}
-\indexentry{report\_manager.knowledge (module)@\spxentry{report\_manager.knowledge}\spxextra{module}|hyperpage}{84}
-\indexentry{Knowledge (class in report\_manager.knowledge)@\spxentry{Knowledge}\spxextra{class in report\_manager.knowledge}|hyperpage}{84}
-\indexentry{identifier() (report\_manager.knowledge.Knowledge property)@\spxentry{identifier()}\spxextra{report\_manager.knowledge.Knowledge property}|hyperpage}{84}
-\indexentry{data() (report\_manager.knowledge.Knowledge property)@\spxentry{data()}\spxextra{report\_manager.knowledge.Knowledge property}|hyperpage}{84}
-\indexentry{entities() (report\_manager.knowledge.Knowledge property)@\spxentry{entities()}\spxextra{report\_manager.knowledge.Knowledge property}|hyperpage}{84}
-\indexentry{nodes() (report\_manager.knowledge.Knowledge property)@\spxentry{nodes()}\spxextra{report\_manager.knowledge.Knowledge property}|hyperpage}{84}
-\indexentry{update\_nodes() (report\_manager.knowledge.Knowledge method)@\spxentry{update\_nodes()}\spxextra{report\_manager.knowledge.Knowledge method}|hyperpage}{84}
+\indexentry{generate\_knowledge() (report\_manager.dataset.ClinicalDataset method)@\spxentry{generate\_knowledge()}\spxextra{report\_manager.dataset.ClinicalDataset method}|hyperpage}{85}
+\indexentry{DNAseqDataset (class in report\_manager.dataset)@\spxentry{DNAseqDataset}\spxextra{class in report\_manager.dataset}|hyperpage}{85}
+\indexentry{generate\_dataset() (report\_manager.dataset.DNAseqDataset method)@\spxentry{generate\_dataset()}\spxextra{report\_manager.dataset.DNAseqDataset method}|hyperpage}{85}
+\indexentry{RNAseqDataset (class in report\_manager.dataset)@\spxentry{RNAseqDataset}\spxextra{class in report\_manager.dataset}|hyperpage}{85}
+\indexentry{generate\_dataset() (report\_manager.dataset.RNAseqDataset method)@\spxentry{generate\_dataset()}\spxextra{report\_manager.dataset.RNAseqDataset method}|hyperpage}{85}
+\indexentry{report\_manager.knowledge (module)@\spxentry{report\_manager.knowledge}\spxextra{module}|hyperpage}{85}
+\indexentry{Knowledge (class in report\_manager.knowledge)@\spxentry{Knowledge}\spxextra{class in report\_manager.knowledge}|hyperpage}{85}
+\indexentry{identifier() (report\_manager.knowledge.Knowledge property)@\spxentry{identifier()}\spxextra{report\_manager.knowledge.Knowledge property}|hyperpage}{85}
+\indexentry{data() (report\_manager.knowledge.Knowledge property)@\spxentry{data()}\spxextra{report\_manager.knowledge.Knowledge property}|hyperpage}{85}
+\indexentry{entities() (report\_manager.knowledge.Knowledge property)@\spxentry{entities()}\spxextra{report\_manager.knowledge.Knowledge property}|hyperpage}{85}
+\indexentry{nodes() (report\_manager.knowledge.Knowledge property)@\spxentry{nodes()}\spxextra{report\_manager.knowledge.Knowledge property}|hyperpage}{85}
+\indexentry{update\_nodes() (report\_manager.knowledge.Knowledge method)@\spxentry{update\_nodes()}\spxextra{report\_manager.knowledge.Knowledge method}|hyperpage}{85}
 \indexentry{relationships() (report\_manager.knowledge.Knowledge property)@\spxentry{relationships()}\spxextra{report\_manager.knowledge.Knowledge property}|hyperpage}{85}
 \indexentry{update\_relationships() (report\_manager.knowledge.Knowledge method)@\spxentry{update\_relationships()}\spxextra{report\_manager.knowledge.Knowledge method}|hyperpage}{85}
 \indexentry{queries\_file() (report\_manager.knowledge.Knowledge property)@\spxentry{queries\_file()}\spxextra{report\_manager.knowledge.Knowledge property}|hyperpage}{85}
@@ -412,18 +427,18 @@
 \indexentry{send\_query() (report\_manager.knowledge.Knowledge method)@\spxentry{send\_query()}\spxextra{report\_manager.knowledge.Knowledge method}|hyperpage}{85}
 \indexentry{query\_data() (report\_manager.knowledge.Knowledge method)@\spxentry{query\_data()}\spxextra{report\_manager.knowledge.Knowledge method}|hyperpage}{85}
 \indexentry{generate\_cypher\_nodes\_list() (report\_manager.knowledge.Knowledge method)@\spxentry{generate\_cypher\_nodes\_list()}\spxextra{report\_manager.knowledge.Knowledge method}|hyperpage}{85}
-\indexentry{generate\_knowledge\_graph() (report\_manager.knowledge.Knowledge method)@\spxentry{generate\_knowledge\_graph()}\spxextra{report\_manager.knowledge.Knowledge method}|hyperpage}{85}
-\indexentry{reduce\_to\_subgraph() (report\_manager.knowledge.Knowledge method)@\spxentry{reduce\_to\_subgraph()}\spxextra{report\_manager.knowledge.Knowledge method}|hyperpage}{85}
-\indexentry{get\_knowledge\_graph\_plot() (report\_manager.knowledge.Knowledge method)@\spxentry{get\_knowledge\_graph\_plot()}\spxextra{report\_manager.knowledge.Knowledge method}|hyperpage}{85}
-\indexentry{generate\_report() (report\_manager.knowledge.Knowledge method)@\spxentry{generate\_report()}\spxextra{report\_manager.knowledge.Knowledge method}|hyperpage}{85}
-\indexentry{save\_report() (report\_manager.knowledge.Knowledge method)@\spxentry{save\_report()}\spxextra{report\_manager.knowledge.Knowledge method}|hyperpage}{85}
-\indexentry{ProjectKnowledge (class in report\_manager.knowledge)@\spxentry{ProjectKnowledge}\spxextra{class in report\_manager.knowledge}|hyperpage}{85}
-\indexentry{generate\_knowledge() (report\_manager.knowledge.ProjectKnowledge method)@\spxentry{generate\_knowledge()}\spxextra{report\_manager.knowledge.ProjectKnowledge method}|hyperpage}{85}
-\indexentry{ProteomicsKnowledge (class in report\_manager.knowledge)@\spxentry{ProteomicsKnowledge}\spxextra{class in report\_manager.knowledge}|hyperpage}{85}
-\indexentry{generate\_knowledge() (report\_manager.knowledge.ProteomicsKnowledge method)@\spxentry{generate\_knowledge()}\spxextra{report\_manager.knowledge.ProteomicsKnowledge method}|hyperpage}{85}
-\indexentry{ClinicalKnowledge (class in report\_manager.knowledge)@\spxentry{ClinicalKnowledge}\spxextra{class in report\_manager.knowledge}|hyperpage}{85}
-\indexentry{generate\_knowledge() (report\_manager.knowledge.ClinicalKnowledge method)@\spxentry{generate\_knowledge()}\spxextra{report\_manager.knowledge.ClinicalKnowledge method}|hyperpage}{85}
-\indexentry{MultiOmicsKnowledge (class in report\_manager.knowledge)@\spxentry{MultiOmicsKnowledge}\spxextra{class in report\_manager.knowledge}|hyperpage}{85}
+\indexentry{generate\_knowledge\_graph() (report\_manager.knowledge.Knowledge method)@\spxentry{generate\_knowledge\_graph()}\spxextra{report\_manager.knowledge.Knowledge method}|hyperpage}{86}
+\indexentry{reduce\_to\_subgraph() (report\_manager.knowledge.Knowledge method)@\spxentry{reduce\_to\_subgraph()}\spxextra{report\_manager.knowledge.Knowledge method}|hyperpage}{86}
+\indexentry{get\_knowledge\_graph\_plot() (report\_manager.knowledge.Knowledge method)@\spxentry{get\_knowledge\_graph\_plot()}\spxextra{report\_manager.knowledge.Knowledge method}|hyperpage}{86}
+\indexentry{generate\_report() (report\_manager.knowledge.Knowledge method)@\spxentry{generate\_report()}\spxextra{report\_manager.knowledge.Knowledge method}|hyperpage}{86}
+\indexentry{save\_report() (report\_manager.knowledge.Knowledge method)@\spxentry{save\_report()}\spxextra{report\_manager.knowledge.Knowledge method}|hyperpage}{86}
+\indexentry{ProjectKnowledge (class in report\_manager.knowledge)@\spxentry{ProjectKnowledge}\spxextra{class in report\_manager.knowledge}|hyperpage}{86}
+\indexentry{generate\_knowledge() (report\_manager.knowledge.ProjectKnowledge method)@\spxentry{generate\_knowledge()}\spxextra{report\_manager.knowledge.ProjectKnowledge method}|hyperpage}{86}
+\indexentry{ProteomicsKnowledge (class in report\_manager.knowledge)@\spxentry{ProteomicsKnowledge}\spxextra{class in report\_manager.knowledge}|hyperpage}{86}
+\indexentry{generate\_knowledge() (report\_manager.knowledge.ProteomicsKnowledge method)@\spxentry{generate\_knowledge()}\spxextra{report\_manager.knowledge.ProteomicsKnowledge method}|hyperpage}{86}
+\indexentry{ClinicalKnowledge (class in report\_manager.knowledge)@\spxentry{ClinicalKnowledge}\spxextra{class in report\_manager.knowledge}|hyperpage}{86}
+\indexentry{generate\_knowledge() (report\_manager.knowledge.ClinicalKnowledge method)@\spxentry{generate\_knowledge()}\spxextra{report\_manager.knowledge.ClinicalKnowledge method}|hyperpage}{86}
+\indexentry{MultiOmicsKnowledge (class in report\_manager.knowledge)@\spxentry{MultiOmicsKnowledge}\spxextra{class in report\_manager.knowledge}|hyperpage}{86}
 \indexentry{generate\_knowledge() (report\_manager.knowledge.MultiOmicsKnowledge method)@\spxentry{generate\_knowledge()}\spxextra{report\_manager.knowledge.MultiOmicsKnowledge method}|hyperpage}{86}
 \indexentry{report\_manager.project (module)@\spxentry{report\_manager.project}\spxextra{module}|hyperpage}{86}
 \indexentry{Project (class in report\_manager.project)@\spxentry{Project}\spxextra{class in report\_manager.project}|hyperpage}{86}
@@ -433,24 +448,24 @@
 \indexentry{name() (report\_manager.project.Project property)@\spxentry{name()}\spxextra{report\_manager.project.Project property}|hyperpage}{86}
 \indexentry{acronym() (report\_manager.project.Project property)@\spxentry{acronym()}\spxextra{report\_manager.project.Project property}|hyperpage}{86}
 \indexentry{data\_types() (report\_manager.project.Project property)@\spxentry{data\_types()}\spxextra{report\_manager.project.Project property}|hyperpage}{86}
-\indexentry{append\_data\_type() (report\_manager.project.Project method)@\spxentry{append\_data\_type()}\spxextra{report\_manager.project.Project method}|hyperpage}{86}
-\indexentry{responsible() (report\_manager.project.Project property)@\spxentry{responsible()}\spxextra{report\_manager.project.Project property}|hyperpage}{86}
-\indexentry{description() (report\_manager.project.Project property)@\spxentry{description()}\spxextra{report\_manager.project.Project property}|hyperpage}{86}
-\indexentry{status() (report\_manager.project.Project property)@\spxentry{status()}\spxextra{report\_manager.project.Project property}|hyperpage}{86}
-\indexentry{num\_subjects() (report\_manager.project.Project property)@\spxentry{num\_subjects()}\spxextra{report\_manager.project.Project property}|hyperpage}{86}
-\indexentry{datasets() (report\_manager.project.Project property)@\spxentry{datasets()}\spxextra{report\_manager.project.Project property}|hyperpage}{86}
-\indexentry{knowledge() (report\_manager.project.Project property)@\spxentry{knowledge()}\spxextra{report\_manager.project.Project property}|hyperpage}{86}
-\indexentry{report() (report\_manager.project.Project property)@\spxentry{report()}\spxextra{report\_manager.project.Project property}|hyperpage}{86}
-\indexentry{similar\_projects() (report\_manager.project.Project property)@\spxentry{similar\_projects()}\spxextra{report\_manager.project.Project property}|hyperpage}{86}
-\indexentry{overlap() (report\_manager.project.Project property)@\spxentry{overlap()}\spxextra{report\_manager.project.Project property}|hyperpage}{86}
-\indexentry{get\_dataset() (report\_manager.project.Project method)@\spxentry{get\_dataset()}\spxextra{report\_manager.project.Project method}|hyperpage}{86}
-\indexentry{update\_dataset() (report\_manager.project.Project method)@\spxentry{update\_dataset()}\spxextra{report\_manager.project.Project method}|hyperpage}{86}
-\indexentry{update\_report() (report\_manager.project.Project method)@\spxentry{update\_report()}\spxextra{report\_manager.project.Project method}|hyperpage}{86}
-\indexentry{remove\_project() (report\_manager.project.Project method)@\spxentry{remove\_project()}\spxextra{report\_manager.project.Project method}|hyperpage}{86}
-\indexentry{get\_report\_directory() (report\_manager.project.Project method)@\spxentry{get\_report\_directory()}\spxextra{report\_manager.project.Project method}|hyperpage}{86}
-\indexentry{get\_downloads\_directory() (report\_manager.project.Project method)@\spxentry{get\_downloads\_directory()}\spxextra{report\_manager.project.Project method}|hyperpage}{86}
-\indexentry{set\_attributes() (report\_manager.project.Project method)@\spxentry{set\_attributes()}\spxextra{report\_manager.project.Project method}|hyperpage}{86}
-\indexentry{from\_dict() (report\_manager.project.Project method)@\spxentry{from\_dict()}\spxextra{report\_manager.project.Project method}|hyperpage}{86}
+\indexentry{append\_data\_type() (report\_manager.project.Project method)@\spxentry{append\_data\_type()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
+\indexentry{responsible() (report\_manager.project.Project property)@\spxentry{responsible()}\spxextra{report\_manager.project.Project property}|hyperpage}{87}
+\indexentry{description() (report\_manager.project.Project property)@\spxentry{description()}\spxextra{report\_manager.project.Project property}|hyperpage}{87}
+\indexentry{status() (report\_manager.project.Project property)@\spxentry{status()}\spxextra{report\_manager.project.Project property}|hyperpage}{87}
+\indexentry{num\_subjects() (report\_manager.project.Project property)@\spxentry{num\_subjects()}\spxextra{report\_manager.project.Project property}|hyperpage}{87}
+\indexentry{datasets() (report\_manager.project.Project property)@\spxentry{datasets()}\spxextra{report\_manager.project.Project property}|hyperpage}{87}
+\indexentry{knowledge() (report\_manager.project.Project property)@\spxentry{knowledge()}\spxextra{report\_manager.project.Project property}|hyperpage}{87}
+\indexentry{report() (report\_manager.project.Project property)@\spxentry{report()}\spxextra{report\_manager.project.Project property}|hyperpage}{87}
+\indexentry{similar\_projects() (report\_manager.project.Project property)@\spxentry{similar\_projects()}\spxextra{report\_manager.project.Project property}|hyperpage}{87}
+\indexentry{overlap() (report\_manager.project.Project property)@\spxentry{overlap()}\spxextra{report\_manager.project.Project property}|hyperpage}{87}
+\indexentry{get\_dataset() (report\_manager.project.Project method)@\spxentry{get\_dataset()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
+\indexentry{update\_dataset() (report\_manager.project.Project method)@\spxentry{update\_dataset()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
+\indexentry{update\_report() (report\_manager.project.Project method)@\spxentry{update\_report()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
+\indexentry{remove\_project() (report\_manager.project.Project method)@\spxentry{remove\_project()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
+\indexentry{get\_report\_directory() (report\_manager.project.Project method)@\spxentry{get\_report\_directory()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
+\indexentry{get\_downloads\_directory() (report\_manager.project.Project method)@\spxentry{get\_downloads\_directory()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
+\indexentry{set\_attributes() (report\_manager.project.Project method)@\spxentry{set\_attributes()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
+\indexentry{from\_dict() (report\_manager.project.Project method)@\spxentry{from\_dict()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
 \indexentry{to\_dict() (report\_manager.project.Project method)@\spxentry{to\_dict()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
 \indexentry{to\_dataframe() (report\_manager.project.Project method)@\spxentry{to\_dataframe()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
 \indexentry{list\_datasets() (report\_manager.project.Project method)@\spxentry{list\_datasets()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
@@ -470,19 +485,19 @@
 \indexentry{get\_similarity\_network\_style() (report\_manager.project.Project method)@\spxentry{get\_similarity\_network\_style()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
 \indexentry{get\_similarity\_network() (report\_manager.project.Project method)@\spxentry{get\_similarity\_network()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
 \indexentry{generate\_knowledge() (report\_manager.project.Project method)@\spxentry{generate\_knowledge()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
-\indexentry{generate\_project\_info\_report() (report\_manager.project.Project method)@\spxentry{generate\_project\_info\_report()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
-\indexentry{generate\_report() (report\_manager.project.Project method)@\spxentry{generate\_report()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
-\indexentry{notify\_project\_ready() (report\_manager.project.Project method)@\spxentry{notify\_project\_ready()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
-\indexentry{empty\_report() (report\_manager.project.Project method)@\spxentry{empty\_report()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
-\indexentry{save\_project\_report() (report\_manager.project.Project method)@\spxentry{save\_project\_report()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
-\indexentry{save\_project\_datasets\_reports() (report\_manager.project.Project method)@\spxentry{save\_project\_datasets\_reports()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
-\indexentry{save\_project() (report\_manager.project.Project method)@\spxentry{save\_project()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
-\indexentry{save\_project\_datasets\_data() (report\_manager.project.Project method)@\spxentry{save\_project\_datasets\_data()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
-\indexentry{show\_report() (report\_manager.project.Project method)@\spxentry{show\_report()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
-\indexentry{download\_project() (report\_manager.project.Project method)@\spxentry{download\_project()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
-\indexentry{download\_project\_report() (report\_manager.project.Project method)@\spxentry{download\_project\_report()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
-\indexentry{download\_knowledge() (report\_manager.project.Project method)@\spxentry{download\_knowledge()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
-\indexentry{download\_project\_datasets() (report\_manager.project.Project method)@\spxentry{download\_project\_datasets()}\spxextra{report\_manager.project.Project method}|hyperpage}{87}
+\indexentry{generate\_project\_info\_report() (report\_manager.project.Project method)@\spxentry{generate\_project\_info\_report()}\spxextra{report\_manager.project.Project method}|hyperpage}{88}
+\indexentry{generate\_report() (report\_manager.project.Project method)@\spxentry{generate\_report()}\spxextra{report\_manager.project.Project method}|hyperpage}{88}
+\indexentry{notify\_project\_ready() (report\_manager.project.Project method)@\spxentry{notify\_project\_ready()}\spxextra{report\_manager.project.Project method}|hyperpage}{88}
+\indexentry{empty\_report() (report\_manager.project.Project method)@\spxentry{empty\_report()}\spxextra{report\_manager.project.Project method}|hyperpage}{88}
+\indexentry{save\_project\_report() (report\_manager.project.Project method)@\spxentry{save\_project\_report()}\spxextra{report\_manager.project.Project method}|hyperpage}{88}
+\indexentry{save\_project\_datasets\_reports() (report\_manager.project.Project method)@\spxentry{save\_project\_datasets\_reports()}\spxextra{report\_manager.project.Project method}|hyperpage}{88}
+\indexentry{save\_project() (report\_manager.project.Project method)@\spxentry{save\_project()}\spxextra{report\_manager.project.Project method}|hyperpage}{88}
+\indexentry{save\_project\_datasets\_data() (report\_manager.project.Project method)@\spxentry{save\_project\_datasets\_data()}\spxextra{report\_manager.project.Project method}|hyperpage}{88}
+\indexentry{show\_report() (report\_manager.project.Project method)@\spxentry{show\_report()}\spxextra{report\_manager.project.Project method}|hyperpage}{88}
+\indexentry{download\_project() (report\_manager.project.Project method)@\spxentry{download\_project()}\spxextra{report\_manager.project.Project method}|hyperpage}{88}
+\indexentry{download\_project\_report() (report\_manager.project.Project method)@\spxentry{download\_project\_report()}\spxextra{report\_manager.project.Project method}|hyperpage}{88}
+\indexentry{download\_knowledge() (report\_manager.project.Project method)@\spxentry{download\_knowledge()}\spxextra{report\_manager.project.Project method}|hyperpage}{88}
+\indexentry{download\_project\_datasets() (report\_manager.project.Project method)@\spxentry{download\_project\_datasets()}\spxextra{report\_manager.project.Project method}|hyperpage}{88}
 \indexentry{report\_manager.report (module)@\spxentry{report\_manager.report}\spxextra{module}|hyperpage}{88}
 \indexentry{Report (class in report\_manager.report)@\spxentry{Report}\spxextra{class in report\_manager.report}|hyperpage}{88}
 \indexentry{identifier() (report\_manager.report.Report property)@\spxentry{identifier()}\spxextra{report\_manager.report.Report property}|hyperpage}{88}
@@ -496,45 +511,40 @@
 \indexentry{visualize\_report() (report\_manager.report.Report method)@\spxentry{visualize\_report()}\spxextra{report\_manager.report.Report method}|hyperpage}{88}
 \indexentry{visualize\_plot() (report\_manager.report.Report method)@\spxentry{visualize\_plot()}\spxextra{report\_manager.report.Report method}|hyperpage}{88}
 \indexentry{download\_report() (report\_manager.report.Report method)@\spxentry{download\_report()}\spxextra{report\_manager.report.Report method}|hyperpage}{88}
-\indexentry{report\_manager.user (module)@\spxentry{report\_manager.user}\spxextra{module}|hyperpage}{88}
-\indexentry{User (class in report\_manager.user)@\spxentry{User}\spxextra{class in report\_manager.user}|hyperpage}{88}
-\indexentry{find() (report\_manager.user.User method)@\spxentry{find()}\spxextra{report\_manager.user.User method}|hyperpage}{88}
-\indexentry{register() (report\_manager.user.User method)@\spxentry{register()}\spxextra{report\_manager.user.User method}|hyperpage}{88}
-\indexentry{verify\_password() (report\_manager.user.User method)@\spxentry{verify\_password()}\spxextra{report\_manager.user.User method}|hyperpage}{88}
-\indexentry{report\_manager.utils (module)@\spxentry{report\_manager.utils}\spxextra{module}|hyperpage}{88}
-\indexentry{copy\_file\_to\_destination() (in module report\_manager.utils)@\spxentry{copy\_file\_to\_destination()}\spxextra{in module report\_manager.utils}|hyperpage}{88}
-\indexentry{send\_message\_to\_slack\_webhook() (in module report\_manager.utils)@\spxentry{send\_message\_to\_slack\_webhook()}\spxextra{in module report\_manager.utils}|hyperpage}{88}
-\indexentry{send\_email() (in module report\_manager.utils)@\spxentry{send\_email()}\spxextra{in module report\_manager.utils}|hyperpage}{88}
-\indexentry{compress\_directory() (in module report\_manager.utils)@\spxentry{compress\_directory()}\spxextra{in module report\_manager.utils}|hyperpage}{88}
-\indexentry{get\_markdown\_date() (in module report\_manager.utils)@\spxentry{get\_markdown\_date()}\spxextra{in module report\_manager.utils}|hyperpage}{88}
-\indexentry{convert\_html\_to\_dash() (in module report\_manager.utils)@\spxentry{convert\_html\_to\_dash()}\spxextra{in module report\_manager.utils}|hyperpage}{88}
-\indexentry{extract\_style() (in module report\_manager.utils)@\spxentry{extract\_style()}\spxextra{in module report\_manager.utils}|hyperpage}{88}
-\indexentry{is\_jsonable() (in module report\_manager.utils)@\spxentry{is\_jsonable()}\spxextra{in module report\_manager.utils}|hyperpage}{88}
-\indexentry{convert\_dash\_to\_json() (in module report\_manager.utils)@\spxentry{convert\_dash\_to\_json()}\spxextra{in module report\_manager.utils}|hyperpage}{88}
-\indexentry{get\_image() (in module report\_manager.utils)@\spxentry{get\_image()}\spxextra{in module report\_manager.utils}|hyperpage}{88}
-\indexentry{parse\_html() (in module report\_manager.utils)@\spxentry{parse\_html()}\spxextra{in module report\_manager.utils}|hyperpage}{88}
-\indexentry{hex2rgb() (in module report\_manager.utils)@\spxentry{hex2rgb()}\spxextra{in module report\_manager.utils}|hyperpage}{88}
-\indexentry{getNumberText() (in module report\_manager.utils)@\spxentry{getNumberText()}\spxextra{in module report\_manager.utils}|hyperpage}{88}
-\indexentry{get\_rgb\_colors() (in module report\_manager.utils)@\spxentry{get\_rgb\_colors()}\spxextra{in module report\_manager.utils}|hyperpage}{88}
+\indexentry{report\_manager.user (module)@\spxentry{report\_manager.user}\spxextra{module}|hyperpage}{89}
+\indexentry{User (class in report\_manager.user)@\spxentry{User}\spxextra{class in report\_manager.user}|hyperpage}{89}
+\indexentry{find() (report\_manager.user.User method)@\spxentry{find()}\spxextra{report\_manager.user.User method}|hyperpage}{89}
+\indexentry{register() (report\_manager.user.User method)@\spxentry{register()}\spxextra{report\_manager.user.User method}|hyperpage}{89}
+\indexentry{verify\_password() (report\_manager.user.User method)@\spxentry{verify\_password()}\spxextra{report\_manager.user.User method}|hyperpage}{89}
+\indexentry{report\_manager.utils (module)@\spxentry{report\_manager.utils}\spxextra{module}|hyperpage}{89}
+\indexentry{copy\_file\_to\_destination() (in module report\_manager.utils)@\spxentry{copy\_file\_to\_destination()}\spxextra{in module report\_manager.utils}|hyperpage}{89}
+\indexentry{send\_message\_to\_slack\_webhook() (in module report\_manager.utils)@\spxentry{send\_message\_to\_slack\_webhook()}\spxextra{in module report\_manager.utils}|hyperpage}{89}
+\indexentry{send\_email() (in module report\_manager.utils)@\spxentry{send\_email()}\spxextra{in module report\_manager.utils}|hyperpage}{89}
+\indexentry{compress\_directory() (in module report\_manager.utils)@\spxentry{compress\_directory()}\spxextra{in module report\_manager.utils}|hyperpage}{89}
+\indexentry{get\_markdown\_date() (in module report\_manager.utils)@\spxentry{get\_markdown\_date()}\spxextra{in module report\_manager.utils}|hyperpage}{89}
+\indexentry{convert\_html\_to\_dash() (in module report\_manager.utils)@\spxentry{convert\_html\_to\_dash()}\spxextra{in module report\_manager.utils}|hyperpage}{89}
+\indexentry{extract\_style() (in module report\_manager.utils)@\spxentry{extract\_style()}\spxextra{in module report\_manager.utils}|hyperpage}{89}
+\indexentry{get\_image() (in module report\_manager.utils)@\spxentry{get\_image()}\spxextra{in module report\_manager.utils}|hyperpage}{89}
+\indexentry{parse\_html() (in module report\_manager.utils)@\spxentry{parse\_html()}\spxextra{in module report\_manager.utils}|hyperpage}{89}
+\indexentry{hex2rgb() (in module report\_manager.utils)@\spxentry{hex2rgb()}\spxextra{in module report\_manager.utils}|hyperpage}{89}
+\indexentry{getNumberText() (in module report\_manager.utils)@\spxentry{getNumberText()}\spxextra{in module report\_manager.utils}|hyperpage}{89}
+\indexentry{get\_rgb\_colors() (in module report\_manager.utils)@\spxentry{get\_rgb\_colors()}\spxextra{in module report\_manager.utils}|hyperpage}{89}
 \indexentry{get\_hex\_colors() (in module report\_manager.utils)@\spxentry{get\_hex\_colors()}\spxextra{in module report\_manager.utils}|hyperpage}{89}
 \indexentry{convert\_html\_to\_pdf() (in module report\_manager.utils)@\spxentry{convert\_html\_to\_pdf()}\spxextra{in module report\_manager.utils}|hyperpage}{89}
-\indexentry{NumpyEncoder (class in report\_manager.utils)@\spxentry{NumpyEncoder}\spxextra{class in report\_manager.utils}|hyperpage}{89}
-\indexentry{default() (report\_manager.utils.NumpyEncoder method)@\spxentry{default()}\spxextra{report\_manager.utils.NumpyEncoder method}|hyperpage}{89}
-\indexentry{DictDFEncoder (class in report\_manager.utils)@\spxentry{DictDFEncoder}\spxextra{class in report\_manager.utils}|hyperpage}{89}
-\indexentry{default() (report\_manager.utils.DictDFEncoder method)@\spxentry{default()}\spxextra{report\_manager.utils.DictDFEncoder method}|hyperpage}{89}
-\indexentry{report\_manager.worker (module)@\spxentry{report\_manager.worker}\spxextra{module}|hyperpage}{90}
-\indexentry{analytics\_core.analytics.analytics (module)@\spxentry{analytics\_core.analytics.analytics}\spxextra{module}|hyperpage}{90}
-\indexentry{unit\_vector() (in module analytics\_core.analytics.analytics)@\spxentry{unit\_vector()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{90}
-\indexentry{flatten() (in module analytics\_core.analytics.analytics)@\spxentry{flatten()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{90}
-\indexentry{angle\_between() (in module analytics\_core.analytics.analytics)@\spxentry{angle\_between()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{90}
+\indexentry{report\_manager.worker (module)@\spxentry{report\_manager.worker}\spxextra{module}|hyperpage}{89}
+\indexentry{analytics\_core.analytics.analytics (module)@\spxentry{analytics\_core.analytics.analytics}\spxextra{module}|hyperpage}{89}
+\indexentry{unit\_vector() (in module analytics\_core.analytics.analytics)@\spxentry{unit\_vector()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{89}
+\indexentry{flatten() (in module analytics\_core.analytics.analytics)@\spxentry{flatten()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{89}
+\indexentry{angle\_between() (in module analytics\_core.analytics.analytics)@\spxentry{angle\_between()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{89}
 \indexentry{transform\_into\_wide\_format() (in module analytics\_core.analytics.analytics)@\spxentry{transform\_into\_wide\_format()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{90}
 \indexentry{transform\_into\_long\_format() (in module analytics\_core.analytics.analytics)@\spxentry{transform\_into\_long\_format()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{90}
-\indexentry{get\_ranking\_with\_markers() (in module analytics\_core.analytics.analytics)@\spxentry{get\_ranking\_with\_markers()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{91}
+\indexentry{get\_ranking\_with\_markers() (in module analytics\_core.analytics.analytics)@\spxentry{get\_ranking\_with\_markers()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{90}
 \indexentry{extract\_number\_missing() (in module analytics\_core.analytics.analytics)@\spxentry{extract\_number\_missing()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{91}
-\indexentry{extract\_percentage\_missing() (in module analytics\_core.analytics.analytics)@\spxentry{extract\_percentage\_missing()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{92}
+\indexentry{extract\_percentage\_missing() (in module analytics\_core.analytics.analytics)@\spxentry{extract\_percentage\_missing()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{91}
 \indexentry{imputation\_KNN() (in module analytics\_core.analytics.analytics)@\spxentry{imputation\_KNN()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{92}
 \indexentry{imputation\_mixed\_norm\_KNN() (in module analytics\_core.analytics.analytics)@\spxentry{imputation\_mixed\_norm\_KNN()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{92}
 \indexentry{imputation\_normal\_distribution() (in module analytics\_core.analytics.analytics)@\spxentry{imputation\_normal\_distribution()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{93}
+\indexentry{normalize\_data\_per\_group() (in module analytics\_core.analytics.analytics)@\spxentry{normalize\_data\_per\_group()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{93}
 \indexentry{normalize\_data() (in module analytics\_core.analytics.analytics)@\spxentry{normalize\_data()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{94}
 \indexentry{median\_normalization() (in module analytics\_core.analytics.analytics)@\spxentry{median\_normalization()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{94}
 \indexentry{zscore\_normalization() (in module analytics\_core.analytics.analytics)@\spxentry{zscore\_normalization()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{94}
@@ -558,7 +568,7 @@
 \indexentry{apply\_pvalue\_fdrcorrection() (in module analytics\_core.analytics.analytics)@\spxentry{apply\_pvalue\_fdrcorrection()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{101}
 \indexentry{apply\_pvalue\_twostage\_fdrcorrection() (in module analytics\_core.analytics.analytics)@\spxentry{apply\_pvalue\_twostage\_fdrcorrection()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{102}
 \indexentry{apply\_pvalue\_permutation\_fdrcorrection() (in module analytics\_core.analytics.analytics)@\spxentry{apply\_pvalue\_permutation\_fdrcorrection()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{102}
-\indexentry{get\_counts\_permutation\_fdr() (in module analytics\_core.analytics.analytics)@\spxentry{get\_counts\_permutation\_fdr()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{102}
+\indexentry{get\_counts\_permutation\_fdr() (in module analytics\_core.analytics.analytics)@\spxentry{get\_counts\_permutation\_fdr()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{103}
 \indexentry{convertToEdgeList() (in module analytics\_core.analytics.analytics)@\spxentry{convertToEdgeList()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{103}
 \indexentry{run\_correlation() (in module analytics\_core.analytics.analytics)@\spxentry{run\_correlation()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{103}
 \indexentry{run\_multi\_correlation() (in module analytics\_core.analytics.analytics)@\spxentry{run\_multi\_correlation()}\spxextra{in module analytics\_core.analytics.analytics}|hyperpage}{103}
@@ -699,8 +709,15 @@
 \indexentry{args() (analytics\_core.analytics\_factory.Analysis property)@\spxentry{args()}\spxextra{analytics\_core.analytics\_factory.Analysis property}|hyperpage}{147}
 \indexentry{data() (analytics\_core.analytics\_factory.Analysis property)@\spxentry{data()}\spxextra{analytics\_core.analytics\_factory.Analysis property}|hyperpage}{147}
 \indexentry{result() (analytics\_core.analytics\_factory.Analysis property)@\spxentry{result()}\spxextra{analytics\_core.analytics\_factory.Analysis property}|hyperpage}{147}
+\indexentry{plots() (analytics\_core.analytics\_factory.Analysis property)@\spxentry{plots()}\spxextra{analytics\_core.analytics\_factory.Analysis property}|hyperpage}{147}
+\indexentry{plot() (analytics\_core.analytics\_factory.Analysis property)@\spxentry{plot()}\spxextra{analytics\_core.analytics\_factory.Analysis property}|hyperpage}{147}
+\indexentry{update\_plots() (analytics\_core.analytics\_factory.Analysis method)@\spxentry{update\_plots()}\spxextra{analytics\_core.analytics\_factory.Analysis method}|hyperpage}{147}
 \indexentry{generate\_result() (analytics\_core.analytics\_factory.Analysis method)@\spxentry{generate\_result()}\spxextra{analytics\_core.analytics\_factory.Analysis method}|hyperpage}{147}
 \indexentry{get\_plot() (analytics\_core.analytics\_factory.Analysis method)@\spxentry{get\_plot()}\spxextra{analytics\_core.analytics\_factory.Analysis method}|hyperpage}{147}
+\indexentry{publish\_analysis() (analytics\_core.analytics\_factory.Analysis method)@\spxentry{publish\_analysis()}\spxextra{analytics\_core.analytics\_factory.Analysis method}|hyperpage}{147}
+\indexentry{save\_analysis\_result() (analytics\_core.analytics\_factory.Analysis method)@\spxentry{save\_analysis\_result()}\spxextra{analytics\_core.analytics\_factory.Analysis method}|hyperpage}{147}
+\indexentry{save\_analysis\_plots() (analytics\_core.analytics\_factory.Analysis method)@\spxentry{save\_analysis\_plots()}\spxextra{analytics\_core.analytics\_factory.Analysis method}|hyperpage}{147}
+\indexentry{make\_interactive() (analytics\_core.analytics\_factory.Analysis method)@\spxentry{make\_interactive()}\spxextra{analytics\_core.analytics\_factory.Analysis method}|hyperpage}{147}
 \indexentry{analytics\_core.utils (module)@\spxentry{analytics\_core.utils}\spxextra{module}|hyperpage}{147}
 \indexentry{generate\_html() (in module analytics\_core.utils)@\spxentry{generate\_html()}\spxextra{in module analytics\_core.utils}|hyperpage}{147}
 \indexentry{append\_to\_list() (in module analytics\_core.utils)@\spxentry{append\_to\_list()}\spxextra{in module analytics\_core.utils}|hyperpage}{147}
@@ -713,10 +730,11 @@
 \indexentry{get\_clustergrammer\_link() (in module analytics\_core.utils)@\spxentry{get\_clustergrammer\_link()}\spxextra{in module analytics\_core.utils}|hyperpage}{147}
 \indexentry{generator\_to\_dict() (in module analytics\_core.utils)@\spxentry{generator\_to\_dict()}\spxextra{in module analytics\_core.utils}|hyperpage}{147}
 \indexentry{parse\_html() (in module analytics\_core.utils)@\spxentry{parse\_html()}\spxextra{in module analytics\_core.utils}|hyperpage}{147}
-\indexentry{hex2rgb() (in module analytics\_core.utils)@\spxentry{hex2rgb()}\spxextra{in module analytics\_core.utils}|hyperpage}{147}
-\indexentry{get\_rgb\_colors() (in module analytics\_core.utils)@\spxentry{get\_rgb\_colors()}\spxextra{in module analytics\_core.utils}|hyperpage}{147}
-\indexentry{get\_hex\_colors() (in module analytics\_core.utils)@\spxentry{get\_hex\_colors()}\spxextra{in module analytics\_core.utils}|hyperpage}{147}
-\indexentry{getMedlineAbstracts() (in module analytics\_core.utils)@\spxentry{getMedlineAbstracts()}\spxextra{in module analytics\_core.utils}|hyperpage}{147}
+\indexentry{convert\_html\_to\_dash() (in module analytics\_core.utils)@\spxentry{convert\_html\_to\_dash()}\spxextra{in module analytics\_core.utils}|hyperpage}{148}
+\indexentry{hex2rgb() (in module analytics\_core.utils)@\spxentry{hex2rgb()}\spxextra{in module analytics\_core.utils}|hyperpage}{148}
+\indexentry{get\_rgb\_colors() (in module analytics\_core.utils)@\spxentry{get\_rgb\_colors()}\spxextra{in module analytics\_core.utils}|hyperpage}{148}
+\indexentry{get\_hex\_colors() (in module analytics\_core.utils)@\spxentry{get\_hex\_colors()}\spxextra{in module analytics\_core.utils}|hyperpage}{148}
+\indexentry{getMedlineAbstracts() (in module analytics\_core.utils)@\spxentry{getMedlineAbstracts()}\spxextra{in module analytics\_core.utils}|hyperpage}{148}
 \indexentry{notebooks.development.vis (module)@\spxentry{notebooks.development.vis}\spxextra{module}|hyperpage}{148}
 \indexentry{vis\_network() (in module notebooks.development.vis)@\spxentry{vis\_network()}\spxextra{in module notebooks.development.vis}|hyperpage}{148}
 \indexentry{draw() (in module notebooks.development.vis)@\spxentry{draw()}\spxextra{in module notebooks.development.vis}|hyperpage}{148}

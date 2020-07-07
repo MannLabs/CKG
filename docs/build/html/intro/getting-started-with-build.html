@@ -251,7 +251,7 @@ Assuming you have <strong>Python 3.6</strong> already installed and added to <co
 <p>If you don’t have <strong>Python 3.6</strong> installed, <a class="reference external" href="https://www.python.org/">download</a> the Python 3.6 version appropriate for your machine, and run the installer package. Python should be installed in <code class="docutils literal notranslate"><span class="pre">/Library/Frameworks/Python.framework/Versions/3.6/bin/python3.6</span></code> and also found in <code class="docutils literal notranslate"><span class="pre">/usr/local/bin/python3.6</span></code>.</p>
 </div>
 <div class="section" id="create-a-virtual-environment">
-<h2>Create a virtual environment<a class="headerlink" href="#create-a-virtual-environment" title="Permalink to this headline">¶</a></h2>
+<span id="create-virtual-environment"></span><h2>Create a virtual environment<a class="headerlink" href="#create-a-virtual-environment" title="Permalink to this headline">¶</a></h2>
 <p>Virtualenv is not installed by default on Macbook machines. To install it, run:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python3 -m pip install virtualenv
 </pre></div>
@@ -289,7 +289,8 @@ Assuming you have <strong>Python 3.6</strong> already installed and added to <co
 <p>Once this is finished, you can find all the Python modules necessary to run the Clinical Knowledge Graph in <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code>.
 To install all the packages required, simply run:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> CKG/
-$ pip install -r requirements.txt
+$ pip3 install --upgrade pip
+$ pip3 install --ignore-installed -r requirements.txt
 </pre></div>
 </div>
 <div class="admonition warning">
