@@ -285,53 +285,6 @@
     <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span> <span class="n">v</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;: &quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">el</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;style&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">)]}</span></div>
 
 
-<div class="viewcode-block" id="is_jsonable"><a class="viewcode-back" href="../../_autosummary/report_manager.html#report_manager.utils.is_jsonable">[docs]</a><span class="k">def</span> <span class="nf">is_jsonable</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">True</span>
-    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">False</span></div>
-
-
-<div class="viewcode-block" id="convert_dash_to_json"><a class="viewcode-back" href="../../_autosummary/report_manager.html#report_manager.utils.convert_dash_to_json">[docs]</a><span class="k">def</span> <span class="nf">convert_dash_to_json</span><span class="p">(</span><span class="n">dash_object</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dash_object</span><span class="p">,</span> <span class="s1">&#39;to_plotly_json&#39;</span><span class="p">):</span>
-        <span class="n">dash_json</span> <span class="o">=</span> <span class="n">dash_object</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">dash_json</span> <span class="o">=</span> <span class="n">dash_object</span><span class="o">.</span><span class="n">to_plotly_json</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dash_json</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dash_json</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">dash_json</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
-                    <span class="n">children</span> <span class="o">=</span> <span class="n">dash_json</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">element</span><span class="p">]</span>
-                    <span class="n">ch</span> <span class="o">=</span> <span class="p">{</span><span class="n">element</span><span class="p">:</span> <span class="p">[]}</span>
-                    <span class="k">if</span> <span class="n">is_jsonable</span><span class="p">(</span><span class="n">children</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">children</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-                        <span class="n">ch</span><span class="p">[</span><span class="n">element</span><span class="p">]</span> <span class="o">=</span> <span class="n">children</span>
-                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">children</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                        <span class="n">ch</span><span class="p">[</span><span class="n">element</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-                        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">children</span><span class="p">:</span>
-                            <span class="n">ch</span><span class="p">[</span><span class="n">element</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">c</span><span class="p">:</span> <span class="p">[]})</span>
-                            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">children</span><span class="p">[</span><span class="n">c</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
-                                <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">children</span><span class="p">[</span><span class="n">c</span><span class="p">]:</span>
-                                    <span class="k">if</span> <span class="n">is_jsonable</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-                                        <span class="n">ch</span><span class="p">[</span><span class="n">element</span><span class="p">][</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-                                    <span class="k">else</span><span class="p">:</span>
-                                        <span class="n">ch</span><span class="p">[</span><span class="n">element</span><span class="p">][</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">convert_dash_to_json</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
-                            <span class="k">else</span><span class="p">:</span>
-                                <span class="k">if</span> <span class="n">is_jsonable</span><span class="p">(</span><span class="n">children</span><span class="p">[</span><span class="n">c</span><span class="p">])</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">children</span><span class="p">[</span><span class="n">c</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-                                    <span class="n">ch</span><span class="p">[</span><span class="n">element</span><span class="p">][</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">children</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
-                                <span class="k">else</span><span class="p">:</span>
-                                    <span class="n">ch</span><span class="p">[</span><span class="n">element</span><span class="p">][</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert_dash_to_json</span><span class="p">(</span><span class="n">children</span><span class="p">[</span><span class="n">c</span><span class="p">])</span>
-                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">children</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span> 
-                        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">children</span><span class="p">:</span> 
-                            <span class="k">if</span> <span class="n">is_jsonable</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-                                <span class="n">ch</span><span class="p">[</span><span class="n">element</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
-                            <span class="k">else</span><span class="p">:</span> 
-                                <span class="n">ch</span><span class="p">[</span><span class="n">element</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">convert_dash_to_json</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">ch</span><span class="p">[</span><span class="n">element</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert_dash_to_json</span><span class="p">(</span><span class="n">children</span><span class="p">)</span>
-                    <span class="n">dash_json</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">dash_json</span> </div>
-
-
 <div class="viewcode-block" id="get_image"><a class="viewcode-back" href="../../_autosummary/report_manager.html#report_manager.utils.get_image">[docs]</a><span class="k">def</span> <span class="nf">get_image</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">))</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
 
@@ -403,20 +356,6 @@
 
     <span class="c1"># return True on success and False on errors</span>
     <span class="k">return</span> <span class="n">pisa_status</span><span class="o">.</span><span class="n">err</span></div>
-
-
-<div class="viewcode-block" id="NumpyEncoder"><a class="viewcode-back" href="../../_autosummary/report_manager.html#report_manager.utils.NumpyEncoder">[docs]</a><span class="k">class</span> <span class="nc">NumpyEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
-<div class="viewcode-block" id="NumpyEncoder.default"><a class="viewcode-back" href="../../_autosummary/report_manager.html#report_manager.utils.NumpyEncoder.default">[docs]</a>    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span></div></div>
-
-
-<div class="viewcode-block" id="DictDFEncoder"><a class="viewcode-back" href="../../_autosummary/report_manager.html#report_manager.utils.DictDFEncoder">[docs]</a><span class="k">class</span> <span class="nc">DictDFEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
-<div class="viewcode-block" id="DictDFEncoder.default"><a class="viewcode-back" href="../../_autosummary/report_manager.html#report_manager.utils.DictDFEncoder.default">[docs]</a>    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;to_json&#39;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s1">&#39;records&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>
