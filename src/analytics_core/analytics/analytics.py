@@ -329,7 +329,7 @@ def imputation_normal_distribution(data, index_cols=['group', 'sample', 'subject
         df = df.set_index(index_cols)
 
     data_imputed = df.T.sort_index()
-    null_columns = data_imputed.columns[data_imputed.isnull().any()]
+    null_columns = data_imputed.isnull().any().index.tolist()
     for c in null_columns:
         missing = data_imputed[data_imputed[c].isnull()].index.tolist()
         std = data_imputed[c].std()
@@ -339,20 +339,24 @@ def imputation_normal_distribution(data, index_cols=['group', 'sample', 'subject
         value = 0.0
         if not math.isnan(std) and not math.isnan(mean) and not math.isnan(sigma) and not math.isnan(mu):
             value = np.random.normal(mu, sigma, size=len(missing))
-
-        data_imputed.loc[missing, c] = value
+        
+        i = 0
+        for m in missing:
+            data_imputed.loc[m, c] = value[i]
+            i += 1
 
     return data_imputed.T
 
 
-def normalize_data_per_group(data, group, method='median'):
+def normalize_data_per_group(data, group, method='median', normalize=None):
     """
     This function normalizes the data by group using the selected method
 
     :param data: DataFrame with the data to be normalized (samples x features)
     :param group_col: Column containing the groups
-    :param string method: normalization method to choose among: median_polish, median,
+    :param str method: normalization method to choose among: median_polish, median,
                         quantile, linear
+    :param str normalize: whether the normalization should be done by 'features' (columns) or 'samples' (rows) (default None)
     :return: Pandas dataframe.
 
     Example::
@@ -361,19 +365,20 @@ def normalize_data_per_group(data, group, method='median'):
     """
     ndf = pd.DataFrame(columns=data.columns)
     for n, gdf in data.groupby(group):
-        norm_group = normalize_data(gdf, method=method)
+        norm_group = normalize_data(gdf, method=method, normalize=normalize)
         ndf = ndf.append(norm_group)
 
     return ndf
 
 
-def normalize_data(data, method='median_polish'):
+def normalize_data(data, method='median_polish', normalize=None):
     """
     This function normalizes the data using the selected method
 
     :param data: DataFrame with the data to be normalized (samples x features)
     :param string method: normalization method to choose among: median_polish, median,
                         quantile, linear
+    :param str normalize: whether the normalization should be done by 'features' (columns) or 'samples' (rows) (default None)
     :return: Pandas dataframe.
 
     Example::
@@ -387,13 +392,13 @@ def normalize_data(data, method='median_polish'):
         if method == 'median_polish':
             normData = median_polish_normalization(numeric_cols, max_iter=250)
         elif method == 'median':
-            normData = median_normalization(numeric_cols)
+            normData = median_normalization(numeric_cols, normalize)
         elif method == 'quantile':
             normData = quantile_normalization(numeric_cols)
         elif method == 'linear':
-            normData = linear_normalization(numeric_cols, method="l1", axis=0)
+            normData = linear_normalization(numeric_cols, method="l1", normalize=normalize)
         elif method == 'zscore':
-            normData = zscore_normalization(numeric_cols)
+            normData = zscore_normalization(numeric_cols, normalize)
 
     if non_numeric_cols is not None and not non_numeric_cols.empty:
         normData = normData.join(non_numeric_cols)
@@ -401,34 +406,45 @@ def normalize_data(data, method='median_polish'):
     return normData
 
 
-def median_normalization(data):
+def median_normalization(data, normalize='samples'):
     """
     This function normalizes each sample by using its median.
 
     :param data:
+    :param str normalize: whether the normalization should be done by 'features' (columns) or 'samples' (rows)
     :return: Pandas dataframe.
 
     Example::
-
-        result = median_normalization(data)
+        data = pd.DataFrame({'a': [2,5,4,3,3], 'b':[4,4,6,5,3], 'c':[4,14,8,8,9]})
+        result = median_normalization(data, normalize='samples')
+        result
+                a         b         c
+            0 -1.333333  0.666667  0.666667
+            1 -2.666667 -3.666667  6.333333
+            2 -2.000000  0.000000  2.000000
+            3 -2.333333 -0.333333  2.666667
+            4 -2.000000 -2.000000  4.000000
     """
-
-    normData = data.sub(data.median(axis=0), axis=1)
+    if normalize is None or normalize == 'samples':
+        normData = data.sub(data.median(axis=1), axis=0)
+    else:
+        normData = data.sub(data.median(axis=0), axis=1)
 
     return normData
 
 
-def zscore_normalization(data):
+def zscore_normalization(data, normalize='samples'):
     """
     This function normalizes each sample by using its mean and standard deviation (mean=0, std=1).
 
     :param data:
+    :param str normalize: whether the normalization should be done by 'features' (columns) or 'samples' (rows)
     :return: Pandas dataframe.
 
     Example::
 
         data = pd.DataFrame({'a': [2,5,4,3,3], 'b':[4,4,6,5,3], 'c':[4,14,8,8,9]})
-        result = zscore_normalization(data)
+        result = zscore_normalization(data, normalize='samples')
         result
 
                   a         b         c
@@ -438,8 +454,12 @@ def zscore_normalization(data):
                 3 -0.927173 -0.132453  1.059626
                 4 -0.577350 -0.577350  1.154701
     """
-    normData = data.sub(data.mean(axis=0), axis=1).div(data.std(axis=0), axis=1)
+    if normalize is None or normalize == 'samples':
+        normData = data.sub(data.mean(axis=1), axis=0).div(data.std(axis=1), axis=0)
 
+    else:
+        normData = data.sub(data.mean(axis=0), axis=1).div(data.std(axis=0), axis=1)
+        
     return normData
 
 
@@ -453,8 +473,15 @@ def median_polish_normalization(data, max_iter=250):
     :return: Pandas dataframe.
 
     Example::
-
+        data = pd.DataFrame({'a': [2,5,4,3,3], 'b':[4,4,6,5,3], 'c':[4,14,8,8,9]})
         result = median_polish_normalization(data, max_iter = 10)
+        result
+                a    b     c
+            0  2.0  4.0   7.0
+            1  5.0  7.0  10.0
+            2  4.0  6.0   9.0
+            3  3.0  5.0   8.0
+            4  3.0  5.0   8.0
     """
     mediandf = data.copy()
     for i in range(max_iter):
@@ -478,8 +505,15 @@ def quantile_normalization(data):
     :return: Pandas dataframe
 
     Example::
-
+        data = pd.DataFrame({'a': [2,5,4,3,3], 'b':[4,4,6,5,3], 'c':[4,14,8,8,9]})
         result = quantile_normalization(data)
+        result
+                a    b    c
+            0  3.2  4.6  4.6
+            1  4.6  3.2  8.6
+            2  3.2  4.6  8.6
+            3  3.2  4.6  8.6
+            4  3.2  3.2  8.6
     """
     rank_mean = data.T.stack().groupby(data.T.rank(method='first').stack().astype(int)).mean()
     normdf = data.T.rank(method='min').stack().astype(int).map(rank_mean).unstack().T
@@ -487,20 +521,31 @@ def quantile_normalization(data):
     return normdf
 
 
-def linear_normalization(data, method="l1", axis=0):
+def linear_normalization(data, method="l1", normalize='samples'):
     """
     This function scales input data to a unit norm. For more information visit https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.normalize.html.
 
     :param data: pandas dataframe with samples as rows and features as columns.
     :param str method: norm to use to normalize each non-zero sample or non-zero feature (depends on axis).
-    :param int axis: axis used to normalize the data along. If 1, independently normalize each sample, otherwise (if 0) normalize each feature.
+    :param str normalize: axis used to normalize the data along. If 'samples', independently normalize each sample, if 'features' normalize each feature.
     :return: Pandas dataframe
 
     Example::
-
-        result = linear_normalization(data, method = "l1", axis = 0)
+        data = pd.DataFrame({'a': [2,5,4,3,3], 'b':[4,4,6,5,3], 'c':[4,14,8,8,9]})
+        result = linear_normalization(data, method = "l1", by = 'feature')
+        result
+                a         b         c
+            0  0.117647  0.181818  0.093023
+            1  0.294118  0.181818  0.325581
+            2  0.235294  0.272727  0.186047
+            3  0.176471  0.227273  0.186047
+            4  0.176471  0.136364  0.209302
     """
-    normvalues = preprocessing.normalize(data.fillna(0).values, norm=method, axis=axis, copy=True, return_norm=False)
+    if normalize is None or normalize == 'samples':
+        normvalues = preprocessing.normalize(data.fillna(0).values, norm=method, axis=0, copy=True, return_norm=False)
+    else:
+        normvalues = preprocessing.normalize(data.fillna(0).values, norm=method, axis=1, copy=True, return_norm=False)
+
     normdf = pd.DataFrame(normvalues, index=data.index, columns=data.columns)
 
     return normdf
@@ -605,10 +650,9 @@ def transform_proteomics_edgelist(df, index_cols=['group', 'sample', 'subject'],
     return wdf
 
 
-def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation=True, method='distribution', missing_method='percentage', missing_per_group=True, missing_max=0.3, min_valid=1, value_col='LFQ_intensity', shift=1.8, nstd=0.3, knn_cutoff=0.6, normalize=False, normalization_method='median', normalize_group=False):
+def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation=True, method='distribution', missing_method='percentage', missing_per_group=True, missing_max=0.3, min_valid=1, value_col='LFQ_intensity', shift=1.8, nstd=0.3, knn_cutoff=0.6, normalize=False, normalization_method='median', normalize_group=False, normalize_by=None):
     """
     Processes proteomics data extracted from the database: 1) filter proteins with high number of missing values (> missing_max or min_valid), 2) impute missing values.
-    For more information on imputation method visit http://www.coxdocs.org/doku.php?id=perseus:user:activities:matrixprocessing:filterrows:filtervalidvaluesrows.
 
     :param df: long-format pandas dataframe with columns 'group', 'sample', 'subject', 'identifier' (protein), 'name' (gene) and 'LFQ_intensity'.
     :param list index_cols: column labels to be be kept as index identifiers.
@@ -626,7 +670,11 @@ def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subjec
     :param float shift: when using distribution imputation, the down-shift
     :param float nstd: when using distribution imputation, the width of the distribution
     :param float knn_cutoff: when using KNN imputation, the minimum percentage of valid values for which to use KNN imputation (i.e. 0.6 -> if 60% valid values use KNN, otherwise MinProb)
-    :return: Pandas dataframe with samples as rows and protein identifiers (UniprotID~GeneName) as columns (with additional columns 'group', 'sample' and 'subject').
+    :param bool normalize: whether or not to normalize the data 
+    :param str normalization_method: method to be used to normalize the data ('median', 'quantile', 'linear', 'zscore', 'median_polish') (only with normalize=True)
+    :param bool normalize_group: normalize per group or not (only with normalize=True)
+    :param str normalize_by: whether the normalization should be done by 'features' (columns) or 'samples' (rows) (only with normalize=True)
+    :return: Pandas dataframe with samples as rows and protein identifiers as columns (with additional columns 'group', 'sample' and 'subject').
 
     Example 1::
 
@@ -640,9 +688,9 @@ def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subjec
     if df is not None:
         if normalize:
             if not normalize_group:
-                df = normalize_data(df, method=normalization_method)
+                df = normalize_data(df, method=normalization_method, normalize=normalize_by)
             else:
-                df = normalize_data_per_group(df, group=group, method=normalization_method)
+                df = normalize_data_per_group(df, group=group, method=normalization_method, normalize=normalize_by)
         aux = []
         aux.extend(index_cols)
         g = group
@@ -940,9 +988,13 @@ def apply_pvalue_correction(pvalues, alpha=0.05, method='bonferroni'):
 
         result = apply_pvalue_correction(pvalues, alpha=0.05, method='bonferroni')
     """
-    rejected, padj, alphacSidak,  alphacBonf = multitest.multipletests(pvalues, alpha, method)
+    p = np.array(pvalues)
+    mask = np.isfinite(p)
+    pval_corrected = np.full(p.shape, np.nan)
+    pval_corrected[mask] = multitest.multipletests(p[mask], alpha, method)[1]
+    rejected = [p <= alpha for p in pval_corrected]
 
-    return (rejected, padj)
+    return (rejected, pval_corrected.tolist())
 
 
 def apply_pvalue_fdrcorrection(pvalues, alpha=0.05, method='indep'):
@@ -1787,7 +1839,7 @@ def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], su
     else:
         scores = scores.rename(columns={'log2FC':'FC'})
 
-    scores['-log10 pvalue'] = [-np.log10(x) for x in scores['pvalue'].values]
+    scores['-log10 pvalue'] = [-np.log10(x) if x != 0 else -np.log10(alpha) for x in scores['pvalue'].values]
     scores['Method'] = method
     scores.index.name = 'identifier'
     scores = scores.reset_index()
