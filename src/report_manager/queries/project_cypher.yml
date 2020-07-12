@@ -99,6 +99,7 @@ project_graph:
         - HAS_ENROLLED
         - BELONGS_TO_SUBJECT
         - SPLITTED_INTO
+    query_type: post
     query: >
         MATCH (p:Project)-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(n:Protein)
         WHERE p.id="PROJECTID"
