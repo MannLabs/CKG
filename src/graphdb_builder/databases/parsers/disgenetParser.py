@@ -93,7 +93,7 @@ def readDisGeNetDiseaseMapping(config, directory):
                 if first:
                     first = False
                     continue
-                data = line.decode('utf-8').rstrip("\r\n").split("|")
+                data = line.decode('utf-8').rstrip("\r\n").split("\t")
                 identifier = data[0]
                 vocabulary = data[2]
                 code = data[3]
