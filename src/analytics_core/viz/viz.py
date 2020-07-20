@@ -11,6 +11,7 @@ import plotly.tools as tls
 import plotly.graph_objs as go
 import plotly.figure_factory as FF
 import plotly.express as px
+import kaleido
 import math
 import dash_table
 import plotly.subplots as tools
@@ -719,7 +720,7 @@ def get_volcanoplot(results, args):
         figures.append(dcc.Graph(id= identifier, figure = figure))
     return figures
 
-def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blues', 'showscale': False, 'marker_size':8, 'x_title':'log2FC', 'y_title':'-log10(pvalue)', 'num_annotations':10}):
+def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blues', 'showscale': False, 'marker_size':8, 'x_title':'log2FC', 'y_title':'-log10(pvalue)', 'num_annotations':10, 'annotate_list':[]}):
     """ 
     This function parsers the regulation data from statistical tests and creates volcano plots for all distinct group comparisons. Significant hits with lowest adjusted p-values are highlighed.
 
@@ -736,7 +737,7 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
         * **marker_size** (int) -- sets the marker size (in px).
         * **x_title** (str) -- plot x axis title.
         * **y_title** (str) -- plot y axis title.
-        * **num_annotations** (int) -- number of hits to be highlighted (if num_annotations = 10, highlights 10 hits with lowest adjusted p-value).
+        * **num_annotations** (int) -- number of hits to be highlighted (if num_annotations = 10, highlights 10 hits with lowest significant adjusted p-value).
     :return: list of volcano plot figures within the <div id="_dash-app-content">.
 
     Example::
@@ -751,6 +752,7 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
     for group in grouping.groups:
         signature = grouping.get_group(group)
         color = []
+        color_dict = {}
         line_colors = []
         text = []
         annotations = []
@@ -788,6 +790,7 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
                                     'ay': -10,
                                     'font': dict(color = "#2c7bb6", size = 10)})
                     color.append('rgba(44, 123, 182, 0.7)')
+                    color_dict[row['identifier']] = "#2c7bb6"
                     line_colors.append('#2c7bb6')
                 elif row['log2FC'] >= np.log2(args['fc']):
                     annotations.append({'x': row['log2FC'],
@@ -800,19 +803,39 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
                                     'ay': -10,
                                     'font': dict(color = "#d7191c", size = 10)})
                     color.append('rgba(215, 25, 28, 0.7)')
+                    color_dict[row['identifier']] = "#d7191c"
                     line_colors.append('#d7191c')
                 elif row['log2FC'] < 0.:
                     color.append('rgba(171, 217, 233, 0.5)')
+                    color_dict[row['identifier']] = '#abd9e9'
                     line_colors.append('#abd9e9')
                 elif row['log2FC'] > 0.:
                     color.append('rgba(253, 174, 97, 0.5)')
+                    color_dict[row['identifier']] = '#fdae61'
                     line_colors.append('#fdae61')
                 else:
                     color.append('rgba(153, 153, 153, 0.3)')
+                    color_dict[row['identifier']] = '#999999'
                     line_colors.append('#999999')
             else:
                 color.append('rgba(153, 153, 153, 0.3)')
                 line_colors.append('#999999')
+
+        if 'annotate_list' in args:
+            if len(args['annotate_list']) > 0:
+                annotations = []
+                hits = args['annotate_list']
+                selected = signature[signature['identifier'].isin(hits)]
+                for index, row in selected.iterrows():
+                    annotations.append({'x': row['log2FC'],
+                                    'y': row['-log10 pvalue'],
+                                    'xref':'x',
+                                    'yref': 'y',
+                                    'text': str(row['identifier']),
+                                    'showarrow': False,
+                                    'ax': 0,
+                                    'ay': -10,
+                                    'font': dict(color = color_dict[row['identifier']], size = 12)})
 
         if len(annotations) < num_annotations:
             num_annotations = len(annotations)
