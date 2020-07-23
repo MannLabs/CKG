@@ -11,7 +11,6 @@ import plotly.tools as tls
 import plotly.graph_objs as go
 import plotly.figure_factory as FF
 import plotly.express as px
-import kaleido
 import math
 import dash_table
 import plotly.subplots as tools
@@ -591,31 +590,26 @@ def get_scatterplot(data, identifier, args):
 
         result = get_scatteplot(data, identifier='scatter plot', 'title':'Scatter Plot', 'x_title':'x_axis', 'y_title':'y_axis', 'height':100, 'width':100}))
     """
-    figure = {}
-    figure["data"] = []
+    figure = px.scatter(data, x='x', y='y', color='name')
+    figure.update_traces(marker=dict(size=14,
+                                     opacity=0.7,
+                                     line=dict(width=0.5, color='DarkSlateGrey')),
+                      selector=dict(mode='markers'))
     figure["layout"] = go.Layout(title = args['title'],
                                 xaxis= {"title": args['x_title']},
                                 yaxis= {"title": args['y_title']},
-                                #margin={'l': 40, 'b': 40, 't': 30, 'r': 10},
-                                legend={'x': -.4, 'y': 1.2},
+                                legend=dict(orientation="h",
+                                            yanchor="bottom",
+                                            y=1.02,
+                                            xanchor="right",
+                                            x=1),
                                 hovermode='closest',
                                 height=args['height'],
                                 width=args['width'],
                                 annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')],
                                 template='plotly_white'
                                 )
-    for name in data.name.unique():
-        m = {'size': 25, 'line': {'width': 0.5, 'color': 'grey'}}
-        if 'colors' in args:
-            if name in args['colors']:
-                m.update({'color' : args['colors'][name]})
-        figure["data"].append(go.Scattergl(x = data.loc[data["name"] == name, "x"],
-                                        y = data.loc[data['name'] == name, "y"],
-                                        text = name,
-                                        mode = 'markers',
-                                        opacity=0.7,
-                                        marker= m,
-                                        name=name))
+    
 
     return dcc.Graph(id= identifier, figure = figure)
 
@@ -769,7 +763,9 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
             signature = signature.sort_values(by="posthoc padj", ascending=True)
         elif "padj" in signature:
             signature = signature.sort_values(by="padj", ascending=True)
-
+        
+        signature = signature.reindex(signature['log2FC'].abs().sort_values(ascending=False).index)
+        
         pvals = []
         for index, row in signature.iterrows():
             # Text
@@ -1408,7 +1404,7 @@ def get_pca_plot(data, identifier, args):
         trace = go.Scattergl(x= [0,x],
                         y = [0,y],
                         mode='markers+lines',
-                        text=index+" loading: {0:.2f}".format(value),
+                        text=str(index)+" loading: {0:.2f}".format(value),
                         name = index,
                         marker= dict(size=3,
                                     symbol= 1,
