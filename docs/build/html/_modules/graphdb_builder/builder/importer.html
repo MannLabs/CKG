@@ -249,7 +249,7 @@
 <span class="sd">    :param str importDirectory: path of the import directory where files will be created.</span>
 <span class="sd">    :param list ontologies: a list of ontology names to be imported.</span>
 <span class="sd">    :param bool download: wether database is to be downloaded.</span>
-<span class="sd">    :param str import_type: type of import (´full´ or ´partial´).</span>
+<span class="sd">    :param str import_type: type of import (&#39;full&#39; or &#39;partial&#39;).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ontologiesImportDirectory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">importDirectory</span><span class="p">,</span> <span class="n">oconfig</span><span class="p">[</span><span class="s2">&quot;ontologies_importDir&quot;</span><span class="p">])</span>
     <span class="n">builder_utils</span><span class="o">.</span><span class="n">checkDirectory</span><span class="p">(</span><span class="n">ontologiesImportDirectory</span><span class="p">)</span>
@@ -268,7 +268,7 @@
 <span class="sd">    :param str importDirectory: path of the import directory where files will be created.</span>
 <span class="sd">    :param list databases: a list of database names to be imported.</span>
 <span class="sd">    :param int n_jobs: number of jobs to run in parallel. 1 by default when updating one database.</span>
-<span class="sd">    :param str import_type: type of import (´full´ or ´partial´).</span>
+<span class="sd">    :param str import_type: type of import (&#39;full&#39; or &#39;partial&#39;).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">databasesImportDirectory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">importDirectory</span><span class="p">,</span> <span class="n">dbconfig</span><span class="p">[</span><span class="s2">&quot;databasesImportDir&quot;</span><span class="p">])</span>
     <span class="n">builder_utils</span><span class="o">.</span><span class="n">checkDirectory</span><span class="p">(</span><span class="n">databasesImportDirectory</span><span class="p">)</span>
@@ -286,7 +286,7 @@
 
 <span class="sd">    :param list projects:  list of project identifiers to be imported.</span>
 <span class="sd">    :param int n_jobs: number of jobs to run in parallel. 1 by default when updating one project.</span>
-<span class="sd">    :param str import_type: type of import (´full´ or ´partial´).</span>
+<span class="sd">    :param str import_type: type of import (&#39;full&#39; or &#39;partial&#39;).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">experiments_import_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directories</span><span class="p">[</span><span class="s1">&#39;importDirectory&#39;</span><span class="p">],</span> <span class="n">econfig</span><span class="p">[</span><span class="s2">&quot;import_directory&quot;</span><span class="p">])</span>
     <span class="n">builder_utils</span><span class="o">.</span><span class="n">checkDirectory</span><span class="p">(</span><span class="n">experiments_import_directory</span><span class="p">)</span>
@@ -323,7 +323,7 @@
 <span class="sd">    directory.</span>
 
 <span class="sd">    :param str importDirectory: path to the directory where all the import files are generated.</span>
-<span class="sd">    :param str import_type: type of import (´full´ or ´partial).</span>
+<span class="sd">    :param str import_type: type of import (&#39;full&#39; or &#39;partial&#39;).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">usersImportDirectory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">importDirectory</span><span class="p">,</span> <span class="n">uconfig</span><span class="p">[</span><span class="s1">&#39;usersImportDirectory&#39;</span><span class="p">])</span>
     <span class="n">builder_utils</span><span class="o">.</span><span class="n">checkDirectory</span><span class="p">(</span><span class="n">usersImportDirectory</span><span class="p">)</span>
@@ -421,7 +421,7 @@
 <span class="c1"># def loadStats(statsFile):</span>
 <span class="c1">#     &quot;&quot;&quot;</span>
 <span class="c1">#     Loads the statistics object.</span>
-    
+
 <span class="c1">#     :param str statsFile: file path where the stats object is stored.</span>
 <span class="c1">#     :returns: HDFStore object with the collected statistics. \</span>
 <span class="c1">#                 stats can be accessed using a key (i.e stats_ version).</span>
