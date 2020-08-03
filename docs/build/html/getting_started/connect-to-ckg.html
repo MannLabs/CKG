@@ -214,13 +214,14 @@ This connection is established via one of Neo4j’s Python drivers <code class="
 <p>Another essential tool when working with Neo4j databases, is the <a class="reference external" href="https://neo4j.com/developer/cypher-query-language/">Cypher query language</a>. We recommend becoming familiar with it, to understand the queries used in the different analyses.</p>
 <div class="section" id="py2neo-connector">
 <h2>Py2neo connector<a class="headerlink" href="#py2neo-connector" title="Permalink to this headline">¶</a></h2>
+<p>Note that this section is for illustration purposes only.</p>
 <p>Within the CKG package, the <code class="docutils literal notranslate"><span class="pre">graph_connector</span></code> module was created to connect the different parts of the Python code, to the Neo4j database and allow their interaction.</p>
 <p>In this module, the <em>Graph</em> class from <code class="docutils literal notranslate"><span class="pre">py2neo</span></code> is used to represent the graph data storage space within the Neo4j database, and a YAML configuration file is parsed to retrieve the connection details. The configuration file <code class="docutils literal notranslate"><span class="pre">connector_config.yml</span></code> contains the database server host name, server port, user to authenticate as, and password to use for authentication.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphdb_connector</span> <span class="kn">import</span> <span class="n">connector</span>
 <span class="n">driver</span> <span class="o">=</span> <span class="n">connector</span><span class="o">.</span><span class="n">getGraphDatabaseConnectionConfiguration</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Once the connection is established, we can start querying the database. For example:</p>
+<p>Once the connection is established, the database can be queried. For example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">example_query</span> <span class="o">=</span> <span class="s1">&#39;MATCH (p:Project)-[:HAS_ENROLLED]-(s:Subject) RETURN p.id as project_id, COUNT(s) as n_subjects&#39;</span>
 <span class="n">results</span> <span class="o">=</span> <span class="n">connector</span><span class="o">.</span><span class="n">getCursorData</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="n">example_query</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="p">{})</span>
 </pre></div>

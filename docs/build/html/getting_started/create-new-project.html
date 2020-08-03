@@ -256,11 +256,19 @@ To create a project, please follow the steps below.</p>
 <li><p>Start a celery queue from the report_manager directory, in each window:</p></li>
 </ul>
 <p><strong>Default queue</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ celery -A worker worker -l debug
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ celery -A worker worker --loglevel<span class="o">=</span>DEBUG --concurrency<span class="o">=</span><span class="m">3</span> -E
+</pre></div>
+</div>
+<p>In Windows, this corresponds to:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt; celery worker -A worker --pool<span class="o">=</span>eventlet --loglevel<span class="o">=</span>DEBUG --concurrency<span class="o">=</span><span class="m">3</span> -E
 </pre></div>
 </div>
 <p><strong>Compute queue - Report generation</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ celery -A worker worker --loglevel<span class="o">=</span>DEBUG --concurrency<span class="o">=</span><span class="m">3</span> -E -Q compute
+</pre></div>
+</div>
+<p>To start this queue on Windows, please run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt; celery worker -A worker --pool<span class="o">=</span>eventlet --loglevel<span class="o">=</span>DEBUG --concurrency<span class="o">=</span><span class="m">3</span> -E -Q compute
 </pre></div>
 </div>
 <ol class="arabic simple" start="3">
@@ -302,7 +310,7 @@ The page will refresh and once finished, the project identifier will be depicted
 <p>At this stage, and if your project has been successfully created in the database, a new button will appear and the message will instruct you to download a compressed file with the experimental design and clinical data template files. To do so, please press the button “Download Clinical Data template”. <strong>(4)</strong></p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Each field, with the exception of <code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">Acronym</span></code>,``Number of subjects``,  <code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">Description</span></code>, <code class="docutils literal notranslate"><span class="pre">Starting</span> <span class="pre">Date</span></code> and <code class="docutils literal notranslate"><span class="pre">Ending</span> <span class="pre">Date</span></code>, can take multiple values. Select the most appropriate ones for your specific project.</p>
+<p>Each field, with the exception of <code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">Acronym</span></code>, <code class="docutils literal notranslate"><span class="pre">Number</span> <span class="pre">of</span> <span class="pre">subjects</span></code>,  <code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">Description</span></code>, <code class="docutils literal notranslate"><span class="pre">Starting</span> <span class="pre">Date</span></code> and <code class="docutils literal notranslate"><span class="pre">Ending</span> <span class="pre">Date</span></code>, can take multiple values. Select the most appropriate ones for your specific project.</p>
 </div>
 <div class="figure align-right" id="id3">
 <a class="reference internal image-reference" href="../_images/design_file.png"><img alt="../_images/design_file.png" src="../_images/design_file.png" style="width: 240px;" /></a>
