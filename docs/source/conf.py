@@ -16,6 +16,13 @@ import sphinx_rtd_theme
 
 sys.path.insert(0, os.path.abspath( './../..'))
 
+
+import mock
+
+MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'matplotlib.pyplot', 'scipy.interpolate']
+for mod_name in MOCK_MODULES:
+sys.modules[mod_name] = mock.Mock()
+
 # -- Project information -----------------------------------------------------
 
 project = 'ClinicalKnowledgeGraph'
@@ -57,7 +64,9 @@ autosectionlabel_prefix_document = True
 ## Default: alphabetically ('alphabetical')
 autodoc_member_order = 'bysource'
 ## Default flags used by autodoc directives
-autodoc_default_flags = ['members', 'show-inheritance']
+autodoc_default_options = {'members': True,
+                            'show-inheritance': True,
+                            'undoc-members': True,}
 ## Generate autodoc stubs with summaries from code
 autosummary_generate = True
 
