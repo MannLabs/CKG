@@ -14,7 +14,7 @@ import os
 import sys
 import sphinx_rtd_theme
 
-sys.path.insert(0, os.path.abspath( '../..'))
+sys.path.insert(0, os.path.abspath( './../..'))
 
 # -- Project information -----------------------------------------------------
 
@@ -202,7 +202,7 @@ texinfo_documents = [
 intersphinx_mapping = {'https://docs.python.org/3.6/': None}
 
 
-# A string of reStructuredText that will be included at the end of every source 
+# A string of reStructuredText that will be included at the end of every source
 # file that is read.
 rst_epilog = """
 
