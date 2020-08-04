@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.abspath( './../../src'))
 #     sys.modules[mod_name] = mock.Mock()
 autodoc_mock_imports = ['pandas', 'numpy', 'scipy', 'matplotlib', 'h5py', 'rpy2',
                         'sklearn', 'lifelines', 'autograd', 'umap', 'numba', 'pingouin',
-                        'seaborn', 'fancyimpute', 'cvxpy', 'kmapper']
+                        'seaborn', 'fancyimpute', 'cvxpy', 'kmapper', 'statsmodels']
 
 # -- Project information -----------------------------------------------------
 
