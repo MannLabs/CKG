@@ -4,7 +4,7 @@ CKG Builder
 User Creation Module
 ----------------------------
 
-.. automodule:: graphdb_builder.builder.create_user
+.. automodule:: src.graphdb_builder.builder.create_user
    :members:
    :undoc-members:
    :show-inheritance:
@@ -13,7 +13,7 @@ User Creation Module
 Importer Module
 ----------------------------
 
-.. automodule:: graphdb_builder.builder.importer
+.. automodule:: src.graphdb_builder.builder.importer
    :members:
    :undoc-members:
    :show-inheritance:
@@ -21,7 +21,7 @@ Importer Module
 Loader Module
 ----------------------------
 
-.. automodule:: graphdb_builder.builder.loader
+.. automodule:: src.graphdb_builder.builder.loader
    :members:
    :undoc-members:
    :show-inheritance:
@@ -29,8 +29,7 @@ Loader Module
 Builder Module
 ----------------------------
 
-.. automodule:: graphdb_builder.builder.builder
+.. automodule:: src.graphdb_builder.builder.builder
    :members:
    :undoc-members:
    :show-inheritance:
-

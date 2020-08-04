@@ -4,7 +4,7 @@ Vizualization
 Viz module
 --------------
 
-.. automodule:: analytics_core.viz.viz
+.. automodule:: src.analytics_core.viz.viz
    :members:
    :undoc-members:
    :show-inheritance:
@@ -12,7 +12,7 @@ Viz module
 WGCNA viz
 --------------
 
-.. automodule:: analytics_core.viz.wgcnaFigures
+.. automodule:: src.analytics_core.viz.wgcnaFigures
    :members:
    :undoc-members:
    :show-inheritance:
@@ -20,7 +20,7 @@ WGCNA viz
 Dendrogram
 --------------
 
-.. automodule:: analytics_core.viz.Dendrogram
+.. automodule:: src.analytics_core.viz.Dendrogram
    :members:
    :undoc-members:
    :show-inheritance:
@@ -28,7 +28,7 @@ Dendrogram
 Colors
 --------------
 
-.. automodule:: analytics_core.viz.color_list
+.. automodule:: src.analytics_core.viz.color_list
    :members:
    :undoc-members:
    :show-inheritance:

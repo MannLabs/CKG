@@ -1,6 +1,14 @@
 Ontologies Parsers
 =======================================================
 
+efoParser.py
+----------------------------
+
+.. automodule:: src.graphdb_builder.ontologies.parsers.efoParser
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 icdParser.py
 ----------------------------
 

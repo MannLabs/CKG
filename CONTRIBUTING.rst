@@ -49,7 +49,7 @@ The Clinical Knowledge Graph could always use more documentation, whether as par
 
 If you want to review your changes on the documentation locally, you can do:
 
-.. prompt:: bash $
+.. code-block:: bash $
     
     cd docs/
     make servedocs
@@ -76,14 +76,14 @@ Here's how to set up ``CKG`` for local development.
 1. Fork the ``CKG`` repo on GitHub.
 2. Clone your fork locally:
 
-.. prompt:: bash $
+.. code-block:: bash $
 
     git clone git@github.com:MannLabs/CKG.git
 
 
 3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development:
 
-.. prompt:: bash $
+.. code-block:: bash $
 
     mkvirtualenv CKG
     cd CKG/
@@ -93,7 +93,7 @@ FINISH THIS PART!!!!!!
 
 4. Create a branch for local development:
 
-.. prompt:: bash $
+.. code-block:: bash $
 
     git checkout -b name-of-your-bugfix-or-feature
 
@@ -107,7 +107,7 @@ Now you can make your changes locally.
 
 6. Commit your changes and push your branch to GitHub:
 
-.. prompt:: bash $
+.. code-block:: bash $
 
     git add .
     git commit -m "Your detailed description of your changes."

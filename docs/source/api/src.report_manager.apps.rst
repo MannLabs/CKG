@@ -5,7 +5,7 @@ Report Dash Apps
 Basic App
 ----------------------------
 
-.. automodule:: report_manager.apps.basicApp
+.. automodule:: src.report_manager.apps.basicApp
    :members:
    :undoc-members:
    :show-inheritance:
@@ -13,7 +13,7 @@ Basic App
 Data Upload App
 ----------------------------
 
-.. automodule:: report_manager.apps.dataUploadApp
+.. automodule:: src.report_manager.apps.dataUploadApp
    :members:
    :undoc-members:
    :show-inheritance:
@@ -21,7 +21,7 @@ Data Upload App
 Data Upload
 ----------------------------
 
-.. automodule:: report_manager.apps.dataUpload
+.. automodule:: src.report_manager.apps.dataUpload
    :members:
    :undoc-members:
    :show-inheritance:
@@ -29,7 +29,7 @@ Data Upload
 HomePage Stats App
 ----------------------------
 
-.. automodule:: report_manager.apps.homepageApp
+.. automodule:: src.report_manager.apps.homepageApp
    :members:
    :undoc-members:
    :show-inheritance:
@@ -37,7 +37,7 @@ HomePage Stats App
 HomePage Stats
 ----------------------------
 
-.. automodule:: report_manager.apps.homepageStats
+.. automodule:: src.report_manager.apps.homepageStats
    :members:
    :undoc-members:
    :show-inheritance:
@@ -45,7 +45,7 @@ HomePage Stats
 DB Imports Stats App
 ----------------------------
 
-.. automodule:: report_manager.apps.importsApp
+.. automodule:: src.report_manager.apps.importsApp
    :members:
    :undoc-members:
    :show-inheritance:
@@ -53,7 +53,7 @@ DB Imports Stats App
 DB Imports Stats
 ----------------------------
 
-.. automodule:: report_manager.apps.imports
+.. automodule:: src.report_manager.apps.imports
    :members:
    :undoc-members:
    :show-inheritance:
@@ -61,7 +61,7 @@ DB Imports Stats
 Initial App
 ----------------------------
 
-.. automodule:: report_manager.apps.initialApp
+.. automodule:: src.report_manager.apps.initialApp
    :members:
    :undoc-members:
    :show-inheritance:
@@ -69,7 +69,7 @@ Initial App
 Login App
 ----------------------------
 
-.. automodule:: report_manager.apps.loginApp
+.. automodule:: src.report_manager.apps.loginApp
    :members:
    :undoc-members:
    :show-inheritance:
@@ -77,7 +77,7 @@ Login App
 Project App
 ----------------------------
 
-.. automodule:: report_manager.apps.projectApp
+.. automodule:: src.report_manager.apps.projectApp
    :members:
    :undoc-members:
    :show-inheritance:
@@ -85,7 +85,7 @@ Project App
 Project Creation App
 ----------------------------
 
-.. automodule:: report_manager.apps.projectCreationApp
+.. automodule:: src.report_manager.apps.projectCreationApp
    :members:
    :undoc-members:
    :show-inheritance:
@@ -93,9 +93,7 @@ Project Creation App
 Project Creation
 ----------------------------
 
-.. automodule:: report_manager.apps.projectCreation
+.. automodule:: src.report_manager.apps.projectCreation
    :members:
    :undoc-members:
    :show-inheritance:
-
-
