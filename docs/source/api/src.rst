@@ -3,17 +3,17 @@ CKG package API Reference
 
 .. toctree::
 
-   src.graphdb_connector
-   src.graphdb_builder
-   src.report_manager
-   src.analytics_core
-   src.notebooks
+   graphdb_connector
+   graphdb_builder
+   report_manager
+   analytics_core
+   notebooks
 
 
 ckg_utils.py
 ----------------
 
-.. automodule:: src.ckg_utils
+.. automodule:: ckg_utils
    :members:
    :undoc-members:
    :show-inheritance:
