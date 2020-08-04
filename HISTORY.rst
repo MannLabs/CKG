@@ -5,4 +5,5 @@ History
 --------------------
 
 * First release on GitHub.
+
 Beta version of CKG for trial under real conditions, by community users.

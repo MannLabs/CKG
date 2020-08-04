@@ -12,7 +12,7 @@ Graph Database Builder
 builder_utils.py
 ----------------
 
-.. automodule:: src.graphdb_builder.builder_utils
+.. automodule:: src.graphdb_builder.builder_utils.py
    :members:
    :undoc-members:
    :show-inheritance:
@@ -20,7 +20,7 @@ builder_utils.py
 mapping.py
 -------------
 
-.. automodule:: src.graphdb_builder.mapping
+.. automodule:: src.graphdb_builder.mapping.py
    :members:
    :undoc-members:
    :show-inheritance:
