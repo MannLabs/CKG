@@ -17,9 +17,10 @@ import sphinx_rtd_theme
 
 sys.path.insert(0, os.path.abspath( './../..'))
 
-MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'matplotlib.pyplot', 'scipy.interpolate']
-for mod_name in MOCK_MODULES:
-    sys.modules[mod_name] = mock.Mock()
+# MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'matplotlib.pyplot', 'scipy.interpolate']
+# for mod_name in MOCK_MODULES:
+#     sys.modules[mod_name] = mock.Mock()
+autodoc_mock_imports = ['pandas', 'numpy', 'scipy', 'matplotlib']
 
 # -- Project information -----------------------------------------------------
 
