@@ -178,7 +178,7 @@ API Reference
 .. toctree::
    :maxdepth: 4
 
-   autosummary/src
+   api/src
 
 
 Project Info

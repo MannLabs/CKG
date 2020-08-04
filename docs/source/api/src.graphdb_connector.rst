@@ -4,7 +4,7 @@ Graph Database Connector
 connector.py
 ---------------------
 
-.. automodule:: graphdb_connector.connector
+.. automodule:: src.graphdb_connector.connector
    :members:
    :undoc-members:
    :show-inheritance:
@@ -12,7 +12,7 @@ connector.py
 query_utils.py
 ---------------------
 
-.. automodule:: graphdb_connector.query_utils
+.. automodule:: src.graphdb_connector.query_utils
    :members:
    :undoc-members:
    :show-inheritance:

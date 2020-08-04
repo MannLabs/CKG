@@ -3,13 +3,13 @@ Analytics Core
 
 .. toctree::
 
-   analytics_core.analytics
-   analytics_core.viz
+   src.analytics_core.analytics
+   src.analytics_core.viz
 
 R wrapper
 --------------
 
-.. automodule:: analytics_core.R_wrapper
+.. automodule:: src.analytics_core.R_wrapper
    :members:
    :undoc-members:
    :show-inheritance:
@@ -17,7 +17,7 @@ R wrapper
 Analytics factory
 ----------------------
 
-.. automodule:: analytics_core.analytics_factory
+.. automodule:: src.analytics_core.analytics_factory
    :members:
    :undoc-members:
    :show-inheritance:
@@ -25,7 +25,7 @@ Analytics factory
 Utils
 --------------
 
-.. automodule:: analytics_core.utils
+.. automodule:: src.analytics_core.utils
    :members:
    :undoc-members:
    :show-inheritance:

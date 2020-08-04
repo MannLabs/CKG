@@ -4,7 +4,7 @@ Experiments Parsers
 Clinical parser
 ----------------------------
 
-.. automodule:: graphdb_builder.experiments.parsers.clinicalParser
+.. automodule:: src.graphdb_builder.experiments.parsers.clinicalParser
    :members:
    :undoc-members:
    :show-inheritance:
@@ -12,7 +12,7 @@ Clinical parser
 Proteomics parser
 ----------------------------
 
-.. automodule:: graphdb_builder.experiments.parsers.proteomicsParser
+.. automodule:: src.graphdb_builder.experiments.parsers.proteomicsParser
    :members:
    :undoc-members:
    :show-inheritance:
@@ -20,7 +20,7 @@ Proteomics parser
 WES parser
 ----------------------------
 
-.. automodule:: graphdb_builder.experiments.parsers.wesParser
+.. automodule:: src.graphdb_builder.experiments.parsers.wesParser
    :members:
    :undoc-members:
    :show-inheritance:
