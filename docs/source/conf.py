@@ -17,13 +17,6 @@ import sphinx_rtd_theme
 sys.path.insert(0, os.path.abspath( './../..'))
 sys.path.insert(0, os.path.abspath( './../../src'))
 
-# MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'matplotlib.pyplot', 'scipy.interpolate']
-# for mod_name in MOCK_MODULES:
-#     sys.modules[mod_name] = mock.Mock()
-autodoc_mock_imports = ['pandas', 'numpy', 'scipy', 'matplotlib', 'h5py', 'rpy2',
-                        'sklearn', 'lifelines', 'autograd', 'umap', 'numba', 'pingouin',
-                        'seaborn', 'fancyimpute', 'cvxpy', 'kmapper', 'statsmodels']
-
 # -- Project information -----------------------------------------------------
 
 project = 'ClinicalKnowledgeGraph'
@@ -58,6 +51,14 @@ extensions = [
     'recommonmark',
     # 'notfound.extension',
 ]
+
+autodoc_mock_imports = ['pandas', 'numpy', 'scipy', 'matplotlib', 'h5py', 'rpy2',
+                        'sklearn', 'lifelines', 'autograd', 'umap', 'numba', 'pingouin',
+                        'seaborn', 'fancyimpute', 'cvxpy', 'kmapper', 'statsmodels']
+
+# If true, the current module name will be prepended to all description
+# unit titles (such as .. function::).
+add_module_names = False
 
 autosectionlabel_prefix_document = True
 
