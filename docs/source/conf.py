@@ -14,7 +14,10 @@ import os
 import sys
 import sphinx_rtd_theme
 
-sys.path.insert(0, os.path.abspath( '../..'))
+sys.path.insert(0, os.path.abspath( './../..'))
+sys.path.insert(0, os.path.abspath( './../../src'))
+sys.path.insert(0, os.path.abspath( './../../src/report_manager'))
+sys.path.insert(0, os.path.abspath( './../../src/report_manager/apps'))
 
 # -- Project information -----------------------------------------------------
 
@@ -51,13 +54,23 @@ extensions = [
     # 'notfound.extension',
 ]
 
+autodoc_mock_imports = ['pandas', 'numpy', 'scipy', 'matplotlib', 'h5py', 'rpy2',
+                        'sklearn', 'lifelines', 'autograd', 'umap', 'numba', 'pingouin',
+                        'seaborn', 'fancyimpute', 'cvxpy', 'kmapper', 'statsmodels']
+
+# If true, the current module name will be prepended to all description
+# unit titles (such as .. function::).
+add_module_names = False
+
 autosectionlabel_prefix_document = True
 
 ## Include Python objects as they appear in source files
 ## Default: alphabetically ('alphabetical')
 autodoc_member_order = 'bysource'
 ## Default flags used by autodoc directives
-autodoc_default_flags = ['members', 'show-inheritance']
+autodoc_default_options = {'members': True,
+                            'show-inheritance': True,
+                            'undoc-members': True}
 ## Generate autodoc stubs with summaries from code
 autosummary_generate = True
 
@@ -202,7 +215,7 @@ texinfo_documents = [
 intersphinx_mapping = {'https://docs.python.org/3.6/': None}
 
 
-# A string of reStructuredText that will be included at the end of every source 
+# A string of reStructuredText that will be included at the end of every source
 # file that is read.
 rst_epilog = """
 

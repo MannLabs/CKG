@@ -1,2 +1,0 @@
-Biomedical databases and resources
-==================================

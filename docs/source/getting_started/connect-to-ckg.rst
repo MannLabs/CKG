@@ -10,6 +10,8 @@ Another essential tool when working with Neo4j databases, is the `Cypher query l
 Py2neo connector
 ------------------
 
+Note that this section is for illustration purposes only.
+
 Within the CKG package, the ``graph_connector`` module was created to connect the different parts of the Python code, to the Neo4j database and allow their interaction.
 
 In this module, the *Graph* class from ``py2neo`` is used to represent the graph data storage space within the Neo4j database, and a YAML configuration file is parsed to retrieve the connection details. The configuration file ``connector_config.yml`` contains the database server host name, server port, user to authenticate as, and password to use for authentication.
@@ -19,7 +21,7 @@ In this module, the *Graph* class from ``py2neo`` is used to represent the graph
 	from graphdb_connector import connector
 	driver = connector.getGraphDatabaseConnectionConfiguration()
 
-Once the connection is established, we can start querying the database. For example:
+Once the connection is established, the database can be queried. For example:
 
 .. code-block:: python
 
