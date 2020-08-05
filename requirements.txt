@@ -32,6 +32,7 @@ dash_cytoscape>=0.1.1
 decorator==4.4.0
 defusedxml==0.6.0
 django>=2.2.10
+docutils==0.15.2
 ecos==2.0.7.post1
 entrypoints==0.3
 fancyimpute==0.5.2
@@ -195,6 +196,7 @@ et-xmlfile==1.0.1
 jdcal==1.4.1
 openpyxl==3.0.1
 watchdog>=0.8.3
+sphinx==2.3.1
 sphinx-rtd-theme>=0.4.3
 recommonmark>=0.6.0
 eventlet==0.25.1
