@@ -1,7 +1,7 @@
-Experiments Parsers
+Experimental Data Parsers
 =======================================================
 
-Clinical parser
+clinicalParser.py
 ----------------------------
 
 .. automodule:: src.graphdb_builder.experiments.parsers.clinicalParser
@@ -9,7 +9,7 @@ Clinical parser
    :undoc-members:
    :show-inheritance:
 
-Proteomics parser
+proteomicsParser.py
 ----------------------------
 
 .. automodule:: src.graphdb_builder.experiments.parsers.proteomicsParser
@@ -17,7 +17,7 @@ Proteomics parser
    :undoc-members:
    :show-inheritance:
 
-WES parser
+wesParser.py
 ----------------------------
 
 .. automodule:: src.graphdb_builder.experiments.parsers.wesParser

@@ -1,7 +1,7 @@
-Vizualization
+Viz
 =====================================
 
-Viz module
+viz.py
 --------------
 
 .. automodule:: src.analytics_core.viz.viz
@@ -9,24 +9,24 @@ Viz module
    :undoc-members:
    :show-inheritance:
 
-WGCNA viz
---------------
+wgcnaFigures.py
+------------------
 
 .. automodule:: src.analytics_core.viz.wgcnaFigures
    :members:
    :undoc-members:
    :show-inheritance:
 
-Dendrogram
---------------
+Dendrogram.py
+----------------
 
 .. automodule:: src.analytics_core.viz.Dendrogram
    :members:
    :undoc-members:
    :show-inheritance:
 
-Colors
---------------
+color_list.py
+----------------
 
 .. automodule:: src.analytics_core.viz.color_list
    :members:

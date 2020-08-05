@@ -5,7 +5,7 @@ Biomedical Databases
 
    src.graphdb_builder.databases.parsers
 
-Databases Controller
+databases_controller.py
 ----------------------------
 
 .. automodule:: src.graphdb_builder.databases.databases_controller

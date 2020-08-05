@@ -1,8 +1,7 @@
-Report Dash Apps
+Apps
 =======================================================
 
-
-Basic App
+basicApp.py
 ----------------------------
 
 .. automodule:: src.report_manager.apps.basicApp
@@ -10,7 +9,7 @@ Basic App
    :undoc-members:
    :show-inheritance:
 
-Data Upload App
+dataUploadApp.py
 ----------------------------
 
 .. automodule:: src.report_manager.apps.dataUploadApp
@@ -18,7 +17,7 @@ Data Upload App
    :undoc-members:
    :show-inheritance:
 
-Data Upload
+dataUpload.py
 ----------------------------
 
 .. automodule:: src.report_manager.apps.dataUpload
@@ -26,7 +25,7 @@ Data Upload
    :undoc-members:
    :show-inheritance:
 
-HomePage Stats App
+homepageApp.py
 ----------------------------
 
 .. automodule:: src.report_manager.apps.homepageApp
@@ -34,7 +33,7 @@ HomePage Stats App
    :undoc-members:
    :show-inheritance:
 
-HomePage Stats
+homepageStats.py
 ----------------------------
 
 .. automodule:: src.report_manager.apps.homepageStats
@@ -42,7 +41,7 @@ HomePage Stats
    :undoc-members:
    :show-inheritance:
 
-DB Imports Stats App
+importsApp.py
 ----------------------------
 
 .. automodule:: src.report_manager.apps.importsApp
@@ -50,7 +49,7 @@ DB Imports Stats App
    :undoc-members:
    :show-inheritance:
 
-DB Imports Stats
+imports.py
 ----------------------------
 
 .. automodule:: src.report_manager.apps.imports
@@ -58,7 +57,7 @@ DB Imports Stats
    :undoc-members:
    :show-inheritance:
 
-Initial App
+initialApp.py
 ----------------------------
 
 .. automodule:: src.report_manager.apps.initialApp
@@ -66,7 +65,7 @@ Initial App
    :undoc-members:
    :show-inheritance:
 
-Login App
+loginApp.py
 ----------------------------
 
 .. automodule:: src.report_manager.apps.loginApp
@@ -74,7 +73,7 @@ Login App
    :undoc-members:
    :show-inheritance:
 
-Project App
+projectApp.py
 ----------------------------
 
 .. automodule:: src.report_manager.apps.projectApp
@@ -82,7 +81,7 @@ Project App
    :undoc-members:
    :show-inheritance:
 
-Project Creation App
+projectCreationApp.py
 ----------------------------
 
 .. automodule:: src.report_manager.apps.projectCreationApp
@@ -90,7 +89,7 @@ Project Creation App
    :undoc-members:
    :show-inheritance:
 
-Project Creation
+projectCreation.py
 ----------------------------
 
 .. automodule:: src.report_manager.apps.projectCreation

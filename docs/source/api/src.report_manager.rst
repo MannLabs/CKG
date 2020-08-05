@@ -1,4 +1,4 @@
-Report Manager
+Report Manager (report_manager)
 ==============================================
 
 .. toctree::

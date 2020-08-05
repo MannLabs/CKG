@@ -1,4 +1,4 @@
-CKG package API Reference
+API Reference
 ================================
 
 .. toctree::

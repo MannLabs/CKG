@@ -1,4 +1,4 @@
-Analytics Core
+Analytics Core (analytics_core)
 =====================================
 
 .. toctree::
@@ -6,7 +6,7 @@ Analytics Core
    src.analytics_core.analytics
    src.analytics_core.viz
 
-R wrapper
+R_wrapper.py
 --------------
 
 .. automodule:: src.analytics_core.R_wrapper
@@ -14,7 +14,7 @@ R wrapper
    :undoc-members:
    :show-inheritance:
 
-Analytics factory
+analytics_factory.py
 ----------------------
 
 .. automodule:: src.analytics_core.analytics_factory
@@ -22,7 +22,7 @@ Analytics factory
    :undoc-members:
    :show-inheritance:
 
-Utils
+utils.py
 --------------
 
 .. automodule:: src.analytics_core.utils

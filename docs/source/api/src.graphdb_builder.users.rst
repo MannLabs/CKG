@@ -1,7 +1,7 @@
 User Creation
 =======================================================
 
-Users Controller
+users_controller.py
 ----------------------------
 
 .. automodule:: src.graphdb_builder.users.users_controller

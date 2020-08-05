@@ -16,6 +16,8 @@ import sphinx_rtd_theme
 
 sys.path.insert(0, os.path.abspath( './../..'))
 sys.path.insert(0, os.path.abspath( './../../src'))
+sys.path.insert(0, os.path.abspath( './../../src/report_manager'))
+sys.path.insert(0, os.path.abspath( './../../src/report_manager/apps'))
 
 # -- Project information -----------------------------------------------------
 

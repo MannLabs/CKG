@@ -5,7 +5,7 @@ Experimental Data
 
    src.graphdb_builder.experiments.parsers
 
-Experiments Controller
+experiments_controller.py
 ----------------------------
 
 .. automodule:: src.graphdb_builder.experiments.experiments_controller

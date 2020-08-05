@@ -1,4 +1,4 @@
-Graph Database Builder
+Graph Database Builder (graphdb_builder)
 ==============================================
 
 .. toctree::
@@ -10,7 +10,7 @@ Graph Database Builder
    src.graphdb_builder.builder
 
 builder_utils.py
-----------------
+------------------
 
 .. automodule:: src.graphdb_builder.builder_utils
    :members:

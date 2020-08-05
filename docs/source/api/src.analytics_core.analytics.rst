@@ -1,7 +1,7 @@
-Analysis
+Analytics
 =====================================
 
-Analytics
+analytics.py
 --------------
 
 .. automodule:: src.analytics_core.analytics.analytics
@@ -9,7 +9,7 @@ Analytics
    :undoc-members:
    :show-inheritance:
 
-WGCNA analytics
+wgcnaAnalysis.py
 ----------------------
 
 .. automodule:: src.analytics_core.analytics.wgcnaAnalysis
@@ -17,8 +17,8 @@ WGCNA analytics
    :undoc-members:
    :show-inheritance:
 
-Kaplan-Meier analytics
-----------------------
+kaplan_meierAnalysis.py
+-------------------------
 
 .. automodule:: src.analytics_core.analytics.kaplan_meierAnalysis
    :members:

@@ -5,7 +5,7 @@ Ontology Databases
 
    src.graphdb_builder.ontologies.parsers
 
-Ontologies Controller
+ontologies_controller.py
 ----------------------------
 
 .. automodule:: src.graphdb_builder.ontologies.ontologies_controller

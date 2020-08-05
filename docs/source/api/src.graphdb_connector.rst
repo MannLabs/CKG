@@ -1,4 +1,4 @@
-Graph Database Connector
+Graph Database Connector (graphdb_connector)
 ==============================================
 
 connector.py
