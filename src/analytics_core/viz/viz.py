@@ -64,7 +64,7 @@ def getPlotTraces(data, key='full', type='lines', div_factor=float(10^10000), ho
         if horizontal == True:
             traces = [go.Bar(x = data[col], y = data.index, orientation = 'h', name = col+' '+key) for col in data.columns]
 
-    else: 
+    else:
         return 'Option not found'
 
     return traces
@@ -218,7 +218,7 @@ def get_barplot(data, identifier, args):
 
             if 'orientation' in args:
                 trace = go.Bar(
-                            x=data.loc[data[args["group"]] == g, args['x']], 
+                            x=data.loc[data[args["group"]] == g, args['x']],
                             y=data.loc[data[args["group"]] == g, args['y']],
                             error_y=dict(type='data', array=errors),
                             name=g,
@@ -267,7 +267,7 @@ def get_histogram(data, identifier, args):
     """
     Basic histogram figure allows facets cols and rows
 
-    param data: pandas dataframe with at least values to be plotted.
+    :param data: pandas dataframe with at least values to be plotted.
     :param str identifier: id used to identify the div where the figure will be generated.
     :param ditc args: see below.
     :Arguments:
@@ -659,9 +659,9 @@ def get_volcanoplot(results, args):
                         mode='markers',
                         text=result['text'],
                         hoverinfo='text',
-                        marker={'color':result['color'], 
-                                'colorscale': args["colorscale"], 
-                                'showscale': args['showscale'], 
+                        marker={'color':result['color'],
+                                'colorscale': args["colorscale"],
+                                'showscale': args['showscale'],
                                 'size': args['marker_size'],
                                 'line': {'color':result['color'], 'width':2}
                                 }
@@ -720,7 +720,7 @@ def get_volcanoplot(results, args):
     return figures
 
 def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blues', 'showscale': False, 'marker_size':8, 'x_title':'log2FC', 'y_title':'-log10(pvalue)', 'num_annotations':10}):
-    """ 
+    """
     This function parsers the regulation data from statistical tests and creates volcano plots for all distinct group comparisons. Significant hits with lowest adjusted p-values are highlighed.
 
     :param data: pandas dataframe with format: 'identifier', 'group1', 'group2', 'mean(group1', 'mean(group2)', 'log2FC', 'std_error', 'tail', 't-statistics', 'padj_THSD', \
@@ -767,7 +767,7 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
             signature = signature.sort_values(by="posthoc padj", ascending=True)
         elif "padj" in signature:
             signature = signature.sort_values(by="padj", ascending=True)
-        
+
         pvals = []
         for index, row in signature.iterrows():
             # Text
@@ -1151,21 +1151,21 @@ def get_network(data, identifier, args):
     net = None
     if 'cutoff_abs' not in args:
         args['cutoff_abs'] = False
-    
+
     if not data.empty:
         if 'cutoff' in args:
             if args['cutoff_abs']:
                 data = data[np.abs(data[args['values']]) >= args['cutoff']]
             else:
                 data = data >= args['cutoff']
-               
+
         data[args["source"]] = [str(n).replace("'","") for n in data[args["source"]]]
         data[args["target"]] = [str(n).replace("'","") for n in data[args["target"]]]
-        
+
         if "values" not in args:
             args["values"] = 'width'
-            data[args["values"]] = 1 
-        
+            data[args["values"]] = 1
+
         data = data.rename(index=str, columns={args['values']: "width"})
         data = data.fillna('null')
         data.columns = [c.replace('_', '') for c in data.columns]
@@ -1241,9 +1241,9 @@ def get_network(data, identifier, args):
             stylesheet.append({'selector':'node','style':{'width':mapper, 'height':mapper}})
         args['stylesheet'] = stylesheet
         args['layout'] = layout
-        
+
         cy_elements, mouseover_node = utils.networkx_to_cytoscape(vis_graph)
-        
+
         app_net = get_cytoscape_network(cy_elements, identifier, args)
         #args['mouseover_node'] = mouseover_node
 
@@ -1261,10 +1261,10 @@ def get_network_style(node_colors, color_edges):
     '''
 
     color_selector = "{'selector': '[name = \"KEY\"]', 'style': {'background-color': \"VALUE\"}}"
-    stylesheet=[{'selector': 'node', 'style': {'label': 'data(name)', 
-                                               'text-valign': 'center', 
-                                               'text-halign': 'center', 
-                                               'border-color':'gray', 
+    stylesheet=[{'selector': 'node', 'style': {'label': 'data(name)',
+                                               'text-valign': 'center',
+                                               'text-halign': 'center',
+                                               'border-color':'gray',
                                                'border-width': '1px',
                                                'font-size': '12',
                                                'opacity':0.75}},
@@ -1307,7 +1307,7 @@ def visualize_notebook_network(network, notebook_type='jupyter', layout={'width'
     :return: cyjupyter.cytoscape.Cytoscape object
 
     Example::
-    
+
         net = get_network(clincorr.dropna(), identifier='corr', args={'source':'node1', 'target':'node2',
                                                             'cutoff':0, 'cutoff_abs':True,
                                                             'values':'weight','node_size':'degree',
@@ -1332,7 +1332,7 @@ def visualize_notebook_path(path, notebook_type='jupyter'):
     :return: cyjupyter.cytoscape.Cytoscape object
 
     Example::
-    
+
         net = get_cytoscape_network(G, identifier='corr', args={'title':'Cytoscape path',
                                                             'stylesheet':stylesheet,
                                                             'layout': layout})
@@ -1525,7 +1525,7 @@ def get_table(data, identifier, args):
         if 'cols' in args:
             if args['cols'] is not None and len(args['cols']) > 0:
                 selected_cols = list(set(args['cols']).intersection(data.columns))
-                if len(selected_cols) > 0:           
+                if len(selected_cols) > 0:
                     data = data[selected_cols + cols]
                 else:
                     data = pd.DataFrame()
@@ -1578,7 +1578,7 @@ def get_table(data, identifier, args):
                                                 'position': 'sticky'
                                             },
                                             style_data_conditional=[{
-                                                "if": 
+                                                "if":
                                                     {"column_id": "rejected", "filter_query": '{rejected} eq "True"'},
                                                     "backgroundColor": "#3B8861",
                                                     'color': 'white'
@@ -1593,7 +1593,7 @@ def get_table(data, identifier, args):
                                             sort_action='custom',
                                             )
         table.extend([html.H2(title),data_trace])
-    
+
     return html.Div(id=identifier, children=table)
 
 
@@ -1607,9 +1607,9 @@ def get_multi_table(data,identifier, title):
             table = get_table(df, identifier=identifier+"_"+subtitle, args={'title':subtitle})
             if table is not None:
                 tables.append(table)
-    
+
     return html.Div(tables)
-            
+
 
 def get_violinplot(data, identifier, args):
     """
@@ -2097,7 +2097,7 @@ def get_cytoscape_network(net, identifier, args):
         * **layout** (dict) -- specifies how the nodes should be positioned on the screen.
     :return: network figure within <div id="_dash-app-content">.
     """
-    height = '700px'    
+    height = '700px'
     width = '100%'
     if 'height' in args:
         height = args['height']
@@ -2158,13 +2158,13 @@ def mpl_to_plotly(fig, ci=True, legend=True):
         style1 = dict(fill='tonexty')
         # apply style
         py_fig['data'][2].update(style1)
-        
+
     # change the default line type to 'step'
     py_fig.update_traces(dict(line=go.Line(shape='hv')))
     py_fig['data'] = py_fig['data'][0:2]
-    # Delete misplaced legend annotations 
+    # Delete misplaced legend annotations
     py_fig['layout'].pop('annotations', None)
-    
+
     if legend:
         # Add legend, place it at the top right corner of the plot
         py_fig['layout'].update(
@@ -2190,10 +2190,10 @@ def get_km_plot(data, identifier, args):
             if 'title' in args:
                 title = args['title'] + "--" + summary
             p = kmfit.plot(ci_force_lines=True, title=title, show_censors=True)
-            
+
             kmf1 = plt.gcf()
             figure = mpl_to_plotly(kmf1, legend=True)
-            
+
     return dcc.Graph(id=identifier, figure=figure)
 
 
@@ -2236,9 +2236,9 @@ def get_polar_plot(df, identifier, args):
             height = args['height']
         if 'type' in args:
             ptype = args['type']
-        
+
         figure = go.Figure()
-        if value is not None and group is not None and colors is not None:  
+        if value is not None and group is not None and colors is not None:
             if not df.empty:
                 min_value = df[value].min()
                 max_value = df[value].max()
@@ -2252,7 +2252,7 @@ def get_polar_plot(df, identifier, args):
                                                          fill='toself'))
                 else:
                     print("Type {} not available. Try with 'line' or 'bar' types.".format(ptype))
-                
+
                 layout = figure.update_layout(width=width, height=height, polar = dict(radialaxis=dict(range=[min_value, max_value])))
-            
+
     return dcc.Graph(id=identifier, figure=figure)
