@@ -8,7 +8,7 @@ Ontology Databases
 Ontologies Controller
 ----------------------------
 
-.. automodule:: src.graphdb_builder.ontologies.ontologies_controller
+.. automodule:: graphdb_builder.ontologies.ontologies_controller
    :members:
    :undoc-members:
    :show-inheritance:

@@ -13,7 +13,7 @@ CKG package API Reference
 ckg_utils.py
 ----------------
 
-.. automodule:: src.ckg_utils
+.. automodule:: ckg_utils
    :members:
    :undoc-members:
    :show-inheritance:
