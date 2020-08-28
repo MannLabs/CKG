@@ -41,7 +41,7 @@ separator = config["separator"]
 
 app.layout = dcc.Loading(children=[html.Div([dcc.Location(id='url', refresh=False),
                                              html.Div(id='page-content',
-                                                      style={'padding-top': 10}, 
+                                                      style={'padding-top': 10},
                                                       className='container-fluid')])],
                          style={'text-align': 'center',
                                 'margin-top': '70px',
@@ -182,7 +182,7 @@ def update_output(contents, value, fname):
         elif dataset == 'reset':
             display = {'display': 'none'}
             if os.path.exists(directory):
-                shutil.rmtree(directory)                
+                shutil.rmtree(directory)
     return display, uploaded, fname
 
 
@@ -321,7 +321,7 @@ def route_report_url(value):
                Input('regenerate', 'title')],
               [State('url', 'href')])
 def regenerate_report(n_clicks, title, pathname):
-    basic_path = '/'.join(pathname.split('/')[0:3]) 
+    basic_path = '/'.join(pathname.split('/')[0:3])
     project_id, force, session_id = get_project_params_from_url(pathname)
     return basic_path+'/apps/project?project_id={}&force=1&session={}'.format(project_id, title)
 
@@ -362,7 +362,7 @@ def create_project(n_clicks, name, acronym, responsible, participant, datatype, 
         arguments = [name, number_subjects, datatype, disease, tissue, responsible]
 
         # Check if clinical variables exist in the database
-        if intervention is not None: 
+        if intervention is not None:
             intervention = intervention.strip()
             if intervention != '':
                 interventions = list()
@@ -564,7 +564,7 @@ def run_processing(n_clicks, project_id):
         destDir = os.path.join(experimentDir, project_id)
         builder_utils.checkDirectory(destDir)
         temporaryDirectory = os.path.join(tmpDirectory, session_cookie+"upload")
-        datasets = builder_utils.listDirectoryFoldersNotEmpty(temporaryDirectory)        
+        datasets = builder_utils.listDirectoryFoldersNotEmpty(temporaryDirectory)
         res_n = dataUpload.check_samples_in_project(driver, project_id)
         if 'experimental_design' in datasets:
             dataset = 'experimental_design'
@@ -584,7 +584,7 @@ def run_processing(n_clicks, project_id):
                         if (res_n > 0).any().values.sum() > 0:
                             message = 'ERROR: There is already an experimental design loaded into the database and there was an error when trying to delete it. Contact your administrator.'
                             return message, style, table
-                                            
+
                     res_n = None
                     result = create_new_identifiers.apply_async(args=[project_id, designData.to_json(), directory, experimental_filename], task_id='data_upload_'+session_cookie+datetime.now().strftime('%Y%m-%d%H-%M%S-'))
                     result_output = result.wait(timeout=None, propagate=True, interval=0.2)
@@ -592,7 +592,7 @@ def run_processing(n_clicks, project_id):
                 else:
                     message = 'ERROR: The Experimental design file provided ({}) is missing some of the required fields: {}'.format(experimental_filename, ','.join(['subject external_id','biological_sample external_id','analytical_sample external_id']))
                     builder_utils.remove_directory(directory)
-                    
+
                     return message, style, table
 
         if 'clinical' in datasets:
@@ -636,7 +636,7 @@ def run_processing(n_clicks, project_id):
                 else:
                     message = 'ERROR: Format of the Clinical Data file is not correct. Check template in the documentation. Check columns: subject external_id, biological_sample external_id and analytical_sample external_id'
                     builder_utils.remove_directory(directory)
-                    
+
                     return message, style, table
         try:
             for dataset in datasets:
@@ -681,14 +681,14 @@ def change_style_data_upload(upload_result):
 def generate_upload_zip(n_clicks, project_id):
     session_cookie = flask.request.cookies.get('custom-auth-session')
     return '/tmp/{}_{}'.format(session_cookie+"upload", project_id)
-    
+
 @application.route('/tmp/<value>')
 def route_upload_url(value):
     page_id, project_id = value.split('_')
     directory = os.path.join(cwd,'../../data/tmp/')
     filename = os.path.join(directory, 'Uploaded_files_'+project_id)
     url = filename+'.zip'
-    
+
     return flask.send_file(url, attachment_filename = filename.split('/')[-1]+'.zip', as_attachment = True)
 
 

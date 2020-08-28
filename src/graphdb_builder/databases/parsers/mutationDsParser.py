@@ -3,7 +3,7 @@ import re
 from graphdb_builder import builder_utils
 
 ############################
-#    IntAct - MutationDs   # 
+#    IntAct - MutationDs   #
 ############################
 def parser(databases_directory, download=True):
     relationships = set()
@@ -25,23 +25,20 @@ def parser(databases_directory, download=True):
                 first = False
                 continue
             data = line.rstrip("\r\n").split("\t")
-            if len(data) > 12: 
-                internal_id = data[0] 
-                pvariant= data[1]
+            if len(data) > 12:
+                internal_id = data[0]
+                pvariant= '_'.join(data[1].split(':'))
                 effect = data[5]
-                protein = data[7].split(':')
                 organism = data[10]
                 interaction = data[11]
                 evidence = data[12]
 
-                if organism.startswith("9606") and len(protein) > 1:
-                    protein = protein[1]
-                    pvariant = protein+"_"+pvariant
+                if organism.startswith("9606"):
                     matches = re.finditer(regex, interaction)
                     for matchNum, match in enumerate(matches, start=1):
                         interactor = match.group(1)
                         relationships.add((pvariant, interactor, "CURATED_AFFECTS_INTERACTION_WITH", effect, interaction, evidence, internal_id, "Intact-MutationDs"))
-    
+
     builder_utils.remove_directory(directory)
-    
+
     return (relationships, header, output_file_name)
