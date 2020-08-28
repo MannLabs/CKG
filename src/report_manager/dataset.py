@@ -233,10 +233,17 @@ class Dataset:
                                     report_step[section][subsection]['args'] = result.args
                                     report_pipeline.update(report_step)
                                     if store_analysis:
-                                        if analysis_type.lower() == "anova" or analysis_type.lower() == "samr" or analysis_type.lower() == "ttest":
+                                        if analysis_type.lower() in ["anova", "samr", "ttest", "ancova"]:
                                             reg_data = result.result[analysis_type]
                                             if not reg_data.empty:
-                                                sig_hits = list(set(reg_data.loc[reg_data.rejected,"identifier"])) + ['group']
+                                                if isinstance(data, dict):
+                                                    data = data['processed']
+                                                cols = ['group']
+                                                if 'sample' in data.columns:
+                                                    cols.append('sample')
+                                                if 'subject' in data.columns:
+                                                    cols.append('subject')
+                                                sig_hits = list(set(reg_data.loc[reg_data.rejected,"identifier"])) + cols
                                                 sig_data = data[sig_hits]
                                                 self.update_data({"regulated": sig_data, "regulation table": reg_data})
                                         else:
@@ -371,10 +378,16 @@ class ProteomicsDataset(Dataset):
     def generate_dataset(self):
         self._data = self.query_data()
         self.process_dataset()
+        self.widen_metadata_dataset()
 
     def process_dataset(self):
         processed_data = self.processing()
         self.update_data({"processed": processed_data})
+        
+    def widen_metadata_dataset(self):
+        data = self.get_dataframe("metadata")
+        wdata = analytics.transform_into_wide_format(data, index=['subject', 'biological_sample'], columns='clinical_variable', values='value', extra=['group'])
+        self.update_data({"metadata": wdata})
 
     def processing(self):
         processed_data = None
@@ -382,6 +395,8 @@ class ProteomicsDataset(Dataset):
 
         if data is not None:
             if not data.empty:
+                filter_samples = False
+                filter_samples_percent = 0.5
                 imputation = True
                 method = "mixed"
                 missing_method = 'percentage'
@@ -394,9 +409,17 @@ class ProteomicsDataset(Dataset):
                 shift = 1.8
                 nstd = 0.3
                 knn_cutoff = 0.6
+                normalize = False
+                normalization_method = 'median'
+                normalize_group = False
+                normalize_by=None
                 args = {}
                 if "args" in self.configuration:
                     args = self.configuration["args"]
+                    if "filter_samples" in args:
+                        filter_samples = args['filter_samples']
+                    if "filter_samples_percent" in args:
+                        filter_samples_percent = args['filter_samples_percent']
                     if "imputation" in args:
                         imputation = args["imputation"]
                     if "extra_identifier" in args:
@@ -419,11 +442,21 @@ class ProteomicsDataset(Dataset):
                         shift = args["missing_shift"]
                     if "knn_cutoff" in args:
                         knn_cutoff = args["knn_cutoff"]
+                    if "normalize" in args:
+                        normalize = args["normalize"]
+                    if "normalization_method" in args:
+                        normalization_method = args["normalization_method"]
+                    if "normalize_group" in args:
+                        normalize_group = args["normalize_group"]
+                    if "normalize_by" in args:
+                        normalize_by = args["normalize_by"]
 
                 processed_data = analytics.get_proteomics_measurements_ready(data, index_cols=index, imputation=imputation,
                                                                              method=method, missing_method=missing_method, extra_identifier=extra_identifier,
+                                                                             filter_samples=filter_samples, filter_samples_percent=filter_samples_percent, 
                                                                              missing_per_group=missing_per_group, missing_max=missing_max,
-                                                                             min_valid=min_valid, shift=shift, nstd=nstd, value_col=value_col, knn_cutoff=knn_cutoff)
+                                                                             min_valid=min_valid, shift=shift, nstd=nstd, value_col=value_col, knn_cutoff=knn_cutoff,
+                                                                             normalize=normalize, normalization_method=normalization_method, normalize_group=normalize_group, normalize_by=normalize_by)
         return processed_data
 
     def generate_knowledge(self):
@@ -480,7 +513,7 @@ class ClinicalDataset(Dataset):
 
     def widen_original_dataset(self):
         data = self.get_dataframe("original")
-        wdata = analytics.transform_into_wide_format(data, index='subject', columns='clinical_variable', values='value', extra=['group'])
+        wdata = analytics.transform_into_wide_format(data, index=['subject', 'biological_sample'], columns='clinical_variable', values='value', extra=['group'])
         self.update_data({"original": wdata})
 
     def processing(self):
@@ -496,6 +529,9 @@ class ClinicalDataset(Dataset):
                 extra = []
                 imputation = True
                 imputation_method = 'KNN'
+                missing_method = 'percentage'
+                missing_max = 0.3
+                min_valid = 1
                 args = {}
                 if "args" in self.configuration:
                     args = self.configuration["args"]
@@ -512,12 +548,20 @@ class ClinicalDataset(Dataset):
                     if 'imputation_method' in args:
                         imputation = True
                         imputation_method = args['imputation_method']
+                    if "missing_method" in args:
+                        missing_method = args["missing_method"]
+                    if "missing_max" in args:
+                        missing_max = args["missing_max"]
+                    if "min_valid" in args:
+                        min_valid = args['min_valid']
                     if 'group_id' in args:
                         group_id = args['group_id']
 
                 processed_data = analytics.get_clinical_measurements_ready(data, subject_id=subject_id, sample_id=sample_id, 
                                                                            group_id=group_id, columns=columns, values=values, 
-                                                                           extra=extra, imputation=imputation, imputation_method=imputation_method)
+                                                                           extra=extra, imputation=imputation, imputation_method=imputation_method,
+                                                                           missing_method=missing_method, missing_max=missing_max, min_valid=min_valid)
+
         return processed_data
 
     def generate_knowledge(self):
