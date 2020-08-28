@@ -18,22 +18,22 @@ create_subjects:
     query: >
         CREATE CONSTRAINT ON (s:Subject) ASSERT s.id IS UNIQUE;
         USING PERIODIC COMMIT 10000
-        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_project.tsv" AS line 
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_project.tsv" AS line
         FIELDTERMINATOR '\t'
         MERGE (s:Subject {id:line.END_ID})
         WITH s, line
         MATCH (p:Project {id:line.START_ID})
-        MATCH (s) 
+        MATCH (s)
         MERGE (p)-[r:HAS_ENROLLED]->(s)
         RETURN COUNT(s) AS PROJECTID_subject, COUNT(r) AS PROJECTID_project_has_enrolled_subject;
 increment_biosample_id:
-    name:  create new biosample internal identifier 
+    name:  create new biosample internal identifier
     description: 'Returns a new Biological_sample identifier based on the existing ones in the database (sequential identifier)'
     involved_nodes:
         - Biological_sample
     involved_rels:
     query: >
-        MATCH (b:Biological_sample) 
+        MATCH (b:Biological_sample)
         WITH max(toInteger(SPLIT(b.id, 'BS')[1]))+1 as new_id
         RETURN new_id AS result;
 create_biosample:
@@ -56,13 +56,13 @@ create_biosample:
         MERGE (b)-[r:BELONGS_TO_SUBJECT]->(s)
         RETURN COUNT(b) AS PROJECTID_biosample, COUNT(r) AS PROJECTID_biosample_belongs_to_subject;
 increment_analytical_sample_id:
-    name:  create new analytical sample internal identifier 
+    name:  create new analytical sample internal identifier
     description: 'Returns a new Analytical_sample identifier based on the existing ones in the database (sequential identifier)'
     involved_nodes:
         - Analytical_sample
     involved_rels:
     query: >
-        MATCH (a:Analytical_sample) 
+        MATCH (a:Analytical_sample)
         WITH max(toInteger(SPLIT(a.id, 'AS')[1]))+1 as new_id
         RETURN new_id AS result;
 create_analytical_sample:
@@ -79,7 +79,7 @@ create_analytical_sample:
         ON CREATE SET a.external_id=$external_id,a.quantity=$quantity,a.quantity_units=$quantity_units,a.source=$source,a.collection_date=$collection_date,a.conservation_conditions=$conservation_conditions,a.storage=$storage,a.status=$status,a.group=$group,a.secondary_group=$secondary_group
         WITH a
         MATCH (b:Biological_sample {id:$biosample_id})
-        MATCH (a) 
+        MATCH (a)
         MERGE (b)-[r:SPLITTED_INTO{quantity:$quantity,quantity_units:$quantity_units}]->(a)
         RETURN COUNT(a) AS PROJECTID_analytical_sample, COUNT(r) AS PROJECTID_biosample_splitted_into_ansample;
 extract_enrolled_subjects:

@@ -39,16 +39,14 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
-    # 'sphinxcontrib.httpdomain',
     'sphinx.ext.autosummary',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.imgmath',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
-    # 'sphinx-prompt',
     'recommonmark',
-    # 'notfound.extension',
+    'nbsphinx'
 ]
 
 autosectionlabel_prefix_document = True
@@ -202,7 +200,7 @@ texinfo_documents = [
 intersphinx_mapping = {'https://docs.python.org/3.6/': None}
 
 
-# A string of reStructuredText that will be included at the end of every source 
+# A string of reStructuredText that will be included at the end of every source
 # file that is read.
 rst_epilog = """
 
