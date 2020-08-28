@@ -34,16 +34,39 @@ the use of multiple visualisation tools. These notebooks can be found in ``src/n
 .. warning:: If the Clinical Knowledge Graph is deployed in a server, please set up a Jupyter Hub in order to allow access to the Jupyter Notebook.
 
 
+
+Development notebooks
+---------------------
+
+In ``src/report_manager/development`` we gathered Jupyter notebooks with analysis and workflows we believe are of interest for the users but are still under development.
+
+When a notebook in this folder is functional and successfully benchmarked, the notebook is moved to the reporting directory.
+
+
+
 Reporting notebooks
 -------------------
 
 Reporting notebooks refers to Jupyter notebooks that have been finished and properly tested by the developers, and are ready to be used by the community.
+
+.. toctree::
+   :maxdepth: 7
+	 :caption: Jupyter notebooks
+	 :glob:
+
+   ../../../src/notebooks/reporting/project_reporting
+	 ../../../src/notebooks/reporting/working_with_R
+	 ../../../src/notebooks/reporting/Parallel\ plots
+	 ../../../src/notebooks/reporting/Urachal\ Carcinoma\ Case\ Study
+	 ../../../src/notebooks/reporting/Proteomics-Based\ Comparative\ Mapping\ of\ the\ Secretomes\ of\ Human\ Brown\ and\ White\ Adipocytes
+
 
 - **project_reporting.ipynb**
 
 Easy access to all the projects in the graph database. Loads all the data from a specific project (e.g. "P0000001") and shows the report in the notebook.
 This notebook enables the visualisation of all the plots and tables that constitute a report, as well as all the dataframes used and produced during its generation.
 By accessing the data directly, you can use the python functionality to further the analysis or visualisation.
+
 
 - **working_with_R.ipynb**
 
@@ -56,20 +79,33 @@ Other R functions like these can be developed by the users according to their ne
 
 - **Parallel plots.ipynb**
 
-An example of a new interactive visualisation method, not currently implemented in the Clinical Knowledge Graph, but using data from a stored project. We start by loading all the data and the report of a specific project (e.g. "P0000001"), and accessing different dataframes within the proteomics dataset, as well as, the correlation network. This plot is then converted into a Pandas DataFrame and used as input for the interactive Parallel plot.
+An example of a new interactive visualisation method, not currently implemented in the Clinical Knowledge Graph, but using data from a stored project. We start by loading\
+all the data and the report of a specific project (e.g. "P0000001"), and accessing different dataframes within the proteomics dataset, as well as, the correlation network.\
+This plot is then converted into a Pandas DataFrame and used as input for the interactive Parallel plot.
 
-The function is created and made interactive with Jupyter Widgets ``interact`` function (``ipywidgets.interact``), which automatically creates user interface (UI) controls within the notebook. In this case, the user can select different clusters of proteins (from the correlation network) and observe their variation across groups.
+The function is created and made interactive with Jupyter Widgets ``interact`` function (``ipywidgets.interact``), which automatically creates user interface (UI) controls\
+within the notebook. In this case, the user can select different clusters of proteins (from the correlation network) and observe their variation across groups.
+
 
 - **Urachal Carcinoma Case Study.ipynb**
 
 Jupyter notebook depicting the use of the Clinical Knowledge Graph database and the analytics core as a decision support tool, proposing a drug candidate in a specific subject case.
 
-The project is analysed with the standard analytics workflow and a list of significantly differentially expressed proteins is returned. To further this analysis we first filter for regulated proteins that have been associated to the disease in study (lung cancer); we then search the database for known inhibitory drugs for these proteins; and to narrow down the list, we can query the database for each drug's side effects. The treatment regimens are also available in the database and their side effects can be used to rank the proposed drugs. We can prioritise drugs with side effects dissimilar to the ones that caused an adverse reaction in the patient, and identify papers where these drugs have already been associated to the studied disease, further reducing the list of potential drugs candidates.
+The project is analysed with the standard analytics workflow and a list of significantly differentially expressed proteins is returned. To further this analysis, we first filter\
+for regulated proteins that have been associated to the disease in study (lung cancer); we then search the database for known inhibitory drugs for these proteins; and to narrow down\
+the list, we can query the database for each drug's side effects. The treatment regimens are also available in the database and their side effects can be used to rank the proposed drugs.\
+We can prioritise drugs with side effects dissimilar to the ones that caused an adverse reaction in the patient, and identify papers where these drugs have already been associated to the\
+studied disease, further reducing the list of potential drugs candidates.
 
 
-Development notebooks
----------------------
+- **Proteomics-Based Comparative Mapping of the Secretomes of Human Brown and White Adipocytes.ipynb**
 
-In ``src/report_manager/development`` we gathered Jupyter notebooks with analysis and workflows we believe are of interest for the users but are still under development.
+A Jupyter notebook that exemplifies how to analyse any external dataset deposited in EBI's PRIDE database, by simply using the respective PRIDE identifier for the project (PXD...)\
+and CKG's Analytics Core.
 
-When a notebook in this folder is functional and successfully benchmarked, the notebook is moved to the reporting directory.
+The entire project folder is downloaded from PRIDE, decompressed, and the proteinGroups.txt file is parsed to obtain relevant information including LFQ intensities. After being converted into\
+a wide-format dataframe, the default analysis pipeline implemented in the CKG, is reproduced by calling the respective functions directly from the Analytics Core modules\
+(*analytics_core.analytics* and *analytics_core.viz*).
+
+Additionally, we demonstrate how other publicly accessible biomedical databases can be downloaded into the notebook, and their information mined for relevant metadata. In this specific case,
+the Human Protein Atlas is downloaded and mined in order to filter for known or predicted secreted proteins.

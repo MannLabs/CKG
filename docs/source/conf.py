@@ -42,16 +42,14 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
-    # 'sphinxcontrib.httpdomain',
     'sphinx.ext.autosummary',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.imgmath',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
-    # 'sphinx-prompt',
     'recommonmark',
-    # 'notfound.extension',
+    'nbsphinx'
 ]
 
 autodoc_mock_imports = ['pandas', 'numpy', 'scipy', 'matplotlib', 'h5py', 'rpy2',

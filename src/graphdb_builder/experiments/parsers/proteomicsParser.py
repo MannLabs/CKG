@@ -6,16 +6,15 @@ from collections import defaultdict
 from graphdb_builder import builder_utils, mapping
 
 
-def parser(projectId, directory=None):
-    data_type = 'proteomics'
+def parser(projectId, dataType, directory=None):
+    directory = None
     data = {}
     cwd = os.path.abspath(os.path.dirname(__file__))
     config = builder_utils.get_config(config_name="proteomics.yml", data_type='experiments')
-
     if directory is None:
-        directory = os.path.join(cwd, '../../../../data/experiments/PROJECTID/' + data_type)
+        directory = os.path.join(cwd, '../../../../data/experiments/PROJECTID/' + dataType)
         if 'directory' in config:
-            directory = os.path.join(cwd, config['directory'] + data_type)
+            directory = os.path.join(cwd, config['directory'] + dataType)
     directory = directory.replace('PROJECTID', projectId)
     data = parse_from_directory(projectId, directory, config)
 

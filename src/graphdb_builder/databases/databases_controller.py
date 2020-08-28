@@ -30,17 +30,20 @@ def parseDatabase(importDirectory, database, download=True):
                 builder_utils.write_relationships(relationships, header, outputfile)
                 logger.info("Database {} - Number of {} relationships: {}".format(database, qtype, len(relationships)))
                 stats.add(builder_utils.buildStats(len(relationships), "relationships", qtype, database, outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "mentions":
             num_entities, outputfile = textminingParser.parser(dbconfig["databasesDir"], importDirectory, download)
             logger.info("Database {} - Number of {} entities: {}".format(database, "Publication", num_entities))
             stats.add(builder_utils.buildStats(num_entities, "entity", "Publication", database, outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "hgnc":
             #HGNC
             entities, header = hgncParser.parser(dbconfig["databasesDir"], download)
-            outputfile = os.path.join(importDirectory, "Gene.tsv")            
+            outputfile = os.path.join(importDirectory, "Gene.tsv")
             builder_utils.write_entities(entities, header, outputfile)
             logger.info("Database {} - Number of {} entities: {}".format(database, "Gene", len(entities)))
             stats.add(builder_utils.buildStats(len(entities), "entity", "Gene", database, outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "refseq":
             entities, relationships, headers = refseqParser.parser(dbconfig["databasesDir"], download)
             for entity in entities:
@@ -55,12 +58,15 @@ def parseDatabase(importDirectory, database, download=True):
                 builder_utils.write_relationships(relationships[rel], header, outputfile)
                 logger.info("Database {} - Number of {} relationships: {}".format(database, rel, len(relationships[rel])))
                 stats.add(builder_utils.buildStats(len(relationships[rel]), "relationships", rel, database, outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "uniprot":
             #UniProt
             stats.update(uniprotParser.parser(dbconfig["databasesDir"], importDirectory, download, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "pfam":
             #UniProt
             stats.update(pfamParser.parser(dbconfig["databasesDir"], importDirectory, download, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "intact":
             #IntAct
             relationships, header, outputfileName = intactParser.parser(dbconfig["databasesDir"], download)
@@ -68,6 +74,7 @@ def parseDatabase(importDirectory, database, download=True):
             builder_utils.write_relationships(relationships, header, outputfile)
             logger.info("Database {} - Number of {} relationships: {}".format(database, "curated_interacts_with", len(relationships)))
             stats.add(builder_utils.buildStats(len(relationships), "relationships", "curated_interacts_with", database, outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "mutationds":
             #MutationDs
             relationships, header, outputfileName = mutationDsParser.parser(dbconfig["databasesDir"], download)
@@ -75,14 +82,17 @@ def parseDatabase(importDirectory, database, download=True):
             builder_utils.write_relationships(relationships, header, outputfile)
             logger.info("Database {} - Number of {} relationships: {}".format(database, "curated_affects_interaction_with", len(relationships)))
             stats.add(builder_utils.buildStats(len(relationships), "relationships", "curated_affects_interaction_with", database, outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "string":
             #STRING
             proteinMapping, drugMapping = stringParser.parser(dbconfig["databasesDir"], importDirectory, download=download)
             stringParser.parseActions(dbconfig["databasesDir"], importDirectory, proteinMapping, drugMapping, download=download, db="STRING")
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "stitch":
             #STITCH
             proteinMapping, drugMapping = stringParser.parser(dbconfig["databasesDir"], importDirectory, drug_source=dbconfig["sources"]["Drug"], download=download, db="STITCH")
             stringParser.parseActions(dbconfig["databasesDir"], importDirectory, proteinMapping, drugMapping, download=download, db="STITCH")
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "disgenet":
             #DisGeNet
             relationships, header, outputfileName = disgenetParser.parser(dbconfig["databasesDir"], download)
@@ -91,6 +101,7 @@ def parseDatabase(importDirectory, database, download=True):
                 builder_utils.write_relationships(relationships[idType], header, outputfile)
                 logger.info("Database {} - Number of {} relationships: {}".format(database, idType, len(relationships[idType])))
                 stats.add(builder_utils.buildStats(len(relationships[idType]), "relationships", idType, database, outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "pathwaycommons":
             #PathwayCommons pathways
             entities, relationships, entities_header, relationships_header = pathwayCommonsParser.parser(dbconfig["databasesDir"], download)
@@ -101,6 +112,7 @@ def parseDatabase(importDirectory, database, download=True):
             builder_utils.write_relationships(relationships, relationships_header, pathway_outputfile)
             logger.info("Database {} - Number of {} relationships: {}".format(database, "protein_associated_with_pathway", len(relationships)))
             stats.add(builder_utils.buildStats(len(relationships), "relationships", "protein_associated_with_pathway", database, pathway_outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "reactome":
             #Reactome
             entities, relationships, entities_header, relationships_header = reactomeParser.parser(dbconfig["databasesDir"], download)
@@ -112,6 +124,7 @@ def parseDatabase(importDirectory, database, download=True):
                 builder_utils.write_relationships(relationships[(entity, relationship)], relationships_header[entity], reactome_outputfile)
                 logger.info("Database {} - Number of {} {} relationships: {}".format(database, entity, relationship, len(relationships[(entity,relationship)])))
                 stats.add(builder_utils.buildStats(len(relationships[(entity,relationship)]), "relationships", relationship, database, reactome_outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "smpdb":
             #SMPDB
             entities, relationships, entities_header, relationships_header = smpdbParser.parser(dbconfig["databasesDir"], download)
@@ -123,12 +136,14 @@ def parseDatabase(importDirectory, database, download=True):
                 builder_utils.write_relationships(relationships[(entity, relationship)], relationships_header[entity], smpdb_outputfile)
                 logger.info("Database {} - Number of {} {} relationships: {}".format(database, entity, relationship, len(relationships[(entity,relationship)])))
                 stats.add(builder_utils.buildStats(len(relationships[(entity,relationship)]), "relationships", relationship, database, smpdb_outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "dgidb":
             relationships, header, outputfileName = drugGeneInteractionDBParser.parser(dbconfig["databasesDir"], download)
-            outputfile = os.path.join(importDirectory, outputfileName)           
+            outputfile = os.path.join(importDirectory, outputfileName)
             builder_utils.write_relationships(relationships, header, outputfile)
             logger.info("Database {} - Number of {} relationships: {}".format(database, "targets", len(relationships)))
             stats.add(builder_utils.buildStats(len(relationships), "relationships", "targets", database, outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "sider":
             relationships,header, outputfileName, drugMapping, phenotypeMapping = siderParser.parser(dbconfig["databasesDir"], dbconfig["sources"]["Drug"], download)
             outputfile = os.path.join(importDirectory, outputfileName)
@@ -140,6 +155,7 @@ def parseDatabase(importDirectory, database, download=True):
             builder_utils.write_relationships(relationships, header, outputfile)
             logger.info("Database {} - Number of {} relationships: {}".format(database, "indicated_for", len(relationships)))
             stats.add(builder_utils.buildStats(len(relationships), "relationships", "indicated_for", database, outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "oncokb":
             entities, relationships, entities_header,  relationships_headers = oncokbParser.parser(dbconfig["databasesDir"], download)
             outputfile = os.path.join(importDirectory, "oncokb_Clinically_relevant_variant.tsv")
@@ -155,6 +171,7 @@ def parseDatabase(importDirectory, database, download=True):
                 builder_utils.write_relationships(relationships[relationship], header, oncokb_outputfile)
                 logger.info("Database {} - Number of {} relationships: {}".format(database, relationship, len(relationships[relationship])))
                 stats.add(builder_utils.buildStats(len(relationships[relationship]), "relationships", relationship, database, outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "cancergenomeinterpreter":
             entities, relationships, entities_header, relationships_headers = cancerGenomeInterpreterParser.parser(dbconfig["databasesDir"], download)
             entity_outputfile = os.path.join(importDirectory, "cgi_Clinically_relevant_variant.tsv")
@@ -169,6 +186,7 @@ def parseDatabase(importDirectory, database, download=True):
                 builder_utils.write_relationships(relationships[relationship], header, cgi_outputfile)
                 logger.info("Database {} - Number of {} relationships: {}".format(database, relationship, len(relationships[relationship])))
                 stats.add(builder_utils.buildStats(len(relationships[relationship]), "relationships", relationship, database, cgi_outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "hmdb":
             entities, relationships, entities_header, relationships_header = hmdbParser.parser(dbconfig["databasesDir"], download)
             entity_outputfile = os.path.join(importDirectory, "Metabolite.tsv")
@@ -180,6 +198,7 @@ def parseDatabase(importDirectory, database, download=True):
                 builder_utils.write_relationships(relationships[relationship], relationships_header, hmdb_outputfile)
                 logger.info("Database {} - Number of {} relationships: {}".format(database, relationship, len(relationships[relationship])))
                 stats.add(builder_utils.buildStats(len(relationships[relationship]), "relationships", relationship, database, hmdb_outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "drugbank":
             entities, relationships, entities_header, relationships_headers = drugBankParser.parser(dbconfig["databasesDir"])
             entity_outputfile = os.path.join(importDirectory, "Drug.tsv")
@@ -194,6 +213,7 @@ def parseDatabase(importDirectory, database, download=True):
                 builder_utils.write_relationships(relationships[relationship], header, relationship_outputfile)
                 logger.info("Database {} - Number of {} relationships: {}".format(database, relationship, len(relationships[relationship])))
                 stats.add(builder_utils.buildStats(len(relationships[relationship]), "relationships", relationship, database, relationship_outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "gwascatalog":
             entities, relationships, entities_header, relationships_header = gwasCatalogParser.parser(dbconfig["databasesDir"], download)
             entity_outputfile = os.path.join(importDirectory, "GWAS_study.tsv")
@@ -208,6 +228,7 @@ def parseDatabase(importDirectory, database, download=True):
                 builder_utils.write_relationships(relationships[relationship], header, outputfile)
                 logger.info("Database {} - Number of {} relationships: {}".format(database, relationship, len(relationships[relationship])))
                 stats.add(builder_utils.buildStats(len(relationships[relationship]), "relationships", relationship, database, outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "phosphositeplus":
             entities, relationships, entities_header, relationships_headers = pspParser.parser(dbconfig["databasesDir"])
             entity_outputfile = os.path.join(importDirectory, "psp_Modified_protein.tsv")
@@ -222,6 +243,7 @@ def parseDatabase(importDirectory, database, download=True):
                 builder_utils.write_relationships(relationships[(entity,relationship)], rel_header, outputfile)
                 logger.info("Database {} - Number of {} relationships: {}".format(database, relationship, len(relationships[(entity,relationship)])))
                 stats.add(builder_utils.buildStats(len(relationships[(entity,relationship)]), "relationships", relationship, database, outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "signor":
             entities, relationships, entities_header, relationships_headers = signorParser.parser(dbconfig["databasesDir"])
             entity_outputfile = os.path.join(importDirectory, "signor_Modified_protein.tsv")
@@ -239,6 +261,7 @@ def parseDatabase(importDirectory, database, download=True):
                 builder_utils.write_relationships(relationships[(entity,relationship)], rel_header, outputfile)
                 logger.info("Database {} - Number of {} relationships: {}".format(database, relationship, len(relationships[(entity,relationship)])))
                 stats.add(builder_utils.buildStats(len(relationships[(entity,relationship)]), "relationships", relationship, database, outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "corum":
             entities, relationships, entities_header, relationships_headers = corumParser.parser(dbconfig["databasesDir"], download)
             entity_outputfile = os.path.join(importDirectory, "Complex.tsv")
@@ -250,6 +273,7 @@ def parseDatabase(importDirectory, database, download=True):
                 builder_utils.write_relationships(relationships[(entity,relationship)], relationships_headers[entity], corum_outputfile)
                 logger.info("Database {} - Number of {} relationships: {}".format(database, relationship, len(relationships[(entity,relationship)])))
                 stats.add(builder_utils.buildStats(len(relationships[(entity,relationship)]), "relationships", relationship, database, corum_outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "foodb":
             entities, relationships, entities_header, relationships_headers = foodbParser.parser(dbconfig["databasesDir"], download)
             entity_outputfile = os.path.join(importDirectory, "Food.tsv")
@@ -261,6 +285,7 @@ def parseDatabase(importDirectory, database, download=True):
                 builder_utils.write_relationships(relationships[(entity,relationship)], relationships_headers[entity], foodb_outputfile)
                 logger.info("Database {} - Number of {} relationships: {}".format(database, relationship, len(relationships[(entity,relationship)])))
                 stats.add(builder_utils.buildStats(len(relationships[(entity,relationship)]), "relationships", relationship, database, foodb_outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "exposome explorer":
             relationships, header = exposomeParser.parser(dbconfig["databasesDir"], download)
             for entity, relationship in relationships:
@@ -268,6 +293,7 @@ def parseDatabase(importDirectory, database, download=True):
                 builder_utils.write_relationships(relationships[(entity,relationship)], header[entity], ee_outputfile)
                 logger.info("Database {} - Number of {} relationships: {}".format(database, relationship, len(relationships[(entity,relationship)])))
                 stats.add(builder_utils.buildStats(len(relationships[(entity,relationship)]), "relationships", relationship, database, ee_outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
         elif database.lower() == "hpa":
             relationships, headers = hpaParser.parser(dbconfig["databasesDir"], download)
             for entity, relationship in relationships:
@@ -275,15 +301,16 @@ def parseDatabase(importDirectory, database, download=True):
                 builder_utils.write_relationships(relationships[(entity,relationship)], headers[relationship], hpa_outputfile)
                 logger.info("Database {} - Number of {} relationships: {}".format(database, relationship, len(relationships[(entity,relationship)])))
                 stats.add(builder_utils.buildStats(len(relationships[(entity,relationship)]), "relationships", relationship, database, hpa_outputfile, updated_on))
+            print("Done Parsing database {}".format(database))
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         logger.error("Database {}: {}, file: {},line: {}".format(database, sys.exc_info(), fname, exc_tb.tb_lineno))
     return stats
-    
+
 
 #########################
-#       Graph files     # 
+#       Graph files     #
 #########################
 def generateGraphFiles(importDirectory, databases=None, download=True, n_jobs = 4):
     if databases is None:
