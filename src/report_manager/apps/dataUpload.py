@@ -313,32 +313,38 @@ def create_mapping_cols_clinical(driver, data, directory, filename, separator='|
     tissue_dict = {}
     disease_dict = {}
     intervention_dict = {}
-    for disease in data['disease'].dropna().unique():
-        if len(disease.split(separator)) > 1:
-            ids = []
-            for i in disease.split(separator):
-                disease_id = query_utils.map_node_name_to_id(driver, 'Disease', str(i.strip()))
-                if disease_id is not None:
-                    ids.append(disease_id)
-                disease_dict[disease] = '|'.join(ids)
-        else:
-            disease_id = query_utils.map_node_name_to_id(driver, 'Disease', str(disease.strip()))
-            disease_dict[disease] = disease_id
-
-    for tissue in data['tissue'].dropna().unique():
-        tissue_id = query_utils.map_node_name_to_id(driver, 'Tissue', str(tissue.strip()))
-        tissue_dict[tissue] = tissue_id
-
-    for interventions in data['studies_intervention'].dropna().unique():
-        for intervention in str(interventions).split('|'):
-            if len(intervention.split()) > 1:
-                intervention_dict[intervention] = re.search('\(([^)]+)', intervention.split()[-1]).group(1)
+    if 'disease' in data:
+        for disease in data['disease'].dropna().unique():
+            if len(disease.split(separator)) > 1:
+                ids = []
+                for i in disease.split(separator):
+                    disease_id = query_utils.map_node_name_to_id(driver, 'Disease', str(i.strip()))
+                    if disease_id is not None:
+                        ids.append(disease_id)
+                    disease_dict[disease] = '|'.join(ids)
             else:
-                intervention_dict[intervention] = intervention
+                disease_id = query_utils.map_node_name_to_id(driver, 'Disease', str(disease.strip()))
+                disease_dict[disease] = disease_id
+        data['disease id'] = data['disease'].map(disease_dict)
 
-    data['intervention id'] = data['studies_intervention'].map(intervention_dict)
-    data['disease id'] = data['disease'].map(disease_dict)
-    data['tissue id'] = data['tissue'].map(tissue_dict)
+    if 'tissue' in data:
+        for tissue in data['tissue'].dropna().unique():
+            tissue_id = query_utils.map_node_name_to_id(driver, 'Tissue', str(tissue.strip()))
+            tissue_dict[tissue] = tissue_id
+        
+        data['tissue id'] = data['tissue'].map(tissue_dict)
+
+    if 'studies_intervention' in data:
+        for interventions in data['studies_intervention'].dropna().unique():
+            for intervention in str(interventions).split('|'):
+                if len(intervention.split()) > 1:
+                    intervention_dict[intervention] = re.search(r'\(([^)]+)', intervention.split()[-1]).group(1)
+                else:
+                    intervention_dict[intervention] = intervention
+
+        data['intervention id'] = data['studies_intervention'].map(intervention_dict)
+    
+    
     builder_utils.export_contents(data, directory, filename)
     
 

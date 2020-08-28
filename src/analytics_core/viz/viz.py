@@ -584,13 +584,22 @@ def get_scatterplot(data, identifier, args):
         * **y_title** (str) -- plot y axis title.
         * **height** (int) -- plot height.
         * **width** (int) -- plot width.
+        * **colors** (dict) -- dictionary with colors to be used
     :return: scatterplot figure within the <div id="_dash-app-content">.
 
     Example::
 
         result = get_scatteplot(data, identifier='scatter plot', 'title':'Scatter Plot', 'x_title':'x_axis', 'y_title':'y_axis', 'height':100, 'width':100}))
     """
-    figure = px.scatter(data, x='x', y='y', color='name')
+    annotation =[]
+    if "hovering_cols" in args:
+        annotation = args["hovering_cols"]
+
+    if 'colors' in args and isinstance(args['colors'], dict):
+        figure = px.scatter(data, x='x', y='y', color='name', color_discrete_map=args['colors'], hover_data=annotation)
+    else:
+        figure = px.scatter(data, x='x', y='y', color='name', hover_data=annotation)
+    
     figure.update_traces(marker=dict(size=14,
                                      opacity=0.7,
                                      line=dict(width=0.5, color='DarkSlateGrey')),
@@ -600,7 +609,7 @@ def get_scatterplot(data, identifier, args):
                                 yaxis= {"title": args['y_title']},
                                 legend=dict(orientation="h",
                                             yanchor="bottom",
-                                            y=1.02,
+                                            y=1.0,
                                             xanchor="right",
                                             x=1),
                                 hovermode='closest',
@@ -1392,7 +1401,6 @@ def get_pca_plot(data, identifier, args):
     sct = get_scatterplot(pca_data, identifier, args).figure
     traces.extend(sct['data'])
     figure['layout'] = sct['layout']
-    figure['layout'].template='plotly_white'
     factor = 50
     if 'factor' in args:
         factor = args['factor']
@@ -1407,8 +1415,8 @@ def get_pca_plot(data, identifier, args):
                         text=str(index)+" loading: {0:.2f}".format(value),
                         name = index,
                         marker= dict(size=3,
-                                    symbol= 1,
-                                    color = 'darkgrey', #set color equal to a variable
+                                    symbol=1,
+                                    color='darkgrey', #set color equal to a variable
                                     showscale=False,
                                     opacity=0.7,
                                     ),
@@ -2136,7 +2144,7 @@ def get_cytoscape_network(net, identifier, args):
 
     return cytonet
 
-def save_DASH_plot(plot, name, plot_format='svg', directory='.'):
+def save_DASH_plot(plot, name, plot_format='svg', directory='.', width=600, height=500):
     """
     This function saves a plotly figure to a specified directory, in a determined format.
 
@@ -2156,9 +2164,9 @@ def save_DASH_plot(plot, name, plot_format='svg', directory='.'):
         plot_file = os.path.join(directory, str(name)+'.'+str(plot_format))
         if plot_format in ['svg', 'pdf', 'png', 'jpeg', 'jpg']:
             if hasattr(plot, 'figure'):
-                pio.write_image(plot.figure, plot_file)
+                pio.write_image(plot.figure, plot_file, width=width, height=height)
             else:
-                pio.write_image(plot, plot_file)
+                pio.write_image(plot, plot_file, width=width, height=height)
         elif plot_format == 'json':
             figure_json = json.dumps(plot.figure, cls=plotly.utils.PlotlyJSONEncoder)
             with open(plot_file, 'w') as f:

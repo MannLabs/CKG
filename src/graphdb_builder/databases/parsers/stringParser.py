@@ -6,7 +6,7 @@ from graphdb_builder import mapping as mp, builder_utils
 
 def parser(databases_directory, importDirectory, drug_source=None, download=True, db="STRING"):
     config = builder_utils.get_config(config_name="stringConfig.yml", data_type='databases')
-    mapping = mp.getSTRINGMapping(download=False)
+    mapping = mp.getSTRINGMapping(download=download)
     stored = set()
     relationship = None
     cutoff = config['STRING_cutoff']
