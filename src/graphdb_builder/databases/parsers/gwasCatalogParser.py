@@ -1,4 +1,5 @@
 import os.path
+import re
 from collections import defaultdict
 from graphdb_builder import builder_utils
 
@@ -39,7 +40,7 @@ def parser(databases_directory, download=True):
                 if pubmedid != "":
                     relationships["published_in_publication"].add((study, pubmedid, "PUBLISHED_IN", "GWAS Catalog"))
                 if snp_id != "":
-                    relationships["variant_found_in_gwas"].add((snp_id, study, "VARIANT_FOUND_IN_GWAS", freq, pval, odds_ratio, trait, "GWAS Catalog"))
+                    relationships["variant_found_in_gwas"].add((re.sub(r"^\W+|\W+$", "",snp_id), study, "VARIANT_FOUND_IN_GWAS", freq, pval, odds_ratio, trait, "GWAS Catalog"))
                 if exp_factor != "":
                     exp_factor = exp_factor.split('/')[-1].replace('_', ':')
                     relationships["studies_trait"].add((study, exp_factor, "STUDIES_TRAIT", "GWAS Catalog"))
