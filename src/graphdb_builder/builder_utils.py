@@ -96,7 +96,7 @@ def parse_contents(contents, filename):
     decoded = base64.b64decode(content_string)
     file_format = filename.split('.')[-1]
 
-    if file_format == 'txt':
+    if file_format == 'txt' or file_format == 'tsv':
         df = pd.read_csv(io.StringIO(decoded.decode('utf-8')), sep='\t', low_memory=True)
     elif file_format == 'csv':
         df = pd.read_csv(io.StringIO(decoded.decode('utf-8')), low_memory=True)

@@ -95,7 +95,7 @@ class ProjectCreationApp(basicApp.BasicApp):
                                                  dcc.DatePickerSingle(id='date-picker-end', placeholder='Select date...', clearable=True)],
                                                  style={'width': '30%', 'verticalAlign': 'top', 'marginTop': 10, 'display': 'inline-block'}),
                               html.Div(children=html.Button('Create Project', id='project_button', n_clicks=0, className="button_link",
-                                                 style={'fontSize': '25px'}), style={'width': '100%', 'padding-left': '87%', 'padding-right': '0%'}),
+                                                            style={'padding-left': '87%', 'padding-right': '0%'})),
                               html.Br(),
                               html.Div(children=[html.A(children=html.Button('Download Clinical Data template', id='download_button', n_clicks=0,
                                                                               style={'fontSize': '16px', 'display': 'block'}),

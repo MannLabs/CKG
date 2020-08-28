@@ -174,8 +174,9 @@ def getSTRINGMapping(source="BLAST_UniProt_AC", download=True, db="STRING"):
     directory = os.path.join(dbconfig["databasesDir"], db)
     file_name = os.path.join(directory, url.split('/')[-1])
     builder_utils.checkDirectory(directory)
-
+    print(download)
     if download:
+        print("Downloading", url, directory)
         builder_utils.downloadDB(url, directory)
 
     f = os.path.join(directory, file_name)
@@ -255,7 +256,7 @@ def map_experiment_files(project_id, datasetPath, mapping):
 
 def map_experimental_data(data, mapping):
     mapping_cols = {}
-    regex = "({})".format("|".join(list(mapping.keys())))
+    regex = "({})".format("|".join(sorted(list(mapping.keys()), key=len, reverse=True)))
     if not data.empty:
         for column in data.columns:
             ids = re.search(regex, column)

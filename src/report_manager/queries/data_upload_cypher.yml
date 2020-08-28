@@ -185,10 +185,8 @@ project_graph:
         - BELONGS_TO_SUBJECT
         - SPLITTED_INTO
     query: >
-        MATCH (p:Project)-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]->(a:Analytical_sample)
-        WHERE p.id=$project_id
-        WITH COLLECT(a) AS ansamples, p.id AS project, COUNT(DISTINCT s.id) AS subjects, COUNT(DISTINCT b.id) AS biological_samples, COUNT(DISTINCT a.id) AS analytical_samples
-        MATCH (aa:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(n:Protein) 
-        WHERE aa IN ansamples
-        WITH COUNT(DISTINCT r.proteinGroup) AS protein_groups, COUNT(DISTINCT n.id) AS proteins, project, subjects, biological_samples, analytical_samples
-        RETURN project, subjects, biological_samples, analytical_samples, protein_groups, proteins;
+            MATCH (:Project{id:$project_id})-[:HAS_ENROLLED]->(:Subject)<-[:BELONGS_TO_SUBJECT]-(:Biological_sample)-[:SPLITTED_INTO]->(:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(n:Protein)
+            WITH COUNT(DISTINCT r.proteinGroup) AS protein_groups, COUNT(DISTINCT n.id) AS proteins
+            MATCH (p:Project{id:$project_id})-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]->(a:Analytical_sample)
+            WITH p.id AS project, COUNT(DISTINCT s.id) AS subjects, COUNT(DISTINCT b.id) AS biological_samples, COUNT(DISTINCT a.id) AS analytical_samples, protein_groups, proteins
+            RETURN project, subjects, biological_samples, analytical_samples, protein_groups, proteins;
