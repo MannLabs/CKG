@@ -510,20 +510,21 @@ class Project:
             query = query_utils.get_query(project_cypher, query_id="projects_subgraph")
             list_projects = []
             driver = connector.getGraphDatabaseConnectionConfiguration()
-            if "other_id" in self.similar_projects:
-                list_projects = self.similar_projects["other_id"].values.tolist()
-            list_projects.append(self.identifier)
-            list_projects = ",".join(['"{}"'.format(i) for i in list_projects])
-            query = query.replace("LIST_PROJECTS", list_projects)
-            path = connector.sendQuery(driver, query, parameters={}).data()
-            G = acore_utils.neo4j_path_to_networkx(path, key='path')
-            args = {}
-            style, layout = self.get_similarity_network_style()
-            args['stylesheet'] = style
-            args['layout'] = layout
-            args['title'] = "Projects subgraph"
-            net, mouseover = acore_utils.networkx_to_cytoscape(G)
-            plot = viz.get_cytoscape_network(net, "projects_subgraph", args)
+            if self.similar_projects is not None:
+                if "other_id" in self.similar_projects:
+                    list_projects = self.similar_projects["other_id"].values.tolist()
+                list_projects.append(self.identifier)
+                list_projects = ",".join(['"{}"'.format(i) for i in list_projects])
+                query = query.replace("LIST_PROJECTS", list_projects)
+                path = connector.sendQuery(driver, query, parameters={}).data()
+                G = acore_utils.neo4j_path_to_networkx(path, key='path')
+                args = {}
+                style, layout = self.get_similarity_network_style()
+                args['stylesheet'] = style
+                args['layout'] = layout
+                args['title'] = "Projects subgraph"
+                net, mouseover = acore_utils.networkx_to_cytoscape(G)
+                plot = viz.get_cytoscape_network(net, "projects_subgraph", args)
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -567,11 +568,13 @@ class Project:
             project_report = self.generate_project_info_report()
             self.update_report({"Project information": project_report})
             for dataset_type in self.data_types:
+                print("DATASET:", dataset_type)
                 dataset = self.get_dataset(dataset_type)
                 if dataset is not None:
                     dataset.generate_report()
             self.generate_knowledge()
             self.knowledge.generate_report()
+            self.knowledge.generate_report(visualization="network")
             self.save_project_report()
             self.save_project()
             self.save_project_datasets_data()

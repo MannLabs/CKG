@@ -93,7 +93,6 @@ def display_page(pathname):
                                             'position': 'absolute',
                                             'right': '50px'}, error)
             else:
-                print("session_id", session_id)
                 project = projectApp.ProjectApp(session_id, project_id, project_id, "", "", layout=[], logo=None, footer=None, force=force)
                 return (project.layout, {'display': 'block',
                                          'position': 'absolute',
@@ -570,9 +569,12 @@ def run_processing(n_clicks, project_id):
         if 'experimental_design' in datasets:
             dataset = 'experimental_design'
             directory = os.path.join(temporaryDirectory, dataset)
-            experimental_files = os.listdir(directory)                
-            if config['file_design'].replace('PROJECTID', project_id) in experimental_files:
-                experimental_filename = config['file_design'].replace('PROJECTID', project_id)
+            experimental_files = os.listdir(directory)
+            regex = r"{}.+".format(config['file_design'].replace('PROJECTID', project_id) )
+            r = re.compile(regex)
+            experimental_filename = list(filter(r.match, experimental_files))
+            if len(experimental_filename) > 0:
+                experimental_filename = experimental_filename.pop()
                 designData = builder_utils.readDataset(os.path.join(directory, experimental_filename))
                 designData = designData.astype(str)
                 if 'subject external_id' in designData.columns and 'biological_sample external_id' in designData.columns and 'analytical_sample external_id' in designData.columns:
@@ -580,7 +582,7 @@ def run_processing(n_clicks, project_id):
                         res = dataUpload.remove_samples_nodes_db(driver, project_id)
                         res_n = dataUpload.check_samples_in_project(driver, project_id)
                         if (res_n > 0).any().values.sum() > 0:
-                            message = 'ERROR: There is already an experimental design loaded into the database and there was an error when trying to delete it. Contact your administrator.'.format(experimental_filename, ','.join(['subject external_id','biological_sample external_id','analytical_sample external_id']))
+                            message = 'ERROR: There is already an experimental design loaded into the database and there was an error when trying to delete it. Contact your administrator.'
                             return message, style, table
                                             
                     res_n = None
@@ -597,14 +599,17 @@ def run_processing(n_clicks, project_id):
             dataset = 'clinical'
             directory = os.path.join(temporaryDirectory, dataset)
             clinical_files = os.listdir(directory)
-            if config['file_clinical'].replace('PROJECTID', project_id) in clinical_files:
-                clinical_filename = config['file_clinical'].replace('PROJECTID', project_id)
+            regex = r"{}.+".format(config['file_clinical'].replace('PROJECTID', project_id) )
+            r = re.compile(regex)
+            clinical_filename = list(filter(r.match, clinical_files))
+            if len(clinical_filename) > 0:
+                clinical_filename = clinical_filename.pop()
                 data = builder_utils.readDataset(os.path.join(directory, clinical_filename))
                 external_ids = {}
-                if 'subject external_id' in data and 'biological_sample external_id' in data and 'analytical_sample external_id' in data:
+                if 'subject external_id' in data and 'biological_sample external_id' in data:# and 'analytical_sample external_id' in data:
                     external_ids['subjects'] = data['subject external_id'].astype(str).unique().tolist()
                     external_ids['biological_samples'] = data['biological_sample external_id'].astype(str).unique().tolist()
-                    external_ids['analytical_samples'] = data['analytical_sample external_id'].astype(str).unique().tolist()
+                    #external_ids['analytical_samples'] = data['analytical_sample external_id'].astype(str).unique().tolist()
                     dataUpload.create_mapping_cols_clinical(driver, data, directory, clinical_filename, separator=separator)
                     if 0 in res_n.values:
                         samples = ', '.join([k for (k,v) in res_n if v == 0])

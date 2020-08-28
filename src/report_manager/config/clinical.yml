@@ -2,6 +2,9 @@ args:
     subject_id: subject
     sample_id: biological_sample
     group_id: group
+    missing_method: percentage
+    missing_per_group: True
+    missing_max: 0.3
     imputation_method: KNN
     columns: clinical_variable
     values: value
@@ -32,6 +35,8 @@ overview: #section
         plots:
             - pca
         args:
+            hovering_cols: 
+                - biological_sample
             x_title: PC1
             y_title: PC2
             drop_cols:
@@ -109,4 +114,3 @@ overview: #section
             communities_algorithm: louvain
             width: 1600
             height: 1600
-

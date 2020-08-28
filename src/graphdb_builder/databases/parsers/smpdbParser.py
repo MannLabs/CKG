@@ -46,7 +46,7 @@ def parsePathways(config, fhandler):
                 df = pd.read_csv(f, sep=',', error_bad_lines=False, low_memory=False)
                 for index, row in df.iterrows():
                     identifier = row[0]
-                    name = row[1]
+                    name = row[2]
                     description = row[3]
                     linkout = url.replace("PATHWAY", identifier)
                     entities.add((identifier, "Pathway", name, description, organism, linkout, "SMPDB"))

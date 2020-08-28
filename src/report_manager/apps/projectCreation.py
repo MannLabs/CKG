@@ -151,7 +151,7 @@ def create_new_project(driver, projectId, data, separator='|'):
 
             datasetPath = os.path.join(os.path.join(importDir, external_identifier), 'clinical')
             ckg_utils.checkDirectory(datasetPath)
-            eh.generate_dataset_imports(external_identifier, 'clinical', datasetPath)
+            eh.generate_dataset_imports(external_identifier, 'project', datasetPath)
             loader.partialUpdate(imports=['project'], specific=[external_identifier])
             done = 1
         else:

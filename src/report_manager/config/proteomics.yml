@@ -1,13 +1,19 @@
 args:
+    filter_samples: True
+    filter_samples_percent: 0.5
     imputation: True
-    imputation_method: distribution
+    imputation_method: mixed
     missing_shift: 1.8
     missing_nstd: 0.3
     missing_method: percentage
     missing_per_group: True
-    missing_max: 0.3
+    missing_max: 0.5
     value_col: LFQ_intensity
     extra_identifier: name
+    normalize: True
+    normalization_method: 'median'
+    normalize_group: False
+    normalize_by: 'samples'
     index:
         - group
         - sample
@@ -139,7 +145,7 @@ overview: #section
             width: 1500
             title: Protein ranking
 data exploration:
-    stratification:
+    stratification_pca:
         description: '# Principal Component Analysis
 
                          **Principal component analysis (PCA)** is a statistical procedure that uses an orthogonal transformation to convert a set of observations 
@@ -151,21 +157,73 @@ data exploration:
         data: processed
         analyses:
             - pca
-            #- tsne
-            #- umap
         plots:
             - pca
         args:
+            hovering_cols: 
+                - sample
+            drop_cols:
+                - sample
+                - subject
+            group: group
             x_title: PC1
             y_title: PC2
             components: 2
-            perplexity: 40
-            n_iter: 1000
             init: 'pca'
             width: 1000
             height: 700
             loadings: 15
-            title: 'Sample stratification'
+            factor: 20
+            title: 'Sample stratification with PCA'
+    stratification_umap:
+        description: '# UMAP'
+        data: processed
+        analyses:
+            - umap
+        plots:
+            - scatterplot
+        args:
+            hovering_cols: 
+                - sample
+            x_title: UMAP1
+            y_title: UMAP2
+            components: 2
+            init: 'pca'
+            width: 1000
+            height: 700
+            loadings: 15
+            title: 'Sample stratification with UMAP'
+    functional stratification:
+        description: '# Functional PCA (Single-Sample GSEA)'
+        data: 
+            - processed
+            - protein go annotation
+        analyses:
+            - functional_pca
+        plots:
+            - pca
+        args:
+            hovering_cols: 
+                - sample
+            data_id: processed
+            annotation_id: protein go annotation
+            annotation_col: annotation
+            identifier_col: identifier
+            index: 
+                - group
+                - sample
+                - subject
+            key: nes
+            min_size: 5
+            x_title: PC1
+            y_title: PC2
+            components: 2
+            factor: 1
+            init: 'pca'
+            width: 1000
+            height: 700
+            loadings: 15
+            title: 'Sample Functional Stratification'
     regulation:
         description: '# Regulation
         
@@ -181,6 +239,9 @@ data exploration:
             - volcanoplot
         store_analysis: True
         args:
+            covariates:
+                - Age (qualifier value)
+                - Biological sex (property) (qualifier value)
             alpha: 0.05
             fc: 2.0
             group: 'group'
@@ -224,7 +285,7 @@ data exploration:
             width: 1600
             height: 1600
 data associations:
-    interaction_network:
+    protein_interaction_network:
         data: regulated
         analyses: []
         plots:
@@ -247,7 +308,7 @@ data associations:
             color_weight: False
             node_size: 'degree'
             communities_algorithm: louvain
-    complex_associations:
+    protein_complex_associations:
         data: regulated
         analyses: []
         plots:
@@ -259,7 +320,7 @@ data associations:
             height: 700
             width: 900
             title: 'List of complexes regulated proteins belong to'
-    drug_associations:
+    protein_drug_associations:
         data: regulated
         analyses: []
         plots:
@@ -271,7 +332,7 @@ data associations:
             height: 700
             width: 900
             title: 'List of drugs targetting differentially regulated proteins'
-    disease_associations:
+    protein_disease_associations:
         data: regulated
         analyses: []
         plots:
@@ -310,10 +371,10 @@ data associations:
             text_col: 'abstract'
             title: 'List of publications mentioning regulated proteins together with related diseases'
 enrichment:
-    go_enrichment:
+    protein_go_enrichment:
         data: 
             - regulation table
-            - go annotation
+            - protein go annotation
         analyses:
             - regulation_enrichment
         plots:
@@ -321,7 +382,7 @@ enrichment:
         store_analysis: True
         args:
             regulation_data: regulation table
-            annotation: go annotation
+            annotation: protein go annotation
             identifier: identifier
             groups:
                 - group1
@@ -331,10 +392,10 @@ enrichment:
             reject_col: rejected
             method: fisher
             title: 'Gene Ontology Enrichment'
-    pathway_enrichment:
+    protein_pathway_enrichment:
         data: 
             - regulation table
-            - pathway annotation
+            - protein pathway annotation
         analyses:
             - regulation_enrichment
         plots:
@@ -342,7 +403,7 @@ enrichment:
         store_analysis: True
         args:
             regulation_data: regulation table
-            annotation: pathway annotation
+            annotation: protein pathway annotation
             identifier: identifier
             groups:
                 - group1

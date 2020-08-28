@@ -3,6 +3,7 @@ import sys
 import pandas as pd
 import numpy as np
 import ast
+from operator import itemgetter
 import networkx as nx
 import ckg_utils
 import config.ckg_config as ckg_config
@@ -30,13 +31,14 @@ class Knowledge:
         self._report = report
         self._default_color = '#636363'
         self._colors = colors
+        self._keep_nodes = []
         if len(colors) == 0:
-            self._colors = {'Protein': '#1a9850',
+            self._colors = {'Protein': '#501a98',
                             'Clinical_variable': '#542788',
                             'Drug': '#c51b7d',
                             'Tissue': '#66c2a5',
                             'Disease': '#b2182b',
-                            'Pathway': '#762a83',
+                            'Pathway': '#0570b0',
                             'Publication': '#b35806',
                             'Biological_process': '#e6f598',
                             'Symptom': '#f46d43',
@@ -131,6 +133,14 @@ class Knowledge:
     @graph.setter
     def graph(self, graph):
         self._graph = graph
+        
+    @property
+    def keep_nodes(self):
+        return self._keep_nodes
+    
+    @keep_nodes.setter
+    def keep_nodes(self, node_ids):
+        self._keep_nodes = node_ids
 
     def generate_knowledge_from_regulation(self, entity):
         nodes = {}
@@ -138,8 +148,9 @@ class Knowledge:
         color = self.colors[entity] if entity in self.colors else self.default_color
         if "regulated" in self.data:
             for n in self.data['regulated']:
-                nodes.update({n: {'type': entity, 'color': color, 'parent': 'Regulated'}})
-                #relationships.update({('Regulated', n): {'type':'is_regulated', 'weight':1, 'source_color':self.default_color, 'target_color':color}})
+                if n not in ['sample', 'group', 'subject']:
+                    nodes.update({n: {'type': entity, 'color': color}})
+                    relationships.update({('Regulated', n): {'type':'is_regulated', 'weight':1, 'source_color':self.default_color, 'target_color':color}})
 
         return nodes, relationships
 
@@ -158,6 +169,102 @@ class Knowledge:
                         relationships.update({(row['node1'], row['node2']): {'type': 'correlates', 'weight': row['weight'], 'width': np.abs(row['weight']), 'source_color': node1_color, 'target_color': node2_color}})
 
         return nodes, relationships
+    
+    def generate_knowledge_from_associations(self, df, name):
+        nodes = {}
+        relationships = {}
+        node1_color = self.colors['Protein'] if 'Protein' in self.colors else self.default_color
+        if not 'literature' in name:
+            entity = name.split('_')[1].capitalize()
+            node2_color = self.colors[entity] if entity in self.colors else self.default_color
+            if 'Proteins' in df and entity in df:
+                if 'score' not in df:
+                    df['score'] = 0.0
+
+                aux = df[['Proteins', entity, 'score']]
+                for i, row in aux.iterrows():
+                    proteins = row['Proteins'].split(';')
+                    for p in proteins:
+                        nodes.update({p: {'type':'Protein', 'color':node1_color}, row[entity]: {'type':entity, 'color':node2_color}})
+                        relationships.update({(p, row[entity]): {'type': 'associated_with', 'weight': row['score'], 'width': np.abs(row['score']), 'source_color': node1_color, 'target_color': node2_color}})
+        else:
+            if 'PMID' in df and 'Proteins' in df and 'Diseases' in df:
+                aux = df[['PMID', 'Proteins', 'Diseases']]
+                aux['PMID'] = aux['PMID'].astype(int).astype(str)
+                node2_color = self.colors["Publication"] if "Publication" in self.colors else self.default_color
+                node3_color = self.colors["Disease"] if "Disease" in self.colors else self.default_color
+                for i, row in aux.iterrows():
+                    proteins = row['Proteins']
+                    if proteins is not None:
+                        if isinstance(proteins, str):
+                            proteins = proteins.split(';')
+                        for p in proteins:
+                            nodes.update({p: {'type':'Protein', 'color':node1_color}, "PMID:"+row['PMID']: {'type':"Publication", 'color':node2_color}})
+                            relationships.update({(p, "PMID:"+row['PMID']): {'type': 'mentioned_in_publication', 'weight': 0.0, 'width': 0.0, 'source_color': node1_color, 'target_color': node2_color}})
+                    diseases = row['Diseases']
+                    if diseases is not None:
+                        if isinstance(diseases, str):
+                            diseases = diseases.split(';')
+                        for d in diseases:
+                            nodes.update({d: {'type':'Disease', 'color':node3_color}})
+                            relationships.update({(d, "PMID:"+row['PMID']): {'type': 'mentioned_in_publication', 'weight': 0.0, 'width': 0.0, 'source_color': node3_color, 'target_color': node2_color}})
+        
+        return nodes, relationships
+    
+    def generate_knowledge_from_interactions(self, df, name):
+        nodes = {}
+        relationships = {}
+        entity = name.split('_')[0].capitalize()
+        if 'node1' in df and 'node2' in df and 'score' in df:
+            for node1, node2, score in df[['node1', 'node2', 'score']].to_records():
+                nodes.update({node1: {'type':entity, 'color':self.colors[entity]}, node2: {'type':entity, 'color':self.colors[entity]}})
+                relationships.update({(node1, node2): {'type': 'interacts_with', 'weight': score, 'width': score, 'source_color': self.colors[entity], 'target_color': self.colors[entity]}})
+        
+        return nodes, relationships
+    
+    def generate_knowledge_from_enrichment(self, df, name):
+        nodes = {}
+        relationships = {}
+        entity = name.split('_')[0].capitalize()
+        node1_color = self.colors[entity] if entity in self.colors else self.default_color
+        if 'terms' in df and 'identifiers' in df and 'padj' in df:
+            aux = df[['terms', 'identifiers', 'padj']]
+            for i, row in aux.iterrows():
+                ids = row['identifiers'].split(',')
+                if ids is not None:
+                    for i in ids:
+                        if 'Pathways' in name:
+                            entity2 = 'Pathway'    
+                        elif 'processes' in name:
+                            entity2 = 'Biological_process'
+                        
+                        node2_color = self.colors[entity2] if entity2 in self.colors else self.default_color
+                        nodes.update({i: {'type':entity, 'color':node1_color}, row['terms']: {'type':entity2, 'color':node2_color}})
+                        relationships.update({(i, row['terms']): {'type': 'annotated_in', 'weight': -np.log10(row['padj']), 'width': -np.log10(row['padj']), 'source_color': node1_color, 'target_color': node2_color}})
+        
+        return nodes, relationships
+    
+    def generate_knowledge_from_dataframes(self):
+        graph_rels = {}
+        graph_nodes = {}
+        for name in self.data:
+            df = self.data[name]
+            if isinstance(df, pd.DataFrame):
+                df = df.dropna()
+                if 'associations' in name:
+                    nodes, rels = self.generate_knowledge_from_associations(df, name)
+                    graph_nodes.update(nodes)
+                    graph_rels.update(rels)
+                elif 'interaction' in name:
+                    nodes, rels = self.generate_knowledge_from_interactions(df, name)
+                    graph_nodes.update(nodes)
+                    graph_rels.update(rels)
+                elif 'enrichment' in name:
+                    nodes, rels = self.generate_knowledge_from_enrichment(df, name)
+                    graph_nodes.update(nodes)
+                    graph_rels.update(rels)
+        
+        return graph_nodes, graph_rels
 
     def generate_knowledge_from_wgcna(self, data, entity1, entity2, cutoff=0.2):
         nodes = {}
@@ -168,7 +275,7 @@ class Knowledge:
         if 'features_per_module' in data:
             modules = data['features_per_module']
             for i, row in modules.iterrows():
-                nodes.update({"ME"+row['modColor']: {'type': 'Module', 'color': color_dict[row['modColor']], 'parent': 'Regulated'}, row['name']: {'type': entity2, 'color': node2_color, 'parent': "ME"+row['modColor']}})
+                nodes.update({"ME"+row['modColor']: {'type': 'Module', 'color': color_dict[row['modColor']]}, row['name']: {'type': entity2, 'color': node2_color}})
                 relationships.update({('Regulated', "ME"+row['modColor']): {'type': '', 'weight': 5, 'source_color': self.default_color, 'target_color': color_dict[row['modColor']]}})
                 relationships.update({("ME"+row['modColor'], row['name']): {'type': 'CONTAINS', 'weight': 5, 'source_color': color_dict[row['modColor']], 'target_color': node2_color}})
         if 'module_trait_cor' in data and data['module_trait_cor'] is not None:
@@ -233,9 +340,9 @@ class Knowledge:
             for i, row in result.iterrows():
                 rel_type = row['type'] if 'type' in row else 'associated'
                 weight = row['weight'] if 'weight' in row else 5
-                nodes.update({row['node1']: {'type': entity, 'color': node1_color}, row['node2'].replace("'", "").title(): {'type': node2, 'color': node2_color, 'parent': node2}})
-                relationships.update({(row['node1'], row['node2'].replace("'", "").title()): {'type': rel_type, 'weight': weight, 'width': weight, 'source_color': node1_color, 'target_color': node2_color}})
-                relationships.update({(row['node2'].replace("'", "").title(), node2): {'type': 'is_a', 'weight': 5, 'width': 5, 'source_color': node2_color, 'target_color': node2_color}})
+                nodes.update({row['node1']: {'type': entity, 'color': node1_color}, row['node2'].replace("'", ""): {'type': node2, 'color': node2_color}})
+                relationships.update({(row['node1'], row['node2'].replace("'", "")): {'type': rel_type, 'weight': weight, 'width': weight, 'source_color': node1_color, 'target_color': node2_color}})
+                relationships.update({(row['node2'].replace("'", ""), node2): {'type': 'is_a', 'weight': 5, 'width': 5, 'source_color': node2_color, 'target_color': node2_color}})
 
         return nodes, relationships
 
@@ -271,11 +378,23 @@ class Knowledge:
         return nodes
 
     def generate_knowledge_graph(self):
+        selected_nodes = []
         G = nx.DiGraph()
         G.add_nodes_from(self.nodes.items())
         G.add_edges_from(self.relationships.keys())
         nx.set_edge_attributes(G, self.relationships)
-        self.graph = G
+        if len(G.nodes()) > 1:
+            centrality = nx.betweenness_centrality(G, k=None, weight='weight', normalized=False)
+            nx.set_node_attributes(G, centrality, 'centrality')
+            sorted_centrality = sorted(centrality.items(), key=itemgetter(1), reverse=True)
+            for node_type in ["Disease", "Drug", "Pathway", "Biological_process", "Complex", "Publication"]:
+                nodes  = [x for x,y in G.nodes(data=True) if 'type' in y and y['type'] == node_type and x not in self.keep_nodes]
+                selected_nodes.extend([n for n, c in sorted_centrality if n in nodes][20:])
+
+            if len(selected_nodes) > 0:
+                G.remove_nodes_from(selected_nodes)
+
+            self.graph = G
 
     def reduce_to_subgraph(self, nodes):
         valid_nodes = set(nodes).intersection(list(self.nodes.keys()))
@@ -284,21 +403,21 @@ class Knowledge:
         self.generate_knowledge_graph()
         for n in valid_nodes:
             if n in self.nodes:
-                for n1, n2,attr in self.graph.out_edges(n, data=True):
+                for n1, n2, attr in self.graph.out_edges(n, data=True):
                     aux.add(n1)
                     aux.add(n2)
                 for n1,n2,attr in self.graph.in_edges(n, data=True):
                     aux.add(n1)
                     aux.add(n2)
-        remove = set(self.nodes.keys()).difference(aux.union(valid_nodes))
-        self.graph.remove_nodes_from(list(remove))
-        self.nodes = dict(self.graph.nodes(data=True))
-        self.relationships = {(a,b):c for a,b,c in self.graph.edges(data=True)}
+        if self.graph is not None:
+            remove = set(self.nodes.keys()).difference(aux.union(valid_nodes))
+            self.graph.remove_nodes_from(list(remove))
+            self.nodes = dict(self.graph.nodes(data=True))
+            self.relationships = {(a,b):c for a,b,c in self.graph.edges(data=True)}
 
     def get_knowledge_graph_plot(self):
         if self.graph is None:
             self.generate_knowledge_graph()
-
         title = 'Project {} Knowledge Graph'.format(self.identifier)
         if self.data is not None:
             if 'name' in self.data:
@@ -306,35 +425,42 @@ class Knowledge:
 
         args = {'title': title,
                 'node_properties': {},
-                'width': 2600,
-                'height': 2600, 
+                'width': 2000,
+                'height': 2000, 
                 'maxLinkWidth': 7,
                 'maxRadius': 20}
-        color_selector = "{'selector': '[name = \"KEY\"]', 'style': {'font-size': 10, 'background-color':'VALUE','width': 50,'height': 50,'background-image':'/assets/graph_icons/ENTITY.png','background-fit': 'cover','opacity':OPACITY}}"
-        stylesheet = [{'selector': 'node', 'style': {'label': 'data(name)', 'z-index': 9999}},
+        color_selector = "{'selector': '[name = \"KEY\"]', 'style': {'font-size': '7px', 'text-opacity': 0.8, 'background-color':'VALUE','width': 50,'height': 50,'background-image':'/assets/graph_icons/ENTITY.png','background-fit': 'cover','opacity':OPACITY}}"
+        stylesheet = [{'selector': 'node', 'style': {'label': 'data(name)'}},
                     {'selector': 'edge', 'style': {'label': 'data(type)',
                                                    'curve-style': 'unbundled-bezier',
-                                                   'control-point-distance': '20px',
+                                                   'control-point-distance': '30px',
                                                    'control-point-weight': '0.7',
                                                    'z-index': 5000,
                                                    'line-color': '#bdbdbd',
                                                    'opacity': 0.2,
-                                                   'font-size': '7px'}}]
-        layout = {'name': 'circle'}
+                                                   'font-size': '2.5px',
+                                                   "text-opacity": 1,
+                                                   "font-style": "normal",
+                                                   "font-weight": "normal"}}]
+        layout = {'name': 'cose'}
 
         #stylesheet.extend([{'selector':'[weight < 0]', 'style':{'line-color':'#3288bd'}},{'selector':'[width > 0]', 'style':{'line-color':'#d73027'}}])
-        for n in self.nodes:
-            color = self.nodes[n]['color']
-            image = self.nodes[n]['type']
+        for n, attr in self.graph.nodes(data=True):
+            color = self.default_color
+            image = ''
+            if 'color' in attr:
+                color = attr['color']
+            if 'type' in attr:
+                image = attr['type']
             opacity = 0.3 if image == 'Module' or image == 'Group' else 1
             stylesheet.append(ast.literal_eval(color_selector.replace("KEY", n.replace("'", "")).replace("VALUE", color).replace("ENTITY", image).replace("OPACITY", str(opacity))))
-        stylesheet.extend([{'selector': '[weight < 0]', 'style': {'line-color': '#4add1'}}, {'selector': '[weight > 0]', 'style': {'line-color': '#d6604d'}}])
+        stylesheet.extend([{'selector':'node','style':{'width':'mapData(centrality,0,1, 15, 20)', 'height':'mapData(centrality,0,1, 15, 20)'}}])
         args['stylesheet'] = stylesheet
         args['layout'] = layout
-
+        self.graph.remove_node('Regulated')
         nodes_table, edges_table = viz.network_to_tables(self.graph)
-        nodes_fig_table = viz.get_table(nodes_table, identifier=self.identifier+"_nodes_table", title="Nodes table")
-        edges_fig_table = viz.get_table(edges_table, identifier=self.identifier+"_edges_table", title="Edges table")
+        nodes_fig_table = viz.get_table(nodes_table, identifier=self.identifier+"_nodes_table", args={'title':"Nodes table"})
+        edges_fig_table = viz.get_table(edges_table, identifier=self.identifier+"_edges_table", args={'title':"Edges table"})
         cy_elements, mouseover_node = utils.networkx_to_cytoscape(self.graph)
         #args['mouseover_node'] = mouseover_node
 
@@ -383,12 +509,12 @@ class ProjectKnowledge(Knowledge):
         similarity_knowledge = self.generate_knowledge_from_similarity(entity='Project')
         self.nodes.update(similarity_knowledge[0])
         self.relationships.update(similarity_knowledge[1])
-        
+        self.nodes.update({self.data["name"]: {"type":'project', 'color': self.colors['Project']}, "Regulated": {'type': "connector", 'color': self.default_color}})
         self.relationships.update({(self.data['name'], 'Regulated'): {'type': 'has', 'weight':5, 'width':5, 'source_color':self.colors['Project'], 'target_color':self.default_color}})
-        
         queries_results = self.query_data(replace=[('PROJECTID',self.identifier)])
         queries_knowledge = self.generate_knowledge_from_queries(entity='Project', queries_results=queries_results)
         self.nodes.update(queries_knowledge[0])
+        self.keep_nodes = list(queries_knowledge[0].keys())
         self.relationships.update(queries_knowledge[1])
     
 class ProteomicsKnowledge(Knowledge):
@@ -404,12 +530,15 @@ class ProteomicsKnowledge(Knowledge):
         #self.nodes.update(correlation_knowledge[0])
         self.relationships = regulation_knowledge[1]
         #self.relationships.update(correlation_knowledge[1])
-        nodes = self.generate_cypher_nodes_list()
-        limit_count = 3 if len(nodes)>10 else 1
-        queries_results = self.query_data(replace=[('PROTEINIDS',nodes), ('PROJECTID', self.identifier), ('LIMIT_COUNT', str(limit_count))])
-        queries_knowledge = self.generate_knowledge_from_queries(entity='Protein', queries_results=queries_results)
-        self.nodes.update(queries_knowledge[0])
-        self.relationships.update(queries_knowledge[1])
+        #nodes = self.generate_cypher_nodes_list()
+        #limit_count = 3 if len(nodes)>10 else 1
+        #queries_results = self.query_data(replace=[('PROTEINIDS',nodes), ('PROJECTID', self.identifier), ('LIMIT_COUNT', str(limit_count))])
+        #queries_knowledge = self.generate_knowledge_from_queries(entity='Protein', queries_results=queries_results)
+        #self.nodes.update(queries_knowledge[0])
+        #self.relationships.update(queries_knowledge[1])
+        df_knowledge = self.generate_knowledge_from_dataframes()
+        self.nodes.update(df_knowledge[0])
+        self.relationships.update(df_knowledge[1])
         
 class ClinicalKnowledge(Knowledge):
     
@@ -419,7 +548,7 @@ class ClinicalKnowledge(Knowledge):
         
     def generate_knowledge(self):
         regulation_knowledge = self.generate_knowledge_from_regulation(entity='Protein')
-        correlation_knowledge = self.genreate_knowledge_from_correlation('Protein', 'Protein', filter=regulation_knowledge[0].keys())
+        correlation_knowledge = self.genreate_knowledge_from_correlation('Clinical_variable', 'Clinical_variable', filter=regulation_knowledge[0].keys())
         self.nodes = regulation_knowledge[0]
         self.nodes.update(correlation_knowledge[0])
         self.relationships = regulation_knowledge[1]
@@ -438,6 +567,7 @@ class MultiOmicsKnowledge(Knowledge):
         Knowledge.__init__(self, identifier, data=data, nodes=nodes, relationships=relationships, queries_file=queries_file, colors=colors, graph=graph, report=report)
         
     def generate_knowledge(self):
+        print(self.data)
         if 'wgcna_wgcna' in self.data:
             for dtype in self.data['wgcna_wgcna']:
                 if dtype == 'wgcna-proteomics':
@@ -446,3 +576,7 @@ class MultiOmicsKnowledge(Knowledge):
                     wgcna_knowledge = self.generate_knowledge_from_wgcna(self.data['wgcna_wgcna'][dtype], entity1, entity2)
                     self.nodes.update(wgcna_knowledge[0])
                     self.relationships.update(wgcna_knowledge[1])
+        elif 'clinical_correlation_multi_correlation' in self.data:
+            correlation_knowledge = self.genreate_knowledge_from_correlation('Protein', 'Clinical_variable', filter=[])
+            self.nodes.update(correlation_knowledge[0])
+            self.relationships.update(correlation_knowledge[1])
