@@ -331,7 +331,7 @@ def create_mapping_cols_clinical(driver, data, directory, filename, separator='|
         for tissue in data['tissue'].dropna().unique():
             tissue_id = query_utils.map_node_name_to_id(driver, 'Tissue', str(tissue.strip()))
             tissue_dict[tissue] = tissue_id
-        
+
         data['tissue id'] = data['tissue'].map(tissue_dict)
 
     if 'studies_intervention' in data:
@@ -343,28 +343,36 @@ def create_mapping_cols_clinical(driver, data, directory, filename, separator='|
                     intervention_dict[intervention] = intervention
 
         data['intervention id'] = data['studies_intervention'].map(intervention_dict)
-    
-    
+
+
     builder_utils.export_contents(data, directory, filename)
-    
+
 
 def get_project_information(driver, project_id):
     query_name = 'project_graph'
-    res = pd.DataFrame()
+    queries = []
+    data = []
+    res = []
     try:
         query = ''
-        parameters = {'project_id': project_id}
         data_upload_cypher = get_data_upload_queries()
-        queries = data_upload_cypher[query_name]['query'].split(';')[:-1]
+        for section in data_upload_cypher[query_name]:
+            code = section['query']
+            queries.extend(code.replace("PROJECTID", project_id).split(';')[0:-1])
         for query in queries:
-            res = connector.getCursorData(driver, query+';', parameters=parameters)
+            result = connector.sendQuery(driver, query+";").data()[0]
+            data.append(result)
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         logger.error("Error: {}. Creating analytical samples: Query name ({}) - Query ({}), error info: {}, file: {},line: {}".format(err, query_name, query, sys.exc_info(), fname, exc_tb.tb_lineno))
 
-    if not res.empty:
-        res = viz.get_table(res, identifier='new_project', args={'title':'Data Uploaded for Project {}'.format(project_id)})
+    if data:
+        for i, j in enumerate(data):
+            df = pd.DataFrame([data[i]], columns=data[i].keys())
+            header = '_'.join(df.columns[0].split('_', 1)[1:]).capitalize()
+            df.rename(columns={df.columns[0]: 'project'}, inplace=True)
+            res.append(viz.get_table(df, identifier='new_project_{}'.format(header), args={'title':'{} data uploaded for project {}'.format(header, project_id)}))
     else:
         res = None
         logger.error("Error: No data was uploaded for project: {}. Review your experimental design and data files and the logs for errors.".format(project_id))
