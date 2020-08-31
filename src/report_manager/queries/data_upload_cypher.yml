@@ -173,9 +173,10 @@ create_asamples_biosamples:
         MATCH (bs:Biological_sample {id:$biosample_id})
         MERGE (bs)-[r:SPLITTED_INTO]->(as)
         RETURN COUNT(as) AS PROJECTID_asamples, COUNT(r) AS PROJECTID_bisamples_splitted_into_asample;
-project_graph:
-    name: project graph
-    description: full graph for a project
+
+project_clinical: &project_clinical
+    name: project proteins
+    description: full graph for a project with quantified clinical variables
     involves_nodes:
         - Project
         - Biological_samples
@@ -184,9 +185,69 @@ project_graph:
         - HAS_ENROLLED
         - BELONGS_TO_SUBJECT
         - SPLITTED_INTO
+    query_type: post
     query: >
-            MATCH (:Project{id:$project_id})-[:HAS_ENROLLED]->(:Subject)<-[:BELONGS_TO_SUBJECT]-(:Biological_sample)-[:SPLITTED_INTO]->(:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(n:Protein)
-            WITH COUNT(DISTINCT r.proteinGroup) AS protein_groups, COUNT(DISTINCT n.id) AS proteins
-            MATCH (p:Project{id:$project_id})-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]->(a:Analytical_sample)
-            WITH p.id AS project, COUNT(DISTINCT s.id) AS subjects, COUNT(DISTINCT b.id) AS biological_samples, COUNT(DISTINCT a.id) AS analytical_samples, protein_groups, proteins
-            RETURN project, subjects, biological_samples, analytical_samples, protein_groups, proteins;
+        MATCH (p:Project{id:"PROJECTID"})-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[r:HAS_QUANTIFIED_CLINICAL]->(n:Clinical_variable)
+        WITH COUNT(DISTINCT n.id) AS clinical_variables
+        MATCH (p:Project{id:"PROJECTID"})-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)
+        WITH p.id AS project_clinical, COUNT(DISTINCT s.id) AS subjects, COUNT(DISTINCT b.id) AS biological_samples, COUNT(DISTINCT a.id) AS analytical_samples, clinical_variables
+        RETURN project_clinical, subjects, biological_samples, analytical_samples, clinical_variables;
+project_proteins: &project_proteins
+    name: project proteins
+    description: full graph for a project with quantified proteins
+    involves_nodes:
+        - Project
+        - Biological_samples
+        - Anlytical_samples
+    involved_rels:
+        - HAS_ENROLLED
+        - BELONGS_TO_SUBJECT
+        - SPLITTED_INTO
+    query_type: post
+    query: >
+        MATCH (p:Project{id:"PROJECTID"})-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(n:Protein)
+        WITH COUNT(DISTINCT r.proteinGroup) AS protein_groups, COUNT(DISTINCT n.id) AS proteins
+        MATCH (p:Project{id:"PROJECTID"})-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]->(a:Analytical_sample)
+        WITH p.id AS project_proteins, COUNT(DISTINCT s.id) AS subjects, COUNT(DISTINCT b.id) AS biological_samples, COUNT(DISTINCT a.id) AS analytical_samples, protein_groups, proteins
+        RETURN project_proteins, subjects, biological_samples, analytical_samples, protein_groups, proteins;
+project_peptides: &project_peptides
+    name: project peptides
+    description: full graph for a project with quantified peptides
+    involves_nodes:
+        - Project
+        - Biological_samples
+        - Anlytical_samples
+    involved_rels:
+        - HAS_ENROLLED
+        - BELONGS_TO_SUBJECT
+        - SPLITTED_INTO
+    query_type: post
+    query: >
+        MATCH (p:Project{id:"PROJECTID"})-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PEPTIDE]->(n:Peptide)
+        WITH COUNT(DISTINCT n.id) AS peptides
+        MATCH (p:Project{id:"PROJECTID"})-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)
+        WITH p.id AS project_peptides, COUNT(DISTINCT s.id) AS subjects, COUNT(DISTINCT b.id) AS biological_samples, COUNT(DISTINCT a.id) AS analytical_samples, peptides
+        RETURN project_peptides, subjects, biological_samples, analytical_samples, peptides;
+project_modified_proteins: &project_modified_proteins
+    name: project modified_proteins
+    description: full graph for a project with quantified modified proteins
+    involves_nodes:
+        - Project
+        - Biological_samples
+        - Anlytical_samples
+    involved_rels:
+        - HAS_ENROLLED
+        - BELONGS_TO_SUBJECT
+        - SPLITTED_INTO
+    query_type: post
+    query: >
+        MATCH (p:Project{id:"PROJECTID"})-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_MODIFIED_PROTEIN]->(n:Modified_protein)
+        WITH COUNT(DISTINCT n.id) AS modified_proteins
+        MATCH (p:Project{id:"PROJECTID"})-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)
+        WITH p.id AS project_modified_proteins, COUNT(DISTINCT s.id) AS subjects, COUNT(DISTINCT b.id) AS biological_samples, COUNT(DISTINCT a.id) AS analytical_samples, modified_proteins
+        RETURN project_modified_proteins, subjects, biological_samples, analytical_samples, modified_proteins;
+project_graph:
+    - *project_clinical
+    - *project_proteins
+    - *project_peptides
+    - *project_modified_proteins
