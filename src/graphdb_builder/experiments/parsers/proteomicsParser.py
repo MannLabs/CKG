@@ -6,15 +6,15 @@ from collections import defaultdict
 from graphdb_builder import builder_utils, mapping
 
 
-def parser(projectId, dataType, directory=None):
-    directory = None
+def parser(projectId, type='proteomics', directory=None):
+    #directory = None
     data = {}
     cwd = os.path.abspath(os.path.dirname(__file__))
     config = builder_utils.get_config(config_name="proteomics.yml", data_type='experiments')
     if directory is None:
-        directory = os.path.join(cwd, '../../../../data/experiments/PROJECTID/' + dataType)
+        directory = os.path.join(cwd, '../../../../data/experiments/PROJECTID/' + type)
         if 'directory' in config:
-            directory = os.path.join(cwd, config['directory'] + dataType)
+            directory = os.path.join(cwd, config['directory'] + type)
     directory = directory.replace('PROJECTID', projectId)
     data = parse_from_directory(projectId, directory, config)
 
@@ -200,7 +200,7 @@ def load_dataset(uri, configuration):
         for regex in regexCols:
             r = re.compile(regex)
             columns.update(set(filter(r.match, data.columns)))
-            
+
         data = data[list(columns)].replace('Filtered', np.nan)
         value_cols = get_value_cols(data, configuration)
         data[value_cols] = data[value_cols].apply(lambda x: pd.to_numeric(x, errors='coerce'))
