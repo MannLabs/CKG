@@ -31,6 +31,7 @@ lifelines==0.23.1
 wordcloud==1.7.0
 nltk==3.5
 dash_cytoscape>=0.1.1
+networkx==2.5
 chart-studio==1.0.0
 xhtml2pdf==0.2.4
 lxml==4.3.4

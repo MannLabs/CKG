@@ -344,7 +344,6 @@ def create_mapping_cols_clinical(driver, data, directory, filename, separator='|
 
         data['intervention id'] = data['studies_intervention'].map(intervention_dict)
 
-
     builder_utils.export_contents(data, directory, filename)
 
 

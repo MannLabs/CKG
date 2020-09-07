@@ -1,4 +1,3 @@
-import config.ckg_config as ckg_config
 from apps import basicApp
 from apps import homepageStats as hpstats
 
@@ -8,7 +7,7 @@ class HomePageApp(basicApp.BasicApp):
     Defines what the HomePage App is in the report_manager.
     Enables the tracking of the number of entitites, relationships, projects, and others, currently in the grapha database.
     """
-    def __init__(self, title, subtitle, description, layout = [], logo = None, footer = None):
+    def __init__(self, title, subtitle, description, layout=[], logo=None, footer=None):
         self.pageType = "homePage"
         basicApp.BasicApp.__init__(self, title, subtitle, description, self.pageType, layout, logo, footer)
         self.buildPage()

@@ -1019,14 +1019,14 @@ def get_notebook_network_web(graph, args):
 
     return notebook_net
 
-def network_to_tables(graph):
+def network_to_tables(graph, source, target):
     """
     Creates the graph edge list and node list and returns them as separate Pandas DataFrames.
 
     :param graph: networkX graph used to construct the Pandas DataFrame.
     :return: two Pandas DataFrames.
     """
-    edges_table = nx.to_pandas_edgelist(graph)
+    edges_table = nx.to_pandas_edgelist(graph, source, target)
     nodes_table = pd.DataFrame.from_dict(dict(graph.nodes(data=True))).transpose().reset_index()
 
     return nodes_table, edges_table
@@ -1258,7 +1258,7 @@ def get_network(data, identifier, args):
                     break
             vis_graph = vis_graph.subgraph(valid_nodes)
 
-        nodes_table, edges_table = network_to_tables(graph)
+        nodes_table, edges_table = network_to_tables(graph, source=args["source"], target=args["target"])
         nodes_fig_table = get_table(nodes_table, identifier=identifier+"_nodes_table", args={'title':args['title']+" nodes table"})
         edges_fig_table = get_table(edges_table, identifier=identifier+"_edges_table", args={'title':args['title']+" edges table"})
 
@@ -1490,11 +1490,15 @@ def get_sankey_plot(data, identifier, args={'source':'source', 'target':'target'
         if 'target_colors' in args:
             node_colors.update(dict(zip(data[args['target']],data[args['target_colors']])))
         else:
-            node_colors.update(dict(zip(data[args['target']],['#a6bddb']*len(data[args['target']].tolist()))))
+            scolors = ['#a6bddb'] * len(data[args['target']].tolist())
+            node_colors.update(dict(zip(data[args['target']],scolors)))
+            args['target_colors'] = 'target_colors'
+            data['target_colors'] = scolors
+
         data_trace = dict(type='sankey',
                             orientation = 'h' if 'orientation' not in args else args['orientation'],
                             valueformat = ".0f" if 'valueformat' not in args else args['valueformat'],
-                            arrangement = 'freeform',
+                            arrangement = 'snap',
                             node = dict(pad = 10 if 'pad' not in args else args['pad'],
                                         thickness = 10 if 'thickness' not in args else args['thickness'],
                                         line = dict(color = "black", width = 0.3),
@@ -2144,7 +2148,7 @@ def get_cytoscape_network(net, identifier, args):
 
     return cytonet
 
-def save_DASH_plot(plot, name, plot_format='svg', directory='.', width=600, height=500):
+def save_DASH_plot(plot, name, plot_format='svg', directory='.', width=1600, height=1500):
     """
     This function saves a plotly figure to a specified directory, in a determined format.
 

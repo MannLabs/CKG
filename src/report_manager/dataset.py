@@ -361,8 +361,8 @@ class MultiOmicsDataset(Dataset):
 
         return data
 
-    def generate_knowledge(self):
-        kn = knowledge.MultiOmicsKnowledge(self.identifier, self.data, nodes={}, relationships={}, colors={}, graph=None, report={})
+    def generate_knowledge(self, nodes):
+        kn = knowledge.MultiOmicsKnowledge(self.identifier, self.data, nodes=nodes, relationships={}, colors={}, graph=None, report={})
         kn.generate_knowledge()        
 
         return kn
