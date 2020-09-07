@@ -1815,9 +1815,7 @@ def run_ancova(df, covariates, alpha=0.05, drop_cols=["sample",'subject'], subje
         if col not in covariates:
             ancova = calculate_ancova(df[[group, col]+covariates], col, group=group, covariates=covariates)
             ancova_result.append(ancova)
-            adj_values = adjust_for_covariates(df, column=col, group=group, covariates=covariates)
-            adj_df = pd.DataFrame(adj_values, index=df[group], columns=[col]).reset_index()
-            pairwise_result = calculate_pairwise_ttest(adj_df, column=col, subject=None, group=group, is_logged=is_logged)
+            pairwise_result = pairwise_ttest_with_covariates(df, column=col, group=group, covariates=covariates, is_logged=is_logged)
             pairwise_cols = pairwise_result.columns
             pairwise_results.extend(pairwise_result.values.tolist())
     df = df.set_index([group])
@@ -1827,15 +1825,33 @@ def run_ancova(df, covariates, alpha=0.05, drop_cols=["sample",'subject'], subje
 
     return res
 
-def adjust_for_covariates(df, column, group, covariates):
+
+def pairwise_ttest_with_covariates(df, column, group, covariates, is_logged):
     formula = "Q('%s') ~ C(Q('%s'))" % (column, group)
     for c in covariates:
         formula += " + Q('%s')" % (c)
     model = ols(formula, data=df).fit()
-    adjusted = model.predict()
+    pw = model.t_test_pairwise("C(Q('%s'))" % (group)).result_frame
+    pw = pw.reset_index()
+    groups = "|".join([re.escape(s) for s in df[group].unique().tolist()])
+    regex = r"({})\-({})".format(groups, groups)
+    pw['group1'] = pw['index'].apply(lambda x: re.search(regex, x).group(2))
+    pw['group2'] = pw['index'].apply(lambda x: re.search(regex, x).group(1))
     
-    return adjusted
+    means = df.groupby(group)[column].mean().to_dict()
+    stds = df.groupby(group)[column].std().to_dict()
+    pw['mean(group1)'] = [means[g] for g in pw['group1'].tolist()]
+    pw['mean(group2)'] = [means[g] for g in pw['group2'].tolist()]
+    pw['std(group1)'] = [stds[g] for g in pw['group1'].tolist()]
+    pw['std(group2)'] = [stds[g] for g in pw['group2'].tolist()]
+    pw = pw.drop(['pvalue-hs', 'reject-hs'], axis=1)
+    pw = pw.rename(columns={'t': 'posthoc T-Statistics', 'P>|t|': 'posthoc pvalue'} )
     
+    pw = pw[['group1', 'group2', 'mean(group1)', 'std(group1)', 'mean(group2)', 'std(group2)', 'posthoc T-Statistics', 'posthoc pvalue', 'coef', 'std err', 'Conf. Int. Low', 'Conf. Int. Upp.']]
+    pw = complement_posthoc(pw, column, is_logged)
+    
+    return pw
+
 
 def correct_pairwise_ttest(df, alpha, correction='fdr_bh'):
     posthoc_df = pd.DataFrame()
