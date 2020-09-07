@@ -117,7 +117,8 @@ def networkx_to_gml(graph, path):
 
 def json_network_to_gml(graph_json, path):
     graph = json_network_to_networkx(graph_json)
-    nx.write_gml(graph, path)
+    with open(path, 'w') as out:
+        nx.write_gml(graph, out)
 
 
 def json_network_to_networkx(graph_json):
@@ -241,8 +242,10 @@ def getMedlineAbstracts(idList):
 
         abstracts = pd.DataFrame.from_dict(results)
     except error.URLError as e:
-        print("Request to Bio.Entrez failed. Error: {}".format(e))
+        print("URLError: Request to Bio.Entrez failed. Error: {}".format(e))
     except error.HTTPError as e:
+        print("HTTPError: Request to Bio.Entrez failed. Error: {}".format(e))
+    except Exception as e:
         print("Request to Bio.Entrez failed. Error: {}".format(e))
 
     return abstracts

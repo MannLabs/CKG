@@ -334,7 +334,7 @@ class Project:
                     self.knowledge = knowledge.Knowledge(self.identifier, {'name': self.name}, report=r)
                 else:
                     self.update_report({data_type: r})
-                    
+
     def load_project(self, directory):
         dataset_store = os.path.join(directory, "project_information_dataset.h5")
         if os.path.isfile(dataset_store):
@@ -535,30 +535,34 @@ class Project:
     def generate_knowledge(self):
         nodes = {}
         relationships = {}
+        keep_nodes = []
         kn = knowledge.ProjectKnowledge(identifier=self.identifier, data=self.to_dict(), nodes={self.name: {'id': '#0', 'type': 'Project'}}, relationships={}, colors={}, graph=None, report={})
         kn.generate_knowledge()
         nodes.update(kn.nodes)
+        keep_nodes = kn.keep_nodes
         relationships.update(kn.relationships)
         types = ["clinical", "proteomics", "interactomics", "phosphoproteomics", "longitudinal_proteomics", "wes", "wgs", "rnaseq", "multiomics"]
         for dataset_type in types:
             if dataset_type in self.datasets:
                 dataset = self.datasets[dataset_type]
-                kn = dataset.generate_knowledge()
-                if dataset_type == "multiomics":
-                    kn.reduce_to_subgraph(nodes.keys())
+                if dataset_type != "multiomics":
+                    kn = dataset.generate_knowledge()
+                else:
+                    kn = dataset.generate_knowledge(nodes=nodes)
+                    #kn.reduce_to_subgraph(nodes.keys())
                 nodes.update(kn.nodes)
+
                 relationships.update(kn.relationships)
-        
-        self.knowledge = knowledge.Knowledge(self.identifier, {'name': self.name}, nodes=nodes, relationships=relationships)
+
+        self.knowledge = knowledge.Knowledge(self.identifier, {'name': self.name}, nodes=nodes, relationships=relationships, keep_nodes=keep_nodes)
 
     def generate_project_info_report(self):
-        
         report = rp.Report(identifier="project_info")
 
         plots = self.generate_project_attributes_plot()
         plots.extend(self.generate_project_similarity_plots())
-        plots.extend(self.generate_overlap_plots())       
-               
+        plots.extend(self.generate_overlap_plots())
+
         report.plots = {("Project info", "Project Information"): plots}
 
         return report
@@ -574,7 +578,7 @@ class Project:
                     dataset.generate_report()
             self.generate_knowledge()
             self.knowledge.generate_report()
-            self.knowledge.generate_report(visualization="network")
+            self.knowledge.generate_report(visualizations=["network", "sankey"])
             self.save_project_report()
             self.save_project()
             self.save_project_datasets_data()
