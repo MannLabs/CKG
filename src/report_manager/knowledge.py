@@ -479,7 +479,7 @@ class Knowledge:
         cy_elements, mouseover_node = utils.networkx_to_cytoscape(G)
         #args['mouseover_node'] = mouseover_node
 
-        net = {"notebook": [cy_elements, stylesheet, layout], "app": viz.get_cytoscape_network(cy_elements, self.identifier, args), "net_tables": (nodes_fig_table, edges_fig_table), "net_json": json_graph.node_link_data(G)}
+        net = {"notebook": [cy_elements, stylesheet, layout], "app": viz.get_cytoscape_network(cy_elements, self.identifier, args), "net_tables": (nodes_table, edges_table), "net_tables_viz": (nodes_fig_table, edges_fig_table), "net_json": json_graph.node_link_data(G)}
 
         return net
 
@@ -497,7 +497,7 @@ class Knowledge:
                 for n1, n2 in G.edges():
                     if G.nodes[n1]['type'] == G.nodes[n2]['type']:
                         remove_edges.append((n1, n2))
-                
+
                 G.remove_edges_from(remove_edges)
                 df = nx.to_pandas_edgelist(G).fillna(1)
                 plots.append(viz.get_sankey_plot(df, self.identifier, args={'source': 'source',
@@ -513,10 +513,10 @@ class Knowledge:
                                                                             'height': 2200,
                                                                             'font': 10,
                                                                             'title':'Knowledge Graph'}))
-        
-        report.plots = {("Knowledge Graph","Knowledge Graph"): plots}
+
+        report.plots = {("Knowledge Graph", "Knowledge Graph"): plots}
         self.report = report
-    
+
     def save_report(self, directory):
         if not os.path.exists(directory):
             os.makedirs(directory)
@@ -524,8 +524,9 @@ class Knowledge:
             os.makedirs(os.path.join(directory, "Knowledge"))
         self.report.save_report(directory=os.path.join(directory, "Knowledge"))
 
+
 class ProjectKnowledge(Knowledge):
-    
+
     def __init__(self, identifier, data, nodes={}, relationships={}, colors={}, graph=None, report={}):
         queries_file = 'queries/project_knowledge_cypher.yml'
         Knowledge.__init__(self, identifier, data=data, nodes=nodes, relationships=relationships, queries_file=queries_file, colors=colors, graph=graph, report=report)

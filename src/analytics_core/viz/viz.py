@@ -172,11 +172,15 @@ def get_boxplot_grid(data, identifier, args):
             args['height'] = None
         if 'title' not in args:
             args['title'] = 'Boxplot'
-
-        if args['axis'] == 'rows':
-            fig = px.box(data, x=args["x"], y=args["y"], color=args['color'], points="all", facet_row=args["facet"], width=args['width'])
+        if 'colors' in args:
+            color_map = args['colors']
         else:
-            fig = px.box(data, x=args["x"], y=args["y"], color=args['color'], points="all", facet_col=args["facet"], width=args['width'])
+            color_map = {}
+            
+        if args['axis'] == 'rows':
+            fig = px.box(data, x=args["x"], y=args["y"], color=args['color'], color_discrete_map=color_map, points="all", facet_row=args["facet"], width=args['width'])
+        else:
+            fig = px.box(data, x=args["x"], y=args["y"], color=args['color'], color_discrete_map=color_map, points="all", facet_col=args["facet"], width=args['width'])
         fig.update_layout(annotations=[dict(xref='paper', yref='paper', showarrow=False)], template='plotly_white')
     else:
         fig = get_markdown(text='Missing arguments. Please, provide: x, y, color, facet, axis')
@@ -382,62 +386,65 @@ def get_ranking_plot(data, identifier, args):
     num_cols = 3
     fig = {}
     layouts = []
-    num_groups = len(data.index.unique())
-    num_rows = math.ceil(num_groups/num_cols)
-    if 'group' in args:
+    if 'group' in args and args['group'] in data.columns:
         group = args['group']
+        num_groups = len(data[group].unique())
+        num_rows = math.ceil(num_groups/num_cols)
+        if 'colors' not in data.columns:
+            if 'colors' in args:
+                data['colors'] = [args['colors'][g] if g in args['colors'] else '#999999' for g in data[group]]
 
-    fig = tools.make_subplots(rows=num_rows, cols=num_cols, shared_yaxes=True, print_grid=False)
-    if 'index' in args and args['index']:
-        r = 1
-        c = 1
-        range_y = [data['y'].min(), data['y'].max()+1]
-        i = 0
-        for index in data.index.unique():
-            gdata = data.loc[index, :].dropna().groupby('name', as_index=False).mean().sort_values(by='y', ascending=False)
-            gdata = gdata.reset_index().reset_index()
-            cols = ['x', 'group', 'name', 'y']
-            cols.extend(gdata.columns[4:])
-            gdata.columns = cols
-            gfig = get_simple_scatterplot(gdata, identifier+'_'+str(index), args)
-            trace = gfig.figure['data'].pop()
-            glayout = gfig.figure['layout']['annotations']
+        fig = tools.make_subplots(rows=num_rows, cols=num_cols, shared_yaxes=True, print_grid=False)
+        if 'index' in args and args['index']:
+            r = 1
+            c = 1
+            range_y = [data['y'].min(), data['y'].max()+1]
+            i = 0
+            for index in data.index.unique():
+                gdata = data.loc[index, :].dropna().groupby('name', as_index=False).mean().sort_values(by='y', ascending=False)
+                gdata = gdata.reset_index().reset_index()
+                cols = ['x', 'group', 'name', 'y']
+                cols.extend(gdata.columns[4:])
+                gdata.columns = cols
+                gfig = get_simple_scatterplot(gdata, identifier+'_'+str(index), args)
+                trace = gfig.figure['data'].pop()
+                glayout = gfig.figure['layout']['annotations']
 
-            for l in glayout:
-                nlayout = dict(x = l.x,
-                            y = l.y,
-                            xref = 'x'+str(i+1),
-                            yref = 'y'+str(i+1),
-                            text = l.text,
-                            showarrow = True,
-                            ax = l.ax,
-                            ay = l.ay,
-                            font = l.font,
-                            align='center',
-                            arrowhead=1,
-                            arrowsize=1,
-                            arrowwidth=1,
-                            arrowcolor='#636363')
-                layouts.append(nlayout)
-            trace.name = index
-            fig.append_trace(trace, r, c)
+                for l in glayout:
+                    nlayout = dict(x = l.x,
+                                y = l.y,
+                                xref = 'x'+str(i+1),
+                                yref = 'y'+str(i+1),
+                                text = l.text,
+                                showarrow = True,
+                                ax = l.ax,
+                                ay = l.ay,
+                                font = l.font,
+                                align='center',
+                                arrowhead=1,
+                                arrowsize=1,
+                                arrowwidth=1,
+                                arrowcolor='#636363')
+                    layouts.append(nlayout)
+                trace.name = index
+                fig.append_trace(trace, r, c)
 
-            if c >= num_cols:
-                r += 1
-                c = 1
-            else:
-                c += 1
-            i += 1
-        fig['layout'].update(dict(height = args['height'],
-                                width=args['width'],
-                                title=args['title'],
-                                xaxis= {"title": args['x_title'], 'autorange':True},
-                                yaxis= {"title": args['y_title'], 'range':range_y},
-                                template='plotly_white'))
-        [fig['layout'][e].update(range=range_y) for e in fig['layout'] if e[0:5] == 'yaxis']
-        fig['layout'].annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')] + layouts
-    else:
-        fig = get_simple_scatterplot(data, identifier+'_'+group, args).figure
+                if c >= num_cols:
+                    r += 1
+                    c = 1
+                else:
+                    c += 1
+                i += 1
+            fig['layout'].update(dict(height = args['height'],
+                                    width=args['width'],
+                                    title=args['title'],
+                                    xaxis= {"title": args['x_title'], 'autorange':True},
+                                    yaxis= {"title": args['y_title'], 'range':range_y},
+                                    template='plotly_white'))
+            [fig['layout'][e].update(range=range_y) for e in fig['layout'] if e[0:5] == 'yaxis']
+            fig['layout'].annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')] + layouts
+        else:
+            fig = get_simple_scatterplot(data, identifier+'_'+group, args).figure
     return dcc.Graph(id=identifier, figure=fig)
 
 def get_scatterplot_matrix(data, identifier, args):
@@ -464,36 +471,39 @@ def get_scatterplot_matrix(data, identifier, args):
     """
     num_cols = 3
     fig = {}
-    if 'group' in args:
-        group=args['group']
+    if 'group' in args and args['group'] in data.columns:
+        group = args['group']
+        num_groups = len(data[group].unique())
+        num_rows = math.ceil(num_groups/num_cols)
+        if 'colors' not in data.columns:
+            if 'colors' in args:
+                data['colors'] = [args['colors'][g] if g in args['colors'] else '#999999' for g in data[group]]
 
-    num_groups = len(data[group].unique())
-    num_rows = math.ceil(num_groups/num_cols)
-    fig = tools.make_subplots(rows=num_rows, cols=num_cols, shared_yaxes=True,print_grid=False)
-    r = 1
-    c = 1
-    range_y = [data['y'].min(), data['y'].max()+1]
-    for g in data[group].unique():
-        gdata = data[data[group] == g].dropna()
-        gfig = get_simple_scatterplot(gdata, identifier+'_'+str(g), args)
-        trace = gfig.figure['data'].pop()
-        trace.name = g
-        fig.append_trace(trace, r, c)
+        fig = tools.make_subplots(rows=num_rows, cols=num_cols, shared_yaxes=True,print_grid=False)
+        r = 1
+        c = 1
+        range_y = [data['y'].min(), data['y'].max()+1]
+        for g in data[group].unique():
+            gdata = data[data[group] == g].dropna()
+            gfig = get_simple_scatterplot(gdata, identifier+'_'+str(g), args)
+            trace = gfig.figure['data'].pop()
+            trace.name = g
+            fig.append_trace(trace, r, c)
 
-        if c >= num_cols:
-            r += 1
-            c = 1
-        else:
-            c += 1
+            if c >= num_cols:
+                r += 1
+                c = 1
+            else:
+                c += 1
 
-    fig['layout'].update(dict(height = args['height'],
-                            width=args['width'],
-                            title=args['title'],
-                            xaxis= {"title": args['x_title'], 'autorange':True},
-                            yaxis= {"title": args['y_title'], 'range':range_y},
-                            template='plotly_white'))
+        fig['layout'].update(dict(height = args['height'],
+                                width=args['width'],
+                                title=args['title'],
+                                xaxis= {"title": args['x_title'], 'autorange':True},
+                                yaxis= {"title": args['y_title'], 'range':range_y},
+                                template='plotly_white'))
 
-    fig['layout'].annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')]
+        fig['layout'].annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')]
 
     return dcc.Graph(id=identifier, figure=fig)
 
@@ -527,7 +537,7 @@ def get_simple_scatterplot(data, identifier, args):
     if 'colors' in data.columns:
         m.update({'color':data['colors'].tolist()})
     elif 'colors' in args:
-        m.update({'color':args['colors'].tolist()})
+        m.update({'color':args['colors']})
     if 'size' in data.columns:
         m.update({'size':data['size'].tolist()})
     if 'symbol' in data.columns:
@@ -1275,7 +1285,7 @@ def get_network(data, identifier, args):
         app_net = get_cytoscape_network(cy_elements, identifier, args)
         #args['mouseover_node'] = mouseover_node
 
-        net = {"notebook":[cy_elements, stylesheet,layout], "app": app_net, "net_tables":(nodes_fig_table, edges_fig_table), "net_json":json_graph.node_link_data(graph)}
+        net = {"notebook":[cy_elements, stylesheet,layout], "app": app_net, "net_tables": (nodes_table, edges_table), "net_tables_viz":(nodes_fig_table, edges_fig_table), "net_json":json_graph.node_link_data(graph)}
     return net
 
 def get_network_style(node_colors, color_edges):
@@ -1394,7 +1404,7 @@ def get_pca_plot(data, identifier, args):
 
         result = get_pca_plot(data, identifier='pca', args={'loadings':15, 'title':'PCA Plot', 'x_title':'PC1', 'y_title':'PC2', 'height':100, 'width':100})
     """
-    pca_data, loadings = data
+    pca_data, loadings, variance = data
     figure = {}
     traces = []
     annotations = []
@@ -2134,7 +2144,7 @@ def get_cytoscape_network(net, identifier, args):
         height = args['height']
     if 'width' in args:
         width = args['width']
-    cytonet = html.Div([html.H2(args['title']), cyto.Cytoscape(id=identifier,
+    cytonet = cyto.Cytoscape(id=identifier,
                                     stylesheet=args['stylesheet'],
                                     elements=net,
                                     layout=args['layout'],
@@ -2143,10 +2153,10 @@ def get_cytoscape_network(net, identifier, args):
                                     #mouseoverNodeData=args['mouseover_node'],
                                     style={'width': width, 'height': height}
                                     )
-                    ])
+    net_div = html.Div([html.H2(args['title']), cytonet])
 
 
-    return cytonet
+    return net_div
 
 def save_DASH_plot(plot, name, plot_format='svg', directory='.', width=1600, height=1500):
     """

@@ -664,7 +664,6 @@ class Project:
         self.download_project_datasets()
         utils.compress_directory(directory, directory, compression_format='zip')
 
-
     def download_project_report(self):
         directory = self.get_downloads_directory()
         for dataset in self.report:
@@ -682,14 +681,14 @@ class Project:
                 report.download_report(dataset_dir)
 
         self.download_knowledge(os.path.join(directory, "Knowledge"))
-        
+
     def download_knowledge(self, directory):
         report = self.knowledge.report
         if not os.path.exists(directory):
             os.makedirs(directory)
-        
+
         report.download_report(directory)
-            
+
     def download_project_datasets(self):
         directory = self.get_downloads_directory()
         for dataset_type in self.datasets:

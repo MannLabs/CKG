@@ -48,6 +48,7 @@ except ImportError:
 
 cwd = os.path.abspath(os.path.dirname(__file__))
 
+
 def unit_vector(vector):
     """
     Returns the unit vector of the vector.
@@ -440,6 +441,7 @@ def median_zero_normalization(data, normalize='samples'):
         normData = data.sub(data.median(axis=0), axis=1)
 
     return normData
+
 
 def median_normalization(data, normalize='samples'):
     """
@@ -865,6 +867,7 @@ def run_pca(data, drop_cols=['sample', 'subject'], group='group', annotation_col
     np.random.seed(112736)
     resultDf = pd.DataFrame()
     loadings = pd.DataFrame()
+    var_exp = []
     args = {}
     if not data.empty:
         df = data.copy()
@@ -910,7 +913,7 @@ def run_pca(data, drop_cols=['sample', 'subject'], group='group', annotation_col
                 resultDf = resultDf.join(annotations)
                 loadings.columns = ['x', 'y', 'z'] + cols + ['value']
 
-    return (resultDf, loadings), args
+    return (resultDf, loadings, var_exp), args
 
 
 def run_tsne(data, drop_cols=['sample', 'subject'], group='group', annotation_cols=['sample'], components=2, perplexity=40, n_iter=1000, init='pca', dropna=True):

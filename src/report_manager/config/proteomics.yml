@@ -1,16 +1,16 @@
 args:
-    filter_samples: True
+    filter_samples: False
     filter_samples_percent: 0.5
     imputation: True
-    imputation_method: mixed
+    imputation_method: distribution
     missing_shift: 1.8
     missing_nstd: 0.30
     missing_method: percentage
     missing_per_group: True
-    missing_max: 0.5
+    missing_max: 0.3
     value_col: LFQ_intensity
     extra_identifier: name
-    normalize: True
+    normalize: False
     normalization_method: 'median'
     normalize_group: False
     normalize_by: 'samples'
