@@ -106,7 +106,7 @@ class Analysis:
             key = 'nes'
             annotation_col = 'annotation'
             identifier_col = 'identifier'
-            index = ['group', 'sample','subject']
+            index = ['group', 'sample', 'subject']
             outdir = None
             min_size = 15
             scale = False

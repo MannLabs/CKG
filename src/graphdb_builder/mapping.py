@@ -266,7 +266,7 @@ def map_experimental_data(data, mapping):
             else:
                 continue
         data = data.rename(columns=mapping_cols)
-   
+
     return data
 
 
