@@ -383,7 +383,7 @@ class ProteomicsDataset(Dataset):
     def process_dataset(self):
         processed_data = self.processing()
         self.update_data({"processed": processed_data})
-        
+
     def widen_metadata_dataset(self):
         data = self.get_dataframe("metadata")
         wdata = analytics.transform_into_wide_format(data, index=['subject', 'biological_sample'], columns='clinical_variable', values='value', extra=['group'])
@@ -412,7 +412,7 @@ class ProteomicsDataset(Dataset):
                 normalize = False
                 normalization_method = 'median'
                 normalize_group = False
-                normalize_by=None
+                normalize_by = None
                 args = {}
                 if "args" in self.configuration:
                     args = self.configuration["args"]
