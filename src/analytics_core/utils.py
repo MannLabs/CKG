@@ -117,8 +117,18 @@ def networkx_to_gml(graph, path):
 
 def json_network_to_gml(graph_json, path):
     graph = json_network_to_networkx(graph_json)
-    with open(path, 'w') as out:
+    with open(path, 'wb') as out:
         nx.write_gml(graph, out)
+
+
+def networkx_to_graphml(graph, path):
+    nx.write_graphml(graph, path)
+
+
+def json_network_to_graphml(graph_json, path):
+    graph = json_network_to_networkx(graph_json)
+    with open(path, 'wb') as out:
+        nx.write_graphml(graph, out)
 
 
 def json_network_to_networkx(graph_json):
