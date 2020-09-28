@@ -141,7 +141,7 @@ class Analysis:
             if 'hovering_cols' in self.args:
                 hovering_cols = self.args['hovering_cols']
             if dfid in self.data and annotid in self.data: 
-                result = analytics.run_ssgsea(self.data[dfid], self.data[annotid], annotation_col=annotation_col, 
+                result = analytics.run_ssgsea(self.data[dfid], self.data[annotid], annotation_col=annotation_col,
                                                                     identifier_col=identifier_col, set_index=index, outdir=outdir, 
                                                                     min_size=min_size, scale=scale, permutations=permutations)
                 if key in result:
@@ -458,6 +458,42 @@ class Analysis:
                                                                                           identifier=identifier, groups=groups, annotation_col=annotation_col, reject_col=reject_col, 
                                                                                           method=method, correction=correction)
             print('Enrichment', time.time() - start)
+        elif self.analysis_type == "up_down_enrichment":
+            start = time.time()
+            identifier = 'identifier'
+            groups = ['group1', 'group2']
+            annotation_col = 'annotation'
+            reject_col = 'rejected'
+            method = 'fisher'
+            annotation_type = 'functional'
+            correction = 'fdr_bh'
+            alpha = 0.05
+            lfc_cutoff = 1
+            if 'identifier' in self.args:
+                identifier = self.args['identifier']
+            if 'groups' in self.args:
+                groups = self.args['groups']
+            if 'annotation_col' in self.args:
+                annotation_col = self.args['annotation_col']
+            if 'reject_col' in self.args:
+                reject_col = self.args['reject_col']
+            if 'method' in self.args:
+                method = self.args['method']
+            if 'annotation_type' in self.args:
+                annotation_type = self.args['annotation_type']
+            if 'correction_method' in self.args:
+                correction = self.args['correction_method']
+            if 'alpha' in self.args:
+                alpha = self.args['alpha']
+            if 'lfc_cutoff' in self.args:
+                lfc_cutoff = self.args['lfc_cutoff']
+            if 'regulation_data' in self.args and 'annotation' in self.args:
+                if self.args['regulation_data'] in self.data and self.args['annotation'] in self.data:
+                    self.analysis_type = annotation_type+"_"+self.analysis_type
+                    self.result[self.analysis_type] = analytics.run_up_down_regulation_enrichment(self.data[self.args['regulation_data']], self.data[self.args['annotation']], 
+                                                                                          identifier=identifier, groups=groups, annotation_col=annotation_col, reject_col=reject_col, 
+                                                                                          method=method, correction=correction, alpha=alpha, lfc_cutoff=lfc_cutoff)
+            print('Enrichment', time.time() - start)
         elif self.analysis_type == "regulation_site_enrichment":
             start = time.time()
             identifier = 'identifier'
@@ -642,7 +678,13 @@ class Analysis:
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
                         figure_title = self.args["title"] + id[0]+" vs "+id[1]
-                    plot.append(viz.get_table(self.result[id], identifier, args={'title': figure_title, 'colors': colors, 'cols': columns, 'rows': rows,'width': 800, 'height': 1500, 'font': 12}))
+                    if isinstance(self.result[id], dict):
+                        i = 0
+                        for ident in self.result[id]:
+                            plot.append(viz.get_table(self.result[id][ident], identifier+"_"+str(i), args={'title': figure_title+" "+ident, 'colors': colors, 'cols': columns, 'rows': rows,'width': 800, 'height': 1500, 'font': 12}))
+                            i += 1
+                    else:
+                        plot.append(viz.get_table(self.result[id], identifier, args={'title': figure_title, 'colors': colors, 'cols': columns, 'rows': rows,'width': 800, 'height': 1500, 'font': 12}))
             if name == "multiTable":
                 for id in self.result:
                     plot.append(viz.get_multi_table(self.result[id], identifier, self.args["title"]))
@@ -721,6 +763,10 @@ class Analysis:
                     self.args["title"] = self.args['title'] + " " + pair[0] + " vs " + pair[1]
                     p = viz.run_volcano(signature, identifier + "_" + pair[0] + "_vs_" + pair[1], self.args)
                     plot.extend(p)
+            elif name == "enrichment_plot":
+                for pair in self.result:
+                    plots = viz.get_enrichment_plots(self.result[pair], identifier=pair, args=self.args)
+                plot.extend(plots)
             elif name == 'network':
                 source = 'source'
                 target = 'target'
