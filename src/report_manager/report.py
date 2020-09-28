@@ -204,20 +204,22 @@ class Report:
                             pass
                         if "net_tables" in plot:
                             nodes_table, edges_table = plot['net_tables']
-                            nodes_table.to_csv(os.path.join(directory, 'node_table.tsv'), sep='\t', header=True, index=False, doublequote=False)
-                            edges_table.to_csv(os.path.join(directory, 'edges_table.tsv'), sep='\t', header=True, index=False, doublequote=False)
+                            nodes_table.to_csv(os.path.join(directory, name+'_node_table.tsv'), sep='\t', header=True, index=False, doublequote=False)
+                            edges_table.to_csv(os.path.join(directory, name+'_edges_table.tsv'), sep='\t', header=True, index=False, doublequote=False)
                         if "app" in plot:
                             plot = plot["app"]
                     if 'props' in plot:
                         if 'figure' in plot['props']:
                             try:
                                 viz.save_DASH_plot(plot['props']['figure'], name=figure_name, plot_format='svg', directory=directory)
+                                viz.save_DASH_plot(plot['props']['figure'], name=figure_name, plot_format='png', directory=directory)
                                 saved.add(figure_name)
                             except Exception:
                                 pass
                     else:
                         try:
                             viz.save_DASH_plot(plot.figure, name=figure_name, plot_format='svg', directory=directory)
+                            viz.save_DASH_plot(plot.figure, name=figure_name, plot_format='png', directory=directory)
                             saved.add(figure_name)
                         except Exception:
                             pass

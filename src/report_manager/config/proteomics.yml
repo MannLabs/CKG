@@ -188,7 +188,7 @@ data exploration:
             x_title: UMAP1
             y_title: UMAP2
             components: 2
-            init: 'pca'
+            group: group
             width: 1000
             height: 700
             loadings: 15
@@ -214,12 +214,12 @@ data exploration:
                 - sample
                 - subject
             key: nes
+            group: group
             min_size: 5
             x_title: PC1
             y_title: PC2
             components: 2
             factor: 1
-            init: 'pca'
             width: 1000
             height: 700
             loadings: 15
@@ -376,9 +376,10 @@ enrichment:
             - regulation table
             - protein go annotation
         analyses:
-            - regulation_enrichment
+            - up_down_enrichment
         plots:
             - basicTable
+            - enrichment_plot
         store_analysis: True
         args:
             regulation_data: regulation table
@@ -391,15 +392,19 @@ enrichment:
             annotation_col: annotation
             reject_col: rejected
             method: fisher
+            lfc_cutoff: 1
+            alpha: 0.05
+            width: 1300
             title: 'Gene Ontology Enrichment'
     protein_pathway_enrichment:
         data:
             - regulation table
             - protein pathway annotation
         analyses:
-            - regulation_enrichment
+            - up_down_enrichment
         plots:
             - basicTable
+            - enrichment_plot
         store_analysis: True
         args:
             regulation_data: regulation table
@@ -411,5 +416,8 @@ enrichment:
             annotation_type: Pathways
             annotation_col: annotation
             reject_col: rejected
+            lfc_cutoff: 1
+            alpha: 0.05
+            width: 1300
             method: fisher
             title: 'Pathway Enrichment'
