@@ -55,7 +55,7 @@ proteomics:
             - IS_BIOMARKER_IN_DISEASE
         query_type: pre
         query: >
-            MATCH (project:Project)-[:STUDIES_DISEASE]->(disease:Disease)-[:HAS_PARENT]->(pdisease:Disease)<-[:HAS_PARENT]-(cdiseases:Disease)
+            MATCH (project:Project)-[:STUDIES_DISEASE]->(disease:Disease)-[:HAS_PARENT]->(pdisease:Disease)-[:HAS_PARENT]->()
             WHERE project.id="PROJECTID"
             WITH project, collect(disease)+collect(pdisease) AS diseases
             MATCH (project)-[:HAS_ENROLLED]->(:Subject)<-[:BELONGS_TO_SUBJECT]-(:Biological_sample)-[:SPLITTED_INTO]->(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
@@ -203,7 +203,7 @@ proteomics:
             - ASSOCIATED_WITH
         query_type: post
         query: >
-            MATCH (project:Project)-[:STUDIES_DISEASE]-(d:Disease)-[:HAS_PARENT]->(parent_disease:Disease)
+            MATCH (project:Project)-[:STUDIES_DISEASE]-(d:Disease)-[:HAS_PARENT]->(parent_disease:Disease)-[:HAS_PARENT]->()
             WHERE project.id="PROJECTID"
             WITH COLLECT(parent_disease) + COLLECT(d) AS parent_diseases
             MATCH (protein:Protein)-[r]-(disease:Disease)-[:HAS_PARENT]->(parents:Disease)
@@ -221,7 +221,7 @@ proteomics:
             - ASSOCIATED_WITH
         query_type: post
         query: >
-            MATCH (project:Project)-[:STUDIES_DISEASE]->(disease:Disease)-[:HAS_PARENT]->(pdisease:Disease)<-[:HAS_PARENT]-(cdiseases:Disease) 
+            MATCH (project:Project)-[:STUDIES_DISEASE]->(disease:Disease)-[:HAS_PARENT]->(pdisease:Disease)-[:HAS_PARENT]->() 
             WHERE project.id="PROJECTID" 
             WITH collect(disease)+collect(pdisease) AS diseases 
             MATCH (d:Disease)-[:MENTIONED_IN_PUBLICATION]->(publication:Publication)<-[r:MENTIONED_IN_PUBLICATION]-(protein:Protein) 

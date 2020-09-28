@@ -281,9 +281,9 @@ class Dataset:
                 except ValueError:
                     print("Could not save dataset: {}. Memory usage {}".format(name, dset[name].memory_usage().sum()/1000000))
                     print(dset[name])
-        
+
         return df_set
-    
+
     def save_dataset(self, dataset_directory):
         if not os.path.isdir(dataset_directory):
             os.makedirs(dataset_directory)
@@ -298,19 +298,22 @@ class Dataset:
             if isinstance(dset[name], dict):
                 self.save_dataset_recursively_to_file(dset[name], dataset_directory, name+"_"+base_name)
             elif isinstance(dset[name], pd.DataFrame):
-                dset[name].to_csv(os.path.join(dataset_directory, name+".tsv"), sep='\t', header=True, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
-                        
+                filename = name+".tsv"
+                if base_name != '':
+                    filename = name+"_"+base_name+".tsv"
+                dset[name].to_csv(os.path.join(dataset_directory, filename), sep='\t', header=True, index=False, quotechar='"', line_terminator='\n', escapechar='\\')
+
     def save_dataset_to_file(self, dataset_directory):
         if not os.path.isdir(dataset_directory):
             os.makedirs(dataset_directory)
         self.save_dataset_recursively_to_file(self.data, dataset_directory, base_name='')
         ckg_utils.save_dict_to_yaml(self.configuration, os.path.join(dataset_directory, self.dataset_type+".yml"))
-        
+
     def save_report(self, dataset_directory):
         if not os.path.exists(dataset_directory):
             os.makedirs(dataset_directory)
         self.report.save_report(directory=dataset_directory)
-        
+
     def load_dataset_recursively(self, dset, loaded_dset={}):
         for name in dset:
             if isinstance(dset[name], h5._hl.group.Group):
@@ -318,7 +321,7 @@ class Dataset:
                 loaded_dset[name] = self.load_dataset_recursively(dset[name], loaded_dset[name])
             else:
                 loaded_dset[name] = pd.read_json(dset[name][0], orient='records')
-        
+
         return loaded_dset
 
     def load_dataset(self, dataset_directory):
@@ -327,17 +330,17 @@ class Dataset:
             with h5.File(dataset_store, 'r') as f:
                 if self.dataset_type in f:
                     self.data.update(self.load_dataset_recursively(f[self.dataset_type], {}))
-                            
+
     def load_dataset_report(self, report_dir):
         self.load_dataset(report_dir)
         dataset_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)), report_dir), self.dataset_type)
         r = rp.Report(self.dataset_type, {})
         r.read_report(dataset_dir)
         self.report = r
-        
+
     def generate_knowledge(self):
         kn = knowledge.Knowledge(self.identifier, self.data, nodes={}, relationships={}, queries_file=None, colors={}, graph=None, report={})
-        
+
         return kn
 
 
