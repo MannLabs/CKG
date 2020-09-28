@@ -126,3 +126,10 @@ def find_node(driver, node_type, **kwargs):
     found = matcher.match(node_type, **kwargs).first()
 
     return found
+
+
+def run_query(query, parameters={}):
+    driver = getGraphDatabaseConnectionConfiguration(configuration=None, database=None)
+    data = getCursorData(driver, query, parameters=parameters)
+
+    return data

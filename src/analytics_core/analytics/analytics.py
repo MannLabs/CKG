@@ -901,7 +901,7 @@ def run_pca(data, drop_cols=['sample', 'subject'], group='group', annotation_col
             if components == 2:
                 resultDf = pd.DataFrame(X, index = y, columns = ["x","y"])
                 resultDf = resultDf.reset_index()
-                resultDf.columns = ["name", "x", "y"]
+                resultDf.columns = ["group", "x", "y"]
                 resultDf = resultDf.join(annotations)
                 loadings.columns = ['x', 'y', 'value']
             if components > 2:
@@ -911,7 +911,7 @@ def run_pca(data, drop_cols=['sample', 'subject'], group='group', annotation_col
                 cols = []
                 if components>3:
                     cols = [str(i) for i in resultDf.columns[4:]]
-                resultDf.columns = ["name", "x", "y", "z"] + cols
+                resultDf.columns = ["group", "x", "y", "z"] + cols
                 resultDf = resultDf.join(annotations)
                 loadings.columns = ['x', 'y', 'z'] + cols + ['value']
 
@@ -959,7 +959,7 @@ def run_tsne(data, drop_cols=['sample', 'subject'], group='group', annotation_co
         if components == 2:
             resultDf = pd.DataFrame(X, index = y, columns = ["x","y"])
             resultDf = resultDf.reset_index()
-            resultDf.columns = ["name", "x", "y"]
+            resultDf.columns = ["group", "x", "y"]
         if components > 2:
             args.update({"z_title":"C3"})
             resultDf = pd.DataFrame(X, index = y)
@@ -967,7 +967,7 @@ def run_tsne(data, drop_cols=['sample', 'subject'], group='group', annotation_co
             cols = []
             if len(components)>4:
                 cols = resultDf.columns[4:]
-            resultDf.columns = ["name", "x", "y", "z"] + cols
+            resultDf.columns = ["group", "x", "y", "z"] + cols
         resultDf = resultDf.join(annotations)
         result['tsne'] = resultDf
     return result, args
@@ -991,6 +991,7 @@ def run_umap(data, drop_cols=['sample', 'subject'], group='group', annotation_co
 
         result = run_umap(data, drop_cols=['sample', 'subject'], group='group', n_neighbors=10, min_dist=0.3, metric='cosine', dropna=True)
     """
+    np.random.seed(1145536)
     result = {}
     args = {}
     df = data.copy()
@@ -1016,7 +1017,7 @@ def run_umap(data, drop_cols=['sample', 'subject'], group='group', annotation_co
         cols = []
         if len(resultDf.columns)>3:
                 cols = resultDf.columns[3:]
-        resultDf.columns = ["name", "x", "y"] + cols
+        resultDf.columns = ["group", "x", "y"] + cols
         resultDf = resultDf.join(annotations)
         result['umap'] = resultDf
 
@@ -1451,18 +1452,9 @@ def calculate_ttest(df, condition1, condition2, paired=False, is_logged=True, no
     if not non_par:
         result = pg.ttest(group1, group2, paired, tail, correction, r)
     else:
-<<<<<<< HEAD
-        if stats.levene(group1,group2).pvalue < 0.05 or stats.shapiro(group1)[1] < 0.05 or stats.shapiro(group2)[1] < 0.05:
-            test = 'Mann Whitney'
-            result = pg.mwu(group1, group2, tail=tail)
-        else:
-            result = pg.ttest(group1, group2, paired, tail, correction, r)
-
-=======
         test = 'Mann Whitney'
         result = pg.mwu(group1, group2, tail=tail)
         
->>>>>>> Adding new analysis: ssGSEA, ANCOVA (test). Adding Units ontology. Identification using external ids. Solve issues mapping ids
     if 'T' in result.columns:
         t = result['T'].values[0]
     elif 'U-val' in result.columns:
@@ -2279,6 +2271,29 @@ def run_site_regulation_enrichment(regulation_data, annotation, identifier='iden
 
     return result
 
+<<<<<<< HEAD
+=======
+def run_up_down_regulation_enrichment(regulation_data, annotation, identifier='identifier', groups=['group1', 'group2'], annotation_col='annotation', reject_col='rejected', group_col='group', method='fisher', correction='fdr_bh', alpha=0.05, lfc_cutoff=1):
+    enrichment_results = {}
+    for g1, g2 in regulation_data.groupby(groups).groups:
+        df = regulation_data.groupby(groups).get_group((g1,g2))
+        if 'posthoc padj' in df:
+            df['up_pairwise_regulation'] = (df['posthoc padj'] <= alpha) & (df['log2FC'] >= lfc_cutoff)
+            df['down_pairwise_regulation'] = (df['posthoc padj'] <= alpha) & (df['log2FC'] <= -lfc_cutoff)
+        else:
+            df['up_pairwise_regulation'] = (df['log2FC'] >= lfc_cutoff)
+            df['down_pairwise_regulation'] = (df['log2FC'] <= -lfc_cutoff)
+            
+        enrichment = run_regulation_enrichment(df, annotation, identifier=identifier, groups=groups, annotation_col=annotation_col, reject_col='up_pairwise_regulation', group_col=group_col, method=method, correction=correction)
+        enrichment['direction'] = 'upregulated'
+        enrichment_results[g1+'~'+g2] = enrichment
+        enrichment = run_regulation_enrichment(df, annotation, identifier=identifier, groups=groups, annotation_col=annotation_col, reject_col='down_pairwise_regulation', group_col=group_col, method=method, correction=correction)
+        enrichment['direction'] = 'downregulated'
+        enrichment_results[g1+'~'+g2] = enrichment_results[g1+'~'+g2].append(enrichment)
+        
+    return enrichment_results
+        
+>>>>>>> Improcing functional enrichment with scatterplot viz and knowledge network
 def run_regulation_enrichment(regulation_data, annotation, identifier='identifier', groups=['group1', 'group2'], annotation_col='annotation', reject_col='rejected', group_col='group', method='fisher', correction='fdr_bh'):
     """
     This function runs a simple enrichment analysis for significantly regulated features in a dataset.
@@ -2297,8 +2312,11 @@ def run_regulation_enrichment(regulation_data, annotation, identifier='identifie
 
         result = run_regulation_enrichment(regulation_data, annotation, identifier='identifier', groups=['group1', 'group2'], annotation_col='annotation', reject_col='rejected', group_col='group', method='fisher')
     """
+    result = {}
     foreground_list = regulation_data[regulation_data[reject_col]][identifier].unique().tolist()
     background_list = regulation_data[~regulation_data[reject_col]][identifier].unique().tolist()
+    foreground_pop = len(foreground_list)
+    background_pop = len(regulation_data[identifier].unique().tolist())
     grouping = []
     for i in annotation[identifier]:
         if i in foreground_list:
@@ -2310,12 +2328,12 @@ def run_regulation_enrichment(regulation_data, annotation, identifier='identifie
     annotation[group_col] = grouping
     annotation = annotation.dropna(subset=[group_col])
 
-    result = run_enrichment(annotation, foreground_id='foreground', background_id='background', annotation_col=annotation_col, group_col=group_col, identifier_col=identifier, method=method, correction=correction)
+    result = run_enrichment(annotation, foreground_id='foreground', background_id='background', foreground_pop=foreground_pop, background_pop=background_pop, annotation_col=annotation_col, group_col=group_col, identifier_col=identifier, method=method, correction=correction)
 
     return result
 
 
-def run_enrichment(data, foreground_id, background_id, annotation_col='annotation', group_col='group', identifier_col='identifier', method='fisher', correction='fdr_bh'):
+def run_enrichment(data, foreground_id, background_id, foreground_pop, background_pop, annotation_col='annotation', group_col='group', identifier_col='identifier', method='fisher', correction='fdr_bh'):
     """
     Computes enrichment of the foreground relative to a given backgroung, using Fisher's exact test, and corrects for multiple hypothesis testing.
 
@@ -2339,8 +2357,8 @@ def run_enrichment(data, foreground_id, background_id, annotation_col='annotatio
     pvalues = []
     fnum = []
     bnum = []
-    foreground_pop = len(data.loc[data[group_col] == foreground_id, identifier_col].unique().tolist())
-    background_pop = len(data[identifier_col].unique().tolist())
+    #foreground_pop = len(data.loc[data[group_col] == foreground_id, identifier_col].unique().tolist())
+    #background_pop = len(data[identifier_col].unique().tolist())
     countsdf = df.groupby([annotation_col, group_col]).agg(['count'])[(identifier_col, 'count')].reset_index()
     countsdf.columns = [annotation_col, group_col, 'count']
     for annotation in countsdf[countsdf[group_col] == foreground_id][annotation_col].unique().tolist():
@@ -2354,13 +2372,13 @@ def run_enrichment(data, foreground_id, background_id, annotation_col='annotatio
             num_background = num_background[0]
         else:
             num_background=0
-        if method == 'fisher':
+        if method == 'fisher' and num_foreground > 1:
             odds, pvalue = run_fisher([num_foreground, foreground_pop-num_foreground],[num_background, background_pop-foreground_pop-num_background])
-        fnum.append(num_foreground)
-        bnum.append(num_background)
-        terms.append(annotation)
-        pvalues.append(pvalue)
-        ids.append(",".join(df.loc[(df[annotation_col]==annotation) & (df[group_col] == foreground_id), identifier_col].tolist()))
+            fnum.append(num_foreground)
+            bnum.append(num_background)
+            terms.append(annotation)
+            pvalues.append(pvalue)
+            ids.append(",".join(df.loc[(df[annotation_col]==annotation) & (df[group_col] == foreground_id), identifier_col].tolist()))
     if len(pvalues) > 1:
         rejected, padj = apply_pvalue_correction(pvalues, alpha=0.05, method=correction)
         result = pd.DataFrame({'terms':terms, 'identifiers':ids, 'foreground':fnum, 'background':bnum, 'foreground_pop':foreground_pop, 'background_pop':background_pop,'pvalue':pvalues, 'padj':padj, 'rejected':rejected})

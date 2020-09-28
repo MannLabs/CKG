@@ -8,7 +8,7 @@ Disease:
   involved_rels:
     - ASSOCIATED_WITH
   query: >
-          MATCH (project:Project)-[:STUDIES_DISEASE]-(d:Disease)-[:HAS_PARENT]->(parent_disease:Disease)
+          MATCH (project:Project)-[:STUDIES_DISEASE]-(d:Disease)-[:HAS_PARENT]->(parent_disease:Disease)-[:HAS_PARENT]->()
           WHERE project.id="PROJECTID"
           WITH COLLECT(parent_disease) + COLLECT(d) AS parent_diseases
           MATCH (protein:Protein)-[r]-(disease:Disease)-[:HAS_PARENT]->(parents:Disease)

@@ -222,25 +222,32 @@ class Knowledge:
 
         return nodes, relationships
 
-    def generate_knowledge_from_enrichment(self, df, name):
+    def generate_knowledge_from_enrichment(self, data, name):
         nodes = {}
         relationships = {}
         entity = name.split('_')[0].capitalize()
         node1_color = self.colors[entity] if entity in self.colors else self.default_color
-        if 'terms' in df and 'identifiers' in df and 'padj' in df:
-            aux = df[['terms', 'identifiers', 'padj']]
-            for i, row in aux.iterrows():
-                ids = row['identifiers'].split(',')
-                if ids is not None:
-                    for i in ids:
-                        if 'Pathways' in name:
-                            entity2 = 'Pathway'    
-                        elif 'processes' in name:
-                            entity2 = 'Biological_process'
+        if isinstance(data, pd.DataFrame):
+            aux = data.copy()
+            data = {'regulation': aux}
+        for g in data:
+            print("IN {}".format(g))
+            df = data[g]
+            if 'terms' in df and 'identifiers' in df and 'padj' in df:
+                aux = df[df.rejected]
+                aux = aux[['terms', 'identifiers', 'padj']]
+                for i, row in aux.iterrows():
+                    ids = row['identifiers'].split(',')
+                    if ids is not None:
+                        for i in ids:
+                            if 'Pathways' in name:
+                                entity2 = 'Pathway'    
+                            elif 'processes' in name:
+                                entity2 = 'Biological_process'
 
-                        node2_color = self.colors[entity2] if entity2 in self.colors else self.default_color
-                        nodes.update({i: {'type': entity, 'color': node1_color}, row['terms']: {'type': entity2, 'color': node2_color}})
-                        relationships.update({(i, row['terms']): {'type': 'annotated_in', 'weight': 0.0, 'width': -np.log10(row['padj'])+1, 'source_color': node1_color, 'target_color': node2_color}})
+                            node2_color = self.colors[entity2] if entity2 in self.colors else self.default_color
+                            nodes.update({i: {'type': entity, 'color': node1_color}, row['terms']: {'type': entity2, 'color': node2_color}})
+                            relationships.update({(i, row['terms']): {'type': 'annotated_in', 'weight': 0.0, 'width': -np.log10(row['padj'])+1, 'source_color': node1_color, 'target_color': node2_color}})
 
         return nodes, relationships
 
@@ -263,6 +270,10 @@ class Knowledge:
                     nodes, rels = self.generate_knowledge_from_enrichment(df, name)
                     graph_nodes.update(nodes)
                     graph_rels.update(rels)
+            elif isinstance(df, dict):
+                nodes, rels = self.generate_knowledge_from_enrichment(df, name)
+                graph_nodes.update(nodes)
+                graph_rels.update(rels)
 
         return graph_nodes, graph_rels
 
