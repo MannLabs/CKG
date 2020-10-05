@@ -14,7 +14,7 @@ import dabest
 import scipy.stats
 from scipy.special import factorial, betainc
 import umap
-from sklearn import preprocessing, ensemble, cluster
+from sklearn import preprocessing, ensemble, cluster, metrics
 from scipy import stats
 import gseapy as gp
 import pingouin as pg
@@ -859,7 +859,7 @@ def run_pca(data, drop_cols=['sample', 'subject'], group='group', annotation_col
     :param list annotation_cols: list of columns to be added in the scatter plot annotation
     :param int components: number of components to keep.
     :param bool dropna: if True removes all columns with any missing values.
-    :return: Two dictionaries: 1) two pandas dataframes (first one with components values, the second with the components vectors for each protein), 2) xaxis and yaxis titles with components loadings for plotly.
+    :return: tuple: 1) three pandas dataframes: components, loadings and variance; 2) xaxis and yaxis titles with components loadings for plotly.
 
     Example::
 
@@ -873,8 +873,9 @@ def run_pca(data, drop_cols=['sample', 'subject'], group='group', annotation_col
     args = {}
     if not data.empty:
         df = data.copy()
-        if len(set(drop_cols).intersection(df.columns)) == len(drop_cols):
-            df = df.drop(drop_cols, axis=1)
+        drop_cols_int = list(set(drop_cols).intersection(df.columns))
+        if len(drop_cols_int) > 0:
+            df = df.drop(drop_cols_int, axis=1)
 
         df = df.set_index(group)
         df = df.sort_index()
@@ -897,7 +898,7 @@ def run_pca(data, drop_cols=['sample', 'subject'], group='group', annotation_col
             values = {index:np.sqrt(np.power(row, 2).sum()) for index, row in loadings.iterrows()}
             loadings['value'] = loadings.index.map(values.get)
             loadings = loadings.sort_values(by='value', ascending=False)
-            args = {"x_title":"PC1"+" ({0:.2f})".format(var_exp[0]),"y_title":"PC2"+" ({0:.2f})".format(var_exp[1])}
+            args = {"x_title":"PC1"+" ({0:.2f})".format(var_exp[0]),"y_title":"PC2"+" ({0:.2f})".format(var_exp[1]), 'group':'group'}
             if components == 2:
                 resultDf = pd.DataFrame(X, index = y, columns = ["x","y"])
                 resultDf = resultDf.reset_index()
@@ -1625,7 +1626,7 @@ def calculate_ancova(data, column, group='group', covariates=[]):
     :return: Tuple with column, F-statistics and p-value.
     """
     ancova_result = pg.ancova(data=data, dv=column, between=group, covar=covariates)
-    t, df, pvalue = ancova_result.loc[ancova_result['Source'] == 'group', ['F', 'DF', 'p-unc']].values.tolist().pop()
+    t, df, pvalue = ancova_result.loc[ancova_result['Source'] == group, ['F', 'DF', 'p-unc']].values.tolist().pop()
     
     return (column, df, df, t, pvalue)
 
@@ -1806,8 +1807,8 @@ def run_ancova(df, covariates, alpha=0.05, drop_cols=["sample",'subject'], subje
 
     pairwise_results = []
     ancova_result = []
-    for col in df.columns.drop(group).tolist():
-        if col not in covariates:
+    for col in df.columns.tolist():
+        if col not in covariates and col != group:
             ancova = calculate_ancova(df[[group, col]+covariates], col, group=group, covariates=covariates)
             ancova_result.append(ancova)
             pairwise_result = pairwise_ttest_with_covariates(df, column=col, group=group, covariates=covariates, is_logged=is_logged)
@@ -2909,15 +2910,81 @@ def run_qc_markers_analysis(data, qc_markers, sample_col='sample', group_col='gr
 
     return bdf
 
-def run_snf(df_dict, clusters, distance_metric, K_affinity, mu_affinity):
+
+def get_snf_clusters(data_tuples, num_clusters=None, metric='euclidean', k=5, mu=0.5):
     """
-
-    :param df_dict:
-    :param clusters:
-
-
+    Cluster samples based on Similarity Network Fusion (SNF) (ref: https://www.ncbi.nlm.nih.gov/pubmed/24464287)
+    
+    :param df_tuples: list of (dataset,metric) tuples
+    :param index: how the datasets can be merged (common columns)
+    :param num_clusters: number of clusters to be identified, if None, the algorithm finds the best number based on SNF algorithm (recommended)
+    :param distance_metric: distance metric used to calculate the sample similarity network
+    :param k: number of neighbors used to measure local affinity (KNN)
+    :param mu: normalization factor to scale similarity kernel when constructing affinity matrix
+    :return tuple: 1) fused_aff: affinity clustered samples, 2) fused_labels: cluster labels, 
+                    3) num_clusters: number of clusters, 4) silhouette: silhouette score
     """
-    pass
+    affinities = []
+    for (d, m) in data_tuples:
+        affinities += [snf.make_affinity(d, metric=m, K=k, mu=mu)]
+    fused_aff = snf.snf(affinities)
+    if num_clusters is None:
+        num_clusters, second = snf.get_n_clusters(fused_aff)
+    fused_labels = cluster.spectral_clustering(fused_aff, n_clusters=num_clusters)
+    fused_labels = [i+1 for i in fused_labels]
+    silhouette = metrics.v_measure_score(fused_aff[0], fused_labels)
+    
+    return (fused_aff, fused_labels, num_clusters, silhouette)
+
+
+def run_snf(df_dict, index, num_clusters=None, distance_metric='euclidean', k_affinity=5, mu_affinity=0.5):
+    """
+    Runs Similarity Network Fusion: integration of multiple omics datasets to identify
+    similar samples (clusters) (ref: https://www.ncbi.nlm.nih.gov/pubmed/24464287). 
+    We make use of the pyton version SNFpy (https://github.com/rmarkello/snfpy)
+    
+    :param df_dict: dictionary of datasets to be used (i.e {'rnaseq': rnaseq_data, 'proteomics': proteomics_data})
+    :param index: how the datasets can be merged (common columns)
+    :param num_clusters: number of clusters to be identified, if None, the algorithm finds the best number based on SNF algorithm (recommended)
+    :param distance_metric: distance metric used to calculate the sample similarity network
+    :param k_affinity: number of neighbors used to measure local affinity (KNN)
+    :param mu_ffinity: normalization factor to scale similarity kernel when constructing affinity matrix
+    :return tuple: 1) feature_df: SNF features and mutual information score (MIscore), 2) fused_labels: cluster labels, 
+                    3) silhouette: silhouette score
+    """
+    datasets = []
+    dataset_labels = []
+    common_samples = set() 
+    for dtype in df_dict:
+        dataset_labels.append(dtype)
+        df = df_dict[dtype]
+        df = df.set_index(index)
+        datasets.append(df)
+        if len(common_samples) > 1:
+            common_samples = common_samples.intersection(df.index)
+        else:
+            common_samples.update(df.index.tolist())
+    
+    data_tuples = [(d.loc[list(common_samples)].values, distance_metric) for d in datasets]
+    
+    fused_aff, fused_labels, num_clusters, silhouette_score = get_snf_clusters(data_tuples, num_clusters, metric=distance_metric, k=k_affinity, mu=mu_affinity)
+    
+    fused_labels = pd.DataFrame(fused_labels, index=common_samples, columns=['cluster'])
+    
+    snf_features = snf.metrics.rank_feature_by_nmi(data_tuples, fused_aff, K=k_affinity, mu=mu_affinity, n_clusters=num_clusters)
+    
+    feature_df = pd.DataFrame(columns=['MIscore'])
+    indexes = [df.columns for df in datasets]
+    i = 0
+    for dtype in snf_features:
+        df = pd.DataFrame(dtype, index = indexes[i], columns = ["MIscore"]).sort_values(by="MIscore", ascending=False)
+        df['dataset'] = dataset_labels[i]
+        i += 1
+        feature_df = feature_df.append(df)
+
+    feature_df = feature_df.sort_values(by='MIscore', ascending=False)
+
+    return feature_df, fused_labels, silhouette_score
 
 
 def run_km(data, time_col, event_col, group_col, args={}):

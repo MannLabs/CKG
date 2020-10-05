@@ -415,6 +415,7 @@ class Project:
                         self.update_dataset({data_type: dataset})
 
                 if len(self.datasets) > 1:
+                    configuration = None
                     if "multiomics" in self.configuration_files:
                         configuration = ckg_utils.get_configuration(self.configuration_files["multiomics"])
                     dataset = MultiOmicsDataset(self.identifier, data=self.datasets, configuration=configuration, report=None)
@@ -498,7 +499,7 @@ class Project:
                   'initialTemp': 200,
                   'coolingFactor': 0.95,
                   'minTemp': 1.0}
-        
+
         return stylesheet, layout
 
     def get_similarity_network(self):
@@ -572,7 +573,6 @@ class Project:
             project_report = self.generate_project_info_report()
             self.update_report({"Project information": project_report})
             for dataset_type in self.data_types:
-                print("DATASET:", dataset_type)
                 dataset = self.get_dataset(dataset_type)
                 if dataset is not None:
                     dataset.generate_report()
@@ -607,7 +607,7 @@ class Project:
             if not os.path.exists(dataset_dir):
                 os.makedirs(dataset_dir)
             report.save_report(dataset_dir)
-        
+
         self.save_project_datasets_reports()
         self.knowledge.save_report(directory)
         print('save report', time.time() - start)
@@ -622,7 +622,7 @@ class Project:
                 dataset.save_report(dataset_directory)
                 dataset = None
         print('save dataset report', time.time() - start)
-        
+
     def save_project(self):
         directory = os.path.join(self.get_report_directory(), "Project information")
         if not os.path.isdir(directory):

@@ -231,7 +231,6 @@ class Knowledge:
             aux = data.copy()
             data = {'regulation': aux}
         for g in data:
-            print("IN {}".format(g))
             df = data[g]
             if 'terms' in df and 'identifiers' in df and 'padj' in df:
                 aux = df[df.rejected]
@@ -613,7 +612,6 @@ class MultiOmicsKnowledge(Knowledge):
                     self.nodes.update(wgcna_knowledge[0])
                     self.relationships.update(wgcna_knowledge[1])
         elif 'clinical_correlation_multi_correlation' in self.data:
-            print("IN the correlation")
             label = 'clinical_correlation_multi_correlation'
             correlation_knowledge = self.genreate_knowledge_from_correlation('Protein', 'Clinical_variable', filter=self.nodes, label=label)
             self.nodes.update(correlation_knowledge[0])

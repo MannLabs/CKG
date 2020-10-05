@@ -175,24 +175,6 @@ data exploration:
             loadings: 15
             factor: 20
             title: 'Sample stratification with PCA'
-    stratification_umap:
-        description: '# UMAP'
-        data: processed
-        analyses:
-            - umap
-        plots:
-            - scatterplot
-        args:
-            hovering_cols:
-                - sample
-            x_title: UMAP1
-            y_title: UMAP2
-            components: 2
-            group: group
-            width: 1000
-            height: 700
-            loadings: 15
-            title: 'Sample stratification with UMAP'
     functional stratification:
         description: '# Functional PCA (Single-Sample GSEA)'
         data:
