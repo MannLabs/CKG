@@ -1715,7 +1715,7 @@ def get_violinplot(data, identifier, args):
     for c in df.columns.unique():
         if c != args['group']:
             figure = create_violinplot(df, x=args['group'], y=c, color=args['group'], color_map=color_map)
-            figure.update_layout(annotations=[dict(xref='paper', yref='paper', showarrow=False)], template='plotly_white')
+            figure.update_layout(annotations=[dict(xref='paper', yref='paper', showarrow=False, text='')], template='plotly_white')
             graphs.append(dcc.Graph(id=identifier+"_"+c, figure=figure))
 
     return graphs
