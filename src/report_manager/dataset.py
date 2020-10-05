@@ -74,7 +74,7 @@ class Dataset:
 
     def generate_dataset(self):
         pass
-    
+
     def update_report(self, report):
         self._report.update(report)
 
