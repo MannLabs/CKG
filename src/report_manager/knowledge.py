@@ -30,6 +30,7 @@ class Knowledge:
         self._graph = graph
         self._report = report
         self._default_color = '#636363'
+        self._entities = ["Disease", "Drug", "Pathway", "Biological_process", "Complex", "Publication", "Tissue"]
         self._colors = colors
         self._keep_nodes = keep_nodes
         if len(colors) == 0:
@@ -387,31 +388,31 @@ class Knowledge:
         nodes = ",".join(nodes)
         return nodes
 
-    def generate_knowledge_graph(self):
+    def generate_knowledge_graph(self, summarize=True):
         selected_nodes = []
         G = nx.DiGraph()
         G.add_nodes_from(self.nodes.items())
         G.add_edges_from(self.relationships.keys())
         nx.set_edge_attributes(G, self.relationships)
-        if len(G.nodes()) > 1:
+        if summarize and len(G.nodes()) > 1:
             centrality = nx.betweenness_centrality(G, k=None, weight='weight', normalized=False)
             #centrality = nx.pagerank(G, alpha=0.95, weight='weight')
             nx.set_node_attributes(G, centrality, 'centrality')
             sorted_centrality = sorted(centrality.items(), key=itemgetter(1), reverse=True)
-            for node_type in ["Disease", "Drug", "Pathway", "Biological_process", "Complex", "Publication"]:
+            for node_type in self.entities:
                 nodes = [x for x, y in G.nodes(data=True) if 'type' in y and y['type'] == node_type and x not in self.keep_nodes]
                 selected_nodes.extend([n for n, c in sorted_centrality if n in nodes][15:])
 
             if len(selected_nodes) > 0:
                 G.remove_nodes_from(selected_nodes)
 
-            self.graph = G
+        self.graph = G
 
-    def reduce_to_subgraph(self, nodes):
+    def reduce_to_subgraph(self, nodes, summarize=True):
         valid_nodes = set(nodes).intersection(list(self.nodes.keys()))
         valid_nodes.add("Regulated")
         aux = set()
-        self.generate_knowledge_graph()
+        self.generate_knowledge_graph(summarize=summarize)
         for n in valid_nodes:
             if n in self.nodes:
                 for n1, n2, attr in self.graph.out_edges(n, data=True):
@@ -426,9 +427,9 @@ class Knowledge:
             self.nodes = dict(self.graph.nodes(data=True))
             self.relationships = {(a, b): c for a, b, c in self.graph.edges(data=True)}
 
-    def get_knowledge_graph_plot(self):
+    def get_knowledge_graph_plot(self, summarize=True):
         if self.graph is None:
-            self.generate_knowledge_graph()
+            self.generate_knowledge_graph(summarize=summarize)
         title = 'Project {} Knowledge Graph'.format(self.identifier)
         if self.data is not None:
             if 'name' in self.data:
@@ -482,7 +483,8 @@ class Knowledge:
         args['stylesheet'] = stylesheet
         args['layout'] = layout
         G = self.graph.copy()
-        G.remove_node('Regulated')
+        if G.has_node('Regulated'):
+            G.remove_node('Regulated')
         nodes_table, edges_table = viz.network_to_tables(G, source='node1', target='node2')
         nodes_fig_table = viz.get_table(nodes_table, identifier=self.identifier + "_nodes_table", args={'title': "Nodes table"})
         edges_fig_table = viz.get_table(edges_table, identifier=self.identifier + "_edges_table", args={'title': "Edges table"})
@@ -493,22 +495,36 @@ class Knowledge:
 
         return net
 
-    def generate_report(self, visualizations=['sankey']):
+    def generate_report(self, visualizations=['sankey'], summarize=True):
         report = rp.Report(identifier="knowledge")
         plots = []
         for visualization in visualizations:
             if visualization == 'network':
-                plots.append(self.get_knowledge_graph_plot())
+                plots.append(self.get_knowledge_graph_plot(summarize=summarize))
             elif visualization == 'sankey':
                 remove_edges = []
                 if self.graph is None:
-                    self.generate_knowledge_graph()
+                    self.generate_knowledge_graph(summarize=summarize)
                 G = self.graph.copy()
+                new_type_edges = {}
+                new_type_nodes = {}
                 for n1, n2 in G.edges():
                     if G.nodes[n1]['type'] == G.nodes[n2]['type']:
                         remove_edges.append((n1, n2))
+                    else:
+                        if G.nodes[n1]['type'] in self.entities:
+                            color = G.nodes[n1]['color']
+                            new_type_edges.update({(n1, G.nodes[n1]['type']): {'type': 'is_a', 'weight': 0.0, 'width': 1.0, 'source_color': color, 'target_color': self.colors[G.nodes[n1]['type']]}})
+                            new_type_nodes.update({G.nodes[n1]['type']: {'type': 'entity', 'color': self.colors[G.nodes[n1]['type']]}})
+                        if G.nodes[n2]['type'] in self.entities:
+                            color = G.nodes[n2]['color']
+                            new_type_edges.update({(n2, G.nodes[n2]['type']): {'type': 'is_a', 'weight': 0.0, 'width': 1.0, 'source_color': color, 'target_color': self.colors[G.nodes[n2]['type']]}})
+                            new_type_nodes.update({G.nodes[n2]['type']: {'type': 'entity', 'color': self.colors[G.nodes[n2]['type']]}})
 
                 G.remove_edges_from(remove_edges)
+                G.add_edges_from(new_type_edges.keys())
+                nx.set_edge_attributes(G, new_type_edges)
+                G.add_nodes_from(new_type_nodes.items())
                 df = nx.to_pandas_edgelist(G).fillna(1)
                 plots.append(viz.get_sankey_plot(df, self.identifier, args={'source': 'source',
                                                                             'target': 'target',
