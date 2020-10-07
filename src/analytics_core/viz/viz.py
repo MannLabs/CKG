@@ -1226,7 +1226,7 @@ def get_network(data, identifier, args):
             if args['cutoff_abs']:
                 data = data[np.abs(data[args['values']]) >= args['cutoff']]
             else:
-                data = data >= args['cutoff']
+                data = data[data[args['values']] >= args['cutoff']]
 
         data[args["source"]] = [str(n).replace("'","") for n in data[args["source"]]]
         data[args["target"]] = [str(n).replace("'","") for n in data[args["target"]]]
@@ -1366,7 +1366,7 @@ def get_network_style(node_colors, color_edges):
 
     return stylesheet, layout
 
-def visualize_notebook_network(network, notebook_type='jupyter', layout={'width':'100%', 'height':'700px'}):
+def visualize_notebook_network(network, notebook_type='jupyter', layout={}):
     """
     This function returns a Cytoscape network visualization for Jupyter notebooks
 
@@ -1384,6 +1384,21 @@ def visualize_notebook_network(network, notebook_type='jupyter', layout={'width'
         visualize_notebook_network(net['notebook'], notebook_type='jupyter', layout={'width':'100%', 'height':'700px'})
     """
     net = None
+    if len(layout) == 0:
+        layout = {'name': 'cose',
+                'idealEdgeLength': 100,
+                'nodeOverlap': 20,
+                'refresh': 20,
+                'randomize': False,
+                'componentSpacing': 100,
+                'nodeRepulsion': 400000,
+                'edgeElasticity': 100,
+                'nestingFactor': 5,
+                'gravity': 80,
+                'numIter': 1000,
+                'initialTemp': 200,
+                'coolingFactor': 0.95,
+                'minTemp': 1.0}
     if notebook_type == 'jupyter':
         net = Cytoscape(data={'elements':network[0]}, visual_style=network[1], layout=layout)
     elif notebook_type == 'jupyterlab':
@@ -1530,7 +1545,7 @@ def get_sankey_plot(data, identifier, args={'source':'source', 'target':'target'
 
         hover_data = []
         if 'hover' in args:
-            hover_data = [t.upper() for t in data[args['hover']].tolist()]
+            hover_data = [str(t).upper() for t in data[args['hover']].tolist()]
 
         if 'target_colors' in args:
             node_colors.update(dict(zip(data[args['target']],data[args['target_colors']])))
@@ -1821,6 +1836,12 @@ def get_parallel_plot(data, identifier, args):
         fig = dict(data = fig_data, layout = layout)
 
     return dcc.Graph(id=identifier, figure=fig)
+
+def get_parallel_coord_plot(data, identifier, args):
+    color = args['color']
+    labels = {c:c for c in data.columns if c != color}
+    fig = px.parallel_coordinates(data, color=color, labels=labels)
+    return fig
 
 def get_WGCNAPlots(data, identifier):
     """
@@ -2355,7 +2376,7 @@ def get_enrichment_plots(enrichment_results, identifier, args):
             if 'direction' not in df:
                 group = None
             if not df.empty:
-                df = df.sort_values(by='padj', ascending=False)
+                df = df.sort_values(by=[group, 'padj'], ascending=False)
                 df['x'] = -np.log10(df['padj'])
                 fig = get_scatterplot(df, identifier=nid,
                                         args={'x': 'x',
