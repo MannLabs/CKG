@@ -41,8 +41,8 @@ Complex:
   involved_rels:
     - IS_SUBUNIT_OF
   query: >
-          MATCH (complex:Complex)<-[:IS_SUBUNIT_OF]-(protein:Protein) 
-          WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS]) 
+          MATCH (complex:Complex)<-[:IS_SUBUNIT_OF]-(protein:Protein)
+          WHERE ((protein.name+"~"+protein.id) IN [PROTEINIDS])
           WITH complex, collect(protein) as Proteins WHERE size(Proteins)>=LIMIT_COUNT
           MATCH (complex)<-[r:IS_SUBUNIT_OF]-(p:Protein)
           WHERE ((p.name+"~"+p.id) IN [PROTEINIDS])
@@ -74,9 +74,9 @@ Publication:
   involved_rels:
     - MENTIONED_IN_PUBLICATION
   query: >
-        MATCH (project:Project)-[:STUDIES_DISEASE]->(disease:Disease)-[:HAS_PARENT]->(pdisease:Disease)<-[:HAS_PARENT]-(cdiseases:Disease) 
-        WHERE project.id="PROJECTID" 
-        WITH collect(disease)+collect(pdisease)+collect(cdiseases) AS diseases            
+        MATCH (project:Project)-[:STUDIES_DISEASE]->(disease:Disease)-[:HAS_PARENT]->(pdisease:Disease)<-[:HAS_PARENT]-(cdiseases:Disease)
+        WHERE project.id="PROJECTID"
+        WITH collect(disease)+collect(pdisease)+collect(cdiseases) AS diseases
         MATCH (d:Disease)-[:MENTIONED_IN_PUBLICATION]->(publication:Publication)<-[r:MENTIONED_IN_PUBLICATION]-(protein:Protein)
         WHERE d in diseases AND (protein.name+"~"+protein.id) IN [PROTEINIDS]
         WITH protein, publication, r, COUNT(r) AS r_count WHERE r_count>=LIMIT_COUNT
@@ -211,18 +211,11 @@ side_effects_jaccard_similarity_intervention_proposed_drugs:
           - drugs = ['DB00439', 'DB06196']
           - similarity = queries["side_effects_jaccard_similarity_intervention_proposed_drugs"]["query"].replace("INTERVENTION", ",".join(intervention)).replace("DRUG", ",".join(drugs))
   query: >
-          MATCH (d1:Drug)-[:HAS_SIDE_EFFECT]->(phenotype1) 
+          MATCH (d1:Drug)-[:HAS_SIDE_EFFECT]->(phenotype1)
           WHERE d1.name in [INTERVENTION]
-          WITH {item:id(d1), categories: collect(id(phenotype1))} as treatmentData
-          WITH collect(treatmentData) as treatment_data_vec 
-          MATCH (d2:Drug)-[:HAS_SIDE_EFFECT]->(phenotype2) 
-          WHERE d2.id IN [DRUG]
-          WITH {item:id(d2), categories: collect(id(phenotype2))} as proposedData, treatment_data_vec 
-          WITH collect(proposedData) as proposed_data_vec, treatment_data_vec 
-          CALL algo.similarity.jaccard.stream(treatment_data_vec+proposed_data_vec) 
-          YIELD item1, item2, count1, count2, intersection, similarity 
-          RETURN algo.asNode(item1).name AS from, algo.asNode(item2).name AS to, intersection, similarity 
+          WITH d1, collect(id(phenotype1)) as treatmentData
+          MATCH (d2:Drug)-[:HAS_SIDE_EFFECT]->(phenotype2)
+          WHERE d2.id IN [DRUG] AND d1 <> d2
+          WITH d1, treatmentData, d2, collect(id(phenotype2)) as proposedData, size(apoc.coll.intersection(treatmentData, collect(DISTINCT id(phenotype2)))) AS intersection
+          RETURN d1.name AS from, d2.name AS to, intersection, gds.alpha.similarity.jaccard(proposedData, treatmentData) AS similarity
           ORDER BY similarity DESC
-
-
-
