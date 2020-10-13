@@ -2907,7 +2907,7 @@ def get_snf_clusters(data_tuples, num_clusters=None, metric='euclidean', k=5, mu
     affinities = []
     for (d, m) in data_tuples:
         affinities += [snf.make_affinity(d, metric=m, K=k, mu=mu)]
-    fused_aff = snf.snf(affinities)
+    fused_aff = snf.snf(affinities, K=k)
     if num_clusters is None:
         num_clusters, second = snf.get_n_clusters(fused_aff)
     fused_labels = cluster.spectral_clustering(fused_aff, n_clusters=num_clusters)
@@ -2929,8 +2929,8 @@ def run_snf(df_dict, index, num_clusters=None, distance_metric='euclidean', k_af
     :param distance_metric: distance metric used to calculate the sample similarity network
     :param k_affinity: number of neighbors used to measure local affinity (KNN)
     :param mu_ffinity: normalization factor to scale similarity kernel when constructing affinity matrix
-    :return tuple: 1) feature_df: SNF features and mutual information score (MIscore), 2) fused_labels: cluster labels, 
-                    3) silhouette: silhouette score
+    :return tuple: 1) feature_df: SNF features and mutual information score (MIscore), 2) fused_aff: adjacent similarity matrix, 3)fused_labels: cluster labels, 
+                    4) silhouette: silhouette score
     """
     datasets = []
     dataset_labels = []
@@ -2964,7 +2964,7 @@ def run_snf(df_dict, index, num_clusters=None, distance_metric='euclidean', k_af
 
     feature_df = feature_df.sort_values(by='MIscore', ascending=False)
 
-    return feature_df, fused_labels, silhouette_score
+    return feature_df, fused_aff, fused_labels, silhouette_score
 
 
 def run_km(data, time_col, event_col, group_col, args={}):
