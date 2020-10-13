@@ -330,7 +330,7 @@ def generate_report_url(n_clicks, pathname):
 @application.route('/downloads/<value>')
 def route_report_url(value):
     uri = os.path.join(os.getcwd(), directories['downloadsDirectory'] + '/' + value + '.zip')
-    return flask.send_file(uri, attachment_filename=value + '.zip', as_attachment=True)
+    return flask.send_file(uri, attachment_filename=value + '.zip', as_attachment=True, cache_timeout=-1)
 
 ###Callback regenerate project
 @app.callback(Output('regenerate', 'href'),
@@ -458,7 +458,7 @@ def serve_static(value):
     if not os.path.isfile(url):
         utils.compress_directory(filename, os.path.join(directory, 'files'), compression_format='zip')
 
-    return flask.send_file(url, attachment_filename = value+'.zip', as_attachment = True)
+    return flask.send_file(url, attachment_filename = value+'.zip', as_attachment = True, cache_timeout=-1)
 
 
 ###Callbacks for data upload app
@@ -706,7 +706,7 @@ def route_upload_url(value):
     filename = os.path.join(directory, 'Uploaded_files_'+project_id)
     url = filename+'.zip'
 
-    return flask.send_file(url, attachment_filename = filename.split('/')[-1]+'.zip', as_attachment = True)
+    return flask.send_file(url, attachment_filename = filename.split('/')[-1]+'.zip', as_attachment = True, cache_timeout=-1)
 
 
 if __name__ == '__main__':
