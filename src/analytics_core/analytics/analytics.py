@@ -10,6 +10,7 @@ from sklearn.manifold import TSNE
 from sklearn.cluster import AffinityPropagation
 from sklearn.utils import shuffle
 from statsmodels.stats import multitest
+from statsmodels.stats.power import FTestAnovaPower
 import dabest
 import scipy.stats
 from scipy.special import factorial, betainc
@@ -111,6 +112,7 @@ def transform_into_wide_format(data, index, columns, values, extra=[]):
 
     """
     df = pd.DataFrame()
+    extra_cols = None
     if data is not None:
         df = data.copy()
         if not df.empty:
@@ -130,7 +132,9 @@ def transform_into_wide_format(data, index, columns, values, extra=[]):
                 df = df.pivot_table(index=index, columns=columns, values=values, aggfunc='first')
             else:
                 df = df.pivot(index=index, columns=columns, values=values)
-            df = df.join(extra_cols)
+            if extra_cols is not None:
+                df = df.join(extra_cols)
+
             df = df.drop_duplicates()
             df = df.reset_index()
 
@@ -2471,46 +2475,38 @@ def calculate_fold_change(df, condition1, condition2):
     return fold_change
 
 
-def cohen_d(df, condition1, condition2, ddof = 0):
+def pooled_standard_deviation(sample1,sample2, ddof):
+    """
+    Calculates the pooled standard deviation.
+    For more information visit https://www.hackdeploy.com/learn-what-is-statistical-power-with-python/.
+    
+    :param array sample1: numpy array with values for first group
+    :param array sample2: numpy array with values for second group
+    :param int ddof: degrees of freedom
+    """
+    #calculate the sample size
+    n1, n2 = len(sample1), len(sample2)
+    #calculate the variances
+    var1, var2 = np.var(sample1, ddof=1), np.var(sample2, ddof=ddof)
+    #calculate the pooled standard deviation
+    numerator = ((n1-1) * var1) + ((n2-1) * var2)
+    denominator = n1+n2-2
+    return np.sqrt(numerator/denominator)
+
+
+def cohens_d(sample1, sample2, ddof):
     """
     Calculates Cohen's d effect size based on the distance between two means, measured in standard deviations.
-    For more information visit https://docs.scipy.org/doc/numpy/reference/generated/numpy.nanstd.html.
-
-    :param df: pandas dataframe with samples as rows and protein identifiers as columns.
-    :param str condition1: identifier of first group.
-    :param str condition2: identifier of second group.
-    :param int ddof: means Delta Degrees of Freedom.
-    :return: Numpy array.
-
-    Example::
-
-        result = cohen_d(data, 'group1', 'group2', ddof=0)
+    For more information visit https://www.hackdeploy.com/learn-what-is-statistical-power-with-python/.
+    
+    :param array sample1: numpy array with values for first group
+    :param array sample2: numpy array with values for second group
+    :param int ddof: degrees of freedom
     """
-    group1 = df[condition1]
-    group2 = df[condition2]
+    u1, u2 = np.mean(sample1), np.mean(sample2)
+    s_pooled = pooled_standard_deviation(sample1, sample2, ddof)
 
-    if isinstance(group1, np.float64):
-        group1 = np.array(group1)
-    else:
-        group1 = group1.values
-    if isinstance(group2, np.float64):
-        group2 = np.array(group2)
-    else:
-        group2 = group2.values
-
-    ng1 = group1.size
-    ng2 = group2.size
-    dof = ng1 + ng2 - 2
-    if np.isnan(group1).all() or np.isnan(group2).all():
-        d = np.nan
-    else:
-        meang1 = np.nanmean(group1)
-        meang2 = np.nanmean(group2)
-        sdg1 = np.nanstd(group1, ddof = ddof)
-        sdg2 = np.nanstd(group2, ddof = ddof)
-        d = (meang1 - meang2) / np.sqrt(((ng1-1)* sdg1 ** 2 + (ng2-1)* sdg2 ** 2) / dof)
-
-    return d
+    return ((u1 - u2) / s_pooled)
 
 
 def hedges_g(df, condition1, condition2, ddof = 0):
@@ -2558,6 +2554,40 @@ def hedges_g(df, condition1, condition2, ddof = 0):
             g = ((meang1 - meang2) / sdpooled)
 
     return g
+
+def power_analysis(data, group='group', groups=None, alpha=0.05, power=0.8, dep_var='nobs', figure=False):
+    quantiles = ['25% qtl es','mean es', '50% qtl es', '75% qtl es']
+    if groups is None:
+        groups = data[group].unique().tolist()
+    k_groups = len(groups)
+    effect_sizes = set()
+    for col in data.drop([group], axis=1).columns:
+        for g1, g2 in itertools.combinations(groups, 2):
+            sample1 = data.loc[data[group] == g1, col].values
+            sample2 = data.loc[data[group] == g2, col].values
+            effect_sizes.add(np.abs(cohens_d(sample1,sample2, ddof=1)))
+
+    effect_sizes = list(effect_sizes)
+    summary_eff = [np.percentile(effect_sizes, 25),
+                   np.mean(effect_sizes),
+                   np.percentile(effect_sizes, 50),
+                   np.percentile(effect_sizes, 75)]
+    
+    analysis = FTestAnovaPower()
+    sample_sizes = np.array(range(3, 150))
+    power_list = []
+    labels = []
+    samples = []
+    for ii, es in enumerate(summary_eff):
+        p = analysis.power(es, sample_sizes, alpha, k_groups)
+        labels.extend(["%s = %4.2F" % (quantiles[ii], es)] * len(p))
+        power_list.extend(p)
+        samples.extend(sample_sizes)
+        
+    power_df = pd.DataFrame(data=list(zip(power_list, samples, labels)), columns=['power', '#samples', 'labels'])
+    sample_size = analysis.solve_power(summary_eff[1], power=power, alpha=alpha, k_groups=k_groups)
+
+    return (sample_size, power_df)
 
 
 def run_mapper(data, lenses=["l2norm"], n_cubes = 15, overlap=0.5, n_clusters=3, linkage="complete", affinity="correlation"):
