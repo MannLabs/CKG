@@ -1,3 +1,4 @@
+project_directory : '../../../../data/experiments/PROJECTID/project/'
 clinical_directory : '../../../../data/experiments/PROJECTID/clinical/'
 design_directory : '../../../../data/experiments/PROJECTID/experimental_design/'
 separator: '|'

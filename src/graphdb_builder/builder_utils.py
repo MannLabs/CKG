@@ -113,11 +113,11 @@ def export_contents(data, dataDir, filename):
     """
     file = filename.split('.')[-1]
     if file == 'txt' or file == 'tsv':
-        csv_string = data.to_csv(os.path.join(dataDir, filename), sep='\t', index=True, encoding='utf-8')
+        csv_string = data.to_csv(os.path.join(dataDir, filename), sep='\t', index=False, encoding='utf-8')
     elif file == 'csv':
-        csv_string = data.to_csv(os.path.join(dataDir, filename), sep=',', index=True, encoding='utf-8')
+        csv_string = data.to_csv(os.path.join(dataDir, filename), sep=',', index=False, encoding='utf-8')
     elif file == 'xlsx' or file == 'xls':
-        csv_string = data.to_excel(os.path.join(dataDir, filename), index=True, encoding='utf-8')
+        csv_string = data.to_excel(os.path.join(dataDir, filename), index=False, encoding='utf-8')
     return csv_string
 
 
