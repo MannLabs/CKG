@@ -190,6 +190,9 @@ def updateDB(driver, imports=None, specific=[]):
             elif i == "drugs":
                 code = cypher_queries['IMPORT_DRUG_DATA']['query']
                 queries = code.replace("IMPORTDIR", import_dir).split(';')[0:-1]
+                code = cypher_queries['IMPORT_DRUG_INTERACTION_DATA']['query']
+                for resource in config['drug_drug_interaction_resources']:
+                    queries.extend(code.replace("IMPORTDIR", import_dir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
                 code = cypher_queries['IMPORT_CURATED_DRUG_DATA']['query']
                 for resource in config["curated_drug_resources"]:
                     queries.extend(code.replace("IMPORTDIR", import_dir).replace("RESOURCE", resource.lower()).split(';')[0:-1])
@@ -268,7 +271,7 @@ def updateDB(driver, imports=None, specific=[]):
                 project_cypher = cypher_queries['IMPORT_PROJECT']
                 for project in projects:
                     projectDir = os.path.join(import_dir, project)
-                    projectDir = os.path.join(projectDir, 'clinical').replace('\\','/')
+                    projectDir = os.path.join(projectDir, 'project').replace('\\','/')
                     for project_section in project_cypher:
                         code = project_section['query']
                         queries.extend(code.replace("IMPORTDIR", projectDir).replace('PROJECTID', project).split(';')[0:-1])
@@ -284,9 +287,10 @@ def updateDB(driver, imports=None, specific=[]):
                     datasetTypes = builder_utils.listDirectoryFolders(projectDir)
                     for dtype in datasetTypes:
                         datasetDir = os.path.join(projectDir, dtype).replace('\\', '/')
-                        dataset = datasets_cypher[dtype]
-                        code = dataset['query']
-                        queries.extend(code.replace("IMPORTDIR", datasetDir).replace('PROJECTID', project).split(';')[0:-1])
+                        if dtype in datasets_cypher:
+                            dataset = datasets_cypher[dtype]
+                            code = dataset['query']
+                            queries.extend(code.replace("IMPORTDIR", datasetDir).replace('PROJECTID', project).split(';')[0:-1])
                 print('Done Loading experiment')
             else:
                 logger.error("Non-existing dataset. The dataset you are trying to load does not exist: {}.".format(i))
@@ -295,6 +299,7 @@ def updateDB(driver, imports=None, specific=[]):
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             logger.error("Loading: {}: {}, file: {}, line: {}".format(i, err, fname, exc_tb.tb_lineno))
+
 
 def fullUpdate():
     """
@@ -313,6 +318,7 @@ def fullUpdate():
     archiveImportDirectory(archive_type="full")
     logger.info("Full update of the database - Archiving took: {}".format(datetime.now() - START_TIME))
 
+
 def partialUpdate(imports, specific=[]):
     """
     Method that controls the update of the graph database with the specified entities and \
@@ -330,6 +336,7 @@ def partialUpdate(imports, specific=[]):
     logger.info("Partial update of the database - Archiving imports folder")
     #archiveImportDirectory(archive_type="partial")
     logger.info("Partial update of the database - Archiving {} took: {}".format(",".join(imports), datetime.now() - START_TIME))
+
 
 def archiveImportDirectory(archive_type="full"):
     """

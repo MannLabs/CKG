@@ -107,11 +107,22 @@ def experimentImport(importDirectory, experimentsDirectory, project):
     builder_utils.checkDirectory(projectPath)
     projectDirectory = os.path.join(experimentsDirectory, project)
     datasets = builder_utils.listDirectoryFolders(projectDirectory)
-    for dataset in datasets:
-        if dataset != "experimental_design":
+    if 'project' in datasets:
+        dataset = 'project'
+        datasetPath = os.path.join(projectPath, dataset)
+        builder_utils.checkDirectory(datasetPath)
+        eh.generate_dataset_imports(project, dataset, datasetPath)
+        datasets.remove(dataset)
+        if 'experimental_design' in datasets:
+            dataset = 'experimental_design'
             datasetPath = os.path.join(projectPath, dataset)
             builder_utils.checkDirectory(datasetPath)
             eh.generate_dataset_imports(project, dataset, datasetPath)
+            datasets.remove(dataset)
+            for dataset in datasets:
+                datasetPath = os.path.join(projectPath, dataset)
+                builder_utils.checkDirectory(datasetPath)
+                eh.generate_dataset_imports(project, dataset, datasetPath)
 
 
 def usersImport(importDirectory, import_type='partial'):
