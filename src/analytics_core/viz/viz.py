@@ -1236,6 +1236,7 @@ def get_network(data, identifier, args):
             data[args["values"]] = 1
 
         data = data.rename(index=str, columns={args['values']: "width"})
+        data['width'] = data['width'].fillna(1.0)
         data = data.fillna('null')
         data.columns = [c.replace('_', '') for c in data.columns]
         data['edgewidth'] = data['width'].apply(np.abs)
@@ -1281,23 +1282,27 @@ def get_network(data, identifier, args):
         nx.set_node_attributes(graph, clusters, 'cluster')
 
         vis_graph = graph
-        if len(vis_graph.edges()) > 500:
-            max_nodes = 150
-            cluster_members = defaultdict(list)
-            cluster_nums = {}
-            for n in clusters:
-                if clusters[n] not in cluster_nums:
-                    cluster_nums[clusters[n]] = 0
-                cluster_members[clusters[n]].append(n)
-                cluster_nums[clusters[n]] += 1
-            valid_clusters = [c for c,n in sorted(cluster_nums.items() ,  key=lambda x: x[1])]
-            valid_nodes = []
-            for c in valid_clusters:
-                valid_nodes.extend(cluster_members[c])
-                if len(valid_nodes) >= max_nodes:
-                    valid_nodes = valid_nodes[0:max_nodes]
-                    break
-            vis_graph = vis_graph.subgraph(valid_nodes)
+        limit=500
+        if 'limit' in args:
+            limit = args['limit']
+        if limit is not None:
+            if len(vis_graph.edges()) > 500:
+                max_nodes = 150
+                cluster_members = defaultdict(list)
+                cluster_nums = {}
+                for n in clusters:
+                    if clusters[n] not in cluster_nums:
+                        cluster_nums[clusters[n]] = 0
+                    cluster_members[clusters[n]].append(n)
+                    cluster_nums[clusters[n]] += 1
+                valid_clusters = [c for c,n in sorted(cluster_nums.items() ,  key=lambda x: x[1])]
+                valid_nodes = []
+                for c in valid_clusters:
+                    valid_nodes.extend(cluster_members[c])
+                    if len(valid_nodes) >= max_nodes:
+                        valid_nodes = valid_nodes[0:max_nodes]
+                        break
+                vis_graph = vis_graph.subgraph(valid_nodes)
 
         nodes_table, edges_table = network_to_tables(graph, source=args["source"], target=args["target"])
         nodes_fig_table = get_table(nodes_table, identifier=identifier+"_nodes_table", args={'title':args['title']+" nodes table"})
@@ -1316,7 +1321,7 @@ def get_network(data, identifier, args):
         app_net = get_cytoscape_network(cy_elements, identifier, args)
         #args['mouseover_node'] = mouseover_node
 
-        net = {"notebook":[cy_elements, stylesheet,layout], "app": app_net, "net_tables": (nodes_table, edges_table), "net_tables_viz":(nodes_fig_table, edges_fig_table), "net_json":json_graph.node_link_data(graph)}
+        net = {"notebook":[cy_elements, stylesheet, layout], "app": app_net, "net_tables": (nodes_table, edges_table), "net_tables_viz":(nodes_fig_table, edges_fig_table), "net_json":json_graph.node_link_data(graph)}
     return net
 
 def get_network_style(node_colors, color_edges):
