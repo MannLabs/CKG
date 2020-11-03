@@ -135,6 +135,8 @@ compiled_drug_resources:
     - 'STITCH'
 drug_action_resources:
     - 'STITCH'
+drug_drug_interaction_resources:
+    - 'DrugBank'
 side_effects_resources:
     - 'SIDER'
 
