@@ -261,19 +261,20 @@ def create_new_ansamples(driver, data):
 
     :return: Pandas DataFrame where new analytical sample internal identifiers have been added.
     """
-    external_ids = data['analytical_sample external_id'].unique()
-    biosample_ids = data['biological_sample id']
+    data = data.rename(columns={'analytical_sample external_id': 'external_id', 'biological_sample id': 'biosample_id'})
+    data['external_id'] = data['external_id'].astype(str)
+    num_samples = data['external_id'].shape[0]
+    if 'grouping2' not in data:
+        data['grouping2'] = None
     ansample_id = get_new_analytical_sample_identifier(driver)
     if ansample_id is None:
         ansample_id = '1'
 
-    ansample_ids = ['AS'+str(i) for i in np.arange(int(ansample_id), int(ansample_id)+len(external_ids))]
-    ansample_dict = dict(zip(external_ids, ansample_ids))
-    asample_biosample_dict = dict(zip(external_ids, biosample_ids))
+    ansample_ids = ['AS' + str(i) for i in np.arange(int(ansample_id), int(ansample_id) + num_samples)]
+    data['asample_id'] = ansample_ids
     query_name = 'create_asamples_biosamples'
-    for external_id, asample_id in ansample_dict.items():
-        biosample_id = asample_biosample_dict[external_id]
-        parameters = {'external_id': str(external_id), 'biosample_id':biosample_id, 'asample_id':asample_id}
+    for parameters in data.to_dict('records'):
+        print(parameters)
         try:
             query = ''
             data_upload_cypher = get_data_upload_queries()
@@ -285,7 +286,7 @@ def create_new_ansamples(driver, data):
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             logger.error("Error: {}. Creating analytical samples: Query name ({}) - Query ({}), error info: {}, file: {},line: {}".format(err, query_name, query, sys.exc_info(), fname, exc_tb.tb_lineno))
 
-    data['analytical_sample id'] = data['analytical_sample external_id'].map(ansample_dict)
+    data = data.rename(columns={'asample_id': 'analytical_sample id', 'external_id': 'analytical_sample external_id', 'biosample_id': 'biological_sample id'})
 
     return data
 
