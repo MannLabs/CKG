@@ -6,23 +6,30 @@ from graphdb_builder import builder_utils
 
 
 def parser(projectId, type='clinical'):
+    data = {}
     cwd = os.path.abspath(os.path.dirname(__file__))
     config = builder_utils.get_config(config_name="clinical.yml", data_type='experiments')
+    project_directory = os.path.join(cwd, '../../../../data/experiments/PROJECTID/project/')
     clinical_directory = os.path.join(cwd, '../../../../data/experiments/PROJECTID/clinical/')
     design_directory = os.path.join(cwd, '../../../../data/experiments/PROJECTID/experimental_design/')
     separator = config["separator"]
+    if 'project_directory' in config:
+        project_directory = os.path.join(cwd, config['project_directory'])
+    project_directory = project_directory.replace('PROJECTID', projectId)
     if 'clinical_directory' in config:
         clinical_directory = os.path.join(cwd, config['clinical_directory'])
     clinical_directory = clinical_directory.replace('PROJECTID', projectId)
     if 'design_directory' in config:
         design_directory = os.path.join(cwd, config['design_directory'])
     design_directory = design_directory.replace('PROJECTID', projectId)
-    project_dfs = project_parser(projectId, config, clinical_directory, separator)
-    data = project_dfs
-    if type == 'clinical':
+    if type == 'project':
+        project_dfs = project_parser(projectId, config, project_directory, separator)
+        data.update(project_dfs)
+    elif type == 'experimental_design':
         design_dfs = experimental_design_parser(projectId, config, design_directory)
-        clinical_dfs = clinical_parser(projectId, config, clinical_directory, separator)    
         data.update(design_dfs)
+    elif type == 'clinical':
+        clinical_dfs = clinical_parser(projectId, config, clinical_directory, project_directory, separator)
         data.update(clinical_dfs)
 
     return data
@@ -60,10 +67,10 @@ def experimental_design_parser(projectId, config, directory):
     return data
 
 
-def clinical_parser(projectId, config, directory, separator):
+def clinical_parser(projectId, config, clinical_directory, project_directory, separator):
     data = {}
-    project_data = parse_dataset(projectId, config, directory, key='project')
-    clinical_data = parse_dataset(projectId, config, directory, key='clinical')
+    project_data = parse_dataset(projectId, config, project_directory, key='project')
+    clinical_data = parse_dataset(projectId, config, clinical_directory, key='clinical')
     if project_data is not None and clinical_data is not None:
         data[('biosamples_info', 'w')] = extract_biological_samples_info(clinical_data)
         data[('biosample_analytical_attributes', 'w')] = extract_biosample_analytical_sample_relationship_attributes(clinical_data)
@@ -103,7 +110,7 @@ def parse_dataset(projectId, configuration, dataDir, key='project'):
 
 
 def extract_project_info(project_data):
-    cols = ['internal_id', 'name', 'acronym', 'description', 'related_to', 'subjects', 'datatypes', 'timepoints', 'disease', 'tissue', 'intervention', 'responsible', 'participant', 'start_date', 'end_date', 'status', 'external_id']
+    cols = ['internal_id', 'name', 'acronym', 'description', 'related_to', 'datatypes', 'timepoints', 'disease', 'tissue', 'intervention', 'responsible', 'participant', 'start_date', 'end_date', 'status', 'external_id']
     n = len(cols)
     df = project_data.copy()
     if len(df.columns) == n:

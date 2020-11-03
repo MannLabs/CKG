@@ -13,6 +13,7 @@ ontologies:
     'Gene_ontology': 'GO'
     'Experimental_factor': 'EFO'
     'Units': 'UO'
+    #'Biomedical_investigations': 'OBI'
     'Diagnosis': 'ICD-10'
 
 entities:
@@ -28,6 +29,7 @@ entities:
     'cellular_component': 'Cellular_component'
     'EFO': 'Experimental_factor'
     'unit.ontology': 'Units'
+    #'OBI': 'Biomedical_investigations'
     'ICD-10': 'Diagnosis'
     
 ontology_types: 
@@ -43,7 +45,8 @@ ontology_types:
     'GO': '-21'
     'EFO': '-45'
     'UO': '-46'
-    'ICD-10': '-47'
+    #'OBI':  '-47'
+    'ICD-10': '-48'
     
 parser_filters:
     '-40':
@@ -75,7 +78,9 @@ urls:
         - 'https://www.ebi.ac.uk/efo/efo.obo'
     '-46':
         - 'https://raw.githubusercontent.com/bio-ontology-research-group/unit-ontology/master/unit.obo'
-    '-47':
+    #'-47':
+    #    - https://raw.githubusercontent.com/obi-ontology/obi/v2020-04-23/views/obi.obo
+    '-48':
         - 'ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/ICD10CM/2020/icd10cm_codes_2020.txt'
 
 files:
