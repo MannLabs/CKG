@@ -439,6 +439,18 @@ IMPORT_DRUG_DATA:
         ON CREATE SET d.name=line.name,d.description=line.description,d.kingdom=line.kingdom,d.superclass=line.superclass,d.class=line.class,d.subclass=line.subclass,d.indication=line.indication,d.synonyms=line.synonyms,d.mechanism_of_action=line.mechanism_of_action,d.metabolism=line.metabolism,d.pharmacodynamics=line.pharmacodynamics,d.prices=line.prices,d.route_of_elimination=line.route_of_elimination,d.toxicity=line.toxicity,d.absorption=line.absorption,d.half_life=line.half_life,d.groups=line.groups,d.experimental_properties=line.experimental_properties,d.Melting_Point=line.Melting_Point,d.Hydrophobicity=line.Hydrophobicity,d.Isoelectric_Point=line.Isoelectric_Point,d.Molecular_Weight=line.Molecular_Weight,d.Molecular_Formula=line.Molecular_Formula,d.Water_Solubility=line.Water_Solubility,d.Monoisotopic_Weight=line.Monoisotopic_Weight,d.Polar_Surface_Area_PSA=line.Polar_Surface_Area_PSA,d.Refractivity=line.Refractivity,d.Polarizability=line.Polarizability,d.Rotatable_Bond_Count=line.Rotatable_Bond_Count,d.H_Bond_Acceptor_Count=line.H_Bond_Acceptor_Count,d.H_Bond_Donor_Count=line.H_Bond_Donor_Count,d.pKa_strongest_acidic=line.pKa_strongest_acidic,d.pKa_strongest_basic=line.pKa_strongest_basic,d.Physiological_Charge=line.Physiological_Charge,d.Number_of_Rings=line.Number_of_Rings,d.Bioavailability=line.Bioavailability,d.Rule_of_Five=line.Rule_of_Five,d.Ghose_Filter=line.Ghose_Filter,d.MDDR_Like_Rule=line.MDDR_Like_Rule,d.caco2_Permeability=line.caco2_Permeability,d.pKa=line.pKa,d.Boiling_Point=line.Boiling_Point
         RETURN COUNT(d) AS drug;
 
+IMPORT_DRUG_INTERACTION_DATA:
+    'name': 'import drug-drug interactions'
+    'description': 'Loads all the interactions between Drugs from different resources i.e. DrugBank'
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_interacts_with_drug.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (d1:Drug {id:line.START_ID})
+        MATCH (d2:Drug {id:line.END_ID})
+        MERGE (d1)-[r:INTERACTS_WITH{source:line.source,interaction_type:line.interaction_type}]->(d2)
+        RETURN COUNT(r) AS drug_drug_interactions;
+
 IMPORT_CURATED_DRUG_DATA:
     'name': 'import curated drug targets'
     'description': 'Loads all the relationships between Drug and Gene nodes targeted that have been curated, i.e. OncoKB'
@@ -863,7 +875,7 @@ CREATE_PROJECT: &create_project
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_info.tsv" AS line
         FIELDTERMINATOR '\t'
         MERGE (p:Project {id:line.external_id})
-        ON CREATE SET p.internal_id=line.internal_id,p.name=line.name,p.acronym=line.acronym,p.description=line.description,p.subjects=line.subjects,p.type=line.datatypes,p.timepoint=line.timepoints,p.disease=line.disease,p.tissue=line.tissue,p.intervention=line.intervention,p.responsible=line.responsible,p.participant=line.participant,p.start_date=line.start_date,p.end_date=line.end_date,p.status=line.status
+        ON CREATE SET p.internal_id=line.internal_id,p.name=line.name,p.acronym=line.acronym,p.description=line.description, p.type=line.datatypes,p.timepoint=line.timepoints,p.disease=line.disease,p.tissue=line.tissue,p.intervention=line.intervention,p.responsible=line.responsible,p.participant=line.participant,p.start_date=line.start_date,p.end_date=line.end_date,p.status=line.status
         RETURN COUNT(p) AS PROJECTID_project;
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_studies_disease.tsv" AS line
         FIELDTERMINATOR '\t'

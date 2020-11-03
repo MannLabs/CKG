@@ -244,7 +244,7 @@ fragpipe :
                 - 'Razor Intensity'
         'log': 'log2'
         'combine': 'valueCol'
-        'file': '\w+\.tsv'
+        'file': 'proteomics_fragpipe_proteingroups.\w+'
 
 spectronaut :
     'proteins':
@@ -287,7 +287,7 @@ spectronaut :
                 - 'PG.MS2Quantity'
         'log': 'log2'
         'combine': 'valueCol'
-        'file': '\w+\.xlsx'
+        'file': 'proteomics_fragpipe_proteingroups.\w+'
 
 table:
     proteins:
