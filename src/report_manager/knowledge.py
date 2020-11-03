@@ -30,7 +30,7 @@ class Knowledge:
         self._graph = graph
         self._report = report
         self._default_color = '#636363'
-        self._entities = ["Disease", "Drug", "Pathway", "Biological_process", "Complex", "Publication", "Tissue"]
+        self._entities = ["Disease", "Drug", "Pathway", "Biological_process", "Complex", "Publication", "Tissue", "Metabolite"]
         self._colors = colors
         self._keep_nodes = keep_nodes
         if len(colors) == 0:
@@ -388,23 +388,11 @@ class Knowledge:
         nodes = ",".join(nodes)
         return nodes
 
-    def generate_knowledge_graph(self, summarize=True):
-        selected_nodes = []
+    def generate_knowledge_graph(self):
         G = nx.DiGraph()
         G.add_nodes_from(self.nodes.items())
         G.add_edges_from(self.relationships.keys())
         nx.set_edge_attributes(G, self.relationships)
-        if summarize and len(G.nodes()) > 1:
-            centrality = nx.betweenness_centrality(G, k=None, weight='weight', normalized=False)
-            #centrality = nx.pagerank(G, alpha=0.95, weight='weight')
-            nx.set_node_attributes(G, centrality, 'centrality')
-            sorted_centrality = sorted(centrality.items(), key=itemgetter(1), reverse=True)
-            for node_type in self.entities:
-                nodes = [x for x, y in G.nodes(data=True) if 'type' in y and y['type'] == node_type and x not in self.keep_nodes]
-                selected_nodes.extend([n for n, c in sorted_centrality if n in nodes][15:])
-
-            if len(selected_nodes) > 0:
-                G.remove_nodes_from(selected_nodes)
 
         self.graph = G
 
@@ -429,7 +417,21 @@ class Knowledge:
 
     def get_knowledge_graph_plot(self, summarize=True):
         if self.graph is None:
-            self.generate_knowledge_graph(summarize=summarize)
+            self.generate_knowledge_graph()
+        
+        selected_nodes = []
+        if summarize and len(self.graph.nodes()) > 1:
+            centrality = nx.betweenness_centrality(self.graph, k=None, weight='weight', normalized=False)
+            #centrality = nx.pagerank(G, alpha=0.95, weight='weight')
+            nx.set_node_attributes(self.graph, centrality, 'centrality')
+            sorted_centrality = sorted(centrality.items(), key=itemgetter(1), reverse=True)
+            for node_type in self.entities:
+                nodes = [x for x, y in self.graph.nodes(data=True) if 'type' in y and y['type'] == node_type and x not in self.keep_nodes]
+                selected_nodes.extend([n for n, c in sorted_centrality if n in nodes][15:])
+
+            if len(selected_nodes) > 0:
+                self.graph.remove_nodes_from(selected_nodes)
+
         title = 'Project {} Knowledge Graph'.format(self.identifier)
         if self.data is not None:
             if 'name' in self.data:
@@ -504,7 +506,7 @@ class Knowledge:
             elif visualization == 'sankey':
                 remove_edges = []
                 if self.graph is None:
-                    self.generate_knowledge_graph(summarize=summarize)
+                    self.generate_knowledge_graph()
                 G = self.graph.copy()
                 new_type_edges = {}
                 new_type_nodes = {}
