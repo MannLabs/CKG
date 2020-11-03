@@ -197,7 +197,7 @@ class Report:
                         i += 1
                     if "net_json" in plot:
                         with open(os.path.join(directory, name+'.json'), 'w') as out:
-                            out.write(json.dumps(plot["net_json"]))
+                            out.write(json.dumps(plot["net_json"], cls=ckg_utils.NumpyEncoder))
                         try:
                             acore_utils.json_network_to_gml(plot["net_json"], os.path.join(directory, name+".gml"))
                         except Exception:
