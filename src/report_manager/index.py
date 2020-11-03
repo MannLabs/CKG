@@ -364,11 +364,11 @@ def image_formatter(im):
                State('disease-picker', 'value'),
                State('tissue-picker', 'value'),
                State('intervention-picker', 'value'),
-               State('number_subjects', 'value'),
+               #State('number_subjects', 'value'),
                State('project description', 'value'),
                State('date-picker-start', 'date'),
                State('date-picker-end', 'date')])
-def create_project(n_clicks, name, acronym, responsible, participant, datatype, timepoints, related_to, disease, tissue, intervention, number_subjects, description, start_date, end_date):
+def create_project(n_clicks, name, acronym, responsible, participant, datatype, timepoints, related_to, disease, tissue, intervention, description, start_date, end_date):
     if n_clicks > 0:
         session_cookie = flask.request.cookies.get('custom-auth-session')
         responsible = separator.join(responsible)
@@ -376,7 +376,7 @@ def create_project(n_clicks, name, acronym, responsible, participant, datatype, 
         datatype = separator.join(datatype)
         disease = separator.join(disease)
         tissue = separator.join(tissue)
-        arguments = [name, number_subjects, datatype, disease, tissue, responsible]
+        arguments = [name, datatype, disease, tissue, responsible]
 
         # Check if clinical variables exist in the database
         if intervention is not None:
@@ -402,8 +402,8 @@ def create_project(n_clicks, name, acronym, responsible, participant, datatype, 
             return response, None, {'display': 'none'}, {'display': 'none'}
 
         # Get project data from filled-in fields
-        projectData = pd.DataFrame([name, acronym, description, related_to, number_subjects, datatype, timepoints, disease, tissue, intervention, responsible, participant, start_date, end_date]).T
-        projectData.columns = ['name', 'acronym', 'description', 'related_to', 'subjects', 'datatypes', 'timepoints', 'disease', 'tissue', 'intervention', 'responsible', 'participant', 'start_date', 'end_date']
+        projectData = pd.DataFrame([name, acronym, description, related_to, datatype, timepoints, disease, tissue, intervention, responsible, participant, start_date, end_date]).T
+        projectData.columns = ['name', 'acronym', 'description', 'related_to', 'datatypes', 'timepoints', 'disease', 'tissue', 'intervention', 'responsible', 'participant', 'start_date', 'end_date']
         projectData['status'] = ''
 
         projectData.fillna(value=pd.np.nan, inplace=True)
@@ -427,6 +427,7 @@ def create_project(n_clicks, name, acronym, responsible, participant, datatype, 
                 response = 'A project with the same name already exists in the database.'
         else:
             response = "There was a problem when creating the project. Please, try again or contact the administrator."
+            external_id = response
 
         return response, '- '+external_id, {'display': 'inline-block'}, {'display': 'block'}
     else:
@@ -541,7 +542,7 @@ def save_files_in_tmp(content, dataset, prot_tool, prot_file, projectid, uploade
             if selected_file in config['file_proteomics']:
                 filename = config['file_proteomics'][selected_file]
             else:
-                filename = uploaded_file
+                filename = dataset+'_'+prot_tool.lower()+'_'+prot_file.replace(' ', '').lower()+'.'+uploaded_file.split('.')[-1]
             directory = os.path.join(directory, prot_tool.lower())
             if os.path.exists(directory):
                 if os.path.exists(os.path.join(directory, filename)):
@@ -586,8 +587,10 @@ def run_processing(n_clicks, project_id):
         if 'experimental_design' in datasets:
             dataset = 'experimental_design'
             directory = os.path.join(temporaryDirectory, dataset)
+            destination = os.path.join(destDir, dataset)
+            builder_utils.copytree(directory, destination)
             experimental_files = os.listdir(directory)
-            regex = r"{}.+".format(config['file_design'].replace('PROJECTID', project_id) )
+            regex = r"{}.+".format(config['file_design'].replace('PROJECTID', project_id))
             r = re.compile(regex)
             experimental_filename = list(filter(r.match, experimental_files))
             if len(experimental_filename) > 0:
@@ -623,10 +626,9 @@ def run_processing(n_clicks, project_id):
                 clinical_filename = clinical_filename.pop()
                 data = builder_utils.readDataset(os.path.join(directory, clinical_filename))
                 external_ids = {}
-                if 'subject external_id' in data and 'biological_sample external_id' in data:# and 'analytical_sample external_id' in data:
+                if 'subject external_id' in data and 'biological_sample external_id' in data:
                     external_ids['subjects'] = data['subject external_id'].astype(str).unique().tolist()
                     external_ids['biological_samples'] = data['biological_sample external_id'].astype(str).unique().tolist()
-                    #external_ids['analytical_samples'] = data['analytical_sample external_id'].astype(str).unique().tolist()
                     dataUpload.create_mapping_cols_clinical(driver, data, directory, clinical_filename, separator=separator)
                     if 0 in res_n.values:
                         samples = ', '.join([k for (k,v) in res_n if v == 0])
@@ -657,14 +659,14 @@ def run_processing(n_clicks, project_id):
                     return message, style, table
         try:
             for dataset in datasets:
-                source = os.path.join(temporaryDirectory, dataset)
-                destination = os.path.join(destDir, dataset)
-                builder_utils.copytree(source, destination)
-                datasetPath = os.path.join(os.path.join(experimentsImportDir, project_id), dataset)
                 if dataset != "experimental_design":
+                    source = os.path.join(temporaryDirectory, dataset)
+                    destination = os.path.join(destDir, dataset)
+                    builder_utils.copytree(source, destination)
+                    datasetPath = os.path.join(os.path.join(experimentsImportDir, project_id), dataset)
                     eh.generate_dataset_imports(project_id, dataset, datasetPath)
 
-            loader.partialUpdate(imports=['project', 'experiment'], specific=[project_id])
+            loader.partialUpdate(imports=['experiment'], specific=[project_id])
             filename = os.path.join(tmpDirectory, 'Uploaded_files_'+project_id)
             utils.compress_directory(filename, temporaryDirectory, compression_format='zip')
             style = {'display':'block'}
