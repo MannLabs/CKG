@@ -203,11 +203,11 @@ proteomics:
             - ASSOCIATED_WITH
         query_type: post
         query: >
-            MATCH (project:Project)-[:STUDIES_DISEASE]-(d:Disease)-[:HAS_PARENT]->()<-[:HAS_PARENT]-(parent_disease:Disease)
-            WHERE project.id="PROJECTID"
+            MATCH (project:Project)-[:STUDIES_DISEASE]-(d:Disease)-[:HAS_PARENT]->(p:Disease)<-[:HAS_PARENT]-(parent_disease:Disease)
+            WHERE project.id="PROJECTID" AND p.id <> "DOID:4"
             WITH COLLECT(parent_disease) + COLLECT(d) AS parent_diseases
             MATCH (protein:Protein)-[r]-(disease:Disease)
-            WHERE ((protein.name+"~"+protein.id) IN [IDENTIFIERS]) AND ((r.score>=2.5 AND r.source="DISEASES") OR (r.score>=0.7 AND toLower(r.source) =~ "disgenet.+") OR toLower(toString(r.score))="curated" OR disease IN parent_diseases)
+            WHERE ((protein.name+"~"+protein.id) IN [IDENTIFIERS]) AND disease IN parent_diseases
             RETURN DISTINCT collect(protein.name+"~"+protein.id) AS Proteins,disease.name AS Disease,disease.description AS Description, r.score AS score, r.source AS source
     LITERATURE_ASSOCIATIONS:
         name: 'get publications mentioning the any of the proteins in the list'
@@ -221,8 +221,8 @@ proteomics:
             - ASSOCIATED_WITH
         query_type: post
         query: >
-            MATCH (project:Project)-[:STUDIES_DISEASE]->(disease:Disease)-[:HAS_PARENT]->()<-[:HAS_PARENT]-(pdisease:Disease) 
-            WHERE project.id="PROJECTID" 
+            MATCH (project:Project)-[:STUDIES_DISEASE]->(disease:Disease)-[:HAS_PARENT]->(p:Disease)<-[:HAS_PARENT]-(pdisease:Disease) 
+            WHERE project.id="PROJECTID" AND p.id <> "DOID:4"
             WITH collect(disease)+collect(pdisease) AS diseases 
             MATCH (d:Disease)-[:MENTIONED_IN_PUBLICATION]->(publication:Publication)<-[r:MENTIONED_IN_PUBLICATION]-(protein:Protein) 
             WHERE d IN diseases AND (protein.name+"~"+protein.id) IN [IDENTIFIERS] 
