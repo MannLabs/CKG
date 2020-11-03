@@ -23,9 +23,6 @@ if [[ -e $EXEC_MODE ]]; then
       sudo -u neo4j neo4j-admin load --from=$DUMP_PATH --database=graph.db --force
     fi
   elif [ $EXEC_MODE == "minimal" ]; then
-    echo "Setting up the config files"
-    python3 setup_CKG.py
-    python3 setup_config_files.py
     echo "Building CKG graph database after loading database dump"
     cd src/graphdb_builder/builder
     python3 builder.py -b minimal -u ckg
@@ -46,4 +43,4 @@ celery -A worker worker --loglevel=DEBUG --concurrency=3 --uid=1500 --gid=nginx 
 
 
 echo "Initiating CKG app"
-nginx && uwsgi --ini /etc/uwsgi/apps-enabled/uwsgi.ini --uid nginx --gid nginx
+nginx && uwsgi --ini /etc/uwsgi/apps-enabled/uwsgi.ini --uid 1500 --gid nginx
