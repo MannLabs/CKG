@@ -108,7 +108,7 @@ def get_db_schema():
                 net, mouseover = utils.networkx_to_cytoscape(G)
                 plot = viz.get_cytoscape_network(net, "db_schema", args)
             except Exception:
-                plot = html.Div(children=viz.get_markdown("## **Database is offline**"), style={'color':'red'})
+                plot = html.Div(children=html.H1("Database is offline", className='error_msg'))
 
     return plot
 
