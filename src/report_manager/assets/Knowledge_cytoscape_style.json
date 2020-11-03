@@ -1,0 +1,80 @@
+[ {
+  "format_version" : "1.0",
+  "generated_by" : "cytoscape-3.8.0",
+  "target_cytoscapejs_version" : "~2.1",
+  "title" : "clinical_knowledge_graph",
+  "style" : [ {
+    "selector" : "node",
+    "css" : {
+      "border-width" : 0.0,
+      "border-opacity" : 1.0,
+      "font-size" : 15,
+      "border-color" : "rgb(204,204,204)",
+      "background-color" : "rgb(137,208,245)",
+      "height" : 35.0,
+      "shape" : "ellipse",
+      "font-family" : "Verdana-Bold",
+      "font-weight" : "normal",
+      "text-valign" : "top",
+      "text-halign" : "center",
+      "width" : 35.0,
+      "color" : "rgb(0,0,0)",
+      "text-opacity" : 1.0,
+      "background-opacity" : 0.7843137254901961,
+      "content" : "data(name)"
+    }
+  }, {
+    "selector" : "node:selected",
+    "css" : {
+      "background-color" : "rgb(255,255,0)"
+    }
+  }, {
+    "selector" : "edge",
+    "css" : {
+      "text-opacity" : 1.0,
+      "font-family" : "Dialog",
+      "font-weight" : "normal",
+      "source-arrow-shape" : "none",
+      "line-color" : "rgb(132,132,132)",
+      "source-arrow-color" : "rgb(0,0,0)",
+      "font-size" : 8,
+      "color" : "rgb(153,153,153)",
+      "target-arrow-shape" : "none",
+      "width" : 2.0,
+      "opacity" : 0.3137254901960784,
+      "target-arrow-color" : "rgb(0,0,0)",
+      "line-style" : "solid",
+      "content" : "data(type)"
+    }
+  }, {
+    "selector" : "edge[weight > 5]",
+    "css" : {
+      "width" : 1.0
+    }
+  }, {
+    "selector" : "edge[weight = 5]",
+    "css" : {
+      "width" : 5.0
+    }
+  }, {
+    "selector" : "edge[weight > 0.703][weight < 5]",
+    "css" : {
+      "width" : "mapData(weight,0.703,5,1.0,5.0)"
+    }
+  }, {
+    "selector" : "edge[weight = 0.703]",
+    "css" : {
+      "width" : 1.0
+    }
+  }, {
+    "selector" : "edge[weight < 0.703]",
+    "css" : {
+      "width" : 1.0
+    }
+  }, {
+    "selector" : "edge:selected",
+    "css" : {
+      "line-color" : "rgb(255,0,0)"
+    }
+  } ]
+} ]
