@@ -1,9 +1,8 @@
 from passlib.hash import bcrypt
-from datetime import datetime
-import uuid
 from graphdb_connector import connector
 
 driver = connector.getGraphDatabaseConnectionConfiguration()
+
 
 class User:
     def __init__(self, username):
@@ -18,7 +17,7 @@ class User:
             return connector.create_node(driver, "User", username=self.username, password=bcrypt.encrypt(password))
         else:
             return False
-        
+
     def verify_password(self, password):
         user = self.find()
         if user:
