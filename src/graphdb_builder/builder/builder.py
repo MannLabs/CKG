@@ -27,6 +27,32 @@ except Exception as err:
     logger.error("builder - Reading configuration > {}.".format(err))
 
 
+def run_minimal_update(user, n_jobs=3):
+    licensed_dbs = ['phosphositeplus', 'drugbank']
+    licensed_ont = ['Clinical_variable']
+    mapping_ont = ['Disease', 'Gene_ontology', 'Experimental_factor']
+    minimal_load = ['ontologies', 'modified_proteins', 'drugs', 'mentions', 'side effects', 'clinical_variants', 'project', 'experiment']
+    logger.info("The user {} chose to perform a minimal build, after creating the database from a dump".format(user))
+    logger.info("Building database > step 1: Importing licensed ontologies and databases")
+    importer.ontologiesImport(importDirectory=directories['importDirectory'], ontologies=licensed_ont, download=False)
+    importer.ontologiesImport(importDirectory=directories['importDirectory'], ontologies=mapping_ont, download=True)
+    importer.databasesImport(importDirectory=directories['importDirectory'], databases=licensed_dbs, n_jobs=n_jobs, download=False)
+    logger.info("Building database > step 2: Loading all missing nodes and entities")
+    loader.partialUpdate(imports=minimal_load, specific=[])
+
+    return True
+
+
+def run_full_update(user, download, n_jobs=3):
+    logger.info("The user {} chose to perform a full build".format(user))
+    logger.info("Building database > step 1: Importing data from ontologies, databases and experiments")
+    importer.fullImport(download=download, n_jobs=n_jobs)
+    logger.info("Building database > step 2: Loading all data imported into the database")
+    loader.fullUpdate()
+
+    return True
+
+
 def set_arguments():
     """
     This function sets the arguments to be used as input for **builder.py** in the command line.
@@ -48,24 +74,10 @@ if __name__ == '__main__':
     parser = set_arguments()
     args = parser.parse_args()
     download = str(args.download).lower() == "true"
-    licensed_dbs = ['phosphositeplus', 'drugbank']
-    licensed_ont = ['Clinical_variable']
-    mapping_ont = ['Disease', 'Gene_ontology', 'Experimental_factor']
-    minimal_load = ['ontologies', 'modified_proteins', 'drugs', 'mentions', 'side effects', 'clinical_variants', 'project', 'experiment']
     if args.build_type == 'full':
-        logger.info("The user {} chose to perform a full build".format(args.user))
-        logger.info("Building database > step 1: Importing data from ontologies, databases and experiments")
-        importer.fullImport(download=download, n_jobs=args.n_jobs)
-        logger.info("Building database > step 2: Loading all data imported into the database")
-        loader.fullUpdate()
+        run_full_update(args.user, args.n_jobs, download)
     elif args.build_type == 'minimal':
-        logger.info("The user {} chose to perform a minimal build, after creating the database from a dump".format(args.user))
-        logger.info("Building database > step 1: Importing licensed ontologies and databases")
-        importer.ontologiesImport(importDirectory=directories['importDirectory'], ontologies=licensed_ont, download=False)
-        importer.ontologiesImport(importDirectory=directories['importDirectory'], ontologies=mapping_ont, download=True)
-        importer.databasesImport(importDirectory=directories['importDirectory'], databases=licensed_dbs, n_jobs=args.n_jobs, download=False)
-        logger.info("Building database > step 2: Loading all missing nodes and entities")
-        loader.partialUpdate(imports=minimal_load, specific=[])
+        run_minimal_update(args.user, args.n_jobs)
     elif args.build_type == 'import':
         logger.info("The user chose to perform a partial build")
         if args.import_types is not None:

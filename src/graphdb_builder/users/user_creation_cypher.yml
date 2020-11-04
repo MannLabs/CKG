@@ -71,3 +71,10 @@ delete_user:
     involved_rels:
     query: >
         CALL dbms.security.deleteUser($username);
+change_user_password:
+    'name': "Change user's password"
+    'description': ''
+    'query': >
+        MATCH (n {name:$username})
+        SET n.password=toString($new_password)
+        RETURN n.username

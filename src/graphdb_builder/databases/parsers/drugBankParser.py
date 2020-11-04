@@ -31,7 +31,6 @@ def extract_drugs(config, directory):
     structuredFields = config['DrugBank_structures']
 
     vocabulary = parseDrugBankVocabulary(config, directory)
-
     with zipfile.ZipFile(fileName, 'r') as zipped:
         for zfile in zipped.namelist():
             zipped.extract(member=zfile, path=directory)
@@ -65,7 +64,6 @@ def extract_drugs(config, directory):
                             #values["alt_drugbank-id"] = vocabulary[values['id']]
                             values["synonyms"] = list(synonyms)
                             drugs[values["id"]] = values
-
     return drugs
 
 

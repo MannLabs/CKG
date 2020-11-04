@@ -36,7 +36,6 @@ def parser(projectId, type='clinical'):
 
 
 def project_parser(projectId, config, directory, separator):
-    print("Project parser")
     data = {}
     project_data = parse_dataset(projectId, config, directory, key='project')
     if project_data is not None:
@@ -48,7 +47,7 @@ def project_parser(projectId, config, directory, separator):
         data[('studies_intervention', 'w')] = extract_project_intervention_rels(project_data, separator=separator)
         data[('follows_up_project', 'w')] = extract_project_rels(project_data, separator=separator)
         data[('timepoint', 'w')] = extract_timepoints(project_data, separator=separator)
-    print(data)
+
     return data
 
 
@@ -94,15 +93,11 @@ def parse_dataset(projectId, configuration, dataDir, key='project'):
     if 'file_'+key in configuration:
         data_file = configuration['file_'+key].replace('PROJECTID', projectId)
         files = os.listdir(dataDir)
-        print(files)
         regex = r"{}.+".format(data_file)
-        print(regex)
         r = re.compile(regex)
         filename = list(filter(r.match, files))
-        print(filename)
         if len(filename) > 0:
             filepath = os.path.join(dataDir, filename.pop())
-            print(filepath)
             if os.path.isfile(filepath):
                 data = builder_utils.readDataset(filepath)
 
@@ -380,7 +375,6 @@ def extract_biological_sample_group_rels(clinical_data):
 
 
 def extract_biological_sample_clinical_variables_rels(clinical_data):
-    print("CLINICAL DATA", clinical_data.head())
     df_quant = pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE', 'value'])
     df_state = pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE', 'value'])
     if 'biological_sample external_id' in clinical_data:
