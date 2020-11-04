@@ -26,7 +26,7 @@ increment_user_id:
     query: >
         MATCH (u:User)
         WITH max(toInteger(SPLIT(u.id, 'U')[1]))+1 as new_id
-        RETURN SUBSTRING('U',0,1) + new_id AS result;
+        RETURN SUBSTRING('U',0,1) + new_id AS result;    
 create_user_node:
     name: create user node
     description: 'Creates a new user as a node in the database'
