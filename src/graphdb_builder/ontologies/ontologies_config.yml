@@ -59,7 +59,7 @@ parser_filters:
 
 urls: 
     '-26': 
-        - 'https://github.com/DiseaseOntology/HumanDiseaseOntology/raw/master/src/ontology/doid.obo'
+        - 'http://purl.obolibrary.org/obo/doid.obo'
     '-25': 
         - 'http://data.bioontology.org/ontologies/BTO/submissions/33/download?apikey=8b5b7825-538d-40e0-9e9e-5ab9274a9aeb'
     '-21': 
