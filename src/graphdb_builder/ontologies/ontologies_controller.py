@@ -11,6 +11,7 @@ log_config = ckg_config.graphdb_builder_log
 logger = builder_utils.setup_logging(log_config, key="ontologies_controller")
 
 try:
+    cwd = os.path.abspath(os.path.dirname(__file__))
     config = builder_utils.setup_config('ontologies')
 except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
@@ -47,7 +48,7 @@ def parse_ontology(ontology, download=True):
     :return: Tuple with three nested dictionaries: terms, relationships between terms, and definitions of the terms.\
             For more information on the returned dictionaries, see the documentation for any ontology parser.
     """
-    directory = config["ontologies_directory"]
+    directory = os.path.join(cwd, config["ontologies_directory"])
     ontology_directory = os.path.join(directory, ontology)
     builder_utils.checkDirectory(ontology_directory)
     ontology_files = []

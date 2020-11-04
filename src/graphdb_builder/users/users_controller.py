@@ -21,6 +21,7 @@ except Exception as err:
   
 cwd = os.path.abspath(os.path.dirname(__file__))
 
+
 def parseUsersFile(importDirectory, expiration=365):
     """
     Creates new user in the graph database and corresponding node, through the following steps:

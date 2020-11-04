@@ -22,6 +22,29 @@ except Exception as err:
 cwd = os.path.abspath(os.path.dirname(__file__))
 
 
+def create_user_from_dict(driver, data):
+    """
+    Creates graph database node for new user and adds properties to the node.
+
+    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
+    :param dict data: dictionary with the user information).
+    """
+    query_name_node = 'create_user_node'
+    result = None
+    try:
+        cypher = uh.get_user_creation_queries()
+        query = cypher[query_name_node]['query']
+        for q in query.split(';')[0:-1]:
+            result = connector.getCursorData(driver, q+';', parameters=data)
+        logger.info("New user node created: {}. Result: {}".format(data['username'], result))
+    except Exception as err:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        logger.error("Reading query {}: {}, file: {},line: {}, error: {}".format(query_name_node, sys.exc_info(), fname, exc_tb.tb_lineno, err))
+
+    return result
+
+
 def create_user_node(driver, data):
     """
     Creates graph database node for new user and adds respective properties to node.
@@ -30,17 +53,9 @@ def create_user_node(driver, data):
     :type driver: py2neo driver
     :param Series data: pandas Series with new user identifier and required user information (see set_arguments()).
     """
-    query_name_node = 'create_user_node'
-    try:
-        cypher = uh.get_user_creation_queries()
-        query = cypher[query_name_node]['query']
-        for q in query.split(';')[0:-1]:
-            result = connector.getCursorData(driver, q+';', parameters=data.to_dict())
-        logger.info("New user node created: {}. Result: {}".format(data['username'], result))
-    except Exception as err:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        logger.error("Reading query {}: {}, file: {},line: {}, error: {}".format(query_name_node, sys.exc_info(), fname, exc_tb.tb_lineno, err)) 
+    result = create_user_from_dict(driver, data.to_dict())
+    
+    return result
 
 
 def create_user_from_command_line(args, expiration):
