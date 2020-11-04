@@ -32,15 +32,24 @@ def create_user_from_dict(driver, data):
     query_name_node = 'create_user_node'
     result = None
     try:
+        user_id = get_new_user_id(driver)
+        if 'ID' in data and data['ID'] is None:
+            data['ID'] = user_id
+        elif 'ID' not in data:
+            data['ID'] = user_id
+
         cypher = uh.get_user_creation_queries()
         query = cypher[query_name_node]['query']
         for q in query.split(';')[0:-1]:
             result = connector.getCursorData(driver, q+';', parameters=data)
         logger.info("New user node created: {}. Result: {}".format(data['username'], result))
+        print("New user node created: {}. Result: {}".format(data['username'], result))
     except Exception as err:
+        result = False
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         logger.error("Reading query {}: {}, file: {},line: {}, error: {}".format(query_name_node, sys.exc_info(), fname, exc_tb.tb_lineno, err))
+        print("ERROR!!! Reading query {}: {}, file: {},line: {}, error: {}".format(query_name_node, sys.exc_info(), fname, exc_tb.tb_lineno, err))
 
     return result
 
@@ -118,6 +127,21 @@ def create_user_from_file(filepath, expiration):
         data.to_excel(usersFile, index=False)
 
 
+def validate_user(driver, username, email):
+    username_found = uh.check_if_node_exists(driver, 'username', username)
+    email_found = uh.check_if_node_exists(driver, 'email', email)
+
+    return not username_found.empty or not email_found.empty
+
+
+def get_new_user_id(driver):
+    user_identifier = uh.get_new_user_identifier(driver)
+    if user_identifier is None:
+        user_identifier = 'U1'
+
+    return user_identifier
+
+
 def create_user(data, output_file, expiration=365):
     """
     Creates new user in the graph database and corresponding node, through the following steps:
@@ -139,13 +163,9 @@ def create_user(data, output_file, expiration=365):
 
     try:
         for index, row in data.iterrows():
-            username = uh.check_if_node_exists(driver, 'username', row['username'])
-            name = uh.check_if_node_exists(driver, 'name', row['name'])
-            email = uh.check_if_node_exists(driver, 'email', row['email'])
-            if username.empty and name.empty and email.empty:
-                user_identifier = uh.get_new_user_identifier(driver)
-                if user_identifier is None:
-                    user_identifier = 'U1'
+            found = validate_user(driver, row['user_name'], row['email'])
+            if not found:
+                user_identifier = get_new_user_id(driver)
                 row['ID'] = user_identifier
                 row['acronym'] = ''.join([c for c in row['name'] if c.isupper()])
                 row['rolename'] = 'reader'

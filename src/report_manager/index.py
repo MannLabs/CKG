@@ -84,7 +84,7 @@ def display_page(pathname):
                 if 'new_user' in pathname:
                     username = pathname.split('=')[1]
                     if 'error' in pathname:
-                        layout.append(html.Div(children=[html.H3("– Error creating the new user: {} – Failed database".format(username))], className='error_panel'))
+                        layout.append(html.Div(children=[html.H3("– Error creating the new user: {} – ".format(username.replace('%20', ' ')))], className='error_panel'))
                     else:
                         layout.append(html.Div(children=[html.H3("– New user successfully created: {} –".format(username))], className='info_panel'))
                 elif 'running' in pathname:
@@ -345,18 +345,20 @@ def route_create_user():
     email = data.get('email')
     alt_email = data.get('alt_email')
     phone = data.get('phone')
-    username = name[0] + surname
-
-    registered = False
-    iter = 0
-    while not registered:
-        u = user.User(username=username, name=name, affiliation=affiliation, acronym=acronym, phone_number=phone, email=email, secondary_email=alt_email)
-        registered = u.register()
+    uname = name[0] + surname
+    username = uname
+    registered = 'error_exists'
+    iter = 1 
+    while registered == 'error_exists':
+        u = user.User(username=username.lower(), name=name, surname=surname, affiliation=affiliation, acronym=acronym, phone=phone, email=email, alternative_email=alt_email)
+        registered = u.register()        
         if registered is None:
-            rep = flask.redirect('/apps/admin?error_new_user={}'.format(username))
-        elif not registered:
-            iter = iter + 1
-            username = username + str(iter)
+            rep = flask.redirect('/apps/admin?error_new_user={}'.format('Failed Database'))
+        elif registered == 'error_exists':
+            username = uname + str(iter)
+            iter += 1
+        elif registered == 'error_email':
+            rep = flask.redirect('/apps/admin?error_new_user={}'.format('Email already registered'))
         else:
             rep = flask.redirect('/apps/admin?new_user={}'.format(username))
 
