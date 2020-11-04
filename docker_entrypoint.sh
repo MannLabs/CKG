@@ -18,6 +18,7 @@ service redis-server start
 echo "Initiating celery queues"
 cd src/report_manager
 celery -A worker worker --loglevel=DEBUG --concurrency=3 --uid=1500 --gid=nginx -E &
+celery -A worker worker --loglevel=DEBUG --concurrency=3 --uid=1500 --gid=nginx -E -Q update &
 celery -A worker worker --loglevel=DEBUG --concurrency=3 --uid=1500 --gid=nginx -E -Q compute &
 
 
