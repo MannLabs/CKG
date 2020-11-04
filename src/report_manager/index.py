@@ -14,13 +14,13 @@ import dash_html_components as html
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from app import app, server as application
-from apps import initialApp, projectCreationApp, dataUploadApp, dataUpload, projectApp, importsApp, homepageApp, loginApp, projectCreation
+from apps import initialApp, adminApp, projectCreationApp, dataUploadApp, dataUpload, projectApp, importsApp, homepageApp, loginApp, projectCreation
 from graphdb_builder import builder_utils
-from graphdb_builder.builder import loader
+from graphdb_builder.builder import loader, builder
 from graphdb_builder.experiments import experiments_controller as eh
 from report_manager import utils
 import config.ckg_config as ckg_config
-from worker import create_new_project, create_new_identifiers
+from worker import create_new_project, create_new_identifiers, run_minimal_update_task
 from graphdb_connector import connector
 
 log_config = ckg_config.report_manager_log
@@ -78,6 +78,22 @@ def display_page(pathname):
                 return (stats_db.layout, {'display': 'block',
                                           'position': 'absolute',
                                           'right': '50px'}, {'display': 'none'})
+        elif '/apps/admin' in pathname:
+            layout = []
+            if 'admin?' in pathname:
+                if 'new_user' in pathname:
+                    username = pathname.split('=')[1]
+                    if 'error' in pathname:
+                        layout.append(html.Div(children=[html.H3("– Error creating the new user: {} – Failed database".format(username))], className='error_panel'))
+                    else:
+                        layout.append(html.Div(children=[html.H3("– New user successfully created: {} –".format(username))], className='info_panel'))
+                elif 'running' in pathname:
+                    running_type = pathname.split('=')[1]
+                    layout.append(html.Div(children=[html.H3("– The {} update is running. This will take a while, check the logs: graphdb_builder.log for more information –".format(running_type))], className='info_panel'))
+            admin_page = adminApp.AdminApp("CKG Admin Dashboard", "Admin Dashboard", "", layout=layout, logo=None, footer=None)
+            return (admin_page.layout, {'display': 'block',
+                                        'position': 'absolute',
+                                        'right': '50px'}, {'display': 'none'})
         elif '/apps/projectCreationApp' in pathname:
             projectCreation_form = projectCreationApp.ProjectCreationApp("Project Creation", "", "", layout=[], logo=None, footer=None)
             return (projectCreation_form.layout, {'display': 'block', 'position': 'absolute', 'right': '50px'}, {'display': 'none'})
@@ -306,7 +322,7 @@ def route_login():
         return flask.redirect('/login_error')
     else:
         rep = flask.redirect('/')
-        rep.set_cookie('custom-auth-session', username+datetime.now().strftime('%Y%m-%d%H-%M%S-') + str(uuid4()))
+        rep.set_cookie('custom-auth-session', username+'_'+datetime.now().strftime('%Y%m-%d%H-%M%S-') + str(uuid4()))
         return rep
 
 
@@ -318,6 +334,58 @@ def route_logout():
 
     return rep
 
+
+@app.server.route('/create_user', methods=['POST', 'GET'])
+def route_create_user():
+    data = flask.request.form
+    name = data.get('name')
+    surname = data.get('surname')
+    affiliation = data.get('affiliation')
+    acronym = data.get('acronym')
+    email = data.get('email')
+    alt_email = data.get('alt_email')
+    phone = data.get('phone')
+    username = name[0] + surname
+
+    registered = False
+    iter = 0
+    while not registered:
+        u = user.User(username=username, name=name, affiliation=affiliation, acronym=acronym, phone_number=phone, email=email, secondary_email=alt_email)
+        registered = u.register()
+        if registered is None:
+            rep = flask.redirect('/apps/admin?error_new_user={}'.format(username))
+        elif not registered:
+            iter = iter + 1
+            username = username + str(iter)
+        else:
+            rep = flask.redirect('/apps/admin?new_user={}'.format(username))
+
+    return rep
+
+
+@app.server.route('/update_minimal', methods=['POST', 'GET'])
+def route_minimal_update():
+    session_cookie = flask.request.cookies.get('custom-auth-session')
+    username = session_cookie.split('_')[0]
+    internal_id = datetime.now().strftime('%Y%m-%d%H-%M%S-')
+    result = run_minimal_update_task.apply_async(args=[username], task_id='run_minimal_'+session_cookie+internal_id, queue='update')
+
+    rep = flask.redirect('/apps/admin?running=minimal')
+
+    return rep
+
+
+@app.server.route('/update_full', methods=['POST', 'GET'])
+def route_full_update():
+    session_cookie = flask.request.cookies.get('custom-auth-session')
+    data = flask.request.form
+    download = data.get('dwn-radio') == 'true'
+    username = session_cookie.split('_')[0]
+    builder.run_full_update(use=username, download=download)
+    
+    rep = flask.redirect('/apps/admin/running=full')
+
+    return rep
 
 @app.callback(Output('download-zip', 'href'),
               [Input('download-zip', 'n_clicks')],
