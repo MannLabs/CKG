@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from passlib.hash import bcrypt
 from graphdb_connector import connector
 from graphdb_builder.builder import create_user
@@ -7,6 +8,7 @@ driver = connector.getGraphDatabaseConnectionConfiguration()
 
 class User:
     def __init__(self, username, name=None, surname=None, acronym=None, affiliation=None, email=None, alternative_email=None, phone=None, image=None, expiration_date=365, role='reader'):
+        self.id = None
         self.username = username
         self.name = name
         self.surname = surname
@@ -17,22 +19,23 @@ class User:
         self.phone_number = phone
         self.image = image
         self.password = self.generate_initial_password()
-        self.expiration_date = expiration_date
-        self.role = role
+        self.expiration_date = datetime.today() + timedelta(days=expiration_date)
+        self.rolename = role
 
     def to_dict(self):
-        return {'username': self.username,
+        return {'ID': self.id,
+                'username': self.username,
                 'password': self.password,
                 'name': self.name,
                 'surname': self.surname,
                 'acronym': self.acronym,
                 'affiliation': self.affiliation,
                 'email': self.email,
-                'secondinary_email': self.email,
+                'secondary_email': self.email,
                 'phone_number': self.phone_number,
                 'image': self.image,
                 'expiration_date': self.expiration_date,
-                'role': self.role
+                'rolename': self.rolename
                 }
 
     def generate_initial_password(self):
@@ -42,12 +45,22 @@ class User:
         user = connector.find_node(driver, node_type="User", username=self.username)
         return user
 
+    def validate_user(self):
+        user = connector.find_node(driver, node_type="User", username=self.username)
+        email = connector.find_node(driver, node_type="User", email=self.email)
+
+        return user is None and email is None
+
     def register(self):
         result = False
-        if not self.find():
+        if self.find():
+            result = "error_exists"
+        if self.validate_user():
             result = create_user.create_user_from_dict(driver, self.to_dict())
             if result is not None:
-                result = True
+                result = 'ok'
+        else:
+            result = 'error_email'
 
         return result
 
