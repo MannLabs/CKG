@@ -91,3 +91,48 @@ div {
 .dropdown:hover .dropdown-content {
   display: block;
 }
+
+p.description_p {
+  background-color: rgb(32, 92, 204);
+  color: lightblue;
+  width: 400px;
+  padding: 25px;
+}
+
+div.div_framed{
+  padding: 25px;
+  border: 1px solid navy;
+}
+
+div.info_panel{
+  color: #35978f;
+  padding: 5px;
+  border: 1px solid #35978f;
+  text-align: center;
+}
+
+div.error_panel{
+  color: rgb(209,122,108);
+  padding: 5px;
+  border: 1px solid rgb(209,122,108);
+  text-align: center;
+}
+
+label{
+  idth: 400px;
+  line-height: 26px;
+  margin-right: 3px;
+  margin-bottom: 3px;
+}
+
+label.radioitem {
+  margin-bottom: 0px;
+  margin-right: 1px;
+}
+
+input{
+  height: 25px;
+  flex: 0 0 200px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
