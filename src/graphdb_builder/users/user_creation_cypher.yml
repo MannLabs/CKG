@@ -35,7 +35,6 @@ create_user_node:
     involved_rels:
     query: >
         CREATE CONSTRAINT ON (u:User) ASSERT u.id IS UNIQUE;
-        CREATE CONSTRAINT ON (u:User) ASSERT u.name IS UNIQUE;
         CREATE CONSTRAINT ON (u:User) ASSERT u.username IS UNIQUE;
         CREATE CONSTRAINT ON (u:User) ASSERT u.email IS UNIQUE;
         MERGE (u:User {id:$ID})
