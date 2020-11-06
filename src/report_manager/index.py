@@ -84,7 +84,7 @@ def display_page(pathname):
                 if 'new_user' in pathname:
                     username = pathname.split('=')[1]
                     if 'error' in pathname:
-                        layout.append(html.Div(children=[html.H3("– Error creating the new user: {} – ".format(username.replace('%20', ' ')))], className='error_panel'))
+                        layout.append(html.Div(children=[html.H3("– Error creating new user: {} – ".format(username.replace('%20', ' ')))], className='error_panel'))
                     else:
                         layout.append(html.Div(children=[html.H3("– New user successfully created: {} –".format(username))], className='info_panel'))
                 elif 'running' in pathname:
@@ -347,11 +347,12 @@ def route_create_user():
     phone = data.get('phone')
     uname = name[0] + surname
     username = uname
+    
     registered = 'error_exists'
-    iter = 1 
+    iter = 1
     while registered == 'error_exists':
         u = user.User(username=username.lower(), name=name, surname=surname, affiliation=affiliation, acronym=acronym, phone=phone, email=email, alternative_email=alt_email)
-        registered = u.register()        
+        registered = u.register()
         if registered is None:
             rep = flask.redirect('/apps/admin?error_new_user={}'.format('Failed Database'))
         elif registered == 'error_exists':
@@ -359,6 +360,8 @@ def route_create_user():
             iter += 1
         elif registered == 'error_email':
             rep = flask.redirect('/apps/admin?error_new_user={}'.format('Email already registered'))
+        elif registered == 'error_database':
+            rep = flask.redirect('/apps/admin?error_new_user={}'.format('User could not be saved in the database'))
         else:
             rep = flask.redirect('/apps/admin?new_user={}'.format(username))
 
