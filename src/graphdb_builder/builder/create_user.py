@@ -43,13 +43,10 @@ def create_user_from_dict(driver, data):
         for q in query.split(';')[0:-1]:
             result = connector.getCursorData(driver, q+';', parameters=data)
         logger.info("New user node created: {}. Result: {}".format(data['username'], result))
-        print("New user node created: {}. Result: {}".format(data['username'], result))
     except Exception as err:
-        result = False
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         logger.error("Reading query {}: {}, file: {},line: {}, error: {}".format(query_name_node, sys.exc_info(), fname, exc_tb.tb_lineno, err))
-        print("ERROR!!! Reading query {}: {}, file: {},line: {}, error: {}".format(query_name_node, sys.exc_info(), fname, exc_tb.tb_lineno, err))
 
     return result
 

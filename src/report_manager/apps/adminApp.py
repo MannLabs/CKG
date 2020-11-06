@@ -20,19 +20,19 @@ class AdminApp(basicApp.BasicApp):
         self.add_basic_layout()
         create_user_form = [html.H3("Create CKG User"), html.Form([
                         html.Div(children=[html.Label('Name'),
-                                           dcc.Input(placeholder='name', name='name', type='text'),
+                                           dcc.Input(placeholder='name', name='name', type='text', required=True),
                                            html.Label('Surname'),
-                                           dcc.Input(placeholder='surname', name='surname', type='text'), 
+                                           dcc.Input(placeholder='surname', name='surname', type='text', required=True), 
                                            html.Label('Acronym'),
                                            dcc.Input(placeholder='acronym', name='acronym', type='text'),
                                            html.Label('Affiliation'),
-                                           dcc.Input(placeholder='affiliation', name='affiliation', type='text')]),
+                                           dcc.Input(placeholder='affiliation', name='affiliation', type='text', required=True)]),
                         html.Div(children=[html.Label('E-mail'),
-                                           dcc.Input(placeholder='email', name='e-mail', type='email'),
+                                           dcc.Input(placeholder='email', name='email', type='email', required=True),
                                            html.Label('alternative E-mail'),
                                            dcc.Input(placeholder='alt email', name='alt_e-mail', type='email'),
                                            html.Label('Phone number'),
-                                           dcc.Input(placeholder='phone', name='phone', type='tel')]),
+                                           dcc.Input(placeholder='phone', name='phone', type='tel', required=True)]),
                         html.Div(children=[html.Button('CreateUser', type='submit', className='button_link')], style={'width': '100%', 'padding-left': '87%', 'padding-right': '0%'})], action='/create_user', method='post')]
         update_database_bts = [html.H3("Build CKG Database"),
                                html.Div(children=[
