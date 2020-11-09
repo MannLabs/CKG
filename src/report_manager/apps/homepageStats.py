@@ -261,7 +261,8 @@ def quick_numbers_panel():
     navigation_links = [html.H4('Navigate to:'),
                         html.A("Database Imports", href="/apps/imports", className="nav_link"),
                         html.A("Project Creation", href="/apps/projectCreationApp", className="nav_link"),
-                        html.A("Data Upload", href="/apps/dataUploadApp", className="nav_link")]
+                        html.A("Data Upload", href="/apps/dataUploadApp", className="nav_link"),
+                        html.A("Admin", href="/apps/admin", className="nav_link")]
 
     layout = [html.Div(children=navigation_links),
               html.Div(children=project_links[0:5]),
