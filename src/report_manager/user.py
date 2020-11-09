@@ -54,11 +54,9 @@ class User:
     def register(self):
         result = False
         if self.find():
-            print("Found")
             result = "error_exists"
         elif self.validate_user():
             result = create_user.create_user_from_dict(driver, self.to_dict())
-            print("Result", result)
             if result is not None:
                 result = 'ok'
             else:
