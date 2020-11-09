@@ -347,7 +347,7 @@ def route_create_user():
     phone = data.get('phone')
     uname = name[0] + surname
     username = uname
-    
+
     registered = 'error_exists'
     iter = 1
     while registered == 'error_exists':
@@ -387,7 +387,7 @@ def route_full_update():
     download = data.get('dwn-radio') == 'true'
     username = session_cookie.split('_')[0]
     builder.run_full_update(use=username, download=download)
-    
+
     rep = flask.redirect('/apps/admin/running=full')
 
     return rep
