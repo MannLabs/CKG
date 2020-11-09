@@ -16,8 +16,8 @@
     'drugbank_interacts_with_drug':
         - 'START_ID'
         - 'END_ID'
-        - 'TYPE'
         - 'interaction_type'
+        - 'TYPE'
         - 'source'
 
 'DrugBank_fields': 
