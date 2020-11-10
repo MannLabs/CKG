@@ -68,9 +68,9 @@ def experimental_design_parser(projectId, config, directory):
 
 def clinical_parser(projectId, config, clinical_directory, project_directory, separator):
     data = {}
-    project_data = parse_dataset(projectId, config, project_directory, key='project')
+    #project_data = parse_dataset(projectId, config, project_directory, key='project')
     clinical_data = parse_dataset(projectId, config, clinical_directory, key='clinical')
-    if project_data is not None and clinical_data is not None:
+    if clinical_data is not None:
         data[('biosamples_info', 'w')] = extract_biological_samples_info(clinical_data)
         data[('biosample_analytical_attributes', 'w')] = extract_biosample_analytical_sample_relationship_attributes(clinical_data)
         data[('biological_sample_at_timepoint', 'w')] = extract_biological_sample_timepoint_rels(clinical_data)
