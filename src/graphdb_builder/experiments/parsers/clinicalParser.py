@@ -29,7 +29,7 @@ def parser(projectId, type='clinical'):
         design_dfs = experimental_design_parser(projectId, config, design_directory)
         data.update(design_dfs)
     elif type == 'clinical':
-        clinical_dfs = clinical_parser(projectId, config, clinical_directory, project_directory, separator)
+        clinical_dfs = clinical_parser(projectId, config, clinical_directory, separator)
         data.update(clinical_dfs)
 
     return data
@@ -66,9 +66,8 @@ def experimental_design_parser(projectId, config, directory):
     return data
 
 
-def clinical_parser(projectId, config, clinical_directory, project_directory, separator):
+def clinical_parser(projectId, config, clinical_directory, separator):
     data = {}
-    #project_data = parse_dataset(projectId, config, project_directory, key='project')
     clinical_data = parse_dataset(projectId, config, clinical_directory, key='clinical')
     if clinical_data is not None:
         data[('biosamples_info', 'w')] = extract_biological_samples_info(clinical_data)
