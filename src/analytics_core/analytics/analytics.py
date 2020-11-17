@@ -879,18 +879,17 @@ def run_pca(data, drop_cols=['sample', 'subject'], group='group', annotation_col
         if len(drop_cols_int) > 0:
             df = df.drop(drop_cols_int, axis=1)
 
+        y = df[group].tolist()
         df = df.set_index(group)
-        df = df.sort_index()
         df = df.select_dtypes(['number'])
         if dropna:
             df = df.dropna(axis=1)
         X = df.values
-        y = df.index
         annotations = pd.DataFrame()
         if annotation_cols is not None: 
             if len(list(set(annotation_cols).intersection(data.columns))) > 0:
-                annotations = data[annotation_cols]
-
+                annotations = data.set_index(group)[annotation_cols]
+        
         if X.size > 0 and X.shape[1] > components:
             pca = PCA(n_components=components)
             X = pca.fit_transform(X)
@@ -903,19 +902,20 @@ def run_pca(data, drop_cols=['sample', 'subject'], group='group', annotation_col
             args = {"x_title":"PC1"+" ({0:.2f})".format(var_exp[0]),"y_title":"PC2"+" ({0:.2f})".format(var_exp[1]), 'group':'group'}
             if components == 2:
                 resultDf = pd.DataFrame(X, index = y, columns = ["x","y"])
+                resultDf = resultDf.assign(**annotations)
                 resultDf = resultDf.reset_index()
-                resultDf.columns = ["group", "x", "y"]
-                resultDf = resultDf.join(annotations)
+                resultDf.columns = ["group", "x", "y"] + annotation_cols
+                
                 loadings.columns = ['x', 'y', 'value']
             if components > 2:
                 args.update({"z_title":"PC3"+" ({0:.2f})".format(var_exp[2])})
                 resultDf = pd.DataFrame(X, index = y)
+                resultDf = resultDf.assign(**annotations)
                 resultDf = resultDf.reset_index()
                 cols = []
                 if components>3:
                     cols = [str(i) for i in resultDf.columns[4:]]
-                resultDf.columns = ["group", "x", "y", "z"] + cols
-                resultDf = resultDf.join(annotations)
+                resultDf.columns = ["group", "x", "y", "z"]  + cols 
                 loadings.columns = ['x', 'y', 'z'] + cols + ['value']
 
     return (resultDf, loadings, var_exp), args
@@ -2932,7 +2932,7 @@ def get_snf_clusters(data_tuples, num_clusters=None, metric='euclidean', k=5, mu
     :param k: number of neighbors used to measure local affinity (KNN)
     :param mu: normalization factor to scale similarity kernel when constructing affinity matrix
     :return tuple: 1) fused_aff: affinity clustered samples, 2) fused_labels: cluster labels, 
-                    3) num_clusters: number of clusters, 4) silhouette: silhouette score
+                    3) num_clusters: number of clusters, 4) silhouette: average silhouette score
     """
     affinities = []
     for (d, m) in data_tuples:
@@ -2942,7 +2942,7 @@ def get_snf_clusters(data_tuples, num_clusters=None, metric='euclidean', k=5, mu
         num_clusters, second = snf.get_n_clusters(fused_aff)
     fused_labels = cluster.spectral_clustering(fused_aff, n_clusters=num_clusters)
     fused_labels = [i+1 for i in fused_labels]
-    silhouette = metrics.v_measure_score(fused_aff[0], fused_labels)
+    silhouette = snf.metrics.silhouette_score(fused_aff, fused_labels)
     
     return (fused_aff, fused_labels, num_clusters, silhouette)
 
