@@ -1251,11 +1251,14 @@ def get_network(data, identifier, args):
         betweenness = None
         ev_centrality = None
         if data.shape[0] < 150 and data.shape[0] > 5:
-            betweenness = nx.betweenness_centrality(graph, weight='width')
-            ev_centrality = nx.eigenvector_centrality_numpy(graph)
-            ev_centrality = {k:"%.3f" % round(v, 3) for k,v in ev_centrality.items()}
-            nx.set_node_attributes(graph, betweenness, 'betweenness')
-            nx.set_node_attributes(graph, ev_centrality, 'eigenvector')
+            try:
+                betweenness = nx.betweenness_centrality(graph, weight='width')
+                ev_centrality = nx.eigenvector_centrality_numpy(graph)
+                ev_centrality = {k:"%.3f" % round(v, 3) for k,v in ev_centrality.items()}
+                nx.set_node_attributes(graph, betweenness, 'betweenness')
+                nx.set_node_attributes(graph, ev_centrality, 'eigenvector')
+            except Exception as e:
+                print("There was an exception when calculating centralities: {}".format(e))
 
         min_node_size = 0
         max_node_size = 0
