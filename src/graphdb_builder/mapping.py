@@ -204,14 +204,13 @@ def getSTRINGMapping(source="BLAST_UniProt_AC", download=True, db="STRING"):
     return mapping
 
 
-def buildMappingFromOBO(oboFile, ontology):
+def buildMappingFromOBO(oboFile, ontology, outputDir):
     """
     Parses and extracts ontology idnetifiers, names and synonyms from raw file, and writes all the information \
     to a .tsv file.
     :param str oboFile: path to ontology raw file.
     :param str ontology: ontology database acronym as defined in ontologies_config.yml.
     """
-    outputDir = os.path.join(oconfig["ontologies_directory"], ontology)
     cmapping_file = os.path.join(outputDir, "complete_mapping.tsv")
     mapping_file = os.path.join(outputDir, "mapping.tsv")
     identifiers = defaultdict(list)
