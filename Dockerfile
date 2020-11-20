@@ -1,5 +1,5 @@
 #Download base image ubuntu
-FROM ubuntu:latest
+FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV LC_CTYPE en_US.UTF-8
