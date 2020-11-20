@@ -90,7 +90,7 @@ def parse_ontology(ontology, download=True):
             ontologyData, mappings = efoParser.parser(ontology_files)
         else:
             ontologyData = oboParser.parser(ontology, ontology_files)
-            mp.buildMappingFromOBO(ontology_files[0], ontology)
+            mp.buildMappingFromOBO(ontology_files[0], ontology, ontology_directory)
     else:
         if ontology == "SNOMED-CT":
             logger.info("WARNING: SNOMED-CT terminology needs to be downloaded manually since it requires UMLS License. More information available here: https://www.nlm.nih.gov/databases/umls.html")
