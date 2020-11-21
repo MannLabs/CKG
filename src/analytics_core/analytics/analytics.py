@@ -679,7 +679,7 @@ def transform_proteomics_edgelist(df, index_cols=['group', 'sample', 'subject'],
     wdf = None
     if df.columns.isin(index_cols).sum() == len(index_cols):
         wdf = df[df[group].notna()]
-        wdf[group] = wdf[group].astype(str)
+        wdf[index_cols] = wdf[index_cols].astype(str)
         wdf = wdf.set_index(index_cols)
         if extra_identifier is not None and extra_identifier in wdf.columns:
             wdf[identifier] = wdf[extra_identifier].map(str) + "~" + wdf[identifier].map(str)
@@ -914,11 +914,14 @@ def run_pca(data, drop_cols=['sample', 'subject'], group='group', annotation_col
                 resultDf = pd.DataFrame(X, index = y)
                 resultDf = resultDf.assign(**annotations)
                 resultDf = resultDf.reset_index()
-                cols = []
+                pca_cols = []
+                loading_cols = []
                 if components>3:
-                    cols = [str(i) for i in resultDf.columns[4:]]
-                resultDf.columns = ["group", "x", "y", "z"]  + cols 
-                loadings.columns = ['x', 'y', 'z'] + cols + ['value']
+                    pca_cols = [str(i) for i in resultDf.columns[4:]]
+                    loading_cols = [str(i) for i in loadings.columns[3:]]
+
+                resultDf.columns = ["group", "x", "y", "z"]  + pca_cols
+                loadings.columns = ['x', 'y', 'z'] + loading_cols
 
     return (resultDf, loadings, var_exp), args
 
