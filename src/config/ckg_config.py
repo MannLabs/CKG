@@ -1,6 +1,6 @@
 import os
 
-version = "1.0b6"
+version = "1.0a"
 
 cwd = os.path.abspath(os.path.dirname(__file__))
 graphdb_builder_log = os.path.join(cwd, "graphdb_builder_log.config")
