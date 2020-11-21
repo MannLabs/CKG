@@ -8,7 +8,7 @@
 
 **Clinical Knowledge Graph**  
 ============================
-*version: 1.0b1* *BETA*
+*version: 1.0* *ALPHA*
 
 A Python project that allows you to analyse proteomics and clinical data, and integrate and mine knowledge from multiple biomedical databases widely used nowadays.
 
@@ -17,6 +17,7 @@ A Python project that allows you to analyse proteomics and clinical data, and in
 * GitHub: `https://github.com/MannLabs/CKG <https://github.com/MannLabs/CKG>`_
 * Free and open source software: `MIT license <https://github.com/MannLabs/CKG/LICENSE.rst>`_
 * Reference: https://www.biorxiv.org/content/10.1101/2020.05.09.084897v1
+* Graph Database dump file and additional relationships: https://data.mendeley.com/datasets/mrcf7f4tc2/1
 
 
 Abstract
@@ -136,4 +137,6 @@ The databases provided within the Clinical Knowledge Graph (CKG) have their own 
 | Ontology    | Molecular Interactions Ontology | https://www.ebi.ac.uk/ols/ontologies/mi                    | https://www.ncbi.nlm.nih.gov/pubmed/23482073 |
 +-------------+---------------------------------+------------------------------------------------------------+----------------------------------------------+
 | Ontology    | Mass Spectrometry Ontology      | https://www.ebi.ac.uk/ols/ontologies/ms                    | https://www.ncbi.nlm.nih.gov/pubmed/23482073 |
++-------------+---------------------------------+------------------------------------------------------------+----------------------------------------------+
+| Ontology    | Units Ontology                  | https://bioportal.bioontology.org/ontologies/UO            | https://www.ncbi.nlm.nih.gov/pubmed/23060432 |
 +-------------+---------------------------------+------------------------------------------------------------+----------------------------------------------+
