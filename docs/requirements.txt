@@ -161,7 +161,7 @@ sqlparse==0.3.0
 snfpy==0.2.1
 statsmodels==0.10.0
 tables==3.6.1
-tensorflow==2.2.0
+tensorflow==2.3.1
 termcolor==1.1.0
 terminado==0.8.2
 testpath==0.4.2
