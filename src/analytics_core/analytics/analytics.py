@@ -851,7 +851,10 @@ def check_normality(data, drop_cols=['group','sample', 'subject'], group_col='gr
 
     return shapiro_wilk_results
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> feature_addition
 def run_pca(data, drop_cols=['sample', 'subject'], group='group', annotation_cols=['sample'], components=2, dropna=True):
     """
     Performs principal component analysis and returns the values of each component for each sample and each protein, and the loadings for each protein. \
@@ -1611,11 +1614,14 @@ def calculate_anova(df, column, group='group'):
     :return: Tuple with t-statistics and p-value.
     """
 <<<<<<< HEAD
+<<<<<<< HEAD
     aov_result = pg.anova(data=df, dv=column, between=group, detailed=True)
     t, pvalue = aov_result[['F', 'p-unc']].values.tolist()[0]
     df1, df2 = aov_result['DF']
 
 =======
+=======
+>>>>>>> feature_addition
     aov_result = pg.anova(data=df, dv=column, between=group)
     df1, df2, t, pvalue = aov_result[['ddof1', 'ddof2', 'F', 'p-unc']].values.tolist()[0]
     
@@ -1652,11 +1658,14 @@ def calculate_repeated_measures_anova(df, column, subject='subject', group='grou
         result = calculate_repeated_measures_anova(df, 'protein a', subject='subject', group='group')
     """
 <<<<<<< HEAD
+<<<<<<< HEAD
     aov_result = pg.rm_anova(data=df, dv=column, within=group, subject=subject, detailed=True, correction=True)
     t, pvalue = aov_result.loc[0, ['F', 'p-unc']].values.tolist()
     df1, df2 = aov_result['DF']
 
 =======
+=======
+>>>>>>> feature_addition
     df1 = np.nan
     df2 = np.nan
     t = np.nan
@@ -2280,7 +2289,10 @@ def run_site_regulation_enrichment(regulation_data, annotation, identifier='iden
     return result
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> feature_addition
 def run_up_down_regulation_enrichment(regulation_data, annotation, identifier='identifier', groups=['group1', 'group2'], annotation_col='annotation', reject_col='rejected', group_col='group', method='fisher', correction='fdr_bh', alpha=0.05, lfc_cutoff=1):
     enrichment_results = {}
     for g1, g2 in regulation_data.groupby(groups).groups:
@@ -2301,7 +2313,10 @@ def run_up_down_regulation_enrichment(regulation_data, annotation, identifier='i
         
     return enrichment_results
         
+<<<<<<< HEAD
 >>>>>>> Improcing functional enrichment with scatterplot viz and knowledge network
+=======
+>>>>>>> feature_addition
 def run_regulation_enrichment(regulation_data, annotation, identifier='identifier', groups=['group1', 'group2'], annotation_col='annotation', reject_col='rejected', group_col='group', method='fisher', correction='fdr_bh'):
     """
     This function runs a simple enrichment analysis for significantly regulated features in a dataset.

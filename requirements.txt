@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 absl-py==0.7.1
 aiohttp==3.5.4
 amqp==2.5.0
@@ -105,6 +106,8 @@ osqp==0.5.0
 packaging==19.0
 =======
 >>>>>>> Solving issues with Docker - issue #28
+=======
+>>>>>>> feature_addition
 pandas==0.24.2
 Flask==1.0.3
 passlib==1.7.1
