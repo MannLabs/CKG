@@ -96,7 +96,7 @@ def parse_contents(contents, filename):
     decoded = base64.b64decode(content_string)
     file_format = filename.split('.')[-1]
 
-    if file_format == 'txt':
+    if file_format == 'txt' or file_format == 'tsv':
         df = pd.read_csv(io.StringIO(decoded.decode('utf-8')), sep='\t', low_memory=True)
     elif file_format == 'csv':
         df = pd.read_csv(io.StringIO(decoded.decode('utf-8')), low_memory=True)
@@ -113,11 +113,11 @@ def export_contents(data, dataDir, filename):
     """
     file = filename.split('.')[-1]
     if file == 'txt' or file == 'tsv':
-        csv_string = data.to_csv(os.path.join(dataDir, filename), sep='\t', index=True, encoding='utf-8')
+        csv_string = data.to_csv(os.path.join(dataDir, filename), sep='\t', index=False, encoding='utf-8')
     elif file == 'csv':
-        csv_string = data.to_csv(os.path.join(dataDir, filename), sep=',', index=True, encoding='utf-8')
+        csv_string = data.to_csv(os.path.join(dataDir, filename), sep=',', index=False, encoding='utf-8')
     elif file == 'xlsx' or file == 'xls':
-        csv_string = data.to_excel(os.path.join(dataDir, filename), index=True, encoding='utf-8')
+        csv_string = data.to_excel(os.path.join(dataDir, filename), index=False, encoding='utf-8')
     return csv_string
 
 

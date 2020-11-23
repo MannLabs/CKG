@@ -1,3 +1,5 @@
+import os
+import uuid
 import time
 import pandas as pd
 import collections
@@ -8,12 +10,14 @@ from sklearn.manifold import TSNE
 from sklearn.cluster import AffinityPropagation
 from sklearn.utils import shuffle
 from statsmodels.stats import multitest
+from statsmodels.stats.power import FTestAnovaPower
 import dabest
 import scipy.stats
 from scipy.special import factorial, betainc
 import umap
-from sklearn import preprocessing, ensemble, cluster
+from sklearn import preprocessing, ensemble, cluster, metrics
 from scipy import stats
+import gseapy as gp
 import pingouin as pg
 import numpy as np
 import networkx as nx
@@ -42,6 +46,8 @@ try:
 except ImportError:
     r_installation = False
     print("R functions will not work. Module Rpy2 not installed.")
+
+cwd = os.path.abspath(os.path.dirname(__file__))
 
 
 def unit_vector(vector):
@@ -106,6 +112,7 @@ def transform_into_wide_format(data, index, columns, values, extra=[]):
 
     """
     df = pd.DataFrame()
+    extra_cols = None
     if data is not None:
         df = data.copy()
         if not df.empty:
@@ -120,11 +127,14 @@ def transform_into_wide_format(data, index, columns, values, extra=[]):
                 utils.append_to_list(extra, index)
                 extra_cols = df[extra].set_index(index)
             df = df[cols]
+            df = df.drop_duplicates()
             if isinstance(index, list):
-                df = df.pivot_table(index=index, columns=columns, values=values)
+                df = df.pivot_table(index=index, columns=columns, values=values, aggfunc='first')
             else:
                 df = df.pivot(index=index, columns=columns, values=values)
-            df = df.join(extra_cols)
+            if extra_cols is not None:
+                df = df.join(extra_cols)
+
             df = df.drop_duplicates()
             df = df.reset_index()
 
@@ -329,7 +339,7 @@ def imputation_normal_distribution(data, index_cols=['group', 'sample', 'subject
         df = df.set_index(index_cols)
 
     data_imputed = df.T.sort_index()
-    null_columns = data_imputed.columns[data_imputed.isnull().any()]
+    null_columns = data_imputed.isnull().any().index.tolist()
     for c in null_columns:
         missing = data_imputed[data_imputed[c].isnull()].index.tolist()
         std = data_imputed[c].std()
@@ -339,20 +349,26 @@ def imputation_normal_distribution(data, index_cols=['group', 'sample', 'subject
         value = 0.0
         if not math.isnan(std) and not math.isnan(mean) and not math.isnan(sigma) and not math.isnan(mu):
             value = np.random.normal(mu, sigma, size=len(missing))
-
-        data_imputed.loc[missing, c] = value
+        i = 0
+        for m in missing:
+            if not isinstance(value, np.ndarray):
+                data_imputed.loc[m, c] = value
+            else:
+                data_imputed.loc[m, c] = value[i]
+                i += 1
 
     return data_imputed.T
 
 
-def normalize_data_per_group(data, group, method='median'):
+def normalize_data_per_group(data, group, method='median', normalize=None):
     """
     This function normalizes the data by group using the selected method
 
     :param data: DataFrame with the data to be normalized (samples x features)
     :param group_col: Column containing the groups
-    :param string method: normalization method to choose among: median_polish, median,
+    :param str method: normalization method to choose among: median_polish, median,
                         quantile, linear
+    :param str normalize: whether the normalization should be done by 'features' (columns) or 'samples' (rows) (default None)
     :return: Pandas dataframe.
 
     Example::
@@ -361,19 +377,20 @@ def normalize_data_per_group(data, group, method='median'):
     """
     ndf = pd.DataFrame(columns=data.columns)
     for n, gdf in data.groupby(group):
-        norm_group = normalize_data(gdf, method=method)
+        norm_group = normalize_data(gdf, method=method, normalize=normalize)
         ndf = ndf.append(norm_group)
 
     return ndf
 
 
-def normalize_data(data, method='median_polish'):
+def normalize_data(data, method='median', normalize=None):
     """
     This function normalizes the data using the selected method
 
     :param data: DataFrame with the data to be normalized (samples x features)
     :param string method: normalization method to choose among: median_polish, median,
                         quantile, linear
+    :param str normalize: whether the normalization should be done by 'features' (columns) or 'samples' (rows) (default None)
     :return: Pandas dataframe.
 
     Example::
@@ -386,14 +403,16 @@ def normalize_data(data, method='median_polish'):
     if not numeric_cols.empty:
         if method == 'median_polish':
             normData = median_polish_normalization(numeric_cols, max_iter=250)
+        elif method == 'median_zero':
+            normData = median_zero_normalization(numeric_cols, normalize)
         elif method == 'median':
-            normData = median_normalization(numeric_cols)
+            normData = median_normalization(numeric_cols, normalize)
         elif method == 'quantile':
             normData = quantile_normalization(numeric_cols)
         elif method == 'linear':
-            normData = linear_normalization(numeric_cols, method="l1", axis=0)
+            normData = linear_normalization(numeric_cols, method="l1", normalize=normalize)
         elif method == 'zscore':
-            normData = zscore_normalization(numeric_cols)
+            normData = zscore_normalization(numeric_cols, normalize)
 
     if non_numeric_cols is not None and not non_numeric_cols.empty:
         normData = normData.join(non_numeric_cols)
@@ -401,33 +420,71 @@ def normalize_data(data, method='median_polish'):
     return normData
 
 
-def median_normalization(data):
+def median_zero_normalization(data, normalize='samples'):
     """
     This function normalizes each sample by using its median.
 
     :param data:
-    :return: Pandas dataframe.
-
-    Example::
-
-        result = median_normalization(data)
-    """
-
-    normData = data.sub(data.median(axis=0), axis=1)
-
-    return normData
-
-
-def zscore_normalization(data):
-    """
-    This function normalizes each sample by using its mean and standard deviation (mean=0, std=1).
-
-    :param data:
+    :param str normalize: whether the normalization should be done by 'features' (columns) or 'samples' (rows)
     :return: Pandas dataframe.
 
     Example::
         data = pd.DataFrame({'a': [2,5,4,3,3], 'b':[4,4,6,5,3], 'c':[4,14,8,8,9]})
-        result = zscore_normalization(data)
+        result = median_normalization(data, normalize='samples')
+        result
+                a         b         c
+            0 -1.333333  0.666667  0.666667
+            1 -2.666667 -3.666667  6.333333
+            2 -2.000000  0.000000  2.000000
+            3 -2.333333 -0.333333  2.666667
+            4 -2.000000 -2.000000  4.000000
+    """
+    if normalize is None or normalize == 'samples':
+        normData = data.sub(data.median(axis=1), axis=0)
+    else:
+        normData = data.sub(data.median(axis=0), axis=1)
+
+    return normData
+
+
+def median_normalization(data, normalize='samples'):
+    """
+    This function normalizes each sample by using its median.
+
+    :param data:
+    :param str normalize: whether the normalization should be done by 'features' (columns) or 'samples' (rows)
+    :return: Pandas dataframe.
+
+    Example::
+        data = pd.DataFrame({'a': [2,5,4,3,3], 'b':[4,4,6,5,3], 'c':[4,14,8,8,9]})
+        result = median_normalization(data, normalize='samples')
+        result
+                a         b         c
+            0 -1.333333  0.666667  0.666667
+            1 -2.666667 -3.666667  6.333333
+            2 -2.000000  0.000000  2.000000
+            3 -2.333333 -0.333333  2.666667
+            4 -2.000000 -2.000000  4.000000
+    """
+    if normalize is None or normalize == 'samples':
+        normData = data.sub(data.median(axis=1) - data.median(axis=1).median(), axis=0)
+    else:
+        normData = data.sub(data.median(axis=0) - data.median(axis=0).median(), axis=1)
+        
+    return normData
+
+
+def zscore_normalization(data, normalize='samples'):
+    """
+    This function normalizes each sample by using its mean and standard deviation (mean=0, std=1).
+
+    :param data:
+    :param str normalize: whether the normalization should be done by 'features' (columns) or 'samples' (rows)
+    :return: Pandas dataframe.
+
+    Example::
+        data = pd.DataFrame({'a': [2,5,4,3,3], 'b':[4,4,6,5,3], 'c':[4,14,8,8,9]})
+        result = zscore_normalization(data, normalize='samples')
         result
                   a         b         c
                 0 -1.154701  0.577350  0.577350
@@ -436,8 +493,12 @@ def zscore_normalization(data):
                 3 -0.927173 -0.132453  1.059626
                 4 -0.577350 -0.577350  1.154701        
     """
-    normData = data.sub(data.mean(axis=0), axis=1).div(data.std(axis=0), axis=1)
+    if normalize is None or normalize == 'samples':
+        normData = data.sub(data.mean(axis=1), axis=0).div(data.std(axis=1), axis=0)
 
+    else:
+        normData = data.sub(data.mean(axis=0), axis=1).div(data.std(axis=0), axis=1)
+        
     return normData
 
 
@@ -451,8 +512,15 @@ def median_polish_normalization(data, max_iter=250):
     :return: Pandas dataframe.
 
     Example::
-
+        data = pd.DataFrame({'a': [2,5,4,3,3], 'b':[4,4,6,5,3], 'c':[4,14,8,8,9]})
         result = median_polish_normalization(data, max_iter = 10)
+        result
+                a    b     c
+            0  2.0  4.0   7.0
+            1  5.0  7.0  10.0
+            2  4.0  6.0   9.0
+            3  3.0  5.0   8.0
+            4  3.0  5.0   8.0
     """
     mediandf = data.copy()
     for i in range(max_iter):
@@ -476,8 +544,15 @@ def quantile_normalization(data):
     :return: Pandas dataframe
 
     Example::
-
+        data = pd.DataFrame({'a': [2,5,4,3,3], 'b':[4,4,6,5,3], 'c':[4,14,8,8,9]})
         result = quantile_normalization(data)
+        result
+                a    b    c
+            0  3.2  4.6  4.6
+            1  4.6  3.2  8.6
+            2  3.2  4.6  8.6
+            3  3.2  4.6  8.6
+            4  3.2  3.2  8.6
     """
     rank_mean = data.T.stack().groupby(data.T.rank(method='first').stack().astype(int)).mean()
     normdf = data.T.rank(method='min').stack().astype(int).map(rank_mean).unstack().T
@@ -485,20 +560,31 @@ def quantile_normalization(data):
     return normdf
 
 
-def linear_normalization(data, method="l1", axis=0):
+def linear_normalization(data, method="l1", normalize='samples'):
     """
     This function scales input data to a unit norm. For more information visit https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.normalize.html.
 
     :param data: pandas dataframe with samples as rows and features as columns.
     :param str method: norm to use to normalize each non-zero sample or non-zero feature (depends on axis).
-    :param int axis: axis used to normalize the data along. If 1, independently normalize each sample, otherwise (if 0) normalize each feature.
+    :param str normalize: axis used to normalize the data along. If 'samples', independently normalize each sample, if 'features' normalize each feature.
     :return: Pandas dataframe
 
     Example::
-
-        result = linear_normalization(data, method = "l1", axis = 0)
+        data = pd.DataFrame({'a': [2,5,4,3,3], 'b':[4,4,6,5,3], 'c':[4,14,8,8,9]})
+        result = linear_normalization(data, method = "l1", by = 'feature')
+        result
+                a         b         c
+            0  0.117647  0.181818  0.093023
+            1  0.294118  0.181818  0.325581
+            2  0.235294  0.272727  0.186047
+            3  0.176471  0.227273  0.186047
+            4  0.176471  0.136364  0.209302
     """
-    normvalues = preprocessing.normalize(data.fillna(0).values, norm=method, axis=axis, copy=True, return_norm=False)
+    if normalize is None or normalize == 'samples':
+        normvalues = preprocessing.normalize(data.fillna(0).values, norm=method, axis=0, copy=True, return_norm=False)
+    else:
+        normvalues = preprocessing.normalize(data.fillna(0).values, norm=method, axis=1, copy=True, return_norm=False)
+
     normdf = pd.DataFrame(normvalues, index=data.index, columns=data.columns)
 
     return normdf
@@ -591,7 +677,7 @@ def transform_proteomics_edgelist(df, index_cols=['group', 'sample', 'subject'],
     wdf = None
     if df.columns.isin(index_cols).sum() == len(index_cols):
         wdf = df[df[group].notna()]
-        wdf[group] = wdf[group].astype(str)
+        wdf[index_cols] = wdf[index_cols].astype(str)
         wdf = wdf.set_index(index_cols)
         if extra_identifier is not None and extra_identifier in wdf.columns:
             wdf[identifier] = wdf[extra_identifier].map(str) + "~" + wdf[identifier].map(str)
@@ -603,10 +689,9 @@ def transform_proteomics_edgelist(df, index_cols=['group', 'sample', 'subject'],
     return wdf
 
 
-def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation=True, method='distribution', missing_method='percentage', missing_per_group=True, missing_max=0.3, min_valid=1, value_col='LFQ_intensity', shift=1.8, nstd=0.3, knn_cutoff=0.6, normalize=False, normalization_method='median', normalize_group=False):
+def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', filter_samples=False, filter_samples_percent=0.5, imputation=True, method='distribution', missing_method='percentage', missing_per_group=True, missing_max=0.3, min_valid=1, value_col='LFQ_intensity', shift=1.8, nstd=0.3, knn_cutoff=0.6, normalize=False, normalization_method='median', normalize_group=False, normalize_by=None):
     """
     Processes proteomics data extracted from the database: 1) filter proteins with high number of missing values (> missing_max or min_valid), 2) impute missing values.
-    For more information on imputation method visit http://www.coxdocs.org/doku.php?id=perseus:user:activities:matrixprocessing:filterrows:filtervalidvaluesrows.
 
     :param df: long-format pandas dataframe with columns 'group', 'sample', 'subject', 'identifier' (protein), 'name' (gene) and 'LFQ_intensity'.
     :param list index_cols: column labels to be be kept as index identifiers.
@@ -614,6 +699,8 @@ def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subjec
     :param str group: column label containing group identifiers.
     :param str identifier: column label containing feature identifiers.
     :param str extra_identifier: column label containing additional protein identifiers (e.g. gene names).
+    :param bool filter_samples: if True filter samples with valid values below percentage (filter_samples_percent).
+    :param float filter_samples_percent: defines the maximum percentage of missing values allowed in a sample.
     :param bool imputation: if True performs imputation of missing values.
     :param str method:  method for missing values imputation ('KNN', 'distribuition', or 'mixed')
     :param str missing_method: defines which expression rows are counted to determine if a column has enough valid values to survive the filtering process.
@@ -624,7 +711,11 @@ def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subjec
     :param float shift: when using distribution imputation, the down-shift
     :param float nstd: when using distribution imputation, the width of the distribution
     :param float knn_cutoff: when using KNN imputation, the minimum percentage of valid values for which to use KNN imputation (i.e. 0.6 -> if 60% valid values use KNN, otherwise MinProb)
-    :return: Pandas dataframe with samples as rows and protein identifiers (UniprotID~GeneName) as columns (with additional columns 'group', 'sample' and 'subject').
+    :param bool normalize: whether or not to normalize the data 
+    :param str normalization_method: method to be used to normalize the data ('median', 'quantile', 'linear', 'zscore', 'median_polish') (only with normalize=True)
+    :param bool normalize_group: normalize per group or not (only with normalize=True)
+    :param str normalize_by: whether the normalization should be done by 'features' (columns) or 'samples' (rows) (only with normalize=True)
+    :return: Pandas dataframe with samples as rows and protein identifiers as columns (with additional columns 'group', 'sample' and 'subject').
 
     Example 1::
 
@@ -636,11 +727,6 @@ def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subjec
     """
     df = transform_proteomics_edgelist(df, index_cols=index_cols, drop_cols=drop_cols, group=group, identifier=identifier, extra_identifier=extra_identifier, value_col=value_col)
     if df is not None:
-        if normalize:
-            if not normalize_group:
-                df = normalize_data(df, method=normalization_method)
-            else:
-                df = normalize_data_per_group(df, group=group, method=normalization_method)
         aux = []
         aux.extend(index_cols)
         g = group
@@ -652,6 +738,15 @@ def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subjec
             aux.extend(extract_percentage_missing(df,  missing_max, drop_cols, group=g))
 
         df = df[list(set(aux))]
+        if filter_samples:
+            df = df.loc[~(df.T.isna().mean() > filter_samples_percent)]
+
+        if normalize:
+            if not normalize_group:
+                df = normalize_data(df, method=normalization_method, normalize=normalize_by)
+            else:
+                df = normalize_data_per_group(df, group=group, method=normalization_method, normalize=normalize_by)
+                
         if imputation:
             if method.lower() == "knn":
                 df = imputation_KNN(df, drop_cols=index_cols, group=group, cutoff=knn_cutoff, alone=True)
@@ -665,7 +760,7 @@ def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subjec
     return df
 
 
-def get_clinical_measurements_ready(df, subject_id='subject', sample_id='biological_sample', group_id='group', columns=['clinical_variable'], values='values', extra=['group'], imputation=True, imputation_method='KNN'):
+def get_clinical_measurements_ready(df, subject_id='subject', sample_id='biological_sample', group_id='group', columns=['clinical_variable'], values='values', extra=['group'], imputation=True, imputation_method='KNN', missing_method='percentage', missing_max=0.3, min_valid=1):
     """
     Processes clinical data extracted from the database by converting dataframe to wide-format and imputing missing values.
 
@@ -678,6 +773,9 @@ def get_clinical_measurements_ready(df, subject_id='subject', sample_id='biologi
     :param list extra: additional column labels to be kept as columns
     :param bool imputation: if True performs imputation of missing values.
     :param str imputation_method: method for missing values imputation ('KNN', 'distribuition', or 'mixed').
+    :param str missing_method: defines which expression rows are counted to determine if a column has enough valid values to survive the filtering process.
+    :param float missing_max: maximum ratio of missing/valid values to be filtered.
+    :param int min_valid: minimum number of valid values to be filtered.
     :return: Pandas dataframe with samples as rows and clinical variables as columns (with additional columns 'group', 'subject' and 'biological_sample').
 
     Example::
@@ -685,21 +783,27 @@ def get_clinical_measurements_ready(df, subject_id='subject', sample_id='biologi
         result = get_clinical_measurements_ready(df, subject_id='subject', sample_id='biological_sample', group_id='group', columns=['clinical_variable'], values='values', extra=['group'], imputation=True, imputation_method='KNN')
     """
     index = [subject_id, sample_id]
-    drop_cols = [subject_id, sample_id]
-    drop_cols.append(group_id)
+    aux = [group_id]
+    aux.extend(index)
+    drop_cols = index
 
     processed_df = df[df['rel_type'] == 'HAS_QUANTIFIED_CLINICAL']
     processed_df[values] = processed_df[values].astype('float')
     processed_df = transform_into_wide_format(processed_df, index=index, columns=columns, values=values, extra=extra)
+    if missing_method == 'at_least_x':
+        aux.extend(extract_number_missing(processed_df, min_valid, drop_cols, group=group_id))
+    elif missing_method == 'percentage':
+        aux.extend(extract_percentage_missing(processed_df,  missing_max, drop_cols, group=group_id))
     
+    processed_df = processed_df[list(set(aux))]
+    drop_cols.append(group_id)
     if imputation:
         if imputation_method.lower() == "knn":
-            df = imputation_KNN(processed_df, drop_cols=drop_cols, group=group_id)
+            df = imputation_KNN(processed_df, drop_cols=drop_cols, group=group_id, cutoff=0.0)
         elif imputation_method.lower() == "distribution":
             df = imputation_normal_distribution(processed_df, index_cols=index)
         elif imputation_method.lower() == 'mixed':
             df = imputation_mixed_norm_KNN(processed_df,index_cols=index, group=group_id)
-
 
     return df
 
@@ -746,7 +850,7 @@ def check_normality(data, drop_cols=['group','sample', 'subject'], group_col='gr
     return shapiro_wilk_results    
 
 
-def run_pca(data, drop_cols=['sample', 'subject'], group='group', components=2, dropna=True):
+def run_pca(data, drop_cols=['sample', 'subject'], group='group', annotation_cols=['sample'], components=2, dropna=True):
     """
     Performs principal component analysis and returns the values of each component for each sample and each protein, and the loadings for each protein. \
     For information visit https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html.
@@ -754,9 +858,10 @@ def run_pca(data, drop_cols=['sample', 'subject'], group='group', components=2, 
     :param data: pandas dataframe with samples as rows and protein identifiers as columns (with additional columns 'group', 'sample' and 'subject').
     :param list drop_cols: column labels to be dropped from the dataframe.
     :param str group: column label containing group identifiers.
+    :param list annotation_cols: list of columns to be added in the scatter plot annotation
     :param int components: number of components to keep.
     :param bool dropna: if True removes all columns with any missing values.
-    :return: Two dictionaries: 1) two pandas dataframes (first one with components values, the second with the components vectors for each protein), 2) xaxis and yaxis titles with components loadings for plotly.
+    :return: tuple: 1) three pandas dataframes: components, loadings and variance; 2) xaxis and yaxis titles with components loadings for plotly.
 
     Example::
 
@@ -764,48 +869,62 @@ def run_pca(data, drop_cols=['sample', 'subject'], group='group', components=2, 
     """
 
     np.random.seed(112736)
-    result = {}
+    resultDf = pd.DataFrame()
+    loadings = pd.DataFrame()
+    var_exp = []
     args = {}
-    df = data.copy()
-    if len(set(drop_cols).intersection(df.columns)) == len(drop_cols):
-        df = df.drop(drop_cols, axis=1)
+    if not data.empty:
+        df = data.copy()
+        drop_cols_int = list(set(drop_cols).intersection(df.columns))
+        if len(drop_cols_int) > 0:
+            df = df.drop(drop_cols_int, axis=1)
 
-    df = df.set_index(group)
-    df = df.select_dtypes(['number'])
-    if dropna:
-        df = df.dropna(axis=1)
-    X = df.values
-    y = df.index
-    if X.size > 0:
-        pca = PCA(n_components=components)
-        X = pca.fit_transform(X)
-        var_exp = pca.explained_variance_ratio_
-        loadings = pd.DataFrame(pca.components_.transpose())
-        loadings.index = df.columns
-        values = {index:np.sqrt(np.power(row, 2).sum()) for index, row in loadings.iterrows()}
-        loadings['value'] = loadings.index.map(values.get)
-        loadings = loadings.sort_values(by='value', ascending=False)
-        args = {"x_title":"PC1"+" ({0:.2f})".format(var_exp[0]),"y_title":"PC2"+" ({0:.2f})".format(var_exp[1])}
-        if components == 2:
-            resultDf = pd.DataFrame(X, index = y, columns = ["x","y"])
-            resultDf = resultDf.reset_index()
-            resultDf.columns = ["name", "x", "y"]
-            loadings.columns = ['x', 'y', 'value']
-        if components > 2:
-            args.update({"z_title":"PC3"+" ({0:.2f})".format(var_exp[2])})
-            resultDf = pd.DataFrame(X, index = y)
-            resultDf = resultDf.reset_index()
-            cols = []
-            if components>3:
-                cols = [str(i) for i in resultDf.columns[4:]]
-            resultDf.columns = ["name", "x", "y", "z"] + cols
-            loadings.columns = ['x', 'y', 'z'] + cols + ['value']
+        y = df[group].tolist()
+        df = df.set_index(group)
+        df = df.select_dtypes(['number'])
+        if dropna:
+            df = df.dropna(axis=1)
+        X = df.values
+        annotations = pd.DataFrame()
+        if annotation_cols is not None: 
+            if len(list(set(annotation_cols).intersection(data.columns))) > 0:
+                annotations = data.set_index(group)[annotation_cols]
+        
+        if X.size > 0 and X.shape[1] > components:
+            pca = PCA(n_components=components)
+            X = pca.fit_transform(X)
+            var_exp = pca.explained_variance_ratio_
+            loadings = pd.DataFrame(pca.components_.transpose())
+            loadings.index = df.columns
+            values = {index:np.sqrt(np.power(row, 2).sum()) for index, row in loadings.iterrows()}
+            loadings['value'] = loadings.index.map(values.get)
+            loadings = loadings.sort_values(by='value', ascending=False)
+            args = {"x_title":"PC1"+" ({0:.2f})".format(var_exp[0]),"y_title":"PC2"+" ({0:.2f})".format(var_exp[1]), 'group':'group'}
+            if components == 2:
+                resultDf = pd.DataFrame(X, index = y, columns = ["x","y"])
+                resultDf = resultDf.assign(**annotations)
+                resultDf = resultDf.reset_index()
+                resultDf.columns = ["group", "x", "y"] + annotation_cols
+                
+                loadings.columns = ['x', 'y', 'value']
+            if components > 2:
+                args.update({"z_title":"PC3"+" ({0:.2f})".format(var_exp[2])})
+                resultDf = pd.DataFrame(X, index = y)
+                resultDf = resultDf.assign(**annotations)
+                resultDf = resultDf.reset_index()
+                pca_cols = []
+                loading_cols = []
+                if components>3:
+                    pca_cols = [str(i) for i in resultDf.columns[4:]]
+                    loading_cols = [str(i) for i in loadings.columns[3:]]
 
-        result['pca'] = (resultDf, loadings)
-    return result, args
+                resultDf.columns = ["group", "x", "y", "z"]  + pca_cols
+                loadings.columns = ['x', 'y', 'z'] + loading_cols
+
+    return (resultDf, loadings, var_exp), args
 
 
-def run_tsne(data, drop_cols=['sample', 'subject'], group='group', components=2, perplexity=40, n_iter=1000, init='pca', dropna=True):
+def run_tsne(data, drop_cols=['sample', 'subject'], group='group', annotation_cols=['sample'], components=2, perplexity=40, n_iter=1000, init='pca', dropna=True):
     """
     Performs t-distributed Stochastic Neighbor Embedding analysis. For more information visit https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html.
 
@@ -813,6 +932,7 @@ def run_tsne(data, drop_cols=['sample', 'subject'], group='group', components=2,
     :param list drop_cols: column labels to be dropped from the dataframe.
     :param str group: column label containing group identifiers.
     :param int components: dimension of the embedded space.
+    :param list annotation_cols: list of columns to be added in the scatter plot annotation
     :param int perplexity: related to the number of nearest neighbors that is used in other manifold learning algorithms. Consider selecting a value between 5 and 50.
     :param int n_iter: maximum number of iterations for the optimization (at least 250).
     :param str init: initialization of embedding ('random', 'pca' or numpy array of shape n_samples x n_components).
@@ -834,6 +954,10 @@ def run_tsne(data, drop_cols=['sample', 'subject'], group='group', components=2,
     df = df.select_dtypes(['number'])
     X = df.values
     y = df.index
+    annotations = pd.DataFrame()
+    if annotation_cols is not None: 
+        if len(list(set(annotation_cols).intersection(data.columns))) > 0:
+            annotations = data[annotation_cols]
     if X.size > 0:
         tsne = TSNE(n_components=components, verbose=0, perplexity=perplexity, n_iter=n_iter, init=init)
         X = tsne.fit_transform(X)
@@ -841,7 +965,7 @@ def run_tsne(data, drop_cols=['sample', 'subject'], group='group', components=2,
         if components == 2:
             resultDf = pd.DataFrame(X, index = y, columns = ["x","y"])
             resultDf = resultDf.reset_index()
-            resultDf.columns = ["name", "x", "y"]
+            resultDf.columns = ["group", "x", "y"]
         if components > 2:
             args.update({"z_title":"C3"})
             resultDf = pd.DataFrame(X, index = y)
@@ -849,18 +973,20 @@ def run_tsne(data, drop_cols=['sample', 'subject'], group='group', components=2,
             cols = []
             if len(components)>4:
                 cols = resultDf.columns[4:]
-            resultDf.columns = ["name", "x", "y", "z"] + cols
+            resultDf.columns = ["group", "x", "y", "z"] + cols
+        resultDf = resultDf.join(annotations)
         result['tsne'] = resultDf
     return result, args
 
 
-def run_umap(data, drop_cols=['sample', 'subject'], group='group', n_neighbors=10, min_dist=0.3, metric='cosine', dropna=True):
+def run_umap(data, drop_cols=['sample', 'subject'], group='group', annotation_cols=['sample'], n_neighbors=10, min_dist=0.3, metric='cosine', dropna=True):
     """
     Performs Uniform Manifold Approximation and Projection. For more information vist https://umap-learn.readthedocs.io.
 
     :param data: pandas dataframe with samples as rows and protein identifiers as columns (with additional columns 'group', 'sample' and 'subject').
     :param list drop_cols: column labels to be dropped from the dataframe.
     :param str group: column label containing group identifiers.
+    :param list annotation_cols: list of columns to be added in the scatter plot annotation
     :param int n_neighbors: number of neighboring points used in local approximations of manifold structure.
     :param float min_dist: controls how tightly the embedding is allowed compress points together.
     :param str metric: metric used to measure distance in the input space.
@@ -871,6 +997,7 @@ def run_umap(data, drop_cols=['sample', 'subject'], group='group', n_neighbors=1
 
         result = run_umap(data, drop_cols=['sample', 'subject'], group='group', n_neighbors=10, min_dist=0.3, metric='cosine', dropna=True)
     """
+    np.random.seed(1145536)
     result = {}
     args = {}
     df = data.copy()
@@ -882,6 +1009,12 @@ def run_umap(data, drop_cols=['sample', 'subject'], group='group', n_neighbors=1
     df = df.select_dtypes(['number'])
     X = df.values
     y = df.index
+    
+    annotations = pd.DataFrame()
+    if annotation_cols is not None: 
+        if len(list(set(annotation_cols).intersection(data.columns))) > 0:
+            annotations = data[annotation_cols]
+    
     if X.size:
         X = umap.UMAP(n_neighbors=10, min_dist=0.3, metric= metric).fit_transform(X)
         args = {"x_title":"C1","y_title":"C2"}
@@ -890,8 +1023,10 @@ def run_umap(data, drop_cols=['sample', 'subject'], group='group', n_neighbors=1
         cols = []
         if len(resultDf.columns)>3:
                 cols = resultDf.columns[3:]
-        resultDf.columns = ["name", "x", "y"] + cols
+        resultDf.columns = ["group", "x", "y"] + cols
+        resultDf = resultDf.join(annotations)
         result['umap'] = resultDf
+
     return result, args
 
 
@@ -938,9 +1073,13 @@ def apply_pvalue_correction(pvalues, alpha=0.05, method='bonferroni'):
 
         result = apply_pvalue_correction(pvalues, alpha=0.05, method='bonferroni')
     """
-    rejected, padj, alphacSidak,  alphacBonf = multitest.multipletests(pvalues, alpha, method)
+    p = np.array(pvalues)
+    mask = np.isfinite(p)
+    pval_corrected = np.full(p.shape, np.nan)
+    pval_corrected[mask] = multitest.multipletests(p[mask], alpha, method)[1]
+    rejected = [p <= alpha for p in pval_corrected]
 
-    return (rejected, padj)
+    return (rejected, pval_corrected.tolist())
 
 
 def apply_pvalue_fdrcorrection(pvalues, alpha=0.05, method='indep'):
@@ -1319,11 +1458,8 @@ def calculate_ttest(df, condition1, condition2, paired=False, is_logged=True, no
     if not non_par:
         result = pg.ttest(group1, group2, paired, tail, correction, r)
     else:
-        if stats.levene(group1,group2).pvalue < 0.05 or stats.shapiro(group1)[1] < 0.05 or stats.shapiro(group2)[1] < 0.05:
-            test = 'Mann Whitney'
-            result = pg.mwu(group1, group2, tail=tail)
-        else:
-            result = pg.ttest(group1, group2, paired, tail, correction, r)
+        test = 'Mann Whitney'
+        result = pg.mwu(group1, group2, tail=tail)
         
     if 'T' in result.columns:
         t = result['T'].values[0]
@@ -1472,12 +1608,25 @@ def calculate_anova(df, column, group='group'):
     :param str group: column with group identifiers
     :return: Tuple with t-statistics and p-value.
     """
-    aov_result = pg.anova(data=df, dv=column, between=group, detailed=True)
-    t, pvalue = aov_result[['F', 'p-unc']].values.tolist()[0]
-    df1, df2 = aov_result['DF']
+    aov_result = pg.anova(data=df, dv=column, between=group)
+    df1, df2, t, pvalue = aov_result[['ddof1', 'ddof2', 'F', 'p-unc']].values.tolist()[0]
     
     return (column, df1, df2, t, pvalue)
 
+def calculate_ancova(data, column, group='group', covariates=[]):
+    """
+    Calculates one-way ANCOVA using pingouin.
+
+    :param df: pandas dataframe with group as rows and protein identifier as column
+    :param str column: name of the column in df to run ANOVA on
+    :param str group: column with group identifiers
+    :param list covariates: list of covariates (columns in df)
+    :return: Tuple with column, F-statistics and p-value.
+    """
+    ancova_result = pg.ancova(data=data, dv=column, between=group, covar=covariates)
+    t, df, pvalue = ancova_result.loc[ancova_result['Source'] == group, ['F', 'DF', 'p-unc']].values.tolist().pop()
+    
+    return (column, df, df, t, pvalue)
 
 def calculate_repeated_measures_anova(df, column, subject='subject', group='group'):
     """
@@ -1493,9 +1642,16 @@ def calculate_repeated_measures_anova(df, column, subject='subject', group='grou
 
         result = calculate_repeated_measures_anova(df, 'protein a', subject='subject', group='group')
     """
-    aov_result = pg.rm_anova(data=df, dv=column, within=group, subject=subject, detailed=True, correction=True)
-    t, pvalue = aov_result.loc[0, ['F', 'p-unc']].values.tolist()
-    df1, df2 = aov_result['DF']
+    df1 = np.nan
+    df2 = np.nan
+    t = np.nan
+    pvalue = np.nan
+    try:
+        aov_result = pg.rm_anova(data=df, dv=column, within=group, subject=subject, detailed=True, correction=True)
+        t, pvalue = aov_result.loc[0, ['F', 'p-unc']].values.tolist()
+        df1, df2 = aov_result['DF']
+    except Exception as e:
+        print("Repeated measurements Anova for column: {} could not be calculated".format(column))
     
     return (column, df1, df2, t, pvalue)
 
@@ -1529,7 +1685,7 @@ def check_is_paired(df, subject, group):
     is_pair = False
     if subject is not None:
         count_subject_groups = df.groupby(subject)[group].count()
-        is_pair = (count_subject_groups > 1).any()
+        is_pair = (count_subject_groups > 1).all()
 
     return is_pair
 
@@ -1589,7 +1745,7 @@ def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject',
     if subject is not None and check_is_paired(df, subject, group):
         groups = df[group].unique()
         drop_cols = [d for d in drop_cols if d != subject]
-        if len(df[subject].unique()) == 1:
+        if len(groups) <= 2:
             res = run_ttest(df, groups[0], groups[1], alpha = alpha, drop_cols=drop_cols, subject=subject, group=group, paired=True, correction=correction, permutations=permutations, is_logged=is_logged, non_par=non_par)
         else:
             res = run_repeated_measurements_anova(df, alpha=alpha, drop_cols=drop_cols, subject=subject, group=group, permutations=0, is_logged=is_logged)
@@ -1613,6 +1769,76 @@ def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject',
         res = correct_pairwise_ttest(res, alpha, correction)
     
     return res
+
+def run_ancova(df, covariates, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', group='group', permutations=0, correction='fdr_bh', is_logged=True, non_par=False):
+    """
+    Performs statistical test for each protein in a dataset.
+    Checks what type of data is the input (paired, unpaired or repeated measurements) and performs posthoc tests for multiclass data.
+    Multiple hypothesis correction uses permutation-based if permutations>0 and Benjamini/Hochberg if permutations=0.
+
+    :param df: pandas dataframe with samples as rows and protein identifiers and covariates as columns (with additional columns 'group', 'sample' and 'subject').
+    :param list covariates: list of covariates to include in the model (column in df)
+    :param str subject: column with subject identifiers
+    :param str group: column with group identifiers
+    :param list drop_cols: column labels to be dropped from the dataframe
+    :param float alpha: error rate for multiple hypothesis correction
+    :param int permutations: number of permutations used to estimate false discovery rates.
+    :param bool non_par: if True, normality and variance equality assumptions are checked and non-parametric test Mann Whitney U test if not passed 
+    :return: Pandas dataframe with columns 'identifier', 'group1', 'group2', 'mean(group1)', 'mean(group2)', 'Log2FC', 'std_error', 'tail', 't-statistics', 'posthoc pvalue', 'effsize', 'efftype', 'FC', 'rejected', 'F-statistics', 'p-value', 'correction', '-log10 p-value', and 'method'.
+
+    Example::
+
+        result = run_ancova(df, covariates=['age'], alpha=0.05, drop_cols=["sample",'subject'], subject='subject', group='group', permutations=50)
+    """
+    df = df.drop(drop_cols, axis=1)
+    for cova in covariates:
+        if df[cova].dtype != np.number:
+            df[cova] = pd.Categorical(df[cova])
+            df[cova] = df[cova].cat.codes
+
+    pairwise_results = []
+    ancova_result = []
+    for col in df.columns.tolist():
+        if col not in covariates and col != group:
+            ancova = calculate_ancova(df[[group, col]+covariates], col, group=group, covariates=covariates)
+            ancova_result.append(ancova)
+            pairwise_result = pairwise_ttest_with_covariates(df, column=col, group=group, covariates=covariates, is_logged=is_logged)
+            pairwise_cols = pairwise_result.columns
+            pairwise_results.extend(pairwise_result.values.tolist())
+    df = df.set_index([group])
+    res = format_anova_table(df, ancova_result, pairwise_results, pairwise_cols, group, permutations, alpha, correction)
+    res['Method'] = 'One-way ancova'
+    res = correct_pairwise_ttest(res, alpha, correction)
+
+    return res
+
+
+def pairwise_ttest_with_covariates(df, column, group, covariates, is_logged):
+    formula = "Q('%s') ~ C(Q('%s'))" % (column, group)
+    for c in covariates:
+        formula += " + Q('%s')" % (c)
+    model = ols(formula, data=df).fit()
+    pw = model.t_test_pairwise("C(Q('%s'))" % (group)).result_frame
+    pw = pw.reset_index()
+    groups = "|".join([re.escape(s) for s in df[group].unique().tolist()])
+    regex = r"({})\-({})".format(groups, groups)
+    pw['group1'] = pw['index'].apply(lambda x: re.search(regex, x).group(2))
+    pw['group2'] = pw['index'].apply(lambda x: re.search(regex, x).group(1))
+    
+    means = df.groupby(group)[column].mean().to_dict()
+    stds = df.groupby(group)[column].std().to_dict()
+    pw['mean(group1)'] = [means[g] for g in pw['group1'].tolist()]
+    pw['mean(group2)'] = [means[g] for g in pw['group2'].tolist()]
+    pw['std(group1)'] = [stds[g] for g in pw['group1'].tolist()]
+    pw['std(group2)'] = [stds[g] for g in pw['group2'].tolist()]
+    pw = pw.drop(['pvalue-hs', 'reject-hs'], axis=1)
+    pw = pw.rename(columns={'t': 'posthoc T-Statistics', 'P>|t|': 'posthoc pvalue'} )
+    
+    pw = pw[['group1', 'group2', 'mean(group1)', 'std(group1)', 'mean(group2)', 'std(group2)', 'posthoc T-Statistics', 'posthoc pvalue', 'coef', 'std err', 'Conf. Int. Low', 'Conf. Int. Upp.']]
+    pw = complement_posthoc(pw, column, is_logged)
+    
+    return pw
+
 
 def correct_pairwise_ttest(df, alpha, correction='fdr_bh'):
     posthoc_df = pd.DataFrame()
@@ -1679,7 +1905,6 @@ def format_anova_table(df, aov_results, pairwise_results, pairwise_cols, group, 
     columns = ['identifier', 'dfk', 'dfn', 'F-statistics', 'pvalue']
     scores = pd.DataFrame(aov_results, columns = columns)
     scores = scores.set_index('identifier')
-
     corrected = False
     #FDR correction
     if permutations > 0: 
@@ -1785,7 +2010,7 @@ def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], su
     else:
         scores = scores.rename(columns={'log2FC':'FC'})
 
-    scores['-log10 pvalue'] = [-np.log10(x) for x in scores['pvalue'].values]
+    scores['-log10 pvalue'] = [-np.log10(x) if x != 0 else -np.log10(alpha) for x in scores['pvalue'].values]
     scores['Method'] = method
     scores.index.name = 'identifier'
     scores = scores.reset_index()
@@ -2002,7 +2227,7 @@ def run_kolmogorov_smirnov(dist1, dist2, alternative='two-sided'):
     return result
 
 
-def run_site_regulation_enrichment(regulation_data, annotation, identifier='identifier', groups=['group1', 'group2'], annotation_col='annotation', reject_col='rejected', group_col='group', method='fisher', regex="(\w+~.+)_\w\d+\-\w+", correction='fdr_bh'):
+def run_site_regulation_enrichment(regulation_data, annotation, identifier='identifier', groups=['group1', 'group2'], annotation_col='annotation', reject_col='rejected', group_col='group', method='fisher', regex=r"(\w+~.+)_\w\d+\-\w+", correction='fdr_bh'):
     """
     This function runs a simple enrichment analysis for significantly regulated protein sites in a dataset.
 
@@ -2036,7 +2261,27 @@ def run_site_regulation_enrichment(regulation_data, annotation, identifier='iden
             result = run_regulation_enrichment(regulation_data, annotation, identifier, groups, annotation_col, reject_col, group_col, method, correction)
     
     return result
-    
+
+def run_up_down_regulation_enrichment(regulation_data, annotation, identifier='identifier', groups=['group1', 'group2'], annotation_col='annotation', reject_col='rejected', group_col='group', method='fisher', correction='fdr_bh', alpha=0.05, lfc_cutoff=1):
+    enrichment_results = {}
+    for g1, g2 in regulation_data.groupby(groups).groups:
+        df = regulation_data.groupby(groups).get_group((g1,g2))
+        if 'posthoc padj' in df:
+            df['up_pairwise_regulation'] = (df['posthoc padj'] <= alpha) & (df['log2FC'] >= lfc_cutoff)
+            df['down_pairwise_regulation'] = (df['posthoc padj'] <= alpha) & (df['log2FC'] <= -lfc_cutoff)
+        else:
+            df['up_pairwise_regulation'] = (df['log2FC'] >= lfc_cutoff)
+            df['down_pairwise_regulation'] = (df['log2FC'] <= -lfc_cutoff)
+            
+        enrichment = run_regulation_enrichment(df, annotation, identifier=identifier, groups=groups, annotation_col=annotation_col, reject_col='up_pairwise_regulation', group_col=group_col, method=method, correction=correction)
+        enrichment['direction'] = 'upregulated'
+        enrichment_results[g1+'~'+g2] = enrichment
+        enrichment = run_regulation_enrichment(df, annotation, identifier=identifier, groups=groups, annotation_col=annotation_col, reject_col='down_pairwise_regulation', group_col=group_col, method=method, correction=correction)
+        enrichment['direction'] = 'downregulated'
+        enrichment_results[g1+'~'+g2] = enrichment_results[g1+'~'+g2].append(enrichment)
+        
+    return enrichment_results
+        
 def run_regulation_enrichment(regulation_data, annotation, identifier='identifier', groups=['group1', 'group2'], annotation_col='annotation', reject_col='rejected', group_col='group', method='fisher', correction='fdr_bh'):
     """
     This function runs a simple enrichment analysis for significantly regulated features in a dataset.
@@ -2055,8 +2300,11 @@ def run_regulation_enrichment(regulation_data, annotation, identifier='identifie
 
         result = run_regulation_enrichment(regulation_data, annotation, identifier='identifier', groups=['group1', 'group2'], annotation_col='annotation', reject_col='rejected', group_col='group', method='fisher')
     """
+    result = {}
     foreground_list = regulation_data[regulation_data[reject_col]][identifier].unique().tolist()
     background_list = regulation_data[~regulation_data[reject_col]][identifier].unique().tolist()
+    foreground_pop = len(foreground_list)
+    background_pop = len(regulation_data[identifier].unique().tolist())
     grouping = []
     for i in annotation[identifier]:
         if i in foreground_list:
@@ -2068,12 +2316,12 @@ def run_regulation_enrichment(regulation_data, annotation, identifier='identifie
     annotation[group_col] = grouping
     annotation = annotation.dropna(subset=[group_col])
 
-    result = run_enrichment(annotation, foreground_id='foreground', background_id='background', annotation_col=annotation_col, group_col=group_col, identifier_col=identifier, method=method, correction=correction)
+    result = run_enrichment(annotation, foreground_id='foreground', background_id='background', foreground_pop=foreground_pop, background_pop=background_pop, annotation_col=annotation_col, group_col=group_col, identifier_col=identifier, method=method, correction=correction)
 
     return result
 
 
-def run_enrichment(data, foreground_id, background_id, annotation_col='annotation', group_col='group', identifier_col='identifier', method='fisher', correction='fdr_bh'):
+def run_enrichment(data, foreground_id, background_id, foreground_pop, background_pop, annotation_col='annotation', group_col='group', identifier_col='identifier', method='fisher', correction='fdr_bh'):
     """
     Computes enrichment of the foreground relative to a given backgroung, using Fisher's exact test, and corrects for multiple hypothesis testing.
 
@@ -2097,8 +2345,8 @@ def run_enrichment(data, foreground_id, background_id, annotation_col='annotatio
     pvalues = []
     fnum = []
     bnum = []
-    foreground_pop = len(data.loc[data[group_col] == foreground_id, identifier_col].unique().tolist())
-    background_pop = len(data[identifier_col].unique().tolist())
+    #foreground_pop = len(data.loc[data[group_col] == foreground_id, identifier_col].unique().tolist())
+    #background_pop = len(data[identifier_col].unique().tolist())
     countsdf = df.groupby([annotation_col, group_col]).agg(['count'])[(identifier_col, 'count')].reset_index()
     countsdf.columns = [annotation_col, group_col, 'count']
     for annotation in countsdf[countsdf[group_col] == foreground_id][annotation_col].unique().tolist():
@@ -2112,13 +2360,13 @@ def run_enrichment(data, foreground_id, background_id, annotation_col='annotatio
             num_background = num_background[0]
         else:
             num_background=0
-        if method == 'fisher':
+        if method == 'fisher' and num_foreground > 1:
             odds, pvalue = run_fisher([num_foreground, foreground_pop-num_foreground],[num_background, background_pop-foreground_pop-num_background])
-        fnum.append(num_foreground)
-        bnum.append(num_background)
-        terms.append(annotation)
-        pvalues.append(pvalue)
-        ids.append(",".join(df.loc[(df[annotation_col]==annotation) & (df[group_col] == foreground_id), identifier_col].tolist()))
+            fnum.append(num_foreground)
+            bnum.append(num_background)
+            terms.append(annotation)
+            pvalues.append(pvalue)
+            ids.append(",".join(df.loc[(df[annotation_col]==annotation) & (df[group_col] == foreground_id), identifier_col].tolist()))
     if len(pvalues) > 1:
         rejected, padj = apply_pvalue_correction(pvalues, alpha=0.05, method=correction)
         result = pd.DataFrame({'terms':terms, 'identifiers':ids, 'foreground':fnum, 'background':bnum, 'foreground_pop':foreground_pop, 'background_pop':background_pop,'pvalue':pvalues, 'padj':padj, 'rejected':rejected})
@@ -2126,6 +2374,76 @@ def run_enrichment(data, foreground_id, background_id, annotation_col='annotatio
 
     return result
 
+
+def run_ssgsea(data, annotation, annotation_col='annotation', identifier_col='identifier', set_index=[], outdir=None, min_size=15, scale=False, permutations=0):
+    """
+    Project each sample within a data set onto a space of gene set enrichment scores using the ssGSEA projection methodology described in Barbie et al., 2009.
+    
+    :param data: pandas dataframe with the quantified features (i.e. subject x proteins)
+    :param annotation: pandas dataframe with the annotation to be used in the enrichment (i.e. CKG pathway annotation file)
+    :param str annotation_col: name of the column containing annotation terms.
+    :param str identifier_col: name of column containing dependent variables identifiers.
+    :param list set_index: column/s to be used as index. Enrichment will be calculated for these values (i.e ["subject"] will return subjects x pathways matrix of enrichment scores)
+    :param str out_dir: directory path where results will be stored (default None, tmp folder is used)
+    :param int min_size: minimum number of features (i.e. proteins) in enriched terms (i.e. pathways)
+    :param bool scale: whether or not to scale the data
+    :param int permutations: number of permutations used in the ssgsea analysis
+    :return: dictionary with two dataframes: es - enrichment scores, and nes - normalized enrichment scores.
+
+    Example::
+        stproject = "P0000008"
+        p = project.Project(stproject, datasets={}, knowledge=None, report={}, configuration_files=None)
+        p.build_project(False)
+        p.generate_report()
+        
+        proteomics_dataset = p.get_dataset("proteomics")
+        annotations = proteomics_dataset.get_dataframe("pathway annotation")
+        processed = proteomics_dataset.get_dataframe('processed')
+        
+        result = run_ssgsea(processed, annotations, annotation_col='annotation', identifier_col='identifier', set_index=['group', 'sample','subject'], outdir=None, min_size=10, scale=False, permutations=0)
+    
+    """
+    result = {}
+    df = data.copy()
+    if outdir is None:
+        outdir = os.path.join(cwd,'../../../data/tmp/')
+    
+    name = []
+    index = data[set_index]
+    for i, row in data[set_index].iterrows():
+        name.append("_".join(row[set_index].tolist()))
+    
+    df['Name'] = name
+    index.index = name
+    df = df.drop(set_index, axis=1).set_index('Name').transpose()
+        
+    if annotation_col in annotation and identifier_col in annotation:
+        grouped_annotations = annotation.groupby(annotation_col)[identifier_col].apply(list).reset_index()
+        fid = uuid.uuid4()
+        file_path = os.path.join(outdir, str(fid)+'.gmt')
+        with open(file_path, 'w') as out:
+            for i, row in grouped_annotations.iterrows():
+                out.write(row[annotation_col]+"\t"+"\t".join(list(filter(None, row[identifier_col])))+"\n")
+        enrichment = gp.ssgsea(data=df, 
+                               gene_sets=str(file_path), 
+                               outdir=outdir, 
+                               min_size=min_size, 
+                               scale=scale, 
+                               permutation_num=permutations, 
+                               no_plot=True, 
+                               processes=4, 
+                               seed=10, 
+                               format='png')
+
+        enrichment_es = pd.DataFrame(enrichment.resultsOnSamples).transpose()
+        enrichment_es = enrichment_es.join(index)
+        enrichment_nes = enrichment.res2d.transpose()
+        enrichment_nes = enrichment_nes.join(index)
+        
+        result = {'es': enrichment_es, 'nes': enrichment_nes}
+    df = None
+        
+    return result
 
 def calculate_fold_change(df, condition1, condition2):
     """
@@ -2160,46 +2478,38 @@ def calculate_fold_change(df, condition1, condition2):
     return fold_change
 
 
-def cohen_d(df, condition1, condition2, ddof = 0):
+def pooled_standard_deviation(sample1,sample2, ddof):
+    """
+    Calculates the pooled standard deviation.
+    For more information visit https://www.hackdeploy.com/learn-what-is-statistical-power-with-python/.
+    
+    :param array sample1: numpy array with values for first group
+    :param array sample2: numpy array with values for second group
+    :param int ddof: degrees of freedom
+    """
+    #calculate the sample size
+    n1, n2 = len(sample1), len(sample2)
+    #calculate the variances
+    var1, var2 = np.var(sample1, ddof=1), np.var(sample2, ddof=ddof)
+    #calculate the pooled standard deviation
+    numerator = ((n1-1) * var1) + ((n2-1) * var2)
+    denominator = n1+n2-2
+    return np.sqrt(numerator/denominator)
+
+
+def cohens_d(sample1, sample2, ddof):
     """
     Calculates Cohen's d effect size based on the distance between two means, measured in standard deviations.
-    For more information visit https://docs.scipy.org/doc/numpy/reference/generated/numpy.nanstd.html.
-
-    :param df: pandas dataframe with samples as rows and protein identifiers as columns.
-    :param str condition1: identifier of first group.
-    :param str condition2: identifier of second group.
-    :param int ddof: means Delta Degrees of Freedom.
-    :return: Numpy array.
-
-    Example::
-
-        result = cohen_d(data, 'group1', 'group2', ddof=0)
+    For more information visit https://www.hackdeploy.com/learn-what-is-statistical-power-with-python/.
+    
+    :param array sample1: numpy array with values for first group
+    :param array sample2: numpy array with values for second group
+    :param int ddof: degrees of freedom
     """
-    group1 = df[condition1]
-    group2 = df[condition2]
+    u1, u2 = np.mean(sample1), np.mean(sample2)
+    s_pooled = pooled_standard_deviation(sample1, sample2, ddof)
 
-    if isinstance(group1, np.float64):
-        group1 = np.array(group1)
-    else:
-        group1 = group1.values
-    if isinstance(group2, np.float64):
-        group2 = np.array(group2)
-    else:
-        group2 = group2.values
-
-    ng1 = group1.size
-    ng2 = group2.size
-    dof = ng1 + ng2 - 2
-    if np.isnan(group1).all() or np.isnan(group2).all():
-        d = np.nan
-    else:
-        meang1 = np.nanmean(group1)
-        meang2 = np.nanmean(group2)
-        sdg1 = np.nanstd(group1, ddof = ddof)
-        sdg2 = np.nanstd(group2, ddof = ddof)
-        d = (meang1 - meang2) / np.sqrt(((ng1-1)* sdg1 ** 2 + (ng2-1)* sdg2 ** 2) / dof)
-
-    return d
+    return ((u1 - u2) / s_pooled)
 
 
 def hedges_g(df, condition1, condition2, ddof = 0):
@@ -2247,6 +2557,40 @@ def hedges_g(df, condition1, condition2, ddof = 0):
             g = ((meang1 - meang2) / sdpooled)
 
     return g
+
+def power_analysis(data, group='group', groups=None, alpha=0.05, power=0.8, dep_var='nobs', figure=False):
+    quantiles = ['25% qtl es','mean es', '50% qtl es', '75% qtl es']
+    if groups is None:
+        groups = data[group].unique().tolist()
+    k_groups = len(groups)
+    effect_sizes = set()
+    for col in data.drop([group], axis=1).columns:
+        for g1, g2 in itertools.combinations(groups, 2):
+            sample1 = data.loc[data[group] == g1, col].values
+            sample2 = data.loc[data[group] == g2, col].values
+            effect_sizes.add(np.abs(cohens_d(sample1,sample2, ddof=1)))
+
+    effect_sizes = list(effect_sizes)
+    summary_eff = [np.percentile(effect_sizes, 25),
+                   np.mean(effect_sizes),
+                   np.percentile(effect_sizes, 50),
+                   np.percentile(effect_sizes, 75)]
+    
+    analysis = FTestAnovaPower()
+    sample_sizes = np.array(range(3, 150))
+    power_list = []
+    labels = []
+    samples = []
+    for ii, es in enumerate(summary_eff):
+        p = analysis.power(es, sample_sizes, alpha, k_groups)
+        labels.extend(["%s = %4.2F" % (quantiles[ii], es)] * len(p))
+        power_list.extend(p)
+        samples.extend(sample_sizes)
+        
+    power_df = pd.DataFrame(data=list(zip(power_list, samples, labels)), columns=['power', '#samples', 'labels'])
+    sample_size = analysis.solve_power(summary_eff[1], power=power, alpha=alpha, k_groups=k_groups)
+
+    return (sample_size, power_df)
 
 
 def run_mapper(data, lenses=["l2norm"], n_cubes = 15, overlap=0.5, n_clusters=3, linkage="complete", affinity="correlation"):
@@ -2439,7 +2783,9 @@ def get_publications_abstracts(data, publication_col="publication", join_by=['pu
         abstracts = utils.getMedlineAbstracts(list(data.reset_index()[publication_col].unique()))
         if not abstracts.empty:
             abstracts = abstracts.set_index(index)
-            abstracts = abstracts.join(data.reset_index()[join_by].set_index(publication_col)).reset_index()
+            abstracts = abstracts.join(data.reset_index()[join_by].set_index(publication_col))
+            abstracts.index.name = index
+            abstracts = abstracts.reset_index()
     return abstracts
 
 
@@ -2577,15 +2923,81 @@ def run_qc_markers_analysis(data, qc_markers, sample_col='sample', group_col='gr
     
     return bdf
 
-def run_snf(df_dict, clusters, distance_metric, K_affinity, mu_affinity):
+
+def get_snf_clusters(data_tuples, num_clusters=None, metric='euclidean', k=5, mu=0.5):
     """
-
-    :param df_dict:
-    :param clusters:
-
-
+    Cluster samples based on Similarity Network Fusion (SNF) (ref: https://www.ncbi.nlm.nih.gov/pubmed/24464287)
+    
+    :param df_tuples: list of (dataset,metric) tuples
+    :param index: how the datasets can be merged (common columns)
+    :param num_clusters: number of clusters to be identified, if None, the algorithm finds the best number based on SNF algorithm (recommended)
+    :param distance_metric: distance metric used to calculate the sample similarity network
+    :param k: number of neighbors used to measure local affinity (KNN)
+    :param mu: normalization factor to scale similarity kernel when constructing affinity matrix
+    :return tuple: 1) fused_aff: affinity clustered samples, 2) fused_labels: cluster labels, 
+                    3) num_clusters: number of clusters, 4) silhouette: average silhouette score
     """
-    pass
+    affinities = []
+    for (d, m) in data_tuples:
+        affinities += [snf.make_affinity(d, metric=m, K=k, mu=mu)]
+    fused_aff = snf.snf(affinities, K=k)
+    if num_clusters is None:
+        num_clusters, second = snf.get_n_clusters(fused_aff)
+    fused_labels = cluster.spectral_clustering(fused_aff, n_clusters=num_clusters)
+    fused_labels = [i+1 for i in fused_labels]
+    silhouette = snf.metrics.silhouette_score(fused_aff, fused_labels)
+    
+    return (fused_aff, fused_labels, num_clusters, silhouette)
+
+
+def run_snf(df_dict, index, num_clusters=None, distance_metric='euclidean', k_affinity=5, mu_affinity=0.5):
+    """
+    Runs Similarity Network Fusion: integration of multiple omics datasets to identify
+    similar samples (clusters) (ref: https://www.ncbi.nlm.nih.gov/pubmed/24464287). 
+    We make use of the pyton version SNFpy (https://github.com/rmarkello/snfpy)
+    
+    :param df_dict: dictionary of datasets to be used (i.e {'rnaseq': rnaseq_data, 'proteomics': proteomics_data})
+    :param index: how the datasets can be merged (common columns)
+    :param num_clusters: number of clusters to be identified, if None, the algorithm finds the best number based on SNF algorithm (recommended)
+    :param distance_metric: distance metric used to calculate the sample similarity network
+    :param k_affinity: number of neighbors used to measure local affinity (KNN)
+    :param mu_ffinity: normalization factor to scale similarity kernel when constructing affinity matrix
+    :return tuple: 1) feature_df: SNF features and mutual information score (MIscore), 2) fused_aff: adjacent similarity matrix, 3)fused_labels: cluster labels, 
+                    4) silhouette: silhouette score
+    """
+    datasets = []
+    dataset_labels = []
+    common_samples = set() 
+    for dtype in df_dict:
+        dataset_labels.append(dtype)
+        df = df_dict[dtype]
+        df = df.set_index(index)
+        datasets.append(df)
+        if len(common_samples) > 1:
+            common_samples = common_samples.intersection(df.index)
+        else:
+            common_samples.update(df.index.tolist())
+    
+    data_tuples = [(d.loc[list(common_samples)].values, distance_metric) for d in datasets]
+    
+    fused_aff, fused_labels, num_clusters, silhouette_score = get_snf_clusters(data_tuples, num_clusters, metric=distance_metric, k=k_affinity, mu=mu_affinity)
+    
+    fused_labels = pd.DataFrame(fused_labels, index=common_samples, columns=['cluster'])
+    
+    snf_features = snf.metrics.rank_feature_by_nmi(data_tuples, fused_aff, K=k_affinity, mu=mu_affinity, n_clusters=num_clusters)
+    
+    feature_df = pd.DataFrame(columns=['MIscore'])
+    indexes = [df.columns for df in datasets]
+    i = 0
+    for dtype in snf_features:
+        df = pd.DataFrame(dtype, index = indexes[i], columns = ["MIscore"]).sort_values(by="MIscore", ascending=False)
+        df['dataset'] = dataset_labels[i]
+        i += 1
+        feature_df = feature_df.append(df)
+
+    feature_df = feature_df.sort_values(by='MIscore', ascending=False)
+
+    return feature_df, fused_aff, fused_labels, silhouette_score
 
 
 def run_km(data, time_col, event_col, group_col, args={}):

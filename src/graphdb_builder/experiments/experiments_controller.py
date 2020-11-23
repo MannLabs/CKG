@@ -12,12 +12,12 @@ def generate_dataset_imports(projectId, dataType, dataset_import_dir):
     stats = set()
     builder_utils.checkDirectory(dataset_import_dir)
     try:
-        if dataType == 'clinical':
-            data = clinicalParser.parser(projectId)
+        if dataType in ['project', 'experimental_design', 'clinical']:
+            data = clinicalParser.parser(projectId, dataType)
             for dtype, ot in data:
                 generate_graph_files(data[(dtype, ot)], dtype, projectId, stats, ot, dataset_import_dir)
-        elif dataType == "proteomics" or dataType == "interactomics" or dataType == "phosphoproteomics":
-            data = proteomicsParser.parser(projectId)
+        elif dataType in ["proteomics", "interactomics", "phosphoproteomics"]:
+            data = proteomicsParser.parser(projectId, dataType)
             for dtype, ot in data:
                 generate_graph_files(data[(dtype, ot)], dtype, projectId, stats, ot, dataset_import_dir)
         elif dataType == "wes":

@@ -1,50 +1,69 @@
 import os
 import sys
-import re
 import argparse
 import pandas as pd
-import numpy as np
 from datetime import datetime, timedelta
 from passlib.hash import bcrypt
-import ckg_utils
 import config.ckg_config as ckg_config
 from graphdb_connector import connector
 from graphdb_builder import builder_utils
 from graphdb_builder.users import users_controller as uh
- 
+
 log_config = ckg_config.graphdb_builder_log
 logger = builder_utils.setup_logging(log_config, key='user_creation')
- 
+
 try:
     config = builder_utils.setup_config('builder')
     directories = builder_utils.get_full_path_directories()
     uconfig = builder_utils.setup_config('users')
 except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
- 
+
 cwd = os.path.abspath(os.path.dirname(__file__))
 
-def create_user_node(driver, data):
+
+def create_user_from_dict(driver, data):
     """
-    Creates graph database node for new user and adds respective properties to node.
- 
+    Creates graph database node for new user and adds properties to the node.
+
     :param driver: py2neo driver, which provides the connection to the neo4j graph database.
-    :type driver: py2neo driver
-    :param Series data: pandas Series with new user identifier and required user information (see set_arguments()).
+    :param dict data: dictionary with the user information).
     """
     query_name_node = 'create_user_node'
+    result = None
     try:
+        user_id = get_new_user_id(driver)
+        if 'ID' in data and data['ID'] is None:
+            data['ID'] = user_id
+        elif 'ID' not in data:
+            data['ID'] = user_id
+
         cypher = uh.get_user_creation_queries()
         query = cypher[query_name_node]['query']
         for q in query.split(';')[0:-1]:
-            result = connector.getCursorData(driver, q+';', parameters=data.to_dict())
+            result = connector.getCursorData(driver, q+';', parameters=data)
         logger.info("New user node created: {}. Result: {}".format(data['username'], result))
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        logger.error("Reading query {}: {}, file: {},line: {}, error: {}".format(query_name_node, sys.exc_info(), fname, exc_tb.tb_lineno, err)) 
- 
-#To use outside builder.py
+        logger.error("Reading query {}: {}, file: {},line: {}, error: {}".format(query_name_node, sys.exc_info(), fname, exc_tb.tb_lineno, err))
+
+    return result
+
+
+def create_user_node(driver, data):
+    """
+    Creates graph database node for new user and adds respective properties to node.
+
+    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
+    :type driver: py2neo driver
+    :param Series data: pandas Series with new user identifier and required user information (see set_arguments()).
+    """
+    result = create_user_from_dict(driver, data.to_dict())
+    
+    return result
+
+
 def create_user_from_command_line(args, expiration):
     """
     Creates new user in the graph database and corresponding node, from a terminal window (command line), \
@@ -75,20 +94,21 @@ def create_user_from_command_line(args, expiration):
     else:
         df.to_excel(usersFile, index=False)
 
+
 def create_user_from_file(filepath, expiration):
     """
     Creates new user in the graph database and corresponding node, from an excel file. \
     Rows in the file must be users, and columns must follow set_arguments() fields.
- 
+
     :param str filepath: filepath and filename containing users information.
     :param str output_file: path to output csv file.
     :param int expiration: number of days users is given access.
- 
+
     .. note:: This function can be used directly with *python create_user_from_file.py -f path_to_file* .
     """
     usersImportDirectory = os.path.join(cwd, directories['usersImportDirectory'])
     usersFile = os.path.join(usersImportDirectory, uconfig['usersFile'])
-    
+
     builder_utils.checkDirectory(usersImportDirectory)
     import_file = os.path.join(usersImportDirectory, uconfig['import_file'])
 
@@ -103,17 +123,32 @@ def create_user_from_file(filepath, expiration):
     else:
         data.to_excel(usersFile, index=False)
 
- 
+
+def validate_user(driver, username, email):
+    username_found = uh.check_if_node_exists(driver, 'username', username)
+    email_found = uh.check_if_node_exists(driver, 'email', email)
+
+    return not username_found.empty or not email_found.empty
+
+
+def get_new_user_id(driver):
+    user_identifier = uh.get_new_user_identifier(driver)
+    if user_identifier is None:
+        user_identifier = 'U1'
+
+    return user_identifier
+
+
 def create_user(data, output_file, expiration=365):
     """
     Creates new user in the graph database and corresponding node, through the following steps:
-     
+
         1. Checks if a user with given properties already exists in the database. If not:
         2. Generates new user identifier
         3. Creates new local user (access to graph database)
         4. Creates new user node
         5. Saves data to users.tsv
- 
+
     :param data: pandas dataframe with users as rows and arguments and columns.
     :param str output_file: path to output csv file.
     :param int expiration: number of days users is given access.
@@ -122,37 +157,34 @@ def create_user(data, output_file, expiration=365):
     driver = connector.getGraphDatabaseConnectionConfiguration(database=None)
     date = datetime.today() + timedelta(days=expiration)
     df = []
- 
+
     try:
         for index, row in data.iterrows():
-            username = uh.check_if_node_exists(driver, 'username', row['username'])
-            name = uh.check_if_node_exists(driver, 'name', row['name'])
-            email = uh.check_if_node_exists(driver, 'email', row['email'])
-            if username.empty and name.empty and email.empty:
-                user_identifier = uh.get_new_user_identifier(driver)
-                if user_identifier is None:
-                    user_identifier = 'U1'
+            found = validate_user(driver, row['user_name'], row['email'])
+            if not found:
+                user_identifier = get_new_user_id(driver)
                 row['ID'] = user_identifier
                 row['acronym'] = ''.join([c for c in row['name'] if c.isupper()])
                 row['rolename'] = 'reader'
                 row['expiration_date'] = date.strftime('%Y-%m-%d')
                 row['image'] = ''
                 uh.create_db_user(driver, row)
-                row['password'] = bcrypt.encrypt(row['password'])
+                row['password'] = bcrypt.hash(row['password'])
                 create_user_node(driver, row)
                 df.append(row)
-     
+
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         logger.error("Creating users: file: {},line: {}, error: {}".format(fname, exc_tb.tb_lineno, err))
-     
+
     if len(df) > 0:
         data = pd.DataFrame(df)
         data['phone_number'] = data['phone_number'].str.split('.').str[0]
         data = data[['ID', 'acronym', 'name', 'username', 'password', 'email', 'secondary_email', 'phone_number', 'affiliation', 'expiration_date', 'rolename', 'image']]
         uh.GenerateGraphFiles(data, output_file)
- 
+
+
 def set_arguments():
     """
     This function sets the arguments to be used as input for **create_user.py** in the command line.
@@ -167,23 +199,24 @@ def set_arguments():
     parser.add_argument('-p', '--phone_number', help='define a phone number where the user can be reached', type=str, required=False)
     parser.add_argument('-a', '--affiliation', help="define the user's affiliation (University, Group)", type=str, required=False)
     parser.add_argument('-i', '--image', help='define path to a picture of the user', type=str, default='', required=False)
- 
+
     return parser
- 
+
+
 if __name__ == "__main__":
-    parser =  set_arguments()
+    parser = set_arguments()
     args = parser.parse_args()
- 
+
     if args.file is None and args.username is None:
         print('Please specify a file path or use the function arguments. See help (--help).')
- 
-    if args.file != None:
+
+    if args.file is not None:
         logger.info('Creating users, from file, in the database')
         print('Creating users, from file, in the database')
         create_user_from_file(args.file, expiration=365)
         print('Done')
- 
-    if args.file is None and args.username != None:
+
+    if args.file is None and args.username is not None:
         logger.info('Creating user in the database')
         print('Creating user in the database')
         create_user_from_command_line(args, expiration=365)

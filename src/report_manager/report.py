@@ -83,10 +83,10 @@ class Report:
                         if 'app' in plot:
                             json_str = ckg_utils.convert_dash_to_json(plot['app'])
                             figure_json['app'] = json_str
-                        if 'net_tables' in plot:
-                            json_str_nodes = ckg_utils.convert_dash_to_json(plot['net_tables'][0])
-                            json_str_edges = ckg_utils.convert_dash_to_json(plot['net_tables'][1])
-                            figure_json["net_tables"] = (json_str_nodes, json_str_edges)
+                        if 'net_tables_viz' in plot:
+                            json_str_nodes = ckg_utils.convert_dash_to_json(plot['net_tables_viz'][0])
+                            json_str_edges = ckg_utils.convert_dash_to_json(plot['net_tables_viz'][1])
+                            figure_json["net_tables_viz"] = (json_str_nodes, json_str_edges)
                         figure_json = json.dumps(figure_json, cls=ckg_utils.NumpyEncoder)
                         figure_id = str(i)+'_net'
                     else:
@@ -148,8 +148,8 @@ class Report:
                         if isinstance(plot, dict):
                             if "app" in plot:
                                 app_plot = plot["app"]
-                            if 'net_tables' in plot:
-                                tables = plot['net_tables']
+                            if 'net_tables_viz' in plot:
+                                tables = plot['net_tables_viz']
                                 report_plots.append(tables[0])
                                 report_plots.append(tables[1])
 
@@ -175,8 +175,8 @@ class Report:
                 if isinstance(plot, dict):
                     if "app" in plot:
                         plot = plot["app"]
-                    if 'net_tables' in plot:
-                        tables = plot['net_tables']
+                    if 'net_tables_viz' in plot:
+                        tables = plot['net_tables_viz']
                         report_plots.append(tables[0])
                         report_plots.append(tables[1])
 
@@ -197,23 +197,29 @@ class Report:
                         i += 1
                     if "net_json" in plot:
                         with open(os.path.join(directory, name+'.json'), 'w') as out:
-                            out.write(json.dumps(plot["net_json"]))
+                            out.write(json.dumps(plot["net_json"], cls=ckg_utils.NumpyEncoder))
                         try:
                             acore_utils.json_network_to_gml(plot["net_json"], os.path.join(directory, name+".gml"))
                         except Exception:
                             pass
+                        if "net_tables" in plot:
+                            nodes_table, edges_table = plot['net_tables']
+                            nodes_table.to_csv(os.path.join(directory, name+'_node_table.tsv'), sep='\t', header=True, index=False, doublequote=False)
+                            edges_table.to_csv(os.path.join(directory, name+'_edges_table.tsv'), sep='\t', header=True, index=False, doublequote=False)
                         if "app" in plot:
                             plot = plot["app"]
                     if 'props' in plot:
                         if 'figure' in plot['props']:
                             try:
                                 viz.save_DASH_plot(plot['props']['figure'], name=figure_name, plot_format='svg', directory=directory)
+                                viz.save_DASH_plot(plot['props']['figure'], name=figure_name, plot_format='png', directory=directory)
                                 saved.add(figure_name)
                             except Exception:
                                 pass
                     else:
                         try:
                             viz.save_DASH_plot(plot.figure, name=figure_name, plot_format='svg', directory=directory)
+                            viz.save_DASH_plot(plot.figure, name=figure_name, plot_format='png', directory=directory)
                             saved.add(figure_name)
                         except Exception:
                             pass

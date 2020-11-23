@@ -145,13 +145,13 @@ def create_new_project(driver, projectId, data, separator='|'):
                 external_identifier = 'P0000001'
             data['external_id'] = external_identifier
 
-            projectDir = os.path.join(experimentDir, os.path.join(external_identifier, 'clinical'))
+            projectDir = os.path.join(experimentDir, os.path.join(external_identifier, 'project'))
             ckg_utils.checkDirectory(projectDir)
             data.to_excel(os.path.join(projectDir, 'ProjectData_{}.xlsx'.format(external_identifier)), index=False, encoding='utf-8')
 
-            datasetPath = os.path.join(os.path.join(importDir, external_identifier), 'clinical')
+            datasetPath = os.path.join(os.path.join(importDir, external_identifier), 'project')
             ckg_utils.checkDirectory(datasetPath)
-            eh.generate_dataset_imports(external_identifier, 'clinical', datasetPath)
+            eh.generate_dataset_imports(external_identifier, 'project', datasetPath)
             loader.partialUpdate(imports=['project'], specific=[external_identifier])
             done = 1
         else:

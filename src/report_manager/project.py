@@ -334,7 +334,7 @@ class Project:
                     self.knowledge = knowledge.Knowledge(self.identifier, {'name': self.name}, report=r)
                 else:
                     self.update_report({data_type: r})
-                    
+
     def load_project(self, directory):
         dataset_store = os.path.join(directory, "project_information_dataset.h5")
         if os.path.isfile(dataset_store):
@@ -415,6 +415,7 @@ class Project:
                         self.update_dataset({data_type: dataset})
 
                 if len(self.datasets) > 1:
+                    configuration = None
                     if "multiomics" in self.configuration_files:
                         configuration = ckg_utils.get_configuration(self.configuration_files["multiomics"])
                     dataset = MultiOmicsDataset(self.identifier, data=self.datasets, configuration=configuration, report=None)
@@ -498,7 +499,7 @@ class Project:
                   'initialTemp': 200,
                   'coolingFactor': 0.95,
                   'minTemp': 1.0}
-        
+
         return stylesheet, layout
 
     def get_similarity_network(self):
@@ -510,20 +511,21 @@ class Project:
             query = query_utils.get_query(project_cypher, query_id="projects_subgraph")
             list_projects = []
             driver = connector.getGraphDatabaseConnectionConfiguration()
-            if "other_id" in self.similar_projects:
-                list_projects = self.similar_projects["other_id"].values.tolist()
-            list_projects.append(self.identifier)
-            list_projects = ",".join(['"{}"'.format(i) for i in list_projects])
-            query = query.replace("LIST_PROJECTS", list_projects)
-            path = connector.sendQuery(driver, query, parameters={}).data()
-            G = acore_utils.neo4j_path_to_networkx(path, key='path')
-            args = {}
-            style, layout = self.get_similarity_network_style()
-            args['stylesheet'] = style
-            args['layout'] = layout
-            args['title'] = "Projects subgraph"
-            net, mouseover = acore_utils.networkx_to_cytoscape(G)
-            plot = viz.get_cytoscape_network(net, "projects_subgraph", args)
+            if self.similar_projects is not None:
+                if "other_id" in self.similar_projects:
+                    list_projects = self.similar_projects["other_id"].values.tolist()
+                list_projects.append(self.identifier)
+                list_projects = ",".join(['"{}"'.format(i) for i in list_projects])
+                query = query.replace("LIST_PROJECTS", list_projects)
+                path = connector.sendQuery(driver, query, parameters={}).data()
+                G = acore_utils.neo4j_path_to_networkx(path, key='path')
+                args = {}
+                style, layout = self.get_similarity_network_style()
+                args['stylesheet'] = style
+                args['layout'] = layout
+                args['title'] = "Projects subgraph"
+                net, mouseover = acore_utils.networkx_to_cytoscape(G)
+                plot = viz.get_cytoscape_network(net, "projects_subgraph", args)
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -534,30 +536,34 @@ class Project:
     def generate_knowledge(self):
         nodes = {}
         relationships = {}
+        keep_nodes = []
         kn = knowledge.ProjectKnowledge(identifier=self.identifier, data=self.to_dict(), nodes={self.name: {'id': '#0', 'type': 'Project'}}, relationships={}, colors={}, graph=None, report={})
         kn.generate_knowledge()
         nodes.update(kn.nodes)
+        keep_nodes = kn.keep_nodes
         relationships.update(kn.relationships)
         types = ["clinical", "proteomics", "interactomics", "phosphoproteomics", "longitudinal_proteomics", "wes", "wgs", "rnaseq", "multiomics"]
         for dataset_type in types:
             if dataset_type in self.datasets:
                 dataset = self.datasets[dataset_type]
-                kn = dataset.generate_knowledge()
-                if dataset_type == "multiomics":
-                    kn.reduce_to_subgraph(nodes.keys())
+                if dataset_type != "multiomics":
+                    kn = dataset.generate_knowledge()
+                else:
+                    kn = dataset.generate_knowledge(nodes=nodes)
+                    #kn.reduce_to_subgraph(nodes.keys())
                 nodes.update(kn.nodes)
+
                 relationships.update(kn.relationships)
-        
-        self.knowledge = knowledge.Knowledge(self.identifier, {'name': self.name}, nodes=nodes, relationships=relationships)
+
+        self.knowledge = knowledge.Knowledge(self.identifier, {'name': self.name}, nodes=nodes, relationships=relationships, keep_nodes=keep_nodes)
 
     def generate_project_info_report(self):
-        
         report = rp.Report(identifier="project_info")
 
         plots = self.generate_project_attributes_plot()
         plots.extend(self.generate_project_similarity_plots())
-        plots.extend(self.generate_overlap_plots())       
-               
+        plots.extend(self.generate_overlap_plots())
+
         report.plots = {("Project info", "Project Information"): plots}
 
         return report
@@ -572,6 +578,7 @@ class Project:
                     dataset.generate_report()
             self.generate_knowledge()
             self.knowledge.generate_report()
+            self.knowledge.generate_report(visualizations=["network", "sankey"])
             self.save_project_report()
             self.save_project()
             self.save_project_datasets_data()
@@ -600,7 +607,7 @@ class Project:
             if not os.path.exists(dataset_dir):
                 os.makedirs(dataset_dir)
             report.save_report(dataset_dir)
-        
+
         self.save_project_datasets_reports()
         self.knowledge.save_report(directory)
         print('save report', time.time() - start)
@@ -615,7 +622,7 @@ class Project:
                 dataset.save_report(dataset_directory)
                 dataset = None
         print('save dataset report', time.time() - start)
-        
+
     def save_project(self):
         directory = os.path.join(self.get_report_directory(), "Project information")
         if not os.path.isdir(directory):
@@ -657,7 +664,6 @@ class Project:
         self.download_project_datasets()
         utils.compress_directory(directory, directory, compression_format='zip')
 
-
     def download_project_report(self):
         directory = self.get_downloads_directory()
         for dataset in self.report:
@@ -675,14 +681,14 @@ class Project:
                 report.download_report(dataset_dir)
 
         self.download_knowledge(os.path.join(directory, "Knowledge"))
-        
+
     def download_knowledge(self, directory):
         report = self.knowledge.report
         if not os.path.exists(directory):
             os.makedirs(directory)
-        
+
         report.download_report(directory)
-            
+
     def download_project_datasets(self):
         directory = self.get_downloads_directory()
         for dataset_type in self.datasets:

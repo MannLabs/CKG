@@ -261,19 +261,20 @@ def create_new_ansamples(driver, data):
 
     :return: Pandas DataFrame where new analytical sample internal identifiers have been added.
     """
-    external_ids = data['analytical_sample external_id'].unique()
-    biosample_ids = data['biological_sample id']
+    data = data.rename(columns={'analytical_sample external_id': 'external_id', 'biological_sample id': 'biosample_id'})
+    data['external_id'] = data['external_id'].astype(str)
+    num_samples = data['external_id'].shape[0]
+    if 'grouping2' not in data:
+        data['grouping2'] = None
     ansample_id = get_new_analytical_sample_identifier(driver)
     if ansample_id is None:
         ansample_id = '1'
 
-    ansample_ids = ['AS'+str(i) for i in np.arange(int(ansample_id), int(ansample_id)+len(external_ids))]
-    ansample_dict = dict(zip(external_ids, ansample_ids))
-    asample_biosample_dict = dict(zip(external_ids, biosample_ids))
+    ansample_ids = ['AS' + str(i) for i in np.arange(int(ansample_id), int(ansample_id) + num_samples)]
+    data['asample_id'] = ansample_ids
     query_name = 'create_asamples_biosamples'
-    for external_id, asample_id in ansample_dict.items():
-        biosample_id = asample_biosample_dict[external_id]
-        parameters = {'external_id': str(external_id), 'biosample_id':biosample_id, 'asample_id':asample_id}
+    for parameters in data.to_dict('records'):
+        print(parameters)
         try:
             query = ''
             data_upload_cypher = get_data_upload_queries()
@@ -285,7 +286,7 @@ def create_new_ansamples(driver, data):
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             logger.error("Error: {}. Creating analytical samples: Query name ({}) - Query ({}), error info: {}, file: {},line: {}".format(err, query_name, query, sys.exc_info(), fname, exc_tb.tb_lineno))
 
-    data['analytical_sample id'] = data['analytical_sample external_id'].map(ansample_dict)
+    data = data.rename(columns={'asample_id': 'analytical_sample id', 'external_id': 'analytical_sample external_id', 'biosample_id': 'biological_sample id'})
 
     return data
 
@@ -313,52 +314,65 @@ def create_mapping_cols_clinical(driver, data, directory, filename, separator='|
     tissue_dict = {}
     disease_dict = {}
     intervention_dict = {}
-    for disease in data['disease'].dropna().unique():
-        if len(disease.split(separator)) > 1:
-            ids = []
-            for i in disease.split(separator):
-                disease_id = query_utils.map_node_name_to_id(driver, 'Disease', str(i.strip()))
-                if disease_id is not None:
-                    ids.append(disease_id)
-                disease_dict[disease] = '|'.join(ids)
-        else:
-            disease_id = query_utils.map_node_name_to_id(driver, 'Disease', str(disease.strip()))
-            disease_dict[disease] = disease_id
-
-    for tissue in data['tissue'].dropna().unique():
-        tissue_id = query_utils.map_node_name_to_id(driver, 'Tissue', str(tissue.strip()))
-        tissue_dict[tissue] = tissue_id
-
-    for interventions in data['studies_intervention'].dropna().unique():
-        for intervention in str(interventions).split('|'):
-            if len(intervention.split()) > 1:
-                intervention_dict[intervention] = re.search('\(([^)]+)', intervention.split()[-1]).group(1)
+    if 'disease' in data:
+        for disease in data['disease'].dropna().unique():
+            if len(disease.split(separator)) > 1:
+                ids = []
+                for i in disease.split(separator):
+                    disease_id = query_utils.map_node_name_to_id(driver, 'Disease', str(i.strip()))
+                    if disease_id is not None:
+                        ids.append(disease_id)
+                    disease_dict[disease] = '|'.join(ids)
             else:
-                intervention_dict[intervention] = intervention
+                disease_id = query_utils.map_node_name_to_id(driver, 'Disease', str(disease.strip()))
+                disease_dict[disease] = disease_id
+        data['disease id'] = data['disease'].map(disease_dict)
 
-    data['intervention id'] = data['studies_intervention'].map(intervention_dict)
-    data['disease id'] = data['disease'].map(disease_dict)
-    data['tissue id'] = data['tissue'].map(tissue_dict)
+    if 'tissue' in data:
+        for tissue in data['tissue'].dropna().unique():
+            tissue_id = query_utils.map_node_name_to_id(driver, 'Tissue', str(tissue.strip()))
+            tissue_dict[tissue] = tissue_id
+
+        data['tissue id'] = data['tissue'].map(tissue_dict)
+
+    if 'studies_intervention' in data:
+        for interventions in data['studies_intervention'].dropna().unique():
+            for intervention in str(interventions).split('|'):
+                if len(intervention.split()) > 1:
+                    intervention_dict[intervention] = re.search(r'\(([^)]+)', intervention.split()[-1]).group(1)
+                else:
+                    intervention_dict[intervention] = intervention
+
+        data['intervention id'] = data['studies_intervention'].map(intervention_dict)
+
     builder_utils.export_contents(data, directory, filename)
-    
+
 
 def get_project_information(driver, project_id):
     query_name = 'project_graph'
-    res = pd.DataFrame()
+    queries = []
+    data = []
+    res = []
     try:
         query = ''
-        parameters = {'project_id': project_id}
         data_upload_cypher = get_data_upload_queries()
-        queries = data_upload_cypher[query_name]['query'].split(';')[:-1]
+        for section in data_upload_cypher[query_name]:
+            code = section['query']
+            queries.extend(code.replace("PROJECTID", project_id).split(';')[0:-1])
         for query in queries:
-            res = connector.getCursorData(driver, query+';', parameters=parameters)
+            result = connector.sendQuery(driver, query+";").data()[0]
+            data.append(result)
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         logger.error("Error: {}. Creating analytical samples: Query name ({}) - Query ({}), error info: {}, file: {},line: {}".format(err, query_name, query, sys.exc_info(), fname, exc_tb.tb_lineno))
 
-    if not res.empty:
-        res = viz.get_table(res, identifier='new_project', args={'title':'Data Uploaded for Project {}'.format(project_id)})
+    if data:
+        for i, j in enumerate(data):
+            df = pd.DataFrame([data[i]], columns=data[i].keys())
+            header = '_'.join(df.columns[0].split('_', 1)[1:]).capitalize()
+            df.rename(columns={df.columns[0]: 'project'}, inplace=True)
+            res.append(viz.get_table(df, identifier='new_project_{}'.format(header), args={'title':'{} data uploaded for project {}'.format(header, project_id)}))
     else:
         res = None
         logger.error("Error: No data was uploaded for project: {}. Review your experimental design and data files and the logs for errors.".format(project_id))

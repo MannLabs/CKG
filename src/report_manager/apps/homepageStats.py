@@ -98,14 +98,17 @@ def get_db_schema():
     if query_name in cypher:
         if 'query' in cypher[query_name]:
             query = cypher[query_name]['query']
-            path = connector.sendQuery(driver, query, parameters={}).data()
-            G = utils.neo4j_schema_to_networkx(path)
-            args = {'height': '1000px'}
-            args['stylesheet'] = style
-            args['layout'] = layout
-            args['title'] = "Database Schema"
-            net, mouseover = utils.networkx_to_cytoscape(G)
-            plot = viz.get_cytoscape_network(net, "db_schema", args)
+            try:
+                path = connector.sendQuery(driver, query, parameters={}).data()
+                G = utils.neo4j_schema_to_networkx(path)
+                args = {'height': '1000px'}
+                args['stylesheet'] = style
+                args['layout'] = layout
+                args['title'] = "Database Schema"
+                net, mouseover = utils.networkx_to_cytoscape(G)
+                plot = viz.get_cytoscape_network(net, "db_schema", args)
+            except Exception:
+                plot = html.Div(children=html.H1("Database is offline", className='error_msg'))
 
     return plot
 
@@ -125,11 +128,14 @@ def get_db_stats_data():
     cypher = get_query()
     for i, j in zip(df_names, query_names):
         query = cypher[j]['query']
-        data = connector.getCursorData(driver, query)
-        if i == 'store_size':
-            data = data.T
-            data['size'] = [size_converter(i) for i in data[0]]
-        dfs[i] = data.to_json(orient='records')
+        try:
+            data = connector.getCursorData(driver, query)
+            if i == 'store_size':
+                data = data.T
+                data['size'] = [size_converter(i) for i in data[0]]
+            dfs[i] = data.to_json(orient='records')
+        except Exception:
+            pass            
     return dfs
 
 
@@ -147,12 +153,15 @@ def plot_store_size_components(dfs, title, args):
         * **width** (str) -- width of the plot.
     :return: New Dash div containing title and pie chart.
     """
-    data = pd.read_json(dfs['store_size'], orient='records')
-    data.index = ['Array store', 'Logical Log', 'Node store', 'Property store',
-                  'Relationship store', 'String store', 'Total store size']
-    data.columns = ['value', 'size']
-    data = data.iloc[:-1]
-    fig = viz.get_pieplot(data, identifier='store_size_pie', args=args)
+    fig = None
+    if len(dfs) > 0:
+        if 'store_size' in dfs:
+            data = pd.read_json(dfs['store_size'], orient='records')
+            data.index = ['Array store', 'Logical Log', 'Node store', 'Property store',
+                        'Relationship store', 'String store', 'Total store size']
+            data.columns = ['value', 'size']
+            data = data.iloc[:-1]
+            fig = viz.get_pieplot(data, identifier='store_size_pie', args=args)
 
     return html.Div([html.H3(title), fig], style={'margin': '0%', 'padding': '0%'})
 
@@ -168,24 +177,27 @@ def plot_node_rel_per_label(dfs, title, args, focus='nodes'):
                                             per type ('relationships').
     :return: New Dash div containing title and barplot.
     """
-    data = pd.read_json(dfs['meta_stats'], orient='records')
-    if focus == 'nodes':
-        data = pd.DataFrame.from_dict(data['labels'][0], orient='index', columns=[
-                                      'number']).reset_index()
-    elif focus == 'relationships':
-        data = pd.DataFrame.from_dict(
-            data['relTypesCount'][0], orient='index', columns=['number']).reset_index()
+    fig = None
+    if len(dfs) > 0:
+        if 'meta_stats' in dfs:
+            data = pd.read_json(dfs['meta_stats'], orient='records')
+            if focus == 'nodes':
+                data = pd.DataFrame.from_dict(data['labels'][0], orient='index', columns=[
+                                            'number']).reset_index()
+            elif focus == 'relationships':
+                data = pd.DataFrame.from_dict(
+                    data['relTypesCount'][0], orient='index', columns=['number']).reset_index()
 
-    data = data.sort_values('number')
+            data = data.sort_values('number')
 
-    fig = viz.get_barplot(data, identifier='node_rel_per_label_{}'.format(focus), args=args)
-    fig.figure['layout'] = go.Layout(barmode='relative',
-                                     height=args['height'],
-                                     xaxis={'type': 'log', 'range': [0, np.log10(data['number'].iloc[-1])]},
-                                     yaxis={'showline': True, 'linewidth': 1, 'linecolor': 'black'},
-                                     font={'family': 'MyriadPro-Regular', 'size': 12},
-                                     template='plotly_white',
-                                     bargap=0.2)
+            fig = viz.get_barplot(data, identifier='node_rel_per_label_{}'.format(focus), args=args)
+            fig.figure['layout'] = go.Layout(barmode='relative',
+                                            height=args['height'],
+                                            xaxis={'type': 'log', 'range': [0, np.log10(data['number'].iloc[-1])]},
+                                            yaxis={'showline': True, 'linewidth': 1, 'linecolor': 'black'},
+                                            font={'family': 'MyriadPro-Regular', 'size': 12},
+                                            template='plotly_white',
+                                            bargap=0.2)
 
     return html.Div([html.H3(title), fig], style={'margin': '0%', 'padding': '0%'})
 
@@ -225,7 +237,7 @@ def quick_numbers_panel():
     try:
         project_ids = [(d['name'], d['id']) for d in driver.nodes.match("Project")]
         project_links = [html.H4('Available Projects:')]
-    except AttributeError:
+    except Exception:
         pass
 
     for project_name, project_id in project_ids:
@@ -249,7 +261,8 @@ def quick_numbers_panel():
     navigation_links = [html.H4('Navigate to:'),
                         html.A("Database Imports", href="/apps/imports", className="nav_link"),
                         html.A("Project Creation", href="/apps/projectCreationApp", className="nav_link"),
-                        html.A("Data Upload", href="/apps/dataUploadApp", className="nav_link")]
+                        html.A("Data Upload", href="/apps/dataUploadApp", className="nav_link"),
+                        html.A("Admin", href="/apps/admin", className="nav_link")]
 
     layout = [html.Div(children=navigation_links),
               html.Div(children=project_links[0:5]),

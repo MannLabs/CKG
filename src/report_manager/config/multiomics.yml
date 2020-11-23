@@ -30,32 +30,3 @@ data exploration:
             communities_algorithm: louvain
             width: 1600
             height: 1600
-    wgcna:
-        data:
-            proteomics: processed
-            rnaseq: processed
-            clinical: processed
-        analyses:
-            - wgcna
-        plots:
-            - wgcnaplots
-        store_analysis: True
-        args:
-            drop_cols_exp:
-                - subject
-                - group
-                - sample
-                - index
-            drop_cols_cli:
-                - index
-                - subject
-                - group
-                - biological_sample
-            RsquaredCut: 0.6
-            networkType: 'unsigned'
-            minModuleSize: 50
-            deepSplit: 2
-            pamRespectsDendro: False
-            merge_modules: True
-            MEDissThres: 0.3
-            verbose: 0

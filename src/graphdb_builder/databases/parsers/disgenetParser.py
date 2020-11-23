@@ -23,7 +23,7 @@ def parser(databases_directory, download=True):
             builder_utils.downloadDB(url+files[f], directory)
         for f in mapping_files:
             builder_utils.downloadDB(url+mapping_files[f], directory)
-
+    
     proteinMapping = readDisGeNetProteinMapping(config, directory)
     diseaseMapping = readDisGeNetDiseaseMapping(config, directory)
     for f in files:

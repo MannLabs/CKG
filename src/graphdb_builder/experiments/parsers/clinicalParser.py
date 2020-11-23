@@ -5,24 +5,32 @@ import numpy as np
 from graphdb_builder import builder_utils
 
 
-def parser(projectId):
+def parser(projectId, type='clinical'):
+    data = {}
     cwd = os.path.abspath(os.path.dirname(__file__))
     config = builder_utils.get_config(config_name="clinical.yml", data_type='experiments')
+    project_directory = os.path.join(cwd, '../../../../data/experiments/PROJECTID/project/')
     clinical_directory = os.path.join(cwd, '../../../../data/experiments/PROJECTID/clinical/')
     design_directory = os.path.join(cwd, '../../../../data/experiments/PROJECTID/experimental_design/')
     separator = config["separator"]
+    if 'project_directory' in config:
+        project_directory = os.path.join(cwd, config['project_directory'])
+    project_directory = project_directory.replace('PROJECTID', projectId)
     if 'clinical_directory' in config:
         clinical_directory = os.path.join(cwd, config['clinical_directory'])
     clinical_directory = clinical_directory.replace('PROJECTID', projectId)
     if 'design_directory' in config:
         design_directory = os.path.join(cwd, config['design_directory'])
     design_directory = design_directory.replace('PROJECTID', projectId)
-    project_dfs = project_parser(projectId, config, clinical_directory, separator)
-    design_dfs = experimental_design_parser(projectId, config, design_directory)
-    clinical_dfs = clinical_parser(projectId, config, clinical_directory, separator)
-    data = project_dfs
-    data.update(design_dfs)
-    data.update(clinical_dfs)
+    if type == 'project':
+        project_dfs = project_parser(projectId, config, project_directory, separator)
+        data.update(project_dfs)
+    elif type == 'experimental_design':
+        design_dfs = experimental_design_parser(projectId, config, design_directory)
+        data.update(design_dfs)
+    elif type == 'clinical':
+        clinical_dfs = clinical_parser(projectId, config, clinical_directory, separator)
+        data.update(clinical_dfs)
 
     return data
 
@@ -51,25 +59,23 @@ def experimental_design_parser(projectId, config, directory):
         data[('subjects', 'w')] = extract_subject_identifiers(design_data)
         data[('biological_samples', 'w')] = extract_biosample_identifiers(design_data)
         data[('analytical_samples', 'w')] = extract_analytical_sample_identifiers(design_data)
+        data[('analytical_samples_info', 'w')] = extract_analytical_samples_info(design_data)
         data[('subject_biosample', 'w')] = extract_biological_sample_subject_rels(design_data)
         data[('biosample_analytical', 'w')] = extract_biological_sample_analytical_sample_rels(design_data)
 
     return data
 
 
-def clinical_parser(projectId, config, directory, separator):
+def clinical_parser(projectId, config, clinical_directory, separator):
     data = {}
-    project_data = parse_dataset(projectId, config, directory, key='project')
-    clinical_data = parse_dataset(projectId, config, directory, key='clinical')
-    if project_data is not None and clinical_data is not None:
+    clinical_data = parse_dataset(projectId, config, clinical_directory, key='clinical')
+    if clinical_data is not None:
         data[('biosamples_info', 'w')] = extract_biological_samples_info(clinical_data)
-        data[('analytical_samples_info', 'w')] = extract_analytical_samples_info(clinical_data)
         data[('biosample_analytical_attributes', 'w')] = extract_biosample_analytical_sample_relationship_attributes(clinical_data)
         data[('biological_sample_at_timepoint', 'w')] = extract_biological_sample_timepoint_rels(clinical_data)
         data[('biosample_tissue', 'w')] = extract_biological_sample_tissue_rels(clinical_data)
         data[('disease', 'w')] = extract_subject_disease_rels(clinical_data, separator=separator)
         data[('subject_had_intervention', 'w')] = extract_subject_intervention_rels(clinical_data, separator=separator)
-        data[('groups', 'w')] = extract_biological_sample_group_rels(clinical_data)
         clinical_state, clinical_quant = extract_biological_sample_clinical_variables_rels(clinical_data)
         data[('clinical_state', 'w')] = clinical_state
         data[('clinical_quant', 'w')] = clinical_quant
@@ -85,16 +91,20 @@ def parse_dataset(projectId, configuration, dataDir, key='project'):
     data = None
     if 'file_'+key in configuration:
         data_file = configuration['file_'+key].replace('PROJECTID', projectId)
-
-        filepath = os.path.join(dataDir, data_file)
-        if os.path.isfile(filepath):
-            data = builder_utils.readDataset(filepath)
+        files = os.listdir(dataDir)
+        regex = r"{}.+".format(data_file)
+        r = re.compile(regex)
+        filename = list(filter(r.match, files))
+        if len(filename) > 0:
+            filepath = os.path.join(dataDir, filename.pop())
+            if os.path.isfile(filepath):
+                data = builder_utils.readDataset(filepath)
 
     return data
 
 
 def extract_project_info(project_data):
-    cols = ['internal_id', 'name', 'acronym', 'description', 'related_to', 'subjects', 'datatypes', 'timepoints', 'disease', 'tissue', 'intervention', 'responsible', 'participant', 'start_date', 'end_date', 'status', 'external_id']
+    cols = ['internal_id', 'name', 'acronym', 'description', 'related_to', 'datatypes', 'timepoints', 'disease', 'tissue', 'intervention', 'responsible', 'participant', 'start_date', 'end_date', 'status', 'external_id']
     n = len(cols)
     df = project_data.copy()
     if len(df.columns) == n:
@@ -284,10 +294,17 @@ def extract_biosample_analytical_sample_relationship_attributes(clinical_data):
     df = pd.DataFrame(columns=['START_ID', 'END_ID', 'quantity', 'quantity_units'])
     if 'analytical_sample external_id' in clinical_data:
         if not pd.isna(clinical_data['analytical_sample external_id']).any():
-            df = clinical_data[['biological_sample external_id', 'analytical_sample external_id', 'analytical_sample quantity', 'analytical_sample quantity_units']].drop_duplicates(keep='first').reset_index(drop=True)
-            df.columns = ['START_ID', 'END_ID', 'quantity', 'quantity_units']
-            # df.insert(loc=2, column='TYPE', value='SPLITTED_INTO')
-
+            cols = ['biological_sample external_id', 'analytical_sample external_id']
+            edge_cols = ['START_ID', 'END_ID']
+            if 'analytical_sample quantity' in clinical_data:
+                cols.append('analytical_sample quantity')
+                edge_cols.append('quantity')
+            if 'analytical_sample quantity_units' in clinical_data:
+                cols.append('analytical_sample quantity_units')
+                edge_cols.append('quantity_units')
+            df = clinical_data[cols].drop_duplicates(keep='first').reset_index(drop=True)
+            df.columns = edge_cols
+            
     return df
 
 
@@ -359,9 +376,8 @@ def extract_biological_sample_group_rels(clinical_data):
 def extract_biological_sample_clinical_variables_rels(clinical_data):
     df_quant = pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE', 'value'])
     df_state = pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE', 'value'])
-    if 'biological_sample external_id' in clinical_data and 'grouping2' in clinical_data:
-        data = clinical_data.set_index('biological_sample external_id').copy()
-        df = data.loc[:, 'grouping2':].drop('grouping2', axis=1)
+    if 'biological_sample external_id' in clinical_data:
+        df = clinical_data.set_index('biological_sample external_id').copy()
         df.columns = [i.split()[-1] for i in df.columns]
         df.columns = df.columns.str.extract(r'.*\((.*)\).*')[0].tolist()
         df_quant = df._get_numeric_data()
@@ -369,10 +385,12 @@ def extract_biological_sample_clinical_variables_rels(clinical_data):
         if not df_quant.empty:
             df_quant = df_quant.stack().reset_index().drop_duplicates(keep='first').dropna()
             df_quant.columns = ['START_ID', 'END_ID', 'value']
+            df_quant = df_quant.drop_duplicates()
             df_quant.insert(loc=2, column='TYPE', value='HAS_QUANTIFIED_CLINICAL')
         if not df_state.empty:
             df_state = df_state.stack().reset_index().drop_duplicates(keep='first').dropna()
             df_state.columns = ['START_ID', 'END_ID', 'value']
+            df_state = df_state.drop_duplicates()
             df_state.insert(loc=2, column='TYPE', value='HAS_CLINICAL_STATE')
 
     return df_state, df_quant

@@ -12,21 +12,21 @@ remove_project:
         - SPLITTED_INTO
     query_type: post
     query: >
-            call apoc.periodic.iterate('MATCH (p:Project)-[:HAS_ENROLLED]-(s:Subject)-[:BELONGS_TO_SUBJECT]-(bio:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)-[]-() 
-                WHERE p.id="PROJECTID" RETURN a', 
-                "DETACH DELETE a", 
+            call apoc.periodic.iterate('MATCH (p:Project)-[:HAS_ENROLLED]-(s:Subject)-[:BELONGS_TO_SUBJECT]-(bio:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)-[]-()
+                WHERE p.id="PROJECTID" RETURN a',
+                "DETACH DELETE a",
                 {batchSize:50}) yield batches, total return batches, total;
-            call apoc.periodic.iterate('MATCH (p:Project)-[:HAS_ENROLLED]-(s:Subject)-[:BELONGS_TO_SUBJECT]-(bio:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample) 
-                WHERE p.id="PROJECTID" RETURN a', 
-                "DETACH DELETE a", 
+            call apoc.periodic.iterate('MATCH (p:Project)-[:HAS_ENROLLED]-(s:Subject)-[:BELONGS_TO_SUBJECT]-(bio:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)
+                WHERE p.id="PROJECTID" RETURN a',
+                "DETACH DELETE a",
                 {batchSize:50}) yield batches, total return batches, total;
-            call apoc.periodic.iterate('MATCH (p:Project)-[:HAS_ENROLLED]-(s:Subject)-[:BELONGS_TO_SUBJECT]-(bio:Biological_sample) 
-                WHERE p.id="PROJECTID" RETURN bio', 
-                "DETACH DELETE bio", 
+            call apoc.periodic.iterate('MATCH (p:Project)-[:HAS_ENROLLED]-(s:Subject)-[:BELONGS_TO_SUBJECT]-(bio:Biological_sample)
+                WHERE p.id="PROJECTID" RETURN bio',
+                "DETACH DELETE bio",
                 {batchSize:50}) yield batches, total return batches, total;
-            call apoc.periodic.iterate('MATCH (p:Project)-[:HAS_ENROLLED]-(s:Subject) 
-                WHERE p.id="PROJECTID" RETURN s', 
-                "DETACH DELETE s", 
+            call apoc.periodic.iterate('MATCH (p:Project)-[:HAS_ENROLLED]-(s:Subject)
+                WHERE p.id="PROJECTID" RETURN s',
+                "DETACH DELETE s",
                 {batchSize:50}) yield batches, total return batches, total;
             MATCH (p:Project) WHERE p.id="PROJECTID" DETACH DELETE p;
 attributes:
@@ -34,7 +34,7 @@ attributes:
     description: 'Gets all the attributes of a given Project. Requires: Project.id'
     involved_nodes:
         - Project
-    involved_rels: 
+    involved_rels:
     query_type: pre
     query: >
         MATCH (project:Project)
@@ -47,7 +47,7 @@ extract_projectID:
     description: 'Returns project external identifier. Requires internal identifier.'
     involved_nodes:
         - Project
-    involved_rels: 
+    involved_rels:
     query_type: post
     query: >
         MATCH (p:Project)
@@ -63,13 +63,13 @@ similarity:
         - HAS_QUANTIFIED_PROTEIN
     query_type: pre
     query: >
-        MATCH (project1:Project{id:'PROJECTID'})-[:HAS_ENROLLED]->(:Subject)<-[:BELONGS_TO_SUBJECT]-(:Biological_sample)-[:SPLITTED_INTO]->(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
+        MATCH (project1:Project{id:'PROJECTID'})-[:HAS_ENROLLED]->(:Subject)<-[:BELONGS_TO_SUBJECT]-(:Biological_sample)-[:SPLITTED_INTO]->(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein)
         WHERE toBoolean(r.is_razor)
-        WITH project1, algo.similarity.asVector(protein, r.value) AS p1Vector
-        MATCH (project2:Project)-[:HAS_ENROLLED]->(:Subject)<-[:BELONGS_TO_SUBJECT]-(:Biological_sample)-[:SPLITTED_INTO]->(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
+        WITH project1, gds.alpha.similarity.asVector(protein, r.value) AS p1Vector
+        MATCH (project2:Project)-[:HAS_ENROLLED]->(:Subject)<-[:BELONGS_TO_SUBJECT]-(:Biological_sample)-[:SPLITTED_INTO]->(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein)
         WHERE toBoolean(r.is_razor) AND project1 <> project2
-        WITH project1, project2, p1Vector, algo.similarity.asVector(protein, r.value) AS p2Vector
-        RETURN project1.id AS current_id, project2.id AS other_id, project1.name AS current, project2.name AS other, project2.description AS description, project2.responsible AS responsible, algo.similarity.pearson(p1Vector, p2Vector, {vectorType: "maps"}) AS similarity_pearson ORDER BY similarity_pearson DESC
+        WITH project1, project2, p1Vector, gds.alpha.similarity.asVector(protein, r.value) AS p2Vector
+        RETURN project1.id AS current_id, project2.id AS other_id, project1.name AS current, project2.name AS other, project2.description AS description, project2.responsible AS responsible, gds.alpha.similarity.pearson(p1Vector, p2Vector, {vectorType: "maps"}) AS similarity_pearson ORDER BY similarity_pearson DESC
 overlap:
     name: overlap_similarity
     description: Get overlap of entities between projects i.e. ENTITY = Biological_process, RELATIONSHIP = ASSOCIATED_WITH
@@ -78,16 +78,13 @@ overlap:
     involved_rels:
     query_type: pre
     query: >
-        MATCH (project:Project)-[:HAS_ENROLLED]->(:Subject)<-[:BELONGS_TO_SUBJECT]-(:Biological_sample)-[:SPLITTED_INTO]->(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
+        MATCH (project1:Project)-[:HAS_ENROLLED]->(:Subject)<-[:BELONGS_TO_SUBJECT]-(:Biological_sample)-[:SPLITTED_INTO]->(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein1:Protein)
         WHERE toBoolean(r.is_razor)
-        WITH {item:id(project), name:project.id, categories: collect(DISTINCT id(protein))} as projectData
-        WITH collect(projectData) as data
-        WITH data, [value in data WHERE value.name IN ["PROJECTID"] | value.item ] AS sourceIds, [value in data WHERE NOT value.name IN ["PROJECTID"] | value.item ] AS targetIds
-        CALL algo.similarity.jaccard.stream(data, {sourceIds:sourceIds, targetIds: targetIds, similarityCutoff:0.2})
-        YIELD item1, item2, count1, count2, intersection, similarity
-        RETURN algo.getNodeById(item1).name AS project1_name, algo.getNodeById(item2).name AS project2_name, 
-        algo.getNodeById(item1).id AS from, algo.getNodeById(item2).id AS to, count1 AS project1_total, count2 AS project2_total, count1-intersection AS project1_unique, 
-        count2-intersection AS project2_unique, intersection, similarity ORDER BY similarity DESC
+        WITH project1, COUNT(DISTINCT id(protein1)) AS count1, collect(DISTINCT id(protein1)) AS projectData1
+        MATCH (project2:Project)-[:HAS_ENROLLED]->(:Subject)<-[:BELONGS_TO_SUBJECT]-(:Biological_sample)-[:SPLITTED_INTO]->(a:Analytical_sample)-[r2:HAS_QUANTIFIED_PROTEIN]->(protein2:Protein)
+        WHERE toBoolean(r2.is_razor) AND project1 <> project2 AND ID(project1) < ID(project2)
+        WITH project1, count1, projectData1, project2, COUNT(DISTINCT id(protein2)) AS count2, collect(DISTINCT id(protein2)) AS projectData2, size(apoc.coll.intersection(projectData1, collect(DISTINCT id(protein2)))) AS intersection
+        RETURN project1.name AS project1_name, project2.name AS project2_name, project1.id AS from, project2.id AS to, count1 AS project1_total, count2 AS project2_total, count1-intersection AS project1_unique, count2-intersection AS project2_unique, intersection, gds.alpha.similarity.jaccard(projectData1, projectData2) AS similarity ORDER BY similarity DESC
 project_graph:
     name: project graph
     description: full graph for a project
@@ -99,6 +96,7 @@ project_graph:
         - HAS_ENROLLED
         - BELONGS_TO_SUBJECT
         - SPLITTED_INTO
+    query_type: post
     query: >
         MATCH (p:Project)-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(n:Protein)
         WHERE p.id="PROJECTID"

@@ -87,18 +87,74 @@ class Analysis:
         if self.analysis_type == "pca":
             components = 2
             drop_cols = []
+            group = 'group'
+            annotation_cols = []
             if "components" in self.args:
                 components = self.args["components"]
             if "drop_cols" in self.args:
                 drop_cols = self.args["drop_cols"]
-            self.result, nargs = analytics.run_pca(self.data, components=components, drop_cols=drop_cols)
+            if 'group' in self.args:
+                group = self.args['group']
+            if 'hovering_cols' in self.args:
+                annotation_cols = self.args['hovering_cols']
+            r, nargs = analytics.run_pca(self.data, components=components, drop_cols=drop_cols, group=group, annotation_cols=annotation_cols)
+            self.result[self.analysis_type] = r
             self.args.update(nargs)
+        if self.analysis_type == 'functional_pca':
+            dfid = 'processed'
+            annotid = 'go annotation'
+            key = 'nes'
+            annotation_col = 'annotation'
+            identifier_col = 'identifier'
+            index = ['group', 'sample', 'subject']
+            outdir = None
+            min_size = 15
+            scale = False
+            permutations = 0
+            components = 2
+            drop_cols = []
+            hovering_cols = []
+            if 'data_id' in self.args:
+                dfid = self.args['data_id']
+            if 'annotation_id' in self.args:
+                annotid = self.args['annotation_id']
+            if 'key' in self.args:
+                key = self.args['key']
+            if 'annotation_col' in self.args:
+                annotation_col = self.args['annotation_col']
+            if 'identifier_col' in self.args:
+                identifier_col = self.args['identifier_col']
+            if 'index' in self.args:
+                index = self.args['index']
+            if 'outdir' in self.args:
+                outdir = self.args['outdir']
+            if 'min_size' in self.args:
+                min_size = self.args['min_size']
+            if 'scale' in self.args:
+                scale = self.args['scale']
+            if 'permutations' in self.args:
+                permutations = self.args['permutations']
+            if "components" in self.args:
+                components = self.args["components"]
+            if "drop_cols" in self.args:
+                drop_cols = self.args["drop_cols"]
+            if 'hovering_cols' in self.args:
+                hovering_cols = self.args['hovering_cols']
+            if dfid in self.data and annotid in self.data: 
+                result = analytics.run_ssgsea(self.data[dfid], self.data[annotid], annotation_col=annotation_col,
+                                                                    identifier_col=identifier_col, set_index=index, outdir=outdir, 
+                                                                    min_size=min_size, scale=scale, permutations=permutations)
+                if key in result:
+                    r, nargs = analytics.run_pca(result[key], components=components, drop_cols=drop_cols, annotation_cols=hovering_cols)
+                    self.result[self.analysis_type] = r
+                    self.args.update(nargs)
         elif self.analysis_type == "tsne":
             components = 2
             perplexity = 40
             n_iter = 1000
             drop_cols = []
             init = 'pca'
+            annotation_cols = []
             if "components" in self.args:
                 components = self.args["components"]
             if "perplexity" in self.args:
@@ -109,20 +165,26 @@ class Analysis:
                 init = self.args["init"]
             if "drop_cols" in self.args:
                 drop_cols = self.args["drop_cols"]
-            self.result, nargs = analytics.run_tsne(self.data, components=components, drop_cols=drop_cols, perplexity=perplexity, n_iter=n_iter, init=init)
+            if 'hovering_cols' in self.args:
+                annotation_cols = self.args['hovering_cols']
+
+            self.result, nargs = analytics.run_tsne(self.data, components=components, annotation_cols=annotation_cols, drop_cols=drop_cols, perplexity=perplexity, n_iter=n_iter, init=init)
             self.args.update(nargs)
         elif self.analysis_type == "umap":
             n_neighbors = 10
             min_dist = 0.3
             metric = 'cosine'
+            annotation_cols = []
             if "n_neighbors" in self.args:
                 n_neighbors = self.args["n_neighbors"]
             if "min_dist" in self.args:
                 min_dist = self.args["min_dist"]
             if "metric" in self.args:
                 metric = self.args["metric"]
+            if 'hovering_cols' in self.args:
+                annotation_cols = self.args['hovering_cols']
             if n_neighbors < self.data.shape[0]:
-                self.result, nargs = analytics.run_umap(self.data, n_neighbors=n_neighbors, min_dist=min_dist, metric=metric)
+                self.result, nargs = analytics.run_umap(self.data, n_neighbors=n_neighbors, annotation_cols=annotation_cols, min_dist=min_dist, metric=metric)
                 self.args.update(nargs)
         elif self.analysis_type == "mapper":
             n_cubes = 15
@@ -181,6 +243,37 @@ class Analysis:
                 correction = self.args['correction_method']
             anova_result = analytics.run_anova(self.data, drop_cols=drop_cols, subject=subject, group=group, alpha=alpha, permutations=permutations, is_logged=is_logged, correction=correction)
             self.result[self.analysis_type] = anova_result
+        elif self.analysis_type == 'ancova':
+            alpha = 0.05
+            drop_cols = []
+            group = 'group'
+            subject = 'subject'
+            permutations = 50
+            is_logged = True
+            correction = 'fdr_bh'
+            covariates = []
+            if "alpha" in self.args:
+                alpha = self.args["alpha"]
+            if "drop_cols" in self.args:
+                drop_cols = self.args['drop_cols']
+            if "subject" in self.args:
+                subject = self.args['subject']
+            if "group" in self.args:
+                group = self.args["group"]
+            if "permutations" in self.args:
+                permutations = self.args["permutations"]
+            if "is_logged" in self.args:
+                is_logged = self.args['is_logged']
+            if 'correction_method' in self.args:
+                correction = self.args['correction_method']
+            if "covariates" in self.args:
+                covariates = self.args["covariates"]
+            if 'processed' in self.data and 'metadata' in self.data:
+                metadata = self.data['metadata']
+                processed = self.data['processed']
+                df = processed.set_index([subject, group]).join(metadata.set_index([subject, group])[covariates]).reset_index()
+                ancova_result = analytics.run_ancova(df, covariates=covariates, drop_cols=drop_cols, subject=subject, group=group, alpha=alpha, permutations=permutations, is_logged=is_logged, correction=correction)
+                self.result[self.analysis_type] = ancova_result
         elif self.analysis_type == 'qcmarkers':
             sample_col = 'sample'
             group_col = 'group'
@@ -365,6 +458,42 @@ class Analysis:
                                                                                           identifier=identifier, groups=groups, annotation_col=annotation_col, reject_col=reject_col, 
                                                                                           method=method, correction=correction)
             print('Enrichment', time.time() - start)
+        elif self.analysis_type == "up_down_enrichment":
+            start = time.time()
+            identifier = 'identifier'
+            groups = ['group1', 'group2']
+            annotation_col = 'annotation'
+            reject_col = 'rejected'
+            method = 'fisher'
+            annotation_type = 'functional'
+            correction = 'fdr_bh'
+            alpha = 0.05
+            lfc_cutoff = 1
+            if 'identifier' in self.args:
+                identifier = self.args['identifier']
+            if 'groups' in self.args:
+                groups = self.args['groups']
+            if 'annotation_col' in self.args:
+                annotation_col = self.args['annotation_col']
+            if 'reject_col' in self.args:
+                reject_col = self.args['reject_col']
+            if 'method' in self.args:
+                method = self.args['method']
+            if 'annotation_type' in self.args:
+                annotation_type = self.args['annotation_type']
+            if 'correction_method' in self.args:
+                correction = self.args['correction_method']
+            if 'alpha' in self.args:
+                alpha = self.args['alpha']
+            if 'lfc_cutoff' in self.args:
+                lfc_cutoff = self.args['lfc_cutoff']
+            if 'regulation_data' in self.args and 'annotation' in self.args:
+                if self.args['regulation_data'] in self.data and self.args['annotation'] in self.data:
+                    self.analysis_type = annotation_type+"_"+self.analysis_type
+                    self.result[self.analysis_type] = analytics.run_up_down_regulation_enrichment(self.data[self.args['regulation_data']], self.data[self.args['annotation']], 
+                                                                                          identifier=identifier, groups=groups, annotation_col=annotation_col, reject_col=reject_col, 
+                                                                                          method=method, correction=correction, alpha=alpha, lfc_cutoff=lfc_cutoff)
+            print('Enrichment', time.time() - start)
         elif self.analysis_type == "regulation_site_enrichment":
             start = time.time()
             identifier = 'identifier'
@@ -373,7 +502,7 @@ class Analysis:
             reject_col = 'rejected'
             method = 'fisher'
             annotation_type = 'functional'
-            regex = "(\w+~.+)_\w\d+\-\w+"
+            regex = r"(\w+~.+)_\w\d+\-\w+"
             correction = 'fdr_bh'
             if 'identifier' in self.args:
                 identifier = self.args['identifier']
@@ -398,6 +527,39 @@ class Analysis:
                                                                                                self.data[self.args['annotation']], identifier=identifier,
                                                                                                groups=groups, annotation_col=annotation_col, reject_col=reject_col,
                                                                                                method=method, regex=regex, correction=correction)
+        elif self.analysis_type == 'ssgsea':
+            dfid = 'processed'
+            annotid = 'go annotation'
+            annotation_col = 'annotation'
+            identifier_col = 'identifier'
+            index = ['group', 'sample','subject']
+            outdir = None
+            min_size = 15
+            scale = False
+            permutations = 0
+            if 'data_id' in self.args:
+                dfid = self.args['data_id']
+            if 'annotation_id' in self.args:
+                annotid = self.args['annotation_id']
+            if 'annotation_col' in self.args:
+                annotation_col = self.args['annotation_col']
+            if 'identifier_col' in self.args:
+                identifier_col = self.args['identifier_col']
+            if 'index' in self.args:
+                index = self.args['index']
+            if 'outdir' in self.args:
+                outdir = self.args['outdir']
+            if 'min_size' in self.args:
+                min_size = self.args['min_size']
+            if 'scale' in self.args:
+                scale = self.args['scale']
+            if 'permutations' in self.args:
+                permutations = self.args['permutations']
+            
+            if dfid in self.data and annotid in self.data: 
+                self.result[self.analysis_type] = analytics.run_ssgsea(self.data[dfid], self.data[annotid], annotation_col=annotation_col, 
+                                                                    identifier_col=identifier_col, set_index=index, outdir=outdir, 
+                                                                    min_size=min_size, scale=scale, permutations=permutations)
         elif self.analysis_type == 'long_format':
             self.result[self.analysis_type] = analytics.transform_into_long_format(self.data, drop_columns=self.args['drop_columns'], group=self.args['group'], columns=self.args['columns'])
         elif self.analysis_type == 'ranking_with_markers':
@@ -424,7 +586,7 @@ class Analysis:
         elif self.analysis_type == 'coefficient_of_variation':
             self.result[self.analysis_type] = analytics.get_coefficient_variation(self.data, drop_columns=self.args['drop_columns'], group=self.args['group'], columns=self.args['columns'])
         elif self.analysis_type == 'publications_abstracts':
-            self.result[self.analysis_type] = analytics.get_publications_abstracts(self.data, publication_col="publication", join_by=['publication', 'Proteins'], index="PMID")
+            self.result[self.analysis_type] = analytics.get_publications_abstracts(self.data, publication_col="publication", join_by=['publication', 'Proteins', 'Diseases'], index="PMID")
         elif self.analysis_type == "wgcna":
             start = time.time()
             drop_cols_exp = []
@@ -516,7 +678,13 @@ class Analysis:
                     if isinstance(id, tuple):
                         identifier = identifier+"_"+id[0]+"_vs_"+id[1]
                         figure_title = self.args["title"] + id[0]+" vs "+id[1]
-                    plot.append(viz.get_table(self.result[id], identifier, args={'title': figure_title, 'colors': colors, 'cols': columns, 'rows': rows,'width': 800, 'height': 1500, 'font': 12}))
+                    if isinstance(self.result[id], dict):
+                        i = 0
+                        for ident in self.result[id]:
+                            plot.append(viz.get_table(self.result[id][ident], identifier+"_"+str(i), args={'title': figure_title+" "+ident, 'colors': colors, 'cols': columns, 'rows': rows,'width': 800, 'height': 1500, 'font': 12}))
+                            i += 1
+                    else:
+                        plot.append(viz.get_table(self.result[id], identifier, args={'title': figure_title, 'colors': colors, 'cols': columns, 'rows': rows,'width': 800, 'height': 1500, 'font': 12}))
             if name == "multiTable":
                 for id in self.result:
                     plot.append(viz.get_multi_table(self.result[id], identifier, self.args["title"]))
@@ -595,6 +763,10 @@ class Analysis:
                     self.args["title"] = self.args['title'] + " " + pair[0] + " vs " + pair[1]
                     p = viz.run_volcano(signature, identifier + "_" + pair[0] + "_vs_" + pair[1], self.args)
                     plot.extend(p)
+            elif name == "enrichment_plot":
+                for pair in self.result:
+                    plots = viz.get_enrichment_plots(self.result[pair], identifier=pair, args=self.args)
+                plot.extend(plots)
             elif name == 'network':
                 source = 'source'
                 target = 'target'

@@ -5,7 +5,7 @@ import zipfile
 from graphdb_builder import mapping as mp, builder_utils
 
 #################################
-#   Human Metabolome Database   # 
+#   Human Metabolome Database   #
 #################################
 def parser(databases_directory, download=True):
     config = builder_utils.get_config(config_name="hmdbConfig.yml", data_type='databases')

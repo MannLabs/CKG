@@ -26,7 +26,7 @@ increment_user_id:
     query: >
         MATCH (u:User)
         WITH max(toInteger(SPLIT(u.id, 'U')[1]))+1 as new_id
-        RETURN SUBSTRING('U',0,1) + new_id AS result;
+        RETURN SUBSTRING('U',0,1) + new_id AS result;    
 create_user_node:
     name: create user node
     description: 'Creates a new user as a node in the database'
@@ -35,7 +35,6 @@ create_user_node:
     involved_rels:
     query: >
         CREATE CONSTRAINT ON (u:User) ASSERT u.id IS UNIQUE;
-        CREATE CONSTRAINT ON (u:User) ASSERT u.name IS UNIQUE;
         CREATE CONSTRAINT ON (u:User) ASSERT u.username IS UNIQUE;
         CREATE CONSTRAINT ON (u:User) ASSERT u.email IS UNIQUE;
         MERGE (u:User {id:$ID})
@@ -71,3 +70,10 @@ delete_user:
     involved_rels:
     query: >
         CALL dbms.security.deleteUser($username);
+change_user_password:
+    'name': "Change user's password"
+    'description': ''
+    'query': >
+        MATCH (n {name:$username})
+        SET n.password=toString($new_password)
+        RETURN n.username

@@ -35,7 +35,7 @@ class DataUploadApp(basicApp.BasicApp):
                                                style={'width': '49%', 'marginLeft': '0%', 'verticalAlign': 'top', 'fontSize': '18px'}),
                                 html.Div(children=[dcc.RadioItems(id='upload-data-type-picker', options=[{'label': i, 'value': i} for i in DataTypes], value=None, labelStyle={'display': 'inline-block', 'margin-right': 20},
                                                               inputStyle={"margin-right": "5px"}, style={'display': 'block', 'fontSize': '16px'})]),
-                                html.Div(children=[html.H5('Proteomics tool:'), dcc.RadioItems(id='prot-tool', options=[{'label': i, 'value': i} for i in ['MaxQuant', 'Spectronaut']], value='', labelStyle={'display': 'inline-block', 'margin-right': 20},
+                                html.Div(children=[html.H5('Proteomics tool:'), dcc.RadioItems(id='prot-tool', options=[{'label': i, 'value': i} for i in ['MaxQuant', 'Spectronaut', 'FragPipe']], value='', labelStyle={'display': 'inline-block', 'margin-right': 20},
                                                               inputStyle={"margin-right": "5px"}, style={'display': 'block', 'fontSize': '16px'})], id='proteomics-tool', style={'padding-top': 20}),
                                 html.Div(children=[html.H5('Select the type of file uploaded:'), dcc.Dropdown(id='prot-file', options=[{'label': i, 'value': i} for i in ['Protein groups', 'Peptides', 'Phospho STY sites']], value='',
                                                               style={'display': 'block', 'fontSize': '14px', 'width': '250px'})], id='proteomics-file', style={'padding-top': 20}),

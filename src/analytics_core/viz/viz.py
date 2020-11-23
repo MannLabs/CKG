@@ -172,11 +172,15 @@ def get_boxplot_grid(data, identifier, args):
             args['height'] = None
         if 'title' not in args:
             args['title'] = 'Boxplot'
-
-        if args['axis'] == 'rows':
-            fig = px.box(data, x=args["x"], y=args["y"], color=args['color'], points="all", facet_row=args["facet"], width=args['width'])
+        if 'colors' in args:
+            color_map = args['colors']
         else:
-            fig = px.box(data, x=args["x"], y=args["y"], color=args['color'], points="all", facet_col=args["facet"], width=args['width'])
+            color_map = {}
+    
+        if args['axis'] == 'rows':
+            fig = px.box(data, x=args["x"], y=args["y"], color=args['color'], color_discrete_map=color_map, points="all", facet_row=args["facet"], width=args['width'])
+        else:
+            fig = px.box(data, x=args["x"], y=args["y"], color=args['color'], color_discrete_map=color_map, points="all", facet_col=args["facet"], width=args['width'])
         fig.update_layout(annotations=[dict(xref='paper', yref='paper', showarrow=False)], template='plotly_white')
     else:
         fig = get_markdown(text='Missing arguments. Please, provide: x, y, color, facet, axis')
@@ -382,13 +386,10 @@ def get_ranking_plot(data, identifier, args):
     num_cols = 3
     fig = {}
     layouts = []
-    num_groups = len(data.index.unique())
-    num_rows = math.ceil(num_groups/num_cols)
-    if 'group' in args:
-        group = args['group']
-
-    fig = tools.make_subplots(rows=num_rows, cols=num_cols, shared_yaxes=True, print_grid=False)
     if 'index' in args and args['index']:
+        num_groups = len(data.index.unique())
+        num_rows = math.ceil(num_groups/num_cols)
+        fig = tools.make_subplots(rows=num_rows, cols=num_cols, shared_yaxes=True, print_grid=False)
         r = 1
         c = 1
         range_y = [data['y'].min(), data['y'].max()+1]
@@ -399,6 +400,9 @@ def get_ranking_plot(data, identifier, args):
             cols = ['x', 'group', 'name', 'y']
             cols.extend(gdata.columns[4:])
             gdata.columns = cols
+            if 'colors' in args:
+                gdata['colors'] = args['colors'][index]
+
             gfig = get_simple_scatterplot(gdata, identifier+'_'+str(index), args)
             trace = gfig.figure['data'].pop()
             glayout = gfig.figure['layout']['annotations']
@@ -438,6 +442,7 @@ def get_ranking_plot(data, identifier, args):
         fig['layout'].annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')] + layouts
     else:
         fig = get_simple_scatterplot(data, identifier+'_'+group, args).figure
+
     return dcc.Graph(id=identifier, figure=fig)
 
 def get_scatterplot_matrix(data, identifier, args):
@@ -464,36 +469,42 @@ def get_scatterplot_matrix(data, identifier, args):
     """
     num_cols = 3
     fig = {}
-    if 'group' in args:
-        group=args['group']
+    if 'group' in args and args['group'] in data.columns:
+        group = args['group']
+        num_groups = len(data[group].unique())
+        num_rows = math.ceil(num_groups/num_cols)
+        if 'colors' not in data.columns:
+            if 'colors' in args:
+                data['colors'] = [args['colors'][g] if g in args['colors'] else '#999999' for g in data[group]]
 
-    num_groups = len(data[group].unique())
-    num_rows = math.ceil(num_groups/num_cols)
-    fig = tools.make_subplots(rows=num_rows, cols=num_cols, shared_yaxes=True,print_grid=False)
-    r = 1
-    c = 1
-    range_y = [data['y'].min(), data['y'].max()+1]
-    for g in data[group].unique():
-        gdata = data[data[group] == g].dropna()
-        gfig = get_simple_scatterplot(gdata, identifier+'_'+str(g), args)
-        trace = gfig.figure['data'].pop()
-        trace.name = g
-        fig.append_trace(trace, r, c)
+        fig = tools.make_subplots(rows=num_rows, cols=num_cols, shared_yaxes=True,print_grid=False)
+        r = 1
+        c = 1
+        range_y = None
+        if pd.api.types.is_numeric_dtype(data['y']):
+            range_y = [data['y'].min(), data['y'].max()+1]
+        
+        for g in data[group].unique():
+            gdata = data[data[group] == g].dropna()
+            gfig = get_simple_scatterplot(gdata, identifier+'_'+str(g), args)
+            trace = gfig.figure['data'].pop()
+            trace.name = g
+            fig.append_trace(trace, r, c)
 
-        if c >= num_cols:
-            r += 1
-            c = 1
-        else:
-            c += 1
+            if c >= num_cols:
+                r += 1
+                c = 1
+            else:
+                c += 1
 
-    fig['layout'].update(dict(height = args['height'],
-                            width=args['width'],
-                            title=args['title'],
-                            xaxis= {"title": args['x_title'], 'autorange':True},
-                            yaxis= {"title": args['y_title'], 'range':range_y},
-                            template='plotly_white'))
+        fig['layout'].update(dict(height = args['height'],
+                                width=args['width'],
+                                title=args['title'],
+                                xaxis= {"title": args['x_title'], 'autorange':True},
+                                yaxis= {"title": args['y_title'], 'range':range_y},
+                                template='plotly_white'))
 
-    fig['layout'].annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')]
+        fig['layout'].annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')]
 
     return dcc.Graph(id=identifier, figure=fig)
 
@@ -527,7 +538,7 @@ def get_simple_scatterplot(data, identifier, args):
     if 'colors' in data.columns:
         m.update({'color':data['colors'].tolist()})
     elif 'colors' in args:
-        m.update({'color':args['colors'].tolist()})
+        m.update({'color':args['colors']})
     if 'size' in data.columns:
         m.update({'size':data['size'].tolist()})
     if 'symbol' in data.columns:
@@ -536,7 +547,7 @@ def get_simple_scatterplot(data, identifier, args):
     annots=[]
     if 'annotations' in args:
         for index, row in data.iterrows():
-            name = row['name'].split(' ')[0]
+            name = str(row['name']).split(' ')[0]
             if name in args['annotations']:
                 annots.append({'x': row['x'],
                             'y': row['y'],
@@ -558,7 +569,7 @@ def get_simple_scatterplot(data, identifier, args):
     figure["layout"] = go.Layout(title = args['title'],
                                 xaxis= {"title": args['x_title']},
                                 yaxis= {"title": args['y_title']},
-                                margin={'l': 40, 'b': 40, 't': 30, 'r': 10},
+                                #margin={'l': 40, 'b': 40, 't': 30, 'r': 10},
                                 legend={'x': 0, 'y': 1},
                                 hovermode='closest',
                                 height=args['height'],
@@ -584,37 +595,71 @@ def get_scatterplot(data, identifier, args):
         * **y_title** (str) -- plot y axis title.
         * **height** (int) -- plot height.
         * **width** (int) -- plot width.
+        * **colors** (dict) -- dictionary with colors to be used
     :return: scatterplot figure within the <div id="_dash-app-content">.
 
     Example::
 
         result = get_scatteplot(data, identifier='scatter plot', 'title':'Scatter Plot', 'x_title':'x_axis', 'y_title':'y_axis', 'height':100, 'width':100}))
     """
-    figure = {}
-    figure["data"] = []
-    figure["layout"] = go.Layout(title = args['title'],
-                                xaxis= {"title": args['x_title']},
-                                yaxis= {"title": args['y_title']},
-                                #margin={'l': 40, 'b': 40, 't': 30, 'r': 10},
-                                legend={'x': -.4, 'y': 1.2},
+    annotation =[]
+    title = 'Scatter plot'
+    x_title = 'x'
+    y_title = 'y'
+    height = 800
+    width = 800
+    size = None
+    symbol = None
+    x = 'x'
+    y = 'y'
+    group = None
+    if 'x' in args:
+        x = args['x']
+    if 'y' in args:
+        y = args['y']
+    if 'group' in args:
+        group = args['group']
+    if "hovering_cols" in args:
+        annotation = args["hovering_cols"]
+    if 'title' in args:
+        title = args['title']
+    if 'x_title' in args:
+        x_title = args['x_title']
+    if 'y_title' in args:
+        y_title = args['y_title']
+    if 'height' in args:
+        height = args['height']
+    if 'width' in args:
+        width = args['width']
+    if 'size' in args:
+        size = args['size']
+    if 'symbol' in args:
+        symbol = args['symbol']
+
+    if 'colors' in args and isinstance(args['colors'], dict):
+        figure = px.scatter(data, x=x, y=y, color=group, color_discrete_map=args['colors'], hover_data=annotation, size=size, symbol=symbol)
+    else:
+        figure = px.scatter(data, x=x, y=y, color=group, hover_data=annotation, size=size, symbol=symbol)
+    
+    figure.update_traces(marker=dict(size=14,
+                                     opacity=0.7,
+                                     line=dict(width=0.5, color='DarkSlateGrey')),
+                      selector=dict(mode='markers'))
+    figure["layout"] = go.Layout(title = title,
+                                xaxis= {"title": x_title},
+                                yaxis= {"title": y_title},
+                                legend=dict(orientation="h",
+                                            yanchor="bottom",
+                                            y=1.0,
+                                            xanchor="right",
+                                            x=1),
                                 hovermode='closest',
-                                height=args['height'],
-                                width=args['width'],
+                                height=height,
+                                width=width,
                                 annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')],
                                 template='plotly_white'
                                 )
-    for name in data.name.unique():
-        m = {'size': 25, 'line': {'width': 0.5, 'color': 'grey'}}
-        if 'colors' in args:
-            if name in args['colors']:
-                m.update({'color' : args['colors'][name]})
-        figure["data"].append(go.Scattergl(x = data.loc[data["name"] == name, "x"],
-                                        y = data.loc[data['name'] == name, "y"],
-                                        text = name,
-                                        mode = 'markers',
-                                        opacity=0.7,
-                                        marker= m,
-                                        name=name))
+    
 
     return dcc.Graph(id= identifier, figure = figure)
 
@@ -719,7 +764,7 @@ def get_volcanoplot(results, args):
         figures.append(dcc.Graph(id= identifier, figure = figure))
     return figures
 
-def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blues', 'showscale': False, 'marker_size':8, 'x_title':'log2FC', 'y_title':'-log10(pvalue)', 'num_annotations':10}):
+def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blues', 'showscale': False, 'marker_size':8, 'x_title':'log2FC', 'y_title':'-log10(pvalue)', 'num_annotations':10, 'annotate_list':[]}):
     """ 
     This function parsers the regulation data from statistical tests and creates volcano plots for all distinct group comparisons. Significant hits with lowest adjusted p-values are highlighed.
 
@@ -736,7 +781,7 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
         * **marker_size** (int) -- sets the marker size (in px).
         * **x_title** (str) -- plot x axis title.
         * **y_title** (str) -- plot y axis title.
-        * **num_annotations** (int) -- number of hits to be highlighted (if num_annotations = 10, highlights 10 hits with lowest adjusted p-value).
+        * **num_annotations** (int) -- number of hits to be highlighted (if num_annotations = 10, highlights 10 hits with lowest significant adjusted p-value).
     :return: list of volcano plot figures within the <div id="_dash-app-content">.
 
     Example::
@@ -751,6 +796,7 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
     for group in grouping.groups:
         signature = grouping.get_group(group)
         color = []
+        color_dict = {}
         line_colors = []
         text = []
         annotations = []
@@ -767,6 +813,8 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
             signature = signature.sort_values(by="posthoc padj", ascending=True)
         elif "padj" in signature:
             signature = signature.sort_values(by="padj", ascending=True)
+        
+        signature = signature.reindex(signature['log2FC'].abs().sort_values(ascending=False).index)
         
         pvals = []
         for index, row in signature.iterrows():
@@ -786,8 +834,9 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
                                     'showarrow': False,
                                     'ax': 0,
                                     'ay': -10,
-                                    'font': dict(color = "#2c7bb6", size = 10)})
+                                    'font': dict(color = "#2c7bb6", size = 13)})
                     color.append('rgba(44, 123, 182, 0.7)')
+                    color_dict[row['identifier']] = "#2c7bb6"
                     line_colors.append('#2c7bb6')
                 elif row['log2FC'] >= np.log2(args['fc']):
                     annotations.append({'x': row['log2FC'],
@@ -798,21 +847,41 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
                                     'showarrow': False,
                                     'ax': 0,
                                     'ay': -10,
-                                    'font': dict(color = "#d7191c", size = 10)})
+                                    'font': dict(color = "#d7191c", size = 13)})
                     color.append('rgba(215, 25, 28, 0.7)')
+                    color_dict[row['identifier']] = "#d7191c"
                     line_colors.append('#d7191c')
                 elif row['log2FC'] < 0.:
                     color.append('rgba(171, 217, 233, 0.5)')
+                    color_dict[row['identifier']] = '#abd9e9'
                     line_colors.append('#abd9e9')
                 elif row['log2FC'] > 0.:
                     color.append('rgba(253, 174, 97, 0.5)')
+                    color_dict[row['identifier']] = '#fdae61'
                     line_colors.append('#fdae61')
                 else:
                     color.append('rgba(153, 153, 153, 0.3)')
+                    color_dict[row['identifier']] = '#999999'
                     line_colors.append('#999999')
             else:
                 color.append('rgba(153, 153, 153, 0.3)')
                 line_colors.append('#999999')
+
+        if 'annotate_list' in args:
+            if len(args['annotate_list']) > 0:
+                annotations = []
+                hits = args['annotate_list']
+                selected = signature[signature['identifier'].isin(hits)]
+                for index, row in selected.iterrows():
+                    annotations.append({'x': row['log2FC'],
+                                    'y': row['-log10 pvalue'],
+                                    'xref':'x',
+                                    'yref': 'y',
+                                    'text': str(row['identifier']),
+                                    'showarrow': False,
+                                    'ax': 0,
+                                    'ay': -10,
+                                    'font': dict(color = color_dict[row['identifier']], size = 12)})
 
         if len(annotations) < num_annotations:
             num_annotations = len(annotations)
@@ -991,14 +1060,14 @@ def get_notebook_network_web(graph, args):
 
     return notebook_net
 
-def network_to_tables(graph):
+def network_to_tables(graph, source, target):
     """
     Creates the graph edge list and node list and returns them as separate Pandas DataFrames.
 
     :param graph: networkX graph used to construct the Pandas DataFrame.
     :return: two Pandas DataFrames.
     """
-    edges_table = nx.to_pandas_edgelist(graph)
+    edges_table = nx.to_pandas_edgelist(graph, source, target)
     nodes_table = pd.DataFrame.from_dict(dict(graph.nodes(data=True))).transpose().reset_index()
 
     return nodes_table, edges_table
@@ -1157,8 +1226,8 @@ def get_network(data, identifier, args):
             if args['cutoff_abs']:
                 data = data[np.abs(data[args['values']]) >= args['cutoff']]
             else:
-                data = data >= args['cutoff']
-               
+                data = data[data[args['values']] >= args['cutoff']]
+
         data[args["source"]] = [str(n).replace("'","") for n in data[args["source"]]]
         data[args["target"]] = [str(n).replace("'","") for n in data[args["target"]]]
         
@@ -1167,6 +1236,7 @@ def get_network(data, identifier, args):
             data[args["values"]] = 1 
         
         data = data.rename(index=str, columns={args['values']: "width"})
+        data['width'] = data['width'].fillna(1.0)
         data = data.fillna('null')
         data.columns = [c.replace('_', '') for c in data.columns]
         data['edgewidth'] = data['width'].apply(np.abs)
@@ -1181,11 +1251,14 @@ def get_network(data, identifier, args):
         betweenness = None
         ev_centrality = None
         if data.shape[0] < 150 and data.shape[0] > 5:
-            betweenness = nx.betweenness_centrality(graph, weight='width')
-            ev_centrality = nx.eigenvector_centrality_numpy(graph)
-            ev_centrality = {k:"%.3f" % round(v, 3) for k,v in ev_centrality.items()}
-            nx.set_node_attributes(graph, betweenness, 'betweenness')
-            nx.set_node_attributes(graph, ev_centrality, 'eigenvector')
+            try:
+                betweenness = nx.betweenness_centrality(graph, weight='width')
+                ev_centrality = nx.eigenvector_centrality_numpy(graph)
+                ev_centrality = {k:"%.3f" % round(v, 3) for k,v in ev_centrality.items()}
+                nx.set_node_attributes(graph, betweenness, 'betweenness')
+                nx.set_node_attributes(graph, ev_centrality, 'eigenvector')
+            except Exception as e:
+                print("There was an exception when calculating centralities: {}".format(e))
 
         min_node_size = 0
         max_node_size = 0
@@ -1212,25 +1285,29 @@ def get_network(data, identifier, args):
         nx.set_node_attributes(graph, clusters, 'cluster')
 
         vis_graph = graph
-        if len(vis_graph.edges()) > 500:
-            max_nodes = 150
-            cluster_members = defaultdict(list)
-            cluster_nums = {}
-            for n in clusters:
-                if clusters[n] not in cluster_nums:
-                    cluster_nums[clusters[n]] = 0
-                cluster_members[clusters[n]].append(n)
-                cluster_nums[clusters[n]] += 1
-            valid_clusters = [c for c,n in sorted(cluster_nums.items() ,  key=lambda x: x[1])]
-            valid_nodes = []
-            for c in valid_clusters:
-                valid_nodes.extend(cluster_members[c])
-                if len(valid_nodes) >= max_nodes:
-                    valid_nodes = valid_nodes[0:max_nodes]
-                    break
-            vis_graph = vis_graph.subgraph(valid_nodes)
+        limit=500
+        if 'limit' in args:
+            limit = args['limit']
+        if limit is not None:
+            if len(vis_graph.edges()) > 500:
+                max_nodes = 150
+                cluster_members = defaultdict(list)
+                cluster_nums = {}
+                for n in clusters:
+                    if clusters[n] not in cluster_nums:
+                        cluster_nums[clusters[n]] = 0
+                    cluster_members[clusters[n]].append(n)
+                    cluster_nums[clusters[n]] += 1
+                valid_clusters = [c for c,n in sorted(cluster_nums.items() ,  key=lambda x: x[1])]
+                valid_nodes = []
+                for c in valid_clusters:
+                    valid_nodes.extend(cluster_members[c])
+                    if len(valid_nodes) >= max_nodes:
+                        valid_nodes = valid_nodes[0:max_nodes]
+                        break
+                vis_graph = vis_graph.subgraph(valid_nodes)
 
-        nodes_table, edges_table = network_to_tables(graph)
+        nodes_table, edges_table = network_to_tables(graph, source=args["source"], target=args["target"])
         nodes_fig_table = get_table(nodes_table, identifier=identifier+"_nodes_table", args={'title':args['title']+" nodes table"})
         edges_fig_table = get_table(edges_table, identifier=identifier+"_edges_table", args={'title':args['title']+" edges table"})
 
@@ -1247,7 +1324,7 @@ def get_network(data, identifier, args):
         app_net = get_cytoscape_network(cy_elements, identifier, args)
         #args['mouseover_node'] = mouseover_node
 
-        net = {"notebook":[cy_elements, stylesheet,layout], "app": app_net, "net_tables":(nodes_fig_table, edges_fig_table), "net_json":json_graph.node_link_data(graph)}
+        net = {"notebook":[cy_elements, stylesheet, layout], "app": app_net, "net_tables": (nodes_table, edges_table), "net_tables_viz":(nodes_fig_table, edges_fig_table), "net_json":json_graph.node_link_data(graph)}
     return net
 
 def get_network_style(node_colors, color_edges):
@@ -1297,7 +1374,7 @@ def get_network_style(node_colors, color_edges):
 
     return stylesheet, layout
 
-def visualize_notebook_network(network, notebook_type='jupyter', layout={'width':'100%', 'height':'700px'}):
+def visualize_notebook_network(network, notebook_type='jupyter', layout={}):
     """
     This function returns a Cytoscape network visualization for Jupyter notebooks
 
@@ -1315,6 +1392,21 @@ def visualize_notebook_network(network, notebook_type='jupyter', layout={'width'
         visualize_notebook_network(net['notebook'], notebook_type='jupyter', layout={'width':'100%', 'height':'700px'})
     """
     net = None
+    if len(layout) == 0:
+        layout = {'name': 'cose',
+                'idealEdgeLength': 100,
+                'nodeOverlap': 20,
+                'refresh': 20,
+                'randomize': False,
+                'componentSpacing': 100,
+                'nodeRepulsion': 400000,
+                'edgeElasticity': 100,
+                'nestingFactor': 5,
+                'gravity': 80,
+                'numIter': 1000,
+                'initialTemp': 200,
+                'coolingFactor': 0.95,
+                'minTemp': 1.0}
     if notebook_type == 'jupyter':
         net = Cytoscape(data={'elements':network[0]}, visual_style=network[1], layout=layout)
     elif notebook_type == 'jupyterlab':
@@ -1366,18 +1458,21 @@ def get_pca_plot(data, identifier, args):
 
         result = get_pca_plot(data, identifier='pca', args={'loadings':15, 'title':'PCA Plot', 'x_title':'PC1', 'y_title':'PC2', 'height':100, 'width':100})
     """
-    pca_data, loadings = data
+    pca_data, loadings, variance = data
     figure = {}
     traces = []
     annotations = []
     sct = get_scatterplot(pca_data, identifier, args).figure
     traces.extend(sct['data'])
     figure['layout'] = sct['layout']
-    figure['layout'].template='plotly_white'
     factor = 50
+    num_loadings = 15
     if 'factor' in args:
         factor = args['factor']
-    for index in list(loadings.index)[0:args['loadings']]:
+    if 'loadings' in args:
+        num_loadings = args['loadings']
+
+    for index in list(loadings.index)[0:num_loadings]:
         x = loadings.loc[index,'x'] * factor
         y = loadings.loc[index, 'y'] * factor
         value = loadings.loc[index, 'value']
@@ -1385,11 +1480,11 @@ def get_pca_plot(data, identifier, args):
         trace = go.Scattergl(x= [0,x],
                         y = [0,y],
                         mode='markers+lines',
-                        text=index+" loading: {0:.2f}".format(value),
+                        text=str(index)+" loading: {0:.2f}".format(value),
                         name = index,
                         marker= dict(size=3,
-                                    symbol= 1,
-                                    color = 'darkgrey', #set color equal to a variable
+                                    symbol=1,
+                                    color='darkgrey', #set color equal to a variable
                                     showscale=False,
                                     opacity=0.7,
                                     ),
@@ -1458,16 +1553,20 @@ def get_sankey_plot(data, identifier, args={'source':'source', 'target':'target'
 
         hover_data = []
         if 'hover' in args:
-            hover_data = [t.upper() for t in data[args['hover']].tolist()]
+            hover_data = [str(t).upper() for t in data[args['hover']].tolist()]
 
         if 'target_colors' in args:
             node_colors.update(dict(zip(data[args['target']],data[args['target_colors']])))
         else:
-            node_colors.update(dict(zip(data[args['target']],['#a6bddb']*len(data[args['target']].tolist()))))
+            scolors = ['#a6bddb'] * len(data[args['target']].tolist())
+            node_colors.update(dict(zip(data[args['target']],scolors)))
+            args['target_colors'] = 'target_colors'
+            data['target_colors'] = scolors
+
         data_trace = dict(type='sankey',
                             orientation = 'h' if 'orientation' not in args else args['orientation'],
                             valueformat = ".0f" if 'valueformat' not in args else args['valueformat'],
-                            arrangement = 'freeform',
+                            arrangement = 'snap',
                             node = dict(pad = 10 if 'pad' not in args else args['pad'],
                                         thickness = 10 if 'thickness' not in args else args['thickness'],
                                         line = dict(color = "black", width = 0.3),
@@ -1629,55 +1728,40 @@ def get_violinplot(data, identifier, args):
     """
     df = data.copy()
     graphs = []
+    color_map = {}
+    if 'colors' in args:
+        color_map = args['colors']
     if 'drop_cols' in args:
-        if set(args['drop_cols']).intersection(df.columns) == len(args['drop_cols']):
+        if len(list(set(args['drop_cols']).intersection(df.columns))) == len(args['drop_cols']):
             df = df.drop(args['drop_cols'], axis=1)
+    
     for c in df.columns.unique():
         if c != args['group']:
-            traces = create_violinplot(df, c, args['group'])
-            figure = {"data": traces,
-                    "layout":{
-                            "title": "Violinplot per group for variable: "+c,
-                            "annotations": [dict(xref='paper', yref='paper', showarrow=False, text='')],
-                            "template":'plotly_white',
-                            "yaxis": {
-                                "zeroline":False,
-                                }
-                        }
-                    }
+            figure = create_violinplot(df, x=args['group'], y=c, color=args['group'], color_map=color_map)
+            figure.update_layout(annotations=[dict(xref='paper', yref='paper', showarrow=False, text='')], template='plotly_white')
             graphs.append(dcc.Graph(id=identifier+"_"+c, figure=figure))
 
     return graphs
 
-def create_violinplot(df, variable, group_col='group'):
+def create_violinplot(df, x, y, color, color_map={}):
     """
     This function creates traces for a simple violin plot.
 
     :param df: pandas dataframe with samples as rows and dependent variables as columns.
-    :param (str) variable: name of the column with the dependent variable.
-    :pram (str) group_col: name of the column containing the group.
-    :return: list of traces to be used as data for plotly figure.
+    :pram (str) x: name of the column containing the group.
+    :param (str) y: name of the column with the dependent variable.
+    :param (str) color: name of the column used for coloring.
+    :param (dict) color_map: dictionary with custom colors
+    :return: plotly figure.
 
     Example::
 
-        result = create_violinplot(df, 'prptein a', group_col='group')
+        result = create_violinplot(df, x='group', y='protein a', color='group', color_map={})
     """
     traces = []
-    for group in np.unique(df[group_col].values):
-        violin = {"type": 'violin',
-                    "x": df[group_col][df[group_col] == group].values,
-                    "y": df[variable][df[group_col] == group].values,
-                    "name": group,
-                    "box": {
-                        "visible": True
-                    },
-                    "meanline": {
-                        "visible": True
-                    }
-                }
-        traces.append(violin)
-
-    return traces
+    violin = px.violin(df, x=x, y=y, color=color, color_discrete_map=color_map, box=True, points="all")
+    
+    return violin
 
 
 def get_clustergrammer_plot(data, identifier, args):
@@ -1760,6 +1844,12 @@ def get_parallel_plot(data, identifier, args):
         fig = dict(data = fig_data, layout = layout)
 
     return dcc.Graph(id=identifier, figure=fig)
+
+def get_parallel_coord_plot(data, identifier, args):
+    color = args['color']
+    labels = {c:c for c in data.columns if c != color}
+    fig = px.parallel_coordinates(data, color=color, labels=labels)
+    return fig
 
 def get_WGCNAPlots(data, identifier):
     """
@@ -2103,7 +2193,7 @@ def get_cytoscape_network(net, identifier, args):
         height = args['height']
     if 'width' in args:
         width = args['width']
-    cytonet = html.Div([html.H2(args['title']), cyto.Cytoscape(id=identifier,
+    cytonet = cyto.Cytoscape(id=identifier,
                                     stylesheet=args['stylesheet'],
                                     elements=net,
                                     layout=args['layout'],
@@ -2112,12 +2202,12 @@ def get_cytoscape_network(net, identifier, args):
                                     #mouseoverNodeData=args['mouseover_node'],
                                     style={'width': width, 'height': height}
                                     )
-                    ])
+    net_div = html.Div([html.H2(args['title']), cytonet])
 
 
-    return cytonet
+    return net_div
 
-def save_DASH_plot(plot, name, plot_format='svg', directory='.'):
+def save_DASH_plot(plot, name, plot_format='svg', directory='.', width=1600, height=1500):
     """
     This function saves a plotly figure to a specified directory, in a determined format.
 
@@ -2137,9 +2227,9 @@ def save_DASH_plot(plot, name, plot_format='svg', directory='.'):
         plot_file = os.path.join(directory, str(name)+'.'+str(plot_format))
         if plot_format in ['svg', 'pdf', 'png', 'jpeg', 'jpg']:
             if hasattr(plot, 'figure'):
-                pio.write_image(plot.figure, plot_file)
+                pio.write_image(plot.figure, plot_file, width=width, height=height)
             else:
-                pio.write_image(plot, plot_file)
+                pio.write_image(plot, plot_file, width=width, height=height)
         elif plot_format == 'json':
             figure_json = json.dumps(plot.figure, cls=plotly.utils.PlotlyJSONEncoder)
             with open(plot_file, 'w') as f:
@@ -2256,3 +2346,60 @@ def get_polar_plot(df, identifier, args):
                 layout = figure.update_layout(width=width, height=height, polar = dict(radialaxis=dict(range=[min_value, max_value])))
             
     return dcc.Graph(id=identifier, figure=figure)
+
+def get_enrichment_plots(enrichment_results, identifier, args):
+    """
+    This function generates a scatter plot with enriched terms (y-axis) and their adjusted pvalues (x-axis)
+
+    :param dataframe enrichment_results: dataframe with the enrichment data to plot (see enrichment functions for format)
+    :param str identifier: identifier to be used in the app
+    :param dict args: dictionary containing the arguments needed to plot the figure (width, height, title)
+    :return list: list of scatter plots one for each enrichment table available (i.e pairwise comparisons)
+
+    Example::
+        figure = get_enrichment_plots(df, identifier='enrichment', args={'width':1500, 'height':800, 'title':'Enrichment'})
+    """
+    figures = []
+    width = 900
+    height = 800
+    colors = {'upregulated': '#cb181d', 'downregulated': '#3288bd', 'regulated': '#ae017e', 'non-regulated': '#fcc5c0'}
+    title = "Enrichment"
+    if 'width' in args:
+        width = args['width']
+    if 'height' in args:
+        height = args['height']
+    if 'title' in args:
+        title = args['title']
+    
+    if not isinstance(enrichment_results, dict):
+        aux = enrichment_results.copy()
+        enrichment_results = {'regulated~non-regulated': aux}
+
+    for g in enrichment_results:
+        g1, g2 = g.split('~')
+        group = 'direction'
+        nid = identifier+'_{}_{}'.format(g1, g2)
+        if not enrichment_results[g].empty:
+            df = enrichment_results[g][enrichment_results[g].rejected]
+            if 'direction' not in df:
+                group = None
+            if not df.empty:
+                df = df.sort_values(by=[group, 'padj'], ascending=False)
+                df['x'] = -np.log10(df['padj'])
+                fig = get_scatterplot(df, identifier=nid,
+                                        args={'x': 'x',
+                                                'y': 'terms',
+                                                'group': group,
+                                                'title':'{} {} vs {}'.format(title, g1, g2),
+                                                'symbol':group,
+                                                'colors': colors,
+                                                'x_title':'-log10(padj)',
+                                                'y_title':'Enriched terms',
+                                                'width': width,
+                                                'height':height,
+                                                'hovering_cols':['foreground', 'foreground_pop', 'background', 'background_pop', 'pvalue', 'padj', 'identifiers'],
+                                                'size':'foreground'})
+                figures.append(fig)
+            
+    return figures
+    

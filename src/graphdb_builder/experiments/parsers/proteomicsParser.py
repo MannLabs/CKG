@@ -6,23 +6,22 @@ from collections import defaultdict
 from graphdb_builder import builder_utils, mapping
 
 
-def parser(projectId, directory=None):
-    data_type = 'proteomics'
+def parser(projectId, type='proteomics', directory=None):
+    #directory = None
     data = {}
     cwd = os.path.abspath(os.path.dirname(__file__))
     config = builder_utils.get_config(config_name="proteomics.yml", data_type='experiments')
-
     if directory is None:
-        directory = os.path.join(cwd, '../../../../data/experiments/PROJECTID/' + data_type)
+        directory = os.path.join(cwd, '../../../../data/experiments/PROJECTID/' + type)
         if 'directory' in config:
-            directory = os.path.join(cwd, config['directory'] + data_type)
+            directory = os.path.join(cwd, config['directory'] + type)
     directory = directory.replace('PROJECTID', projectId)
     data = parse_from_directory(projectId, directory, config)
 
     return data
 
 
-def parse_from_directory(projectId, directory, configuration=None):
+def parse_from_directory(projectId, directory, configuration={}):
     data = {}
     processing_results = [x[0] for x in os.walk(directory)]
     for results_path in processing_results:
@@ -430,7 +429,10 @@ def extract_peptide_protein_rels(data, configuration):
 def extract_protein_subject_rels(data, configuration):
     aux = data.filter(regex=configuration["valueCol"])
     attributes = configuration["attributes"]
-    aux.columns = [re.sub("\.?" + configuration["valueCol"] + "\s?", '', c).strip() for c in aux.columns]
+    if configuration["valueCol"] != 'AS':
+        aux.columns = [re.sub("\.?" + configuration["valueCol"] + "\s?", '', c).strip() for c in aux.columns]
+    else:
+        aux.columns = [c.strip() for c in aux.columns]
     aux = aux.stack()
     aux = aux.reset_index()
     aux.columns = ["c"+str(i) for i in range(len(aux.columns))]
@@ -483,12 +485,16 @@ def extract_subject_replicates_from_regex(data, regex):
 def extract_subject_replicates(data, value_cols):
     subjectDict = defaultdict(list)
     for c in value_cols:
-        fields = c.split('_')
-        value = " ".join(fields[0].split(' ')[0:-1])
-        subject = fields[1]
+        value = ""
         timepoint = ""
-        if len(fields) > 2:
-            timepoint = " " + fields[2]
+        fields = c.split('_')
+        if len(fields) > 1:
+            value = " ".join(fields[0].split(' ')[0:-1])
+            subject = fields[1]
+            if len(fields) > 2:
+                timepoint = " " + fields[2]
+        else:
+            subject = fields[0]
         ident = value + " " + subject + timepoint
         subjectDict[ident].append(c)
 

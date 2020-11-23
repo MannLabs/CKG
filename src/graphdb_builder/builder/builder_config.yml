@@ -25,9 +25,9 @@ directories:
 
 separator: '|'
 
-file_clinical: 'ClinicalData_PROJECTID.xlsx'
-file_project: 'ProjectData_PROJECTID.xlsx'
-file_design: 'ExperimentalDesign_PROJECTID.xlsx'
+file_clinical: 'ClinicalData_PROJECTID'
+file_project: 'ProjectData_PROJECTID'
+file_design: 'ExperimentalDesign_PROJECTID'
 file_proteomics:
     maxquant-protein groups: proteinGroups.txt
     maxquant-peptides: peptides.txt
@@ -97,6 +97,7 @@ ontology_entities:
     - 'Phenotype'
     - 'Experiment'
     - 'Experimental_factor'
+    - 'Units'
 ontology_mappings:
     Experimental_factor: 
         - Disease
@@ -134,6 +135,8 @@ compiled_drug_resources:
     - 'STITCH'
 drug_action_resources:
     - 'STITCH'
+drug_drug_interaction_resources:
+    - 'DrugBank'
 side_effects_resources:
     - 'SIDER'
 

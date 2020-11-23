@@ -174,8 +174,9 @@ def getSTRINGMapping(source="BLAST_UniProt_AC", download=True, db="STRING"):
     directory = os.path.join(dbconfig["databasesDir"], db)
     file_name = os.path.join(directory, url.split('/')[-1])
     builder_utils.checkDirectory(directory)
-
+    print(download)
     if download:
+        print("Downloading", url, directory)
         builder_utils.downloadDB(url, directory)
 
     f = os.path.join(directory, file_name)
@@ -203,14 +204,13 @@ def getSTRINGMapping(source="BLAST_UniProt_AC", download=True, db="STRING"):
     return mapping
 
 
-def buildMappingFromOBO(oboFile, ontology):
+def buildMappingFromOBO(oboFile, ontology, outputDir):
     """
     Parses and extracts ontology idnetifiers, names and synonyms from raw file, and writes all the information \
     to a .tsv file.
     :param str oboFile: path to ontology raw file.
     :param str ontology: ontology database acronym as defined in ontologies_config.yml.
     """
-    outputDir = os.path.join(oconfig["ontologies_directory"], ontology)
     cmapping_file = os.path.join(outputDir, "complete_mapping.tsv")
     mapping_file = os.path.join(outputDir, "mapping.tsv")
     identifiers = defaultdict(list)
@@ -255,7 +255,7 @@ def map_experiment_files(project_id, datasetPath, mapping):
 
 def map_experimental_data(data, mapping):
     mapping_cols = {}
-    regex = "({})".format("|".join(list(mapping.keys())))
+    regex = "({})".format("|".join(sorted(list(mapping.keys()), key=len, reverse=True)))
     if not data.empty:
         for column in data.columns:
             ids = re.search(regex, column)
@@ -265,7 +265,7 @@ def map_experimental_data(data, mapping):
             else:
                 continue
         data = data.rename(columns=mapping_cols)
-   
+
     return data
 
 

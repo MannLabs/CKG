@@ -220,6 +220,32 @@ maxquant :
     'Glycation': *var_gly
     'Phosphorylation': *var_p
 
+fragpipe :
+    'proteins':
+        'columns':
+            - 'Protein ID'
+            - 'Protein Group'
+            - is_razor
+            - id
+            - '\w*_?AS\d+_?-?\d* Razor Intensity'
+        'generated_columns':
+            - id
+            - 'is_razor'
+        'filters': []
+        'proteinCol': 'Protein ID'
+        'valueCol': 'Razor Intensity'
+        'groupCol': 'id'
+        'indexCol': 'Protein ID'
+        'attributes':
+            'cols':
+                - 'id'
+                - 'is_razor'
+            'regex':
+                - 'Razor Intensity'
+        'log': 'log2'
+        'combine': 'valueCol'
+        'file': 'proteomics_fragpipe_proteingroups.\w+'
+
 spectronaut :
     'proteins':
         'columns':
@@ -261,4 +287,23 @@ spectronaut :
                 - 'PG.MS2Quantity'
         'log': 'log2'
         'combine': 'valueCol'
-        'file': '\w+\.xlsx'
+        'file': 'proteomics_spectronaut_proteingroups.\w+'
+
+table:
+    proteins:
+        columns: []
+        generated_columns:
+            - is_razor
+            - id
+        proteinCol: ''
+        valueCol: ''
+        numeric filter: []
+        groupCol: id
+        indexCol: ''
+        attributes:
+            col:
+                - id
+                - is_razor
+            regex: []
+        log: log2
+        combine: ''

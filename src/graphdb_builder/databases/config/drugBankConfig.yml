@@ -16,8 +16,8 @@
     'drugbank_interacts_with_drug':
         - 'START_ID'
         - 'END_ID'
-        - 'TYPE'
         - 'interaction_type'
+        - 'TYPE'
         - 'source'
 
 'DrugBank_fields': 
@@ -133,5 +133,5 @@
         - 'ASSOCIATED_WITH'
         - 'drugbank_targets_protein'
     'drug-interactions': 
-        - 'ASSOCIATED_WITH'
+        - 'INTERACTS_WITH'
         - 'drugbank_interacts_with_drug'
