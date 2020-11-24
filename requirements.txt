@@ -148,7 +148,7 @@ bcrypt==3.1.7
 tables==3.6.1
 psutil>=5.6.6
 plotly==4.9.0
-kaleido==0.0.1
+kaleido==0.0.3
 gseapy==0.9.19
 docutils==0.15.2
 sphinx==2.3.1

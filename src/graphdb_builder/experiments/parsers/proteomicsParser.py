@@ -25,7 +25,7 @@ def parse_from_directory(projectId, directory, configuration={}):
     data = {}
     processing_results = [x[0] for x in os.walk(directory)]
     for results_path in processing_results:
-        processing_tool = results_path.split('/')[-1]
+        processing_tool = os.path.basename(os.path.normpath(results_path))
         if processing_tool in configuration:
             sample_mapping = mapping.get_mapping_analytical_samples(projectId)
             if len(sample_mapping) > 0:

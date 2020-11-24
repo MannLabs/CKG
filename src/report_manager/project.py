@@ -582,7 +582,6 @@ class Project:
             self.save_project_report()
             self.save_project()
             self.save_project_datasets_data()
-            self.download_project()
             self.notify_project_ready()
 
     def notify_project_ready(self, message_type='slack'):

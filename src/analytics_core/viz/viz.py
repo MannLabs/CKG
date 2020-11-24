@@ -181,6 +181,7 @@ def get_boxplot_grid(data, identifier, args):
             fig = px.box(data, x=args["x"], y=args["y"], color=args['color'], color_discrete_map=color_map, points="all", facet_row=args["facet"], width=args['width'])
         else:
             fig = px.box(data, x=args["x"], y=args["y"], color=args['color'], color_discrete_map=color_map, points="all", facet_col=args["facet"], width=args['width'])
+        fig.update_xaxes(type='category')
         fig.update_layout(annotations=[dict(xref='paper', yref='paper', showarrow=False)], template='plotly_white')
     else:
         fig = get_markdown(text='Missing arguments. Please, provide: x, y, color, facet, axis')
@@ -256,7 +257,7 @@ def get_barplot(data, identifier, args):
                         )
     figure["layout"] = go.Layout(
                             title=args['title'],
-                            xaxis={"title": args["x_title"]},
+                            xaxis={"title": args["x_title"], "type": "category"},
                             yaxis={"title": args["y_title"]},
                             height=args['height'],
                             width=args['width'],

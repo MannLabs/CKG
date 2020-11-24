@@ -163,7 +163,7 @@ class ProjectApp(basicApp.BasicApp):
         p = project.Project(self.project_id, datasets={}, knowledge=None, report={}, configuration_files=config_files)
         p.build_project(False)
         p.generate_report()
-
+        p.download_project()
         if p.name is not None:
             self.title = "Project: {}".format(p.name)
         else:
