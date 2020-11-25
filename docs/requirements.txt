@@ -61,7 +61,7 @@ jupyter==1.0.0
 jupyter-client==5.3.1
 jupyter-console==6.0.0
 jupyter-core==4.5.0
-jupyter-server==0.1.0
+jupyter-server==1.0.6
 jupyter-server-proxy==1.1.0
 jupyterlab==1.0.3
 jupyterlab-dash==0.1.0a2
