@@ -12,6 +12,13 @@ from urllib import error
 Entrez.email = 'alberto.santos@cpr.ku.dk'
 
 
+def check_columns(df, cols):
+    for col in cols:
+        if col not in df:
+            return False
+    return True
+
+
 def generate_html(network):
     """
     This method gets the data structures supporting the nodes, edges,
