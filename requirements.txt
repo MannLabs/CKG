@@ -26,7 +26,6 @@ cryptography==2.7
 cvxpy==1.0.24
 cycler==0.10.0
 cyjupyter==0.2.0
-dabest==0.2.4
 dash==1.2.0
 dash_cytoscape>=0.1.1
 decorator==4.4.0
