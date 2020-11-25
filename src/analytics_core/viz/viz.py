@@ -1223,7 +1223,11 @@ def get_network(data, identifier, args):
         args['cutoff_abs'] = False
 
     if not data.empty:
-        if utils.check_columns(data, cols=[args['values'], args['source'], args['target']]):
+        if utils.check_columns(data, cols=[args['source'], args['target']]):
+            if "values" not in args:
+                args["values"] = 'width'
+                data[args["values"]] = 1
+
             if 'cutoff' in args:
                 if args['cutoff_abs']:
                     data = data[np.abs(data[args['values']]) >= args['cutoff']]
@@ -1233,9 +1237,6 @@ def get_network(data, identifier, args):
             data[args["source"]] = [str(n).replace("'","") for n in data[args["source"]]]
             data[args["target"]] = [str(n).replace("'","") for n in data[args["target"]]]
 
-            if "values" not in args:
-                args["values"] = 'width'
-                data[args["values"]] = 1
 
             data = data.rename(index=str, columns={args['values']: "width"})
             data['width'] = data['width'].fillna(1.0)
