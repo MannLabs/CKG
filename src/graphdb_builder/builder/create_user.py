@@ -160,7 +160,7 @@ def create_user(data, output_file, expiration=365):
 
     try:
         for index, row in data.iterrows():
-            found = validate_user(driver, row['user_name'], row['email'])
+            found = validate_user(driver, row['username'], row['email'])
             if not found:
                 user_identifier = get_new_user_id(driver)
                 row['ID'] = user_identifier
