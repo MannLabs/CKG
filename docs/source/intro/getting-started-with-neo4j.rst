@@ -16,7 +16,7 @@ Once the file has downloaded, you can install Neo4j by following the instruction
 .. image:: ../_static/images/neo4j_app3.png
     :width: 32%
 
-Open the Neo4j Desktop App and create a database by clicking :guilabel:`Add graph`, followed by :guilabel:`Create a Local Graph`, using the password "NeO4J".
+Open the Neo4j Desktop App and create a database by clicking :guilabel:`Add graph`, followed by :guilabel:`Create a Local Graph`, **choose database version 3.5.20** using the password "NeO4J".
 Now that your database is created:
 
 .. image:: ../_static/images/neo4j_app4.png
@@ -26,12 +26,10 @@ Now that your database is created:
 .. image:: ../_static/images/neo4j_app6.png
     :width: 32%
 
-1. Click :guilabel:`Manage` and then :guilabel:`Plugins`. Install "**APOC**" and "**GRAPH ALGORITHMS**".
+1. Click :guilabel:`Manage` and then :guilabel:`Plugins`. Install "**APOC**" and "**Graph Data Science Library**".
 #. Click the tab :guilabel:`Settings`, and comment the option ``dbms.directories.import=import`` by adding ``#`` at the beginning of the line.
 #. Click :guilabel:`Apply` at the bottom of the window.
 #. Start the Graph by clicking the play sign, at the top of the window.
 
 If the database starts and no errors are reported in the tab :guilabel:`Logs`, you are ready go to!
 
-
-.. note:: Be aware, at the time of release of this version, "**GRAPH ALGORITHMS**" was only available for Neo4j database version **=< 3.14**.
