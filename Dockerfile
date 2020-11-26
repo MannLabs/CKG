@@ -76,7 +76,7 @@ RUN rm -f /var/lib/neo4j/data/dbms/auth && \
     neo4j-admin set-initial-password "NeO4J"
 
 ## Install graph data science library and APOC
-RUN wget -P /var/lib/neo4j/pubgins https://github.com/neo4j/graph-data-science/releases/download/1.1.5/neo4j-graph-data-science-1.1.5-standalone.jar
+RUN wget -P /var/lib/neo4j/plugins https://github.com/neo4j/graph-data-science/releases/download/1.1.5/neo4j-graph-data-science-1.1.5-standalone.jar
 RUN wget -P /var/lib/neo4j/plugins https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.5.0.15/apoc-3.5.0.15-all.jar
 
 RUN ls -lrth /var/lib/neo4j/plugins
