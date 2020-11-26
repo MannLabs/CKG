@@ -23,7 +23,6 @@ dabest>=0.2.4
 umap-learn>=0.3.9
 pingouin==0.3.8
 python-louvain==0.13
-Pygments>=2.4.2
 snfpy==0.2.2
 fancyimpute==0.5.4
 kmapper==1.2.0
