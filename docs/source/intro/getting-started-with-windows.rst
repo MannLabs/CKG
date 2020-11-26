@@ -215,17 +215,6 @@ To install all the required packages, simply run:
 
 	.. warning:: Make sure the virtual environment previously created is active before installing ``requirements.txt``.
 
-
-When these packages are installed, you can proceed to install a functinal version of celery 4 for Windows:
-
-.. code-block:: bash
-
-	> cd ..\
-	> git clone https://github.com/bstiel/celery-4-windows.git
-	> cd celery-4-windows
-	> pip install requirements.txt
-
-
 Now that all the packages are correctly installed, you will have to create the appropriate directory architecture within the local copy of the cloned repository:
 
 .. code-block:: bash
