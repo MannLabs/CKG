@@ -29,6 +29,8 @@ Running ``/usr/libexec/java_home`` in the terminal should print out a path like 
 
 #. Run ``/usr/libexec/java_home`` in the terminal to make sure the *Java* package has been installed in ``/Library/Java/JavaVirtualMachines/``.
 
+.. note:: You can also install Java from OpenJDK. Follow the instructions here: https://openjdk.java.net/install/index.html (make sure to choose the right Java version for your Neo4j installation)
+
 
 R
 -----------
