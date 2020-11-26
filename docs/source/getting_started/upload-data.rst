@@ -3,6 +3,14 @@
 Upload project experimental data
 ==================================
 
+To upload data into CKG you will generally use 3 files:
+
+- Experimental design: identifiers used for subjects, biological samples and analytical samples
+- Clinical data: metadata associated to the subjects in the cohort
+- Experiment data (proteomics, phosphoproteomics, interactomics): output format from processing tools
+
+Example files are available in the data directory: https://github.com/MannLabs/CKG/blob/master/data/example_files.zip
+
 Prepare data for upload
 -----------------------
 
