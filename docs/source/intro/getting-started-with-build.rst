@@ -76,11 +76,10 @@ After this, the name of the virtual environment will now appear on the left of t
 
 	(env_name) username$
 
-If you are finished working in the virtual environment for the moment, you can deactivate it by running:
 
-.. code-block:: bash
 
-	$ deactivate
+.. note:: 
+	If you are finished working in the virtual environment for the moment, you can deactivate it by running: deactivate
 
 
 Setting up the Clinical Knowledge Graph
