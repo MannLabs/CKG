@@ -29,7 +29,7 @@ The installation of Neo4j on Windows follows the same steps as :ref:`Getting Sta
 
 #. Open the Neo4j Desktop App and create a database by clicking :guilabel:`Add graph`, followed by :guilabel:`Create a Local Graph`, using the password "NeO4J".
 
-#. Click :guilabel:`Manage` and then :guilabel:`Plugins`. Install "**APOC**" and "**GRAPH ALGORITHMS**".
+#. Click :guilabel:`Manage` and then :guilabel:`Plugins`. Install "**APOC**" and "**Graph Data Science Library**".
 
 #. Click the tab :guilabel:`Settings`, and comment the option ``dbms.directories.import=import`` by adding ``#`` at the beginning of the line.
 
@@ -183,11 +183,7 @@ After this, the name of the virtual environment will now appear on the left of t
 
 	(env_name) C:\>
 
-If you are finished working in the virtual environment for the moment, you can deactivate it by running:
-
-.. code-block:: bash
-
-	> deactivate
+.. note:: If you are finished working in the virtual environment for the moment, you can deactivate it by running: deactivate
 
 .. warning:: Remember, every time you are working with the CKG, the virtual environment needs to be activated first.
 
@@ -198,9 +194,9 @@ Setting up the CKG
 
 Once you have cloned the master branch of the CKG GitHub repository, all the Python packages necessary to run the Clinical Knowledge Graph can be found in ``requirements.txt``.
 
-Unfortunately, due to incompatibilities of the current versions ``celery`` and ``rpy2`` packages need to be removed from ``requirements.txt`` before installing all other packages.
+Unfortunately, due to incompatibilities of the current versions ``rpy2`` package needs to be removed from ``requirements.txt`` before installing all other packages.
 
-To do so, open the mentioned file in your preferred text editor tool (e.g. Notepad) and add ``#`` in the beginning of the lines ``celery==4.3.0`` and ``rpy2==3.0.5``. Save and close the file, making sure it is saved as a plain text file.
+To do so, open the mentioned file in your preferred text editor tool (e.g. Notepad) and add ``#`` in the beginning of the line ``rpy2==3.0.5``. Save and close the file, making sure it is saved as a plain text file.
 
 .. warning:: Part of the CKG functionality includes interfacing Python and R, and seemingly use R functions for data analysis. The python package ``rpy2`` is used as this interface and unfortunately, the current release of this package for Windows is not compatible with CKG. Installation of the CKG on Windows machines, will therefore **not** allow the usage of R packages (SAMR and WGCNA) within the CKG.
 
@@ -223,6 +219,8 @@ Now that all the packages are correctly installed, you will have to create the a
 	> python setup_config_files.py
 
 This will automatically create the ``data`` folder and all subfolders, as well as setup the configuration for the log files where all errors and warnings related to the code will be written to.
+
+In Windows, the database url needs to be set to localhost instead of 0.0.0.0 (non-particular address). To change this configuration open the file ``C:\CKG\src\graphdb_connector\connector_config.yml`` and modify the line: db_url: "0.0.0.0" to db_url: "localhost".
 
 
 Add CKG to environmental variables
