@@ -26,10 +26,10 @@ copyright = '2019, Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen'
 author = 'Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen'
 
 # The short X.Y version
-version = '1.0b1 BETA'
+version = '1.0'
 
 # The full version, including alpha/beta/rc tags
-release = '1.0b1 BETA'
+release = '1.0'
 
 
 # -- General configuration ---------------------------------------------------
