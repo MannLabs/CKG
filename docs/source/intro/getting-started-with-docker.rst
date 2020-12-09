@@ -14,14 +14,15 @@ To run the Docker, simply:
 4. Extract compressed data file into the CKG folder and copy licensed databases in the right directories: 
 - data/databases/{DrugBank|PhosphoSitePlus}
 - data/ontologies/SNOMED-CT
-4. Build  thecontainer: 
+5. Move the dump file to CKG/resources/neo4j_db
+6. Build  thecontainer: 
 
 .. code-block:: bash
 	
 	$ cd CKG/
 	$ docker build -t docker-ckg:latest .
 
-5. Run docker:
+7. Run docker:
 
 .. code-block:: bash
 
