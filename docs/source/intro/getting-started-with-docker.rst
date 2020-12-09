@@ -11,10 +11,13 @@ To run the Docker, simply:
 2. Get licensed databases: https://ckg.readthedocs.io/en/latest/intro/getting-started-with-build.html#build-neo4j-graph-database
 3. Download the database dump and data directory from Mendeley:
             https://data.mendeley.com/public-files/datasets/mrcf7f4tc2/files/
+	    
 4. Extract compressed data file into the CKG folder and copy licensed databases in the right directories: 
 - data/databases/{DrugBank|PhosphoSitePlus}
 - data/ontologies/SNOMED-CT
+
 5. Move the dump file to CKG/resources/neo4j_db
+
 6. Build  thecontainer: 
 
 .. code-block:: bash
