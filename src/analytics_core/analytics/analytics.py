@@ -11,7 +11,6 @@ from sklearn.cluster import AffinityPropagation
 from sklearn.utils import shuffle
 from statsmodels.stats import multitest
 from statsmodels.stats.power import FTestAnovaPower
-import dabest
 import scipy.stats
 from scipy.special import factorial, betainc
 import umap
@@ -1539,42 +1538,6 @@ def complement_posthoc(posthoc, identifier, is_logged):
     return posthoc
 
 
-def calculate_dabest(df, idx, x, y, paired=False, id_col=None, test='mean_diff'):
-    """
-
-
-    :param df:
-    :param idx:
-    :param x:
-    :param y:
-    :param paired:
-    :param id_col:
-    :param test:
-    :return:
-    """
-    cols = ["group1", "group2", "effect size", "paired", 'difference', "CI", "bca low", "bca high", "bca interval idx", "pct low", "pct high", "pct interval idx", "bootstraps", 'resamples', 'random seed', 'pvalue Welch', 'statistic Welch', 'pvalue Student T', 'statistic Student T', 'pvalue Mann Whitney', 'statistic Mann Whitney']
-    valid_cols = ["group1", "group2", "effect size", "paired", 'difference', "CI", 'pvalue Welch', 'statistic Welch', 'pvalue Student T', 'statistic Student T', 'pvalue Mann Whitney', 'statistic Mann Whitney']
-    dabest_df = dabest.load(df, idx=idx, x=x, y=y, paired=paired, id_col=id_col)
-    result = pd.DataFrame()
-    if test == 'mean_diff':
-        result = dabest_df.mean_diff.results
-    elif test == 'median_diff':
-        result = dabest_df.median_diff.results
-    elif test == 'cohens_d':
-        result = dabest_df.cohens_d.results
-    elif test == 'hedges_g':
-        result = dabest_df.hedges_g.results
-    elif test == 'cliffs_delta':
-        result = dabest_df.cliffs_delta
-
-    result.columns = cols
-    result = result[valid_cols]
-
-    result['identifier'] = y
-
-    return result
-
-
 def calculate_anova_samr(df, labels, s0=0):
     """
     Calculates modified one-way ANOVA using 'samr' R package.
@@ -1688,39 +1651,6 @@ def check_is_paired(df, subject, group):
         is_pair = (count_subject_groups > 1).all()
 
     return is_pair
-
-
-def run_dabest(df, drop_cols=['sample'], subject='subject', group='group', test='mean_diff'):
-    """
-
-
-    :param df:
-    :param list drop_cols:
-    :param str subject:
-    :param str group:
-    :param str test:
-    :return: Pandas dataframe
-
-    """
-    scores = pd.DataFrame()
-    paired = False
-    if subject is not None:
-        paired = check_is_paired(df, subject, group)
-
-    groups = df[group].unique()
-
-    if len(groups) == 2:
-        df = df.set_index([subject,group])
-        df = df.drop(drop_cols, axis=1)
-        for col in df.columns:
-            result = calculate_dabest(df.reset_index(), idx=(groups[0],groups[1]), x=group, y=col, id_col=subject, paired=paired)
-            if scores.empty:
-                scores = result
-            else:
-                scores = scores.append(result)
-        scores = scores.set_index('identifier')
-
-    return scores
 
 
 def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', group='group', permutations=0, correction='fdr_bh', is_logged=True, non_par=False):
