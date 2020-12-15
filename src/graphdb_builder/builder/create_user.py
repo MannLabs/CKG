@@ -26,7 +26,7 @@ def create_user_from_dict(driver, data):
     """
     Creates graph database node for new user and adds properties to the node.
 
-    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
+    :param driver: neo4j driver, which provides the connection to the neo4j graph database.
     :param dict data: dictionary with the user information).
     """
     query_name_node = 'create_user_node'
@@ -55,8 +55,8 @@ def create_user_node(driver, data):
     """
     Creates graph database node for new user and adds respective properties to node.
 
-    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
-    :type driver: py2neo driver
+    :param driver: neo4j driver, which provides the connection to the neo4j graph database.
+    :type driver: neo4j driver
     :param Series data: pandas Series with new user identifier and required user information (see set_arguments()).
     """
     result = create_user_from_dict(driver, data.to_dict())

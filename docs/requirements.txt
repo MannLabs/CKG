@@ -1,7 +1,7 @@
 pandas==0.24.2
 Flask==1.0.3
 passlib==1.7.1
-py2neo==4.3.0
+neo4j==4.2.0
 PyYAML==5.1.1
 wget==3.2
 requests==2.22.0

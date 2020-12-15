@@ -93,8 +93,8 @@ def get_new_user_identifier(driver):
     """
     Queries the database for the last user identifier and returns a new sequential identifier.
  
-    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
-    :type driver: py2neo driver
+    :param driver: neo4j driver, which provides the connection to the neo4j graph database.
+    :type driver: neo4j driver
     :return: User identifier.
     :rtype: str
     """
@@ -113,8 +113,8 @@ def check_if_node_exists(driver, node_property, value):
     """
     Queries the graph database and checks if a node with a specific property and property value already exists.
 
-    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
-    :type driver: py2neo driver
+    :param driver: neo4j driver, which provides the connection to the neo4j graph database.
+    :type driver: neo4j driver
     :param str node_property: property of the node.
     :param value: property value.
     :type value: str, int, float or bool
@@ -140,8 +140,8 @@ def create_db_user(driver, data):
     """
     Creates and assigns role to new graph database user, if user not in list of local users.
  
-    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
-    :type driver: py2neo driver
+    :param driver: neo4j driver, which provides the connection to the neo4j graph database.
+    :type driver: neo4j driver
     :param Series data: pandas Series with required user information (see set_arguments()).
     """
     query_name_add = 'create_db_user'

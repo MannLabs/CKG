@@ -543,8 +543,8 @@ def activate_upload_form(projectid):
     m = ''
     style = {'pointer-events': 'none', 'opacity': 0.5}
     if len(projectid) > 7:
-        db_projects = [(t['id']) for t in driver.nodes.match("Project")]
-        if projectid not in db_projects:
+        project = connector.find_node(driver, node_type='Project', parameters={'id': projectid})
+        if len(project) == 0:
             m = 'ERROR: Project "{}" does not exist in the database.'.format(projectid)
         else:
             style = {}

@@ -188,9 +188,9 @@ class Project:
             project_cypher = query_utils.read_queries(query_path)
             query = query_utils.get_query(project_cypher, query_id="remove_project")
             driver = connector.connectToDB(host, port, user, password)
-            queries = query.replace("PROJECTID",self.identifier)
+            queries = query.replace("PROJECTID", self.identifier)
             for query in queries.split(';')[:-1]:
-                result = connector.sendQuery(driver, query+';', parameters={}).data()
+                result = connector.sendQuery(driver, query+';', parameters={})
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -517,7 +517,7 @@ class Project:
                 list_projects.append(self.identifier)
                 list_projects = ",".join(['"{}"'.format(i) for i in list_projects])
                 query = query.replace("LIST_PROJECTS", list_projects)
-                path = connector.sendQuery(driver, query, parameters={}).data()
+                path = connector.sendQuery(driver, query, parameters={})
                 G = acore_utils.neo4j_path_to_networkx(path, key='path')
                 args = {}
                 style, layout = self.get_similarity_network_style()
