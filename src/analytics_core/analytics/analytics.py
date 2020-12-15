@@ -2193,6 +2193,26 @@ def run_site_regulation_enrichment(regulation_data, annotation, identifier='iden
     return result
 
 def run_up_down_regulation_enrichment(regulation_data, annotation, identifier='identifier', groups=['group1', 'group2'], annotation_col='annotation', reject_col='rejected', group_col='group', method='fisher', correction='fdr_bh', alpha=0.05, lfc_cutoff=1):
+    """
+    This function runs a simple enrichment analysis for significantly regulated proteins distinguishing between up- and down-regulated.
+
+    :param regulation_data: pandas dataframe resulting from differential regulation analysis (CKG's regulation table).
+    :param annotation: pandas dataframe with annotations for features (columns: 'annotation', 'identifier' (feature identifiers), and 'source').
+    :param str identifier: name of the column from annotation containing feature identifiers.
+    :param list groups: column names from regulation_data containing group identifiers.
+    :param str annotation_col: name of the column from annotation containing annotation terms.
+    :param str reject_col: name of the column from regulation_data containing boolean for rejected null hypothesis.
+    :param str group_col: column name for new column in annotation dataframe determining if feature belongs to foreground or background.
+    :param str method: method used to compute enrichment (only 'fisher' is supported currently).
+    :param str correction: method to be used for multiple-testing correction
+    :param float alpha: adjusted p-value cutoff to define significance
+    :param float lfc_cutoff: log fold-change cutoff to define practical significance
+    :return: Pandas dataframe with columns: 'terms', 'identifiers', 'foreground', 'background', 'pvalue', 'padj' and 'rejected'.
+
+    Example::
+
+        result = run_up_down_regulation_enrichment(regulation_data, annotation, identifier='identifier', groups=['group1', 'group2'], annotation_col='annotation', reject_col='rejected', group_col='group', method='fisher', correction='fdr_bh', alpha=0.05, lfc_cutoff=1)
+    """
     enrichment_results = {}
     for g1, g2 in regulation_data.groupby(groups).groups:
         df = regulation_data.groupby(groups).get_group((g1,g2))
@@ -2224,6 +2244,7 @@ def run_regulation_enrichment(regulation_data, annotation, identifier='identifie
     :param str reject_col: name of the column from regulatio_data containing boolean for rejected null hypothesis.
     :param str group_col: column name for new column in annotation dataframe determining if feature belongs to foreground or background.
     :param str method: method used to compute enrichment (only 'fisher' is supported currently).
+    :param str correction: method to be used for multiple-testing correction
     :return: Pandas dataframe with columns: 'terms', 'identifiers', 'foreground', 'background', 'pvalue', 'padj' and 'rejected'.
 
     Example::
@@ -2275,8 +2296,6 @@ def run_enrichment(data, foreground_id, background_id, foreground_pop, backgroun
     pvalues = []
     fnum = []
     bnum = []
-    #foreground_pop = len(data.loc[data[group_col] == foreground_id, identifier_col].unique().tolist())
-    #background_pop = len(data[identifier_col].unique().tolist())
     countsdf = df.groupby([annotation_col, group_col]).agg(['count'])[(identifier_col, 'count')].reset_index()
     countsdf.columns = [annotation_col, group_col, 'count']
     for annotation in countsdf[countsdf[group_col] == foreground_id][annotation_col].unique().tolist():
