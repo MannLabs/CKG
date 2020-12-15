@@ -26,9 +26,19 @@ class ProjectCreationApp(basicApp.BasicApp):
         """
         self.add_basic_layout()
         try:
-            Users = [(u['name']) for u in driver.nodes.match("User")]
-            Tissues = [(t['name']) for t in driver.nodes.match("Tissue")]
-            Diseases = [(d['name']) for d in driver.nodes.match("Disease")]
+            users = []
+            tissues = []
+            diseases = []
+            user_nodes = connector.find_nodes(driver, node_type='User')
+            tissue_nodes = connector.find_nodes(driver, node_type='Tissue')
+            disease_nodes = connector.find_nodes(driver, node_type='Disease')
+            for user in user_nodes:
+                users.append((user['n']['name']))
+            for tissue in tissue_nodes:
+                tissues.append((tissue['n']['name']))
+            for disease in disease_nodes:
+                diseases.append((disease['n']['name']))
+            
             layout = [html.Div([
                     html.Div([html.H4('Project information', style={'width': '15.5%', 'verticalAlign': 'top', 'display': 'inline-block'}),
                               html.H4('', id='update_project_id', style={'width': '15%', 'verticalAlign': 'top', 'display': 'none'}),
@@ -45,9 +55,9 @@ class ProjectCreationApp(basicApp.BasicApp):
                                                  style={'width': '49%', 'verticalAlign': 'top', 'display': 'inline-block'}),
                               html.Div(children=[html.Label('Project Participants:*', style={'marginTop': 15})],
                                                  style={'width': '49%', 'marginLeft': '2%', 'verticalAlign': 'top', 'display': 'inline-block'}),
-                              html.Div(children=[dcc.Dropdown(id='responsible-picker', options=[{'label': i, 'value': i} for i in Users], value=[], multi=True, searchable=True, style={'width': '100%'})],
+                              html.Div(children=[dcc.Dropdown(id='responsible-picker', options=[{'label': i, 'value': i} for i in users], value=[], multi=True, searchable=True, style={'width': '100%'})],
                                                  style={'width': '49%', 'verticalAlign': 'top', 'display': 'inline-block'}),
-                              html.Div(children=[dcc.Dropdown(id='participant-picker', options=[{'label': i, 'value': i} for i in Users], value=[], multi=True, searchable=True, style={'width': '100%'})],
+                              html.Div(children=[dcc.Dropdown(id='participant-picker', options=[{'label': i, 'value': i} for i in users], value=[], multi=True, searchable=True, style={'width': '100%'})],
                                                  style={'width': '49%', 'marginLeft': '2%', 'verticalAlign': 'top', 'display': 'inline-block'}),
                               html.Br(),
                               html.Br(),
@@ -57,7 +67,7 @@ class ProjectCreationApp(basicApp.BasicApp):
                                                  style={'width': '49%', 'marginLeft': '2%', 'verticalAlign': 'top', 'display': 'inline-block'}),
                               html.Div(children=[dcc.Dropdown(id='data-types-picker', options=[{'label': i, 'value': i} for i in DataTypes], value=[], multi=True, searchable=True, style={'width': '100%'})],
                                                  style={'width': '49%', 'marginLeft': '0%', 'verticalAlign': 'top', 'display': 'inline-block'}),
-                              html.Div(children=[dcc.Dropdown(id='disease-picker', options=[{'label': i, 'value': i} for i in Diseases], value=[], multi=True, searchable=True, style={'width': '100%'})],
+                              html.Div(children=[dcc.Dropdown(id='disease-picker', options=[{'label': i, 'value': i} for i in diseases], value=[], multi=True, searchable=True, style={'width': '100%'})],
                                                  style={'width': '49%', 'marginLeft': '2%', 'verticalAlign': 'top', 'display': 'inline-block'}),
                               html.Br(),
                               html.Br(),
@@ -65,7 +75,7 @@ class ProjectCreationApp(basicApp.BasicApp):
                                                  style={'width': '49%', 'marginLeft': '0%', 'verticalAlign': 'top', 'display': 'inline-block'}),
                               html.Div(children=[html.Label('Project Intervention:', style={'marginTop': 10})],
                                                  style={'width': '49%', 'marginLeft': '2%', 'verticalAlign': 'top', 'display': 'inline-block'}),
-                              html.Div(children=[dcc.Dropdown(id='tissue-picker', options=[{'label': i, 'value': i} for i in Tissues], value=[], multi=True, searchable=True, style={'width': '100%'})],
+                              html.Div(children=[dcc.Dropdown(id='tissue-picker', options=[{'label': i, 'value': i} for i in tissues], value=[], multi=True, searchable=True, style={'width': '100%'})],
                                                  style={'width': '49%', 'marginLeft': '0%', 'verticalAlign': 'top', 'display': 'inline-block'}),
                               html.Div(children=[dcc.Input(id='intervention-picker', placeholder='E.g. SNOMED identifier|SNOMED identifier|...', type='text', style={'width': '100%', 'height': '54px'})],
                                                  style={'width': '49%', 'marginLeft': '2%', 'verticalAlign': 'top', 'display': 'inline-block'}),

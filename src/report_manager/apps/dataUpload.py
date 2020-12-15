@@ -38,8 +38,8 @@ def get_new_subject_identifier(driver):
     """
     Queries the database for the last subject identifier and returns a new sequential identifier.
 
-    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
-    :type driver: py2neo driver
+    :param driver: neo4j driver, which provides the connection to the neo4j graph database.
+    :type driver: neo4j driver
     :param str projectId: external project identifier (from the graph database).
     :return: Subject identifier.
     :rtype: str
@@ -62,7 +62,7 @@ def get_new_biosample_identifier(driver):
     """
     Queries the database for the last biological sample internal identifier and returns a new sequential identifier.
 
-    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
+    :param driver: neo4j driver, which provides the connection to the neo4j graph database.
 
     :return: Biological sample identifier.
     """
@@ -84,7 +84,7 @@ def get_new_biosample_identifier(driver):
 def get_new_analytical_sample_identifier(driver):
     """
     Queries the database for the last analytical sample internal identifier and returns a new sequential identifier.
-    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
+    :param driver: neo4j driver, which provides the connection to the neo4j graph database.
 
     :return: Analytical sample identifier.
     """
@@ -107,8 +107,8 @@ def get_subjects_enrolled_in_project(driver, projectId):
     """
     Extracts the number of subjects included in a given project.
 
-    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
-    :type driver: py2neo driver
+    :param driver: neo4j driver, which provides the connection to the neo4j graph database.
+    :type driver: neo4j driver
     :param str projectId: external project identifier (from the graph database).
     :return: Number of subjects.
     :rtype: Numpy ndarray
@@ -188,7 +188,7 @@ def remove_samples_nodes_db(driver, projectId):
 
 def create_new_subjects(driver, data, projectId):
     """
-    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
+    :param driver: neo4j driver, which provides the connection to the neo4j graph database.
     :param data: pandas Dataframe with clinical data as columns and samples as rows.
     :param string projectId: project identifier.
     :return: Pandas DataFrame where new biological sample internal identifiers have been added.
@@ -220,7 +220,7 @@ def create_new_subjects(driver, data, projectId):
 
 def create_new_biosamples(driver, data):
     """
-    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
+    :param driver: neo4j driver, which provides the connection to the neo4j graph database.
     :param data: pandas Dataframe with clinical data as columns and samples as rows.
 
     :return: Pandas DataFrame where new biological sample internal identifiers have been added.
@@ -256,7 +256,7 @@ def create_new_biosamples(driver, data):
 
 def create_new_ansamples(driver, data):
     """
-    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
+    :param driver: neo4j driver, which provides the connection to the neo4j graph database.
     :param data: pandas Dataframe with clinical data as columns and samples as rows.
 
     :return: Pandas DataFrame where new analytical sample internal identifiers have been added.
@@ -304,8 +304,8 @@ def create_experiment_internal_identifiers(driver, projectId, data, directory, f
 
 def create_mapping_cols_clinical(driver, data, directory, filename, separator='|'):
     """
-    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
-    :type driver: py2neo driver
+    :param driver: neo4j driver, which provides the connection to the neo4j graph database.
+    :type driver: neo4j driver
     :param data: pandas Dataframe with clinical data as columns and samples as rows.
     :param str separator: character used to separate multiple entries in an attribute.
 
@@ -360,7 +360,7 @@ def get_project_information(driver, project_id):
             code = section['query']
             queries.extend(code.replace("PROJECTID", project_id).split(';')[0:-1])
         for query in queries:
-            result = connector.sendQuery(driver, query+";").data()[0]
+            result = connector.sendQuery(driver, query+";")[0]
             data.append(result)
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()

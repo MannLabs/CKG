@@ -255,7 +255,7 @@ def map_experiment_files(project_id, datasetPath, mapping):
 
 def map_experimental_data(data, mapping):
     mapping_cols = {}
-    regex = "({})".format("|".join(sorted(list(mapping.keys()), key=len, reverse=True)))
+    regex = "({})".format("|".join([re.escape(k) for k in sorted(list(mapping.keys()), key=len, reverse=True)]))
     if not data.empty:
         for column in data.columns:
             ids = re.search(regex, column)

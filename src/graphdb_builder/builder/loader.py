@@ -39,10 +39,10 @@ except Exception as err:
 
 def load_into_database(driver, queries, requester):
     """
-    This function runs the queries provided in the graph database using a py2neo driver.
+    This function runs the queries provided in the graph database using a neo4j driver.
 
-    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
-    :type driver: py2neo driver
+    :param driver: neo4j driver, which provides the connection to the neo4j graph database.
+    :type driver: neo4j driver
     :param list[dict] queries: list of queries to be passed to the database.
     :param str requester: identifier of the query.
     """
@@ -55,19 +55,20 @@ def load_into_database(driver, queries, requester):
                 if matches:
                     file_path = matches.group(1)
                     if os.path.isfile(file_path):
-                        result = connector.sendQuery(driver, query+";").data()
-                        if len(result) > 0:
-                            counts = result.pop()
-                            if 0 in counts.values():
+                        result = connector.commitQuery(driver, query+";")
+                        record = result.single()
+                        if record is not None and 'c' in record:
+                            counts = record['c']
+                            if counts == 0:
                                 logger.warning("{} - No data was inserted in query: {}.\n results: {}".format(requester, query, counts))
-
-                            logger.info("{} - cypher query: {}.\n results: {}".format(requester, query, counts))
+                            else:
+                                logger.info("{} - Query: {}.\n results: {}".format(requester, query, counts))
                         else:
                             logger.info("{} - cypher query: {}".format(requester, query))
                     else:
                         logger.error("Error loading: File does not exist. Query: {}".format(query))
             else:
-                result = connector.sendQuery(driver, query+";").data()
+                result = connector.commitQuery(driver, query+";")
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -84,8 +85,8 @@ def updateDB(driver, imports=None, specific=[]):
     This function also updates the graph stats object with numbers from the loaded entities and \
     relationships.
 
-    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
-    :type driver: py2neo driver
+    :param driver: neo4j driver, which provides the connection to the neo4j graph database.
+    :type driver: neo4j driver
     :param list imports: a list of entities to be loaded into the graph.
     """
     if imports is None:

@@ -1,6 +1,6 @@
 import sys
 import os
-import py2neo
+import neo4j
 import pandas as pd
 import ckg_utils
 from config import ckg_config
@@ -35,15 +35,8 @@ def getGraphDatabaseConnectionConfiguration(configuration=None, database=None):
 
 def connectToDB(host="localhost", port=7687, user="neo4j", password="password"):
     try:
-        driver = py2neo.Graph(host=host, port=port, user=user, password=password)
-    except py2neo.database.DatabaseError as err:
-        raise py2neo.database.DatabaseError("Database failed to service the request. {}".format(err))
-    except py2neo.database.ClientError as err:
-        raise py2neo.ClientError("The client sent a bad request. {}".format(err))
-    except py2neo.database.TransientError as err:
-        raise py2neo.TransientError("Database cannot service the request right now. {}".format(err))
-    except py2neo.GraphError as err:
-        raise py2neo.GraphError("{}".format(err))
+        uri = "bolt://{}:{}".format(host, port)
+        driver = neo4j.GraphDatabase.driver(uri, auth=(user, password))
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -55,7 +48,6 @@ def connectToDB(host="localhost", port=7687, user="neo4j", password="password"):
 
 def removeRelationshipDB(entity1, entity2, relationship):
     driver = getGraphDatabaseConnectionConfiguration()
-
     countCy = cy.COUNT_RELATIONSHIPS
     deleteCy = cy.REMOVE_RELATIONSHIPS
     countst = countCy.replace('ENTITY1', entity1).replace('ENTITY2', entity2).replace('RELATIONSHIP', relationship)
@@ -82,50 +74,73 @@ def modifyEntityProperty(parameters):
                 sendQuery(driver, query)
                 print("Property successfully modified")
     except Exception as err:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            logger.error("Error: {}. Reading queries from file {}: {}, file: {},line: {}".format(err, queries_path, sys.exc_info(), fname, exc_tb.tb_lineno))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        logger.error("Error: {}. Reading queries from file {}: {}, file: {},line: {}".format(err, queries_path, sys.exc_info(), fname, exc_tb.tb_lineno))
+
+
+def do_cypher_tx(tx, cypher, parameters):
+    result = tx.run(cypher, **parameters)
+    values = result.data()
+    return values
+
+
+def commitQuery(driver, query, parameters={}):
+    result = None
+    try:
+        with driver.session() as session:
+            result = session.run(query, parameters)
+    except Exception as err:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        sys_error = "{}, file: {},line: {}".format(sys.exc_info(), fname, exc_tb.tb_lineno)
+        raise Exception("Connection error:{}.\n{}".format(err, sys_error))
+
+    return result
 
 
 def sendQuery(driver, query, parameters={}):
     result = None
     try:
-        result = driver.run(query, parameters)
-    except py2neo.database.DatabaseError as err:
-        raise py2neo.database.DatabaseError("Database failed to service the request. {}".format(err))
-    except py2neo.database.ClientError as err:
-        raise py2neo.ClientError("The client sent a bad request. {}".format(err))
-    except py2neo.GraphError as err:
-        raise py2neo.GraphError("{}".format(err))
-    except py2neo.database.TransientError as err:
-        raise py2neo.TransientError("Database cannot service the request right now. {}".format(err))
+        with driver.session() as session:
+            result = session.read_transaction(do_cypher_tx, query, parameters)
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         sys_error = "{}, file: {},line: {}".format(sys.exc_info(), fname, exc_tb.tb_lineno)
-        raise Exception("Unexpected error:{}.\n{}".format(err, sys_error))
+        raise Exception("Connection error:{}.\n{}".format(err, sys_error))
 
     return result
 
 
 def getCursorData(driver, query, parameters={}):
     result = sendQuery(driver, query, parameters)
-    df = pd.DataFrame(result.data())
+    df = pd.DataFrame(result)
 
     return df
 
 
-def create_node(driver, node_type, **kwargs):
-    node = py2neo.Node(node_type, **kwargs)
-    driver.create(node)
-    return True
+def find_node(driver, node_type, parameters={}):
+    query = "MATCH (n:TYPE) WHERE RETURN n".replace('TYPE', node_type)
+    where_clause = ''
+    if len(parameters) > 0:
+        where_clause = "WHERE "+'AND '.join(["n.{}='{}'".format(k,v) for k, v in parameters.items()])
+    query = query.replace("WHERE", where_clause)
+    result = sendQuery(driver, query)
+    result = result.pop()['n']
+
+    return result
 
 
-def find_node(driver, node_type, **kwargs):
-    matcher = py2neo.NodeMatcher(driver)
-    found = matcher.match(node_type, **kwargs).first()
+def find_nodes(driver, node_type, parameters={}):
+    query = "MATCH (n:TYPE) WHERE RETURN n".replace('TYPE', node_type)
+    where_clause = ''
+    if len(parameters) > 0:
+        where_clause = "WHERE "+'AND '.join(["n.{}='{}'".format(k,v) for k, v in parameters.items()])
+    query = query.replace("WHERE", where_clause)
+    result = sendQuery(driver, query)
 
-    return found
+    return result
 
 
 def run_query(query, parameters={}):

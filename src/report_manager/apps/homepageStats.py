@@ -99,7 +99,7 @@ def get_db_schema():
         if 'query' in cypher[query_name]:
             query = cypher[query_name]['query']
             try:
-                path = connector.sendQuery(driver, query, parameters={}).data()
+                path = connector.sendQuery(driver, query, parameters={})
                 G = utils.neo4j_schema_to_networkx(path)
                 args = {'height': '1000px'}
                 args['stylesheet'] = style
@@ -235,7 +235,9 @@ def quick_numbers_panel():
     project_ids = []
     project_links = [html.H4('No available Projects')]
     try:
-        project_ids = [(d['name'], d['id']) for d in driver.nodes.match("Project")]
+        projects = connector.find_nodes(driver, node_type='Project', parameters={})
+        for project in projects:
+            project_ids.append((project['n']['name'], project['n']['id']))
         project_links = [html.H4('Available Projects:')]
     except Exception:
         pass

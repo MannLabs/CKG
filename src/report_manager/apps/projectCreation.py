@@ -41,8 +41,8 @@ def get_project_creation_queries():
 def check_if_node_exists(driver, node, node_property, value):
     """
     Queries the graph database and checks if a node with a specific property and property value already exists.
-    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
-    :type driver: py2neo driver
+    :param driver: neo4j driver, which provides the connection to the neo4j graph database.
+    :type driver: neo4j driver
     :param str node: node to be matched in the database.
     :param str node_property: property of the node.
     :param value: property value.
@@ -71,8 +71,8 @@ def get_new_project_identifier(driver, projectId):
     """
     Queries the database for the last project external identifier and returns a new sequential identifier.
 
-    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
-    :type driver: py2neo driver
+    :param driver: neo4j driver, which provides the connection to the neo4j graph database.
+    :type driver: neo4j driver
     :param str projectId: internal project identifier (CPxxxxxxxxxxxx).
     :return: Project external identifier.
     :rtype: str
@@ -101,8 +101,8 @@ def get_subject_number_in_project(driver, projectId):
     """
     Extracts the number of subjects included in a given project.
 
-    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
-    :type driver: py2neo driver
+    :param driver: neo4j driver, which provides the connection to the neo4j graph database.
+    :type driver: neo4j driver
     :param str projectId: external project identifier (from the graph database).
     :return: Integer with the number of subjects.
     """
@@ -127,8 +127,8 @@ def create_new_project(driver, projectId, data, separator='|'):
     3. Saves all the entities and relationships to tab-delimited files.
     4. Returns the number of projects created and the project external identifier.
 
-    :param driver: py2neo driver, which provides the connection to the neo4j graph database.
-    :type driver: py2neo driver
+    :param driver: neo4j driver, which provides the connection to the neo4j graph database.
+    :type driver: neo4j driver
     :param str projectId: internal project identifier (CPxxxxxxxxxxxx).
     :param data: pandas Dataframe with project as row and other attributes as columns.
     :param str separator: character used to separate multiple entries in a project attribute.

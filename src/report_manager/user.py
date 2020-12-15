@@ -42,18 +42,18 @@ class User:
         return bcrypt.encrypt(self.username)
 
     def find(self):
-        user = connector.find_node(driver, node_type="User", username=self.username)
+        user = connector.find_node(driver, node_type="User", parameters={"username": self.username})
         return user
 
     def validate_user(self):
-        user = connector.find_node(driver, node_type="User", username=self.username)
-        email = connector.find_node(driver, node_type="User", email=self.email)
+        user = connector.find_node(driver, node_type="User", parameters={"username": self.username})
+        email = connector.find_node(driver, node_type="User", parameters={'email': self.email})
 
         return user is None and email is None
 
     def register(self):
         result = False
-        if self.find():
+        if len(self.find()) > 0:
             result = "error_exists"
         elif self.validate_user():
             result = create_user.create_user_from_dict(driver, self.to_dict())
