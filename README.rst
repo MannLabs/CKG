@@ -35,6 +35,8 @@ The promise of precision medicine is to deliver personalized treatment based on 
 Cloning and installing
 -----------------------
 
+Installation requires >= 80 GB of disk space. See details `here <docs/source/system_requirements.rst>`_. 
+
 The setting up of the CKG includes several steps and might take a few hours (if you are building the database from scratch). However, we have prepared documentation and manuals that will guide through every step.
 To get a copy of the GitHub repository on your local machine, please open a terminal windown and run:
 
@@ -50,7 +52,7 @@ This will create a new folder named "CKG" on your current location. To access th
 Features
 ---------------
 
-* Cross-platform: Mac, and Linux are officially supported.
+* Cross-platform: Mac, and Linux are officially supported. Instructions `for Windows <https://ckg.readthedocs.io/en/latest/intro/getting-started-with-windows.html>`_  exist.
 
 * Docker container runs all neccessary steps to setup the CKG. 
 
