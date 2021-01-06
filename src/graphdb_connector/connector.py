@@ -1,5 +1,6 @@
 import sys
 import os
+import json
 import neo4j
 import pandas as pd
 import ckg_utils
@@ -148,3 +149,10 @@ def run_query(query, parameters={}):
     data = getCursorData(driver, query, parameters=parameters)
 
     return data
+
+
+def generate_virtual_graph(graph_json):
+    query = "CALL apoc.graph.fromDocument('JSON', {write:false}) YIELD graph RETURN *".replace("JSON", json.dumps(graph_json))
+    #driver = getGraphDatabaseConnectionConfiguration()
+    #neo4j = sendQuery(driver, query)
+    return query
