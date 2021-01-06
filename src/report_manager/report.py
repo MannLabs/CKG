@@ -186,6 +186,7 @@ class Report:
 
     def download_report(self, directory):
         saved = set()
+        ckg_utils.checkDirectory(directory)
         for plot_type in natsort.natsorted(self.plots):
             name = "_".join(plot_type) if isinstance(plot_type, tuple) else plot_type
             i = 0

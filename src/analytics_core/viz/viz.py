@@ -210,7 +210,16 @@ def get_barplot(data, identifier, args):
     """
     figure = {}
     figure["data"] = []
-
+    if 'title' not in args:
+        args['title'] = 'Barplot {} - {}'.format(args['x'], args['y'])
+    if 'x_title' not in args:
+        args['x_title'] = args['x']
+    if 'y_title' not in args:
+        args['y_title'] = args['y']
+    if 'height' not in args:
+        args['height'] = 600
+    if 'width' not in args:
+        args['width'] = 600
     if "group" in args:
         for g in data[args["group"]].unique():
             color = None
@@ -1373,7 +1382,7 @@ def get_network_style(node_colors, color_edges):
 
 
     for k,v in node_colors.items():
-        stylesheet.append(ast.literal_eval(color_selector.replace("KEY", k).replace("VALUE",v)))
+        stylesheet.append(ast.literal_eval(color_selector.replace("KEY", k.replace("'", "")).replace("VALUE",v)))
 
     return stylesheet, layout
 
