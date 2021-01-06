@@ -42,7 +42,7 @@ class Knowledge:
                             'Pathway': '#0570b0',
                             'Publication': '#b35806',
                             'Biological_process': '#e6f598',
-                            'Symptom': '#f46d43',
+                            'Metabolite': '#f46d43',
                             'Project': '#3288bd',
                             'Complex': '#31a354',
                             'upregulated': '#d53e4f',
@@ -142,6 +142,11 @@ class Knowledge:
     @keep_nodes.setter
     def keep_nodes(self, node_ids):
         self._keep_nodes = node_ids
+    
+    def empty_graph(self):
+        self.nodes = {}
+        self.relationships = {}
+        self.graph = None
 
     def generate_knowledge_from_regulation(self, entity):
         nodes = {}
@@ -307,11 +312,10 @@ class Knowledge:
         node1_color = self.colors[entity1] if entity1 in self.colors else self.default_color
         node2_color = self.colors[entity2] if entity2 in self.colors else self.default_color
         for i, row in edgelist.iterrows():
-            nodes.update({row[source]: {'type': entity1, 'color': node1_color}, row[target]: {'type': entity2, 'color': node2_color}})
-            relationships.update({(row[source], row[target]): {'type': rtype, 'source_color': node1_color, 'target_color': node2_color, 'weight': row[weight]}})
+            nodes.update({row[source].replace("'", ""): {'type': entity1, 'color': node1_color}, row[target].replace("'", ""): {'type': entity2, 'color': node2_color}})
+            relationships.update({(row[source].replace("'", ""), row[target].replace("'", "")): {'type': rtype, 'source_color': node1_color, 'target_color': node2_color, 'weight': row[weight]}})
 
-        self.update_nodes(nodes)
-        self.update_relationships(relationships)
+        return nodes, relationships
 
     def generate_knowledge_from_annotations(self, entity1, entity2, filter=None):
         nodes = {}
@@ -363,7 +367,7 @@ class Knowledge:
 
         return data
 
-    def query_data(self, replace):
+    def query_data(self, replace=[]):
         query_data = {}
         try:
             cwd = os.path.abspath(os.path.dirname(__file__))
@@ -383,24 +387,100 @@ class Knowledge:
 
         return query_data
 
+    def annotate_list(self, query_list, entity_type, attribute='name', queries_file=None, diseases=[], entities=None):
+        self.empty_graph()
+        if queries_file is None:
+            queries_file = 'queries/knowledge_annotation.yml'
+
+        if entities is None:
+            entities = self.entities
+
+        if diseases is None or len(diseases) < 1:
+            replace_by = ('DISEASE_COND', '')
+        else:
+            replace_by = ('DISEASE_COND', 'OR (d.name IN {} AND r.score > 1.5)'.format(diseases))
+
+        query_data = []
+        drugs = []
+        q = 'NA'
+        try:
+            cwd = os.path.abspath(os.path.dirname(__file__))
+            cypher_queries = ckg_utils.get_queries(os.path.join(cwd, queries_file))
+            if cypher_queries is not None:
+                if entity_type.capitalize() in cypher_queries:
+                    queries = cypher_queries[entity_type.capitalize()]
+                    for query_name in queries:
+                        involved_nodes = queries[query_name]['involves_nodes']
+                        if len(set(involved_nodes).intersection(entities)) > 0 or query_name.capitalize() == entity_type.capitalize():
+                            query = queries[query_name]['query']
+                            q = 'NA'
+                            for q in query.split(';')[:-1]:
+                                q = q.format(query_list=query_list).replace("ATTRIBUTE", attribute).replace(replace_by[0], replace_by[1]).replace('DISEASES', str(diseases)).replace('DRUGS', str(drugs))
+                                data = self.send_query(q)
+                                if not data.empty:
+                                    if query_name == 'disease' and len(diseases) < 1:
+                                        diseases = data['target'].unique().tolist()
+                                    if query_name == 'drug':
+                                        drugs = data['target'].unique().tolist()
+                                    query_data.append(data)
+        except Exception as err:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            logger.error("Error annotating list. Query: {} from file {}: {}, file: {},line: {}, err: {}".format(q, queries_file, sys.exc_info(), fname, exc_tb.tb_lineno, err))
+            print("Error annotating list. Query: {} from file {}: {}, file: {},line: {}, err: {}".format(q, queries_file, sys.exc_info(), fname, exc_tb.tb_lineno, err))
+
+        if len(query_data) > 0:
+            self.data = pd.DataFrame().append(query_data)
+            for df in query_data:
+                entity1 = df['source_type'][0][0]
+                entity2 = df['target_type'][0][0]
+                assoc_type = df['rel_type'][0]
+                df['weight'] = df['weight'].fillna(0.5)
+                nodes, relationships = self.generate_knowledge_from_edgelist(df, entity1, entity2, source='source', target='target', rtype=assoc_type, weight='weight')
+                self.nodes.update(nodes)
+                self.relationships.update(relationships)
+
     def generate_cypher_nodes_list(self):
         nodes = ['"{}"'.format(n) for n in self.nodes.keys()]
         nodes = ",".join(nodes)
         return nodes
 
-    def generate_knowledge_graph(self):
+    def generate_knowledge_graph(self, summarize=True, method='betweenness', inplace=True):
         G = nx.DiGraph()
         G.add_nodes_from(self.nodes.items())
         G.add_edges_from(self.relationships.keys())
         nx.set_edge_attributes(G, self.relationships)
+        selected_nodes = []
+        if summarize and len(G.nodes()) > 1:
+            centrality = None
+            if method == 'betweenness':
+                k = None if len(G.nodes()) < 15000 else 15000
+                centrality = nx.betweenness_centrality(G, k=k, weight='weight', normalized=False)
+            elif method == 'closeness':
+                centrality = nx.closeness_centrality(G, u=None, distance='weight', wf_improved=True)
+            elif method == 'pagerank':
+                centrality = nx.pagerank(G, alpha=0.95, weight='weight')
 
-        self.graph = G
+            if centrality is not None:
+                nx.set_node_attributes(G, centrality, 'centrality')
+                sorted_centrality = sorted(centrality.items(), key=itemgetter(1), reverse=True)
+                for node_type in self.entities:
+                    nodes = [x for x, y in G.nodes(data=True) if 'type' in y and y['type'] == node_type and x not in self.keep_nodes]
+                    selected_nodes.extend([n for n, c in sorted_centrality if n in nodes][15:])
+
+                if len(selected_nodes) > 0:
+                    G.remove_nodes_from(selected_nodes)
+                    G.remove_nodes_from(list(nx.isolates(G)))
+        if inplace:
+            self.graph = G.copy()
+
+        return G
 
     def reduce_to_subgraph(self, nodes, summarize=True):
         valid_nodes = set(nodes).intersection(list(self.nodes.keys()))
         valid_nodes.add("Regulated")
         aux = set()
-        self.generate_knowledge_graph(summarize=summarize)
+        self.generate_knowledge_graph()
         for n in valid_nodes:
             if n in self.nodes:
                 for n1, n2, attr in self.graph.out_edges(n, data=True):
@@ -415,23 +495,9 @@ class Knowledge:
             self.nodes = dict(self.graph.nodes(data=True))
             self.relationships = {(a, b): c for a, b, c in self.graph.edges(data=True)}
 
-    def get_knowledge_graph_plot(self, summarize=True):
-        if self.graph is None:
-            self.generate_knowledge_graph()
-        
-        selected_nodes = []
-        if summarize and len(self.graph.nodes()) > 1:
-            centrality = nx.betweenness_centrality(self.graph, k=None, weight='weight', normalized=False)
-            #centrality = nx.pagerank(G, alpha=0.95, weight='weight')
-            nx.set_node_attributes(self.graph, centrality, 'centrality')
-            sorted_centrality = sorted(centrality.items(), key=itemgetter(1), reverse=True)
-            for node_type in self.entities:
-                nodes = [x for x, y in self.graph.nodes(data=True) if 'type' in y and y['type'] == node_type and x not in self.keep_nodes]
-                selected_nodes.extend([n for n, c in sorted_centrality if n in nodes][15:])
-
-            if len(selected_nodes) > 0:
-                self.graph.remove_nodes_from(selected_nodes)
-
+    def get_knowledge_graph_plot(self, graph=None):
+        if graph is None:
+            graph = self.graph.copy()
         title = 'Project {} Knowledge Graph'.format(self.identifier)
         if self.data is not None:
             if 'name' in self.data:
@@ -472,7 +538,7 @@ class Knowledge:
                   'minTemp': 1.0}
 
         stylesheet.extend([{'selector': '[weight < 0]', 'style': {'line-color': '#3288bd'}}, {'selector': '[weight > 0]', 'style': {'line-color': '#d73027'}}])
-        for n, attr in self.graph.nodes(data=True):
+        for n, attr in graph.nodes(data=True):
             color = self.default_color
             image = ''
             if 'color' in attr:
@@ -484,63 +550,71 @@ class Knowledge:
         stylesheet.extend([{'selector': 'node', 'style': {'width': 'mapData(centrality, 0, 1, 15, 30)', 'height': 'mapData(centrality, 0, 1, 15, 30)'}}])
         args['stylesheet'] = stylesheet
         args['layout'] = layout
-        G = self.graph.copy()
-        if G.has_node('Regulated'):
-            G.remove_node('Regulated')
-        nodes_table, edges_table = viz.network_to_tables(G, source='node1', target='node2')
+
+        if graph.has_node('Regulated'):
+            graph.remove_node('Regulated')
+        nodes_table, edges_table = viz.network_to_tables(graph, source='node1', target='node2')
         nodes_fig_table = viz.get_table(nodes_table, identifier=self.identifier + "_nodes_table", args={'title': "Nodes table"})
         edges_fig_table = viz.get_table(edges_table, identifier=self.identifier + "_edges_table", args={'title': "Edges table"})
-        cy_elements, mouseover_node = utils.networkx_to_cytoscape(G)
+        cy_elements, mouseover_node = utils.networkx_to_cytoscape(graph)
         #args['mouseover_node'] = mouseover_node
 
-        net = {"notebook": [cy_elements, stylesheet, layout], "app": viz.get_cytoscape_network(cy_elements, self.identifier, args), "net_tables": (nodes_table, edges_table), "net_tables_viz": (nodes_fig_table, edges_fig_table), "net_json": json_graph.node_link_data(G)}
+        net = {"notebook": [cy_elements, stylesheet, layout], "app": viz.get_cytoscape_network(cy_elements, self.identifier, args), "net_tables": (nodes_table, edges_table), "net_tables_viz": (nodes_fig_table, edges_fig_table), "net_json": json_graph.node_link_data(graph)}
 
         return net
 
-    def generate_report(self, visualizations=['sankey'], summarize=True):
+    def generate_knowledge_sankey_plot(self, graph=None):
+        remove_edges = []
+        if graph is None:
+            graph = self.graph.copy()
+        new_type_edges = {}
+        new_type_nodes = {}
+        for n1, n2 in graph.edges():
+            if graph.nodes[n1]['type'] == graph.nodes[n2]['type']:
+                remove_edges.append((n1, n2))
+            else:
+                if graph.nodes[n1]['type'] in self.entities:
+                    color = graph.nodes[n1]['color']
+                    new_type_edges.update({(n1, graph.nodes[n1]['type']): {'type': 'is_a', 'weight': 0.0, 'width': 1.0, 'source_color': color, 'target_color': self.colors[graph.nodes[n1]['type']]}})
+                    new_type_nodes.update({graph.nodes[n1]['type']: {'type': 'entity', 'color': self.colors[graph.nodes[n1]['type']]}})
+                if graph.nodes[n2]['type'] in self.entities:
+                    color = graph.nodes[n2]['color']
+                    new_type_edges.update({(n2, graph.nodes[n2]['type']): {'type': 'is_a', 'weight': 0.0, 'width': 1.0, 'source_color': color, 'target_color': self.colors[graph.nodes[n2]['type']]}})
+                    new_type_nodes.update({graph.nodes[n2]['type']: {'type': 'entity', 'color': self.colors[graph.nodes[n2]['type']]}})
+
+        graph.remove_edges_from(remove_edges)
+        graph.add_edges_from(new_type_edges.keys())
+        nx.set_edge_attributes(graph, new_type_edges)
+        graph.add_nodes_from(new_type_nodes.items())
+        df = nx.to_pandas_edgelist(graph).fillna(0.5)
+        plot = viz.get_sankey_plot(df, self.identifier, args={'source': 'source',
+                                                                    'target': 'target',
+                                                                    'source_colors': 'source_color',
+                                                                    'target_colors': 'target_color',
+                                                                    'hover': 'type',
+                                                                    'pad': 10,
+                                                                    'weight': 'width',
+                                                                    'orientation': 'h',
+                                                                    'valueformat': '.0f',
+                                                                    'width': 1600,
+                                                                    'height': 2200,
+                                                                    'font': 10,
+                                                                    'title':'Knowledge Graph'})
+        
+        return plot
+
+    def generate_report(self, visualizations=['sankey'], summarize=True, method='betweenness', inplace=True):
         report = rp.Report(identifier="knowledge")
         plots = []
+        G = None
+        if self.graph is None:
+            G = self.generate_knowledge_graph(summarize=summarize, method=method, inplace=inplace)
+
         for visualization in visualizations:
             if visualization == 'network':
-                plots.append(self.get_knowledge_graph_plot(summarize=summarize))
+                plots.append(self.get_knowledge_graph_plot(G))
             elif visualization == 'sankey':
-                remove_edges = []
-                if self.graph is None:
-                    self.generate_knowledge_graph()
-                G = self.graph.copy()
-                new_type_edges = {}
-                new_type_nodes = {}
-                for n1, n2 in G.edges():
-                    if G.nodes[n1]['type'] == G.nodes[n2]['type']:
-                        remove_edges.append((n1, n2))
-                    else:
-                        if G.nodes[n1]['type'] in self.entities:
-                            color = G.nodes[n1]['color']
-                            new_type_edges.update({(n1, G.nodes[n1]['type']): {'type': 'is_a', 'weight': 0.0, 'width': 1.0, 'source_color': color, 'target_color': self.colors[G.nodes[n1]['type']]}})
-                            new_type_nodes.update({G.nodes[n1]['type']: {'type': 'entity', 'color': self.colors[G.nodes[n1]['type']]}})
-                        if G.nodes[n2]['type'] in self.entities:
-                            color = G.nodes[n2]['color']
-                            new_type_edges.update({(n2, G.nodes[n2]['type']): {'type': 'is_a', 'weight': 0.0, 'width': 1.0, 'source_color': color, 'target_color': self.colors[G.nodes[n2]['type']]}})
-                            new_type_nodes.update({G.nodes[n2]['type']: {'type': 'entity', 'color': self.colors[G.nodes[n2]['type']]}})
-
-                G.remove_edges_from(remove_edges)
-                G.add_edges_from(new_type_edges.keys())
-                nx.set_edge_attributes(G, new_type_edges)
-                G.add_nodes_from(new_type_nodes.items())
-                df = nx.to_pandas_edgelist(G).fillna(1)
-                plots.append(viz.get_sankey_plot(df, self.identifier, args={'source': 'source',
-                                                                            'target': 'target',
-                                                                            'source_colors': 'source_color',
-                                                                            'target_colors': 'target_color',
-                                                                            'hover': 'type',
-                                                                            'pad': 10,
-                                                                            'weight': 'width',
-                                                                            'orientation': 'h',
-                                                                            'valueformat': '.0f',
-                                                                            'width': 1600,
-                                                                            'height': 2200,
-                                                                            'font': 10,
-                                                                            'title':'Knowledge Graph'}))
+                plots.append(self.generate_knowledge_sankey_plot(G))
 
         report.plots = {("Knowledge Graph", "Knowledge Graph"): plots}
         self.report = report

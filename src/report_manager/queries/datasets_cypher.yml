@@ -176,7 +176,8 @@ proteomics:
         query_type: post
         query: >
             MATCH (drug:Drug)-[r:ACTS_ON]->(protein:Protein) 
-            WHERE ((protein.name+"~"+protein.id) IN [IDENTIFIERS]) AND r.score>=0.7
+            WHERE ((protein.name+"~"+protein.id) IN [IDENTIFIERS]) AND r.score>0.7
+            WITH protein, drug, r, SIZE((drug)-[:ACTS_ON]->(:Protein)) AS drug_degree WHERE drug_degree < 200
             RETURN DISTINCT collect(protein.name+"~"+protein.id) AS Proteins,drug.name AS Drug,r.score AS score, r.source AS source,r.action AS action
     PROTEIN_COMPLEX_ASSOCIATIONS:
         name: 'get complexes involving the list of proteins'
@@ -188,7 +189,7 @@ proteomics:
             - IS_SUBUNIT_OF
         query_type: post
         query: >
-            MATCH (complex:Complex)<-[r:IS_SUBUNIT_OF]-(protein:Protein) 
+            MATCH (protein:Protein)-[r:IS_SUBUNIT_OF]->(complex:Complex) 
             WHERE ((protein.name+"~"+protein.id) IN [IDENTIFIERS])
             WITH complex.name AS Complex, r.source AS source, collect(DISTINCT protein.name+"~"+protein.id) AS Proteins
             WHERE SIZE(Proteins)>1
@@ -203,10 +204,10 @@ proteomics:
             - ASSOCIATED_WITH
         query_type: post
         query: >
-            MATCH (project:Project)-[:STUDIES_DISEASE]-(d:Disease)-[:HAS_PARENT]->(p:Disease)<-[:HAS_PARENT]-(parent_disease:Disease)
+            MATCH (project:Project)-[:STUDIES_DISEASE]->(d:Disease)-[:HAS_PARENT]->(p:Disease)<-[:HAS_PARENT]-(parent_disease:Disease)
             WHERE project.id="PROJECTID" AND p.id <> "DOID:4"
             WITH COLLECT(parent_disease) + COLLECT(d) AS parent_diseases
-            MATCH (protein:Protein)-[r]-(disease:Disease)
+            MATCH (protein:Protein)-[r:ASSOCIATED_WITH]->(disease:Disease)
             WHERE ((protein.name+"~"+protein.id) IN [IDENTIFIERS]) AND disease IN parent_diseases
             RETURN DISTINCT collect(protein.name+"~"+protein.id) AS Proteins,disease.name AS Disease,disease.description AS Description, r.score AS score, r.source AS source
     LITERATURE_ASSOCIATIONS:
@@ -223,11 +224,12 @@ proteomics:
         query: >
             MATCH (project:Project)-[:STUDIES_DISEASE]->(disease:Disease)-[:HAS_PARENT]->(p:Disease)<-[:HAS_PARENT]-(pdisease:Disease) 
             WHERE project.id="PROJECTID" AND p.id <> "DOID:4"
-            WITH collect(disease)+collect(pdisease) AS diseases 
+            WITH collect(disease.id)+collect(pdisease.id) AS diseases 
             MATCH (d:Disease)-[:MENTIONED_IN_PUBLICATION]->(publication:Publication)<-[r:MENTIONED_IN_PUBLICATION]-(protein:Protein) 
-            WHERE d IN diseases AND (protein.name+"~"+protein.id) IN [IDENTIFIERS] 
-            WITH d, publication, protein
-            RETURN DISTINCT collect(DISTINCT protein.name+"~"+protein.id) AS Proteins, publication.id AS publication, publication.linkout AS linkout, COLLECT(d.name) AS Diseases;
+            WHERE d.id IN diseases AND (protein.name+"~"+protein.id) IN [IDENTIFIERS] 
+            WITH collect(DISTINCT protein.name+"~"+protein.id) as Proteins, COLLECT(DISTINCT d.name) AS Diseases, publication
+            WITH Diseases, publication, Proteins, SIZE(Proteins) AS c WHERE c>1
+            RETURN  Proteins, publication.id AS publication, publication.linkout AS linkout, Diseases;
 ptm:
     NUMBER_OF_MODIFIED_PROTEINS:
         name: number of modified proteins
