@@ -32,9 +32,9 @@ RUN adduser --quiet --disabled-password --shell /bin/bash --home /home/adminhub 
     adduser --disabled-password --gecos '' --uid 1500 nginx
 
 # Python 3.6.8 installation
-RUN wget https://www.python.org/ftp/python/3.6.8/Python-3.6.8.tgz
-RUN tar -xzf Python-3.6.8.tgz
-WORKDIR Python-3.6.8
+RUN wget https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tgz
+RUN tar -xzf Python-3.7.3.tgz
+WORKDIR Python-3.7.3
 RUN ./configure
 RUN make altinstall
 RUN make install
