@@ -1,6 +1,6 @@
 import random
 from Bio import Entrez, Medline
-import re
+from collections import defaultdict
 import pandas as pd
 import bs4 as bs
 import dash_html_components as html
@@ -112,6 +112,28 @@ def networkx_to_cytoscape(graph):
 
 def networkx_to_gml(graph, path):
     nx.write_gml(graph, path)
+
+
+def networkx_to_neo4j_document(graph):
+    graph_json = []
+    seen_rels = set()
+    for n, attr in graph.nodes(data=True):
+        rels = defaultdict(list)
+        attr.update({'id': n})
+        for r in graph[n]:
+            edge = graph[n][r]
+            edge.update({'id': r})
+            if 'type' in edge:
+                rel_type = edge['type']
+                if 'type' in graph.nodes()[r]:
+                    edge['type'] = graph.nodes()[r]['type']
+                if not (n, r, edge['type']) in seen_rels:
+                    rels[rel_type].append(edge)
+                    seen_rels.update({(n, r, edge['type']), (r, n, edge['type'])})
+                    attr.update(rels)
+        graph_json.append(attr)
+
+    return graph_json
 
 
 def json_network_to_gml(graph_json, path):
