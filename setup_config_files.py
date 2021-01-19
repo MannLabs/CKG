@@ -9,12 +9,9 @@ def setup_config_file(file_name, path):
 
 
 if __name__ == '__main__':
-    config_dir = 'src/config/'
+    config_dir = 'ckg/config/'
     config_files = ['report_manager_log_template.config', 'graphdb_connector_log_template.config', 'graphdb_builder_log_template.config']
     path = os.path.dirname(os.path.abspath(__file__))
     for config_file in config_files:
         file_name = os.path.join(path, os.path.join(config_dir, config_file))
         setup_config_file(file_name, path)
-        
-
-
