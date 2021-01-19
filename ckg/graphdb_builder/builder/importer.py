@@ -13,7 +13,7 @@ from datetime import datetime
 import pandas as pd
 from joblib import Parallel, delayed
 from uuid import uuid4
-import config.ckg_config as ckg_config
+import ckg.config.ckg_config as ckg_config
 from ckg.graphdb_builder.ontologies import ontologies_controller as oh
 from ckg.graphdb_builder.databases import databases_controller as dh
 from ckg.graphdb_builder.experiments import experiments_controller as eh

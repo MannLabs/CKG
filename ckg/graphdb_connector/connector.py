@@ -3,7 +3,7 @@ import os
 import json
 import neo4j
 import pandas as pd
-import ckg_utils
+import ckg.ckg_utils
 from ckg.config import ckg_config
 from ckg.graphdb_builder import builder_utils
 
