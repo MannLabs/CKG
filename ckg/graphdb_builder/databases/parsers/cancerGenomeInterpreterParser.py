@@ -1,11 +1,11 @@
 import os.path
 from collections import defaultdict
 import zipfile
-from graphdb_builder import builder_utils, mapping as mp
+from ckg.graphdb_builder import builder_utils, mapping as mp
 import re
 
 #######################################
-#   The Cancer Genome Interpreter     # 
+#   The Cancer Genome Interpreter     #
 #######################################
 def parser(databases_directory, download=True):
     variant_regex = r"(\D\d+\D)$"
@@ -36,7 +36,7 @@ def parser(databases_directory, download=True):
                     if first:
                         first = False
                         continue
-                    data = line.decode('utf-8').rstrip("\r\n").split("\t") 
+                    data = line.decode('utf-8').rstrip("\r\n").split("\t")
                     gene_variant = data[0].split(':')
                     if len(gene_variant) < 2:
                         continue
@@ -85,7 +85,7 @@ def parser(databases_directory, download=True):
                         for valid_variant in valid_variants:
                             relationships["targets_clinically_relevant_variant"].add((drug, valid_variant, "TARGETS_CLINICALLY_RELEVANT_VARIANT", evidence, response, "".join(tumors), "curated", "CGI"))
 
-                    for tumor in tumors:                         
+                    for tumor in tumors:
                         if tumor.lower() in mapping:
                             tumor = mapping[tumor.lower()]
                             for valid_variant in valid_variants:

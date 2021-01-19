@@ -1,9 +1,9 @@
 import os.path
 import pandas as pd
-from graphdb_builder import mapping as mp, builder_utils
+from ckg.graphdb_builder import mapping as mp, builder_utils
 
 #####################################
-#   Textmining (JensenLab.org)      # 
+#   Textmining (JensenLab.org)      #
 #####################################
 
 
@@ -90,7 +90,7 @@ def parse_mentions(config, directory, qtype, importDirectory, download=True):
         builder_utils.downloadDB(url.replace("FILE", ifile), os.path.join(directory, "textmining"))
     ifile = os.path.join(directory, os.path.join("textmining", ifile))
     with open(outputfile, 'w') as f:
-        f.write("START_ID\tEND_ID\tTYPE\n") 
+        f.write("START_ID\tEND_ID\tTYPE\n")
         with open(ifile, 'r') as idbf:
             for line in idbf:
                 data = line.rstrip("\r\n").split('\t')

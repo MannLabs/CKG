@@ -2,10 +2,10 @@ import os.path
 from collections import defaultdict
 import pandas as pd
 import re
-from graphdb_builder import mapping as mp, builder_utils
+from ckg.graphdb_builder import mapping as mp, builder_utils
 
 #########################
-#       UniProt         # 
+#       UniProt         #
 #########################
 def parser(databases_directory, import_directory, download=True, updated_on=None):
     config = builder_utils.get_config(config_name="uniprotConfig.yml", data_type='databases')
@@ -31,7 +31,7 @@ def parser(databases_directory, import_directory, download=True, updated_on=None
 
     directory = os.path.join(databases_directory, "UniProt")
     builder_utils.remove_directory(directory)
-    
+
     return stats
 
 
@@ -117,8 +117,8 @@ def parse_idmapping_file(databases_directory, config, import_directory, download
             # data = line.decode('utf-8').rstrip("\r\n").split("\t")
             # iid = data[0]
             field = data[1]
-            alias = data[2]                
-            
+            alias = data[2]
+
             if iid not in skip:
                 skip = set()
                 if re.search(regex_transcript, iid):
@@ -210,10 +210,10 @@ def format_output(proteins):
         if "isoforms" in proteins[protein]:
             for i in proteins[protein]['isoforms']:
                 relationships[('Transcript','IS_ISOFORM')].add((i, protein, 'IS_ISOFORM', 'UniProt'))
-        
+
         entities.add((protein, "Protein", accession, name, ",".join(synonyms), description, int(taxid)))
-        
-            
+
+
     return entities, relationships, pdb_entities
 
 def print_single_file(data, header, output_file, data_type, data_object, is_first, updated_on):
@@ -222,7 +222,7 @@ def print_single_file(data, header, output_file, data_type, data_object, is_firs
     stats.add(builder_utils.buildStats(len(data), data_type, data_object, "UniProt", output_file, updated_on))
     with open(output_file, 'a', encoding='utf-8') as ef:
         df.to_csv(path_or_buf=ef, sep='\t',
-                header=is_first, index=False, quotechar='"', 
+                header=is_first, index=False, quotechar='"',
                 line_terminator='\n', escapechar='\\')
 
     return stats
@@ -235,7 +235,7 @@ def print_multiple_relationships_files(data, header, output_dir, is_first, updat
         stats.add(builder_utils.buildStats(len(data[(entity, relationship)]), 'relationships', relationship, "UniProt", output_file, updated_on))
         with open(output_file, 'a', encoding='utf-8') as ef:
             df.to_csv(path_or_buf=ef, sep='\t',
-            header=is_first, index=False, quotechar='"', 
+            header=is_first, index=False, quotechar='"',
             line_terminator='\n', escapechar='\\')
 
     return stats
@@ -247,7 +247,7 @@ def addUniProtTexts(textsFile, proteins):
             protein = data[0]
             name = data[1]
             function = data[3]
-            
+
             if protein in proteins:
                 proteins[protein].update({"description": function})
 
@@ -368,7 +368,7 @@ def parseUniProtPeptides(config, databases_directory, download=True):
                 if first:
                     first = False
                     continue
-    
+
                 data = line.rstrip("\r\n").split("\t")
                 peptide = data[0]
                 accs = data[6].split(",")
@@ -379,6 +379,6 @@ def parseUniProtPeptides(config, databases_directory, download=True):
                 for protein in accs:
                     relationships[("Peptide", 'belongs_to_protein')].add((peptide, protein, "BELONGS_TO_PROTEIN", "UniProt"))
     return entities, relationships
-    
+
 if __name__ == "__main__":
     parser(databases_directory="../../../../data/databases", import_directory="../../../../data/imports/databases", download=False)

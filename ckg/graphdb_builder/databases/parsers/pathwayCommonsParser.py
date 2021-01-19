@@ -1,9 +1,9 @@
 import os.path
 import gzip
-from graphdb_builder import builder_utils
+from ckg.graphdb_builder import builder_utils
 
 #########################
-#   PathwayCommons      # 
+#   PathwayCommons      #
 #########################
 def parser(databases_directory, download=True):
     config = builder_utils.get_config(config_name="pathwayCommonsConfig.yml", data_type='databases')
@@ -37,7 +37,7 @@ def parser(databases_directory, download=True):
             relationships.add((protein, code, "ANNOTATED_IN_PATHWAY", linkout, "PathwayCommons: "+source))
 
     associations.close()
-    
+
     builder_utils.remove_directory(directory)
-    
+
     return (entities, relationships, entities_header, relationships_header)

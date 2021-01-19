@@ -5,13 +5,13 @@ import numpy as np
 import ast
 from operator import itemgetter
 import networkx as nx
-import ckg_utils
-import config.ckg_config as ckg_config
+import ckg.ckg_utils
+import ckg.config.ckg_config as ckg_config
 import dash_cytoscape as cyto
-from graphdb_connector import connector
-from report_manager import report as rp
-from analytics_core import utils
-from analytics_core.viz import viz, color_list
+from ckg.graphdb_connector import connector
+from ckg.report_manager import report as rp
+from ckg.analytics_core import utils
+from ckg.analytics_core.viz import viz, color_list
 from networkx.readwrite import json_graph
 
 log_config = ckg_config.report_manager_log
@@ -142,7 +142,7 @@ class Knowledge:
     @keep_nodes.setter
     def keep_nodes(self, node_ids):
         self._keep_nodes = node_ids
-    
+
     def empty_graph(self):
         self.nodes = {}
         self.relationships = {}
@@ -246,7 +246,7 @@ class Knowledge:
                     if ids is not None:
                         for i in ids:
                             if 'Pathways' in name:
-                                entity2 = 'Pathway'    
+                                entity2 = 'Pathway'
                             elif 'processes' in name:
                                 entity2 = 'Biological_process'
 
@@ -506,7 +506,7 @@ class Knowledge:
         args = {'title': title,
                 'node_properties': {},
                 'width': 2000,
-                'height': 2000, 
+                'height': 2000,
                 'maxLinkWidth': 7,
                 'maxRadius': 20}
         color_selector = "{'selector': '[name = \"KEY\"]', 'style': {'font-size': '7px', 'text-opacity': 0.8, 'background-color':'VALUE','width': 50,'height': 50,'background-image':'/assets/graph_icons/ENTITY.png','background-fit': 'cover','opacity':OPACITY}}"
@@ -600,7 +600,7 @@ class Knowledge:
                                                                     'height': 2200,
                                                                     'font': 10,
                                                                     'title':'Knowledge Graph'})
-        
+
         return plot
 
     def generate_report(self, visualizations=['sankey'], summarize=True, method='betweenness', inplace=True):
@@ -632,7 +632,7 @@ class ProjectKnowledge(Knowledge):
     def __init__(self, identifier, data, nodes={}, relationships={}, colors={}, graph=None, report={}):
         queries_file = 'queries/project_knowledge_cypher.yml'
         Knowledge.__init__(self, identifier, data=data, nodes=nodes, relationships=relationships, queries_file=queries_file, colors=colors, graph=graph, report=report)
-        
+
     def generate_knowledge(self):
         similarity_knowledge = self.generate_knowledge_from_similarity(entity='Project')
         self.nodes.update(similarity_knowledge[0])
@@ -644,13 +644,13 @@ class ProjectKnowledge(Knowledge):
         self.nodes.update(queries_knowledge[0])
         self.keep_nodes = list(queries_knowledge[0].keys())
         self.relationships.update(queries_knowledge[1])
-    
+
 class ProteomicsKnowledge(Knowledge):
-    
+
     def __init__(self, identifier, data, nodes={}, relationships={}, colors={}, graph=None, report={}):
         queries_file = 'queries/proteomics_knowledge_cypher.yml'
         Knowledge.__init__(self, identifier, data=data, nodes=nodes, relationships=relationships, queries_file=queries_file, colors=colors, graph=graph, report=report)
-    
+
     def generate_knowledge(self):
         regulation_knowledge = self.generate_knowledge_from_regulation(entity='Protein')
         #correlation_knowledge = self.genreate_knowledge_from_correlation('Protein', 'Protein', filter=regulation_knowledge[0].keys())
@@ -667,13 +667,13 @@ class ProteomicsKnowledge(Knowledge):
         df_knowledge = self.generate_knowledge_from_dataframes()
         self.nodes.update(df_knowledge[0])
         self.relationships.update(df_knowledge[1])
-        
+
 class ClinicalKnowledge(Knowledge):
-    
+
     def __init__(self, identifier, data, nodes={}, relationships={}, colors={}, graph=None, report={}):
         queries_file = 'queries/clinical_knowledge_cypher.yml'
         Knowledge.__init__(self, identifier, data=data, nodes=nodes, relationships=relationships, queries_file=queries_file, colors=colors, graph=graph, report=report)
-        
+
     def generate_knowledge(self):
         regulation_knowledge = self.generate_knowledge_from_regulation(entity='Clinical_variable')
         #correlation_knowledge = self.genreate_knowledge_from_correlation('Clinical_variable', 'Clinical_variable', filter=regulation_knowledge[0].keys())
@@ -681,19 +681,19 @@ class ClinicalKnowledge(Knowledge):
         #self.nodes.update(correlation_knowledge[0])
         self.relationships = regulation_knowledge[1]
         #self.relationships.update(correlation_knowledge[1])
-        
+
         nodes = self.generate_cypher_nodes_list()
         queries_results = self.query_data(replace=[('PROJECTID', nodes)])
         queries_knowledge = self.generate_knowledge_from_queries(entity='Clinical', queries_results=queries_results)
         self.nodes.update(queries_knowledge[0])
         self.relationships.update(queries_knowledge[1])
-        
+
 class MultiOmicsKnowledge(Knowledge):
-    
+
     def __init__(self, identifier, data, nodes={}, relationships={}, colors={}, graph=None, report={}):
         queries_file = 'queries/multiomics_knowledge_cypher.yml'
         Knowledge.__init__(self, identifier, data=data, nodes=nodes, relationships=relationships, queries_file=queries_file, colors=colors, graph=graph, report=report)
-        
+
     def generate_knowledge(self):
         if 'wgcna_wgcna' in self.data:
             for dtype in self.data['wgcna_wgcna']:

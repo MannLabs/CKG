@@ -1,5 +1,5 @@
 from collections import defaultdict
-from graphdb_builder import builder_utils
+from ckg.graphdb_builder import builder_utils
 
 #################################
 # Clinical_variable - SNOMED-CT #
@@ -79,7 +79,7 @@ def parser(files, filters):
 def get_inactive_terms(concept_file):
     """
     :param concept_file:
-    :return set inactive_terms: inactive terms 
+    :return set inactive_terms: inactive terms
     """
     inactive_terms = set()
     first = True

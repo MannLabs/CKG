@@ -3,7 +3,7 @@ import re
 import pandas as pd
 import numpy as np
 from collections import defaultdict
-from graphdb_builder import builder_utils, mapping
+from ckg.graphdb_builder import builder_utils, mapping
 
 
 def parser(projectId, type='proteomics', directory=None):

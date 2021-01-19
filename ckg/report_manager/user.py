@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from passlib.hash import bcrypt
-from graphdb_connector import connector
-from graphdb_builder.builder import create_user
+from ckg.graphdb_connector import connector
+from ckg.graphdb_builder.builder import create_user
 
 driver = connector.getGraphDatabaseConnectionConfiguration()
 

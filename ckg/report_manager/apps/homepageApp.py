@@ -1,5 +1,5 @@
-from apps import basicApp
-from apps import homepageStats as hpstats
+from ckg.report_manager.apps import basicApp
+from ckg.report_manager.apps import homepageStats as hpstats
 
 
 class HomePageApp(basicApp.BasicApp):

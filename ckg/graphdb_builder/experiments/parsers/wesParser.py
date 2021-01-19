@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
-from graphdb_builder import builder_utils
+from ckg.graphdb_builder import builder_utils
 
 def parser(projectId):
     data = {}
@@ -26,7 +26,7 @@ def parser(projectId):
                 somatic_mutations = somatic_mutations.append(entities.loc[new,:], ignore_index=False)
         somatic_mutations = somatic_mutations.reset_index()
         data[('somatic_mutation', 'w')] = somatic_mutations
-    
+
     return data
 
 def parseWESDataset(projectId, configuration, dataDir):

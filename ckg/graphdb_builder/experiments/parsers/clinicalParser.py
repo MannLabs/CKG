@@ -2,7 +2,7 @@ import os
 import re
 import pandas as pd
 import numpy as np
-from graphdb_builder import builder_utils
+from ckg.graphdb_builder import builder_utils
 
 
 def parser(projectId, type='clinical'):
@@ -304,7 +304,7 @@ def extract_biosample_analytical_sample_relationship_attributes(clinical_data):
                 edge_cols.append('quantity_units')
             df = clinical_data[cols].drop_duplicates(keep='first').reset_index(drop=True)
             df.columns = edge_cols
-            
+
     return df
 
 

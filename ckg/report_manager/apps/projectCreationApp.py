@@ -1,7 +1,7 @@
-from apps import basicApp
+from ckg.report_manager.apps import basicApp
 import dash_core_components as dcc
 import dash_html_components as html
-from graphdb_connector import connector
+from ckg.graphdb_connector import connector
 
 
 driver = connector.getGraphDatabaseConnectionConfiguration()
@@ -38,7 +38,7 @@ class ProjectCreationApp(basicApp.BasicApp):
                 tissues.append((tissue['n']['name']))
             for disease in disease_nodes:
                 diseases.append((disease['n']['name']))
-            
+
             layout = [html.Div([
                     html.Div([html.H4('Project information', style={'width': '15.5%', 'verticalAlign': 'top', 'display': 'inline-block'}),
                               html.H4('', id='update_project_id', style={'width': '15%', 'verticalAlign': 'top', 'display': 'none'}),

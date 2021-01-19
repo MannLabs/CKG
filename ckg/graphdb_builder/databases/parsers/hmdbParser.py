@@ -2,7 +2,7 @@ import os.path
 from collections import defaultdict
 from lxml import etree
 import zipfile
-from graphdb_builder import mapping as mp, builder_utils
+from ckg.graphdb_builder import mapping as mp, builder_utils
 
 #################################
 #   Human Metabolome Database   #

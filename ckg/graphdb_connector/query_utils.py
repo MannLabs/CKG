@@ -1,7 +1,7 @@
 import os
 import pandas as pd
-import ckg_utils
-from graphdb_connector import connector
+import ckg.ckg_utils
+from ckg.graphdb_connector import connector
 
 
 def read_knowledge_queries(dataset_type='proteomics'):

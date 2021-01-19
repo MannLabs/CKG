@@ -20,7 +20,7 @@ import obonet
 import datetime
 import logging
 import logging.config
-from config import ckg_config
+from ckg.config import ckg_config
 import ckg_utils
 import rarfile
 
@@ -133,7 +133,7 @@ def write_relationships(relationships, header, outputfile):
     try:
         df = pd.DataFrame(list(relationships), columns=header)
         df.to_csv(path_or_buf=outputfile, sep='\t',
-                header=True, index=False, quotechar='"', 
+                header=True, index=False, quotechar='"',
                 line_terminator='\n', escapechar='\\')
     except Exception as err:
         raise csv.Error("Error writing relationships to file: {}.\n {}".format(outputfile, err))
@@ -151,7 +151,7 @@ def write_entities(entities, header, outputfile):
     try:
         df = pd.DataFrame(list(entities), columns=header)
         df.to_csv(path_or_buf=outputfile, sep='\t',
-                header=True, index=False, quotechar='"', 
+                header=True, index=False, quotechar='"',
                 line_terminator='\n', escapechar='\\')
     except csv.Error as err:
         raise csv.Error("Error writing etities to file: {}.\n {}".format(outputfile, err))
@@ -231,7 +231,7 @@ def get_full_path_directories():
         if 'directories' in config:
             for directory in config['directories']:
                 directories[directory] = os.path.join(dirname, config['directories'][directory])
-        
+
     except Exception as err:
         raise Exception("Error {}: builder_utils - Reading directories from configuration > {}.".format(err, ckg_config.builder_config_file))
 
@@ -277,7 +277,7 @@ def setup_logging(path='log.config', key=None):
         try:
             logging.config.dictConfig(config)
         except Exception:
-            logging.basicConfig(level=logging.DEBUG)        
+            logging.basicConfig(level=logging.DEBUG)
     else:
         logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger(key)
@@ -312,7 +312,7 @@ def download_PRIDE_data(pxd_id, file_name, to='.', user='', password='', date_fi
     :param str to: local directory where the file should be downloaded
     :param str user: username to access biomedical database server if required.
     :param str password: password to access biomedical database server if required.
-    :param str date_field: projects deposited in PRIDE are search based on date, either 
+    :param str date_field: projects deposited in PRIDE are search based on date, either
         submissionData or publicationDate (default)
     """
     ftp_PRIDE = 'ftp://ftp.pride.ebi.ac.uk/pride/data/archive/YEAR/MONTH/PXDID/FILE_NAME'
@@ -463,7 +463,7 @@ def getMedlineAbstracts(idList):
             aux["url"] = pubmedUrl + aux["PMID"]
         else:
             aux["url"] = ""
-        
+
         results.append(aux)
 
     abstracts = pd.DataFrame.from_dict(results)
@@ -526,7 +526,7 @@ def listDirectoryFoldersNotEmpty(directory):
     dircontent = []
     if isdir(directory):
         dircontent = [f for f in listdir(directory) if not f.startswith('.') and isdir(join(directory, f)) and listdir(join(directory, f))]
-    
+
     return dircontent
 
 
@@ -545,7 +545,7 @@ def flatten(t):
     Code from: https://gist.github.com/shaxbee/0ada767debf9eefbdb6e
     Acknowledgements: Zbigniew Mandziejewicz (shaxbee)
     Generator flattening the structure
-    
+
     >>> list(flatten([2, [2, (4, 5, [7], [2, [6, 2, 6, [6], 4]], 6)]]))
     [2, 2, 4, 5, 7, 2, 6, 2, 6, 6, 4, 6]
     """
@@ -576,7 +576,7 @@ def convertOBOtoNet(ontologyFile):
     :return: NetworkX graph.
     """
     graph = obonet.read_obo(ontologyFile)
-    
+
     return graph
 
 
@@ -587,7 +587,7 @@ def getCurrentTime():
     :return: Two strings: date and time.
     """
     now = datetime.datetime.now()
-    return '{}-{}-{}'.format(now.year, now.month, now.day), '{}:{}:{}'.format(now.hour, now.minute, now.second) 
+    return '{}-{}-{}'.format(now.year, now.month, now.day), '{}:{}:{}'.format(now.hour, now.minute, now.second)
 
 
 def convert_bytes(num):
@@ -607,7 +607,7 @@ def copytree(src, dst, symlinks=False, ignore=None):
         s = os.path.join(src, item)
         checkDirectory(dst)
         d = os.path.join(dst, item)
-        if os.path.isdir(s):    
+        if os.path.isdir(s):
             copytree(s, d, symlinks, ignore)
         else:
             shutil.copy2(s, d)
@@ -641,7 +641,7 @@ def buildStats(count, otype, name, dataset, filename, updated_on=None):
     y,t = getCurrentTime()
     size = file_size(filename)
     filename = filename.split('/')[-1]
-    
+
     return(str(y), str(t), dataset, filename, size, count, otype, name, updated_on)
 
 def unrar(filepath, to):
@@ -649,7 +649,7 @@ def unrar(filepath, to):
     Decompress RAR file
     :param str filepath: path to rar file
     :param str to: where to extract all files
-    
+
     """
     try:
         with rarfile.RarFile(filepath) as opened_rar:
@@ -681,21 +681,21 @@ def read_gzipped_file(filepath):
     :return: A bytes sequence that specifies the standard output.
     """
     handle = gzip.open(filepath, "rt")
-    
+
     return handle
 
 
 def parse_fasta(file_handler):
     """
     Using BioPython to read fasta file as SeqIO objects
-    
+
     :param file_handler file_handler: opened fasta file
     :return iterator records: iterator of sequence objects
     """
     records = SeqIO.parse(file_handler,format="fasta")
-    
+
     return records
-    
+
 
 def batch_iterator(iterator, batch_size):
     """Returns lists of length batch_size.
@@ -708,11 +708,11 @@ def batch_iterator(iterator, batch_size):
     This is a generator function, and it returns lists of the
     entries from the supplied iterator.  Each list will have
     batch_size entries, although the final list may be shorter.
-    
+
     :param iterator iterator: batch to be extracted
     :param integer batch_size: size of the batch
     :return list batch: list with the batch elements of size batch_size
-        
+
     source: https://biopython.org/wiki/Split_large_file
     """
     entry = True

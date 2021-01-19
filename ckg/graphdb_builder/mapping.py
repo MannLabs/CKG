@@ -1,5 +1,5 @@
-from graphdb_connector import connector
-from graphdb_builder import builder_utils
+from ckg.graphdb_connector import connector
+from ckg.graphdb_builder import builder_utils
 import os.path
 import time
 from collections import defaultdict
@@ -23,7 +23,7 @@ def reset_mapping(entity):
         directory = os.path.join(dbconfig["databasesDir"], dbconfig["sources"][entity])
         mapping_file = os.path.join(directory, "complete_mapping.tsv")
         if os.path.exists(mapping_file):
-            os.remove(mapping_file) 
+            os.remove(mapping_file)
 
 
 def mark_complete_mapping(entity):

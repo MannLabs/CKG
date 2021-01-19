@@ -1,8 +1,8 @@
 import sys
 import os.path
-from graphdb_builder import builder_utils
-from graphdb_builder.experiments.parsers import clinicalParser, proteomicsParser, wesParser
-import config.ckg_config as ckg_config
+from ckg.graphdb_builder import builder_utils
+from ckg.graphdb_builder.experiments.parsers import clinicalParser, proteomicsParser, wesParser
+import ckg.config.ckg_config as ckg_config
 
 log_config = ckg_config.graphdb_builder_log
 logger = builder_utils.setup_logging(log_config, key="experiments_controller")

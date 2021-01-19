@@ -1,4 +1,4 @@
-from apps import basicApp
+from ckg.report_manager.apps import basicApp
 import dash_core_components as dcc
 import dash_html_components as html
 
@@ -22,7 +22,7 @@ class AdminApp(basicApp.BasicApp):
                         html.Div(children=[html.Label('Name'),
                                            dcc.Input(placeholder='name', name='name', type='text', required=True),
                                            html.Label('Surname'),
-                                           dcc.Input(placeholder='surname', name='surname', type='text', required=True), 
+                                           dcc.Input(placeholder='surname', name='surname', type='text', required=True),
                                            html.Label('Acronym'),
                                            dcc.Input(placeholder='acronym', name='acronym', type='text'),
                                            html.Label('Affiliation'),

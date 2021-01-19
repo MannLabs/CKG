@@ -1,8 +1,8 @@
 import os.path
 from collections import defaultdict
 import pandas as pd
-from graphdb_builder import builder_utils
-from graphdb_builder import mapping as mp
+from ckg.graphdb_builder import builder_utils
+from ckg.graphdb_builder import mapping as mp
 
 
 #########################

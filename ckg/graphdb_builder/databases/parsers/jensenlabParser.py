@@ -1,8 +1,8 @@
 import os.path
-from graphdb_builder import mapping as mp, builder_utils
+from ckg.graphdb_builder import mapping as mp, builder_utils
 
 ######################################
-#   Databases at jensenLab.org)      # 
+#   Databases at jensenLab.org)      #
 ######################################
 
 

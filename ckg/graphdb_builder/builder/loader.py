@@ -19,10 +19,10 @@ import os
 import sys
 import re
 from datetime import datetime
-import config.ckg_config as ckg_config
-import ckg_utils
-from graphdb_connector import connector
-from graphdb_builder import builder_utils
+import ckg.config.ckg_config as ckg_config
+import ckg.ckg_utils
+from ckg.graphdb_connector import connector
+from ckg.graphdb_builder import builder_utils
 
 
 cwd = os.path.abspath(os.path.dirname(__file__))

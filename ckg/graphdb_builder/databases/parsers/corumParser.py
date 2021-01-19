@@ -1,10 +1,10 @@
 import os.path
 import zipfile
-from graphdb_builder import builder_utils
+from ckg.graphdb_builder import builder_utils
 from collections import defaultdict
 
 ###################
-#       CORUM     # 
+#       CORUM     #
 ###################
 def parser(databases_directory, download=True):
     entities = set()
@@ -42,7 +42,7 @@ def parser(databases_directory, download=True):
                 evidences = data[7].split(';')
                 processes = data[8].split(';')
                 pubmedid = data[14]
-                
+
                 if organism == "Human":
                     #ID name organism synonyms source
                     if name not in names:

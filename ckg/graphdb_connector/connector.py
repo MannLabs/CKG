@@ -4,8 +4,8 @@ import json
 import neo4j
 import pandas as pd
 import ckg_utils
-from config import ckg_config
-from graphdb_builder import builder_utils
+from ckg.config import ckg_config
+from ckg.graphdb_builder import builder_utils
 
 log_config = ckg_config.graphdb_connector_log
 logger = builder_utils.setup_logging(log_config, key="connector")

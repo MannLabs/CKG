@@ -2,13 +2,13 @@ import os
 import sys
 import pandas as pd
 import h5py as h5
-import ckg_utils
-import config.ckg_config as ckg_config
-from report_manager import report as rp, knowledge
-from analytics_core import analytics_factory
-from analytics_core.analytics import analytics
-from analytics_core.viz import viz
-from graphdb_connector import connector
+import ckg.ckg_utils
+import ckg.config.ckg_config as ckg_config
+from ckg.report_manager import report as rp, knowledge
+from ckg.analytics_core import analytics_factory
+from ckg.analytics_core.analytics import analytics
+from ckg.analytics_core.viz import viz
+from ckg.graphdb_connector import connector
 
 
 log_config = ckg_config.report_manager_log
@@ -155,7 +155,7 @@ class Dataset:
     def send_query(self, query):
         driver = connector.getGraphDatabaseConnectionConfiguration()
         data = connector.getCursorData(driver, query)
-        
+
         return data
 
     def extract_configuration(self, configuration):
@@ -348,7 +348,7 @@ class MultiOmicsDataset(Dataset):
     def __init__(self, identifier, data, configuration=None, analysis_queries={}, report=None):
         Dataset.__init__(self, identifier, "multiomics", data=data, configuration=configuration, analysis_queries=analysis_queries, report=report)
         if configuration is None:
-            self._config_file = "multiomics.yml" 
+            self._config_file = "multiomics.yml"
             self.set_configuration_from_file(self._config_file)
 
     def get_dataframes(self, datasets):
@@ -366,7 +366,7 @@ class MultiOmicsDataset(Dataset):
 
     def generate_knowledge(self, nodes):
         kn = knowledge.MultiOmicsKnowledge(self.identifier, self.data, nodes=nodes, relationships={}, colors={}, graph=None, report={})
-        kn.generate_knowledge()        
+        kn.generate_knowledge()
 
         return kn
 
@@ -456,7 +456,7 @@ class ProteomicsDataset(Dataset):
 
                 processed_data = analytics.get_proteomics_measurements_ready(data, index_cols=index, imputation=imputation,
                                                                              method=method, missing_method=missing_method, extra_identifier=extra_identifier,
-                                                                             filter_samples=filter_samples, filter_samples_percent=filter_samples_percent, 
+                                                                             filter_samples=filter_samples, filter_samples_percent=filter_samples_percent,
                                                                              missing_per_group=missing_per_group, missing_max=missing_max,
                                                                              min_valid=min_valid, shift=shift, nstd=nstd, value_col=value_col, knn_cutoff=knn_cutoff,
                                                                              normalize=normalize, normalization_method=normalization_method, normalize_group=normalize_group, normalize_by=normalize_by)
@@ -560,8 +560,8 @@ class ClinicalDataset(Dataset):
                     if 'group_id' in args:
                         group_id = args['group_id']
 
-                processed_data = analytics.get_clinical_measurements_ready(data, subject_id=subject_id, sample_id=sample_id, 
-                                                                           group_id=group_id, columns=columns, values=values, 
+                processed_data = analytics.get_clinical_measurements_ready(data, subject_id=subject_id, sample_id=sample_id,
+                                                                           group_id=group_id, columns=columns, values=values,
                                                                            extra=extra, imputation=imputation, imputation_method=imputation_method,
                                                                            missing_method=missing_method, missing_max=missing_max, min_valid=min_valid)
 

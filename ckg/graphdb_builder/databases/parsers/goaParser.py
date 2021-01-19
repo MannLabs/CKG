@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 from collections import defaultdict
-from graphdb_builder import mapping as mp, builder_utils
+from ckg.graphdb_builder import mapping as mp, builder_utils
 
 
 def parser(databases_dir, download=True):
@@ -9,7 +9,7 @@ def parser(databases_dir, download=True):
     url = config['url']
     rel_header = config['header']
 
-    protein_mapping = mp.getMappingForEntity(entity="Protein")    
+    protein_mapping = mp.getMappingForEntity(entity="Protein")
     valid_proteins = list(set(protein_mapping.values))
 
     directory = os.path.join(databases_dir, "GOA")

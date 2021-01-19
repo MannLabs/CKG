@@ -1,7 +1,7 @@
 import os.path
 import re
 from collections import defaultdict
-from graphdb_builder import mapping as mp, builder_utils
+from ckg.graphdb_builder import mapping as mp, builder_utils
 
 #########################
 #   Reactome database   #
@@ -79,7 +79,7 @@ def parsePathwayHierarchy(fhandler):
 
 def parsePathwayRelationships(config, fhandler, mapping=None):
     relationships = set()
-    regex = r"(.+)\s\[(.+)\]" 
+    regex = r"(.+)\s\[(.+)\]"
     organisms = config['organisms']
     for line in fhandler:
         data = line.rstrip("\r\n").split("\t")

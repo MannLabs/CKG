@@ -1,4 +1,4 @@
-from graphdb_builder import builder_utils
+from ckg.graphdb_builder import builder_utils
 from collections import defaultdict
 import re
 

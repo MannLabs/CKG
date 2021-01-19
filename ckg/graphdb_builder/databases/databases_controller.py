@@ -1,8 +1,8 @@
 import os.path
 import sys
-import config.ckg_config as ckg_config
-from graphdb_builder import builder_utils
-from graphdb_builder.databases.parsers import *
+import ckg.config.ckg_config as ckg_config
+from ckg.graphdb_builder import builder_utils
+from ckg.graphdb_builder.databases.parsers import *
 from joblib import Parallel, delayed
 from datetime import date
 

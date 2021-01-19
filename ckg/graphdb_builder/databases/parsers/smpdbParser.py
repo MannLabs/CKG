@@ -2,7 +2,7 @@ import os.path
 import zipfile
 import pandas as pd
 from collections import defaultdict
-from graphdb_builder import builder_utils
+from ckg.graphdb_builder import builder_utils
 
 #########################
 #     SMPDB database    #
@@ -65,7 +65,7 @@ def parsePathwayProteinRelationships(fhandler):
                 df = pd.read_csv(f, sep=',', error_bad_lines=False, low_memory=False)
                 for index, row in df.iterrows():
                     identifier = row[0]
-                    protein = row[3] 
+                    protein = row[3]
                     if protein != '':
                         relationships[("protein", "annotated_to_pathway")].add((protein, identifier, "ANNOTATED_TO_PATHWAY", evidence, organism, loc, "SMPDB"))
 
@@ -83,7 +83,7 @@ def parsePathwayMetaboliteDrugRelationships(fhandler):
                 df = pd.read_csv(f, sep=',', error_bad_lines=False, low_memory=False)
                 for index, row in df.iterrows():
                     identifier = row[0]
-                    metabolite = row[5] 
+                    metabolite = row[5]
                     drug = row[8]
                     if metabolite != '':
                         relationships[("metabolite", "annotated_to_pathway")].add((metabolite, identifier, "ANNOTATED_TO_PATHWAY", evidence, organism, loc, "SMPDB"))

@@ -1,11 +1,11 @@
 import os.path
 import zipfile
-from graphdb_builder import mapping as mp, builder_utils
+from ckg.graphdb_builder import mapping as mp, builder_utils
 from collections import defaultdict
 import pandas as pd
 
 ###############################
-#       Exposome Explorer     # 
+#       Exposome Explorer     #
 ###############################
 def parser(databases_directory, download=True):
     directory = os.path.join(databases_directory, "ExposomeExplorer")

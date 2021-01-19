@@ -1,10 +1,10 @@
 import os.path
 import gzip
 from collections import defaultdict
-from graphdb_builder import builder_utils
+from ckg.graphdb_builder import builder_utils
 
 #########################
-#       DisGeNet        # 
+#       DisGeNet        #
 #########################
 def parser(databases_directory, download=True):
     relationships = defaultdict(set)
@@ -23,7 +23,7 @@ def parser(databases_directory, download=True):
             builder_utils.downloadDB(url+files[f], directory)
         for f in mapping_files:
             builder_utils.downloadDB(url+mapping_files[f], directory)
-    
+
     proteinMapping = readDisGeNetProteinMapping(config, directory)
     diseaseMapping = readDisGeNetDiseaseMapping(config, directory)
     for f in files:

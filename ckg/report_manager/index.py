@@ -13,15 +13,15 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-from app import app, server as application
-from apps import initialApp, adminApp, projectCreationApp, dataUploadApp, dataUpload, projectApp, importsApp, homepageApp, loginApp, projectCreation
-from graphdb_builder import builder_utils
-from graphdb_builder.builder import loader, builder
-from graphdb_builder.experiments import experiments_controller as eh
-from report_manager import utils
-import config.ckg_config as ckg_config
-from worker import create_new_project, create_new_identifiers, run_minimal_update_task
-from graphdb_connector import connector
+from ckg.report_manager.app import app, server as application
+from ckg.report_manager.apps import initialApp, adminApp, projectCreationApp, dataUploadApp, dataUpload, projectApp, importsApp, homepageApp, loginApp, projectCreation
+from ckg.graphdb_builder import builder_utils
+from ckg.graphdb_builder.builder import loader, builder
+from ckg.graphdb_builder.experiments import experiments_controller as eh
+from ckg.report_manager import utils
+import ckg.config.ckg_config as ckg_config
+from ckg.report_manager.worker import create_new_project, create_new_identifiers, run_minimal_update_task
+from ckg.graphdb_connector import connector
 
 log_config = ckg_config.report_manager_log
 logger = builder_utils.setup_logging(log_config, key="index page")

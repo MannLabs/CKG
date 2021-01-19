@@ -1,7 +1,7 @@
 import dash_core_components as dcc
 import dash_html_components as html
-from apps import basicApp
-from graphdb_connector import connector
+from ckg.report_manager.apps import basicApp
+from ckg.graphdb_connector import connector
 
 driver = connector.getGraphDatabaseConnectionConfiguration()
 DataTypes = ['experimental_design', 'clinical', 'proteomics', 'interactomics', 'phosphoproteomics']
@@ -27,7 +27,7 @@ class DataUploadApp(basicApp.BasicApp):
         layout = [html.Div([
                             html.Div([html.H4('Project identifier:', style={'marginTop': 30, 'marginBottom': 20}),
                                       dcc.Input(id='project_id', placeholder='e.g. P0000001', type='text', value='', debounce=True, maxLength=8, minLength=8, style={'width':'100%', 'height':'55px'}),
-                                      dcc.Markdown(id='existing-project')], 
+                                      dcc.Markdown(id='existing-project')],
                                      style={'width': '20%'}),
                             html.Br(),
                             html.Div(id='upload-form', children=[
@@ -60,7 +60,7 @@ class DataUploadApp(basicApp.BasicApp):
                                 html.Div(children=html.A('Download Files(.zip)',
                                             id='data_download_link',
                                             href='',
-                                            n_clicks=0, 
+                                            n_clicks=0,
                                             style={'display': 'none'},
                                             className="button_link"),
                                          style={'width': '100%', 'padding-left': '87%', 'padding-right': '0%'}),

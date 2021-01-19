@@ -1,11 +1,11 @@
 import os
 import sys
-import config.ckg_config as ckg_config
-import ckg_utils
-from graphdb_connector import connector
-from graphdb_builder import builder_utils
-from graphdb_builder.builder import loader
-from graphdb_builder.experiments import experiments_controller as eh
+import ckg.config.ckg_config as ckg_config
+import ckg.ckg_utils
+from ckg.graphdb_connector import connector
+from ckg.graphdb_builder import builder_utils
+from ckg.graphdb_builder.builder import loader
+from ckg.graphdb_builder.experiments import experiments_controller as eh
 
 log_config = ckg_config.report_manager_log
 logger = builder_utils.setup_logging(log_config, key="project_creation")
@@ -63,7 +63,7 @@ def check_if_node_exists(driver, node, node_property, value):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         logger.error("Reading query {}: {}, file: {},line: {}, error: {}".format(query_name, sys.exc_info(), fname, exc_tb.tb_lineno, err))
-    
+
     return result
 
 

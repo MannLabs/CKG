@@ -5,9 +5,9 @@ import pandas as pd
 from datetime import datetime, timedelta
 from passlib.hash import bcrypt
 import config.ckg_config as ckg_config
-from graphdb_connector import connector
-from graphdb_builder import builder_utils
-from graphdb_builder.users import users_controller as uh
+from ckg.graphdb_connector import connector
+from ckg.graphdb_builder import builder_utils
+from ckg.graphdb_builder.users import users_controller as uh
 
 log_config = ckg_config.graphdb_builder_log
 logger = builder_utils.setup_logging(log_config, key='user_creation')
@@ -60,7 +60,7 @@ def create_user_node(driver, data):
     :param Series data: pandas Series with new user identifier and required user information (see set_arguments()).
     """
     result = create_user_from_dict(driver, data.to_dict())
-    
+
     return result
 
 

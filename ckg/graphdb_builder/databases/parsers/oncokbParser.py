@@ -1,7 +1,7 @@
 import os.path
 import re
 from collections import defaultdict
-from graphdb_builder import mapping as mp, builder_utils
+from ckg.graphdb_builder import mapping as mp, builder_utils
 
 #########################
 #   OncoKB database     #
@@ -40,7 +40,7 @@ def parser(databases_directory, download=True):
             gene = data[3]
             variant = data[4]
             oncogenicity = data[5]
-            effect = data[6]         
+            effect = data[6]
             if gene in protein_mapping:
                 for protein in protein_mapping[gene]:
                     match = re.search(variant_regex, variant)
@@ -65,7 +65,7 @@ def parser(databases_directory, download=True):
             pubmed_ids = data[9].split(',')
             if level in levels:
                 level = levels[level]
-            
+
             valid_variants = []
             if gene in protein_mapping:
                 for protein in protein_mapping[gene]:
@@ -83,11 +83,11 @@ def parser(databases_directory, download=True):
             for valid_variant in valid_variants:
                 if disease.lower() in mapping:
                     disease = mapping[disease.lower()]
-                    relationships["associated_with"].add((valid_variant, disease, "ASSOCIATED_WITH", "curated", "curated", "OncoKB", len(pubmed_ids)))   
+                    relationships["associated_with"].add((valid_variant, disease, "ASSOCIATED_WITH", "curated", "curated", "OncoKB", len(pubmed_ids)))
                 else:
                     pass
                 relationships["known_variant_is_clinically_relevant"].add((valid_variant, valid_variant, "KNOWN_VARIANT_IS_CLINICALLY_RELEVANT", "OncoKB"))
 
     builder_utils.remove_directory(directory)
-    
+
     return (entities, relationships, entities_header, relationships_headers)

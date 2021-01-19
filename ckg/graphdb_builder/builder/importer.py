@@ -14,11 +14,11 @@ import pandas as pd
 from joblib import Parallel, delayed
 from uuid import uuid4
 import config.ckg_config as ckg_config
-from graphdb_builder.ontologies import ontologies_controller as oh
-from graphdb_builder.databases import databases_controller as dh
-from graphdb_builder.experiments import experiments_controller as eh
-from graphdb_builder.users import users_controller as uh
-from graphdb_builder import builder_utils
+from ckg.graphdb_builder.ontologies import ontologies_controller as oh
+from ckg.graphdb_builder.databases import databases_controller as dh
+from ckg.graphdb_builder.experiments import experiments_controller as eh
+from ckg.graphdb_builder.users import users_controller as uh
+from ckg.graphdb_builder import builder_utils
 
 log_config = ckg_config.graphdb_builder_log
 logger = builder_utils.setup_logging(log_config, key="importer")
@@ -230,7 +230,7 @@ def createEmptyStats(statsCols, statsFile, statsName):
 # def loadStats(statsFile):
 #     """
 #     Loads the statistics object.
-    
+
 #     :param str statsFile: file path where the stats object is stored.
 #     :returns: HDFStore object with the collected statistics. \
 #                 stats can be accessed using a key (i.e stats_ version).

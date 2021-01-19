@@ -1,9 +1,9 @@
 """
     Builds the database in two main steps:
-    
+
     1) Imports all the data from ontologies, databases and experiments
     2) Loads these data into the database
-    
+
     The module can perform full updates, executing both steps for all the ontologies,
     databases and experiments or a partial update. Partial updates can execute step 1 or
     step 2 for specific data.
@@ -11,9 +11,9 @@
 """
 
 import argparse
-from graphdb_builder.builder import importer, loader
-import config.ckg_config as ckg_config
-from graphdb_builder import builder_utils
+from ckg.graphdb_builder.builder import importer, loader
+import ckg.config.ckg_config as ckg_config
+from ckg.graphdb_builder import builder_utils
 
 log_config = ckg_config.graphdb_builder_log
 logger = builder_utils.setup_logging(log_config, key="builder")

@@ -1,8 +1,8 @@
 import os.path
-from graphdb_builder import builder_utils
+from ckg.graphdb_builder import builder_utils
 
 #########################################
-#          HUGO Gene Nomenclature       # 
+#          HUGO Gene Nomenclature       #
 #########################################
 def parser(databases_directory, download=True):
     config = builder_utils.get_config(config_name="hgncConfig.yml", data_type='databases')

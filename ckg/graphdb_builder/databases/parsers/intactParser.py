@@ -1,10 +1,10 @@
 import os.path
 import re
 from collections import defaultdict
-from graphdb_builder import builder_utils
+from ckg.graphdb_builder import builder_utils
 
 #########################
-#          IntAct       # 
+#          IntAct       #
 #########################
 def parser(databases_directory, download=True):
     intact_dictionary = defaultdict()
@@ -66,7 +66,7 @@ def parser(databases_directory, download=True):
         if (intA, intB, intact_dictionary[(intA, intB)]["score"]) not in stored:
             relationships.add((intA, intB, "CURATED_INTERACTS_WITH", intact_dictionary[(intA, intB)]['score'], ",".join(intact_dictionary[(intA, intB)]['itype']), ",".join(intact_dictionary[(intA, intB)]['methods']), ",".join(intact_dictionary[(intA, intB)]['sources']), ",".join(intact_dictionary[(intA, intB)]['publications'])))
             stored.add((intA, intB, intact_dictionary[(intA, intB)]["score"]))
-    
+
     builder_utils.remove_directory(directory)
-    
+
     return (relationships, header, outputfileName)

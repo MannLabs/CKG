@@ -7,10 +7,10 @@ import dash_html_components as html
 from plotly.offline import iplot
 from collections import defaultdict
 from cyjupyter import Cytoscape
-from report_manager import utils
-import ckg_utils
-from analytics_core.viz import viz
-from analytics_core import utils as acore_utils
+from ckg.report_manager import utils
+import ckg.ckg_utils
+from ckg.analytics_core.viz import viz
+from ckg.analytics_core import utils as acore_utils
 
 
 class Report:
@@ -72,7 +72,7 @@ class Report:
                 name = "~".join(plot_id)
                 grp = f.create_group(name)
                 i = 0
-                for plot in self._plots[plot_id]:       
+                for plot in self._plots[plot_id]:
                     figure_id = None
                     if isinstance(plot, dict):
                         figure_json = {}
@@ -92,7 +92,7 @@ class Report:
                     else:
                         json_str = ckg_utils.convert_dash_to_json(plot)
                         figure_json = json.dumps(json_str, cls=ckg_utils.NumpyEncoder)
-                        figure_id = str(i) + '_figure' 
+                        figure_id = str(i) + '_figure'
                     i += 1
                     fig_set = grp.create_dataset(figure_id, (1,), dtype=dt, compression="gzip")
                     try:

@@ -1,7 +1,7 @@
 import os.path
 import gzip
 import csv
-from graphdb_builder import mapping as mp, builder_utils
+from ckg.graphdb_builder import mapping as mp, builder_utils
 
 
 def parser(databases_directory, importDirectory, drug_source=None, download=True, db="STRING"):

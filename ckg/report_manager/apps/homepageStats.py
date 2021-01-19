@@ -5,11 +5,11 @@ import numpy as np
 import plotly.graph_objs as go
 import dash_core_components as dcc
 import dash_html_components as html
-import ckg_utils
-from graphdb_connector import connector
-from graphdb_builder import builder_utils
-from analytics_core.viz import viz
-from analytics_core import utils
+import ckg.ckg_utils
+from ckg.graphdb_connector import connector
+from ckg.graphdb_builder import builder_utils
+from ckg.analytics_core.viz import viz
+from ckg.analytics_core import utils
 
 try:
     cwd = os.path.abspath(os.path.dirname(__file__))
@@ -61,8 +61,8 @@ def get_db_schema():
 
     :return: network with all the database nodes and how they are related
     """
-    style = [{'selector': 'node', 
-            'style': {'label': 'data(name)', 
+    style = [{'selector': 'node',
+            'style': {'label': 'data(name)',
                       'background-color': 'data(color)',
                       'text-valign': 'center',
                       'text-halign': 'center',
@@ -73,8 +73,8 @@ def get_db_schema():
                       'opacity': 0.8,
                       'font-size': '14'}},
            {'selector': 'edge',
-            'style': {'label': 'data(label)', 
-                     'curve-style': 'bezier', 
+            'style': {'label': 'data(label)',
+                     'curve-style': 'bezier',
                      'opacity': 0.7,
                      'width': 0.4,
                      'font-size': '5'}}]
@@ -135,7 +135,7 @@ def get_db_stats_data():
                 data['size'] = [size_converter(i) for i in data[0]]
             dfs[i] = data.to_json(orient='records')
         except Exception:
-            pass            
+            pass
     return dfs
 
 
@@ -246,7 +246,7 @@ def quick_numbers_panel():
         project_links.append(html.A(project_name.title(),
                                     id='link-internal',
                                     href='/apps/project?project_id={}&force=0'.format(project_id),
-                                    target='', 
+                                    target='',
                                     n_clicks=0,
                                     className="button_link"))
 

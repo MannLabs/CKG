@@ -1,9 +1,9 @@
 import pandas as pd
 from celery import Celery
-from report_manager.apps import projectCreation, dataUpload
-from graphdb_builder.builder import builder
-from graphdb_connector import connector
-from report_manager import project
+from ckg.report_manager.apps import projectCreation, dataUpload
+from ckg.graphdb_builder.builder import builder
+from ckg.graphdb_connector import connector
+from ckg.report_manager import project
 
 
 celery_app = Celery('create_new_project')
@@ -44,7 +44,5 @@ def generate_project_report(project_id, config_files, force):
 @celery_app.task
 def run_minimal_update_task(username):
     response = builder.run_minimal_update(user=username)
-    
+
     return {'response': str(response)}
-    
-    

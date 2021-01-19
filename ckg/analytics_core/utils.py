@@ -9,7 +9,7 @@ import networkx as nx
 from networkx.readwrite import json_graph
 from urllib import error
 
-Entrez.email = 'alberto.santos@cpr.ku.dk'
+Entrez.email = 'alberto.santos@cpr.ku.dk' # TODO: This should probably be changed to the email of the person installing ckg?
 
 
 def check_columns(df, cols):
@@ -42,7 +42,7 @@ def generate_html(network):
     template = network.template
 
     nodes, edges, height, width, options = network.get_network_data()
-    network.html = template.render(height=height, width=width, nodes=nodes, edges=edges, options=options, use_DOT=network.use_DOT, dot_lang=network.dot_lang, 
+    network.html = template.render(height=height, width=width, nodes=nodes, edges=edges, options=options, use_DOT=network.use_DOT, dot_lang=network.dot_lang,
                                    widget=network.widget, bgcolor=network.bgcolor, conf=network.conf, tooltip_link=use_link_template)
 
 
@@ -237,7 +237,7 @@ def get_rgb_colors(n):
         r = int(r) % 256
         g = int(g) % 256
         b = int(b) % 256
-        colors.append((r, g, b)) 
+        colors.append((r, g, b))
     return colors
 
 

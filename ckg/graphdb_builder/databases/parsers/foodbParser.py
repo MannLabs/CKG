@@ -1,11 +1,11 @@
 import os.path
 import tarfile
 from collections import defaultdict
-from graphdb_builder import mapping as mp, builder_utils
+from ckg.graphdb_builder import mapping as mp, builder_utils
 import pandas as pd
 
 ###################
-#       FooDB     # 
+#       FooDB     #
 ###################
 
 
@@ -70,7 +70,7 @@ def parseContents(fhandler):
         if len(data) == 24:
             compound_id = data[0]
             food_id = int(data[3])
-            min_cont = float(data[11]) if data[11] != 'NULL' else 0 
+            min_cont = float(data[11]) if data[11] != 'NULL' else 0
             max_cont = float(data[12]) if data[12] != 'NULL' else 0
             units = data[13].replace('"', '')
             average = float(data[23]) if data[23] != 'NULL' else 0

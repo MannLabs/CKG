@@ -1,11 +1,11 @@
 import os
 from datetime import datetime
 from uuid import uuid4
-from apps import basicApp
-from report_manager import project
+from ckg.report_manager.apps import basicApp
+from ckg.report_manager import project
 import dash_html_components as html
 import dash_core_components as dcc
-from worker import generate_project_report
+from ckg.report_manager.worker import generate_project_report
 
 
 class ProjectApp(basicApp.BasicApp):
@@ -103,7 +103,7 @@ class ProjectApp(basicApp.BasicApp):
         :param boolean force: force.
         """
         self._force = force
-        
+
     def build_header(self):
         buttons = html.Div([html.Div([html.A('Download Project Report',
                                 id='download-zip',
@@ -112,7 +112,7 @@ class ProjectApp(basicApp.BasicApp):
                                 n_clicks=0,
                                 className="button_link"
                                 )]),
-                            html.Div([html.A("Regenerate Project Report", 
+                            html.Div([html.A("Regenerate Project Report",
                                 id='regenerate',
                                 title=self.id,
                                 href='',

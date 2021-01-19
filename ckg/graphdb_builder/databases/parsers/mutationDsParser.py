@@ -1,6 +1,6 @@
 import os.path
 import re
-from graphdb_builder import builder_utils
+from ckg.graphdb_builder import builder_utils
 
 ############################
 #    IntAct - MutationDs   #

@@ -1,4 +1,4 @@
-from apps import basicApp
+from ckg.report_manager.apps import basicApp
 import dash_core_components as dcc
 import dash_html_components as html
 

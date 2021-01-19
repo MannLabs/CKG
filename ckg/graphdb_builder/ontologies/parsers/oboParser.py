@@ -1,5 +1,5 @@
 from collections import defaultdict
-from graphdb_builder import builder_utils
+from ckg.graphdb_builder import builder_utils
 import re
 
 
@@ -48,4 +48,3 @@ def parser(ontology, files):
                 for isa in attr["is_a"]:
                     relationships[namespace].add((term, isa, "HAS_PARENT"))
     return terms, relationships, definitions
-

@@ -23,15 +23,15 @@ from pyvis.network import Network as visnet
 from webweb import Web
 from networkx.readwrite import json_graph
 import json
-from analytics_core import utils
-from analytics_core.analytics import analytics
+from ckg.analytics_core import utils
+from ckg.analytics_core.analytics import analytics
 from wordcloud import WordCloud, STOPWORDS
 from nltk.corpus import stopwords
 import nltk
 
 
-from analytics_core.analytics import wgcnaAnalysis
-from analytics_core.viz import wgcnaFigures, Dendrogram
+from ckg.analytics_core.analytics import wgcnaAnalysis
+from ckg.analytics_core.viz import wgcnaFigures, Dendrogram
 import dash_cytoscape as cyto
 
 
@@ -176,7 +176,7 @@ def get_boxplot_grid(data, identifier, args):
             color_map = args['colors']
         else:
             color_map = {}
-    
+
         if args['axis'] == 'rows':
             fig = px.box(data, x=args["x"], y=args["y"], color=args['color'], color_discrete_map=color_map, points="all", facet_row=args["facet"], width=args['width'])
         else:
@@ -493,7 +493,7 @@ def get_scatterplot_matrix(data, identifier, args):
         range_y = None
         if pd.api.types.is_numeric_dtype(data['y']):
             range_y = [data['y'].min(), data['y'].max()+1]
-        
+
         for g in data[group].unique():
             gdata = data[data[group] == g].dropna()
             gfig = get_simple_scatterplot(gdata, identifier+'_'+str(g), args)
@@ -650,7 +650,7 @@ def get_scatterplot(data, identifier, args):
         figure = px.scatter(data, x=x, y=y, color=group, color_discrete_map=args['colors'], hover_data=annotation, size=size, symbol=symbol)
     else:
         figure = px.scatter(data, x=x, y=y, color=group, hover_data=annotation, size=size, symbol=symbol)
-    
+
     figure.update_traces(marker=dict(size=14,
                                      opacity=0.7,
                                      line=dict(width=0.5, color='DarkSlateGrey')),
@@ -669,7 +669,7 @@ def get_scatterplot(data, identifier, args):
                                 annotations = [dict(xref='paper', yref='paper', showarrow=False, text='')],
                                 template='plotly_white'
                                 )
-    
+
 
     return dcc.Graph(id= identifier, figure = figure)
 
@@ -775,7 +775,7 @@ def get_volcanoplot(results, args):
     return figures
 
 def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blues', 'showscale': False, 'marker_size':8, 'x_title':'log2FC', 'y_title':'-log10(pvalue)', 'num_annotations':10, 'annotate_list':[]}):
-    """ 
+    """
     This function parsers the regulation data from statistical tests and creates volcano plots for all distinct group comparisons. Significant hits with lowest adjusted p-values are highlighed.
 
     :param data: pandas dataframe with format: 'identifier', 'group1', 'group2', 'mean(group1', 'mean(group2)', 'log2FC', 'std_error', 'tail', 't-statistics', 'padj_THSD', \
@@ -823,9 +823,9 @@ def run_volcano(data, identifier, args={'alpha':0.05, 'fc':2, 'colorscale':'Blue
             signature = signature.sort_values(by="posthoc padj", ascending=True)
         elif "padj" in signature:
             signature = signature.sort_values(by="padj", ascending=True)
-        
+
         signature = signature.reindex(signature['log2FC'].abs().sort_values(ascending=False).index)
-        
+
         pvals = []
         for index, row in signature.iterrows():
             # Text
@@ -1746,7 +1746,7 @@ def get_violinplot(data, identifier, args):
     if 'drop_cols' in args:
         if len(list(set(args['drop_cols']).intersection(df.columns))) == len(args['drop_cols']):
             df = df.drop(args['drop_cols'], axis=1)
-    
+
     for c in df.columns.unique():
         if c != args['group']:
             figure = create_violinplot(df, x=args['group'], y=c, color=args['group'], color_map=color_map)
@@ -1772,7 +1772,7 @@ def create_violinplot(df, x, y, color, color_map={}):
     """
     traces = []
     violin = px.violin(df, x=x, y=y, color=color, color_discrete_map=color_map, box=True, points="all")
-    
+
     return violin
 
 
@@ -2356,7 +2356,7 @@ def get_polar_plot(df, identifier, args):
                     print("Type {} not available. Try with 'line' or 'bar' types.".format(ptype))
 
                 layout = figure.update_layout(width=width, height=height, polar = dict(radialaxis=dict(range=[min_value, max_value])))
-            
+
     return dcc.Graph(id=identifier, figure=figure)
 
 def get_enrichment_plots(enrichment_results, identifier, args):
@@ -2382,7 +2382,7 @@ def get_enrichment_plots(enrichment_results, identifier, args):
         height = args['height']
     if 'title' in args:
         title = args['title']
-    
+
     if not isinstance(enrichment_results, dict):
         aux = enrichment_results.copy()
         enrichment_results = {'regulated~non-regulated': aux}
@@ -2412,6 +2412,5 @@ def get_enrichment_plots(enrichment_results, identifier, args):
                                                 'hovering_cols':['foreground', 'foreground_pop', 'background', 'background_pop', 'pvalue', 'padj', 'identifiers'],
                                                 'size':'foreground'})
                 figures.append(fig)
-            
+
     return figures
-    

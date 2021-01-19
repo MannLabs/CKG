@@ -1,11 +1,11 @@
 import pandas as pd
 import numpy as np
 import scipy as scp
-from analytics_core.viz import color_list
+from ckg.analytics_core.viz import color_list
 import plotly.graph_objs as go
 import plotly.subplots as tools
-from analytics_core.viz import Dendrogram
-from analytics_core.analytics import wgcnaAnalysis
+from ckg.analytics_core.viz import Dendrogram
+from ckg.analytics_core.analytics import wgcnaAnalysis
 
 
 def get_module_color_annotation(map_list, col_annotation=False, row_annotation=False, bygene=False, module_colors=[], dendrogram=[]):
@@ -105,7 +105,7 @@ def get_heatmap(df, colorscale=None, color_missing=True):
         figure = {'layout': {'template': None}, 'data': []}
         figure['layout']['template'] = 'plotly_white'
         figure['data'].append(go.Heatmap(z=df.values.tolist(), y=list(df.index), x=list(df.columns),
-                                        colorscale=colors, showscale=True, 
+                                        colorscale=colors, showscale=True,
                                         colorbar=dict(x=1, y=0, xanchor='left', yanchor='bottom', len=0.35, thickness=15)))
         if color_missing:
             df_missing = wgcnaAnalysis.get_miss_values_df(df)

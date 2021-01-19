@@ -1,8 +1,8 @@
 import os.path
-from graphdb_builder import mapping as mp, builder_utils
+from ckg.graphdb_builder import mapping as mp, builder_utils
 
 ############################################
-#   The Drug Gene Interaction Database     # 
+#   The Drug Gene Interaction Database     #
 ############################################
 def parser(databases_directory, download=True):
     config = builder_utils.get_config(config_name="drugGeneInteractionDBConfig.yml", data_type='databases')
@@ -29,7 +29,7 @@ def parser(databases_directory, download=True):
             interactionType = data[4] if data[4] != '' else 'unknown'
             drug = data[8].lower()
             if drug == "":
-                drug = data[7] 
+                drug = data[7]
                 if drug == "" and data[6] != "":
                     drug = data[6]
                 else:
@@ -38,7 +38,7 @@ def parser(databases_directory, download=True):
                 if drug in drugmapping:
                     drug = drugmapping[drug]
                     relationships.add((drug, gene, "TARGETS", "NA", "NA", "NA", interactionType, "DGIdb: "+source))
-    
+
     builder_utils.remove_directory(directory)
-    
+
     return (relationships, header, output_file)

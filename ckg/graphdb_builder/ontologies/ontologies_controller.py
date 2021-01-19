@@ -1,6 +1,6 @@
-from graphdb_builder import mapping as mp, builder_utils
-import config.ckg_config as ckg_config
-from graphdb_builder.ontologies.parsers import *
+from ckg.graphdb_builder import mapping as mp, builder_utils
+import ckg.config.ckg_config as ckg_config
+from ckg.graphdb_builder.ontologies.parsers import * # TODO: remove star import
 import os.path
 import pandas as pd
 import csv

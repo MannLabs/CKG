@@ -6,14 +6,14 @@ import json
 from collections import defaultdict
 from json import dumps
 import pandas as pd
-import ckg_utils
-import config.ckg_config as ckg_config
-from report_manager.dataset import Dataset, DNAseqDataset, ProteomicsDataset, InteractomicsDataset, PhosphoproteomicsDataset, ClinicalDataset, LongitudinalProteomicsDataset, MultiOmicsDataset
-from analytics_core.viz import viz
-from analytics_core import utils as acore_utils
-from report_manager import report as rp, utils, knowledge
-from graphdb_connector import query_utils
-from graphdb_connector import connector
+import ckg.ckg_utils
+import ckg.config.ckg_config as ckg_config
+from ckg.report_manager.dataset import Dataset, DNAseqDataset, ProteomicsDataset, InteractomicsDataset, PhosphoproteomicsDataset, ClinicalDataset, LongitudinalProteomicsDataset, MultiOmicsDataset
+from ckg.analytics_core.viz import viz
+from ckg.analytics_core import utils as acore_utils
+from ckg.report_manager import report as rp, utils, knowledge
+from ckg.graphdb_connector import query_utils
+from ckg.graphdb_connector import connector
 
 log_config = ckg_config.report_manager_log
 logger = ckg_utils.setup_logging(log_config, key="project")
@@ -23,7 +23,7 @@ class Project:
     """
     A project class that defines an experimental project.
     A project can be of different types, contain several datasets and reports.
-    
+
     Example::
 
         p = Project(identifier="P0000001", datasets=None, report=None)
@@ -279,10 +279,10 @@ class Project:
         djson = dumps(d)
 
         return djson
-    
+
     def from_json(self, json_str):
         d = json.loads(json_str)
-        self.from_dict(d)       
+        self.from_dict(d)
 
     def query_data(self):
         data = {}
@@ -586,7 +586,7 @@ class Project:
 
     def notify_project_ready(self, message_type='slack'):
         message = "Report for project "+str(self.name)+" is ready: check it out at http://localhost:8050/apps/project/"+str(self.identifier)
-        subject = 'Report ready '+self.identifier 
+        subject = 'Report ready '+self.identifier
         message_from = "alsantosdel"
         message_to = "albsantosdel" #self.responsible_email
         if message_type == 'slack':
@@ -626,7 +626,7 @@ class Project:
         directory = os.path.join(self.get_report_directory(), "Project information")
         if not os.path.isdir(directory):
             os.makedirs(directory)
-        dt = h5.special_dtype(vlen=str) 
+        dt = h5.special_dtype(vlen=str)
         with h5.File(os.path.join(directory, "project_information_dataset.h5"), "w") as f:
             df_set = f.create_dataset("Project_information", (1,), dtype=dt, compression="gzip", chunks=True, data=self.to_json())
 

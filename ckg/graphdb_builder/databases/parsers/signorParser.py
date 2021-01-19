@@ -1,6 +1,6 @@
 import os.path
 from collections import defaultdict
-from graphdb_builder import builder_utils
+from ckg.graphdb_builder import builder_utils
 
 
 def parser(databases_directory, download=True):
