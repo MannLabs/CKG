@@ -7,8 +7,7 @@ setuptools.setup(
     author_email="alberto.santos@sund.ku.dk",
     description="A Python project that allows you to analyse proteomics and clinical data, and integrate and mine knowledge from multiple biomedical databases widely used nowadays.",
     url="https://github.com/MannLabs/CKG",
-    packages=setuptools.find_packages(where="src"),
-    package_dir={"": "ckg"},
+    packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
