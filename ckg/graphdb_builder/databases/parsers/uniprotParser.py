@@ -381,4 +381,7 @@ def parseUniProtPeptides(config, databases_directory, download=True):
     return entities, relationships
 
 if __name__ == "__main__":
-    parser(databases_directory="../../../../data/databases", import_directory="../../../../data/imports/databases", download=False)
+    base = path = os.path.dirname(os.path.abspath(__file__))
+    db_path = os.path.join(base, "../../../../data/databases")
+    import_path = os.path.join(base, "../../../../data/imports/databases")
+    parser(databases_directory=db_path, import_directory=import_path, download=False)
