@@ -1,4 +1,5 @@
 import subprocess
+import os
 #Script to check if all requirements are installed
 to_check = {}
 to_check['java'] = (['Java', '-version'], None) #command, desired output
@@ -14,3 +15,14 @@ for _ in to_check:
         print(f"{'='*10} Checking {_} {'='*10} \n{out}")
     except FileNotFoundError as e:
         print(f"Error checking {_}. Error: {e}.")
+
+# Run all py scripts and check if all import are correct.
+
+for path, subdirs, files in os.walk('ckg'):
+    for name in files:
+        if name.endswith('.py') and not name.startswith('__'):
+            path = os.path.join(path, name)
+            try:
+                out = subprocess.check_output(['python', path], stderr=subprocess.STDOUT).decode("utf-8").rstrip()
+            except Exception as e:
+                print(f"{e}")
