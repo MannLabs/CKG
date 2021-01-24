@@ -21,7 +21,7 @@ import datetime
 import logging
 import logging.config
 from ckg.config import ckg_config
-import ckg.ckg_utils
+import ckg.ckg_utils as ckg_utils
 import rarfile
 
 
