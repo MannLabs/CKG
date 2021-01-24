@@ -21,8 +21,9 @@ for _ in to_check:
 for path, subdirs, files in os.walk('ckg'):
     for name in files:
         if name.endswith('.py') and not name.startswith('__'):
-            path = os.path.join(path, name)
+            path_ = os.path.join(path, name)
+
             try:
-                out = subprocess.check_output(['python', path], stderr=subprocess.STDOUT).decode("utf-8").rstrip()
+                out = subprocess.check_output(['python', path_], stderr=subprocess.STDOUT).decode("utf-8").rstrip()
             except Exception as e:
                 print(f"{e}")
