@@ -121,4 +121,8 @@ def print_files(data, header, outputfile, is_first, filter_for=None):
 
 
 if __name__ == "__main__":
-    parser(databases_directory='../../../../data/databases', import_directory='../../../../data/imports', download=False)
+    base = os.path.dirname(os.path.abspath(__file__))
+    db_path = os.path.join(base, "../../../../data/databases")
+    import_path = os.path.join(base, "../../../../data/imports/databases")
+
+    parser(databases_directory=db_path, import_directory=import_path, download=False)

@@ -50,4 +50,6 @@ def parse_annotations_with_pandas(annotation_file, valid_proteins=None):
 
 
 if __name__ == '__main__':
-    parser(databases_dir='../../data/databases', download=True)
+    base = os.path.dirname(os.path.abspath(__file__))
+    db_path = os.path.join(base, "../../../../data/databases")
+    parser(databases_dir=db_path, download=True)

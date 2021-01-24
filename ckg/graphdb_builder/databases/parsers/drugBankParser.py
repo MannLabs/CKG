@@ -160,4 +160,6 @@ def build_DrugBank_dictionary(config, directory, drugs):
 
 
 if __name__ == "__main__":
-    parser("../../../../data/databases/")
+    base = os.path.dirname(os.path.abspath(__file__))
+    db_path = os.path.join(base, "../../../../data/databases")
+    parser(db_path)
