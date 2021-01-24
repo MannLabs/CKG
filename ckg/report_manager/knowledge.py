@@ -5,7 +5,7 @@ import numpy as np
 import ast
 from operator import itemgetter
 import networkx as nx
-import ckg.ckg_utils
+import ckg.ckg_utils as ckg_utils
 import ckg.config.ckg_config as ckg_config
 import dash_cytoscape as cyto
 from ckg.graphdb_connector import connector

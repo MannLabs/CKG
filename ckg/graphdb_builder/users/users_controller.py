@@ -6,31 +6,31 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 from passlib.hash import bcrypt
-import ckg_utils
-import config.ckg_config as ckg_config
-from graphdb_connector import connector
-from graphdb_builder import builder_utils
- 
+import ckg.ckg_utils
+import ckg.config.ckg_config as ckg_config
+from ckg.graphdb_connector import connector
+from ckg.graphdb_builder import builder_utils
+
 log_config = ckg_config.graphdb_builder_log
 logger = builder_utils.setup_logging(log_config, key='users_controller')
- 
+
 try:
     config = builder_utils.setup_config('users')
 except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
-  
+
 cwd = os.path.abspath(os.path.dirname(__file__))
 
 
 def parseUsersFile(importDirectory, expiration=365):
     """
     Creates new user in the graph database and corresponding node, through the following steps:
-     
+
         1. Generates new user identifier
         2. Checks if a user with given properties already exists in the database. If not:
         3. Creates new local user (access to graph database)
         4. Saves data to tab-delimited file.
- 
+
     :param str importDirectory: path to the directory where all the import files are generated.
     :param int expiration: number of days a user is given access.
     :return: Writes relevant .tsv file for the users in the provided file.
@@ -49,7 +49,7 @@ def parseUsersFile(importDirectory, expiration=365):
         if user_identifier is None:
             user_identifier = 'U1'
         new_id = int(re.search('\d+', user_identifier).group())
- 
+
         for index, row in data.iterrows():
             username = check_if_node_exists(driver, 'username', row['username'])
             name = check_if_node_exists(driver, 'name', row['name'])
@@ -64,7 +64,7 @@ def parseUsersFile(importDirectory, expiration=365):
                 row['password'] = bcrypt.encrypt(row['password'])
                 df.append(row)
                 new_id += 1
- 
+
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -88,11 +88,11 @@ def get_user_creation_queries():
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         logger.error("Reading queries from file {}: {}, file: {},line: {}, error: {}".format(queries_path, sys.exc_info(), fname, exc_tb.tb_lineno, err))
     return user_creation_cypher
- 
+
 def get_new_user_identifier(driver):
     """
     Queries the database for the last user identifier and returns a new sequential identifier.
- 
+
     :param driver: neo4j driver, which provides the connection to the neo4j graph database.
     :type driver: neo4j driver
     :return: User identifier.
@@ -139,7 +139,7 @@ def check_if_node_exists(driver, node_property, value):
 def create_db_user(driver, data):
     """
     Creates and assigns role to new graph database user, if user not in list of local users.
- 
+
     :param driver: neo4j driver, which provides the connection to the neo4j graph database.
     :type driver: neo4j driver
     :param Series data: pandas Series with required user information (see set_arguments()).
@@ -147,7 +147,7 @@ def create_db_user(driver, data):
     query_name_add = 'create_db_user'
     query_name_role = 'add_role_to_db_user'
     query_list_db_users =  'list_db_users'
- 
+
     try:
         cypher = get_user_creation_queries()
         db_query = cypher[query_name_add]['query'] + cypher[query_name_role]['query']
@@ -166,11 +166,11 @@ def GenerateGraphFiles(data, output_file):
     Saves pandas dataframe to users.tsv.
     If file already exists, appends new lines. \
     Else, creates file and writes dataframe to it.
-     
+
     :param data: pandas dataframe to be written to .tsv file.
     :param str output_file: path to output csv file.
     """
- 
+
     if os.path.exists(output_file):
         with open(output_file, 'a') as f:
             data.to_csv(path_or_buf = f, sep='\t',

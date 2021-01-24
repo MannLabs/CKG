@@ -6,7 +6,7 @@ import json
 from collections import defaultdict
 from json import dumps
 import pandas as pd
-import ckg.ckg_utils
+import ckg.ckg_utils as ckg_utils
 import ckg.config.ckg_config as ckg_config
 from ckg.report_manager.dataset import Dataset, DNAseqDataset, ProteomicsDataset, InteractomicsDataset, PhosphoproteomicsDataset, ClinicalDataset, LongitudinalProteomicsDataset, MultiOmicsDataset
 from ckg.analytics_core.viz import viz

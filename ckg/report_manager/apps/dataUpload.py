@@ -3,7 +3,7 @@ import sys
 import re
 import pandas as pd
 import numpy as np
-import config.ckg_config as ckg_config
+import ckg.config.ckg_config as ckg_config
 import ckg.ckg_utils
 from ckg.graphdb_connector import connector
 from ckg.graphdb_builder import builder_utils

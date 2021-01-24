@@ -2,7 +2,7 @@ import os
 import sys
 import pandas as pd
 import h5py as h5
-import ckg.ckg_utils
+import ckg.ckg_utils as ckg_utils
 import ckg.config.ckg_config as ckg_config
 from ckg.report_manager import report as rp, knowledge
 from ckg.analytics_core import analytics_factory
