@@ -20,7 +20,7 @@ except Exception as err:
 
 def getGraphDatabaseConnectionConfiguration(configuration=None, database=None):
     if configuration is None:
-        configuration = config
+        configuration = config # TODO this will fail if this function is imported
     host = configuration['db_url']
     port = configuration['db_port']
     user = configuration['db_user']

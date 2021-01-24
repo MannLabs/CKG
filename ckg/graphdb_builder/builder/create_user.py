@@ -4,7 +4,7 @@ import argparse
 import pandas as pd
 from datetime import datetime, timedelta
 from passlib.hash import bcrypt
-import config.ckg_config as ckg_config
+import ckg.config.ckg_config as ckg_config
 from ckg.graphdb_connector import connector
 from ckg.graphdb_builder import builder_utils
 from ckg.graphdb_builder.users import users_controller as uh
