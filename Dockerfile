@@ -6,7 +6,7 @@ ENV LC_CTYPE en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV R_BASE_VERSION 3.6.1
 
-MAINTAINER Alberto Santos "alberto.santos@cpr.ku.dk"
+LABEL maintainer "Alberto Santos alberto.santos@cpr.ku.dk"
 
 USER root
 
@@ -21,20 +21,22 @@ RUN apt-get update && \
     apt-get install -yq nginx && \
     apt-get install -yq redis-server && \
     apt-get install -yq git && \
-    apt-get -y install sudo && \
+    apt-get install -y sudo && \
+    apt-get install -y net-tools &&\
     rm -rf /var/lib/apt/lists/*
 
-## User management
+
+# User management
 RUN adduser --quiet --disabled-password --shell /bin/bash --home /home/adminhub --gecos "User" adminhub && \
     echo "adminhub:adminhub" | chpasswd && \
     adduser --quiet --disabled-password --shell /bin/bash --home /home/ckguser --gecos "User" ckguser && \
     echo "ckguser:ckguser" | chpasswd && \
     adduser --disabled-password --gecos '' --uid 1500 nginx
 
-# Python 3.6.8 installation
-RUN wget https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tgz
-RUN tar -xzf Python-3.7.3.tgz
-WORKDIR Python-3.7.3
+
+RUN wget https://www.python.org/ftp/python/3.7.4/Python-3.7.4.tgz
+RUN tar -xzf Python-3.7.4.tgz
+WORKDIR /Python-3.7.4
 RUN ./configure
 RUN make altinstall
 RUN make install
@@ -65,7 +67,7 @@ RUN apt-get install -yq openjdk-8-jdk
 RUN java -version
 RUN javac -version 
 
-# NEO4J 3.5.14
+# NEO4J 3.5.20
 RUN wget -O - https://debian.neo4j.com/neotechnology.gpg.key | apt-key add - && \
     echo "deb [trusted=yes] https://debian.neo4j.com stable 3.5" > /etc/apt/sources.list.d/neo4j.list && \
     apt-get update && \
@@ -82,14 +84,13 @@ RUN wget -P /var/lib/neo4j/plugins https://github.com/neo4j-contrib/neo4j-apoc-p
 RUN ls -lrth /var/lib/neo4j/plugins
 
 ## Change configuration
-RUN cat /etc/neo4j/neo4j.conf
 COPY /resources/neo4j_db/neo4j.conf  /etc/neo4j/.
 
 ## Test the service Neo4j
 RUN service neo4j start && \
     sleep 30 && \
-    service neo4j stop && \
-    cat /var/log/neo4j/neo4j.log
+    cat /var/log/neo4j/neo4j.log && \
+    service neo4j stop
 
 ## Load backup with Clinical Knowledge Graph
 RUN mkdir -p /var/lib/neo4j/data/backup
@@ -104,6 +105,7 @@ RUN rm -rf /var/lib/neo4j/data/backup
 
 #RUN ls -lrth  /var/lib/neo4j/data/databases
 RUN [ -e  /var/lib/neo4j/data/databases/store_lock ] && rm /var/lib/neo4j/data/databases/store_lock
+#RUN [ -e  /var/lib/neo4j/data/databases/store_lock ] && rm /var/lib/neo4j/data/databases/store_lock
 
 # R
 RUN apt-get update && \
@@ -118,9 +120,6 @@ RUN apt-get update && \
 ## Install packages
 COPY /resources/R_packages.R /R_packages.R
 RUN Rscript R_packages.R
-
-# START neo4j
-RUN service neo4j start
 
 # Python
 ## Copy Requirements
@@ -141,12 +140,6 @@ COPY setup_config_files.py /CKG/.
 RUN python3 /CKG/setup_CKG.py
 RUN python3 /CKG/setup_config_files.py
 RUN chown -R nginx /CKG
-
-RUN echo "Creating Test user in the database"
-RUN python3 /CKG/src/graphdb_builder/builder/create_user.py -u test_user -d test_user -n test -e test@ckg.com -a test
-
-RUN service neo4j stop
-#RUN [ -e  /var/lib/neo4j/data/databases/store_lock ] && rm /var/lib/neo4j/data/databases/store_lock
 
 # JupyterHub
 RUN apt-get -y install npm nodejs && \
