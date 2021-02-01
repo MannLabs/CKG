@@ -17,7 +17,6 @@ done
 
 echo "Database ready"
 
-python3 src/connect.py
 echo "Creating Test user in the database"
 python3 src/graphdb_builder/builder/create_user.py -u test_user -d test_user -n test -e test@ckg.com -a test
 
