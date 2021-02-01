@@ -20,6 +20,7 @@ RUN apt-get update && \
     apt-get install -yq build-essential sqlite3 libsqlite3-dev libxml2 libxml2-dev zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libcurl4-openssl-dev && \
     apt-get install -yq nginx && \
     apt-get install -yq redis-server && \
+    apt-get install -y dos2unix && \
     apt-get install -yq git && \
     apt-get install -y sudo && \
     apt-get install -y net-tools &&\
@@ -81,15 +82,14 @@ RUN rm -f /var/lib/neo4j/data/dbms/auth && \
 RUN wget -P /var/lib/neo4j/plugins https://github.com/neo4j/graph-data-science/releases/download/1.1.5/neo4j-graph-data-science-1.1.5-standalone.jar
 RUN wget -P /var/lib/neo4j/plugins https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.5.0.15/apoc-3.5.0.15-all.jar
 
-RUN ls -lrth /var/lib/neo4j/plugins
-
 ## Change configuration
 COPY /resources/neo4j_db/neo4j.conf  /etc/neo4j/.
+RUN dos2unix /etc/neo4j/neo4j.conf
 
 ## Test the service Neo4j
 RUN service neo4j start && \
-    sleep 30 && \
-    cat /var/log/neo4j/neo4j.log && \
+    sleep 60 && \
+    ls -lrth /var/log && \
     service neo4j stop
 
 ## Load backup with Clinical Knowledge Graph
@@ -180,6 +180,7 @@ RUN mkdir -p /var/log/uwsgi
 RUN rm -rf /var/lib/apt/lists/*
 
 RUN chmod +x /CKG/docker_entrypoint.sh
+RUN dos2unix /CKG/docker_entrypoint.sh && apt-get --purge remove -y dos2unix && rm -rf /var/lib/apt/lists/*
 
 RUN ls -alrth /
 RUN ls -alrth /CKG
