@@ -35,9 +35,9 @@ RUN adduser --quiet --disabled-password --shell /bin/bash --home /home/adminhub 
     adduser --disabled-password --gecos '' --uid 1500 nginx
 
 
-RUN wget https://www.python.org/ftp/python/3.7.4/Python-3.7.4.tgz
-RUN tar -xzf Python-3.7.4.tgz
-WORKDIR /Python-3.7.4
+RUN wget https://www.python.org/ftp/python/3.7.9/Python-3.7.9.tgz
+RUN tar -xzf Python-3.7.9.tgz
+WORKDIR /Python-3.7.9
 RUN ./configure
 RUN make altinstall
 RUN make install
