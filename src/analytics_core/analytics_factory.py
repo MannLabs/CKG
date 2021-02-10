@@ -100,6 +100,11 @@ class Analysis:
             r, nargs = analytics.run_pca(self.data, components=components, drop_cols=drop_cols, group=group, annotation_cols=annotation_cols)
             self.result[self.analysis_type] = r
             self.args.update(nargs)
+        if self.analysis_type == 'combat_batch_correction':
+            dfid = 'processed'
+            if dfid in self.data and 'batch' in self.args:
+                r = analytics.combat_batch_correction(self.data[dfid], batch = self.args['batch'])
+                self.result[self.analysis_type] = r
         if self.analysis_type == 'functional_pca':
             dfid = 'processed'
             annotid = 'go annotation'
@@ -140,9 +145,9 @@ class Analysis:
                 drop_cols = self.args["drop_cols"]
             if 'hovering_cols' in self.args:
                 hovering_cols = self.args['hovering_cols']
-            if dfid in self.data and annotid in self.data: 
+            if dfid in self.data and annotid in self.data:
                 result = analytics.run_ssgsea(self.data[dfid], self.data[annotid], annotation_col=annotation_col,
-                                                                    identifier_col=identifier_col, set_index=index, outdir=outdir, 
+                                                                    identifier_col=identifier_col, set_index=index, outdir=outdir,
                                                                     min_size=min_size, scale=scale, permutations=permutations)
                 if key in result:
                     r, nargs = analytics.run_pca(result[key], components=components, drop_cols=drop_cols, annotation_cols=hovering_cols)
@@ -454,8 +459,8 @@ class Analysis:
             if 'regulation_data' in self.args and 'annotation' in self.args:
                 if self.args['regulation_data'] in self.data and self.args['annotation'] in self.data:
                     self.analysis_type = annotation_type+"_"+self.analysis_type
-                    self.result[self.analysis_type] = analytics.run_regulation_enrichment(self.data[self.args['regulation_data']], self.data[self.args['annotation']], 
-                                                                                          identifier=identifier, groups=groups, annotation_col=annotation_col, reject_col=reject_col, 
+                    self.result[self.analysis_type] = analytics.run_regulation_enrichment(self.data[self.args['regulation_data']], self.data[self.args['annotation']],
+                                                                                          identifier=identifier, groups=groups, annotation_col=annotation_col, reject_col=reject_col,
                                                                                           method=method, correction=correction)
             print('Enrichment', time.time() - start)
         elif self.analysis_type == "up_down_enrichment":
@@ -490,8 +495,8 @@ class Analysis:
             if 'regulation_data' in self.args and 'annotation' in self.args:
                 if self.args['regulation_data'] in self.data and self.args['annotation'] in self.data:
                     self.analysis_type = annotation_type+"_"+self.analysis_type
-                    self.result[self.analysis_type] = analytics.run_up_down_regulation_enrichment(self.data[self.args['regulation_data']], self.data[self.args['annotation']], 
-                                                                                          identifier=identifier, groups=groups, annotation_col=annotation_col, reject_col=reject_col, 
+                    self.result[self.analysis_type] = analytics.run_up_down_regulation_enrichment(self.data[self.args['regulation_data']], self.data[self.args['annotation']],
+                                                                                          identifier=identifier, groups=groups, annotation_col=annotation_col, reject_col=reject_col,
                                                                                           method=method, correction=correction, alpha=alpha, lfc_cutoff=lfc_cutoff)
             print('Enrichment', time.time() - start)
         elif self.analysis_type == "regulation_site_enrichment":
@@ -555,10 +560,10 @@ class Analysis:
                 scale = self.args['scale']
             if 'permutations' in self.args:
                 permutations = self.args['permutations']
-            
-            if dfid in self.data and annotid in self.data: 
-                self.result[self.analysis_type] = analytics.run_ssgsea(self.data[dfid], self.data[annotid], annotation_col=annotation_col, 
-                                                                    identifier_col=identifier_col, set_index=index, outdir=outdir, 
+
+            if dfid in self.data and annotid in self.data:
+                self.result[self.analysis_type] = analytics.run_ssgsea(self.data[dfid], self.data[annotid], annotation_col=annotation_col,
+                                                                    identifier_col=identifier_col, set_index=index, outdir=outdir,
                                                                     min_size=min_size, scale=scale, permutations=permutations)
         elif self.analysis_type == 'long_format':
             self.result[self.analysis_type] = analytics.transform_into_long_format(self.data, drop_columns=self.args['drop_columns'], group=self.args['group'], columns=self.args['columns'])
@@ -622,7 +627,7 @@ class Analysis:
                 verbose = self.args["verbose"]
             if "sd_cutoff" in self.args:
                 sd_cutoff = self.args["sd_cutoff"]
-            self.result[self.analysis_type] = analytics.run_WGCNA(self.data, drop_cols_exp, drop_cols_cli, RsquaredCut=RsquaredCut, networkType=networkType, 
+            self.result[self.analysis_type] = analytics.run_WGCNA(self.data, drop_cols_exp, drop_cols_cli, RsquaredCut=RsquaredCut, networkType=networkType,
                                                             minModuleSize=minModuleSize, deepSplit=deepSplit, pamRespectsDendro=pamRespectsDendro, merge_modules=merge_modules,
                                                             MEDissThres=MEDissThres, verbose=verbose, sd_cutoff=sd_cutoff)
         elif self.analysis_type == 'kaplan_meier':
