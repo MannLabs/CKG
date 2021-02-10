@@ -50,3 +50,4 @@ docutils==0.15.2
 sphinx==2.3.1
 nbsphinx==0.8.0
 eventlet==0.25.1
+combat==0.2.0
