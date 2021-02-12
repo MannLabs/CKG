@@ -43,11 +43,12 @@ def create_user_from_dict(driver, data):
         for q in query.split(';')[0:-1]:
             result = connector.getCursorData(driver, q+';', parameters=data)
         logger.info("New user node created: {}. Result: {}".format(data['username'], result))
+        print("New user node created: {}. Result: {}".format(data['username'], result))
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         logger.error("Reading query {}: {}, file: {},line: {}, error: {}".format(query_name_node, sys.exc_info(), fname, exc_tb.tb_lineno, err))
-
+        print("Reading query {}: {}, file: {},line: {}, error: {}".format(query_name_node, sys.exc_info(), fname, exc_tb.tb_lineno, err))
     return result
 
 
@@ -172,7 +173,8 @@ def create_user(data, output_file, expiration=365):
                 row['password'] = bcrypt.hash(row['password'])
                 create_user_node(driver, row)
                 df.append(row)
-
+            else:
+                print("User already in the database. Check username and email address.")
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]

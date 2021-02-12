@@ -37,7 +37,7 @@ def getGraphDatabaseConnectionConfiguration(configuration=None, database=None):
 def connectToDB(host="localhost", port=7687, user="neo4j", password="password"):
     try:
         uri = "bolt://{}:{}".format(host, port)
-        driver = neo4j.GraphDatabase.driver(uri, auth=(user, password))
+        driver = neo4j.GraphDatabase.driver(uri, auth=(user, password), encrypted=False)
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]

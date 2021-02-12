@@ -38,12 +38,12 @@ def readDataset(uri):
     return data
 
 
-def readDataFromCSV(uri):
+def readDataFromCSV(uri, sep=','):
     """
     Read the data from csv file
 
     """
-    data = pd.read_csv(uri, sep=',', low_memory=False)
+    data = pd.read_csv(uri, sep=sep, low_memory=False)
 
     return data
 

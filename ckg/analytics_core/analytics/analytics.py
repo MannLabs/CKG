@@ -210,7 +210,7 @@ def extract_number_missing(data, min_valid, drop_cols=['sample'], group='group')
         result = extract_number_missing(data, min_valid=3, drop_cols=['sample'], group='group')
     """
     if group is None:
-        groups = data.loc[:, data.notnull().sum(axis=1) >= min_valid]
+        groups = data.loc[:, data.notnull().sum(axis=0) >= min_valid]
     else:
         groups = data.copy()
         groups = groups.drop(drop_cols, axis=1)
