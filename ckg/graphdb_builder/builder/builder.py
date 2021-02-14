@@ -69,8 +69,7 @@ def set_arguments():
 
     return parser
 
-
-if __name__ == '__main__':
+def main():
     parser = set_arguments()
     args = parser.parse_args()
     download = str(args.download).lower() == "true"
@@ -139,3 +138,7 @@ if __name__ == '__main__':
                                     Example: Import > python builder.py --build_type import --import_types databases --data UniProt\n \
                                     Load > python builder.py --build_type load --load_types Mentions\n \
                                     Full > python builder.py --build_type full or simpy python builder.py")
+
+
+if __name__ == '__main__':
+    main()
