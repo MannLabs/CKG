@@ -27,6 +27,8 @@ def main():
 
     # Run all scripts and check if the inputs are correct.
 
+    print('Checking Scripts')
+
     for path, subdirs, files in os.walk('ckg'):
         for name in files:
             if name.endswith('.py') and not name.startswith('__'):
@@ -34,5 +36,7 @@ def main():
 
                 try:
                     out = subprocess.check_output(['python', path_], stderr=subprocess.STDOUT).decode("utf-8").rstrip()
+                    print('.')
                 except Exception as e:
+                    print('\n')
                     print(f"Error: {e}")
