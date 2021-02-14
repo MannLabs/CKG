@@ -3,24 +3,26 @@ import os
 import json
 import neo4j
 import pandas as pd
-import ckg.ckg_utils
+import ckg.ckg_utils as ckg_utils
 from ckg.config import ckg_config
 from ckg.graphdb_builder import builder_utils
 
 log_config = ckg_config.graphdb_connector_log
 logger = builder_utils.setup_logging(log_config, key="connector")
 
-try:
-    cwd = os.path.abspath(os.path.dirname(__file__))
-    path = os.path.join(cwd, ckg_config.connector_config_file)
-    config = ckg_utils.get_configuration(path)
-except Exception as err:
-    logger.error("Reading configuration > {}.".format(err))
+def read_config():
+    try:
+        cwd = os.path.abspath(os.path.dirname(__file__))
+        path = os.path.join(cwd, ckg_config.connector_config_file)
+        config = ckg_utils.get_configuration(path)
+        return config
+    except Exception as err:
+        logger.error("Reading configuration > {}.".format(err))
 
 
 def getGraphDatabaseConnectionConfiguration(configuration=None, database=None):
     if configuration is None:
-        configuration = config # TODO this will fail if this function is imported
+        configuration = read_config() # TODO this will fail if this function is imported
     host = configuration['db_url']
     port = configuration['db_port']
     user = configuration['db_user']
