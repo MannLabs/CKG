@@ -18,7 +18,7 @@ IMPORT_ONTOLOGY_DATA:
     'description': "Creates all the onotology nodes and has parent relationships"
     'query': >
         CREATE CONSTRAINT ON (e:ENTITY) ASSERT e.id IS UNIQUE;
-        CREATE INDEX ON :ENTITY(name)
+        CREATE INDEX ON :ENTITY(name);  
         USING PERIODIC COMMIT 10000
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/ENTITY.tsv" AS line
         FIELDTERMINATOR '\t'
