@@ -59,7 +59,8 @@ def parse_PMC_list(config, directory, download=True, valid_pubs=None):
     entities = entities[entities.iloc[:, 0].notnull()]
     entities = entities.set_index(list(entities.columns)[0])
     if valid_pubs is not None:
-        entities = entities.loc[valid_pubs]
+        valid_pubs = set(entities.index).intersection(valid_pubs)
+        entities = entities.loc[list(valid_pubs)]
 
     entities['linkout'] = [plinkout.replace("PUBMEDID", str(int(pubmedid))) for pubmedid in list(entities.index)]
     entities.index.names = ['ID']
