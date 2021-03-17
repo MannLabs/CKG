@@ -874,6 +874,10 @@ def run_pca(data, drop_cols=['sample', 'subject'], group='group', annotation_col
     args = {}
     if not data.empty:
         df = data.copy()
+        annotations = pd.DataFrame()
+        if annotation_cols is not None: 
+            if len(list(set(annotation_cols).intersection(data.columns))) > 0:
+                annotations = data.set_index(group)[annotation_cols]
         drop_cols_int = list(set(drop_cols).intersection(df.columns))
         if len(drop_cols_int) > 0:
             df = df.drop(drop_cols_int, axis=1)
@@ -884,10 +888,7 @@ def run_pca(data, drop_cols=['sample', 'subject'], group='group', annotation_col
         if dropna:
             df = df.dropna(axis=1)
         X = df.values
-        annotations = pd.DataFrame()
-        if annotation_cols is not None: 
-            if len(list(set(annotation_cols).intersection(data.columns))) > 0:
-                annotations = data.set_index(group)[annotation_cols]
+        
         
         if X.size > 0 and X.shape[1] > components:
             pca = PCA(n_components=components)
@@ -1230,10 +1231,11 @@ def run_correlation(df, alpha=0.05, subject='subject', group='group', method='pe
             correlation = pd.merge(correlation, pvalues, on=['node1','node2'])
             
             rejected, padj = apply_pvalue_correction(correlation["pvalue"].tolist(), alpha=alpha, method=correction)
-            correlation["pvalue"] = [str(round(i, 8)) for i in correlation['pvalue']]
-            correlation["padj"] = [str(round(i, 8)) for i in padj]
+            correlation["padj"] = padj
             correlation["rejected"] = rejected
             correlation = correlation[correlation.rejected]
+            correlation["pvalue"] = correlation["pvalue"].apply(lambda x: str(round(x, 5)))
+            correlation["padj"] = correlation["padj"].apply(lambda x: str(round(x, 5)))
     
     return correlation
 
@@ -1326,17 +1328,21 @@ def run_rm_correlation(df, alpha=0.05, subject='subject', correction='fdr_bh'):
     rows = []
     if not df.empty:
         df = df.set_index(subject)._get_numeric_data().dropna(axis=1)
+        df.columns = df.columns.astype(str)
         combinations = itertools.combinations(df.columns, 2)
         df = df.reset_index()
         for x, y in combinations:
+            row = [x, y]
             subset = df[[x,y, subject]]
-            row = calculate_rm_correlation(subset, x, y, subject)
+            row.extend(pg.rm_corr(subset, x, y, subject).values.tolist()[0])
             rows.append(row)
-        correlation = pd.DataFrame(rows, columns=["node1", "node2", "weight", "pvalue", "dof"])
+
+        correlation = pd.DataFrame(rows, columns=["node1", "node2", "weight", "dof", "pvalue", "CI95%", "power"])
         rejected, padj = apply_pvalue_correction(correlation["pvalue"].tolist(), alpha=alpha, method=correction)
-        correlation["padj"] = [str(round(i, 8)) for i in padj] #limit number of decimals to 8 and avoid scientific notation
+        correlation["padj"] = padj
         correlation["rejected"] = rejected
         correlation = correlation[correlation.rejected]
+        correlation["padj"] = correlation["padj"].apply(lambda x: str(round(x, 5)))
 
     return correlation
 
@@ -1672,18 +1678,19 @@ def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject',
 
         result = run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject', group='group', permutations=50)
     """
+    res = pd.DataFrame()
     if subject is not None and check_is_paired(df, subject, group):
         groups = df[group].unique()
         drop_cols = [d for d in drop_cols if d != subject]
-        if len(groups) <= 2:
+        if len(groups) == 2:
             res = run_ttest(df, groups[0], groups[1], alpha = alpha, drop_cols=drop_cols, subject=subject, group=group, paired=True, correction=correction, permutations=permutations, is_logged=is_logged, non_par=non_par)
-        else:
+        elif len(groups) > 2:
             res = run_repeated_measurements_anova(df, alpha=alpha, drop_cols=drop_cols, subject=subject, group=group, permutations=0, is_logged=is_logged)
-    elif len(df[group].unique()) <= 2:
+    elif len(df[group].unique()) == 2:
         groups = df[group].unique()
         drop_cols = [d for d in drop_cols if d != subject]
         res = run_ttest(df, groups[0], groups[1], alpha = alpha, drop_cols=drop_cols, subject=subject, group=group, paired=False, correction=correction, permutations=permutations, is_logged=is_logged, non_par=non_par)
-    else:
+    elif len(df[group].unique()) > 2:
         df = df.drop(drop_cols, axis=1)
         aov_results = []
         pairwise_results = []
@@ -2324,7 +2331,7 @@ def run_enrichment(data, foreground_id, background_id, foreground_pop, backgroun
     return result
 
 
-def run_ssgsea(data, annotation, annotation_col='annotation', identifier_col='identifier', set_index=[], outdir=None, min_size=15, scale=False, permutations=0):
+def run_ssgsea(data, annotation, annotation_col='an notation', identifier_col='identifier', set_index=[], outdir=None, min_size=15, max_size=500, scale=False, permutations=0):
     """
     Project each sample within a data set onto a space of gene set enrichment scores using the ssGSEA projection methodology described in Barbie et al., 2009.
     
@@ -2335,6 +2342,7 @@ def run_ssgsea(data, annotation, annotation_col='annotation', identifier_col='id
     :param list set_index: column/s to be used as index. Enrichment will be calculated for these values (i.e ["subject"] will return subjects x pathways matrix of enrichment scores)
     :param str out_dir: directory path where results will be stored (default None, tmp folder is used)
     :param int min_size: minimum number of features (i.e. proteins) in enriched terms (i.e. pathways)
+    :param int max_size: maximum number of features (i.e. proteins) in enriched terms (i.e. pathways)
     :param bool scale: whether or not to scale the data
     :param int permutations: number of permutations used in the ssgsea analysis
     :return: dictionary with two dataframes: es - enrichment scores, and nes - normalized enrichment scores.
@@ -2356,6 +2364,8 @@ def run_ssgsea(data, annotation, annotation_col='annotation', identifier_col='id
     df = data.copy()
     if outdir is None:
         outdir = os.path.join(cwd,'../../../data/tmp/')
+    if not os.path.exists(outdir):
+            os.makedirs(outdir)
     
     name = []
     index = data[set_index]
@@ -2373,23 +2383,27 @@ def run_ssgsea(data, annotation, annotation_col='annotation', identifier_col='id
         with open(file_path, 'w') as out:
             for i, row in grouped_annotations.iterrows():
                 out.write(row[annotation_col]+"\t"+"\t".join(list(filter(None, row[identifier_col])))+"\n")
-        enrichment = gp.ssgsea(data=df, 
-                               gene_sets=str(file_path), 
-                               outdir=outdir, 
-                               min_size=min_size, 
-                               scale=scale, 
-                               permutation_num=permutations, 
-                               no_plot=True, 
-                               processes=4, 
-                               seed=10, 
-                               format='png')
+        try:
+            enrichment = gp.ssgsea(data=df, 
+                                gene_sets=str(file_path), 
+                                outdir=outdir, 
+                                min_size=min_size,
+                                max_size=max_size,
+                                scale=scale, 
+                                permutation_num=permutations, 
+                                no_plot=True, 
+                                processes=1, 
+                                seed=10, 
+                                format='png')
 
-        enrichment_es = pd.DataFrame(enrichment.resultsOnSamples).transpose()
-        enrichment_es = enrichment_es.join(index)
-        enrichment_nes = enrichment.res2d.transpose()
-        enrichment_nes = enrichment_nes.join(index)
-        
-        result = {'es': enrichment_es, 'nes': enrichment_nes}
+            enrichment_es = pd.DataFrame(enrichment.resultsOnSamples).transpose()
+            enrichment_es = enrichment_es.join(index)
+            enrichment_nes = enrichment.res2d.transpose()
+            enrichment_nes = enrichment_nes.join(index)
+            
+            result = {'es': enrichment_es, 'nes': enrichment_nes}
+        except Exception as e:
+            print("Error in ssGSEA.", e)
     df = None
         
     return result
@@ -2517,14 +2531,17 @@ def power_analysis(data, group='group', groups=None, alpha=0.05, power=0.8, dep_
         for g1, g2 in itertools.combinations(groups, 2):
             sample1 = data.loc[data[group] == g1, col].values
             sample2 = data.loc[data[group] == g2, col].values
-            effect_sizes.add(np.abs(cohens_d(sample1,sample2, ddof=1)))
+            eff_size = np.abs(cohens_d(sample1,sample2, ddof=1))
+            effect_sizes.add(eff_size)
 
-    effect_sizes = list(effect_sizes)
-    summary_eff = [np.percentile(effect_sizes, 25),
-                   np.mean(effect_sizes),
-                   np.percentile(effect_sizes, 50),
-                   np.percentile(effect_sizes, 75)]
-    
+    summary_eff = []
+    if len(effect_sizes):
+        effect_sizes = list(effect_sizes)
+        summary_eff = [np.percentile(effect_sizes, 25),
+                    np.mean(effect_sizes),
+                    np.percentile(effect_sizes, 50),
+                    np.percentile(effect_sizes, 75)]
+        
     analysis = FTestAnovaPower()
     sample_sizes = np.array(range(3, 150))
     power_list = []
