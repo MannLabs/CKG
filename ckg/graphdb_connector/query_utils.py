@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-import ckg.ckg_utils
+import ckg.ckg_utils as ckg_utils
 from ckg.graphdb_connector import connector
 
 

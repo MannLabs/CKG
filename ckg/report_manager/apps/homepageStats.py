@@ -5,7 +5,7 @@ import numpy as np
 import plotly.graph_objs as go
 import dash_core_components as dcc
 import dash_html_components as html
-import ckg.ckg_utils
+import ckg.ckg_utils as ckg_utils
 from ckg.graphdb_connector import connector
 from ckg.graphdb_builder import builder_utils
 from ckg.analytics_core.viz import viz

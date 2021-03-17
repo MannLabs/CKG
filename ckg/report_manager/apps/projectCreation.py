@@ -1,7 +1,7 @@
 import os
 import sys
 import ckg.config.ckg_config as ckg_config
-import ckg.ckg_utils
+import ckg.ckg_utils as ckg_utils
 from ckg.graphdb_connector import connector
 from ckg.graphdb_builder import builder_utils
 from ckg.graphdb_builder.builder import loader

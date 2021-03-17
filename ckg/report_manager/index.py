@@ -8,7 +8,7 @@ from datetime import datetime
 from uuid import uuid4
 import base64
 import flask
-import user
+import ckg.report_manager.user as user
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
@@ -783,7 +783,9 @@ def route_upload_url(value):
 
     return flask.send_file(url, attachment_filename = filename.split('/')[-1]+'.zip', as_attachment = True, cache_timeout=-1)
 
-
-if __name__ == '__main__':
+def main():
     print("IN MAIN")
     application.run(debug=True, host='0.0.0.0')
+
+if __name__ == '__main__':
+    main()

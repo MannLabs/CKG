@@ -4,7 +4,7 @@ import re
 import pandas as pd
 import numpy as np
 import ckg.config.ckg_config as ckg_config
-import ckg.ckg_utils
+import ckg.ckg_utils as ckg_utils
 from ckg.graphdb_connector import connector
 from ckg.graphdb_builder import builder_utils
 from ckg.graphdb_connector import query_utils

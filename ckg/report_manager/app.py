@@ -4,7 +4,9 @@ import redis
 import dash
 
 server = flask.Flask('app')
-app = dash.Dash('app', server=server, meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}])
+cwd = os.path.abspath(os.path.dirname(__file__))
+assets_path = os.path.join(cwd, 'assets')
+app = dash.Dash('app', server=server, assets_folder=assets_path, meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}])
 
 
 r = redis.StrictRedis.from_url('redis://localhost:6379')
