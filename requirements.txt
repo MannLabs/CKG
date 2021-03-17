@@ -27,6 +27,7 @@ fancyimpute==0.5.4
 kmapper==1.2.0
 natsort==6.0.0
 lifelines==0.23.1
+cvxpy==1.1.7
 wordcloud==1.7.0
 nltk==3.5
 dash_cytoscape>=0.1.1
@@ -36,7 +37,7 @@ xhtml2pdf==0.2.4
 lxml==4.3.4
 celery>=4.3.0
 cffi>=1.14.0
-rpy2==3.0.5
+rpy2==3.0.5; platform_system!="Windows"
 jupyter>=1.0.0
 xlrd==1.2.0
 openpyxl==3.0.1
