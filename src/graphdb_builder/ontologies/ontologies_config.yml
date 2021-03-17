@@ -14,7 +14,7 @@ ontologies:
     'Experimental_factor': 'EFO'
     'Units': 'UO'
     #'Biomedical_investigations': 'OBI'
-    'Diagnosis': 'ICD-10'
+    #'Diagnosis': 'ICD-10'
 
 entities:
     'DO': 'Disease'
@@ -30,13 +30,12 @@ entities:
     'EFO': 'Experimental_factor'
     'unit.ontology': 'Units'
     #'OBI': 'Biomedical_investigations'
-    'ICD-10': 'Diagnosis'
+    #'ICD-10': 'Diagnosis'
     
 ontology_types: 
     'DO': '-26' 
     'BTO': '-25'
     'SNOMED-CT': '-40'
-    'HPO': '-44'
     'PSI-MOD': '-41'
     'PSI-MS': '-42'
     'PSI-MI': '-43'
@@ -46,7 +45,7 @@ ontology_types:
     'EFO': '-45'
     'UO': '-46'
     #'OBI':  '-47'
-    'ICD-10': '-48'
+    #'ICD-10': '-48'
     
 parser_filters:
     '-40':
@@ -80,8 +79,8 @@ urls:
         - 'https://raw.githubusercontent.com/bio-ontology-research-group/unit-ontology/master/unit.obo'
     #'-47':
     #    - https://raw.githubusercontent.com/obi-ontology/obi/v2020-04-23/views/obi.obo
-    '-48':
-        - 'ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/ICD10CM/2020/icd10cm_codes_2020.txt'
+    #'-48':
+    #    - 'ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/ICD10CM/2020/icd10cm_codes_2020.txt'
 
 files:
     '-40': 
