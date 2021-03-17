@@ -6,7 +6,7 @@ uniprot_peptides_files:
     -  'ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/proteomics_mapping/UP000005640_9606_nonUniquePeptides.tsv'
     -  'ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/proteomics_mapping/UP000005640_9606_uniquePeptides.tsv'
 uniprot_go_annotations: 'http://geneontology.org/gene-associations/goa_human.gaf.gz'
-uniprot_fasta_file: 'ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Eukaryota/UP000005640_9606.fasta.gz'
+uniprot_fasta_file: 'ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Eukaryota/UP000005640/UP000005640_9606.fasta.gz'
 release_notes: 'ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/relnotes.txt'
 
 species: 

@@ -5,6 +5,7 @@ import ast
 from collections import defaultdict
 import dash_core_components as dcc
 import dash_html_components as html
+import matplotlib
 import matplotlib.pyplot as plt
 import plotly
 import plotly.tools as tls
@@ -33,6 +34,8 @@ import nltk
 from ckg.analytics_core.analytics import wgcnaAnalysis
 from ckg.analytics_core.viz import wgcnaFigures, Dendrogram
 import dash_cytoscape as cyto
+
+matplotlib.use("Agg")
 
 
 def getPlotTraces(data, key='full', type='lines', div_factor=float(10^10000), horizontal=False):
@@ -622,7 +625,9 @@ def get_scatterplot(data, identifier, args):
     symbol = None
     x = 'x'
     y = 'y'
+    trendline = None
     group = None
+    text = None
     if 'x' in args:
         x = args['x']
     if 'y' in args:
@@ -645,12 +650,16 @@ def get_scatterplot(data, identifier, args):
         size = args['size']
     if 'symbol' in args:
         symbol = args['symbol']
+    if 'trendline' in args:
+        trendline = args['trendline']
+    if 'text' in args:
+        text = args['text']
 
     if 'colors' in args and isinstance(args['colors'], dict):
-        figure = px.scatter(data, x=x, y=y, color=group, color_discrete_map=args['colors'], hover_data=annotation, size=size, symbol=symbol)
+        figure = px.scatter(data, x=x, y=y, color=group, color_discrete_map=args['colors'], hover_data=annotation, size=size, symbol=symbol, trendline=trendline, text=text)
     else:
-        figure = px.scatter(data, x=x, y=y, color=group, hover_data=annotation, size=size, symbol=symbol)
-
+        figure = px.scatter(data, x=x, y=y, color=group, hover_data=annotation, size=size, symbol=symbol, trendline=trendline, text=text)
+    
     figure.update_traces(marker=dict(size=14,
                                      opacity=0.7,
                                      line=dict(width=0.5, color='DarkSlateGrey')),
@@ -1498,7 +1507,7 @@ def get_pca_plot(data, identifier, args):
                                     symbol=1,
                                     color='darkgrey', #set color equal to a variable
                                     showscale=False,
-                                    opacity=0.7,
+                                    opacity=0.9,
                                     ),
                         showlegend=False,
                         )
@@ -2262,7 +2271,7 @@ def mpl_to_plotly(fig, ci=True, legend=True):
         py_fig['data'][2].update(style1)
 
     # change the default line type to 'step'
-    py_fig.update_traces(dict(line=go.Line(shape='hv')))
+    #py_fig.update_traces(dict(line=go.layout.shape.Line({'dash':'solid'})))
     py_fig['data'] = py_fig['data'][0:2]
     # Delete misplaced legend annotations
     py_fig['layout'].pop('annotations', None)
@@ -2275,7 +2284,7 @@ def mpl_to_plotly(fig, ci=True, legend=True):
             height=400,
             width=1000,
             template='plotly_white',
-            legend=go.Legend(
+            legend=go.layout.Legend(
                 x=1.05,
                 y=1
             )
@@ -2283,21 +2292,98 @@ def mpl_to_plotly(fig, ci=True, legend=True):
     # Send updated figure object to Plotly, show result in notebook
     return py_fig
 
-def get_km_plot(data, identifier, args):
+def get_km_plot_old(data, identifier, args):
     figure = {}
-    if len(data) ==2:
-        kmfit, summary = data
+    if len(data) == 3:
+        kmfit, summary, plot = data
         if kmfit is not None:
-            title = 'Kaplan-meier plot'
+            title = 'Kaplan-meier plot' + summary
             if 'title' in args:
                 title = args['title'] + "--" + summary
-            p = kmfit.plot(ci_force_lines=True, title=title, show_censors=True)
-
-            kmf1 = plt.gcf()
-            figure = mpl_to_plotly(kmf1, legend=True)
+            plot.set_title(title)
+            #p = kmfit.plot(ci_force_lines=True, title=title, show_censors=True)
+            figure = mpl_to_plotly(plot.figure, legend=True)
 
     return dcc.Graph(id=identifier, figure=figure)
 
+
+def get_km_plot(data, identifier, args):
+    figure = {}
+    plot = plt.subplot(111)
+    environment = 'app'
+    colors = None
+    if 'environment' in args:
+        environment = args['environment']
+    if 'colors' in args:
+        colors = args['colors']
+    if len(data) == 2:
+        kmfit, summary = data
+        if kmfit is not None:
+            i = 0
+            for kmf in kmfit:
+                c = None
+                if colors is not None:
+                    c = colors[i]
+                plot = kmf.plot_survival_function(show_censors=True, ax=plot, c=c)
+                i += 1
+            title = 'Kaplan-meier plot ' + summary
+            xlabel = 'Time'
+            ylabel = 'Survival'
+            if 'title' in args:
+                title = args['title'] + "--" + summary
+            if 'xlabel' in args:
+                xlabel = args['xlabel']
+            if 'ylabel' in args:
+                ylabel = args['ylabel']
+            plot.set_title(title)
+            plot.set_xlabel(xlabel)
+            plot.set_ylabel(ylabel)
+            if environment == 'app':
+                figure = utils.mpl_to_html_image(plot.figure, width=800)
+                result = html.Div(id=identifier, children=[figure])
+            else:
+                result = plot.figure
+            
+    return result
+
+def get_cumulative_hazard_plot(data, identifier, args):
+    figure = {}
+    plot = plt.subplot(111)
+    environment = 'app'
+    colors = None
+    if 'environment' in args:
+        environment = args['environment']
+    if 'colors' in args:
+        colors = args['colors']
+    if len(data) == 2:
+        hrfit = data
+        if hrfit is not None:
+            i = 0
+            for hrdf in hrfit:
+                c = None
+                if colors is not None:
+                    c = colors[i]
+                plot = hrdf.plot_cumulative_hazard(ax=plot, c=c)
+                i += 1
+            title = 'Cumulative Hazard plot '
+            xlabel = 'Time'
+            ylabel = 'Nelson Aalen - Cumulative Hazard'
+            if 'title' in args:
+                title = args['title'] + "--" 
+            if 'xlabel' in args:
+                xlabel = args['xlabel']
+            if 'ylabel' in args:
+                ylabel = args['ylabel']
+            plot.set_title(title)
+            plot.set_xlabel(xlabel)
+            plot.set_ylabel(ylabel)
+            if environment == 'app':
+                figure = utils.mpl_to_html_image(plot.figure, width=800)
+                result = html.Div(id=identifier, children=[figure])
+            else:
+                result = plot.figure
+            
+    return result
 
 
 def get_polar_plot(df, identifier, args):

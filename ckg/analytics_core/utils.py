@@ -2,6 +2,8 @@ import random
 from Bio import Entrez, Medline
 from collections import defaultdict
 import pandas as pd
+import io
+import base64
 import bs4 as bs
 import dash_html_components as html
 import requests
@@ -17,6 +19,15 @@ def check_columns(df, cols):
         if col not in df:
             return False
     return True
+
+
+def mpl_to_html_image(plot, width=800):
+    buf = io.BytesIO()
+    plot.savefig(buf, format="png")
+    data = base64.b64encode(buf.getbuffer()).decode("utf8")
+    figure = html.Img(src="data:image/png;base64,{}".format(data), width="800")
+
+    return figure
 
 
 def generate_html(network):

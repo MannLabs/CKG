@@ -38,7 +38,7 @@ attributes:
     query_type: pre
     query: >
         MATCH (project:Project)
-        WITH project, size((project)-[]->()) AS number_subjects
+        WITH project, size((project)-[]->(:Subject)) AS number_subjects
         WHERE project.id="PROJECTID"
         RETURN project.id AS identifier, project.name AS name, project.acronym AS acronym,
         project.type AS data_types, project.responsible AS responsible, project.description AS description, number_subjects, project.status AS status;

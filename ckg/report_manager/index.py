@@ -236,33 +236,34 @@ def number_panel_update(df):
         if not projects.empty and 'Projects' in projects:
             projects = projects['Projects'][0]
         updates.append(projects)
-        meta_stats = pd.read_json(df['meta_stats'], orient='records')
-        if not meta_stats.empty:
-            if 'nodeCount' in meta_stats:
-                ent = meta_stats['nodeCount'][0]
-            else:
-                ent = '0'
-            updates.append(ent)
-            if 'relCount' in meta_stats:
-                rel = meta_stats['relCount'][0]
-            else:
-                rel = '0'
-            updates.append(rel)
-            if 'labelCount' in meta_stats:
-                labels = meta_stats['labelCount'][0]
-            else:
-                labels = '0'
-            updates.append(labels)
-            if 'relTypeCount' in meta_stats:
-                types = meta_stats['relTypeCount'][0]
-            else:
-                types = '0'
-            updates.append(types)
-            if 'propertyKeyCount' in meta_stats:
-                prop = meta_stats['propertyKeyCount'][0]
-            else:
-                prop = '0'
-            updates.append(prop)
+        if 'meta_stats' in df:
+            meta_stats = pd.read_json(df['meta_stats'], orient='records')
+            if not meta_stats.empty:
+                if 'nodeCount' in meta_stats:
+                    ent = meta_stats['nodeCount'][0]
+                else:
+                    ent = '0'
+                updates.append(ent)
+                if 'relCount' in meta_stats:
+                    rel = meta_stats['relCount'][0]
+                else:
+                    rel = '0'
+                updates.append(rel)
+                if 'labelCount' in meta_stats:
+                    labels = meta_stats['labelCount'][0]
+                else:
+                    labels = '0'
+                updates.append(labels)
+                if 'relTypeCount' in meta_stats:
+                    types = meta_stats['relTypeCount'][0]
+                else:
+                    types = '0'
+                updates.append(types)
+                if 'propertyKeyCount' in meta_stats:
+                    prop = meta_stats['propertyKeyCount'][0]
+                else:
+                    prop = '0'
+                updates.append(prop)
 
     if 'store_size' in df:
         store_size = pd.read_json(df['store_size'], orient='records')

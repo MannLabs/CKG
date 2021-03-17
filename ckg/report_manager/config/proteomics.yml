@@ -197,7 +197,7 @@ data exploration:
                 - subject
             key: nes
             group: group
-            min_size: 5
+            min_size: 15
             x_title: PC1
             y_title: PC2
             components: 2
@@ -221,9 +221,6 @@ data exploration:
             - volcanoplot
         store_analysis: True
         args:
-            covariates:
-                - Age (qualifier value)
-                - Biological sex (property) (qualifier value)
             alpha: 0.05
             fc: 2.0
             group: 'group'
