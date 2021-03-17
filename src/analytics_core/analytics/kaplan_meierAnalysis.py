@@ -1,10 +1,6 @@
 import pandas as pd
-import matplotlib
-import matplotlib.pyplot as plt
-from lifelines import KaplanMeierFitter
+from lifelines import KaplanMeierFitter, NelsonAalenFitter
 from lifelines.statistics import multivariate_logrank_test
-
-matplotlib.use("Agg")
 
 
 def get_data_ready_for_km(dfs_dict, args):
@@ -72,24 +68,43 @@ def run_km(data, time_col, event_col, group_col, args={}):
 
 
 def get_km_results(df, group_col, time_col, event_col):
-    kmf = KaplanMeierFitter()
+    models = []
     summary_ = None
     summary_result = None
-    ax = plt.subplot(111)
     df = df[[event_col, time_col, group_col]].dropna()
     df[event_col] = df[event_col].astype('category')
     df[event_col] = df[event_col].cat.codes
     df[time_col] = df[time_col].astype('float')
     if not df.empty:
         for name, grouped_df in df.groupby(group_col):
+            kmf = KaplanMeierFitter()
             t = grouped_df[time_col]
             e = grouped_df[event_col]
             kmf.fit(t, event_observed=e, label=name + " (N=" + str(len(t.tolist())) + ")")
-            kmf.survival_function_.plot(ax=ax)
+            models.append(kmf)
 
         summary_ = multivariate_logrank_test(df[time_col].tolist(), df[group_col].tolist(), df[event_col].tolist(), alpha=99)
 
     if summary_ is not None:
         summary_result = "Multivariate logrank test: pval={}, t_statistic={}".format(summary_.p_value, summary_._test_statistic)
 
-    return kmf, summary_result
+    return models, summary_result
+
+
+def get_hazard_ratio_results(df, group_col, time_col, event_col):
+    models = []
+    summary_ = None
+    summary_result = None
+    df = df[[event_col, time_col, group_col]].dropna()
+    df[event_col] = df[event_col].astype('category')
+    df[event_col] = df[event_col].cat.codes
+    df[time_col] = df[time_col].astype('float')
+    if not df.empty:
+        for name, grouped_df in df.groupby(group_col):
+            hr = NelsonAalenFitter()
+            t = grouped_df[time_col]
+            e = grouped_df[event_col]
+            hr.fit(t, event_observed=e, label=name + " (N=" + str(len(t.tolist())) + ")")
+            models.append(hr)
+
+    return models

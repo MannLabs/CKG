@@ -109,6 +109,7 @@ class Analysis:
             index = ['group', 'sample', 'subject']
             outdir = None
             min_size = 15
+            max_size = 500
             scale = False
             permutations = 0
             components = 2
@@ -130,6 +131,8 @@ class Analysis:
                 outdir = self.args['outdir']
             if 'min_size' in self.args:
                 min_size = self.args['min_size']
+            if 'max_size' in self.args:
+                max_size = args['max_size']
             if 'scale' in self.args:
                 scale = self.args['scale']
             if 'permutations' in self.args:
@@ -143,7 +146,7 @@ class Analysis:
             if dfid in self.data and annotid in self.data: 
                 result = analytics.run_ssgsea(self.data[dfid], self.data[annotid], annotation_col=annotation_col,
                                                                     identifier_col=identifier_col, set_index=index, outdir=outdir, 
-                                                                    min_size=min_size, scale=scale, permutations=permutations)
+                                                                    min_size=min_size, max_size=max_size, scale=scale, permutations=permutations)
                 if key in result:
                     r, nargs = analytics.run_pca(result[key], components=components, drop_cols=drop_cols, annotation_cols=hovering_cols)
                     self.result[self.analysis_type] = r
