@@ -211,7 +211,8 @@ class Project:
     def set_attributes(self, project_info):
         if "attributes" in project_info:
             attributes = project_info["attributes"].to_dict('r')[0]
-            self.from_dict(attributes)
+            if len(attributes) > 0:
+                self.from_dict(attributes[0])
 
     def from_dict(self, attributes):
         if "name" in attributes:
@@ -221,7 +222,7 @@ class Project:
         if "description" in attributes:
             self.description = attributes["description"]
         if "data_types" in attributes:
-            if isinstance(attributes['data_types'],str):
+            if isinstance(attributes['data_types'], str):
                 self.data_types = [i.strip(' ') for i in attributes["data_types"].split('|')]
             else:
                 self.data_types = attributes["data_types"]
@@ -583,6 +584,7 @@ class Project:
             self.save_project()
             self.save_project_datasets_data()
             self.notify_project_ready()
+            self.download_project()
 
     def notify_project_ready(self, message_type='slack'):
         message = "Report for project "+str(self.name)+" is ready: check it out at http://localhost:8050/apps/project/"+str(self.identifier)

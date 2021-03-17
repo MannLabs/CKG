@@ -1,4 +1,5 @@
 import os.path
+import pandas as pd
 import plotly.io as pio
 import h5py as h5
 import json
@@ -205,8 +206,10 @@ class Report:
                             pass
                         if "net_tables" in plot:
                             nodes_table, edges_table = plot['net_tables']
-                            nodes_table.to_csv(os.path.join(directory, name+'_node_table.tsv'), sep='\t', header=True, index=False, doublequote=False)
-                            edges_table.to_csv(os.path.join(directory, name+'_edges_table.tsv'), sep='\t', header=True, index=False, doublequote=False)
+                            if isinstance(nodes_table, pd.DataFrame):
+                                nodes_table.to_csv(os.path.join(directory, name+'_node_table.tsv'), sep='\t', header=True, index=False, doublequote=False)
+                            if isinstance(edges_table, pd.DataFrame):
+                                edges_table.to_csv(os.path.join(directory, name+'_edges_table.tsv'), sep='\t', header=True, index=False, doublequote=False)
                         if "app" in plot:
                             plot = plot["app"]
                     if 'props' in plot:
