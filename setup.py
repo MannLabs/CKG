@@ -1,8 +1,10 @@
+import os
 import pathlib
 import setuptools
 from setuptools import setup
 from setuptools.command.install import install
 import pkg_resources
+import ckg.init
 
 with pathlib.Path('requirements.txt').open() as requirements_txt:
     reqs = [
@@ -10,7 +12,10 @@ with pathlib.Path('requirements.txt').open() as requirements_txt:
         for requirement
         in pkg_resources.parse_requirements(requirements_txt)
     ]
-    
+
+ckg.init.installer_script()
+
+
 setuptools.setup(
     name="CKG", # Replace with your own username
     version="1.0.0",
@@ -20,10 +25,9 @@ setuptools.setup(
     url="https://github.com/MannLabs/CKG",
     packages=setuptools.find_packages(),
     install_requires=reqs,
-    entry_points='''
-        [console_scripts]
-        ckg_app=ckg.report_manager.index:main
-    ''',
+    entry_points={'console_scripts': [
+        'ckg_app=ckg.report_manager.index:main',
+        'ckg_debug=ckg.debug:main']},
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

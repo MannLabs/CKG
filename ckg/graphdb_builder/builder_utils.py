@@ -20,8 +20,7 @@ import obonet
 import datetime
 import logging
 import logging.config
-from ckg.config import ckg_config
-import ckg.ckg_utils as ckg_utils
+from ckg import ckg_utils
 import rarfile
 
 
@@ -167,8 +166,8 @@ def get_config(config_name, data_type='databases'):
 
     .. note:: Use this function to obtain configuration for individual database/ontology parsers.
     """
-    cwd = os.path.abspath(os.path.dirname(__file__))
-    config = ckg_utils.get_configuration(os.path.join(cwd, '{}/config/{}'.format(data_type, config_name)))
+    directory = os.path.join(ckg_utils.read_ckg_config(key='ckg_directory'), 'graphdb_builder')
+    config = ckg_utils.get_configuration(os.path.join(directory, '{}/config/{}'.format(data_type, config_name)))
 
     return config
 
@@ -201,41 +200,13 @@ def setup_config(data_type="databases"):
                 ontologies_controller.py, experiments_controller.py and builder.py.
     """
     try:
-        dirname = os.path.abspath(os.path.dirname(__file__))
-        if data_type == 'databases':
-            config = ckg_utils.get_configuration(os.path.join(dirname, ckg_config.databases_config_file))
-        elif data_type == 'ontologies':
-            config = ckg_utils.get_configuration(os.path.join(dirname, ckg_config.ontologies_config_file))
-        elif data_type == "experiments":
-            config = ckg_utils.get_configuration(os.path.join(dirname, ckg_config.experiments_config_file))
-        elif data_type == 'builder':
-            config = ckg_utils.get_configuration(os.path.join(dirname, ckg_config.builder_config_file))
-        elif data_type == 'users':
-            config = ckg_utils.get_configuration(os.path.join(dirname, ckg_config.users_config_file))
-
+        dirname = os.path.join(ckg_utils.read_ckg_config(key='ckg_directory'), 'graphdb_builder')
+        file_name = '{}/{}_config.yml'.format(data_type, data_type)
+        config = ckg_utils.get_configuration(os.path.join(dirname, file_name))
     except Exception as err:
         raise Exception("builder_utils - Reading configuration > {}.".format(err))
 
     return config
-
-
-def get_full_path_directories():
-    """
-    Reads Builder YAML configuration file and returns the full path of all directories.
-    :return: Dictionary.
-    """
-    directories = {}
-    try:
-        dirname = os.path.abspath(os.path.dirname(__file__))
-        config = ckg_utils.get_configuration(os.path.join(dirname, ckg_config.builder_config_file))
-        if 'directories' in config:
-            for directory in config['directories']:
-                directories[directory] = os.path.join(dirname, config['directories'][directory])
-
-    except Exception as err:
-        raise Exception("Error {}: builder_utils - Reading directories from configuration > {}.".format(err, ckg_config.builder_config_file))
-
-    return directories
 
 
 def list_ftp_directory(ftp_url, user='', password=''):
