@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ClinicalKnowledgeGraph's documentation!
-==================================================
+Clinical Knowledge Graph Documentation
+=======================================
 
 This web page contains the documentation for the Python code using **Sphinx**.
 
@@ -135,6 +135,7 @@ Advanced features
 * **Jupyter notebooks**:
   :doc:`Notebooks <advanced_features/ckg-notebooks>`
 
+ 
 * **Retrieving data from the CKG**:
   :doc:`DB Querying <advanced_features/ckg-queries>`
 
@@ -178,7 +179,7 @@ API Reference
 .. toctree::
    :maxdepth: 4
 
-   api/src
+   api/ckg
 
 
 Project Info

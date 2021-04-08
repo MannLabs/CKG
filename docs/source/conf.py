@@ -15,9 +15,11 @@ import sys
 import sphinx_rtd_theme
 
 sys.path.insert(0, os.path.abspath( './../..'))
-sys.path.insert(0, os.path.abspath( './../../src'))
-sys.path.insert(0, os.path.abspath( './../../src/report_manager'))
-sys.path.insert(0, os.path.abspath( './../../src/report_manager/apps'))
+sys.path.insert(0, os.path.abspath( './../../ckg'))
+sys.path.insert(0, os.path.abspath( './../../ckg/report_manager'))
+sys.path.insert(0, os.path.abspath( './../../ckg/graphdb_builder'))
+sys.path.insert(0, os.path.abspath( './../../ckg/graphdb_connector'))
+
 
 # -- Project information -----------------------------------------------------
 
@@ -44,6 +46,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.autosummary',
     'sphinx.ext.todo',
+    'sphinx.ext.mathjax',
     'sphinx.ext.coverage',
     'sphinx.ext.imgmath',
     'sphinx.ext.ifconfig',
@@ -84,7 +87,7 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '**.ipynb_checkpoints']
 
 
 
@@ -210,7 +213,7 @@ texinfo_documents = [
 # -- Options for intersphinx extension ---------------------------------------
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/3.6/': None}
+intersphinx_mapping = {'https://docs.python.org/3.7/': None}
 
 
 # A string of reStructuredText that will be included at the end of every source

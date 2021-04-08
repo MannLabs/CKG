@@ -123,10 +123,10 @@ In order run the the Clinical Knowledge Graph, add the path to the code to your 
 
 .. code-block:: bash
 
-	PYTHONPATH="${PYTHONPATH}:/path/to/folder/CKG/src/"
+	PYTHONPATH="${PYTHONPATH}:/path/to/folder/CKG/ckg/"
 	export PYTHONPATH
 
-Notice that the path should always finish with "/CKG/src/".
+Notice that the path should always finish with "/CKG/ckg/".
 
 
 #. To reload the bash file, first deactivate the virtual environment, reload ~/.bashrc, and activate the virtual environment again:
@@ -231,6 +231,7 @@ In some systems you might have to run this as root:
 Be aware the database contained in the dump file **does NOT** include the licensed databases (**PhosphoSitePlus**, **DrugBank** and **SNOMED-CT**).
 
 .. figure:: ../_static/images/data_folder.png
+	:alt: data_folder
     :width: 240px
     :align: right
 
@@ -243,7 +244,7 @@ Once this is done, run the following commands:
 
 .. code-block:: bash
 
-	$ cd CKG/src/graphdb_builder/builder
+	$ cd CKG/ckg/graphdb_builder/builder
 	$ python builder.py -b minimal -u username
 
 
@@ -258,7 +259,7 @@ To build the graph database, run ``builder.py``:
 
 .. code-block:: bash
 
-	$ cd src/graphdb_builder/builder
+	$ cd ckg/graphdb_builder/builder
 	$ python builder.py -b full -u neo4j
 
 .. warning:: Before running ``builder.py``, please make sure your Neo4j graph is running. The builder will fail otherwise.

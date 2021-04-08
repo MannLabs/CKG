@@ -13,14 +13,14 @@ There are multiple ways to create a new user:
 
 .. code-block:: bash
 
-	$ cd src/graphdb_builder/builder
+	$ cd ckg/graphdb_builder/builder
 	$ python create_user.py -u username -d password -n name -e email -s second_email -p phone_number -a affiliation
 
 **From an excel file:** *(multiple users)*
 
 .. code-block:: bash
 
-	$ cd src/graphdb_builder/builder
+	$ cd ckg/graphdb_builder/builder
 	$ python create_user.py -f path/to/excel/file
 
 For help on how to use ``create_user.py``, run:

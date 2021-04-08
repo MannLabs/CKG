@@ -40,7 +40,7 @@ To create a project, please follow the steps below.
 
 .. code-block:: bash
 
-	$ cd CKG/src/report_manager
+	$ cd CKG/ckg/report_manager
 
 * Start a celery queue from the report_manager directory, in each window:
 
@@ -76,7 +76,7 @@ To start this queue on Windows, please run:
 
 .. code-block:: bash
 
-	$ cd CKG/src/report_manager
+	$ cd CKG/ckg/report_manager
 	$ python index.py
 
 This will print some warnings, which should be okay.
@@ -85,6 +85,7 @@ This will print some warnings, which should be okay.
 .. warning:: Make sure that your virtual environment is always activated in each terminal window, before running any other command.
 
 .. image:: ../_static/images/homepage_app.png
+	:alt: homepage
     :width: 32%
     :align: right
 

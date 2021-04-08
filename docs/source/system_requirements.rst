@@ -28,7 +28,7 @@ Software
 
 - Java, version compatible with chosen Neo4j version (check Neo4j requirements)
 - R >= 3.5.2
-- Python 3.6/3.7
+- Python 3.7.9
 - Redis server
 - Neo4j Desktop
 - Neo4j database == 3.5.20
