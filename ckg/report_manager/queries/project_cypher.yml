@@ -117,4 +117,4 @@ projects_subgraph:
         - STUDIES_INTERVENTION
     query_type: post
     query: >
-        MATCH path=(p:Project)-[:STUDIES_DISEASE|:STUDIES_TISSUE|:STUDIES_INTERVENTION]->() WHERE p.id IN [LIST_PROJECTS] RETURN path
+        MATCH path=(p:Project)-[:STUDIES_DISEASE|STUDIES_TISSUE|STUDIES_INTERVENTION]->() WHERE p.id IN [LIST_PROJECTS] RETURN path

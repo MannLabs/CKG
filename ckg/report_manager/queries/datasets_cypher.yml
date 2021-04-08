@@ -161,7 +161,7 @@ proteomics:
             - ACTS_ON
         query_type: post
         query: >
-            MATCH (protein1:Protein)-[r:CURATED_INTERACTS_WITH|:COMPILED_INTERACTS_WITH|:ACTS_ON]-(protein2:Protein) 
+            MATCH (protein1:Protein)-[r:CURATED_INTERACTS_WITH|COMPILED_INTERACTS_WITH|ACTS_ON]-(protein2:Protein) 
             WHERE ((protein1.name+"~"+protein1.id) IN [IDENTIFIERS]) AND ((protein2.name+"~"+protein2.id) IN [IDENTIFIERS]) AND (r.score>=0.7 OR TYPE(r)="CURATED_INTERACTS_WITH")
             RETURN protein1.name+"~"+protein1.id AS node1,protein2.name+"~"+protein2.id AS node2,r.score AS score, r.source AS source,r.action AS action,r.interaction_type AS interaction_type
     PROTEIN_DRUG_ASSOCIATIONS:
@@ -204,9 +204,9 @@ proteomics:
             - ASSOCIATED_WITH
         query_type: post
         query: >
-            MATCH (project:Project)-[:STUDIES_DISEASE]->(d:Disease)-[:HAS_PARENT]->(p:Disease)<-[:HAS_PARENT]-(parent_disease:Disease)
+            MATCH (project:Project)-[:STUDIES_DISEASE]->(d:Disease)-[:HAS_PARENT]->(p:Disease)
             WHERE project.id="PROJECTID" AND p.id <> "DOID:4"
-            WITH COLLECT(parent_disease) + COLLECT(d) AS parent_diseases
+            WITH COLLECT(p) + COLLECT(d) AS parent_diseases
             MATCH (protein:Protein)-[r:ASSOCIATED_WITH]->(disease:Disease)
             WHERE ((protein.name+"~"+protein.id) IN [IDENTIFIERS]) AND disease IN parent_diseases
             RETURN DISTINCT collect(protein.name+"~"+protein.id) AS Proteins,disease.name AS Disease,disease.description AS Description, r.score AS score, r.source AS source
@@ -222,9 +222,9 @@ proteomics:
             - ASSOCIATED_WITH
         query_type: post
         query: >
-            MATCH (project:Project)-[:STUDIES_DISEASE]->(disease:Disease)-[:HAS_PARENT]->(p:Disease)<-[:HAS_PARENT]-(pdisease:Disease) 
+            MATCH (project:Project)-[:STUDIES_DISEASE]->(disease:Disease)-[:HAS_PARENT]->(p:Disease)
             WHERE project.id="PROJECTID" AND p.id <> "DOID:4"
-            WITH collect(disease.id)+collect(pdisease.id) AS diseases 
+            WITH collect(disease.id)+collect(p.id) AS diseases
             MATCH (d:Disease)-[:MENTIONED_IN_PUBLICATION]->(publication:Publication)<-[r:MENTIONED_IN_PUBLICATION]-(protein:Protein) 
             WHERE d.id IN diseases AND (protein.name+"~"+protein.id) IN [IDENTIFIERS] 
             WITH collect(DISTINCT protein.name+"~"+protein.id) as Proteins, COLLECT(DISTINCT d.name) AS Diseases, publication

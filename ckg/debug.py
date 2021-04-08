@@ -10,9 +10,9 @@ def main():
     import os
     #Script to check if all requirements are installed
     to_check = {}
-    to_check['java'] = (['Java', '-version'], None) #command, desired output
+    #to_check['java'] = (['Java', '-version'], None) #command, desired output
     to_check['R'] = (['R', '--version'], None)
-    to_check['R path'] = (['which', 'R'], '/usr/local/bin/R')
+    #to_check['R path'] = (['which', 'R'], '/usr/local/bin/R')
     to_check['Python'] = (['python', '--version'], None)
 
     for _ in to_check:

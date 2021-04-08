@@ -130,9 +130,9 @@ RUN pip3 install --ignore-installed -r requirements.txt
 
 #Creating CKG directory and setting up CKG
 RUN mkdir /CKG
-COPY --chown=nginx src /CKG/src
+COPY --chown=nginx ckg /CKG/ckg
 COPY docker_entrypoint.sh /CKG/.
-ENV PYTHONPATH "${PYTHONPATH}:/CKG/src"
+ENV PYTHONPATH "${PYTHONPATH}:/CKG/ckg"
 
 RUN echo "Setting up the config files"
 COPY setup_CKG.py /CKG/.
@@ -150,8 +150,8 @@ RUN pip3 install jupyterhub && \
 
 RUN mkdir /etc/jupyterhub
 COPY /resources/jupyterhub.py /etc/jupyterhub/.
-RUN cp -r /CKG/src/notebooks /home/adminhub/.
-RUN cp -r /CKG/src/notebooks /home/ckguser/.
+RUN cp -r /CKG/ckg/notebooks /home/adminhub/.
+RUN cp -r /CKG/ckg/notebooks /home/ckguser/.
 RUN chown -R adminhub /home/adminhub/notebooks
 RUN chown -R ckguser /home/ckguser/notebooks
 
@@ -184,7 +184,7 @@ RUN dos2unix /CKG/docker_entrypoint.sh && apt-get --purge remove -y dos2unix && 
 
 RUN ls -alrth /
 RUN ls -alrth /CKG
-RUN ls -alrth /CKG/src/notebooks
+RUN ls -alrth /CKG/ckg/notebooks
 # Expose ports (HTTP Neo4j, Bolt Neo4j, jupyterHub, CKG prod, CKG dev, Redis)
 EXPOSE 7474 7687 8090 8050 5000 6379
 

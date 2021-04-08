@@ -1,5 +1,6 @@
 import os
 import shutil
+import subprocess
 import re
 import pandas as pd
 import numpy as np
@@ -8,36 +9,32 @@ from datetime import datetime
 from uuid import uuid4
 import base64
 import flask
-import ckg.report_manager.user as user
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
+from ckg import ckg_utils
+import ckg.report_manager.user as user
 from ckg.report_manager.app import app, server as application
 from ckg.report_manager.apps import initialApp, adminApp, projectCreationApp, dataUploadApp, dataUpload, projectApp, importsApp, homepageApp, loginApp, projectCreation
 from ckg.graphdb_builder import builder_utils
 from ckg.graphdb_builder.builder import loader, builder
 from ckg.graphdb_builder.experiments import experiments_controller as eh
 from ckg.report_manager import utils
-import ckg.config.ckg_config as ckg_config
 from ckg.report_manager.worker import create_new_project, create_new_identifiers, run_minimal_update_task
 from ckg.graphdb_connector import connector
 
-log_config = ckg_config.report_manager_log
-logger = builder_utils.setup_logging(log_config, key="index page")
-
 try:
+    ckg_config = ckg_utils.read_ckg_config()
+    log_config = ckg_config['report_manager_log']
+    logger = builder_utils.setup_logging(log_config, key="index page")
     config = builder_utils.setup_config('builder')
-    directories = builder_utils.get_full_path_directories()
+    separator = config["separator"]
 except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
 
-cwd = os.path.abspath(os.path.dirname(__file__))
-experimentDir = os.path.join(directories['dataDirectory'], 'experiments')
-experimentsImportDir = directories['experimentsDirectory']
-tmpDirectory = directories['tmpDirectory']
 driver = connector.getGraphDatabaseConnectionConfiguration()
-separator = config["separator"]
+
 
 app.layout = dcc.Loading(children=[html.Div([dcc.Location(id='url', refresh=False),
                                              html.Div(id='page-content',
@@ -149,12 +146,6 @@ def get_project_params_from_url(pathname):
     return project_id, force, session_id
 
 
-# Documentation files
-@app.server.route("/docs/<value>")
-def return_docs(value):
-    docs_url = ckg_config.docs_url
-    return flask.render_template(docs_url+"{}".format(value))
-
 
 @app.callback([Output('upload-config', 'style'),
                Output('output-data-upload', 'children'),
@@ -167,7 +158,9 @@ def update_output(contents, value, fname):
     uploaded = None
     if value is not None:
         page_id, dataset = value.split('/')
-        directory = os.path.join(tmpDirectory, page_id)
+        if not os.path.exists(ckg_config['tmp_directory']):
+            os.makedirs(ckg_config['tmp_directory'])
+        directory = os.path.join(ckg_config['tmp_directory'], page_id)
         if dataset != "defaults":
             display = {'width': '50%',
                        'height': '60px',
@@ -178,9 +171,7 @@ def update_output(contents, value, fname):
                        'textAlign': 'center',
                        'margin-bottom': '20px',
                        'display': 'block'}
-            if not os.path.exists(tmpDirectory):
-                os.makedirs(tmpDirectory)
-            elif not os.path.exists(directory):
+            if not os.path.exists(directory):
                 os.makedirs(directory)
 
             if fname is None:
@@ -403,7 +394,7 @@ def generate_report_url(n_clicks, pathname):
 
 @application.route('/downloads/<value>')
 def route_report_url(value):
-    uri = os.path.join(os.getcwd(), directories['downloadsDirectory'] + '/' + value + '.zip')
+    uri = os.path.join(ckg_config['downloads_directory'], value + '.zip')
     return flask.send_file(uri, attachment_filename=value + '.zip', as_attachment=True, cache_timeout=-1)
 
 ###Callback regenerate project
@@ -488,7 +479,7 @@ def create_project(n_clicks, name, acronym, responsible, participant, datatype, 
         epoch = time.time()
         internal_id = "%s%d" % ("CP", epoch)
         projectData.insert(loc=0, column='internal_id', value=internal_id)
-        result = create_new_project.apply_async(args=[internal_id, projectData.to_json(), separator], task_id='project_creation_'+session_cookie+internal_id)
+        result = create_new_project.apply_async(args=[internal_id, projectData.to_json(), separator], task_id='project_creation_'+session_cookie+internal_id, queue='creation')
         result_output = result.get()
         if len(result_output) > 0:
             external_id = list(result_output.keys())[0]
@@ -527,6 +518,7 @@ def update_download_link(project):
 
 @application.route('/apps/templates<value>')
 def serve_static(value):
+    cwd = os.path.dirname(os.path.abspath(__file__))
     directory = os.path.join(cwd,'apps/templates/')
     filename = os.path.join(directory, value)
     url = filename+'.zip'
@@ -599,9 +591,9 @@ def show_proteomics_file_options(datatype, prot_tool, prot_file):
 def save_files_in_tmp(content, dataset, prot_tool, prot_file, projectid, uploaded_file):
     if dataset is not None:
         session_cookie = flask.request.cookies.get('custom-auth-session')
-        temporaryDirectory = os.path.join(tmpDirectory, session_cookie + "upload")
-        if not os.path.exists(tmpDirectory):
-            os.makedirs(tmpDirectory)
+        temporaryDirectory = os.path.join(ckg_config['tmp_directory'], session_cookie + "upload")
+        if not os.path.exists(ckg_config['tmp_directory']):
+            os.makedirs(ckg_config['tmp_directory'])
         elif not os.path.exists(temporaryDirectory):
             os.makedirs(temporaryDirectory)
 
@@ -653,9 +645,9 @@ def run_processing(n_clicks, project_id):
     table = None
     if n_clicks > 0:
         session_cookie = flask.request.cookies.get('custom-auth-session')
-        destDir = os.path.join(experimentDir, project_id)
+        destDir = os.path.join(ckg_config['experiments_directory'], project_id)
         builder_utils.checkDirectory(destDir)
-        temporaryDirectory = os.path.join(tmpDirectory, session_cookie+"upload")
+        temporaryDirectory = os.path.join(ckg_config['tmp_directory'], session_cookie+"upload")
         datasets = builder_utils.listDirectoryFoldersNotEmpty(temporaryDirectory)
         res_n = dataUpload.check_samples_in_project(driver, project_id)
         if 'experimental_design' in datasets:
@@ -680,7 +672,7 @@ def run_processing(n_clicks, project_id):
                             return message, style, table
 
                     res_n = None
-                    result = create_new_identifiers.apply_async(args=[project_id, designData.to_json(), directory, experimental_filename], task_id='data_upload_'+session_cookie+datetime.now().strftime('%Y%m-%d%H-%M%S-'))
+                    result = create_new_identifiers.apply_async(args=[project_id, designData.to_json(), directory, experimental_filename], task_id='data_upload_'+session_cookie+datetime.now().strftime('%Y%m-%d%H-%M%S-'), queue='creation')
                     result_output = result.wait(timeout=None, propagate=True, interval=0.2)
                     res_n = pd.DataFrame.from_dict(result_output['res_n'])
                 else:
@@ -737,11 +729,11 @@ def run_processing(n_clicks, project_id):
                     source = os.path.join(temporaryDirectory, dataset)
                     destination = os.path.join(destDir, dataset)
                     builder_utils.copytree(source, destination)
-                    datasetPath = os.path.join(os.path.join(experimentsImportDir, project_id), dataset)
+                    datasetPath = os.path.join(os.path.join(ckg_config['imports_experiments_directory'], project_id), dataset)
                     eh.generate_dataset_imports(project_id, dataset, datasetPath)
 
             loader.partialUpdate(imports=['experiment'], specific=[project_id])
-            filename = os.path.join(tmpDirectory, 'Uploaded_files_'+project_id)
+            filename = os.path.join(ckg_config['tmp_directory'], 'Uploaded_files_'+project_id)
             utils.compress_directory(filename, temporaryDirectory, compression_format='zip')
             style = {'display':'block'}
             message = 'Files successfully uploaded.'
@@ -778,7 +770,7 @@ def generate_upload_zip(n_clicks, project_id):
 @application.route('/tmp/<value>')
 def route_upload_url(value):
     page_id, project_id = value.split('_')
-    directory = os.path.join(cwd,'../../data/tmp/')
+    directory = ckg_config['tmp_directory']
     filename = os.path.join(directory, 'Uploaded_files_'+project_id)
     url = filename+'.zip'
 
@@ -786,7 +778,17 @@ def route_upload_url(value):
 
 def main():
     print("IN MAIN")
-    application.run(debug=True, host='0.0.0.0')
+    celery_working_dir = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(celery_working_dir)
+    queues = ['creation', 'compute', 'update']
+    for q in queues:
+        celery_cmdline = 'celery -A ckg.report_manager.worker worker --loglevel=DEBUG --concurrency=3 -E -Q {}'.format(q).split(" ")
+        print("Ready to call {} ".format(celery_cmdline))
+        subprocess.Popen(celery_cmdline)
+        print("Done callling {} ".format(celery_cmdline))
+    
+    application.run(debug=True, host='0.0.0.0')  
+
 
 if __name__ == '__main__':
     main()

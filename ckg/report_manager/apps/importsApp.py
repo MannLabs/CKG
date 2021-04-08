@@ -1,5 +1,5 @@
 import os
-import ckg.config.ckg_config as ckg_config
+from ckg import ckg_utils
 from ckg.report_manager.apps import basicApp
 from ckg.report_manager.apps import imports
 from ckg.analytics_core.viz import viz
@@ -21,8 +21,8 @@ class ImportsApp(basicApp.BasicApp):
         """
         plots = []
         self.add_basic_layout()
-        cwd = os.path.abspath(os.path.dirname(__file__))
-        stats_file = os.path.join(cwd, "../../../data/imports/stats/stats.hdf")
+        stats_dir = ckg_utils.read_ckg_config(key='imports_stats_directory')
+        stats_file = os.path.join(stats_dir, "stats.hdf")
         if os.path.exists(stats_file):
             stats_df = imports.get_stats_data(stats_file, n=3)
             plots.append(imports.plot_total_number_imported(stats_df, 'Number of imported entities and relationships'))

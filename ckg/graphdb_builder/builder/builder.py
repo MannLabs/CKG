@@ -12,15 +12,14 @@
 
 import argparse
 from ckg.graphdb_builder.builder import importer, loader
-import ckg.config.ckg_config as ckg_config
+from ckg import ckg_utils
 from ckg.graphdb_builder import builder_utils
 
-log_config = ckg_config.graphdb_builder_log
-logger = builder_utils.setup_logging(log_config, key="builder")
-
 try:
+    ckg_config = ckg_utils.read_ckg_config()
+    log_config = ckg_config['graphdb_builder_log']
+    logger = builder_utils.setup_logging(log_config, key="builder")
     config = builder_utils.setup_config('builder')
-    directories = builder_utils.get_full_path_directories()
     dbconfig = builder_utils.setup_config('databases')
     oconfig = builder_utils.setup_config('ontologies')
 except Exception as err:
@@ -34,9 +33,9 @@ def run_minimal_update(user, n_jobs=3):
     minimal_load = ['ontologies', 'modified_proteins', 'drugs', 'mentions', 'side effects', 'clinical_variants', 'project', 'experiment']
     logger.info("The user {} chose to perform a minimal build, after creating the database from a dump".format(user))
     logger.info("Building database > step 1: Importing licensed ontologies and databases")
-    importer.ontologiesImport(importDirectory=directories['importDirectory'], ontologies=licensed_ont, download=False)
-    importer.ontologiesImport(importDirectory=directories['importDirectory'], ontologies=mapping_ont, download=True)
-    importer.databasesImport(importDirectory=directories['importDirectory'], databases=licensed_dbs, n_jobs=n_jobs, download=False)
+    importer.ontologiesImport(ontologies=licensed_ont, download=False)
+    importer.ontologiesImport(ontologies=mapping_ont, download=True)
+    importer.databasesImport(databases=licensed_dbs, n_jobs=n_jobs, download=False)
     logger.info("Building database > step 2: Loading all missing nodes and entities")
     loader.partialUpdate(imports=minimal_load, specific=[])
 
@@ -87,7 +86,7 @@ def main():
                     if import_type.lower() == 'experiments' or import_type.lower() == 'experiment':
                         importer.experimentsImport(projects=args.data, n_jobs=1)
                     elif import_type.lower() == 'users' or import_type.lower() == 'user':
-                        importer.usersImport(importDirectory=directories['importDirectory'])
+                        importer.usersImport()
                     elif import_type.lower() == 'databases' or import_type.lower() == 'database':
                         databases = [d.lower() for d in dbconfig['databases']]
                         if args.data is not None:
@@ -97,7 +96,7 @@ def main():
                         if len(valid_entities) > 0:
                             logger.info("These entities will be imported: {}".format(", ".join(valid_entities)))
                             print("These entities will be imported: {}".format(", ".join(valid_entities)))
-                            importer.databasesImport(importDirectory=directories['importDirectory'], databases=valid_entities, n_jobs=args.n_jobs, download=download)
+                            importer.databasesImport(databases=valid_entities, n_jobs=args.n_jobs, download=download)
                         else:
                             logger.error("The indicated entities (--data) cannot be imported: {}".format(args.data))
                             print("The indicated entities (--data) cannot be imported: {}".format(args.data))
@@ -110,7 +109,7 @@ def main():
                         if len(valid_entities) > 0:
                             logger.info("These entities will be imported: {}".format(", ".join(valid_entities)))
                             print("These entities will be loaded into the database: {}".format(", ".join(valid_entities)))
-                            importer.ontologiesImport(importDirectory=directories['importDirectory'], ontologies=valid_entities, download=download)
+                            importer.ontologiesImport(ontologies=valid_entities, download=download)
                         else:
                             logger.error("The indicated entities (--data) cannot be imported: {}".format(args.data))
                             print("The indicated entities (--data) cannot be imported: {}".format(args.data))

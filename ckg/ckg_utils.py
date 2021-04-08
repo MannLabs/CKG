@@ -5,6 +5,17 @@ import json
 import logging
 
 
+def read_ckg_config(key=None):
+    cwd = os.path.dirname(os.path.abspath(__file__))
+    config_file = os.path.join(cwd, 'config/ckg_config.yml')
+    content = read_yaml(config_file)
+    if key is not None:
+        if key in content:
+            return content[key]
+
+    return content
+
+
 def save_dict_to_yaml(data, yaml_file):
     with open(yaml_file, 'w') as out:
         try:

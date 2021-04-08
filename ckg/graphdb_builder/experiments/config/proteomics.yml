@@ -220,6 +220,30 @@ maxquant :
     'Glycation': *var_gly
     'Phosphorylation': *var_p
 
+dia-nn :
+    'proteins':
+        'columns':
+            - 'Protein.Ids'
+            - 'Protein.Group'
+            - is_razor
+            - id
+            - '\w*_?AS\d+_?-?\d*'
+        'generated_columns':
+            - id
+            - 'is_razor'
+        'filters': []
+        'proteinCol': 'Protein.Ids'
+        'valueCol': '\w*_?AS\d+_?-?\d*'
+        'groupCol': 'id'
+        'indexCol': 'Protein.Ids'
+        'attributes':
+            'cols':
+                - 'id'
+                - 'is_razor'
+        'log': 'log2'
+        'combine': 'regex'
+        'file': 'proteomics_dia-nn_proteingroups.\w+'
+
 fragpipe :
     'proteins':
         'columns':

@@ -6,23 +6,25 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 from passlib.hash import bcrypt
-import ckg.ckg_utils
-import ckg.config.ckg_config as ckg_config
+from ckg import ckg_utils
 from ckg.graphdb_connector import connector
 from ckg.graphdb_builder import builder_utils
 
-log_config = ckg_config.graphdb_builder_log
-logger = builder_utils.setup_logging(log_config, key='users_controller')
+
 
 try:
+    ckg_config = ckg_utils.read_ckg_config()
+    cwd = os.path.dirname(os.path.abspath(__file__))
     config = builder_utils.setup_config('users')
+    log_config = ckg_config['graphdb_builder_log']
+    logger = builder_utils.setup_logging(log_config, key='users_controller')
 except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
 
-cwd = os.path.abspath(os.path.dirname(__file__))
 
 
-def parseUsersFile(importDirectory, expiration=365):
+
+def parseUsersFile(expiration=365):
     """
     Creates new user in the graph database and corresponding node, through the following steps:
 
@@ -31,13 +33,13 @@ def parseUsersFile(importDirectory, expiration=365):
         3. Creates new local user (access to graph database)
         4. Saves data to tab-delimited file.
 
-    :param str importDirectory: path to the directory where all the import files are generated.
     :param int expiration: number of days a user is given access.
     :return: Writes relevant .tsv file for the users in the provided file.
     """
-    usersDir = os.path.join(cwd, config['usersDirectory'])
+    usersDir = ckg_config['users_directory']
     usersFile = os.path.join(usersDir, config['usersFile'])
-    usersImportFile = os.path.join(importDirectory, config['import_file'])
+    usersImportDir = ckg_config['imports_users_directory']
+    usersImportFile = os.path.join(usersImportDir, config['import_file'])
 
     driver = connector.getGraphDatabaseConnectionConfiguration(database=None)
 

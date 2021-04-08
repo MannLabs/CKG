@@ -3,18 +3,18 @@ import re
 import pandas as pd
 import numpy as np
 from collections import defaultdict
+from ckg import ckg_utils
 from ckg.graphdb_builder import builder_utils, mapping
 
 
 def parser(projectId, type='proteomics', directory=None):
     #directory = None
     data = {}
-    cwd = os.path.abspath(os.path.dirname(__file__))
+    experiments_directory = ckg_utils.read_ckg_config(key='experiments_directory')
     config = builder_utils.get_config(config_name="proteomics.yml", data_type='experiments')
     if directory is None:
-        directory = os.path.join(cwd, '../../../../data/experiments/PROJECTID/' + type)
-        if 'directory' in config:
-            directory = os.path.join(cwd, config['directory'] + type)
+        directory = os.path.join(experiments_directory, 'PROJECTID/' + type)
+
     directory = directory.replace('PROJECTID', projectId)
     data = parse_from_directory(projectId, directory, config)
 
@@ -55,7 +55,7 @@ def parser_from_file(file_path, configuration, data_type, is_standard=True):
         df = parse_standard_dataset(file_path, configuration)
     else:
         df = parse_dataset(file_path, configuration)
-
+    
     if df is not None and not df.empty:
         if data_type == "proteins":
             data[(data_type, 'w')] = extract_protein_subject_rels(df, configuration)
@@ -69,7 +69,7 @@ def parser_from_file(file_path, configuration, data_type, is_standard=True):
             data[('modifiedprotein_peptide', 'a')] = extract_peptide_protein_modification_rels(df, configuration)
             data[('modifiedprotein', 'a')] = extract_protein_modifications_rels(df, configuration)
             data[('modifiedprotein_modification', 'a')] = extract_protein_modifications_modification_rels(df, configuration)
-
+    
     return data
 
 
@@ -118,6 +118,7 @@ def parse_dataset(filepath, configuration):
                     data[cols] = np.log2(data[cols]).replace([np.inf, -np.inf], np.nan)
                 elif log == 'log10':
                     data[cols] = np.log10(data[cols]).replace([np.inf, -np.inf], np.nan)
+    
     return data
 
 
@@ -144,7 +145,7 @@ def parse_standard_dataset(file_path, configuration):
 
             dataset = data.drop(delCols, 1)
             dataset = dataset.dropna(how='all')
-
+    
     return dataset
 
 
@@ -198,9 +199,9 @@ def load_dataset(uri, configuration):
         columns.remove(indexCol)
 
         for regex in regexCols:
-            r = re.compile(regex)
-            columns.update(set(filter(r.match, data.columns)))
-
+            cols = data.filter(regex=regex).columns.tolist()
+            columns.update(set(cols))
+        
         data = data[list(columns)].replace('Filtered', np.nan)
         value_cols = get_value_cols(data, configuration)
         data[value_cols] = data[value_cols].apply(lambda x: pd.to_numeric(x, errors='coerce'))
@@ -427,14 +428,20 @@ def extract_peptide_protein_rels(data, configuration):
 
 
 def extract_protein_subject_rels(data, configuration):
-    aux = data.filter(regex=configuration["valueCol"])
+    regex = '(\w*)_?(AS\d+)_?(-?\d*)'
     attributes = configuration["attributes"]
-    if configuration["valueCol"] != 'AS':
-        aux.columns = [re.sub("\.?" + configuration["valueCol"] + "\s?", '', c).strip() for c in aux.columns]
-    else:
-        aux.columns = [c.strip() for c in aux.columns]
+    aux = data.filter(regex=configuration["valueCol"])
+    cols = []
+    for c in aux.columns:
+        matches = re.search(regex, c)
+        if matches is not None:
+            m = matches.group(2)
+            cols.append(m)
+    
+    aux.columns = cols
     aux = aux.stack()
     aux = aux.reset_index()
+    
     aux.columns = ["c"+str(i) for i in range(len(aux.columns))]
     columns = ['END_ID', 'START_ID', "value"]
     (cAttributes, cCols), (rAttributes, regexCols) = extract_attributes(data, attributes)
@@ -456,7 +463,9 @@ def extract_protein_subject_rels(data, configuration):
 def get_value_cols(data, configuration):
     value_cols = []
     if 'valueCol' in configuration:
-        value_cols = [c for c in data.columns if configuration['valueCol'] in c]
+        r = configuration['valueCol']
+        value_cols = data.filter(regex=r).columns.tolist()
+        #value_cols = [c for c in data.columns if configuration['valueCol'] in c]
 
     return value_cols
 
@@ -466,17 +475,19 @@ def extract_subject_replicates_from_regex(data, regex):
     for r in regex:
         columns = data.filter(regex=r).columns
         for c in columns:
+            matches = re.search(r, c)
+            m = matches.group()
             value = ""
             timepoint = ""
-            fields = c.split('_')
+            fields = m.split('_')
             if len(fields) > 1:
-                value = " ".join(fields[0].split(' ')[0:-1])
+                value = " ".join(fields[0].split(' ')[0:-1])+ " "
                 subject = fields[1]
                 if len(fields) > 2:
                     timepoint = " " + fields[2]
             else:
                 subject = fields[0]
-            ident = value + " " + subject + timepoint
+            ident = value + subject + timepoint
             subjectDict[ident].append(c)
 
     return subjectDict
@@ -564,7 +575,7 @@ def calculate_median_replicates(data, log="log2"):
         median = np.log10(median).replace([np.inf, -np.inf], np.nan).median(axis=1, skipna=True)
     else:
         median = data.median(axis=1)
-
+    
     return median
 
 

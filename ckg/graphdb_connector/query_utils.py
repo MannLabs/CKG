@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-import ckg.ckg_utils as ckg_utils
+from ckg import ckg_utils
 from ckg.graphdb_connector import connector
 
 
@@ -82,7 +82,7 @@ def get_relationships(query):
 def map_node_name_to_id(driver, node, value):
     identifier = None
     query_name = 'map_node_name'
-    cwd = os.path.abspath(os.path.dirname(__file__))
+    cwd = os.path.dirname(os.path.abspath(__file__))
     queries_path = "queries.yml"
     cypher = read_queries(os.path.join(cwd, queries_path))
     query = cypher[query_name]['query'].replace('NODE', node)

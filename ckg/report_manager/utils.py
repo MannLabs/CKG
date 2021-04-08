@@ -13,6 +13,7 @@ from urllib import request
 import shutil
 import smtplib
 from email.message import EmailMessage
+from ckg import ckg_utils
 
 
 def copy_file_to_destination(cfile, destination):
@@ -21,8 +22,7 @@ def copy_file_to_destination(cfile, destination):
 
 
 def send_message_to_slack_webhook(message, message_to, username='albsantosdel'):
-    cwd = os.path.abspath(os.path.dirname(__file__))
-    webhook_file = os.path.join(cwd, "../config/wh.txt")
+    webhook_file = os.path.join(ckg_utils.read_ckg_config(key='ckg_directory'), "config/wh.txt")
     if os.path.exists(webhook_file):
         with open(webhook_file, 'r') as hf:
             webhook_url = hf.read()

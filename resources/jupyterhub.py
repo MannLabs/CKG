@@ -10,7 +10,7 @@ c.Authenticator.admin_users = {'adminhub'}
 c.Authenticator.whitelist = {'ckguser'}
 
 # set the Clinical Knowledge Graph logo
-c.JupyterHub.logo_file = '/CKG/src/report_manager/assets/logo_small.jpg'
+c.JupyterHub.logo_file = '/CKG/ckg/report_manager/assets/logo_small.jpg'
 
 ## The public facing port of the proxy.
 c.JupyterHub.port = 8090

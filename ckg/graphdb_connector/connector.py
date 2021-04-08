@@ -3,24 +3,26 @@ import os
 import json
 import neo4j
 import pandas as pd
-import ckg.ckg_utils as ckg_utils
-from ckg.config import ckg_config
+from ckg import ckg_utils
 from ckg.graphdb_builder import builder_utils
 
-log_config = ckg_config.graphdb_connector_log
-logger = builder_utils.setup_logging(log_config, key="connector")
 
 def read_config():
     try:
-        cwd = os.path.abspath(os.path.dirname(__file__))
-        path = os.path.join(cwd, ckg_config.connector_config_file)
+        ckg_config = ckg_utils.read_ckg_config()
+        cwd = os.path.dirname(os.path.abspath(__file__))
+        path = os.path.join(cwd, 'connector_config.yml')
         config = ckg_utils.get_configuration(path)
+        log_config = ckg_config['graphdb_connector_log']
+        logger = builder_utils.setup_logging(log_config, key="connector")
+        
         return config
     except Exception as err:
         logger.error("Reading configuration > {}.".format(err))
 
 
 def getGraphDatabaseConnectionConfiguration(configuration=None, database=None):
+    driver = None
     if configuration is None:
         configuration = read_config() # TODO this will fail if this function is imported
     host = configuration['db_url']
@@ -30,8 +32,10 @@ def getGraphDatabaseConnectionConfiguration(configuration=None, database=None):
 
     if database is not None:
         host = host+'/'+database
-
-    driver = connectToDB(host, port, user, password)
+    try:
+        driver = connectToDB(host, port, user, password)
+    except Exception as e:
+        print("Database is offline", e)
 
     return driver
 
@@ -44,7 +48,8 @@ def connectToDB(host="localhost", port=7687, user="neo4j", password="password"):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         sys_error = "{}, file: {},line: {}".format(sys.exc_info(), fname, exc_tb.tb_lineno)
-        raise Exception("Unexpected error:{}.\n{}".format(err, sys_error))
+        print("Database is not online")
+        #raise Exception("Unexpected error:{}.\n{}".format(err, sys_error))
 
     return driver
 
@@ -67,7 +72,6 @@ def modifyEntityProperty(parameters):
     entity, entityid, attribute, value = parameters
 
     try:
-        cwd = os.path.abspath(os.path.dirname(__file__))
         queries_path = "./queries.yml"
         project_cypher = ckg_utils.get_queries(os.path.join(cwd, queries_path))
         for query_name in project_cypher:
@@ -93,6 +97,11 @@ def commitQuery(driver, query, parameters={}):
     try:
         with driver.session() as session:
             result = session.run(query, parameters)
+    except neo4j.exceptions.ClientError as err:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        sys_error = "{}, file: {},line: {}".format(sys.exc_info(), fname, exc_tb.tb_lineno)
+        print("Connection error:{}.\n{}".format(err, sys_error))
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]

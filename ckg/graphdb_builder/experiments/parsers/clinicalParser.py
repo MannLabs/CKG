@@ -2,56 +2,50 @@ import os
 import re
 import pandas as pd
 import numpy as np
+from ckg import ckg_utils
 from ckg.graphdb_builder import builder_utils
 
 
 def parser(projectId, type='clinical'):
     data = {}
-    cwd = os.path.abspath(os.path.dirname(__file__))
-    config = builder_utils.get_config(config_name="clinical.yml", data_type='experiments')
-    project_directory = os.path.join(cwd, '../../../../data/experiments/PROJECTID/project/')
-    clinical_directory = os.path.join(cwd, '../../../../data/experiments/PROJECTID/clinical/')
-    design_directory = os.path.join(cwd, '../../../../data/experiments/PROJECTID/experimental_design/')
-    separator = config["separator"]
-    if 'project_directory' in config:
-        project_directory = os.path.join(cwd, config['project_directory'])
+    experiments_directory = ckg_utils.read_ckg_config(key='experiments_directory')
+    project_directory = os.path.join(experiments_directory, 'PROJECTID/project/')
+    clinical_directory = os.path.join(experiments_directory, 'PROJECTID/clinical/')
+    design_directory = os.path.join(experiments_directory, 'PROJECTID/experimental_design/')
     project_directory = project_directory.replace('PROJECTID', projectId)
-    if 'clinical_directory' in config:
-        clinical_directory = os.path.join(cwd, config['clinical_directory'])
     clinical_directory = clinical_directory.replace('PROJECTID', projectId)
-    if 'design_directory' in config:
-        design_directory = os.path.join(cwd, config['design_directory'])
     design_directory = design_directory.replace('PROJECTID', projectId)
+    config = builder_utils.get_config(config_name="clinical.yml", data_type='experiments')
     if type == 'project':
-        project_dfs = project_parser(projectId, config, project_directory, separator)
+        project_dfs = project_parser(projectId, config, project_directory)
         data.update(project_dfs)
     elif type == 'experimental_design':
         design_dfs = experimental_design_parser(projectId, config, design_directory)
         data.update(design_dfs)
     elif type == 'clinical':
-        clinical_dfs = clinical_parser(projectId, config, clinical_directory, separator)
+        clinical_dfs = clinical_parser(projectId, config, clinical_directory)
         data.update(clinical_dfs)
 
     return data
 
 
-def project_parser(projectId, config, directory, separator):
+def project_parser(projectId, config, directory):
     data = {}
     project_data = parse_dataset(projectId, config, directory, key='project')
     if project_data is not None:
         data[('info', 'w')] = extract_project_info(project_data)
-        data[('responsibles', 'w')] = extract_responsible_rels(project_data, separator=separator)
-        data[('participants', 'w')] = extract_participant_rels(project_data, separator=separator)
-        data[('studies_tissue', 'w')] = extract_project_tissue_rels(project_data, separator=separator)
-        data[('studies_disease', 'w')] = extract_project_disease_rels(project_data, separator=separator)
-        data[('studies_intervention', 'w')] = extract_project_intervention_rels(project_data, separator=separator)
-        data[('follows_up_project', 'w')] = extract_project_rels(project_data, separator=separator)
-        data[('timepoint', 'w')] = extract_timepoints(project_data, separator=separator)
+        data[('responsibles', 'w')] = extract_responsible_rels(project_data, separator=config['separator'])
+        data[('participants', 'w')] = extract_participant_rels(project_data, separator=config['separator'])
+        data[('studies_tissue', 'w')] = extract_project_tissue_rels(project_data, separator=config['separator'])
+        data[('studies_disease', 'w')] = extract_project_disease_rels(project_data, separator=config['separator'])
+        data[('studies_intervention', 'w')] = extract_project_intervention_rels(project_data, separator=config['separator'])
+        data[('follows_up_project', 'w')] = extract_project_rels(project_data, separator=config['separator'])
+        data[('timepoint', 'w')] = extract_timepoints(project_data, separator=config['separator'])
 
     return data
 
 
-def experimental_design_parser(projectId, config, directory):
+def experimental_design_parser(projectId, config):
     data = {}
     design_data = parse_dataset(projectId, config, directory, key='design')
     if design_data is not None:
@@ -66,7 +60,7 @@ def experimental_design_parser(projectId, config, directory):
     return data
 
 
-def clinical_parser(projectId, config, clinical_directory, separator):
+def clinical_parser(projectId, config, clinical_directory):
     data = {}
     clinical_data = parse_dataset(projectId, config, clinical_directory, key='clinical')
     if clinical_data is not None:
@@ -74,8 +68,8 @@ def clinical_parser(projectId, config, clinical_directory, separator):
         data[('biosample_analytical_attributes', 'w')] = extract_biosample_analytical_sample_relationship_attributes(clinical_data)
         data[('biological_sample_at_timepoint', 'w')] = extract_biological_sample_timepoint_rels(clinical_data)
         data[('biosample_tissue', 'w')] = extract_biological_sample_tissue_rels(clinical_data)
-        data[('disease', 'w')] = extract_subject_disease_rels(clinical_data, separator=separator)
-        data[('subject_had_intervention', 'w')] = extract_subject_intervention_rels(clinical_data, separator=separator)
+        data[('disease', 'w')] = extract_subject_disease_rels(clinical_data, separator=config['separator'])
+        data[('subject_had_intervention', 'w')] = extract_subject_intervention_rels(clinical_data, separator=config['separator'])
         clinical_state, clinical_quant = extract_biological_sample_clinical_variables_rels(clinical_data)
         data[('clinical_state', 'w')] = clinical_state
         data[('clinical_quant', 'w')] = clinical_quant

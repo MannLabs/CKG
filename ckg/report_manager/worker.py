@@ -10,7 +10,6 @@ celery_app = Celery('create_new_project')
 
 celery_app.conf.update(broker_url='redis://127.0.0.1:6379', result_backend='redis://127.0.0.1:6379/0')
 
-
 @celery_app.task
 def create_new_project(identifier, data, separator='|'):
     driver = connector.getGraphDatabaseConnectionConfiguration()

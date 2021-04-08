@@ -6,8 +6,7 @@ import json
 from collections import defaultdict
 from json import dumps
 import pandas as pd
-import ckg.ckg_utils as ckg_utils
-import ckg.config.ckg_config as ckg_config
+from ckg import ckg_utils
 from ckg.report_manager.dataset import Dataset, DNAseqDataset, ProteomicsDataset, InteractomicsDataset, PhosphoproteomicsDataset, ClinicalDataset, LongitudinalProteomicsDataset, MultiOmicsDataset
 from ckg.analytics_core.viz import viz
 from ckg.analytics_core import utils as acore_utils
@@ -15,7 +14,9 @@ from ckg.report_manager import report as rp, utils, knowledge
 from ckg.graphdb_connector import query_utils
 from ckg.graphdb_connector import connector
 
-log_config = ckg_config.report_manager_log
+ckg_config = ckg_utils.read_ckg_config()
+cwd = os.path.dirname(os.path.abspath(__file__))
+log_config = ckg_config['report_manager_log']
 logger = ckg_utils.setup_logging(log_config, key="project")
 
 
@@ -183,7 +184,6 @@ class Project:
 
     def remove_project(self, host="localhost", port=7687, user="neo4j", password="password"):
         try:
-            cwd = os.path.abspath(os.path.dirname(__file__))
             query_path = os.path.join(cwd, self.queries_file)
             project_cypher = query_utils.read_queries(query_path)
             query = query_utils.get_query(project_cypher, query_id="remove_project")
@@ -197,13 +197,13 @@ class Project:
             logger.error("Error removing project {}. Query file: {},line: {}, error: {}".format(self.identifier, fname, exc_tb.tb_lineno, err))
 
     def get_report_directory(self):
-        reports_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../data/reports/"), self.identifier)
+        reports_dir = os.path.join(ckg_config['reports_directory'], self.identifier)
         if not os.path.isdir(reports_dir):
             os.makedirs(reports_dir)
         return reports_dir
 
     def get_downloads_directory(self):
-        downloads_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../data/downloads/"), self.identifier)
+        downloads_dir = os.path.join(ckg_config['downloads_directory'], self.identifier)
         if not os.path.isdir(downloads_dir):
             os.makedirs(downloads_dir)
         return downloads_dir
@@ -212,7 +212,7 @@ class Project:
         if "attributes" in project_info:
             attributes = project_info["attributes"].to_dict('r')[0]
             if len(attributes) > 0:
-                self.from_dict(attributes[0])
+                self.from_dict(attributes)
 
     def from_dict(self, attributes):
         if "name" in attributes:
@@ -288,7 +288,6 @@ class Project:
     def query_data(self):
         data = {}
         try:
-            cwd = os.path.abspath(os.path.dirname(__file__))
             queries_path = os.path.join(cwd, self.queries_file)
             project_cypher = query_utils.read_queries(queries_path)
 
@@ -311,7 +310,7 @@ class Project:
 
     def check_report_exists(self):
         exists = True
-        report_dir = os .path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../data/reports/"), self.identifier)
+        report_dir = os.path.join(ckg_config['reports_directory'], self.identifier)
         if not os.path.isdir(report_dir):
             return False
         for dataset in self.report:
@@ -323,7 +322,7 @@ class Project:
 
     def load_project_report(self):
         self.load_project_data()
-        project_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../data/reports/"), self.identifier)
+        project_dir = os.path.join(ckg_config['reports_directory'], self.identifier)
         self.report = {}
         for root, data_types, files in os.walk(project_dir):
             for data_type in data_types:
@@ -344,7 +343,7 @@ class Project:
                     self.from_json(f["Project_information"][0])
 
     def load_project_data(self):
-        project_dir = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../data/reports/"), self.identifier)
+        project_dir = os.path.join(ckg_config['reports_directory'], self.identifier)
         self.load_project(os.path.join(project_dir, "Project information"))
         for root, data_types, files in os.walk(project_dir):
             for data_type in data_types:
@@ -506,7 +505,6 @@ class Project:
     def get_similarity_network(self):
         plot = None
         try:
-            cwd = os.path.abspath(os.path.dirname(__file__))
             query_path = os.path.join(cwd, self.queries_file)
             project_cypher = query_utils.read_queries(query_path)
             query = query_utils.get_query(project_cypher, query_id="projects_subgraph")
@@ -649,13 +647,17 @@ class Project:
         for dataset in types:
             if dataset in self.report:
                 report = self.report[dataset]
-                app_plots[dataset.upper()] = report.visualize_report(environment)
+                if report is not None:
+                    app_plots[dataset.upper()] = report.visualize_report(environment)
             elif dataset in self.datasets:
                 report = self.datasets[dataset].report
-                app_plots[dataset.upper()] = report.visualize_report(environment)
+                if report is not None:
+                    app_plots[dataset.upper()] = report.visualize_report(environment)
             elif dataset == "Knowledge Graph":
-                report = self.knowledge.report
-                app_plots[dataset.upper()] = report.visualize_report(environment)
+                if self.knowledge is not None:
+                    report = self.knowledge.report
+                    if report is not None:
+                        app_plots[dataset.upper()] = report.visualize_report(environment)
 
         return app_plots
 

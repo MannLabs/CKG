@@ -87,7 +87,6 @@ def read_colors():
     """
     color_dict = make_color_dict()
     rgbs = invert_dict(color_dict).items()
-    rgbs.sort()
 
     return color_dict, rgbs
 

@@ -1,21 +1,15 @@
 import os
 import sys
-import ckg.config.ckg_config as ckg_config
-import ckg.ckg_utils as ckg_utils
+from ckg import ckg_utils
 from ckg.graphdb_connector import connector
 from ckg.graphdb_builder import builder_utils
 from ckg.graphdb_builder.builder import loader
 from ckg.graphdb_builder.experiments import experiments_controller as eh
 
-log_config = ckg_config.report_manager_log
-logger = builder_utils.setup_logging(log_config, key="project_creation")
-
-cwd = os.path.abspath(os.path.dirname(__file__))
-experimentDir = os.path.join(cwd, '../../../data/experiments')
-importDir = os.path.join(cwd, '../../../data/imports/experiments')
-
 try:
-    config = builder_utils.get_config(config_name="clinical.yml", data_type='experiments')
+    ckg_config = ckg_utils.read_ckg_config()
+    log_config = ckg_config['report_manager_log']
+    logger = builder_utils.setup_logging(log_config, key="project_creation")
 except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
 
@@ -28,9 +22,9 @@ def get_project_creation_queries():
     :return: Nested dictionary.
     """
     try:
-        cwd = os.path.abspath(os.path.dirname(__file__))
+        directory = os.path.dirname(os.path.abspath(__file__))
         queries_path = "../queries/project_creation_cypher.yml"
-        project_creation_cypher = ckg_utils.get_queries(os.path.join(cwd, queries_path))
+        project_creation_cypher = ckg_utils.get_queries(os.path.join(directory, queries_path))
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -145,11 +139,11 @@ def create_new_project(driver, projectId, data, separator='|'):
                 external_identifier = 'P0000001'
             data['external_id'] = external_identifier
 
-            projectDir = os.path.join(experimentDir, os.path.join(external_identifier, 'project'))
+            projectDir = os.path.join(ckg_config['experiments_directory'], os.path.join(external_identifier, 'project'))
             ckg_utils.checkDirectory(projectDir)
             data.to_excel(os.path.join(projectDir, 'ProjectData_{}.xlsx'.format(external_identifier)), index=False, encoding='utf-8')
 
-            datasetPath = os.path.join(os.path.join(importDir, external_identifier), 'project')
+            datasetPath = os.path.join(os.path.join(ckg_config['imports_experiments_directory'], external_identifier), 'project')
             ckg_utils.checkDirectory(datasetPath)
             eh.generate_dataset_imports(external_identifier, 'project', datasetPath)
             loader.partialUpdate(imports=['project'], specific=[external_identifier])

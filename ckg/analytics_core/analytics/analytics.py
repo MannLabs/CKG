@@ -25,6 +25,7 @@ import snf
 import math
 from fancyimpute import KNN
 import kmapper as km
+from ckg import ckg_utils
 from ckg.analytics_core import utils
 from ckg.analytics_core.analytics import wgcnaAnalysis as wgcna
 from ckg.analytics_core.analytics import kaplan_meierAnalysis
@@ -45,8 +46,6 @@ try:
 except ImportError:
     r_installation = False
     print("R functions will not work. Module Rpy2 not installed.")
-
-cwd = os.path.abspath(os.path.dirname(__file__))
 
 
 def unit_vector(vector):
@@ -2363,7 +2362,7 @@ def run_ssgsea(data, annotation, annotation_col='an notation', identifier_col='i
     result = {}
     df = data.copy()
     if outdir is None:
-        outdir = os.path.join(cwd,'../../../data/tmp/')
+        outdir = ckg_utils.read_ckg_config(key='tmp_directory')
     if not os.path.exists(outdir):
             os.makedirs(outdir)
     

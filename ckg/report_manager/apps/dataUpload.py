@@ -3,17 +3,15 @@ import sys
 import re
 import pandas as pd
 import numpy as np
-import ckg.config.ckg_config as ckg_config
-import ckg.ckg_utils as ckg_utils
+from ckg import ckg_utils
 from ckg.graphdb_connector import connector
 from ckg.graphdb_builder import builder_utils
 from ckg.graphdb_connector import query_utils
 from ckg.analytics_core.viz import viz
 
-log_config = ckg_config.graphdb_builder_log
+ckg_config = ckg_utils.read_ckg_config()
+log_config = ckg_config['graphdb_builder_log']
 logger = builder_utils.setup_logging(log_config, key="data_upload")
-
-cwd = os.path.abspath(os.path.dirname(__file__))
 
 
 def get_data_upload_queries():
@@ -25,7 +23,8 @@ def get_data_upload_queries():
     """
     try:
         queries_path = "../queries/data_upload_cypher.yml"
-        data_upload_cypher = ckg_utils.get_queries(os.path.join(cwd, queries_path))
+        directory = os.path.dirname(os.path.abspath(__file__))
+        data_upload_cypher = ckg_utils.get_queries(os.path.join(directory, queries_path))
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -174,10 +173,11 @@ def remove_samples_nodes_db(driver, projectId):
     query = ''
     try:
         queries_path = "../queries/project_cypher.yml"
-        project_cypher = ckg_utils.get_queries(os.path.join(cwd, queries_path))
+        directory = os.path.dirname(os.path.abspath(__file__))
+        project_cypher = ckg_utils.get_queries(os.path.join(directory, queries_path))
         query = project_cypher[query_name]['query'].replace('PROJECTID', projectId).split(';')[:-2]
         for q in query:
-            result = connector.getCursorData(driver, q+';')
+            result = connector.commitQuery(driver, q+';')
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -207,7 +207,7 @@ def create_new_subjects(driver, data, projectId):
             data_upload_cypher = get_data_upload_queries()
             queries = data_upload_cypher[query_name]['query'].split(';')[:-1]
             for query in queries:
-                res = connector.getCursorData(driver, query+';', parameters=parameters)
+                res = connector.commitQuery(driver, query+';', parameters=parameters)
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -243,7 +243,7 @@ def create_new_biosamples(driver, data):
             data_upload_cypher = get_data_upload_queries()
             queries = data_upload_cypher[query_name]['query'].split(';')[:-1]
             for query in queries:
-                res = connector.getCursorData(driver, query+';', parameters=parameters)
+                res = connector.commitQuery(driver, query+';', parameters=parameters)
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -280,7 +280,7 @@ def create_new_ansamples(driver, data):
             data_upload_cypher = get_data_upload_queries()
             queries = data_upload_cypher[query_name]['query'].split(';')[:-1]
             for query in queries:
-                res = connector.getCursorData(driver, query+';', parameters=parameters)
+                res = connector.commitQuery(driver, query+';', parameters=parameters)
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]

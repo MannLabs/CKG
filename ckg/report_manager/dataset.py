@@ -2,16 +2,16 @@ import os
 import sys
 import pandas as pd
 import h5py as h5
-import ckg.ckg_utils as ckg_utils
-import ckg.config.ckg_config as ckg_config
+from ckg import ckg_utils
 from ckg.report_manager import report as rp, knowledge
 from ckg.analytics_core import analytics_factory
 from ckg.analytics_core.analytics import analytics
 from ckg.analytics_core.viz import viz
 from ckg.graphdb_connector import connector
 
-
-log_config = ckg_config.report_manager_log
+ckg_config = ckg_utils.read_ckg_config()
+cwd = os.path.dirname(os.path.abspath(__file__))
+log_config = ckg_config['report_manager_log']
 logger = ckg_utils.setup_logging(log_config, key="dataset")
 
 
@@ -102,7 +102,6 @@ class Dataset:
 
     def set_configuration_from_file(self, configuration_file):
         try:
-            cwd = os.path.abspath(os.path.dirname(__file__))
             config_path = os.path.join("config/", configuration_file)
             self.configuration = ckg_utils.get_configuration(os.path.join(cwd, config_path))
         except Exception as err:
@@ -110,7 +109,6 @@ class Dataset:
 
     def update_configuration_from_file(self, configuration_file):
         try:
-            cwd = os.path.abspath(os.path.dirname(__file__))
             config_path = os.path.join("config/", configuration_file)
             if os.path.exists(os.path.join(cwd, config_path)):
                 self.configuration.update(ckg_utils.get_configuration(os.path.join(cwd, config_path)))
@@ -130,7 +128,6 @@ class Dataset:
         data = {}
         replace = [("PROJECTID", self.identifier)]
         try:
-            cwd = os.path.abspath(os.path.dirname(__file__))
             queries_path = "queries/datasets_cypher.yml"
             datasets_cypher = ckg_utils.get_queries(os.path.join(cwd, queries_path))
             if "replace" in self.configuration:

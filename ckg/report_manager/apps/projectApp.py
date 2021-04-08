@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 from uuid import uuid4
+from ckg import ckg_utils
 from ckg.report_manager.apps import basicApp
 from ckg.report_manager import project
 import dash_html_components as html
@@ -151,8 +152,9 @@ class ProjectApp(basicApp.BasicApp):
         A button to download the entire project and report is added.
         """
         config_files = {}
-        if os.path.exists("../../data/tmp"):
-            directory = os.path.join('../../data/tmp', self.id)
+        tmp_dir = ckg_utils.read_ckg_config(key='tmp_directory')
+        if os.path.exists(tmp_dir):
+            directory = os.path.join(tmp_dir, self.id)
             if os.path.exists(directory):
                 config_files = {f.split('.')[0]: os.path.join(directory, f) for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))}
 

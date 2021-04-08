@@ -256,8 +256,10 @@ def map_experiment_files(project_id, datasetPath, mapping):
 def map_experimental_data(data, mapping):
     mapping_cols = {}
     regex = "({})".format("|".join([re.escape(k) for k in sorted(list(mapping.keys()), key=len, reverse=True)]))
+    print(regex)
     if not data.empty:
         for column in data.columns:
+            print(column)
             ids = re.search(regex, column)
             if ids is not None:
                 ids = ids.group(1)
@@ -270,7 +272,7 @@ def map_experimental_data(data, mapping):
 
 
 def get_mapping_analytical_samples(project_id):
-    from graphdb_connector import connector
+    from ckg.graphdb_connector import connector
     driver = connector.getGraphDatabaseConnectionConfiguration()
 
     mapping = {}

@@ -161,7 +161,7 @@ def get_boxplot_grid(data, identifier, args):
 
     Example::
 
-        result = get_boxplot_grid(data, identifier='Boxplot', args:{"Title":"Boxplot", 'x':'sample', 'y':'identifier', 'color':'group', 'facet':'qc_class', 'axis':'cols'})
+        result = get_boxplot_grid(data, identifier='Boxplot', args:{"title":"Boxplot", 'x':'sample', 'y':'identifier', 'color':'group', 'facet':'qc_class', 'axis':'cols'})
     """
     fig = {}
     if 'x' in args and 'y' in args and 'color' in args:
@@ -171,23 +171,21 @@ def get_boxplot_grid(data, identifier, args):
             args["facet"] = None
         if 'width' not in args:
             args['width'] = 2500
-        if 'height' not in args:
-            args['height'] = None
         if 'title' not in args:
             args['title'] = 'Boxplot'
         if 'colors' in args:
             color_map = args['colors']
         else:
             color_map = {}
-
+        print("IN")
         if args['axis'] == 'rows':
             fig = px.box(data, x=args["x"], y=args["y"], color=args['color'], color_discrete_map=color_map, points="all", facet_row=args["facet"], width=args['width'])
         else:
             fig = px.box(data, x=args["x"], y=args["y"], color=args['color'], color_discrete_map=color_map, points="all", facet_col=args["facet"], width=args['width'])
         fig.update_xaxes(type='category')
-        fig.update_layout(annotations=[dict(xref='paper', yref='paper', showarrow=False)], template='plotly_white')
+        fig.update_layout(annotations=[dict(xref='paper', yref='paper', showarrow=False, text=None)], template='plotly_white')
     else:
-        fig = get_markdown(text='Missing arguments. Please, provide: x, y, color, facet, axis')
+        fig = get_markdown(text='Missing arguments. Please, provide: x, y, color')
 
     return dcc.Graph(id=identifier, figure=fig)
 

@@ -19,20 +19,19 @@ import os
 import sys
 import re
 from datetime import datetime
-import ckg.config.ckg_config as ckg_config
-import ckg.ckg_utils as ckg_utils
+from ckg import ckg_utils
 from ckg.graphdb_connector import connector
 from ckg.graphdb_builder import builder_utils
 
 
-cwd = os.path.abspath(os.path.dirname(__file__))
-log_config = ckg_config.graphdb_builder_log
-logger = builder_utils.setup_logging(log_config, key="loader")
 START_TIME = datetime.now()
 
 try:
+    ckg_config = ckg_utils.read_ckg_config()
+    cwd = os.path.dirname(os.path.abspath(__file__))
+    log_config = ckg_config['graphdb_builder_log']
+    logger = builder_utils.setup_logging(log_config, key="loader")
     config = builder_utils.setup_config('builder')
-    directories = builder_utils.get_full_path_directories()
 except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
 
@@ -100,12 +99,12 @@ def updateDB(driver, imports=None, specific=[]):
         queries = []
         logger.info("Loading {} into the database".format(i))
         try:
-            import_dir = os.path.join(cwd, directories["databasesDirectory"]).replace('\\', '/')
+            import_dir = ckg_config['imports_databases_directory']
             if i == "ontologies":
                 entities = [e.lower() for e in config["ontology_entities"]]
                 if len(specific) > 0:
                     entities = list(set(entities).intersection([s.lower() for s in specific]))
-                import_dir = os.path.join(cwd, directories["ontologiesDirectory"]).replace('\\', '/')
+                import_dir = ckg_config['imports_ontologies_directory']
                 ontologyDataImportCode = cypher_queries['IMPORT_ONTOLOGY_DATA']['query']
                 for entity in entities:
                     queries.extend(ontologyDataImportCode.replace("ENTITY", entity.capitalize()).replace("IMPORTDIR", import_dir).split(';')[0:-1])
@@ -118,12 +117,12 @@ def updateDB(driver, imports=None, specific=[]):
                 print('Done Loading ontologies')
             elif i == "biomarkers":
                 code = cypher_queries['IMPORT_BIOMARKERS']['query']
-                import_dir = os.path.join(cwd, directories["curatedDirectory"]).replace('\\', '/')
+                import_dir = ckg_config['imports_curated_directory']
                 queries = code.replace("IMPORTDIR", import_dir).split(';')[0:-1]
                 print('Done Loading biomarkers')
             elif i == "qcmarkers":
                 code = cypher_queries['IMPORT_QCMARKERS']['query']
-                import_dir = os.path.join(cwd, directories["curatedDirectory"]).replace('\\', '/')
+                import_dir = ckg_config['imports_curated_directory']
                 queries = code.replace("IMPORTDIR", import_dir).split(';')[0:-1]
                 print('Done Loading qcmarkers')
             elif i == "chromosomes":
@@ -259,13 +258,13 @@ def updateDB(driver, imports=None, specific=[]):
                     queries.extend(code.replace("IMPORTDIR", import_dir).replace("ENTITY", entity).split(';')[0:-1])
                 print('Done Loading published')
             elif i == "user":
-                usersDir = os.path.join(cwd, directories["usersImportDirectory"]).replace('\\', '/')
+                usersDir = ckg_config['imports_users_directory']
                 user_cypher = cypher_queries['CREATE_USER_NODE']
                 code = user_cypher['query']
                 queries.extend(code.replace("IMPORTDIR", usersDir).split(';')[0:-1])
                 print('Done Loading user')
             elif i == "project":
-                import_dir = os.path.join(cwd, directories["experimentsDirectory"]).replace('\\', '/')
+                import_dir = ckg_config['imports_experiments_directory']
                 projects = builder_utils.listDirectoryFolders(import_dir)
                 if len(specific) > 0:
                     projects = list(set(projects).intersection(specific))
@@ -278,7 +277,7 @@ def updateDB(driver, imports=None, specific=[]):
                         queries.extend(code.replace("IMPORTDIR", projectDir).replace('PROJECTID', project).split(';')[0:-1])
                 print('Done Loading project')
             elif i == "experiment":
-                import_dir = os.path.join(cwd, directories["experimentsDirectory"]).replace('\\', '/')
+                import_dir = ckg_config['imports_experiments_directory']
                 datasets_cypher = cypher_queries['IMPORT_DATASETS']
                 projects = builder_utils.listDirectoryFolders(import_dir)
                 if len(specific) > 0:
@@ -348,9 +347,9 @@ def archiveImportDirectory(archive_type="full"):
 
     :param str archive_type: whether it is a full update or a partial update.
     """
-    dest_folder = directories["archiveDirectory"]
+    dest_folder = ckg_config["archive_directory"]
     builder_utils.checkDirectory(dest_folder)
-    folder_to_backup = directories["importDirectory"]
+    folder_to_backup = ckg_config["imports_directory"]
     date, time = builder_utils.getCurrentTime()
     file_name = "{}_{}_{}".format(archive_type, date.replace('-', ''), time.replace(':', ''))
     logger.info("Archiving {} to file: {}".format(folder_to_backup, file_name))
@@ -358,5 +357,4 @@ def archiveImportDirectory(archive_type="full"):
     logger.info("New backup created: {}".format(file_name))
 
 if __name__ == "__main__":
-    fullUpdate()
-    #partialUpdate(imports=["clinical variants"])
+    pass

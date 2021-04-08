@@ -5,8 +5,7 @@ import numpy as np
 import ast
 from operator import itemgetter
 import networkx as nx
-import ckg.ckg_utils as ckg_utils
-import ckg.config.ckg_config as ckg_config
+from ckg import ckg_utils
 import dash_cytoscape as cyto
 from ckg.graphdb_connector import connector
 from ckg.report_manager import report as rp
@@ -14,7 +13,8 @@ from ckg.analytics_core import utils
 from ckg.analytics_core.viz import viz, color_list
 from networkx.readwrite import json_graph
 
-log_config = ckg_config.report_manager_log
+ckg_config = ckg_utils.read_ckg_config()
+log_config = ckg_config['report_manager_log']
 logger = ckg_utils.setup_logging(log_config, key="knowledge")
 cyto.load_extra_layouts()
 
@@ -370,7 +370,7 @@ class Knowledge:
     def query_data(self, replace=[]):
         query_data = {}
         try:
-            cwd = os.path.abspath(os.path.dirname(__file__))
+            cwd = os.path.dirname(os.path.abspath(__file__))
             cypher_queries = ckg_utils.get_queries(os.path.join(cwd, self.queries_file))
             if cypher_queries is not None:
                 for query_name in cypher_queries:
@@ -404,7 +404,7 @@ class Knowledge:
         drugs = []
         q = 'NA'
         try:
-            cwd = os.path.abspath(os.path.dirname(__file__))
+            cwd = os.path.dirname(os.path.abspath(__file__))
             cypher_queries = ckg_utils.get_queries(os.path.join(cwd, queries_file))
             if cypher_queries is not None:
                 if entity_type.capitalize() in cypher_queries:

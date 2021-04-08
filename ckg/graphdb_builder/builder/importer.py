@@ -13,43 +13,37 @@ from datetime import datetime
 import pandas as pd
 from joblib import Parallel, delayed
 from uuid import uuid4
-import ckg.config.ckg_config as ckg_config
+from ckg import ckg_utils
 from ckg.graphdb_builder.ontologies import ontologies_controller as oh
 from ckg.graphdb_builder.databases import databases_controller as dh
 from ckg.graphdb_builder.experiments import experiments_controller as eh
 from ckg.graphdb_builder.users import users_controller as uh
 from ckg.graphdb_builder import builder_utils
 
-log_config = ckg_config.graphdb_builder_log
-logger = builder_utils.setup_logging(log_config, key="importer")
 import_id = uuid4()
 
 try:
-    cwd = os.path.abspath(os.path.dirname(__file__))
+    ckg_config = ckg_utils.read_ckg_config()
+    log_config = ckg_config['graphdb_builder_log']
+    logger = builder_utils.setup_logging(log_config, key="importer")
     config = builder_utils.setup_config('builder')
-    directories = builder_utils.get_full_path_directories()
-    oconfig = builder_utils.setup_config('ontologies')
-    dbconfig = builder_utils.setup_config('databases')
-    econfig = builder_utils.setup_config('experiments')
-    uconfig = builder_utils.setup_config('users')
 except Exception as err:
     logger.error("importer - Reading configuration > {}.".format(err))
 
 START_TIME = datetime.now()
 
 
-def ontologiesImport(importDirectory, ontologies=None, download=True, import_type="partial"):
+def ontologiesImport(ontologies=None, download=True, import_type="partial"):
     """
     Generates all the entities and relationships from the provided ontologies. If the ontologies list is\
     not provided, then all the ontologies listed in the configuration will be imported (full_import). \
     This function also updates the stats object with numbers from the imported ontologies.
 
-    :param str importDirectory: path of the import directory where files will be created.
     :param list ontologies: a list of ontology names to be imported.
     :param bool download: wether database is to be downloaded.
     :param str import_type: type of import (´full´ or ´partial´).
     """
-    ontologiesImportDirectory = os.path.join(importDirectory, oconfig["ontologies_importDir"])
+    ontologiesImportDirectory = ckg_config['imports_ontologies_directory']
     builder_utils.checkDirectory(ontologiesImportDirectory)
     stats = oh.generate_graphFiles(ontologiesImportDirectory, ontologies, download)
     statsDf = generateStatsDataFrame(stats)
@@ -57,18 +51,17 @@ def ontologiesImport(importDirectory, ontologies=None, download=True, import_typ
     writeStats(statsDf, import_type)
 
 
-def databasesImport(importDirectory, databases=None, n_jobs=1, download=True, import_type="partial"):
+def databasesImport(databases=None, n_jobs=1, download=True, import_type="partial"):
     """
     Generates all the entities and relationships from the provided databases. If the databases list is\
     not provided, then all the databases listed in the configuration will be imported (full_import).\
     This function also updates the stats object with numbers from the imported databases.
 
-    :param str importDirectory: path of the import directory where files will be created.
     :param list databases: a list of database names to be imported.
     :param int n_jobs: number of jobs to run in parallel. 1 by default when updating one database.
     :param str import_type: type of import (´full´ or ´partial´).
     """
-    databasesImportDirectory = os.path.join(importDirectory, dbconfig["databasesImportDir"])
+    databasesImportDirectory = ckg_config['imports_databases_directory']
     builder_utils.checkDirectory(databasesImportDirectory)
     stats = dh.generateGraphFiles(databasesImportDirectory, databases, download, n_jobs)
     statsDf = generateStatsDataFrame(stats)
@@ -86,9 +79,9 @@ def experimentsImport(projects=None, n_jobs=1, import_type="partial"):
     :param int n_jobs: number of jobs to run in parallel. 1 by default when updating one project.
     :param str import_type: type of import (´full´ or ´partial´).
     """
-    experiments_import_directory = os.path.join(directories['importDirectory'], econfig["import_directory"])
+    experiments_import_directory = ckg_config['imports_experiments_directory']
     builder_utils.checkDirectory(experiments_import_directory)
-    experiments_directory = os.path.join(directories['dataDirectory'], econfig["experiments_directory"])
+    experiments_directory = ckg_config['experiments_directory']
     if projects is None:
         projects = builder_utils.listDirectoryFolders(experiments_directory)
     if len(projects) > 0:
@@ -125,18 +118,15 @@ def experimentImport(importDirectory, experimentsDirectory, project):
                 eh.generate_dataset_imports(project, dataset, datasetPath)
 
 
-def usersImport(importDirectory, import_type='partial'):
+def usersImport(import_type='partial'):
     """
     Generates User entities from excel file and grants access of new users to the database.
     This function also writes the relevant information to a tab-delimited file in the import \
     directory.
 
-    :param str importDirectory: path to the directory where all the import files are generated.
     :param str import_type: type of import (´full´ or ´partial).
     """
-    usersImportDirectory = os.path.join(importDirectory, uconfig['usersImportDirectory'])
-    builder_utils.checkDirectory(usersImportDirectory)
-    uh.parseUsersFile(usersImportDirectory, expiration=365)
+    uh.parseUsersFile(expiration=365)
 
 
 def fullImport(download=True, n_jobs=4):
@@ -146,20 +136,18 @@ def fullImport(download=True, n_jobs=4):
     and create it otherwise. Calls setupStats.
     """
     try:
-        importDirectory = directories["importDirectory"]
-        builder_utils.checkDirectory(importDirectory)
         setupStats(import_type='full')
         logger.info("Full import: importing all Ontologies")
-        ontologiesImport(importDirectory, download=download, import_type='full')
+        ontologiesImport(download=download, import_type='full')
         logger.info("Full import: Ontologies import took {}".format(datetime.now() - START_TIME))
         logger.info("Full import: importing all Databases")
-        databasesImport(importDirectory, n_jobs=n_jobs, download=download, import_type='full')
+        databasesImport(n_jobs=n_jobs, download=download, import_type='full')
         logger.info("Full import: Databases import took {}".format(datetime.now() - START_TIME))
         logger.info("Full import: importing all Experiments")
         experimentsImport(n_jobs=n_jobs, import_type='full')
         logger.info("Full import: Experiments import took {}".format(datetime.now() - START_TIME))
         logger.info("Full import: importing all Users")
-        usersImport(importDirectory, import_type='full')
+        usersImport(import_type='full')
         logger.info("Full import: Users import took {}".format(datetime.now() - START_TIME))
     except FileNotFoundError as err:
         logger.error("Full import > {}.".format(err))
@@ -194,7 +182,7 @@ def setupStats(import_type):
     """
     Creates a stats object that will collect all the statistics collected from each import.
     """
-    statsDirectory = directories["statsDirectory"]
+    statsDirectory = ckg_config['stats_directory']
     statsFile = os.path.join(statsDirectory, config["statsFile"])
     statsCols = config["statsCols"]
     statsName = getStatsName(import_type)
@@ -251,7 +239,7 @@ def writeStats(statsDf, import_type, stats_name=None):
     :param statsDf: a pandas dataframe with the new statistics from the importing.
     :param str statsName: If the statistics should be stored with a specific name.
     """
-    stats_directory = directories["statsDirectory"]
+    stats_directory = ckg_config['stats_directory']
     stats_file = os.path.join(stats_directory, config["statsFile"])
     try:
         if stats_name is None:
@@ -270,7 +258,7 @@ def getStatsName(import_type):
     :return: statsName: key used to store in the stats object.
     :rtype: str
     """
-    version = ckg_config.version
+    version = ckg_config['version']
     statsName = import_type+'_stats_' + str(version).replace('.', '_')
 
     return statsName

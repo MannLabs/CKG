@@ -5,15 +5,13 @@ import numpy as np
 import plotly.graph_objs as go
 import dash_core_components as dcc
 import dash_html_components as html
-import ckg.ckg_utils as ckg_utils
+from ckg import ckg_utils
 from ckg.graphdb_connector import connector
 from ckg.graphdb_builder import builder_utils
 from ckg.analytics_core.viz import viz
 from ckg.analytics_core import utils
 
 try:
-    cwd = os.path.abspath(os.path.dirname(__file__))
-    config = builder_utils.setup_config('experiments')
     driver = connector.getGraphDatabaseConnectionConfiguration()
 except Exception as err:
     raise Exception("Reading configuration > {}.".format(err))
@@ -46,8 +44,8 @@ def get_query():
     """
     try:
         queries_path = "../queries/dbstats_cypher.yml"
-        data_upload_cypher = ckg_utils.get_queries(
-            os.path.join(cwd, queries_path))
+        directory = os.path.dirname(os.path.abspath(__file__))
+        data_upload_cypher = ckg_utils.get_queries(os.path.join(directory, queries_path))
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]

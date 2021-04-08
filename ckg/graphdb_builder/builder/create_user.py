@@ -4,22 +4,19 @@ import argparse
 import pandas as pd
 from datetime import datetime, timedelta
 from passlib.hash import bcrypt
-import ckg.config.ckg_config as ckg_config
+from ckg import ckg_utils
 from ckg.graphdb_connector import connector
 from ckg.graphdb_builder import builder_utils
 from ckg.graphdb_builder.users import users_controller as uh
 
-log_config = ckg_config.graphdb_builder_log
-logger = builder_utils.setup_logging(log_config, key='user_creation')
 
 try:
-    config = builder_utils.setup_config('builder')
-    directories = builder_utils.get_full_path_directories()
+    ckg_config = ckg_utils.read_ckg_config()
+    log_config = ckg_config['graphdb_builder_log']
+    logger = builder_utils.setup_logging(log_config, key='user_creation')
     uconfig = builder_utils.setup_config('users')
 except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
-
-cwd = os.path.abspath(os.path.dirname(__file__))
 
 
 def create_user_from_dict(driver, data):
@@ -79,7 +76,7 @@ def create_user_from_command_line(args, expiration):
     .. note:: This function can be used directly with *python create_user_from_command_line.py -u username \
                 -n user_name -e email -s secondary_email -p phone_number -a affiliation* .
     """
-    usersImportDirectory = os.path.join(cwd, directories['usersImportDirectory'])
+    usersImportDirectory = ckg_config['imports_users_directory']
     usersFile = os.path.join(usersImportDirectory, uconfig['usersFile'])
 
     builder_utils.checkDirectory(usersImportDirectory)
@@ -108,7 +105,7 @@ def create_user_from_file(filepath, expiration):
 
     .. note:: This function can be used directly with *python create_user_from_file.py -f path_to_file* .
     """
-    usersImportDirectory = os.path.join(cwd, directories['usersImportDirectory'])
+    usersImportDirectory = ckg_config['imports_users_directory']
     usersFile = os.path.join(usersImportDirectory, uconfig['usersFile'])
 
     builder_utils.checkDirectory(usersImportDirectory)

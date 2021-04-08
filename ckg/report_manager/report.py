@@ -9,7 +9,7 @@ from plotly.offline import iplot
 from collections import defaultdict
 from cyjupyter import Cytoscape
 from ckg.report_manager import utils
-import ckg.ckg_utils
+from ckg import ckg_utils
 from ckg.analytics_core.viz import viz
 from ckg.analytics_core import utils as acore_utils
 

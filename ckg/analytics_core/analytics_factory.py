@@ -1,7 +1,7 @@
 import os
 import json
 from ckg.graphdb_builder import builder_utils
-import ckg.ckg_utils
+from ckg import ckg_utils
 from ckg.analytics_core.analytics import analytics
 from ckg.analytics_core.viz import viz
 import pandas as pd

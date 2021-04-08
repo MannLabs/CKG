@@ -1,16 +1,16 @@
 import os.path
 import sys
-import ckg.config.ckg_config as ckg_config
+from ckg import ckg_utils
 from ckg.graphdb_builder import builder_utils
 from ckg.graphdb_builder.databases.parsers import *
 from joblib import Parallel, delayed
 from datetime import date
 
-log_config = ckg_config.graphdb_builder_log
-logger = builder_utils.setup_logging(log_config, key="database_controller")
 
 try:
-    cwd = os.path.abspath(os.path.dirname(__file__))
+    ckg_config = ckg_utils.read_ckg_config()
+    log_config = ckg_config['graphdb_builder_log']
+    logger = builder_utils.setup_logging(log_config, key="database_controller")
     dbconfig = builder_utils.setup_config('databases')
 except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
@@ -23,7 +23,7 @@ def parseDatabase(importDirectory, database, download=True):
         updated_on = str(date.today())
     try:
         logger.info("Parsing database {}".format(database))
-        database_directory = os.path.join(cwd, dbconfig["databasesDir"])
+        database_directory = ckg_config['databases_directory']
         if database.lower() == "jensenlab":
             result = jensenlabParser.parser(database_directory, download)
             for qtype in result:
