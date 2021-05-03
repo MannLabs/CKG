@@ -26,6 +26,8 @@ snfpy==0.2.2
 fancyimpute==0.5.4
 kmapper==1.2.0
 natsort==6.0.0
+mpmath==1.2.1
+combat==0.2.0
 lifelines==0.23.1
 cvxpy==1.1.7
 wordcloud==1.8.1

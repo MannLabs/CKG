@@ -65,23 +65,6 @@ increment_analytical_sample_id:
         MATCH (a:Analytical_sample)
         WITH max(toInteger(SPLIT(a.id, 'AS')[1]))+1 as new_id
         RETURN new_id AS result;
-create_analytical_sample:
-    name: create analytical sample from app
-    description: 'Creates Analytical_sample nodes and links them to Biological_sample nodes, directly from dataUploadApp (web app).'
-    involved_nodes:
-        - Biological_sample
-        - Analytical_sample
-    involved_rels:
-        - SPLITTED_INTO
-    query: >
-        CREATE CONSTRAINT ON (a:Analytical_sample) ASSERT a.id IS UNIQUE;
-        MERGE (a:Analytical_sample {id:$ansample_id})
-        ON CREATE SET a.external_id=$external_id,a.quantity=$quantity,a.quantity_units=$quantity_units,a.source=$source,a.collection_date=$collection_date,a.conservation_conditions=$conservation_conditions,a.storage=$storage,a.status=$status,a.group=$group,a.secondary_group=$secondary_group
-        WITH a
-        MATCH (b:Biological_sample {id:$biosample_id})
-        MATCH (a)
-        MERGE (b)-[r:SPLITTED_INTO{quantity:$quantity,quantity_units:$quantity_units}]->(a)
-        RETURN COUNT(a) AS PROJECTID_analytical_sample, COUNT(r) AS PROJECTID_biosample_splitted_into_ansample;
 extract_enrolled_subjects:
     name: project subjects
     description: 'Extracts subject ids from specific project id.'
@@ -168,7 +151,7 @@ create_asamples_biosamples:
     query: >
         CREATE CONSTRAINT ON (as:Analytical_sample) ASSERT as.id IS UNIQUE;
         MERGE (as:Analytical_sample {id:$asample_id})
-        ON CREATE SET as.external_id=$external_id, as.group=$grouping1, as.group2=$grouping2
+        ON CREATE SET as.external_id=$external_id, as.group=$grouping1, as.group2=$grouping2, as.batch=$batch
         WITH as
         MATCH (bs:Biological_sample {id:$biosample_id})
         MERGE (bs)-[r:SPLITTED_INTO]->(as)

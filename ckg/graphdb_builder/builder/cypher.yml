@@ -1017,7 +1017,7 @@ CREATE_ANALYTICALSAMPLES: &create_ana
         LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_analytical_samples_info.tsv" AS line
         FIELDTERMINATOR '\t'
         MATCH (:Project {id:'PROJECTID'})-[:HAS_ENROLLED]-(:Subject)-[:BELONGS_TO_SUBJECT]-(:Biological_sample)-[:SPLITTED_INTO]-(s:Analytical_sample {external_id:toString(line.ID)})
-        SET s.quantity=line.quantity,s.quantity_units=line.quantity_units,s.source=line.source,s.collection_date=line.collection_date,s.conservation_conditions=line.conservation_conditions,s.storage=line.storage,s.status=line.status,s.group=line.group,s.secondary_group=line.secondary_group
+        SET s.quantity=line.quantity,s.quantity_units=line.quantity_units,s.source=line.source,s.collection_date=line.collection_date,s.conservation_conditions=line.conservation_conditions,s.storage=line.storage,s.status=line.status,s.group=line.group,s.secondary_group=line.secondary_group,s.batch=line.batch
         RETURN COUNT(s) AS c;
 
 CREATE_TIMEPOINT: &create_timepoint

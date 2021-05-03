@@ -1,3 +1,4 @@
+import warnings
 import os
 import uuid
 import time
@@ -31,6 +32,10 @@ from ckg.analytics_core.analytics import wgcnaAnalysis as wgcna
 from ckg.analytics_core.analytics import kaplan_meierAnalysis
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
+from combat.pycombat import pycombat
+
+warnings.filterwarnings("ignore", category=DeprecationWarning) 
+warnings.filterwarnings("ignore", category=RuntimeWarning) 
 
 try:
     from rpy2 import robjects as ro
@@ -357,6 +362,27 @@ def imputation_normal_distribution(data, index_cols=['group', 'sample', 'subject
 
     return data_imputed.T
 
+def combat_batch_correction(data, batch_col, index_cols):
+    """
+    This function corrects processed data for batch effects. For more information visit: https://pypi.org/project/pycombat/
+    :param data: pandas dataframe with samples as rows and protein identifiers as columns.
+    :param batch_col: column with the batch identifiers
+    :param index_cols: list of columns that don't need to be corrected (i.e group)
+    :return: pandas dataframe with samples as rows and protein identifiers as columns.
+    Example::
+        result = combat_batch_correction(data, batch_col='batch', index_cols=['subject', 'sample', 'group'])
+    """
+    index_cols = [c for c in index_cols if c != batch_col]
+    data = data.set_index(index_cols)
+    df = data.drop(batch_col, axis=1)
+    df_numeric = df._get_numeric_data()
+    info_cols = list(set(df.columns.tolist()).difference(df_numeric.columns))
+    df_corrected = pd.DataFrame(pycombat(df_numeric.T, data[batch_col].values).T, index = df.index)
+    df_corrected = df_corrected.join(df[info_cols])
+    df_corrected = df_corrected.reset_index()
+
+    return df_corrected
+
 
 def normalize_data_per_group(data, group, method='median', normalize=None):
     """
@@ -655,7 +681,7 @@ def get_coefficient_variation(data, drop_columns, group, columns=['name', 'y']):
     return cvs_df
 
 
-def transform_proteomics_edgelist(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', value_col='LFQ_intensity'):
+def transform_proteomics_edgelist(df, index_cols=['group', 'sample', 'subject', 'batch'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', value_col='LFQ_intensity'):
     """
     Transforms a long format proteomics matrix into a wide format
 
@@ -670,7 +696,7 @@ def transform_proteomics_edgelist(df, index_cols=['group', 'sample', 'subject'],
     :return: Pandas dataframe with samples as rows and protein identifiers (UniprotID~GeneName) as columns (with additional columns 'group', 'sample' and 'subject').
 
     Example:
-        df = transform_proteomics_edgelist(original, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', value_col='LFQ_intensity')
+        df = transform_proteomics_edgelist(original, index_cols=['group', 'sample', 'subject', 'batch'], drop_cols=['sample'], group='group', identifier='identifier', value_col='LFQ_intensity')
     """
     wdf = None
     if df.columns.isin(index_cols).sum() == len(index_cols):
@@ -687,7 +713,7 @@ def transform_proteomics_edgelist(df, index_cols=['group', 'sample', 'subject'],
     return wdf
 
 
-def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', filter_samples=False, filter_samples_percent=0.5, imputation=True, method='distribution', missing_method='percentage', missing_per_group=True, missing_max=0.3, min_valid=1, value_col='LFQ_intensity', shift=1.8, nstd=0.3, knn_cutoff=0.6, normalize=False, normalization_method='median', normalize_group=False, normalize_by=None):
+def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject', 'batch'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', filter_samples=False, filter_samples_percent=0.5, imputation=True, method='distribution', missing_method='percentage', missing_per_group=True, missing_max=0.3, min_valid=1, value_col='LFQ_intensity', shift=1.8, nstd=0.3, knn_cutoff=0.6, normalize=False, normalization_method='median', normalize_group=False, normalize_by=None):
     """
     Processes proteomics data extracted from the database: 1) filter proteins with high number of missing values (> missing_max or min_valid), 2) impute missing values.
 
@@ -717,11 +743,11 @@ def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subjec
 
     Example 1::
 
-        result = get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation=True, method = 'distribution', missing_method = 'percentage', missing_per_group=True, missing_max = 0.3, value_col='LFQ_intensity')
+        result = get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject', 'batch'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation=True, method = 'distribution', missing_method = 'percentage', missing_per_group=True, missing_max = 0.3, value_col='LFQ_intensity')
 
     Example 2::
 
-        result = get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation = True, method = 'mixed', missing_method = 'at_least_x', missing_per_group=False, min_valid=5, value_col='LFQ_intensity')
+        result = get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject', 'batch'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation = True, method = 'mixed', missing_method = 'at_least_x', missing_per_group=False, min_valid=5, value_col='LFQ_intensity')
     """
     df = transform_proteomics_edgelist(df, index_cols=index_cols, drop_cols=drop_cols, group=group, identifier=identifier, extra_identifier=extra_identifier, value_col=value_col)
     if df is not None:
@@ -754,7 +780,6 @@ def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subjec
             elif method == 'mixed':
                 df = imputation_mixed_norm_KNN(df, index_cols=index_cols, shift=shift, nstd=nstd, group=group, cutoff=knn_cutoff)
                 df = df.reset_index()
-
     return df
 
 
@@ -2226,8 +2251,8 @@ def run_up_down_regulation_enrichment(regulation_data, annotation, identifier='i
             df['up_pairwise_regulation'] = (df['posthoc padj'] <= alpha) & (df['log2FC'] >= lfc_cutoff)
             df['down_pairwise_regulation'] = (df['posthoc padj'] <= alpha) & (df['log2FC'] <= -lfc_cutoff)
         else:
-            df['up_pairwise_regulation'] = (df['log2FC'] >= lfc_cutoff)
-            df['down_pairwise_regulation'] = (df['log2FC'] <= -lfc_cutoff)
+            df['up_pairwise_regulation'] = (df['padj'] <= alpha) & (df['log2FC'] >= lfc_cutoff)
+            df['down_pairwise_regulation'] = (df['padj'] <= alpha) & (df['log2FC'] <= -lfc_cutoff)
 
         enrichment = run_regulation_enrichment(df, annotation, identifier=identifier, groups=groups, annotation_col=annotation_col, reject_col='up_pairwise_regulation', group_col=group_col, method=method, correction=correction)
         enrichment['direction'] = 'upregulated'

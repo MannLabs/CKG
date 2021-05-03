@@ -149,7 +149,7 @@ proteomics:
         query: >
             MATCH (project:Project)-[:HAS_ENROLLED]->(subject:Subject)-[:BELONGS_TO_SUBJECT]-(:Biological_sample)-[:SPLITTED_INTO]->(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(protein:Protein) 
             WHERE project.id="PROJECTID" AND toBoolean(r.is_razor)
-            RETURN subject.external_id as subject, a.external_id AS sample, protein.id AS identifier, a.group AS group, toFloat(r.value) as LFQ_intensity, protein.name AS name ORDER BY name, group;
+            RETURN subject.external_id as subject, a.external_id AS sample, protein.id AS identifier, a.group AS group, a.batch as batch, toFloat(r.value) as LFQ_intensity, protein.name AS name ORDER BY name, group;
     PROTEIN_INTERACTION_NETWORK:
         name: 'get PPI network'
         description: 'Get all the protein-protein interactions for the relevant proteins'

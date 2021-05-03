@@ -378,11 +378,32 @@ class ProteomicsDataset(Dataset):
     def generate_dataset(self):
         self._data = self.query_data()
         self.process_dataset()
+        self.correct_batches()
         self.widen_metadata_dataset()
 
     def process_dataset(self):
         processed_data = self.processing()
         self.update_data({"processed": processed_data})
+        
+    def correct_batches(self):
+        data = self.get_dataframe("processed")
+        corrected_data = None
+        if data is not None and not data.empty:
+            if "args" in self.configuration:
+                args = self.configuration["args"]
+                if "batch_correction" in args:
+                    if args["batch_correction"]:
+                        batch_col = 'batch'
+                        if 'batch_col' in args:
+                            batch_col = args["batch_col"]
+                        
+                        index_cols = ['subject', 'sample', 'group']
+                        if 'index' in args:
+                            index_cols = args['index']
+                        corrected_data = analytics.combat_batch_correction(data, batch_col=batch_col, index_cols=index_cols)
+        
+        if corrected_data is not None:
+            self.update_data({"uncorrected_batch": data, "processed": corrected_data})
 
     def widen_metadata_dataset(self):
         data = self.get_dataframe("metadata")
@@ -404,7 +425,7 @@ class ProteomicsDataset(Dataset):
                 missing_max = 0.3
                 min_valid = 1
                 value_col = 'LFQ_intensity'
-                index = ['group', 'sample', 'subject']
+                index = ['group', 'sample', 'subject', 'batch']
                 extra_identifier = None
                 shift = 1.8
                 nstd = 0.3
@@ -450,6 +471,8 @@ class ProteomicsDataset(Dataset):
                         normalize_group = args["normalize_group"]
                     if "normalize_by" in args:
                         normalize_by = args["normalize_by"]
+                    if 'index' in args:
+                        index = args['index']
 
                 processed_data = analytics.get_proteomics_measurements_ready(data, index_cols=index, imputation=imputation,
                                                                              method=method, missing_method=missing_method, extra_identifier=extra_identifier,

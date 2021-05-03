@@ -266,6 +266,8 @@ def create_new_ansamples(driver, data):
     num_samples = data['external_id'].shape[0]
     if 'grouping2' not in data:
         data['grouping2'] = None
+    if 'batch' not in data:
+        data['batch'] = None
     ansample_id = get_new_analytical_sample_identifier(driver)
     if ansample_id is None:
         ansample_id = '1'
