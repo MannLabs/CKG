@@ -20,9 +20,10 @@ cyto.load_extra_layouts()
 
 
 class Knowledge:
-    def __init__(self, identifier, data, nodes={}, relationships={}, queries_file=None, keep_nodes=[], colors={}, graph=None, report={}):
+    def __init__(self, identifier, data, focus_on="Protein", nodes={}, relationships={}, queries_file=None, keep_nodes=[], colors={}, graph=None, report={}):
         self._identifier = identifier
         self._data = data
+        self._focus_on = focus_on
         self._colors = {}
         self._nodes = nodes
         self._relationships = relationships
@@ -30,7 +31,8 @@ class Knowledge:
         self._graph = graph
         self._report = report
         self._default_color = '#636363'
-        self._entities = ["Disease", "Drug", "Pathway", "Biological_process", "Complex", "Publication", "Tissue", "Metabolite"]
+        self._entities = ["Protein", "Disease", "Drug", "Pathway", "Biological_process", "Complex", "Publication", "Tissue", "Metabolite"]
+        self.remove_entity(self._focus_on)
         self._colors = colors
         self._keep_nodes = keep_nodes
         if len(colors) == 0:
@@ -64,6 +66,14 @@ class Knowledge:
     @data.setter
     def data(self, data):
         self._data = data
+        
+    @property
+    def focus_on(self):
+        return self._focus_on
+
+    @focus_on.setter
+    def focus_on(self, focus_on):
+        self._focus_on = focus_on
 
     @property
     def entities(self):
@@ -72,6 +82,10 @@ class Knowledge:
     @entities.setter
     def entities(self, entities):
         self._entities = entities
+        
+    def remove_entity(self, entity):
+        if entity in self._entities:
+            self._entities.remove(entity)
 
     @property
     def nodes(self):
@@ -315,7 +329,9 @@ class Knowledge:
             nodes.update({row[source].replace("'", ""): {'type': entity1, 'color': node1_color}, row[target].replace("'", ""): {'type': entity2, 'color': node2_color}})
             relationships.update({(row[source].replace("'", ""), row[target].replace("'", "")): {'type': rtype, 'source_color': node1_color, 'target_color': node2_color, 'weight': row[weight]}})
 
-        return nodes, relationships
+        self.update_nodes(nodes)
+        self.update_relationships(relationships)
+        
 
     def generate_knowledge_from_annotations(self, entity1, entity2, filter=None):
         nodes = {}
@@ -436,9 +452,8 @@ class Knowledge:
                 entity2 = df['target_type'][0][0]
                 assoc_type = df['rel_type'][0]
                 df['weight'] = df['weight'].fillna(0.5)
-                nodes, relationships = self.generate_knowledge_from_edgelist(df, entity1, entity2, source='source', target='target', rtype=assoc_type, weight='weight')
-                self.nodes.update(nodes)
-                self.relationships.update(relationships)
+                self.generate_knowledge_from_edgelist(df, entity1, entity2, source='source', target='target', rtype=assoc_type, weight='weight')
+                
 
     def generate_cypher_nodes_list(self):
         nodes = ['"{}"'.format(n) for n in self.nodes.keys()]

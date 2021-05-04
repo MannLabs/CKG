@@ -1,3 +1,4 @@
+import warnings
 import os
 import shutil
 import subprocess
@@ -24,6 +25,9 @@ from ckg.report_manager import utils
 from ckg.report_manager.worker import create_new_project, create_new_identifiers, run_minimal_update_task
 from ckg.graphdb_connector import connector
 
+warnings.filterwarnings("ignore", category=DeprecationWarning) 
+warnings.filterwarnings("ignore", category=RuntimeWarning)
+
 try:
     ckg_config = ckg_utils.read_ckg_config()
     log_config = ckg_config['report_manager_log']
@@ -32,9 +36,6 @@ try:
     separator = config["separator"]
 except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
-
-driver = connector.getGraphDatabaseConnectionConfiguration()
-
 
 app.layout = dcc.Loading(children=[html.Div([dcc.Location(id='url', refresh=False),
                                              html.Div(id='page-content',
@@ -442,58 +443,62 @@ def create_project(n_clicks, name, acronym, responsible, participant, datatype, 
         disease = separator.join(disease)
         tissue = separator.join(tissue)
         arguments = [name, datatype, disease, tissue, responsible]
+        driver = connector.getGraphDatabaseConnectionConfiguration()
+        
+        if driver is not None: 
+            # Check if clinical variables exist in the database
+            if intervention is not None:
+                intervention = intervention.strip()
+                if intervention != '':
+                    interventions = list()
+                    exist = dict()
+                    for i in intervention.split(separator):
+                        res = projectCreation.check_if_node_exists(driver, 'Clinical_variable', 'id', i)
+                        if res.empty:
+                            exist[i] = True
+                        else:
+                            exist[i] = False
+                            interventions.append('{} ({})'.format(res['n.name'][0], i))
+                    intervention = separator.join(interventions)
 
-        # Check if clinical variables exist in the database
-        if intervention is not None:
-            intervention = intervention.strip()
-            if intervention != '':
-                interventions = list()
-                exist = dict()
-                for i in intervention.split(separator):
-                    res = projectCreation.check_if_node_exists(driver, 'Clinical_variable', 'id', i)
-                    if res.empty:
-                        exist[i] = True
-                    else:
-                        exist[i] = False
-                        interventions.append('{} ({})'.format(res['n.name'][0], i))
-                intervention = separator.join(interventions)
+                    if any(exist.values()):
+                        response = 'The intervention(s) "{}" specified does(do) not exist.'.format(', '.join([k for k,n in exist.items() if n==True]))
+                        return response, None, {'display': 'none'}, {'display': 'none'}
 
-                if any(exist.values()):
-                    response = 'The intervention(s) "{}" specified does(do) not exist.'.format(', '.join([k for k,n in exist.items() if n==True]))
-                    return response, None, {'display': 'none'}, {'display': 'none'}
+            if any(not arguments[n] for n, i in enumerate(arguments)):
+                response = "Insufficient information to create project. Fill in all fields with '*'."
+                return response, None, {'display': 'none'}, {'display': 'none'}
 
-        if any(not arguments[n] for n, i in enumerate(arguments)):
-            response = "Insufficient information to create project. Fill in all fields with '*'."
-            return response, None, {'display': 'none'}, {'display': 'none'}
+            # Get project data from filled-in fields
+            projectData = pd.DataFrame([name, acronym, description, related_to, datatype, timepoints, disease, tissue, intervention, responsible, participant, start_date, end_date]).T
+            projectData.columns = ['name', 'acronym', 'description', 'related_to', 'datatypes', 'timepoints', 'disease', 'tissue', 'intervention', 'responsible', 'participant', 'start_date', 'end_date']
+            projectData['status'] = ''
 
-        # Get project data from filled-in fields
-        projectData = pd.DataFrame([name, acronym, description, related_to, datatype, timepoints, disease, tissue, intervention, responsible, participant, start_date, end_date]).T
-        projectData.columns = ['name', 'acronym', 'description', 'related_to', 'datatypes', 'timepoints', 'disease', 'tissue', 'intervention', 'responsible', 'participant', 'start_date', 'end_date']
-        projectData['status'] = ''
+            projectData.fillna(value=pd.np.nan, inplace=True)
+            projectData.replace('', np.nan, inplace=True)
 
-        projectData.fillna(value=pd.np.nan, inplace=True)
-        projectData.replace('', np.nan, inplace=True)
-
-        # Generate project internal identifier bsed on timestamp
-        # Excel file is saved in folder with internal id name
-        epoch = time.time()
-        internal_id = "%s%d" % ("CP", epoch)
-        projectData.insert(loc=0, column='internal_id', value=internal_id)
-        result = create_new_project.apply_async(args=[internal_id, projectData.to_json(), separator], task_id='project_creation_'+session_cookie+internal_id, queue='creation')
-        result_output = result.get()
-        if len(result_output) > 0:
-            external_id = list(result_output.keys())[0]
-            done_msg = result_output[external_id]
-            if external_id != '' and done_msg is not None:
-                response = "Project successfully submitted. Download Clinical Data template."
-            elif done_msg is None:
-                response = "There was a problem when creating the project. Please, contact the administrator."
+            # Generate project internal identifier bsed on timestamp
+            # Excel file is saved in folder with internal id name
+            epoch = time.time()
+            internal_id = "%s%d" % ("CP", epoch)
+            projectData.insert(loc=0, column='internal_id', value=internal_id)
+            result = create_new_project.apply_async(args=[internal_id, projectData.to_json(), separator], task_id='project_creation_'+session_cookie+internal_id, queue='creation')
+            result_output = result.get()
+            if len(result_output) > 0:
+                external_id = list(result_output.keys())[0]
+                done_msg = result_output[external_id]
+                if external_id != '' and done_msg is not None:
+                    response = "Project successfully submitted. Download Clinical Data template."
+                elif done_msg is None:
+                    response = "There was a problem when creating the project. Please, contact the administrator."
+                else:
+                    response = 'A project with the same name already exists in the database.'
             else:
-                response = 'A project with the same name already exists in the database.'
+                response = "There was a problem when creating the project. Please, try again or contact the administrator."
+                external_id = response
         else:
-            response = "There was a problem when creating the project. Please, try again or contact the administrator."
-            external_id = response
-
+            response = "The Database is temporarily offline. Contact your administrator or start the datatabase."
+        
         return response, '- '+external_id, {'display': 'inline-block'}, {'display': 'block'}
     else:
         return None, None, {'display': 'none'}, {'display': 'none'}
@@ -535,12 +540,17 @@ def serve_static(value):
 def activate_upload_form(projectid):
     m = ''
     style = {'pointer-events': 'none', 'opacity': 0.5}
-    if len(projectid) > 7:
-        project = connector.find_node(driver, node_type='Project', parameters={'id': projectid})
-        if len(project) == 0:
-            m = 'ERROR: Project "{}" does not exist in the database.'.format(projectid)
-        else:
-            style = {}
+    driver = connector.getGraphDatabaseConnectionConfiguration()
+    if driver is not None:
+        
+        if len(projectid) > 7:
+            project = connector.find_node(driver, node_type='Project', parameters={'id': projectid})
+            if len(project) == 0:
+                m = 'ERROR: Project "{}" does not exist in the database.'.format(projectid)
+            else:
+                style = {}
+    else:
+        m = 'ERROR: Database if temporarily offline. Contact your administrator or start the database.'
 
     return m, style
 
@@ -568,7 +578,7 @@ def show_proteomics_file_options(datatype, prot_tool, prot_file):
     display = ({'display': 'none'}, False)
     if datatype in ['proteomics', 'interactomics', 'phosphoproteomics']:
         if prot_tool is not None and prot_tool != '':
-            if prot_file == '':
+            if prot_file == '' and prot_tool != 'mzTab':
                 display = ({'display': 'block'}, True)
             else:
                 display = ({'display': 'block'}, False)
@@ -603,12 +613,15 @@ def save_files_in_tmp(content, dataset, prot_tool, prot_file, projectid, uploade
                 shutil.rmtree(directory)
 
         builder_utils.checkDirectory(directory)
-        if dataset in ['proteomics', 'interactomics', 'phosphoproteomics'] and prot_tool != '' and prot_file != '':
+        if dataset in ['proteomics', 'interactomics', 'phosphoproteomics'] and prot_tool != '' and (prot_file != '' or prot_tool == 'mzTab'):
             selected_file = prot_tool.lower() + "-" + prot_file.lower()
             if selected_file in config['file_proteomics']:
                 filename = config['file_proteomics'][selected_file]
             else:
-                filename = dataset+'_'+prot_tool.lower()+'_'+prot_file.replace(' ', '').lower()+'.'+uploaded_file.split('.')[-1]
+                if prot_tool == 'mzTab':
+                    filename = dataset+'_'+prot_tool.lower()+'.mztab'
+                else:
+                    filename = dataset+'_'+prot_tool.lower()+'_'+prot_file.replace(' ', '').lower()+'.'+uploaded_file.split('.')[-1]
             directory = os.path.join(directory, prot_tool.lower())
             if os.path.exists(directory):
                 if os.path.exists(os.path.join(directory, filename)):
@@ -643,107 +656,112 @@ def run_processing(n_clicks, project_id):
     message = None
     style = {'display': 'none'}
     table = None
+    
     if n_clicks > 0:
         session_cookie = flask.request.cookies.get('custom-auth-session')
         destDir = os.path.join(ckg_config['experiments_directory'], project_id)
         builder_utils.checkDirectory(destDir)
         temporaryDirectory = os.path.join(ckg_config['tmp_directory'], session_cookie+"upload")
         datasets = builder_utils.listDirectoryFoldersNotEmpty(temporaryDirectory)
-        res_n = dataUpload.check_samples_in_project(driver, project_id)
-        if 'experimental_design' in datasets:
-            dataset = 'experimental_design'
-            directory = os.path.join(temporaryDirectory, dataset)
-            destination = os.path.join(destDir, dataset)
-            builder_utils.copytree(directory, destination)
-            experimental_files = os.listdir(directory)
-            regex = r"{}.+".format(config['file_design'].replace('PROJECTID', project_id))
-            r = re.compile(regex)
-            experimental_filename = list(filter(r.match, experimental_files))
-            if len(experimental_filename) > 0:
-                experimental_filename = experimental_filename.pop()
-                designData = builder_utils.readDataset(os.path.join(directory, experimental_filename))
-                designData = designData.astype(str)
-                if 'subject external_id' in designData.columns and 'biological_sample external_id' in designData.columns and 'analytical_sample external_id' in designData.columns:
-                    if (res_n > 0).any().values.sum() > 0:
-                        res = dataUpload.remove_samples_nodes_db(driver, project_id)
-                        res_n = dataUpload.check_samples_in_project(driver, project_id)
+        driver = connector.getGraphDatabaseConnectionConfiguration()
+        if driver is not None:
+            res_n = dataUpload.check_samples_in_project(driver, project_id)
+            if 'experimental_design' in datasets:
+                dataset = 'experimental_design'
+                directory = os.path.join(temporaryDirectory, dataset)
+                destination = os.path.join(destDir, dataset)
+                builder_utils.copytree(directory, destination)
+                experimental_files = os.listdir(directory)
+                regex = r"{}.+".format(config['file_design'].replace('PROJECTID', project_id))
+                r = re.compile(regex)
+                experimental_filename = list(filter(r.match, experimental_files))
+                if len(experimental_filename) > 0:
+                    experimental_filename = experimental_filename.pop()
+                    designData = builder_utils.readDataset(os.path.join(directory, experimental_filename))
+                    designData = designData.astype(str)
+                    if 'subject external_id' in designData.columns and 'biological_sample external_id' in designData.columns and 'analytical_sample external_id' in designData.columns:
                         if (res_n > 0).any().values.sum() > 0:
-                            message = 'ERROR: There is already an experimental design loaded into the database and there was an error when trying to delete it. Contact your administrator.'
-                            return message, style, table
+                            res = dataUpload.remove_samples_nodes_db(driver, project_id)
+                            res_n = dataUpload.check_samples_in_project(driver, project_id)
+                            if (res_n > 0).any().values.sum() > 0:
+                                message = 'ERROR: There is already an experimental design loaded into the database and there was an error when trying to delete it. Contact your administrator.'
+                                return message, style, table
 
-                    res_n = None
-                    result = create_new_identifiers.apply_async(args=[project_id, designData.to_json(), directory, experimental_filename], task_id='data_upload_'+session_cookie+datetime.now().strftime('%Y%m-%d%H-%M%S-'), queue='creation')
-                    result_output = result.wait(timeout=None, propagate=True, interval=0.2)
-                    res_n = pd.DataFrame.from_dict(result_output['res_n'])
-                else:
-                    message = 'ERROR: The Experimental design file provided ({}) is missing some of the required fields: {}'.format(experimental_filename, ','.join(['subject external_id','biological_sample external_id','analytical_sample external_id']))
-                    builder_utils.remove_directory(directory)
-
-                    return message, style, table
-
-        if 'clinical' in datasets:
-            dataset = 'clinical'
-            directory = os.path.join(temporaryDirectory, dataset)
-            clinical_files = os.listdir(directory)
-            regex = r"{}.+".format(config['file_clinical'].replace('PROJECTID', project_id) )
-            r = re.compile(regex)
-            clinical_filename = list(filter(r.match, clinical_files))
-            if len(clinical_filename) > 0:
-                clinical_filename = clinical_filename.pop()
-                data = builder_utils.readDataset(os.path.join(directory, clinical_filename))
-                external_ids = {}
-                if 'subject external_id' in data and 'biological_sample external_id' in data:
-                    external_ids['subjects'] = data['subject external_id'].astype(str).unique().tolist()
-                    external_ids['biological_samples'] = data['biological_sample external_id'].astype(str).unique().tolist()
-                    dataUpload.create_mapping_cols_clinical(driver, data, directory, clinical_filename, separator=separator)
-                    if 0 in res_n.values:
-                        samples = ', '.join([k for (k,v) in res_n if v == 0])
-                        message = 'ERROR: No {} for project {} in the database. Please upload first the experimental design (ExperimentalDesign_{}.xlsx)'.format(samples, project_id, project_id)
+                        res_n = None
+                        result = create_new_identifiers.apply_async(args=[project_id, designData.to_json(), directory, experimental_filename], task_id='data_upload_'+session_cookie+datetime.now().strftime('%Y%m-%d%H-%M%S-'), queue='creation')
+                        result_output = result.wait(timeout=None, propagate=True, interval=0.2)
+                        res_n = pd.DataFrame.from_dict(result_output['res_n'])
+                    else:
+                        message = 'ERROR: The Experimental design file provided ({}) is missing some of the required fields: {}'.format(experimental_filename, ','.join(['subject external_id','biological_sample external_id','analytical_sample external_id']))
                         builder_utils.remove_directory(directory)
 
                         return message, style, table
+
+            if 'clinical' in datasets:
+                dataset = 'clinical'
+                directory = os.path.join(temporaryDirectory, dataset)
+                clinical_files = os.listdir(directory)
+                regex = r"{}.+".format(config['file_clinical'].replace('PROJECTID', project_id) )
+                r = re.compile(regex)
+                clinical_filename = list(filter(r.match, clinical_files))
+                if len(clinical_filename) > 0:
+                    clinical_filename = clinical_filename.pop()
+                    data = builder_utils.readDataset(os.path.join(directory, clinical_filename))
+                    external_ids = {}
+                    if 'subject external_id' in data and 'biological_sample external_id' in data:
+                        external_ids['subjects'] = data['subject external_id'].astype(str).unique().tolist()
+                        external_ids['biological_samples'] = data['biological_sample external_id'].astype(str).unique().tolist()
+                        dataUpload.create_mapping_cols_clinical(driver, data, directory, clinical_filename, separator=separator)
+                        if 0 in res_n.values:
+                            samples = ', '.join([k for (k,v) in res_n if v == 0])
+                            message = 'ERROR: No {} for project {} in the database. Please upload first the experimental design (ExperimentalDesign_{}.xlsx)'.format(samples, project_id, project_id)
+                            builder_utils.remove_directory(directory)
+
+                            return message, style, table
+                        else:
+                            db_ids = dataUpload.check_external_ids_in_db(driver, project_id).to_dict()
+                            message = ''
+                            intersections = {}
+                            differences_in = {}
+                            differences_out = {}
+                            for col in external_ids:
+                                intersect = list(set(db_ids[col].values()).intersection(external_ids[col]))
+                                difference_in = list(set(db_ids[col].values()).difference(external_ids[col]))
+                                difference_out = list(set(external_ids[col]).difference(set(db_ids[col].values())))
+                                if len(difference_in) > 0 or len(difference_out) > 0:
+                                    intersections[col] = intersect
+                                    differences_in[col] = difference_in
+                                    differences_out[col] = difference_out
+                            for col in intersections:
+                                message += 'WARNING: Some {} identifiers were not matched:\n Matching: {}\n No information provided: {} \n Non-existing in the database: {}\n'.format(col, len(intersections[col]), ','.join(differences_in[col]), ','.join(differences_out[col]))
                     else:
-                        db_ids = dataUpload.check_external_ids_in_db(driver, project_id).to_dict()
-                        message = ''
-                        intersections = {}
-                        differences_in = {}
-                        differences_out = {}
-                        for col in external_ids:
-                            intersect = list(set(db_ids[col].values()).intersection(external_ids[col]))
-                            difference_in = list(set(db_ids[col].values()).difference(external_ids[col]))
-                            difference_out = list(set(external_ids[col]).difference(set(db_ids[col].values())))
-                            if len(difference_in) > 0 or len(difference_out) > 0:
-                                intersections[col] = intersect
-                                differences_in[col] = difference_in
-                                differences_out[col] = difference_out
-                        for col in intersections:
-                            message += 'WARNING: Some {} identifiers were not matched:\n Matching: {}\n No information provided: {} \n Non-existing in the database: {}\n'.format(col, len(intersections[col]), ','.join(differences_in[col]), ','.join(differences_out[col]))
-                else:
-                    message = 'ERROR: Format of the Clinical Data file is not correct. Check template in the documentation. Check columns: subject external_id, biological_sample external_id and analytical_sample external_id'
-                    builder_utils.remove_directory(directory)
+                        message = 'ERROR: Format of the Clinical Data file is not correct. Check template in the documentation. Check columns: subject external_id, biological_sample external_id and analytical_sample external_id'
+                        builder_utils.remove_directory(directory)
 
-                    return message, style, table
-        try:
-            for dataset in datasets:
-                if dataset != "experimental_design":
-                    source = os.path.join(temporaryDirectory, dataset)
-                    destination = os.path.join(destDir, dataset)
-                    builder_utils.copytree(source, destination)
-                    datasetPath = os.path.join(os.path.join(ckg_config['imports_experiments_directory'], project_id), dataset)
-                    eh.generate_dataset_imports(project_id, dataset, datasetPath)
+                        return message, style, table
+            try:
+                for dataset in datasets:
+                    if dataset != "experimental_design":
+                        source = os.path.join(temporaryDirectory, dataset)
+                        destination = os.path.join(destDir, dataset)
+                        builder_utils.copytree(source, destination)
+                        datasetPath = os.path.join(os.path.join(ckg_config['imports_experiments_directory'], project_id), dataset)
+                        eh.generate_dataset_imports(project_id, dataset, datasetPath)
 
-            loader.partialUpdate(imports=['experiment'], specific=[project_id])
-            filename = os.path.join(ckg_config['tmp_directory'], 'Uploaded_files_'+project_id)
-            utils.compress_directory(filename, temporaryDirectory, compression_format='zip')
+                loader.partialUpdate(imports=['experiment'], specific=[project_id])
+                filename = os.path.join(ckg_config['tmp_directory'], 'Uploaded_files_'+project_id)
+                utils.compress_directory(filename, temporaryDirectory, compression_format='zip')
+                style = {'display':'block'}
+                message = 'Files successfully uploaded.'
+                table = dataUpload.get_project_information(driver, project_id)
+                if table is None:
+                    message = 'Error: No data was uploaded for project: {}. Review your experimental design and data files.'.format(project_id)
+            except Exception as err:
+                style = {'display':'block'}
+                message = str(err)
+        else:
             style = {'display':'block'}
-            message = 'Files successfully uploaded.'
-            table = dataUpload.get_project_information(driver, project_id)
-            if table is None:
-                message = 'Error: No data was uploaded for project: {}. Review your experimental design and data files.'.format(project_id)
-        except Exception as err:
-            style = {'display':'block'}
-            message = str(err)
-
+            message = "ERROR: Database is offline. Contact your administrator or start the database."
 
     return message, style, table
 
@@ -780,14 +798,14 @@ def main():
     print("IN MAIN")
     celery_working_dir = os.path.dirname(os.path.abspath(__file__))
     os.chdir(celery_working_dir)
-    queues = ['creation', 'compute', 'update']
-    for q in queues:
-        celery_cmdline = 'celery -A ckg.report_manager.worker worker --loglevel=DEBUG --concurrency=3 -E -Q {}'.format(q).split(" ")
+    queues = [('creation', 1, 'INFO'), ('compute', 3, 'INFO'), ('update', 1, 'INFO')]
+    for queue, processes, log_level in queues:
+        celery_cmdline = 'celery -A ckg.report_manager.worker worker --loglevel={} --concurrency={} -E -Q {}'.format(log_level, processes, queue).split(" ")
         print("Ready to call {} ".format(celery_cmdline))
         subprocess.Popen(celery_cmdline)
         print("Done callling {} ".format(celery_cmdline))
     
-    application.run(debug=True, host='0.0.0.0')  
+    application.run(debug=False, host='0.0.0.0')  
 
 
 if __name__ == '__main__':

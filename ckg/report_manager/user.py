@@ -3,8 +3,6 @@ from passlib.hash import bcrypt
 from ckg.graphdb_connector import connector
 from ckg.graphdb_builder.builder import create_user
 
-driver = connector.getGraphDatabaseConnectionConfiguration()
-
 
 class User:
     def __init__(self, username, name=None, surname=None, acronym=None, affiliation=None, email=None, alternative_email=None, phone=None, image=None, expiration_date=365, role='reader'):
@@ -42,27 +40,38 @@ class User:
         return bcrypt.encrypt(self.username)
 
     def find(self):
-        user = connector.find_node(driver, node_type="User", parameters={"username": self.username})
+        user = None
+        driver = connector.getGraphDatabaseConnectionConfiguration()
+        if driver is not None:
+            user = connector.find_node(driver, node_type="User", parameters={"username": self.username})
         return user
 
     def validate_user(self):
-        user = connector.find_node(driver, node_type="User", parameters={"username": self.username})
-        email = connector.find_node(driver, node_type="User", parameters={'email': self.email})
+        user = None
+        email = None
+        driver = connector.getGraphDatabaseConnectionConfiguration()
+        if driver is not None:
+            user = connector.find_node(driver, node_type="User", parameters={"username": self.username})
+            email = connector.find_node(driver, node_type="User", parameters={'email': self.email})
 
         return user is None and email is None
 
     def register(self):
         result = False
-        if len(self.find()) > 0:
-            result = "error_exists"
-        elif self.validate_user():
-            result = create_user.create_user_from_dict(driver, self.to_dict())
-            if result is not None:
-                result = 'ok'
-            else:
-                result = 'error_database'
+        driver = connector.getGraphDatabaseConnectionConfiguration()
+        if driver is None:
+            result = 'error_msg'
         else:
-            result = 'error_email'
+            if len(self.find()) > 0:
+                result = "error_exists"
+            elif self.validate_user():
+                result = create_user.create_user_from_dict(driver, self.to_dict())
+                if result is not None:
+                    result = 'ok'
+                else:
+                    result = 'error_database'
+            else:
+                result = 'error_email'
 
         return result
 

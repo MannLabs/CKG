@@ -11,12 +11,6 @@ from ckg.graphdb_builder import builder_utils
 from ckg.analytics_core.viz import viz
 from ckg.analytics_core import utils
 
-try:
-    driver = connector.getGraphDatabaseConnectionConfiguration()
-except Exception as err:
-    raise Exception("Reading configuration > {}.".format(err))
-
-
 def size_converter(value):
     """
     Converts a given value to the highest possible unit, maintaining two decimals.
@@ -93,20 +87,27 @@ def get_db_schema():
 
     query_name = 'db_schema'
     cypher = get_query()
-    if query_name in cypher:
-        if 'query' in cypher[query_name]:
-            query = cypher[query_name]['query']
-            try:
-                path = connector.sendQuery(driver, query, parameters={})
-                G = utils.neo4j_schema_to_networkx(path)
-                args = {'height': '1000px'}
-                args['stylesheet'] = style
-                args['layout'] = layout
-                args['title'] = "Database Schema"
-                net, mouseover = utils.networkx_to_cytoscape(G)
-                plot = viz.get_cytoscape_network(net, "db_schema", args)
-            except Exception:
-                plot = html.Div(children=html.H1("Database is offline", className='error_msg'))
+    driver = connector.getGraphDatabaseConnectionConfiguration()
+    
+    if driver is not None:
+        if query_name in cypher:
+            if 'query' in cypher[query_name]:
+                query = cypher[query_name]['query']
+                try:
+                    path = connector.sendQuery(driver, query, parameters={})
+                    G = utils.neo4j_schema_to_networkx(path)
+                    args = {'height': '1000px'}
+                    args['stylesheet'] = style
+                    args['layout'] = layout
+                    args['title'] = "Database Schema"
+                    net, mouseover = utils.networkx_to_cytoscape(G)
+                    plot = viz.get_cytoscape_network(net, "db_schema", args)
+                except Exception as err:
+                    plot = html.Div(children=html.H1("Error accessing the database statistics", className='error_msg'))
+        else:
+            plot = html.Div(children=html.H1("Error: Cypher query {} for accessing the database statistics does not exist".format(query_name), className='error_msg'))
+    else:
+        plot = html.Div(children=html.H1("Database is offline", className='error_msg'))
 
     return plot
 
@@ -124,16 +125,19 @@ def get_db_stats_data():
 
     dfs = {}
     cypher = get_query()
-    for i, j in zip(df_names, query_names):
-        query = cypher[j]['query']
-        try:
-            data = connector.getCursorData(driver, query)
-            if i == 'store_size':
-                data = data.T
-                data['size'] = [size_converter(i) for i in data[0]]
-            dfs[i] = data.to_json(orient='records')
-        except Exception:
-            pass
+    driver = connector.getGraphDatabaseConnectionConfiguration()
+    
+    if driver is not None:
+        for i, j in zip(df_names, query_names):
+            query = cypher[j]['query']
+            try:
+                data = connector.getCursorData(driver, query)
+                if i == 'store_size':
+                    data = data.T
+                    data['size'] = [size_converter(i) for i in data[0]]
+                dfs[i] = data.to_json(orient='records')
+            except Exception:
+                pass
     return dfs
 
 
@@ -233,10 +237,13 @@ def quick_numbers_panel():
     project_ids = []
     project_links = [html.H4('No available Projects')]
     try:
-        projects = connector.find_nodes(driver, node_type='Project', parameters={})
-        for project in projects:
-            project_ids.append((project['n']['name'], project['n']['id']))
-        project_links = [html.H4('Available Projects:')]
+        driver = connector.getGraphDatabaseConnectionConfiguration()
+    
+        if driver is not None:
+            projects = connector.find_nodes(driver, node_type='Project', parameters={})
+            for project in projects:
+                project_ids.append((project['n']['name'], project['n']['id']))
+            project_links = [html.H4('Available Projects:')]
     except Exception:
         pass
 
