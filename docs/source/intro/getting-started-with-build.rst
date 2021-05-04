@@ -1,142 +1,46 @@
-Getting Started with the CKG Build
+.. _Installing CKG python library:
+
+.. include:: ../global.rst
+
+Installing CKG python library
 ===================================
 
 Setting up the Clinical Knowledge Graph is straightforward.
-Assuming you have **Python 3.6** already installed and added to ``PATH``, you can choose to create a virtual environment where all the packages with the specific versions will be installed. To do so, use Virtualenv.
+Assuming you have **Python** |python_version| already installed and a virtual environment created following instructions here: :ref:`Installation`.
 
-To check which Python version is currently installed:
-
-.. code-block:: bash
-
-	$ python3.6 --version
-
-And where this Python version is:
-
-.. code-block:: bash
-
-	$ which python3.6
-
-If this does not correspond to the correct Python version you want to run, you can create a shell alias in the bash file:
-
-1. Open the bash file:
-
-.. code-block:: bash
-
-	$ vi ~/.bash_profile
-
-#. Add at the end of the file:
-
-.. code-block:: bash
-
-	alias python3.6="/path/to/correct/python3.6"
-
-#. Save and close the bash file
-
-#. Make the alias available in the current session:
-
-.. code-block:: bash
-
-	$ source ~/.bash_profile
-
-.. note:: If you don't have **Python 3.6** installed, `download <https://www.python.org/>`__ the Python 3.6 version appropriate for your machine, and run the installer package. Python should be installed in ``/Library/Frameworks/Python.framework/Versions/3.6/bin/python3.6`` and also found in ``/usr/local/bin/python3.6``.
-
-
-.. _Create virtual environment:
-
-Create a virtual environment
------------------------------
-
-Virtualenv is not installed by default on Macbook machines. To install it, run:
-
-.. code-block:: bash
-
-	$ python3 -m pip install virtualenv
-
-To create a new virtual environment using a custom version of Python, follow the steps:
-
-1. Take note of the full path to the Python version you would like to use inside the virtual environment.
-
-#. Navigate to the directory where you would like your virtual environment to be (e.g. user's root).
-
-#. Create the virtual environment at the same time you specify the version of Python you wish to use. ``env_name`` is the name of the virtual environment and can be set to anything you like.
-
-.. code-block:: bash
-
-	$ virtualenv -p /path/to/python env_name
-
-#. Activate the virtual environment by running:
-
-.. code-block:: bash
-
-	$ source path/to/env_name/bin/activate
-
-After this, the name of the virtual environment will now appear on the left of the prompt:
-
-.. code-block:: bash
-
-	(env_name) username$
-
-
-
-.. note:: 
-	If you are finished working in the virtual environment for the moment, you can deactivate it by running: deactivate
 
 
 Setting up the Clinical Knowledge Graph
 -----------------------------------------
 
-The first step in setting up the CKG, is to obtain the complete code by clone the GitHub repository:
+The first step in setting up the CKG, is to obtain the complete code by cloning the GitHub repository:
 
 .. code-block:: bash
 
 	$ git clone https://github.com/MannLabs/CKG.git
 
-Once this is finished, you can find all the Python modules necessary to run the Clinical Knowledge Graph in ``requirements.txt``.
-To install all the packages required, simply run:
+Another option is to download it from the github page directly:
+
+1. Go to https://github.com/MannLabs/CKG
+
+2. In `Code` select **Download ZIP**
+
+3. Unzip the file
+
+Once this the cloning is finished or the file is unzipped, you can install CKG by running:
 
 .. code-block:: bash
 
 	$ cd CKG/
-	$ pip3 install --upgrade pip
-	$ pip3 install --ignore-installed -r requirements.txt
-
-.. warning:: Make sure the virtual environment previously created is active before installing ``requirements.txt``.
-
-Now that all the packages are correctly installed, you will have to create the appropriate directory architecture within the local copy of the cloned repository:
-
-.. code-block:: bash
-
-	$ python setup_CKG.py
-	$ python setup_config_files.py
+	$ conda activate ckgenv
+	$ python setup.py install
 
 This will automatically create the ``data`` folder and all subfolders, as well as setup the configuration for the log files where all errors and warnings related to the code will be written to.
-
-
-Add CKG to *.bashrc*
----------------------
-
-In order run the the Clinical Knowledge Graph, add the path to the code to your ``.bashrc`` (or ``.bash_profile``):
-
-1. Open the .bashrc file.
-
-#. Add the following lines to the file and save it:
+Further, it will create an executable file with CKG's app. To start the app, simpy run:
 
 .. code-block:: bash
 
-	PYTHONPATH="${PYTHONPATH}:/path/to/folder/CKG/ckg/"
-	export PYTHONPATH
-
-Notice that the path should always finish with "/CKG/ckg/".
-
-
-#. To reload the bash file, first deactivate the virtual environment, reload ~/.bashrc, and activate the virtual environment again:
-
-.. code-block:: bash
-
-	$ deactivate
-	$ source ~/.bashrc
-	$ source path/to/env_name/bin/activate
-
+	$ ckg_app
 
 
 .. figure:: ../_static/images/snomed_folder.png

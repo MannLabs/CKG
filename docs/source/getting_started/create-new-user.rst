@@ -30,3 +30,10 @@ For help on how to use ``create_user.py``, run:
 	$ python create_user.py -h
 
 .. warning:: If you want to have spaces (" ") in any of the arguments (e.g. -n name), you need to have the argument value within quotes "" (e.g. -n "John Smith"). The same applies to other arguments like affiliation.
+
+**From an CKG's app:**
+
+In CKG's app there is an Admin section that provides the option to create users in the database.
+
+.. image:: ../_static/images/Admin_create_user.png
+    :alt: Admin_create_user

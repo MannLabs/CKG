@@ -1,12 +1,50 @@
+.. _Installation:
 
-Getting Started with some Requirements
-========================================
+.. include:: ../global.rst
 
-The following instructions on installation of software requirements and setting up the Clinical Knowledge graph, are optimised for operating systems MacOS and Linux. For more detailed instructions on how to set up the CKG in Windows, please go to :ref:`Windows installation`.
+Installation
+===============
+
+The installation of CKG is a two step process:
+
+1. **Installation of Neo4j**: The Neo4j graph database needs to be installed (https://neo4.com) and following the instructions here: :ref:`Installing Neo4j`
+
+2. **Installation of CKG's python library**: installation of python and CKG's modules (:ref:`Installing CKG python library`)
+
+
+The Clinical Knowledge Graph requires the installation of:
+
+- Python
+
+- Java
+
+- R
+
+The following instructions are optimised for operating systems MacOS and Linux. The installation on Windows systems is slightly different, please go to :ref:`Windows installation`.
+
+Initial Requirements
+--------------------------
+
+Python
+^^^^^^^^^^^
+
+To facillitate the installation of Python, we recommend to use the Miniconda installer:
+
+1. Go to https://docs.conda.io/en/latest/miniconda.html and download the latest installer for your Operating System.
+
+2. Install python following the instructions in the installation wizard
+
+3. Open a terminal window to create a pyhton environment (https://docs.conda.io/projects/conda/en/4.6.1/user-guide/concepts.html#conda-environments) 
+
+4. Run ``conda create -n ckgenv python=`` |qpython_version| (ckgenv is the name os the environment)
+
+5. Activate the environment by running in the terminal window: ``conda activate ckgenv``
+
+.. note:: To deactivate the environment run: ``conda deactivate``
 
 
 Java
--------
+^^^^^^^^^^^
 
 Before starting setting up Neo4j and, later on, the Clinical Knowledge Graph, it is very important that you have *Java* installed in your machine, including **Java SE Runtime Environment**.
 
@@ -33,11 +71,11 @@ Running ``/usr/libexec/java_home`` in the terminal should print out a path like 
 
 
 R
------------
+^^^^^^^^^^^
 
 Another essential package for the functioning of the Clinical Knowledge Graph is R.
 
-Make sure you have installed **R version >= 3.5.2**:
+Make sure you have installed **R version >=** |r_version|:
 
 .. code-block:: bash
 
@@ -56,7 +94,9 @@ To install the necessary R packages, simply initiate R (terminal or shell) and r
 	install.packages('BiocManager')
 	BiocManager::install()
 	BiocManager::install(c('AnnotationDbi', 'GO.db', 'preprocessCore', 'impute'))
-	install.packages(c('flashClust','WGCNA', 'samr'), dependencies=TRUE, repos='http://cran.rstudio.com/')
+	install.packages(c('devtools', 'tidyverse', 'flashClust', 'WGCNA', 'samr'),
+		dependencies=TRUE, repos='http://cran.rstudio.com/')
+	install.packages('IRkernel')
 
 
 .. note:: If you need to install R, follow `these <https://web.stanford.edu/~kjytay/courses/stats32-aut2018/Session%201/Installation%20for%20Mac.html>`__ tutorial.

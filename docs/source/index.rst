@@ -3,6 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+
 Clinical Knowledge Graph Documentation
 =======================================
 
@@ -21,12 +22,11 @@ Are you new to the Clinical Knowledge Graph? Learn about how to use it and
 all the possibilities.
 
 * **Getting started**:
-  :doc:`With Requirements <intro/getting-started-with-requirements>` |
-  :doc:`With Neo4j <intro/getting-started-with-neo4j>` |
-  :doc:`With Clinical Knowledge Graph <intro/getting-started-with-build>` |
-  :doc:`With Windows <intro/getting-started-with-windows>` |
-  :doc:`With Docker <intro/getting-started-with-docker>`
-
+  :doc:`Installation <intro/getting-started-with-requirements>` |
+  :doc:`Windows Installation <intro/getting-started-with-windows>` |
+  :doc:`Installing Neo4j <intro/getting-started-with-neo4j>` |
+  :doc:`Installing CKG python library <intro/getting-started-with-build>` |
+  :doc:`CKG Docker Container <intro/getting-started-with-docker>`
 
 .. toctree::
    :maxdepth: 2

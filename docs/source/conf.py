@@ -52,7 +52,8 @@ extensions = [
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
     'recommonmark',
-    'nbsphinx'
+    'nbsphinx',
+    'rst2pdf.pdfbuilder'
 ]
 
 autodoc_mock_imports = ['pandas', 'numpy', 'scipy', 'matplotlib', 'h5py', 'rpy2',
@@ -164,9 +165,13 @@ latex_documents = [
    'Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen', 'manual'),
 ]
 
+
+pdf_documents = [(master_doc, 'ClinicalKnowledgeGraphdocs.pdf', 'Clinical Knowledge Graph Documentation',
+   'Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen', 'manual')]
+
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-#latex_logo = None
+#latex_logo = 'banner.jpg'
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.

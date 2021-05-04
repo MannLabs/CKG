@@ -1,7 +1,9 @@
-.. _Getting Started with Neo4j:
+.. _Installing Neo4j:
 
-Getting Started with Neo4j
-============================
+.. include:: ../global.rst
+
+Installing Neo4j
+===================
 
 Getting started with Neo4j is easy.
 
@@ -16,7 +18,7 @@ Once the file has downloaded, you can install Neo4j by following the instruction
 .. image:: ../_static/images/neo4j_app3.png
     :width: 32%
 
-Open the Neo4j Desktop App and create a database by clicking :guilabel:`Add graph`, followed by :guilabel:`Create a Local Graph`, **choose database version 3.5.20** using the password "NeO4J".
+Open the Neo4j Desktop App and create a database by clicking :guilabel:`Add graph`, followed by :guilabel:`Create a Local Graph`, **choose database version**  |neo4j_version| using the password "NeO4J".
 Now that your database is created:
 
 .. image:: ../_static/images/neo4j_app4.png
