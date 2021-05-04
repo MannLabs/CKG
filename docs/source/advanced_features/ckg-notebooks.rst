@@ -133,3 +133,4 @@ A Jupyter notebook showing how CKG can be used to analyze a dataset generated wi
 
 The analysis reproduces similar results to the ones described in this manuscript: https://www.biorxiv.org/content/10.1101/2020.11.02.365536v2
 and also extends these results by comparing different severity groups in this cohort based on WHO scores.
+
