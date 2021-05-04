@@ -6,6 +6,7 @@ from setuptools.command.install import install
 import pkg_resources
 import ckg.init
 
+
 with pathlib.Path('requirements.txt').open() as requirements_txt:
     reqs = [
         str(requirement)
@@ -15,6 +16,9 @@ with pathlib.Path('requirements.txt').open() as requirements_txt:
 
 ckg.init.installer_script()
 
+with open("README.rst", "r") as fh:
+    long_description = fh.read()
+
 
 setuptools.setup(
     name="CKG", # Replace with your own username
@@ -22,6 +26,8 @@ setuptools.setup(
     author="Alberto Santos Delgado",
     author_email="alberto.santos@sund.ku.dk",
     description="A Python project that allows you to analyse proteomics and clinical data, and integrate and mine knowledge from multiple biomedical databases widely used nowadays.",
+    long_description=long_description,
+    long_description_content_type='text/x-rst',
     url="https://github.com/MannLabs/CKG",
     packages=setuptools.find_packages(),
     install_requires=reqs,

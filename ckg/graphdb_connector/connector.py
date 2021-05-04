@@ -35,7 +35,7 @@ def getGraphDatabaseConnectionConfiguration(configuration=None, database=None):
     try:
         driver = connectToDB(host, port, user, password)
     except Exception as e:
-        print("Database is offline", e)
+        print("Database is offline: ", e)
 
     return driver
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import sys
-from init import installer_script
-from graphdb_builder.builder import builder as builder
-import debug
+from ckg.init import installer_script
+from ckg.graphdb_builder.builder import builder as builder
+import ckg.debug as debug
 
 if __name__ == '__main__':
 

@@ -61,7 +61,8 @@ def setup_config_file(file_name, path):
 def setup_config_files(config_path):
     config_files = {'report_manager_log': 'report_manager_log_template.config', 
                     'graphdb_connector_log': 'graphdb_connector_log_template.config',
-                    'graphdb_builder_log':'graphdb_builder_log_template.config'}
+                    'graphdb_builder_log':'graphdb_builder_log_template.config',
+                    'analytics_factory_log':'analytics_factory_log_template.config'}
     for log_file in config_files:
         config_file = config_files[log_file]
         file_name = os.path.join(config_path, config_file)
