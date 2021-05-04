@@ -101,6 +101,8 @@ def parse_contents(contents, filename):
         df = pd.read_csv(io.StringIO(decoded.decode('utf-8')), low_memory=True)
     elif file_format == 'xlsx' or file_format == 'xls':
         df = pd.read_excel(io.BytesIO(decoded))
+    elif file_format == 'mztab':
+        df = parse_mztab_filehandler(io.StringIO(decoded.decode('utf-8')))
 
     return df
 
@@ -110,14 +112,56 @@ def export_contents(data, dataDir, filename):
     Export Pandas DataFrame to file, with UTF-8 endocing.
 
     """
-    file = filename.split('.')[-1]
-    if file == 'txt' or file == 'tsv':
-        csv_string = data.to_csv(os.path.join(dataDir, filename), sep='\t', index=False, encoding='utf-8')
-    elif file == 'csv':
-        csv_string = data.to_csv(os.path.join(dataDir, filename), sep=',', index=False, encoding='utf-8')
-    elif file == 'xlsx' or file == 'xls':
-        csv_string = data.to_excel(os.path.join(dataDir, filename), index=False, encoding='utf-8')
-    return csv_string
+    file_format = filename.split('.')[-1]
+    if file_format == 'txt' or file_format == 'tsv':
+        data.to_csv(os.path.join(dataDir, filename), sep='\t', index=False, encoding='utf-8')
+    elif file_format == 'csv':
+        data.to_csv(os.path.join(dataDir, filename), sep=',', index=False, encoding='utf-8')
+    elif file_format == 'xlsx' or file_format == 'xls':
+        data.to_excel(os.path.join(dataDir, filename), index=False, encoding='utf-8')
+    elif file_format == 'mztab':
+        for dataset in data:
+            data[dataset].to_csv(os.path.join(dataDir, dataset+'.tsv'), sep='\t', index=False, encoding='utf-8')
+
+
+def parse_mztab_filehandler(mztabf):
+    content = {'MTD': [], 
+               'PRH': None, 'PRT': [],
+               'PEH': None, 'PEP': [],
+               'PSH': None, 'PSM': [],
+               'SMH': None, 'SML': []}
+    
+    datasets = {}
+    
+    headers = {'PRT': 'PRH', 'PEP': 'PEH', 'PSM': 'PSH', 'SML': 'SMH'}
+
+    for line in mztabf:
+        data = line.rstrip().split('\t')
+        dtype = data[0]
+        if dtype in content:
+            if content[dtype] is None:
+                content[dtype] = data[1:]
+            else:
+                content[dtype].append(data[1:])
+
+    for dtype in content:
+        columns = None
+        if dtype not in headers.values():
+            if dtype in headers and dtype in content:
+                header = headers[dtype]
+                columns = content[header]
+            
+            if len(content[dtype]) > 0:
+                datasets[dtype] = pd.DataFrame(content[dtype], columns=columns)
+            
+    return datasets
+
+
+def parse_mztab_file(mztab_file):
+    with open(mztab_file, 'r') as mztabf:
+        datasets = parse_mztab_filehandler(mztabf)
+            
+    return datasets
 
 
 def write_relationships(relationships, header, outputfile):

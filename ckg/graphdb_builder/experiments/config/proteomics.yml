@@ -8,7 +8,7 @@ ox : &var_ox
         - 'Amino acid'
         - 'Sequence window'
         - 'Score'
-        - 'Intensity \w+_AS\d+_?-?\d*'
+        - 'Intensity AS\d+_?-?\d*'
         - 'Reverse'
         - Potential contaminant
         - 'Score'
@@ -42,7 +42,6 @@ ox : &var_ox
         - 'Amino acid'
     'sequenceCol': 'Sequence window'
     'geneCol': 'Gene names'
-    'combine': 'regex'
     'log': 'log2'
     'modId': 'MOD:00256'
     'mod_acronym': 'ox'
@@ -56,7 +55,7 @@ gly : &var_gly
         - 'Amino acid'
         - 'Sequence window'
         - 'Score'
-        - 'Intensity \w+_AS\d+_?-?\d*'
+        - 'Intensity AS\d+_?-?\d*'
         - 'Reverse'
         - Potential contaminant
         - 'Score'
@@ -91,7 +90,6 @@ gly : &var_gly
     'sequenceCol': 'Sequence window'
     'geneCol': 'Gene names'
     'log': 'log2'
-    'combine': 'regex'
     'modId': 'MOD:00767'
     'mod_acronym': 'gly'
     'file': 'GlycationSites.txt'
@@ -104,7 +102,7 @@ p : &var_p
         - 'id'
         - 'Sequence window'
         - 'Score'
-        - 'Intensity \w+_AS\d+_?-?\d*'
+        - 'Intensity AS\d+_?-?\d*'
         - 'Reverse'
         - Potential contaminant
         - 'Score'
@@ -138,7 +136,6 @@ p : &var_p
         - 'Amino acid'
     'sequenceCol': 'Sequence window'
     'geneCol': 'Gene names'
-    'combine': 'regex'
     'log': 'log2'
     'modId': 'MOD:00696'
     'mod_acronym': 'p'
@@ -152,8 +149,8 @@ maxquant :
             - 'Score'
             - 'Razor + unique peptides'
             - 'id'
-            - 'LFQ intensity \w+_AS\d+_?-?\d*'  #replicate_analytical_sample_timepoint
-            - 'Intensity \w+_AS\d+_?-?\d*'
+            - 'LFQ intensity AS\d+_?-?\d*'  #analytical_sample_timepoint
+            - 'Intensity AS\d+_?-?\d*'
             - 'Reverse'
             - Potential contaminant
             - 'Only identified by site'
@@ -178,7 +175,6 @@ maxquant :
             'regex':
                 - 'Intensity'
         'log': 'log2'
-        'combine': 'regex'
         'file': 'proteinGroups.txt'
     'peptides':
         'columns':
@@ -189,14 +185,14 @@ maxquant :
             - 'Second last amino acid'
             - 'Last amino acid'
             - 'Amino acid after'
-            - 'Experiment \w+_AS\d+_?-?\d*'
+            - 'Experiment AS\d+_?-?\d*'
             - 'Proteins'
             - 'id'
             - 'Start position'
             - 'End position'
             - 'Score'
             - 'Protein group IDs'
-            - 'Intensity \w+_AS\d+_?-?\d*'
+            - 'Intensity AS\d+_?-?\d*'
             - 'Reverse'
         'filters':
             - 'Reverse'
@@ -214,7 +210,6 @@ maxquant :
             - 'End position'
         'type': 'tryptic peptide'
         'log': 'log2'
-        'combine': 'regex'
         'file': 'peptides.txt'
     'Oxydation(M)': *var_ox
     'Glycation': *var_gly
@@ -227,13 +222,13 @@ dia-nn :
             - 'Protein.Group'
             - is_razor
             - id
-            - '\w*_?AS\d+_?-?\d*'
+            - 'AS\d+_?-?\d*'
         'generated_columns':
             - id
             - 'is_razor'
         'filters': []
         'proteinCol': 'Protein.Ids'
-        'valueCol': '\w*_?AS\d+_?-?\d*'
+        'valueCol': 'AS\d+_?-?\d*'
         'groupCol': 'id'
         'indexCol': 'Protein.Ids'
         'attributes':
@@ -241,7 +236,6 @@ dia-nn :
                 - 'id'
                 - 'is_razor'
         'log': 'log2'
-        'combine': 'regex'
         'file': 'proteomics_dia-nn_proteingroups.\w+'
 
 fragpipe :
@@ -251,7 +245,7 @@ fragpipe :
             - 'Protein Group'
             - is_razor
             - id
-            - '\w*_?AS\d+_?-?\d* Razor Intensity'
+            - 'AS\d+_?-?\d* Razor Intensity'
         'generated_columns':
             - id
             - 'is_razor'
@@ -267,7 +261,6 @@ fragpipe :
             'regex':
                 - 'Razor Intensity'
         'log': 'log2'
-        'combine': 'valueCol'
         'file': 'proteomics_fragpipe_proteingroups.\w+'
 
 spectronaut :
@@ -310,7 +303,6 @@ spectronaut :
                 - 'PG.MS1Quantity'
                 - 'PG.MS2Quantity'
         'log': 'log2'
-        'combine': 'valueCol'
         'file': 'proteomics_spectronaut_proteingroups.\w+'
 
 table:
@@ -330,4 +322,37 @@ table:
                 - is_razor
             regex: []
         log: log2
-        combine: ''
+
+
+mztab:
+    'proteins':
+        'columns':
+            - accession
+            - description
+            - taxid
+            - species
+            - database
+            - database_version
+            - search_engine
+            - ambiguity_members
+            - modifications
+            - protein_coverage
+            - is_razor
+            - id
+            - protein_abundance_AS\d+_?-?\d*
+        'generated_columns':
+            - id
+            - 'is_razor'
+        'filters': []
+        'proteinCol': 'accession'
+        'valueCol': 'protein_abundance_'
+        'groupCol': 'id'
+        'indexCol': 'accession'
+        'attributes':
+            'cols':
+                - 'id'
+                - 'is_razor'
+            'regex':
+                - 'protein_abundance_'
+        'log': 'log2'
+        'file': 'PRT.tsv'

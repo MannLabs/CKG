@@ -8,7 +8,6 @@ from ckg.graphdb_builder import builder_utils, mapping
 
 
 def parser(projectId, type='proteomics', directory=None):
-    #directory = None
     data = {}
     experiments_directory = ckg_utils.read_ckg_config(key='experiments_directory')
     config = builder_utils.get_config(config_name="proteomics.yml", data_type='experiments')
@@ -49,12 +48,10 @@ def parse_from_directory(projectId, directory, configuration={}):
     return data
 
 
-def parser_from_file(file_path, configuration, data_type, is_standard=True):
+def parser_from_file(file_path, configuration, data_type):
     data = {}
-    if is_standard:
-        df = parse_standard_dataset(file_path, configuration)
-    else:
-        df = parse_dataset(file_path, configuration)
+    
+    df = parse_dataset(file_path, configuration)
     
     if df is not None and not df.empty:
         if data_type == "proteins":
@@ -85,7 +82,7 @@ def get_configuration(processing_tool, data_type):
     return configuration
 
 
-def update_configuration(data_type, processing_tool, value_col='LFQ intensity', columns=[], drop_cols=[], filters=None, new_config={}):
+def update_configuration(data_type, processing_tool, value_col='LFQ intensity', columns=[], drop_cols=[], filters=None, regex=None, new_config={}):
     configuration = get_configuration(processing_tool, data_type)
     if configuration is not None:
         configuration['columns'].extend(columns)
@@ -99,6 +96,9 @@ def update_configuration(data_type, processing_tool, value_col='LFQ intensity', 
                     configuration['attributes']['regex'] = [c for c in configuration['attributes']['regex'] if c not in drop_cols]
         if filters is not None:
             configuration['filters'] = filters
+            
+        if regex is not None:
+            configuration['regex'] = regex
 
         for key in new_config:
             configuration[key] = new_config[key]
@@ -106,46 +106,28 @@ def update_configuration(data_type, processing_tool, value_col='LFQ intensity', 
     return configuration
 
 
-def parse_dataset(filepath, configuration):
-    data = None
-    if os.path.isfile(filepath):
-        data, regex = load_dataset(filepath, configuration)
-        if data is not None:
-            if 'log' in configuration:
-                log = configuration['log']
-                cols = get_value_cols(data, configuration)
-                if log == 'log2':
-                    data[cols] = np.log2(data[cols]).replace([np.inf, -np.inf], np.nan)
-                elif log == 'log10':
-                    data[cols] = np.log10(data[cols]).replace([np.inf, -np.inf], np.nan)
-    
-    return data
-
-
-def parse_standard_dataset(file_path, configuration):
+def parse_dataset(file_path, configuration):
     dataset = None
     if os.path.isfile(file_path):
         data, regex = load_dataset(file_path, configuration)
         if data is not None:
-            log = configuration['log']
-            combine = 'regex'
-            if 'combine' in configuration:
-                combine = configuration['combine']
-            if combine == 'valueCol':
-                value_cols = get_value_cols(data, configuration)
-                subjectDict = extract_subject_replicates(data, value_cols)
-            else:
-                subjectDict = extract_subject_replicates_from_regex(data, regex)
+            log = 'log2'
+            if 'log' in configuration:
+                log = configuration['log']
+            
+            regex = None
+            if 'regex' in configuration:
+                regex = configuration['regex']
 
-            delCols = []
+            cols = get_value_cols(data, configuration)
+            aux = data[cols]
+            subjectDict = extract_subject_replicates(aux, regex=regex)
             for subject in subjectDict:
-                delCols.extend(subjectDict[subject])
                 aux = data[subjectDict[subject]]
-                data[subject] = calculate_median_replicates(aux, log)
+                data[subjectDict[subject]] = calculate_median_replicates(aux, log)
 
-            dataset = data.drop(delCols, 1)
-            dataset = dataset.dropna(how='all')
-    
+            dataset = data.dropna(how='all')
+
     return dataset
 
 
@@ -264,6 +246,9 @@ def extract_modification_protein_rels(data, configuration):
 def extract_protein_modification_subject_rels(data, configuration):
     positionCols = configuration["positionCols"]
     proteinCol = configuration["proteinCol"]
+    regex = None
+    if 'regex' in configuration:
+        regex = configuration['regex']
     cols = [proteinCol]
     cols.extend(positionCols)
     data = data.reset_index()
@@ -271,8 +256,10 @@ def extract_protein_modification_subject_rels(data, configuration):
     data = data.set_index("END_ID")
     newIndexdf = data.copy()
     data = data.drop(cols, axis=1)
-    data = data.filter(regex=configuration["valueCol"].replace("\\\\", "\\"))
-    data.columns = [c.split(" ")[1] for c in data.columns]
+    aux = data.filter(regex=configuration["valueCol"].replace("\\\\", "\\"))
+    subject_cols = extract_subjects(aux, regex)
+    cols.extend(subject_cols)
+    data.columns = cols
     data = data.stack()
     data = data.reset_index()
     data.columns = ["c"+str(i) for i in range(len(data.columns))]
@@ -387,29 +374,36 @@ def extract_peptides(data, configuration):
 
 
 def extract_peptide_subject_rels(data, configuration):
+    regex = None
+    attributes = configuration["attributes"]
+    if 'regex' in configuration:
+        regex = configuration['regex']
+    
     data = data[~data.index.duplicated(keep='first')]
     aux = data.filter(regex=configuration["valueCol"].replace("\\\\", "\\"))
-    attributes = configuration["attributes"]
-    aux.columns = [c.split(" ")[1] for c in aux.columns]
-    aux = aux.stack()
-    aux = aux.reset_index()
-    aux.columns = ["c"+str(i) for i in range(len(aux.columns))]
-    columns = ['END_ID', 'START_ID', "value"]
+    cols = extract_subjects(aux, regex)
+    if len(cols) > 0:
+        aux.columns = cols
+        aux = aux.stack()
+        aux = aux.reset_index()
+        
+        aux.columns = ["c"+str(i) for i in range(len(aux.columns))]
+        columns = ['END_ID', 'START_ID', "value"]
 
-    (cAttributes, cCols), (rAttributes, regexCols) = extract_attributes(data, attributes)
-    if not rAttributes.empty:
-        aux = merge_regex_attributes(aux, rAttributes, ["c0", "c1"], regexCols)
-        columns.extend(regexCols)
-    if not cAttributes.empty:
-        aux = merge_col_attributes(aux, cAttributes, "c0")
-        columns.extend(cCols)
+        (cAttributes, cCols), (rAttributes, regexCols) = extract_attributes(data, attributes)
+        if not rAttributes.empty:
+            aux = merge_regex_attributes(aux, rAttributes, ["c0", "c1"], regexCols)
+            columns.extend(regexCols)
+        if not cAttributes.empty:
+            aux = merge_col_attributes(aux, cAttributes, "c0")
+            columns.extend(cCols)
 
-    aux['TYPE'] = "HAS_QUANTIFIED_PEPTIDE"
-    columns.append("TYPE")
-    aux.columns = columns
-    aux = aux[['START_ID', 'END_ID', 'TYPE', "value"] + regexCols + cCols]
-    aux.columns = [c.replace('PG.', '') for c in aux.columns]
-    aux = aux.drop_duplicates()
+        aux['TYPE'] = "HAS_QUANTIFIED_PEPTIDE"
+        columns.append("TYPE")
+        aux.columns = columns
+        aux = aux[['START_ID', 'END_ID', 'TYPE', "value"] + regexCols + cCols]
+        aux.columns = [c.replace('PG.', '') for c in aux.columns]
+        aux = aux.drop_duplicates()
 
     return aux
 
@@ -428,34 +422,32 @@ def extract_peptide_protein_rels(data, configuration):
 
 
 def extract_protein_subject_rels(data, configuration):
-    regex = '(\w*)_?(AS\d+)_?(-?\d*)'
+    regex = None
     attributes = configuration["attributes"]
-    aux = data.filter(regex=configuration["valueCol"])
-    cols = []
-    for c in aux.columns:
-        matches = re.search(regex, c)
-        if matches is not None:
-            m = matches.group(2)
-            cols.append(m)
-    
-    aux.columns = cols
-    aux = aux.stack()
-    aux = aux.reset_index()
-    
-    aux.columns = ["c"+str(i) for i in range(len(aux.columns))]
-    columns = ['END_ID', 'START_ID', "value"]
-    (cAttributes, cCols), (rAttributes, regexCols) = extract_attributes(data, attributes)
-    if not rAttributes.empty:
-        aux = merge_regex_attributes(aux, rAttributes, ["c0", "c1"], regexCols)
-        columns.extend(regexCols)
-    if not cAttributes.empty:
-        aux = merge_col_attributes(aux, cAttributes, "c0")
-        columns.extend(cCols)
-    aux['TYPE'] = "HAS_QUANTIFIED_PROTEIN"
-    columns.append("TYPE")
-    aux.columns = columns
-    aux = aux[['START_ID', 'END_ID', 'TYPE', "value"] + regexCols + cCols]
-    aux.columns = [c.replace('PG.', '') for c in aux.columns]
+    if 'regex' in configuration:
+        regex = configuration['regex']
+
+    aux = data.filter(regex=configuration["valueCol"].replace("\\\\", "\\"))
+    cols = extract_subjects(aux, regex)
+    if len(cols) > 0:
+        aux.columns = cols
+        aux = aux.stack()
+        aux = aux.reset_index()
+        
+        aux.columns = ["c"+str(i) for i in range(len(aux.columns))]
+        columns = ['END_ID', 'START_ID', "value"]
+        (cAttributes, cCols), (rAttributes, regexCols) = extract_attributes(data, attributes)
+        if not rAttributes.empty:
+            aux = merge_regex_attributes(aux, rAttributes, ["c0", "c1"], regexCols)
+            columns.extend(regexCols)
+        if not cAttributes.empty:
+            aux = merge_col_attributes(aux, cAttributes, "c0")
+            columns.extend(cCols)
+        aux['TYPE'] = "HAS_QUANTIFIED_PROTEIN"
+        columns.append("TYPE")
+        aux.columns = columns
+        aux = aux[['START_ID', 'END_ID', 'TYPE', "value"] + regexCols + cCols]
+        aux.columns = [c.replace('PG.', '') for c in aux.columns]
 
     return aux
 
@@ -465,49 +457,34 @@ def get_value_cols(data, configuration):
     if 'valueCol' in configuration:
         r = configuration['valueCol']
         value_cols = data.filter(regex=r).columns.tolist()
-        #value_cols = [c for c in data.columns if configuration['valueCol'] in c]
 
     return value_cols
 
 
-def extract_subject_replicates_from_regex(data, regex):
+def extract_subjects(data, regex):
+    subjects = []
+    if regex is None:
+        regex = r'(AS\d+)'
+
+    for c in data.columns:
+        matches = re.search(regex, c)
+        if matches is not None:
+            subject = matches.group(1)
+            subjects.append(subject)
+
+    return subjects
+
+
+def extract_subject_replicates(data, regex=None):
     subjectDict = defaultdict(list)
-    for r in regex:
-        columns = data.filter(regex=r).columns
-        for c in columns:
-            matches = re.search(r, c)
-            m = matches.group()
-            value = ""
-            timepoint = ""
-            fields = m.split('_')
-            if len(fields) > 1:
-                value = " ".join(fields[0].split(' ')[0:-1])+ " "
-                subject = fields[1]
-                if len(fields) > 2:
-                    timepoint = " " + fields[2]
-            else:
-                subject = fields[0]
-            ident = value + subject + timepoint
-            subjectDict[ident].append(c)
+    if regex is None:
+        regex = r'(AS\d+)'
 
-    return subjectDict
-
-
-def extract_subject_replicates(data, value_cols):
-    subjectDict = defaultdict(list)
-    for c in value_cols:
-        value = ""
-        timepoint = ""
-        fields = c.split('_')
-        if len(fields) > 1:
-            value = " ".join(fields[0].split(' ')[0:-1])
-            subject = fields[1]
-            if len(fields) > 2:
-                timepoint = " " + fields[2]
-        else:
-            subject = fields[0]
-        ident = value + " " + subject + timepoint
-        subjectDict[ident].append(c)
+    for c in data.columns:
+        matches = re.search(regex, c)
+        if matches is not None:
+            subject = matches.group(1)
+            subjectDict[subject].append(c)
 
     return subjectDict
 
