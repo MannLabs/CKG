@@ -149,8 +149,8 @@ maxquant :
             - 'Score'
             - 'Razor + unique peptides'
             - 'id'
-            - 'LFQ intensity AS\d+_?-?\d*'  #analytical_sample_timepoint
-            - 'Intensity AS\d+_?-?\d*'
+            - 'LFQ intensity .*AS\d+_?-?\d*'  #analytical_sample_timepoint
+            - 'Intensity .*AS\d+_?-?\d*'
             - 'Reverse'
             - Potential contaminant
             - 'Only identified by site'
@@ -185,14 +185,14 @@ maxquant :
             - 'Second last amino acid'
             - 'Last amino acid'
             - 'Amino acid after'
-            - 'Experiment AS\d+_?-?\d*'
+            - 'Experiment .*AS\d+_?-?\d*'
             - 'Proteins'
             - 'id'
             - 'Start position'
             - 'End position'
             - 'Score'
             - 'Protein group IDs'
-            - 'Intensity AS\d+_?-?\d*'
+            - 'Intensity .*AS\d+_?-?\d*'
             - 'Reverse'
         'filters':
             - 'Reverse'

@@ -121,10 +121,11 @@ def parse_dataset(file_path, configuration):
 
             cols = get_value_cols(data, configuration)
             aux = data[cols]
+            
             subjectDict = extract_subject_replicates(aux, regex=regex)
             for subject in subjectDict:
                 aux = data[subjectDict[subject]]
-                data[subjectDict[subject]] = calculate_median_replicates(aux, log)
+                data[subject] = calculate_median_replicates(aux, log)
 
             dataset = data.dropna(how='all')
 
@@ -179,7 +180,6 @@ def load_dataset(uri, configuration):
         data = data.dropna(subset=[configuration["proteinCol"]], axis=0)
         data = expand_groups(data, configuration)
         columns.remove(indexCol)
-
         for regex in regexCols:
             cols = data.filter(regex=regex).columns.tolist()
             columns.update(set(cols))
@@ -256,10 +256,8 @@ def extract_protein_modification_subject_rels(data, configuration):
     data = data.set_index("END_ID")
     newIndexdf = data.copy()
     data = data.drop(cols, axis=1)
-    aux = data.filter(regex=configuration["valueCol"].replace("\\\\", "\\"))
-    subject_cols = extract_subjects(aux, regex)
-    cols.extend(subject_cols)
-    data.columns = cols
+    subject_cols = extract_subjects(data, regex)
+    data = data[subject_cols]
     data = data.stack()
     data = data.reset_index()
     data.columns = ["c"+str(i) for i in range(len(data.columns))]
@@ -380,10 +378,9 @@ def extract_peptide_subject_rels(data, configuration):
         regex = configuration['regex']
     
     data = data[~data.index.duplicated(keep='first')]
-    aux = data.filter(regex=configuration["valueCol"].replace("\\\\", "\\"))
-    cols = extract_subjects(aux, regex)
+    cols = extract_subjects(data, regex)
     if len(cols) > 0:
-        aux.columns = cols
+        aux = data[cols]
         aux = aux.stack()
         aux = aux.reset_index()
         
@@ -427,10 +424,9 @@ def extract_protein_subject_rels(data, configuration):
     if 'regex' in configuration:
         regex = configuration['regex']
 
-    aux = data.filter(regex=configuration["valueCol"].replace("\\\\", "\\"))
-    cols = extract_subjects(aux, regex)
+    cols = extract_subjects(data, regex)
     if len(cols) > 0:
-        aux.columns = cols
+        aux = data[cols]
         aux = aux.stack()
         aux = aux.reset_index()
         
@@ -457,21 +453,21 @@ def get_value_cols(data, configuration):
     if 'valueCol' in configuration:
         r = configuration['valueCol']
         value_cols = data.filter(regex=r).columns.tolist()
-
+    
     return value_cols
 
 
 def extract_subjects(data, regex):
     subjects = []
     if regex is None:
-        regex = r'(AS\d+)'
+        regex = r'^(AS\d+)$'
 
     for c in data.columns:
         matches = re.search(regex, c)
         if matches is not None:
             subject = matches.group(1)
             subjects.append(subject)
-
+    
     return subjects
 
 

@@ -21,6 +21,7 @@ import datetime
 import logging
 import logging.config
 from ckg import ckg_utils
+import zipfile
 import rarfile
 
 
@@ -672,6 +673,18 @@ def unrar(filepath, to):
     except Exception as err:
         print("Error: {}. Could not unrar file {}".format(filepath, err))
 
+def unzip_file(filepath, to):
+    """
+    Decompress zipped file
+    :param str filepath: path to zip file
+    :param str to: where to extract all files
+
+    """
+    try:
+        with zipfile.ZipFile(filepath, 'r') as zip_ref:
+            zip_ref.extractall(to)
+    except Exception as err:
+        print("Error: {}. Could not unzip file {}".format(filepath, err))
 
 def compress_directory(folder_to_backup, dest_folder, file_name):
     """
