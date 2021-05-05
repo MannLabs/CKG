@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 import pandas as pd
 import numpy as np
 import ast
@@ -325,6 +326,8 @@ class Knowledge:
         relationships = {}
         node1_color = self.colors[entity1] if entity1 in self.colors else self.default_color
         node2_color = self.colors[entity2] if entity2 in self.colors else self.default_color
+        edgelist[source] = edgelist[source].astype(str)
+        edgelist[target] = edgelist[target].astype(str)
         for i, row in edgelist.iterrows():
             nodes.update({row[source].replace("'", ""): {'type': entity1, 'color': node1_color}, row[target].replace("'", ""): {'type': entity2, 'color': node2_color}})
             relationships.update({(row[source].replace("'", ""), row[target].replace("'", "")): {'type': rtype, 'source_color': node1_color, 'target_color': node2_color, 'weight': row[weight]}})
@@ -414,7 +417,7 @@ class Knowledge:
         if diseases is None or len(diseases) < 1:
             replace_by = ('DISEASE_COND', '')
         else:
-            replace_by = ('DISEASE_COND', 'OR (d.name IN {} AND r.score > 1.5)'.format(diseases))
+            replace_by = ('DISEASE_COND', 'OR d.name IN {} AND r.score > 1.5'.format(diseases))
 
         query_data = []
         drugs = []
@@ -431,7 +434,15 @@ class Knowledge:
                             query = queries[query_name]['query']
                             q = 'NA'
                             for q in query.split(';')[:-1]:
-                                q = q.format(query_list=query_list).replace("ATTRIBUTE", attribute).replace(replace_by[0], replace_by[1]).replace('DISEASES', str(diseases)).replace('DRUGS', str(drugs))
+                                if attribute is None:
+                                    matches = re.finditer(r'(\w+).ATTRIBUTE', q)
+                                    for matchNum, match in enumerate(matches, start=1):
+                                        var = match.group(1)
+                                        q = q.format(query_list=query_list).replace("ATTRIBUTE", 'name+"~"+{}.id'.format(var)).replace(replace_by[0], replace_by[1]).replace('DISEASES', str(diseases)).replace('DRUGS', str(drugs))
+                                    else:
+                                        q = q.format(query_list=query_list).replace(replace_by[0], replace_by[1]).replace('DISEASES', str(diseases)).replace('DRUGS', str(drugs))
+                                else:
+                                    q = q.format(query_list=query_list).replace("ATTRIBUTE", attribute).replace(replace_by[0], replace_by[1]).replace('DISEASES', str(diseases)).replace('DRUGS', str(drugs))
                                 data = self.send_query(q)
                                 if not data.empty:
                                     if query_name == 'disease' and len(diseases) < 1:
@@ -448,10 +459,18 @@ class Knowledge:
         if len(query_data) > 0:
             self.data = pd.DataFrame().append(query_data)
             for df in query_data:
-                entity1 = df['source_type'][0][0]
-                entity2 = df['target_type'][0][0]
-                assoc_type = df['rel_type'][0]
-                df['weight'] = df['weight'].fillna(0.5)
+                if 'source_type' in df and 'target_type' in df:
+                    entity1 = df['source_type'][0][0]
+                    entity2 = df['target_type'][0][0]
+                    if 'rel_type' in df:
+                        assoc_type = df['rel_type'][0]
+                    else:
+                        assoc_type = 'relationship'
+                    
+                    if 'weight' in df:
+                        df['weight'] = df['weight'].fillna(0.5)
+                    else:
+                        df['weight'] = 0.5
                 self.generate_knowledge_from_edgelist(df, entity1, entity2, source='source', target='target', rtype=assoc_type, weight='weight')
                 
 

@@ -10,7 +10,7 @@ Protein:
     query: >
       MATCH (p:Protein)-[r:ANNOTATED_IN_PATHWAY]->(ph:Pathway)
       WHERE p.ATTRIBUTE IN {query_list} AND toLOWER(r.source)="reactome"
-      RETURN DISTINCT p.name AS source, LABELS(p) as source_type, ph.name AS target, LABELS(ph) as target_type, r.score AS weight, r.source, type(r) AS rel_type;
+      RETURN DISTINCT p.ATTRIBUTE AS source, LABELS(p) as source_type, ph.name AS target, LABELS(ph) as target_type, r.score AS weight, r.source, type(r) AS rel_type;
   biological_process:
     name: 'GO biological processes annotation'
     description: 'Gene Ontology Biological processes annotated to a list of proteins'
@@ -23,7 +23,7 @@ Protein:
       MATCH (p:Protein)-[r:ASSOCIATED_WITH]->(ph:Biological_process) 
       WHERE p.ATTRIBUTE IN {query_list}
       WITH p, ph, r, SIZE((ph)<-[:ASSOCIATED_WITH]-(:Protein)) AS bp_degree WHERE bp_degree < 200
-      RETURN DISTINCT p.name AS source, LABELS(p) as source_type, ph.name AS target, LABELS(ph) as target_type, r.score AS weight, r.source, type(r) AS rel_type;
+      RETURN DISTINCT p.ATTRIBUTE AS source, LABELS(p) as source_type, ph.name AS target, LABELS(ph) as target_type, r.score AS weight, r.source, type(r) AS rel_type;
   complex:
     name: 'Protein complexes within the list of proteins'
     description: 'Protein complexes represented in the provided list of proteins'
@@ -35,7 +35,7 @@ Protein:
     query: >
       MATCH (p:Protein)-[r:IS_SUBUNIT_OF]->(ph:Complex) 
       WHERE p.ATTRIBUTE IN {query_list}
-      RETURN DISTINCT p.name AS source, LABELS(p) as source_type, ph.name AS target, LABELS(ph) as target_type, r.score AS weight, r.source, type(r) AS rel_type;
+      RETURN DISTINCT p.ATTRIBUTE AS source, LABELS(p) as source_type, ph.name AS target, LABELS(ph) as target_type, r.score AS weight, r.source, type(r) AS rel_type;
   drug:
     name: 'Drugs targetting the list of proteins'
     description: 'Drugs targetting at least one of the proteins in the provided list of proteins and their interactions'
@@ -49,7 +49,7 @@ Protein:
       MATCH (p:Protein)<-[r:ACTS_ON]-(d:Drug) 
       WHERE p.ATTRIBUTE IN {query_list} AND r.score>0.7
       WITH p, d, r, SIZE((:Protein)<-[:ACTS_ON]-(d)) AS drug_degree WHERE drug_degree < 200
-      RETURN DISTINCT p.name AS source, LABELS(p) as source_type, d.name AS target, LABELS(d) as target_type, r.score AS weight, r.source, type(r) AS rel_type;
+      RETURN DISTINCT p.ATTRIBUTE AS source, LABELS(p) as source_type, d.name AS target, LABELS(d) as target_type, r.score AS weight, r.source, type(r) AS rel_type;
   drug_interactions:
     name: 'Drugs interactions'
     description: 'Drugs that interact'
@@ -59,8 +59,8 @@ Protein:
       - INTERACTS_WITH
     query: >
       MATCH (d1:Drug)-[r:INTERACTS_WITH]-(d2:Drug)
-      WHERE d1 IN DRUGS AND d2 IN DRUGS
-      RETURN d1.name AS source, LABELS(d1) as source_type, d2.name AS target, LABELS(d2) as target_type, r.score AS weight, r.source;
+      WHERE d1.name IN DRUGS AND d2.name IN DRUGS
+      RETURN d1.name AS source, LABELS(d1) as source_type, d2.name AS target, LABELS(d2) as target_type, r.score AS weight, r.source, type(r) AS rel_type;
   disease:
     name: 'Diseases associated with the list of proteins'
     description: 'Diseases associated to the list of proteins'
@@ -78,8 +78,8 @@ Protein:
       WITH d, COLLECT(p) AS proteins, SIZE((:Protein)-[:ASSOCIATED_WITH]->(d)) AS disease_degree WHERE disease_degree < 4500
       WITH DISTINCT d, SIZE(proteins) AS c WHERE c>2
       MATCH (p:Protein)-[r:ASSOCIATED_WITH]->(d)
-      WHERE p.ATTRIBUTE IN {query_list} AND r.score > 3 DISEASE_COND
-      RETURN p.name AS source, LABELS(p) AS source_type, d.name AS target, LABELS(d) AS target_type, toFLOAT(r.score)/5 AS weight, r.source, type(r) AS rel_type;
+      WHERE p.ATTRIBUTE IN {query_list} AND (r.score > 3 DISEASE_COND)
+      RETURN p.ATTRIBUTE AS source, LABELS(p) AS source_type, d.name AS target, LABELS(d) AS target_type, toFLOAT(r.score)/5 AS weight, r.source, type(r) AS rel_type;
   disease_ontology:
     name: 'Disease ontology relationships'
     description: 'Diseases associated to the same parent term in the ontology'
@@ -89,7 +89,7 @@ Protein:
       - HAS_PARENT
     query: >
       MATCH (d1:Disease)-[r:HAS_PARENT]->(d2:Disease)<-[:HAS_PARENT]-(d3:Disease)
-      WHERE d1 IN DISEASES AND d3 IN DISEASES
+      WHERE d1.name IN DISEASES AND d3.name IN DISEASES
       RETURN d1.name AS source, LABELS(d1) AS source_type, d3.name AS target, LABELS(d3) AS target_type, r.score AS weight, r.source, "SAME_PARENT" AS rel_type;
   indications:
     name: 'Drug-diseases indications'
@@ -102,7 +102,7 @@ Protein:
       - MAPS_TO
     query: >
       MATCH (p:Protein)<-[r]-(drug:Drug)
-      WHERE p.name IN {query_list}
+      WHERE p.ATTRIBUTE IN {query_list}
       WITH COLLECT(DISTINCT drug.id) AS drugs
       MATCH (drug:Drug)-[r:IS_INDICATED_FOR]->(p:Phenotype)-[:MAPS_TO]->(ef)<-[:MAPS_TO]-(d:Disease)
       WHERE drug.id IN drugs AND d.name IN DISEASES
@@ -119,7 +119,7 @@ Protein:
     query: >
       MATCH (p1:Protein)-[r:CURATED_INTERACTS_WITH|COMPILED_INTERACTS_WITH|ACTS_ON]-(p2:Protein)
       WHERE p1.ATTRIBUTE IN {query_list} AND p2.ATTRIBUTE IN {query_list} AND r.score>0.7
-      RETURN p1.name AS source, LABELS(p1) AS source_type, p2.name AS target, LABELS(p2) AS target_type, r.score AS weight, r.source, type(r) AS rel_type;
+      RETURN p1.ATTRIBUTE AS source, LABELS(p1) AS source_type, p2.ATTRIBUTE AS target, LABELS(p2) AS target_type, r.score AS weight, r.source, type(r) AS rel_type;
   publication:
     name: 'Publications'
     description: 'Publications where the provided list of proteins are mentioned'
@@ -132,4 +132,4 @@ Protein:
     query: >
       MATCH (d:Disease)-[:MENTIONED_IN_PUBLICATION]->(pub:Publication)<-[r:MENTIONED_IN_PUBLICATION]-(p:Protein)
       WHERE d.name IN DISEASES AND p.ATTRIBUTE IN {query_list}
-      RETURN DISTINCT p.name AS source, LABELS(p) AS source_type, "PMID:"+pub.id AS target, LABELS(pub) AS target_type, r.score AS weight, r.source, type(r) AS rel_type;
+      RETURN DISTINCT p.ATTRIBUTE AS source, LABELS(p) AS source_type, "PMID:"+pub.id AS target, LABELS(pub) AS target_type, r.score AS weight, r.source, type(r) AS rel_type;
