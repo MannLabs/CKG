@@ -681,7 +681,7 @@ def get_coefficient_variation(data, drop_columns, group, columns=['name', 'y']):
     return cvs_df
 
 
-def transform_proteomics_edgelist(df, index_cols=['group', 'sample', 'subject', 'batch'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', value_col='LFQ_intensity'):
+def transform_proteomics_edgelist(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', value_col='LFQ_intensity'):
     """
     Transforms a long format proteomics matrix into a wide format
 
@@ -696,7 +696,7 @@ def transform_proteomics_edgelist(df, index_cols=['group', 'sample', 'subject', 
     :return: Pandas dataframe with samples as rows and protein identifiers (UniprotID~GeneName) as columns (with additional columns 'group', 'sample' and 'subject').
 
     Example:
-        df = transform_proteomics_edgelist(original, index_cols=['group', 'sample', 'subject', 'batch'], drop_cols=['sample'], group='group', identifier='identifier', value_col='LFQ_intensity')
+        df = transform_proteomics_edgelist(original, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', value_col='LFQ_intensity')
     """
     wdf = None
     if df.columns.isin(index_cols).sum() == len(index_cols):
@@ -713,7 +713,7 @@ def transform_proteomics_edgelist(df, index_cols=['group', 'sample', 'subject', 
     return wdf
 
 
-def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject', 'batch'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', filter_samples=False, filter_samples_percent=0.5, imputation=True, method='distribution', missing_method='percentage', missing_per_group=True, missing_max=0.3, min_valid=1, value_col='LFQ_intensity', shift=1.8, nstd=0.3, knn_cutoff=0.6, normalize=False, normalization_method='median', normalize_group=False, normalize_by=None):
+def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', filter_samples=False, filter_samples_percent=0.5, imputation=True, imputation_method='distribution', missing_method='percentage', missing_per_group=True, missing_max=0.3, min_valid=1, value_col='LFQ_intensity', shift=1.8, nstd=0.3, knn_cutoff=0.6, normalize=False, normalization_method='median', normalize_group=False, normalize_by=None):
     """
     Processes proteomics data extracted from the database: 1) filter proteins with high number of missing values (> missing_max or min_valid), 2) impute missing values.
 
@@ -726,7 +726,7 @@ def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subjec
     :param bool filter_samples: if True filter samples with valid values below percentage (filter_samples_percent).
     :param float filter_samples_percent: defines the maximum percentage of missing values allowed in a sample.
     :param bool imputation: if True performs imputation of missing values.
-    :param str method:  method for missing values imputation ('KNN', 'distribuition', or 'mixed')
+    :param str imputation_method:  method for missing values imputation ('KNN', 'distribuition', or 'mixed')
     :param str missing_method: defines which expression rows are counted to determine if a column has enough valid values to survive the filtering process.
     :param bool missing_per_group: if True filter proteins based on valid values per group; if False filter across all samples.
     :param float missing_max: maximum ratio of missing/valid values to be filtered.
@@ -743,11 +743,11 @@ def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subjec
 
     Example 1::
 
-        result = get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject', 'batch'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation=True, method = 'distribution', missing_method = 'percentage', missing_per_group=True, missing_max = 0.3, value_col='LFQ_intensity')
+        result = get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation=True, method = 'distribution', missing_method = 'percentage', missing_per_group=True, missing_max = 0.3, value_col='LFQ_intensity')
 
     Example 2::
 
-        result = get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject', 'batch'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation = True, method = 'mixed', missing_method = 'at_least_x', missing_per_group=False, min_valid=5, value_col='LFQ_intensity')
+        result = get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subject'], drop_cols=['sample'], group='group', identifier='identifier', extra_identifier='name', imputation = True, method = 'mixed', missing_method = 'at_least_x', missing_per_group=False, min_valid=5, value_col='LFQ_intensity')
     """
     df = transform_proteomics_edgelist(df, index_cols=index_cols, drop_cols=drop_cols, group=group, identifier=identifier, extra_identifier=extra_identifier, value_col=value_col)
     if df is not None:
@@ -772,12 +772,12 @@ def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subjec
                 df = normalize_data_per_group(df, group=group, method=normalization_method, normalize=normalize_by)
 
         if imputation:
-            if method.lower() == "knn":
+            if imputation_method.lower() == "knn":
                 df = imputation_KNN(df, drop_cols=index_cols, group=group, cutoff=knn_cutoff, alone=True)
-            elif method == "distribution":
+            elif imputation_method == "distribution":
                 df = imputation_normal_distribution(df, index_cols=index_cols, shift=shift, nstd=nstd)
                 df = df.reset_index()
-            elif method == 'mixed':
+            elif imputation_method == 'mixed':
                 df = imputation_mixed_norm_KNN(df, index_cols=index_cols, shift=shift, nstd=nstd, group=group, cutoff=knn_cutoff)
                 df = df.reset_index()
     return df

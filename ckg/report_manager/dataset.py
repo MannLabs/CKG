@@ -378,7 +378,20 @@ class ProteomicsDataset(Dataset):
     def generate_dataset(self):
         self._data = self.query_data()
         self.process_dataset()
-        self.correct_batches()
+        if "args" in self.configuration:
+            args = self.configuration["args"]
+            if "batch_correction" in args and args["batch_correction"]:
+                    self.correct_batches()
+            else:
+                data = self.get_dataframe("processed")
+                batch_col = 'batch'
+                if 'batch_col' in args:
+                    batch_col = args['batch_col']
+
+                if batch_col in data:
+                    data = data.drop(batch_col, axis=1)
+                self.update_data({"processed": data})
+
         self.widen_metadata_dataset()
 
     def process_dataset(self):
@@ -391,18 +404,18 @@ class ProteomicsDataset(Dataset):
         if data is not None and not data.empty:
             if "args" in self.configuration:
                 args = self.configuration["args"]
-                if "batch_correction" in args:
-                    if args["batch_correction"]:
-                        batch_col = 'batch'
-                        if 'batch_col' in args:
-                            batch_col = args["batch_col"]
-                        
-                        index_cols = ['subject', 'sample', 'group']
-                        if 'index' in args:
-                            index_cols = args['index']
-                        corrected_data = analytics.combat_batch_correction(data, batch_col=batch_col, index_cols=index_cols)
+                batch_col = 'batch'
+                if 'batch_col' in args:
+                    batch_col = args["batch_col"]
+                
+                index_cols = ['subject', 'sample', 'group']
+                if 'index' in args:
+                    index_cols = [c for c in args['index'] if c != batch_col]
+                    
+                corrected_data = analytics.combat_batch_correction(data, batch_col=batch_col, index_cols=index_cols)
         
         if corrected_data is not None:
+            corrected_data = corrected_data.drop(batch_col, axis=1)
             self.update_data({"uncorrected_batch": data, "processed": corrected_data})
 
     def widen_metadata_dataset(self):
@@ -475,7 +488,7 @@ class ProteomicsDataset(Dataset):
                         index = args['index']
 
                 processed_data = analytics.get_proteomics_measurements_ready(data, index_cols=index, imputation=imputation,
-                                                                             method=method, missing_method=missing_method, extra_identifier=extra_identifier,
+                                                                             imputation_method=method, missing_method=missing_method, extra_identifier=extra_identifier,
                                                                              filter_samples=filter_samples, filter_samples_percent=filter_samples_percent,
                                                                              missing_per_group=missing_per_group, missing_max=missing_max,
                                                                              min_valid=min_valid, shift=shift, nstd=nstd, value_col=value_col, knn_cutoff=knn_cutoff,
