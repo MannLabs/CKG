@@ -177,7 +177,7 @@ def get_boxplot_grid(data, identifier, args):
             color_map = args['colors']
         else:
             color_map = {}
-        print("IN")
+        
         if args['axis'] == 'rows':
             fig = px.box(data, x=args["x"], y=args["y"], color=args['color'], color_discrete_map=color_map, points="all", facet_row=args["facet"], width=args['width'])
         else:
@@ -1237,6 +1237,9 @@ def get_network(data, identifier, args):
     net = None
     if 'cutoff_abs' not in args:
         args['cutoff_abs'] = False
+        
+    if 'title' not in args:
+        args['title'] = identifier
 
     if not data.empty:
         if utils.check_columns(data, cols=[args['source'], args['target']]):

@@ -130,7 +130,9 @@ class Report:
                     if environment == "notebook":
                         if "notebook" in plot:
                             net = plot['notebook']
-                            report_plots.append(Cytoscape(data={'elements': net[0]}, visual_style=net[1], layout={'width': '100%', 'height': '700px'}))
+                            net_viz = viz.visualize_notebook_network(net, notebook_type='jupyter',
+                                                                     layout={'width': '100%', 'height': '700px'})
+                            report_plots.append(net_viz)
                         else:
                             if isinstance(plot, dict):
                                 if 'props' in plot:
