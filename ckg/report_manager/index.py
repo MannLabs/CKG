@@ -679,6 +679,7 @@ def run_processing(n_clicks, project_id):
                     experimental_filename = experimental_filename.pop()
                     designData = builder_utils.readDataset(os.path.join(directory, experimental_filename))
                     designData = designData.astype(str)
+                    designData.columns = [c.lower() for c in designData.columns]
                     if 'subject external_id' in designData.columns and 'biological_sample external_id' in designData.columns and 'analytical_sample external_id' in designData.columns:
                         if (res_n > 0).any().values.sum() > 0:
                             res = dataUpload.remove_samples_nodes_db(driver, project_id)
@@ -707,6 +708,7 @@ def run_processing(n_clicks, project_id):
                 if len(clinical_filename) > 0:
                     clinical_filename = clinical_filename.pop()
                     data = builder_utils.readDataset(os.path.join(directory, clinical_filename))
+                    data.columns = [c.lower() for c in data.columns]
                     external_ids = {}
                     if 'subject external_id' in data and 'biological_sample external_id' in data:
                         external_ids['subjects'] = data['subject external_id'].astype(str).unique().tolist()
