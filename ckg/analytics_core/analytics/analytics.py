@@ -372,14 +372,16 @@ def combat_batch_correction(data, batch_col, index_cols):
     Example::
         result = combat_batch_correction(data, batch_col='batch', index_cols=['subject', 'sample', 'group'])
     """
+    df_corrected = pd.DataFrame()
     index_cols = [c for c in index_cols if c != batch_col]
     data = data.set_index(index_cols)
     df = data.drop(batch_col, axis=1)
     df_numeric = df._get_numeric_data()
-    info_cols = list(set(df.columns.tolist()).difference(df_numeric.columns))
-    df_corrected = pd.DataFrame(pycombat(df_numeric.T, data[batch_col].values).T, index = df.index)
-    df_corrected = df_corrected.join(df[info_cols])
-    df_corrected = df_corrected.reset_index()
+    if not df_numeric.empty:
+        info_cols = list(set(df.columns.tolist()).difference(df_numeric.columns))
+        df_corrected = pd.DataFrame(pycombat(df_numeric.T, data[batch_col].values).T, index = df.index)
+        df_corrected = df_corrected.join(df[info_cols])
+        df_corrected = df_corrected.reset_index()
 
     return df_corrected
 
@@ -780,6 +782,8 @@ def get_proteomics_measurements_ready(df, index_cols=['group', 'sample', 'subjec
             elif imputation_method == 'mixed':
                 df = imputation_mixed_norm_KNN(df, index_cols=index_cols, shift=shift, nstd=nstd, group=group, cutoff=knn_cutoff)
                 df = df.reset_index()
+        else:
+            df = df.set_index(index_cols).dropna(axis=1).reset_index()
     return df
 
 
