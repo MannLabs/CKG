@@ -377,7 +377,8 @@ def combat_batch_correction(data, batch_col, index_cols):
     data = data.set_index(index_cols)
     df = data.drop(batch_col, axis=1)
     df_numeric = df._get_numeric_data()
-    if not df_numeric.empty:
+    num_batches = len(data[batch_col].unique())
+    if not df_numeric.empty and num_batches > 1:
         info_cols = list(set(df.columns.tolist()).difference(df_numeric.columns))
         df_corrected = pd.DataFrame(pycombat(df_numeric.T, data[batch_col].values).T, index = df.index)
         df_corrected = df_corrected.join(df[info_cols])
