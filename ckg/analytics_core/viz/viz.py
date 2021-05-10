@@ -1519,7 +1519,7 @@ def get_pca_plot(data, identifier, args):
                         text=index,
                         showarrow=False,
                         font=dict(
-                                size=11,
+                                size=12,
                                 color='darkgrey'
                             ),
                             align='center',
@@ -2229,7 +2229,7 @@ def get_cytoscape_network(net, identifier, args):
 
     return net_div
 
-def save_DASH_plot(plot, name, plot_format='svg', directory='.', width=1600, height=1500):
+def save_DASH_plot(plot, name, plot_format='svg', directory='.', width=800, height=700):
     """
     This function saves a plotly figure to a specified directory, in a determined format.
 
