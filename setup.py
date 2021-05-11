@@ -2,7 +2,9 @@ import os
 import pathlib
 import setuptools
 from setuptools import setup
+from setuptools.command.develop import develop
 from setuptools.command.install import install
+from subprocess import check_call
 import pkg_resources
 import ckg.init
 
@@ -14,10 +16,22 @@ with pathlib.Path('requirements.txt').open() as requirements_txt:
         in pkg_resources.parse_requirements(requirements_txt)
     ]
 
-ckg.init.installer_script()
-
 with open("README.rst", "r") as fh:
     long_description = fh.read()
+
+class PreInstallCommand(install):
+    """Pre-installation for install mode."""
+    def run(self):
+        check_call("pip install -r requirements.txt".split())
+        ckg.init.installer_script()
+        install.run(self)
+        
+class PreDevelopCommand(develop):
+    """Pre-installation for install mode."""
+    def run(self):
+        check_call("pip install -r requirements.txt".split())
+        ckg.init.installer_script()
+        develop.run(self)
 
 
 setuptools.setup(
@@ -30,7 +44,11 @@ setuptools.setup(
     long_description_content_type='text/x-rst',
     url="https://github.com/MannLabs/CKG",
     packages=setuptools.find_packages(),
-    install_requires=reqs,
+    cmdclass={
+        'develop': PreDevelopCommand,
+        'install': PreInstallCommand,
+    },
+    #install_requires=["setuptools>=56.2", "wheel"]+reqs,
     entry_points={'console_scripts': [
         'ckg_app=ckg.report_manager.index:main',
         'ckg_debug=ckg.debug:main']},
