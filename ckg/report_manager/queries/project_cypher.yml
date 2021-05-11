@@ -118,3 +118,27 @@ projects_subgraph:
     query_type: post
     query: >
         MATCH path=(p:Project)-[:STUDIES_DISEASE|STUDIES_TISSUE|STUDIES_INTERVENTION]->() WHERE p.id IN [LIST_PROJECTS] RETURN path
+project_sdrf:
+    name: project info sdrf
+    description: project information required to convert to sdrf format
+    involved_nodes:
+        - Project
+        - Biological_sample
+        - Analytical_sample
+        - Clinical_variable
+        - Experimental_factor
+    involved_rels:
+        - HAS_ENROLLED
+        - SPLITTED_INTO
+        - BELONGS_TO_SUBJECT
+        - HAS_QUANTIFIED_CLINICAL
+        - HAS_CLINICAL_STATE
+    query_type: post
+    query: >
+        MATCH (p:Project)-[]-(s:Subject)-[]-(bs:Biological_sample)-[]-(as:Analytical_sample)
+        WHERE p.id='PROJECTID'
+        WITH s, bs, as
+        MATCH (bs)-[r]-(c:Clinical_variable)-[MAPS_TO]-(ef:Experimental_factor)
+        WITH s, bs, as, ef, r
+        MATCH (bs)-[:FROM_TISSUE]-(t:Tissue)
+        RETURN s.external_id AS subject, bs.external_id AS biological_sample, r.value AS exp_factor_value , as.external_id AS analytical_sample, as.group AS grouping1, ef.name AS exp_factor, t.name AS tissue

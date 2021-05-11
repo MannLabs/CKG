@@ -181,6 +181,22 @@ class Project:
 
     def update_report(self, new):
         self.report.update(new)
+        
+    def get_sdrf(self):
+        sdrf_df = pd.DataFrame()
+        try:
+            driver = connector.getGraphDatabaseConnectionConfiguration()
+            query_path = os.path.join(cwd, self.queries_file)
+            project_cypher = query_utils.read_queries(query_path)
+            query = query_utils.get_query(project_cypher, query_id="project_sdrf")
+            df = connector.getCursorData(driver, query.replace("PROJECTID", self.identifier))
+            sdrf_df = utils.convert_ckg_to_sdrf(df)
+        except Exception as err:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            logger.error("Error: {}. Reading queries from file {}: {}, file: {},line: {}".format(err, query_path, sys.exc_info(), fname, exc_tb.tb_lineno))
+        
+        return sdrf_df
 
     def remove_project(self, host="localhost", port=7687, user="neo4j", password="password"):
         try:
