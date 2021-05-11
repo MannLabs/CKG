@@ -2112,6 +2112,22 @@ def get_wordcloud(data, identifier, args={'stopwords':[], 'max_words': 400, 'max
     if data is not None:
         nltk.download('stopwords')
         sw = set(stopwords.words('english')).union(set(STOPWORDS))
+        sw.update(['patient', 'protein', 'gene', 'proteins', 'genes', 'using', 'review',
+                   'identified', 'identify', 'expression', 'role', 'functions', 'factors',
+                   'cell', 'function', 'human', 'may', 'found', 'well', 'analysis', 'recent',
+                   'data', 'include', 'including', 'specific', 'involve', 'study', 'information',
+                   'studies', 'demonstrate', 'demonstrated', 'associated', 'show', 'Changes',
+                   'showed', 'high', 'low', 'level', 'system', 'change', 'different', 'pathways',
+                   'similar', 'several', 'many', 'factor', 'peptide', 'based', 'lead', 'processes',
+                   'finding', 'pathway', 'process', 'disease', 'performed', 'p', 'p-value', 'model',
+                   'value', 'line', 'mechanism', 'patients', 'mechanisms', 'known', 'increased', 'cells',
+                   'decreased', 'involved', 'complex', 'levels', 'type', 'activity', 'new', 'contribute',
+                   'approach', 'significant', 'significantly', 'propose', 'suggests', 'biological', 'suggest',
+                   'lines', 'clinical', 'provide', 'tissue', 'number', 'via', 'important', 'co', 'profile',
+                   'vitro', 'complexes', 'domain', 'signaling', 'induced', 'regulation', 'signature', 'dependent',
+                   'diseases', 'vivo', 'promote', 'Thus', 'used', 'related', 'key', 'shown', 'first', 'one', 'two',
+                   'research', 'pattern', 'major', 'novel', 'effect', 'affect', 'multiple', 'present', 'normal',
+                   'Finally', 'signalling', 'Although', 'play', 'discuss', 'risk', 'association', 'underlying'])
         if 'stopwords' in args:
             sw = sw.union(args['stopwords'])
 
