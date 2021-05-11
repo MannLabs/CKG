@@ -19,7 +19,7 @@ def read_ckg_config(key=None):
 def save_dict_to_yaml(data, yaml_file):
     with open(yaml_file, 'w') as out:
         try:
-            content = yaml.dump(data)
+            content = yaml.dump(data, sort_keys=False)
             out.write(content)
         except yaml.YAMLError as err:
             raise yaml.YAMLError("The yaml file {} could not be parsed. {}".format(yaml_file, err))

@@ -2,6 +2,7 @@ import os
 import sys
 import pandas as pd
 import h5py as h5
+from collections import OrderedDict
 from ckg import ckg_utils
 from ckg.report_manager import report as rp, knowledge
 from ckg.analytics_core import analytics_factory
@@ -184,7 +185,7 @@ class Dataset:
     def generate_report(self):
         self.report = rp.Report(identifier=self.dataset_type.capitalize(), plots={})
         order = 1
-        report_pipeline = {}
+        report_pipeline = OrderedDict()
         if self.configuration is not None:
             for section in self.configuration:
                 report_step = {}
@@ -414,7 +415,7 @@ class ProteomicsDataset(Dataset):
                     
                 corrected_data = analytics.combat_batch_correction(data, batch_col=batch_col, index_cols=index_cols)
         
-        if corrected_data is not None:
+        if not corrected_data.empty:
             self.update_data({"uncorrected_batch": data, "processed": corrected_data})
 
     def widen_metadata_dataset(self):
