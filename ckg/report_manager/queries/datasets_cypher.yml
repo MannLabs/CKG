@@ -225,10 +225,10 @@ proteomics:
             MATCH (project:Project)-[:STUDIES_DISEASE]->(disease:Disease)-[:HAS_PARENT]->(p:Disease)
             WHERE project.id="PROJECTID" AND p.id <> "DOID:4"
             WITH collect(disease.id)+collect(p.id) AS diseases
-            MATCH (d:Disease)-[:MENTIONED_IN_PUBLICATION]->(publication:Publication)<-[r:MENTIONED_IN_PUBLICATION]-(protein:Protein) 
+            MATCH (d:Disease)-[:MENTIONED_IN_PUBLICATION]->(publication:Publication)<-[r:MENTIONED_IN_PUBLICATION]-(protein:Protein)
             WHERE d.id IN diseases AND (protein.name+"~"+protein.id) IN [IDENTIFIERS] 
             WITH collect(DISTINCT protein.name+"~"+protein.id) as Proteins, COLLECT(DISTINCT d.name) AS Diseases, publication
-            WITH Diseases, publication, Proteins, SIZE(Proteins) AS c WHERE c>1
+            WITH Diseases, publication, Proteins
             RETURN  Proteins, publication.id AS publication, publication.linkout AS linkout, Diseases;
 ptm:
     NUMBER_OF_MODIFIED_PROTEINS:

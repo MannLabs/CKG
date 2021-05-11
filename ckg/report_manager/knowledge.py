@@ -162,6 +162,14 @@ class Knowledge:
         self.nodes = {}
         self.relationships = {}
         self.graph = None
+        
+    def get_nodes(self, query_type):
+        nodes = set()
+        for node in self.nodes:
+            if "type" in self.nodes[node]:
+                if self.nodes[node]["type"] == query_type:
+                    nodes.add(node)
+        return list(nodes)
 
     def generate_knowledge_from_regulation(self, entity):
         nodes = {}
@@ -423,33 +431,34 @@ class Knowledge:
         drugs = []
         q = 'NA'
         try:
-            cwd = os.path.dirname(os.path.abspath(__file__))
-            cypher_queries = ckg_utils.get_queries(os.path.join(cwd, queries_file))
-            if cypher_queries is not None:
-                if entity_type.capitalize() in cypher_queries:
-                    queries = cypher_queries[entity_type.capitalize()]
-                    for query_name in queries:
-                        involved_nodes = queries[query_name]['involves_nodes']
-                        if len(set(involved_nodes).intersection(entities)) > 0 or query_name.capitalize() == entity_type.capitalize():
-                            query = queries[query_name]['query']
-                            q = 'NA'
-                            for q in query.split(';')[:-1]:
-                                if attribute is None:
-                                    matches = re.finditer(r'(\w+).ATTRIBUTE', q)
-                                    for matchNum, match in enumerate(matches, start=1):
-                                        var = match.group(1)
-                                        q = q.format(query_list=query_list).replace("ATTRIBUTE", 'name+"~"+{}.id'.format(var)).replace(replace_by[0], replace_by[1]).replace('DISEASES', str(diseases)).replace('DRUGS', str(drugs))
+            if len(query_list) > 1:
+                cwd = os.path.dirname(os.path.abspath(__file__))
+                cypher_queries = ckg_utils.get_queries(os.path.join(cwd, queries_file))
+                if cypher_queries is not None:
+                    if entity_type.capitalize() in cypher_queries:
+                        queries = cypher_queries[entity_type.capitalize()]
+                        for query_name in queries:
+                            involved_nodes = queries[query_name]['involves_nodes']
+                            if len(set(involved_nodes).intersection(entities)) > 0 or query_name.capitalize() == entity_type.capitalize():
+                                query = queries[query_name]['query']
+                                q = 'NA'
+                                for q in query.split(';')[:-1]:
+                                    if attribute is None:
+                                        matches = re.finditer(r'(\w+).ATTRIBUTE', q)
+                                        for matchNum, match in enumerate(matches, start=1):
+                                            var = match.group(1)
+                                            q = q.format(query_list=query_list).replace("ATTRIBUTE", 'name+"~"+{}.id'.format(var)).replace(replace_by[0], replace_by[1]).replace('DISEASES', str(diseases)).replace('DRUGS', str(drugs))
+                                        else:
+                                            q = q.format(query_list=query_list).replace(replace_by[0], replace_by[1]).replace('DISEASES', str(diseases)).replace('DRUGS', str(drugs))
                                     else:
-                                        q = q.format(query_list=query_list).replace(replace_by[0], replace_by[1]).replace('DISEASES', str(diseases)).replace('DRUGS', str(drugs))
-                                else:
-                                    q = q.format(query_list=query_list).replace("ATTRIBUTE", attribute).replace(replace_by[0], replace_by[1]).replace('DISEASES', str(diseases)).replace('DRUGS', str(drugs))
-                                data = self.send_query(q)
-                                if not data.empty:
-                                    if query_name == 'disease' and len(diseases) < 1:
-                                        diseases = data['target'].unique().tolist()
-                                    if query_name == 'drug':
-                                        drugs = data['target'].unique().tolist()
-                                    query_data.append(data)
+                                        q = q.format(query_list=query_list).replace("ATTRIBUTE", attribute).replace(replace_by[0], replace_by[1]).replace('DISEASES', str(diseases)).replace('DRUGS', str(drugs))
+                                    data = self.send_query(q)
+                                    if not data.empty:
+                                        if query_name == 'disease' and len(diseases) < 1:
+                                            diseases = data['target'].unique().tolist()
+                                        if query_name == 'drug':
+                                            drugs = data['target'].unique().tolist()
+                                        query_data.append(data)
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -687,10 +696,9 @@ class ProteomicsKnowledge(Knowledge):
 
     def generate_knowledge(self):
         regulation_knowledge = self.generate_knowledge_from_regulation(entity='Protein')
-        #correlation_knowledge = self.genreate_knowledge_from_correlation('Protein', 'Protein', filter=regulation_knowledge[0].keys())
         self.nodes = regulation_knowledge[0]
-        #self.nodes.update(correlation_knowledge[0])
         self.relationships = regulation_knowledge[1]
+        #self.nodes.update(correlation_knowledge[0])
         #self.relationships.update(correlation_knowledge[1])
         #nodes = self.generate_cypher_nodes_list()
         #limit_count = 3 if len(nodes)>10 else 1
@@ -700,7 +708,7 @@ class ProteomicsKnowledge(Knowledge):
         #self.relationships.update(queries_knowledge[1])
         df_knowledge = self.generate_knowledge_from_dataframes()
         self.nodes.update(df_knowledge[0])
-        self.relationships.update(df_knowledge[1])
+        self.relationships.update(df_knowledge[1])        
 
 class ClinicalKnowledge(Knowledge):
 
@@ -721,6 +729,7 @@ class ClinicalKnowledge(Knowledge):
         queries_knowledge = self.generate_knowledge_from_queries(entity='Clinical', queries_results=queries_results)
         self.nodes.update(queries_knowledge[0])
         self.relationships.update(queries_knowledge[1])
+        
 
 class MultiOmicsKnowledge(Knowledge):
 
