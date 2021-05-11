@@ -9,13 +9,6 @@ import pkg_resources
 import ckg.init
 
 
-with pathlib.Path('requirements.txt').open() as requirements_txt:
-    reqs = [
-        str(requirement)
-        for requirement
-        in pkg_resources.parse_requirements(requirements_txt)
-    ]
-
 with open("README.rst", "r") as fh:
     long_description = fh.read()
 
@@ -48,7 +41,6 @@ setuptools.setup(
         'develop': PreDevelopCommand,
         'install': PreInstallCommand,
     },
-    #install_requires=["setuptools>=56.2", "wheel"]+reqs,
     entry_points={'console_scripts': [
         'ckg_app=ckg.report_manager.index:main',
         'ckg_debug=ckg.debug:main']},
