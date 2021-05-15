@@ -22,7 +22,7 @@ from ckg.graphdb_builder import builder_utils
 from ckg.graphdb_builder.builder import loader, builder
 from ckg.graphdb_builder.experiments import experiments_controller as eh
 from ckg.report_manager import utils
-from ckg.report_manager.worker import create_new_project, create_new_identifiers, run_minimal_update_task
+from ckg.report_manager.worker import create_new_project, create_new_identifiers, run_minimal_update_task, run_full_update_task
 from ckg.graphdb_connector import connector
 
 warnings.filterwarnings("ignore", category=DeprecationWarning) 
@@ -379,8 +379,9 @@ def route_full_update():
     data = flask.request.form
     download = data.get('dwn-radio') == 'true'
     username = session_cookie.split('_')[0]
-    builder.run_full_update(use=username, download=download)
-
+    internal_id = datetime.now().strftime('%Y%m-%d%H-%M%S-')
+    result = run_full_update_task.apply_async(args=[username, download], task_id='run_full_'+session_cookie+internal_id, queue='update')
+    
     rep = flask.redirect('/apps/admin/running=full')
 
     return rep
@@ -670,7 +671,6 @@ def run_processing(n_clicks, project_id):
                 dataset = 'experimental_design'
                 directory = os.path.join(temporaryDirectory, dataset)
                 destination = os.path.join(destDir, dataset)
-                builder_utils.copytree(directory, destination)
                 experimental_files = os.listdir(directory)
                 regex = r"{}.+".format(config['file_design'].replace('PROJECTID', project_id))
                 r = re.compile(regex)
@@ -692,6 +692,7 @@ def run_processing(n_clicks, project_id):
                         result = create_new_identifiers.apply_async(args=[project_id, designData.to_json(), directory, experimental_filename], task_id='data_upload_'+session_cookie+datetime.now().strftime('%Y%m-%d%H-%M%S-'), queue='creation')
                         result_output = result.wait(timeout=None, propagate=True, interval=0.2)
                         res_n = pd.DataFrame.from_dict(result_output['res_n'])
+                        builder_utils.copytree(directory, destination)
                     else:
                         message = 'ERROR: The Experimental design file provided ({}) is missing some of the required fields: {}'.format(experimental_filename, ','.join(['subject external_id','biological_sample external_id','analytical_sample external_id']))
                         builder_utils.remove_directory(directory)

@@ -92,6 +92,21 @@ extract_samples_numbers:
     query: >
         MATCH (p:Project {id:$external_id})-[:HAS_ENROLLED]-(s:Subject)-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)
         RETURN COUNT(DISTINCT(s.id)) AS subjects, COUNT(DISTINCT(b.id)) AS biological_samples, COUNT(DISTINCT(a.id)) AS analytical_samples;
+extract_design:
+    name: extract experimental design
+    description: 'Returns the internal and external identifiers for subjects, biological and analytical samples within a specific project.'
+    involved_nodes:
+        - Project
+        - Subject
+        - Biological_sample
+        - Analytical_sample
+    involved_rels:
+        - HAS_ENROLLED
+        - BELONGS_TO_SUBJECT
+        - SPLITTED_INTO
+    query: >
+        MATCH (p:Project {id:$external_id})-[:HAS_ENROLLED]-(s:Subject)-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)
+        RETURN s.id AS subject_id, s.external_id AS subject_external_id, b.id AS biological_sample_id, b.external_id AS biological_sample_external_id, a.id AS analytical_sample_id, a.external_id AS analytical_sample_external_id;
 check_external_ids:
     name:
     description:

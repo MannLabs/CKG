@@ -45,7 +45,7 @@ def project_parser(projectId, config, directory):
     return data
 
 
-def experimental_design_parser(projectId, config):
+def experimental_design_parser(projectId, config, directory):
     data = {}
     design_data = parse_dataset(projectId, config, directory, key='design')
     if design_data is not None:
@@ -194,7 +194,7 @@ def extract_timepoints(project_data, separator='|'):
 
 def extract_project_subject_rels(projectId, design_data):
     df = pd.DataFrame(columns=['START_ID', 'END_ID', 'TYPE'])
-    if 'subject external_id' in design_data:
+    if 'subject id' in design_data:
         if not pd.isna(design_data['subject id']).any():
             df = pd.DataFrame(design_data['subject id'].dropna().unique(), columns=['END_ID'])
             df.insert(loc=0, column='START_ID', value=projectId)
@@ -271,15 +271,15 @@ def extract_biological_samples_info(clinical_data):
     return df
 
 
-def extract_analytical_samples_info(clinical_data):
-    df = pd.DataFrame(columns=['ID', 'group', 'secondary_group'])
-    if 'analytical_sample external_id' in clinical_data:
-        if not pd.isna(clinical_data['analytical_sample external_id']).any():
-            cols = [i for i in clinical_data.columns if str(i).startswith('analytical_sample')]
-            df = clinical_data[cols]
-            df.columns = [col.replace('analytical_sample ', '') for col in cols]
-            df = df.rename(columns={'external_id': 'ID'})
-            df[['group', 'secondary_group']] = clinical_data[['grouping1', 'grouping2']]
+def extract_analytical_samples_info(data):
+    df = pd.DataFrame(columns=['ID', 'group', 'secondary_group', 'batch'])
+    if 'analytical_sample external_id' in data:
+        if not pd.isna(data['analytical_sample external_id']).any():
+            df = data.copy()
+            df.columns = [col.replace('analytical_sample ', '') for col in df.columns]
+            df = df.rename(columns={'external_id': 'ID', 'grouping1':'group', 'grouping2':'secondary_group'})
+            if 'batch' not in df:
+                df['batch'] = None
 
     return df
 
@@ -349,20 +349,6 @@ def extract_subject_intervention_rels(clinical_data, separator='|'):
             df = pd.concat([interventions, types, combi, response], axis=1).reset_index()
             df.columns = ['START_ID', 'END_ID', 'type', 'in_combination', 'response']
             df.insert(loc=2, column='TYPE', value='HAD_INTERVENTION')
-
-    return df
-
-
-def extract_biological_sample_group_rels(clinical_data):
-    df = pd.DataFrame(columns=['START_ID', 'END_ID', 'primary', 'TYPE'])
-    if 'grouping1' in clinical_data:
-        if not pd.isna(clinical_data['grouping1']).all():
-            df = clinical_data[['biological_sample external_id', 'grouping1', 'grouping2']]
-            df = pd.melt(df, id_vars=['biological_sample external_id'], value_vars=['grouping1', 'grouping2'])
-            df['primary'] = df['variable'].map(lambda x: x == 'grouping1')
-            df = df.drop(['variable'], axis=1).dropna(subset=['value']).drop_duplicates(keep='first').sort_values('biological_sample external_id').reset_index(drop=True)
-            df.columns = ['START_ID', 'END_ID', 'primary']
-            df.insert(loc=2, column='TYPE', value='BELONGS_TO_GROUP')
 
     return df
 
