@@ -105,7 +105,7 @@ def display_page(pathname):
             if project_id is None:
                 return (initialApp.layout, {'display': 'block',
                                             'position': 'absolute',
-                                            'right': '50px'}, error)
+                                            'right': '50px'}, {'display': 'none'})
             else:
                 project = projectApp.ProjectApp(session_id, project_id, project_id, "", "", layout=[], logo=None, footer=None, force=force)
                 return (project.layout, {'display': 'block',

@@ -42,12 +42,22 @@ def run_minimal_update(user, n_jobs=3):
     return True
 
 
-def run_full_update(user, download, n_jobs=3):
+def run_full_update(user='ckg', download=True, n_jobs=3):
     logger.info("The user {} chose to perform a full build".format(user))
     logger.info("Building database > step 1: Importing data from ontologies, databases and experiments")
     importer.fullImport(download=download, n_jobs=n_jobs)
     logger.info("Building database > step 2: Loading all data imported into the database")
     loader.fullUpdate()
+
+    return True
+
+
+def update_textmining(user='ckg', download=True, n_jobs=3):
+    logger.info("The user {} chose to perform an update of the text mining".format(user))
+    logger.info("Updating text mining > step 1: Importing data from mentions")
+    importer.databasesImport(databases=['mentions'], n_jobs=n_jobs, download=download)
+    logger.info("Updating text mining > step 2: Loading updated mentions into the database")
+    loader.partialUpdate(imports=['mentions'], specific=[])
 
     return True
 
