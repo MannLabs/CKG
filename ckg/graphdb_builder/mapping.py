@@ -95,7 +95,7 @@ def getMappingForEntity(entity):
         mapping_file = os.path.join(dbconfig["databasesDir"], os.path.join(dbconfig["sources"][entity], "complete_mapping.tsv"))
         max_wait = 0
         while not os.path.isfile(mapping_file) and max_wait < 5000:
-            time.sleep(5)
+            time.sleep(15)
             max_wait += 1
 
         try:
