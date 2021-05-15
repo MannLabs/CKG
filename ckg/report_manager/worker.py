@@ -45,3 +45,9 @@ def run_minimal_update_task(username):
     response = builder.run_minimal_update(user=username)
 
     return {'response': str(response)}
+
+@celery_app.task
+def run_full_update_task(username, download):
+    response = builder.run_full_update(user=username, download=download)
+
+    return {'response': str(response)}
