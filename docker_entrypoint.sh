@@ -27,12 +27,12 @@ jupyterhub -f /etc/jupyterhub/jupyterhub.py --no-ssl &
 echo "Running redis-server"
 service redis-server start
 
-echo "Initiating celery queues"
+echo "Running celery queues"
 cd ckg/report_manager
-celery -A worker worker --loglevel=DEBUG --concurrency=3 --uid=1500 --gid=nginx -E &
-celery -A worker worker --loglevel=DEBUG --concurrency=3 --uid=1500 --gid=nginx -E -Q update &
-celery -A worker worker --loglevel=DEBUG --concurrency=3 --uid=1500 --gid=nginx -E -Q compute &
+celery -A ckg.report_manager.worker worker --loglevel=INFO --concurrency=1 -E -Q creation &
+celery -A ckg.report_manager.worker worker --loglevel=INFO --concurrency=3 -E -Q compute &
+celery -A ckg.report_manager.worker worker --loglevel=INFO --concurrency=1 -E -Q update &
 
-
+cd /CKG
 echo "Initiating CKG app"
 nginx && uwsgi --ini /etc/uwsgi/apps-enabled/uwsgi.ini --uid 1500 --gid nginx
