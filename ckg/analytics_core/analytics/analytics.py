@@ -24,7 +24,7 @@ import networkx as nx
 import community
 import snf
 import math
-from fancyimpute import KNN
+from sklearn.impute import KNNImputer
 import kmapper as km
 from ckg import ckg_utils
 from ckg.analytics_core import utils
@@ -272,6 +272,7 @@ def imputation_KNN(data, drop_cols=['group', 'sample', 'subject'], group='group'
 
         result = imputation_KNN(data, drop_cols=['group', 'sample', 'subject'], group='group', cutoff=0.6, alone=True)
     """
+    np.random.seed(112736)
     df = data.copy()
     cols = df.columns
     df = df._get_numeric_data()
@@ -284,7 +285,7 @@ def imputation_KNN(data, drop_cols=['group', 'sample', 'subject'], group='group'
             missDf = missDf.loc[:, missDf.notnull().mean() >= cutoff]
             if missDf.isnull().values.any():
                 X = np.array(missDf.values, dtype=np.float64)
-                X_trans = KNN(k=3, verbose=False).fit_transform(X)
+                X_trans = KNNImputer(n_neighbors=3).fit_transform(X)
                 missingdata_df = missDf.columns.tolist()
                 dfm = pd.DataFrame(X_trans, index=list(missDf.index), columns=missingdata_df)
                 df.update(dfm)
@@ -292,7 +293,7 @@ def imputation_KNN(data, drop_cols=['group', 'sample', 'subject'], group='group'
             df = df.dropna(axis=1)
 
         df = df.join(data[cols])
-
+    
     return df
 
 
