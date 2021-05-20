@@ -40,8 +40,8 @@ def parse_from_directory(projectId, directory, configuration={}):
                         for f in dir_content[2]:
                             if dfile_regex.match(f):
                                 filepath = os.path.join(results_path, f)
+                                data.update(parser_from_file(file_path=filepath, configuration=dataset_configuration, data_type=dtype))
                                 break
-                        data.update(parser_from_file(file_path=filepath, configuration=dataset_configuration, data_type=dtype))
                 else:
                     raise Exception("Error when importing proteomics experiment.\n Missing configuration: {}".format(",".join(missing_conf)))
 
@@ -52,7 +52,6 @@ def parser_from_file(file_path, configuration, data_type):
     data = {}
     
     df = parse_dataset(file_path, configuration)
-    
     if df is not None and not df.empty:
         if data_type == "proteins":
             data[(data_type, 'w')] = extract_protein_subject_rels(df, configuration)

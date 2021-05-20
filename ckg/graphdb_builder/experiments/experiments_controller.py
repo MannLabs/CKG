@@ -35,12 +35,12 @@ def generate_dataset_imports(projectId, dataType, dataset_import_dir):
 
 
 def generate_graph_files(data, dataType, projectId, stats, ot='w', dataset_import_dir='experiments'):
-    if dataType.lower() == '':
+    if dataType == '':
         outputfile = os.path.join(dataset_import_dir, projectId+".tsv")
     else:
         outputfile = os.path.join(dataset_import_dir, projectId+"_"+dataType.lower()+".tsv")
 
-    with open(outputfile, ot) as f:
+    with open(outputfile, ot, encoding="utf-8") as f:
         data.to_csv(path_or_buf=f, sep='\t',
                     header=True, index=False, quotechar='"',
                     line_terminator='\n', escapechar='\\')
