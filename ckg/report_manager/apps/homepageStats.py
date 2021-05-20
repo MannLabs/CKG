@@ -191,15 +191,16 @@ def plot_node_rel_per_label(dfs, title, args, focus='nodes'):
                     data['relTypesCount'][0], orient='index', columns=['number']).reset_index()
 
             data = data.sort_values('number')
-
-            fig = viz.get_barplot(data, identifier='node_rel_per_label_{}'.format(focus), args=args)
-            fig.figure['layout'] = go.Layout(barmode='relative',
-                                            height=args['height'],
-                                            xaxis={'type': 'log', 'range': [0, np.log10(data['number'].iloc[-1])]},
-                                            yaxis={'showline': True, 'linewidth': 1, 'linecolor': 'black'},
-                                            font={'family': 'MyriadPro-Regular', 'size': 12},
-                                            template='plotly_white',
-                                            bargap=0.2)
+            
+            if not data.empty:
+                fig = viz.get_barplot(data, identifier='node_rel_per_label_{}'.format(focus), args=args)
+                fig.figure['layout'] = go.Layout(barmode='relative',
+                                                height=args['height'],
+                                                xaxis={'type': 'log', 'range': [0, np.log10(data['number'].iloc[-1])]},
+                                                yaxis={'showline': True, 'linewidth': 1, 'linecolor': 'black'},
+                                                font={'family': 'MyriadPro-Regular', 'size': 12},
+                                                template='plotly_white',
+                                                bargap=0.2)
 
     return html.Div([html.H3(title), fig], style={'margin': '0%', 'padding': '0%'})
 
