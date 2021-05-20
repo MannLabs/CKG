@@ -62,7 +62,8 @@ class User:
         if driver is None:
             result = 'error_msg'
         else:
-            if len(self.find()) > 0:
+            found = self.find()
+            if found is not None:
                 result = "error_exists"
             elif self.validate_user():
                 result = create_user.create_user_from_dict(driver, self.to_dict())

@@ -138,9 +138,14 @@ def find_node(driver, node_type, parameters={}):
     if len(parameters) > 0:
         where_clause = "WHERE "+'AND '.join(["n.{}='{}'".format(k,v) for k, v in parameters.items()])
     query = query.replace("WHERE", where_clause)
-    result = sendQuery(driver, query)
-    result = result.pop()['n']
-
+    query_result = sendQuery(driver, query)
+    
+    result = None
+    if len(query_result) > 0:
+        query_result = query_result.pop()
+        if 'n' in query_result:
+            result = query_result['n']
+    
     return result
 
 
