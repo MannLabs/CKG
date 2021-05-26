@@ -190,11 +190,7 @@ def setupStats(import_type):
         if not os.path.exists(statsDirectory) or not os.path.isfile(statsFile):
             if not os.path.exists(statsDirectory):
                 os.makedirs(statsDirectory)
-            else:
-                pass
             createEmptyStats(statsCols, statsFile, statsName)
-        else:
-            pass
     except Exception as err:
         logger.error("Setting up Stats object {} in file:{} > {}.".format(statsName, statsFile, err))
 
@@ -209,28 +205,27 @@ def createEmptyStats(statsCols, statsFile, statsName):
     """
     try:
         statsDf = pd.DataFrame(columns=statsCols)
-        with pd.HDFStore(statsFile) as hdf:
+        with pd.HDFStore(statsFile, mode='w') as hdf:
             hdf.put(statsName, statsDf, format='table', data_columns=True)
-            hdf.close()
     except Exception as err:
         logger.error("Creating empty Stats object {} in file:{} > {}.".format(statsName, statsFile, err))
 
-# def loadStats(statsFile):
-#     """
-#     Loads the statistics object.
+def loadStats(statsFile):
+    """
+    Loads the statistics object.
 
-#     :param str statsFile: file path where the stats object is stored.
-#     :returns: HDFStore object with the collected statistics. \
-#                 stats can be accessed using a key (i.e stats_ version).
-#     """
-#     try:
-#         hdf = None
-#         if os.path.isfile(statsFile):
-#             hdf = pd.HDFStore(statsFile)
-#     except Exception as err:
-#         logger.error("Loading Stats file:{} > {}.".format(statsFile, err))
+    :param str statsFile: file path where the stats object is stored.
+    :returns: HDFStore object with the collected statistics. \
+                stats can be accessed using a key (i.e stats_ version).
+    """
+    try:
+        hdf = None
+        if os.path.isfile(statsFile):
+            hdf = pd.HDFStore(statsFile, 'r')
+    except Exception as err:
+        logger.error("Loading Stats file:{} > {}.".format(statsFile, err))
 
-#     return hdf
+    return hdf
 
 
 def writeStats(statsDf, import_type, stats_name=None):
@@ -244,8 +239,8 @@ def writeStats(statsDf, import_type, stats_name=None):
     try:
         if stats_name is None:
             stats_name = getStatsName(import_type)
-        with pd.HDFStore(stats_file) as hdf:
-            hdf.append(stats_name, statsDf, data_columns=True, min_itemsize={'time': 8})
+        with pd.HDFStore(stats_file, mode='w') as hdf:
+            hdf.put(key=stats_name, value=statsDf, format='table', append=True, data_columns=True)
     except Exception as err:
         logger.error("Writing Stats object {} in file:{} > {}.".format(stats_name, stats_file, err))
 
