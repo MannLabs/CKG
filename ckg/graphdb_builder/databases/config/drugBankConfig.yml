@@ -34,13 +34,10 @@
     - 'absorption'
     - 'half-life'
     - 'route-of-elimination'
-    - 'kingdom'
-    - 'superclass'
-    - 'class'
-    - 'subclass'
 
 'DrugBank_parentFields': 
     - 'groups'
+    - 'classification'
     - 'prices'
     - 'pathways'
     - 'articles'

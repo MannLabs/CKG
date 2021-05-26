@@ -27,6 +27,7 @@ def extract_drugs(config, directory):
     url = config['DrugBank_url']
     fileName = os.path.join(directory, url.split('/')[-1])
     fields = config['DrugBank_fields']
+    attributes = config['DrugBank_attributes']
     parentFields = config['DrugBank_parentFields']
     structuredFields = config['DrugBank_structures']
 
@@ -56,6 +57,8 @@ def extract_drugs(config, directory):
                                                 values[label].append(intchild.text)
                                     elif intchild.tag.replace(prefix, '') in fields and intchild.text:
                                         values[label].append(intchild.text)
+                                    elif intchild.tag.replace(prefix, '') in attributes and intchild.text:
+                                        values[intchild.tag.replace(prefix, '')] = intchild.text
 
                     if "drugbank-id" in values and len(values) > 2:
                         if values["drugbank-id"] in vocabulary:
