@@ -18,19 +18,23 @@ def get_stats_data(filename, n=3):
     :param int n: number of independent imports to plot.
     :return: Pandas Dataframe with different entities and relationships as rows and columns:
     """
+    df = pd.DataFrame()
+    with pd.HDFStore(filename, 'r') as store:
+        for key in store.keys():
+            k = key.split('_')[0].replace('/', '')
+            if df.empty:
+                df = store[key].copy()
+                df['Import_flag'] = k
+            else:
+                aux = store[key]
+                aux['Import_flag']= k
+                df = df.append(aux)
+    
+    if not df.empty:
+        df['datetime'] = pd.to_datetime(df['date']+' '+df['time'])
+        imp = select_last_n_imports(df, n=n)
+        df = df[df['import_id'].isin(imp)].reset_index(drop=True)
 
-    store = pd.HDFStore(filename, 'r')
-    full, partial = list(store.keys())
-    df_full = store[full]
-    df_partial = store[partial]
-    store.close()
-
-    df_full['Import_flag'] = 'full'
-    df_partial['Import_flag'] = 'partial'
-    df = pd.concat([df_full, df_partial])
-    df['datetime'] = pd.to_datetime(df['date']+' '+df['time'])
-    imp = select_last_n_imports(df, n=n)
-    df = df[df['import_id'].isin(imp)].reset_index(drop=True)
     return df
 
 
@@ -42,12 +46,16 @@ def select_last_n_imports(stats_file, n=3):
     :param int n: number of independent imports to select.
     :return: List of import ids to be plotted according to selection criterion.
     """
-    df = stats_file[['datetime', 'import_id', 'Import_flag']].sort_values('datetime', ascending=False).drop_duplicates(['import_id'], keep = 'first', inplace = False)
-    f = df[df['Import_flag'] == 'full']
-    f = f.iloc[:n, 1].tolist()
-    p = df[df['Import_flag'] == 'partial']
-    p = p.iloc[:n, 1].tolist()
-    return p+f
+    partial = []
+    full = []
+    if 'datetime' in  stats_file and 'import_id' in stats_file and 'Import_flag' in stats_file:
+        df = stats_file[['datetime', 'import_id', 'Import_flag']].sort_values('datetime', ascending=False).drop_duplicates(['import_id'], keep = 'first', inplace = False)
+        full = df[df['Import_flag'] == 'full']
+        full = full.iloc[:n, 1].tolist()
+        partial = df[df['Import_flag'] == 'partial']
+        partial = partial.iloc[:n, 1].tolist()
+    
+    return partial + full
 
 
 def remove_legend_duplicates(figure):
@@ -57,13 +65,14 @@ def remove_legend_duplicates(figure):
     :param figure: plotly graph object figure.
     """
     seen = []
-    for n,i in enumerate(figure['data']):
-        name = figure['data'][n]['name']
-        if name in seen:
-            figure.data[n].update(showlegend=False)
-        else:
-            figure.data[n].update(showlegend=True)
-        seen.append(name)
+    if 'data' in figure:
+        for n,i in enumerate(figure['data']):
+            name = figure['data'][n]['name']
+            if name in seen:
+                figure.data[n].update(showlegend=False)
+            else:
+                figure.data[n].update(showlegend=True)
+            seen.append(name)
 
 
 def get_databases_entities_relationships(stats_file, key='full', options='databases'):
@@ -80,53 +89,62 @@ def get_databases_entities_relationships(stats_file, key='full', options='databa
                         'databases', 'entities' or 'relationships').
     :return: Dictionary.
     """
-    if key == 'full':
-        stats = stats_file[stats_file['Import_flag'] == 'full']
-    elif key == 'partial':
-        stats = stats_file[stats_file['Import_flag'] == 'partial']
-    elif key == 'all':
-        stats = stats_file
+    d_ent = {}
+    d_rel = {}
+    d_dat = {}
+    d_dbs_filename = None
+    stats = pd.DataFrame()
+    if 'Import_flag' in stats_file:
+        if key == 'full':
+            stats = stats_file[stats_file['Import_flag'] == 'full']
+        elif key == 'partial':
+            stats = stats_file[stats_file['Import_flag'] == 'partial']
+        elif key == 'all':
+            stats = stats_file
+    if not stats.empty:
+        if 'Import_type' in stats:
+            mask = (stats['Import_type']=='entity')
+            mask2 = (stats['Import_type']=='relationships')
+            ent = list(set(list(zip(stats.loc[mask,'filename'], stats.loc[mask,'dataset']))))
+            rel = list(set(list(zip(stats.loc[mask2,'filename'], stats.loc[mask2,'dataset']))))
 
-    mask = (stats['Import_type']=='entity')
-    mask2 = (stats['Import_type']=='relationships')
-    ent = list(set(list(zip(stats.loc[mask,'filename'], stats.loc[mask,'dataset']))))
-    rel = list(set(list(zip(stats.loc[mask2,'filename'], stats.loc[mask2,'dataset']))))
+        if 'import_id' in stats and 'datetime in stats':
+            dat = []
+            for i, j in stats.groupby('import_id'):
+                date = str(j['datetime'].sort_values().reset_index(drop=True)[0])
+                for i in j['dataset'].unique():
+                    dat.append((date, i))
 
-    dat = []
-    for i, j in stats.groupby('import_id'):
-        date = str(j['datetime'].sort_values().reset_index(drop=True)[0])
-        for i in j['dataset'].unique():
-            dat.append((date, i))
+            d_dat = defaultdict(list)
+            for k, v in dat:
+                d_dat[k].append(v)
+            d_dat = {k: tuple(v) for k, v in d_dat.items()}
+            d_dat = dict(natsorted(d_dat.items()))
 
-    d_dat = defaultdict(list)
-    for k, v in dat:
-        d_dat[k].append(v)
-    d_dat = {k: tuple(v) for k, v in d_dat.items()}
-    d_dat = dict(natsorted(d_dat.items()))
+            d_ent = defaultdict(list)
+            for k, v in ent:
+                d_ent[v].append(k)
+            d_ent = {k: tuple(v) for k, v in d_ent.items()}
+            d_ent = dict(natsorted(d_ent.items()))
 
-    d_ent = defaultdict(list)
-    for k, v in ent:
-        d_ent[v].append(k)
-    d_ent = {k: tuple(v) for k, v in d_ent.items()}
-    d_ent = dict(natsorted(d_ent.items()))
+            d_rel = defaultdict(list)
+            for k, v in rel:
+                d_rel[v].append(k)
+            d_rel = {k: tuple(v) for k, v in d_rel.items()}
+            d_rel = dict(natsorted(d_rel.items()))
 
-    d_rel = defaultdict(list)
-    for k, v in rel:
-        d_rel[v].append(k)
-    d_rel = {k: tuple(v) for k, v in d_rel.items()}
-    d_rel = dict(natsorted(d_rel.items()))
+        if 'dataset' in stats_file:
+            for i in stats_file['dataset'].unique():
+                if i not in d_ent.keys():
+                    d_ent[i] = ''
+                if i not in d_rel.keys():
+                    d_rel[i] = ''
 
-    for i in stats_file['dataset'].unique():
-        if i not in d_ent.keys():
-            d_ent[i] = ''
-        if i not in d_rel.keys():
-            d_rel[i] = ''
-
-    d_dbs_filename = defaultdict(list)
-    for k, v in chain(d_ent.items(), d_rel.items()):
-        d_dbs_filename[k].append(v)
-    d_dbs_filename = {k: tuple(v) for k, v in d_dbs_filename.items()}
-    d_dbs_filename = dict(natsorted(d_dbs_filename.items()))
+        d_dbs_filename = defaultdict(list)
+        for k, v in chain(d_ent.items(), d_rel.items()):
+            d_dbs_filename[k].append(v)
+        d_dbs_filename = {k: tuple(v) for k, v in d_dbs_filename.items()}
+        d_dbs_filename = dict(natsorted(d_dbs_filename.items()))
 
     if options == 'entities':
         return d_ent
@@ -171,38 +189,39 @@ def get_dropdown_menu(fig, options_dict, add_button=True, equal_traces=True, num
     """
 
     list_updatemenus = []
-
+    updatemenus = []
     start = 0
-    for n, i in enumerate(options_dict.keys()):
-        if equal_traces:
-            visible = [False] * len(fig['data'])
-            end = start + number_traces
-            visible[start:end] = [True] * number_traces
-            start += number_traces
+    if options_dict is not None:
+        for n, i in enumerate(options_dict.keys()):
+            if equal_traces:
+                visible = [False] * len(fig['data'])
+                end = start + number_traces
+                visible[start:end] = [True] * number_traces
+                start += number_traces
+            else:
+                number_traces = len([element for tupl in options_dict[i] for element in tupl])*2
+                visible = [False] * len(fig['data'])
+                end = start + number_traces
+                visible[start:end] = [True] * number_traces
+                start += number_traces
+            temp_dict = dict(label=str(i),
+                            method='update',
+                            args=[{'visible': visible},
+                                    {'title': 'Date: '+i}])
+            list_updatemenus.append(temp_dict)
+
+        if add_button:
+            button = [dict(label='All',
+                            method='update',
+                            args=[{'visible': [True] * len(fig['data'])}, {'title': 'All'}])]
+            list_updatemenus = list_updatemenus + button
         else:
-            number_traces = len([element for tupl in options_dict[i] for element in tupl])*2
-            visible = [False] * len(fig['data'])
-            end = start + number_traces
-            visible[start:end] = [True] * number_traces
-            start += number_traces
-        temp_dict = dict(label=str(i),
-                         method='update',
-                         args=[{'visible': visible},
-                                 {'title': 'Date: '+i}])
-        list_updatemenus.append(temp_dict)
+            pass
 
-    if add_button:
-        button = [dict(label='All',
-                        method='update',
-                        args=[{'visible': [True] * len(fig['data'])}, {'title': 'All'}])]
-        list_updatemenus = list_updatemenus + button
-    else:
-        pass
-
-    updatemenus = list([dict(active=len(list_updatemenus)-1,
-                             buttons=list_updatemenus,
-                             direction='down',
-                             showactive=True, x=-0.17, xanchor='left', y=1.1, yanchor='top'), ])
+        updatemenus = list([dict(active=len(list_updatemenus)-1,
+                                buttons=list_updatemenus,
+                                direction='down',
+                                showactive=True, x=-0.17, xanchor='left', y=1.1, yanchor='top'), ])
 
     return updatemenus
 
@@ -217,32 +236,37 @@ def get_totals_per_date(stats_file, key='full', import_types=False):
     :param bool import_types: breakdown importing stats into entities or relationships related.
     :return: Pandas DataFrame with independent import dates as rows and imported numbers as columns.
     """
-    if key == 'full':
-        stats = stats_file[stats_file['Import_flag'] == 'full']
-    elif key == 'partial':
-        stats = stats_file[stats_file['Import_flag'] == 'partial']
+    df = pd.DataFrame()
+    stats = pd.DataFrame()
+    if 'Import_flag' in stats_file:
+        if key == 'full':
+            stats = stats_file[stats_file['Import_flag'] == 'full']
+        elif key == 'partial':
+            stats = stats_file[stats_file['Import_flag'] == 'partial']
 
     cols = ['date', 'total']
     counts = []
-    for i, j in stats.groupby('import_id'):
-        date = str(j['datetime'].sort_values().reset_index(drop=True)[0])
-        count = j['Imported_number'].sum()
-        counts.append((date, count))
+    if not stats.empty:
+        if 'import_id' in stats:
+            for i, j in stats.groupby('import_id'):
+                date = str(j['datetime'].sort_values().reset_index(drop=True)[0])
+                count = j['Imported_number'].sum()
+                counts.append((date, count))
 
-    df = pd.DataFrame(counts, columns=cols)
-    df = df.set_index('date')
+            df = pd.DataFrame(counts, columns=cols)
+            df = df.set_index('date')
 
-    if import_types:
-        cols = ['date', 'entity', 'relationships']
-        counts = []
-        for i, j in stats.groupby(['import_id']):
-            date = str(j['datetime'].sort_values().reset_index(drop=True)[0])
-            ent = j.loc[(j['Import_type'] == 'entity'), 'Imported_number'].sum()
-            rel = j.loc[(j['Import_type'] == 'relationships'), 'Imported_number'].sum()
-            counts.append((date, ent, rel))
+            if import_types:
+                cols = ['date', 'entity', 'relationships']
+                counts = []
+                for i, j in stats.groupby(['import_id']):
+                    date = str(j['datetime'].sort_values().reset_index(drop=True)[0])
+                    ent = j.loc[(j['Import_type'] == 'entity'), 'Imported_number'].sum()
+                    rel = j.loc[(j['Import_type'] == 'relationships'), 'Imported_number'].sum()
+                    counts.append((date, ent, rel))
 
-        df = pd.DataFrame(counts, columns=cols)
-        df = df.set_index('date')
+                df = pd.DataFrame(counts, columns=cols)
+                df = df.set_index('date')
 
     return df
 
@@ -257,18 +281,20 @@ def get_imports_per_database_date(stats_file):
     """
     cols = ['date', 'dataset', 'entities', 'relationships', 'total']
     stats_sum = []
-    for i, j in stats_file.groupby(['import_id']):
-        date = str(j['datetime'].sort_values().reset_index(drop=True)[0])
-        for a, b in j.groupby('dataset'):
-            ent = b.loc[(b['Import_type'] == 'entity'), 'Imported_number'].sum()
-            rel = b.loc[(b['Import_type'] == 'relationships'), 'Imported_number'].sum()
-            total = b['Imported_number'].sum()
-            stats_sum.append((date, a, ent, rel, total))
+    df = pd.DataFrame()
+    if not stats_file.empty:
+        for i, j in stats_file.groupby(['import_id']):
+            date = str(j['datetime'].sort_values().reset_index(drop=True)[0])
+            for a, b in j.groupby('dataset'):
+                ent = b.loc[(b['Import_type'] == 'entity'), 'Imported_number'].sum()
+                rel = b.loc[(b['Import_type'] == 'relationships'), 'Imported_number'].sum()
+                total = b['Imported_number'].sum()
+                stats_sum.append((date, a, ent, rel, total))
 
-    df = pd.DataFrame(stats_sum, columns=cols)
-    df = df.sort_values(['date', 'total'])
-    df = df.set_index(['date', 'dataset'])
-    df = df.drop('total', axis=1)
+        df = pd.DataFrame(stats_sum, columns=cols)
+        df = df.sort_values(['date', 'total'])
+        df = df.set_index(['date', 'dataset'])
+        df = df.drop('total', axis=1)
 
     return df
 
@@ -287,11 +313,10 @@ def plot_total_number_imported(stats_file, plot_title):
     traces_f = viz.getPlotTraces(df_full, key='full', type='lines')
     traces_p = viz.getPlotTraces(df_partial, key='partial', type='lines')
     traces = traces_f + traces_p
-
-    if type(traces[0]) == list:
-        traces = list(chain.from_iterable(traces))
-    else: pass
-
+    if len(traces) > 0:
+        if type(traces[0]) == list:
+            traces = list(chain.from_iterable(traces))
+    
     layout = go.Layout(title='', xaxis=dict(title=''), yaxis={'title': 'Number of imports'},
                        legend={'font': {'size': 11}}, margin=go.layout.Margin(l=80, r=40, t=100, b=50),
                        annotations=[dict(text='<b>{}<b>'.format(plot_title), font=dict(family='Arial', size=18),
@@ -355,7 +380,8 @@ def plot_databases_numbers_per_date(stats_file, plot_title, key='full', dropdown
     elif key == 'partial':
         stats = stats_file[stats_file['Import_flag'] == 'partial']
     else:
-        print('Syntax error')
+        
+        ('Syntax error')
 
     dropdown_options = get_databases_entities_relationships(stats_file, key=key, options=dropdown_options)
     data = get_imports_per_database_date(stats)
@@ -365,10 +391,9 @@ def plot_databases_numbers_per_date(stats_file, plot_title, key='full', dropdown
         df = data.iloc[data.index.get_level_values(0).str.contains(i)].droplevel(0)
         traces.append(viz.getPlotTraces(df, key=key, type='bars', horizontal=True))
 
-    if type(traces[0]) == list:
-        traces = list(chain.from_iterable(traces))
-    else:
-        pass
+    if len(traces) > 0:
+        if type(traces[0]) == list:
+            traces = list(chain.from_iterable(traces))
 
     layout = go.Layout(title='', xaxis = {'showgrid':True, 'type':'log','title':'Imported entities/relationships'},
                         legend={'font':{'size':11}}, height=600, margin=go.layout.Margin(l=40,r=40,t=80,b=100),
