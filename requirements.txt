@@ -36,7 +36,7 @@ networkx==2.5
 chart-studio==1.0.0
 xhtml2pdf==0.2.4
 lxml==4.3.4
-celery>=4.3.0
+celery==5.0.5
 cffi>=1.14.0
 rpy2==3.0.5; platform_system!="Windows"
 h5py==2.10.0
