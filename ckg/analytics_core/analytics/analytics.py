@@ -1910,7 +1910,7 @@ def format_anova_table(df, aov_results, pairwise_results, pairwise_cols, group, 
     return res
 
 
-def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], subject='subject', group='group', paired=False, correction='fdr_bh', permutations=50, is_logged=True, non_par=False):
+def run_ttest(df, condition1, condition2, alpha = 0.05, drop_cols=["sample"], subject='subject', group='group', paired=False, correction='fdr_bh', permutations=0, is_logged=True, non_par=False):
     """
     Runs t-test (paired/unpaired) for each protein in dataset and performs permutation-based (if permutations>0) or Benjamini/Hochberg (if permutations=0) multiple hypothesis correction.
 
