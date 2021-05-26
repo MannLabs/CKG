@@ -329,7 +329,7 @@ class Knowledge:
 
         return nodes, relationships
 
-    def generate_knowledge_from_edgelist(self, edgelist, entity1, entity2, source, target, rtype, weight):
+    def generate_knowledge_from_edgelist(self, edgelist, entity1, entity2, source, target, rtype, weight, source_attr=[], target_attr=[]):
         nodes = {}
         relationships = {}
         node1_color = self.colors[entity1] if entity1 in self.colors else self.default_color
@@ -337,7 +337,12 @@ class Knowledge:
         edgelist[source] = edgelist[source].astype(str)
         edgelist[target] = edgelist[target].astype(str)
         for i, row in edgelist.iterrows():
-            nodes.update({row[source].replace("'", ""): {'type': entity1, 'color': node1_color}, row[target].replace("'", ""): {'type': entity2, 'color': node2_color}})
+            attr1 = {'type': entity1, 'color': node1_color}
+            attr1.update({c: row[c] for c in source_attr if c in row})
+            attr2 = {'type': entity2, 'color': node2_color}
+            attr2.update({c: row[c] for c in target_attr if c in row})
+            
+            nodes.update({row[source].replace("'", ""): attr1, row[target].replace("'", ""): attr2})
             relationships.update({(row[source].replace("'", ""), row[target].replace("'", "")): {'type': rtype, 'source_color': node1_color, 'target_color': node2_color, 'weight': row[weight]}})
 
         self.update_nodes(nodes)
@@ -488,7 +493,7 @@ class Knowledge:
         nodes = ",".join(nodes)
         return nodes
 
-    def generate_knowledge_graph(self, summarize=True, method='betweenness', inplace=True):
+    def generate_knowledge_graph(self, summarize=True, method='betweenness', inplace=True, num_nodes=15):
         G = nx.DiGraph()
         G.add_nodes_from(self.nodes.items())
         G.add_edges_from(self.relationships.keys())
@@ -503,13 +508,15 @@ class Knowledge:
                 centrality = nx.closeness_centrality(G, u=None, distance='weight', wf_improved=True)
             elif method == 'pagerank':
                 centrality = nx.pagerank(G, alpha=0.95, weight='weight')
+            elif method == 'degree':
+                centrality = nx.degree_centrality(G)
 
             if centrality is not None:
                 nx.set_node_attributes(G, centrality, 'centrality')
                 sorted_centrality = sorted(centrality.items(), key=itemgetter(1), reverse=True)
                 for node_type in self.entities:
                     nodes = [x for x, y in G.nodes(data=True) if 'type' in y and y['type'] == node_type and x not in self.keep_nodes]
-                    selected_nodes.extend([n for n, c in sorted_centrality if n in nodes][15:])
+                    selected_nodes.extend([n for n, c in sorted_centrality if n in nodes][num_nodes:])
 
                 if len(selected_nodes) > 0:
                     G.remove_nodes_from(selected_nodes)
@@ -646,12 +653,12 @@ class Knowledge:
 
         return plot
 
-    def generate_report(self, visualizations=['sankey'], summarize=True, method='betweenness', inplace=True):
+    def generate_report(self, visualizations=['sankey'], summarize=True, method='betweenness', inplace=True, num_nodes=15):
         report = rp.Report(identifier="knowledge")
         plots = []
         G = None
         if self.graph is None:
-            G = self.generate_knowledge_graph(summarize=summarize, method=method, inplace=inplace)
+            G = self.generate_knowledge_graph(summarize=summarize, method=method, inplace=inplace, num_nodes=num_nodes)
 
         for visualization in visualizations:
             if visualization == 'network':

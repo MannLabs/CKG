@@ -178,7 +178,7 @@ proteomics:
             MATCH (drug:Drug)-[r:ACTS_ON]->(protein:Protein) 
             WHERE ((protein.name+"~"+protein.id) IN [IDENTIFIERS]) AND r.score>0.7
             WITH protein, drug, r, SIZE((drug)-[:ACTS_ON]->(:Protein)) AS drug_degree WHERE drug_degree < 200
-            RETURN DISTINCT collect(protein.name+"~"+protein.id) AS Proteins,drug.name AS Drug,r.score AS score, r.source AS source,r.action AS action
+            RETURN DISTINCT collect(protein.name+"~"+protein.id) AS Proteins,drug.name AS Drug, drug.class AS Class, drug.subclass AS Subclass, r.score AS score, r.source AS source,r.action AS action
     PROTEIN_COMPLEX_ASSOCIATIONS:
         name: 'get complexes involving the list of proteins'
         description: 'Get all the complex-protein associations for the relevant proteins'
@@ -298,7 +298,7 @@ ptm:
         query: >
             MATCH (sprotein:Protein)-[:HAS_MODIFIED_SITE]->(modified_protein:Modified_protein)<-[:HAS_MODIFIED_SITE]-(protein:Protein)<-[r:ACTS_ON]-(drug:Drug)
             WHERE (sprotein.name+"~"+modified_protein.id) IN [IDENTIFIERS] AND toFloat(r.score)>=0.4
-            RETURN DISTINCT collect(sprotein.name+"~"+modified_protein.id) AS Modified_protein, collect(protein.name+"~"+protein.id) AS Proteins,drug.name AS Drug,r.score AS score, r.source AS source,r.action AS action
+            RETURN DISTINCT collect(sprotein.name+"~"+modified_protein.id) AS Modified_protein, collect(protein.name+"~"+protein.id) AS Proteins,drug.name AS Drug, drug.class AS Class, drug.subclass AS Subclass, r.score AS score, r.source AS source,r.action AS action
     GO_ANNOTATION_MOD:
         name: 'get gene ontology annotations for the modified proteins identified'
         description: 'Get all the gene ontology annotations for the all the modified proteins identified in a project'

@@ -48,7 +48,7 @@ Protein:
     query: >
       MATCH (p:Protein)<-[r:ACTS_ON]-(d:Drug) 
       WHERE p.ATTRIBUTE IN {query_list} AND r.score>0.7
-      WITH p, d, r, SIZE((:Protein)<-[:ACTS_ON]-(d)) AS drug_degree WHERE drug_degree < 200
+      WITH p, d, r, SIZE((:Protein)<-[:ACTS_ON]-(d)) AS drug_degree WHERE drug_degree < 20
       RETURN DISTINCT p.ATTRIBUTE AS source, LABELS(p) as source_type, d.name AS target, LABELS(d) as target_type, r.score AS weight, r.source, type(r) AS rel_type;
   drug_interactions:
     name: 'Drugs interactions'
