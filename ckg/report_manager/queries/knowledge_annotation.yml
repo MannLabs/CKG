@@ -133,3 +133,117 @@ Protein:
       MATCH (d:Disease)-[:MENTIONED_IN_PUBLICATION]->(pub:Publication)<-[r:MENTIONED_IN_PUBLICATION]-(p:Protein)
       WHERE d.name IN DISEASES AND p.ATTRIBUTE IN {query_list}
       RETURN DISTINCT p.ATTRIBUTE AS source, LABELS(p) AS source_type, "PMID:"+pub.id AS target, LABELS(pub) AS target_type, r.score AS weight, r.source, type(r) AS rel_type;
+Drug:
+  drug:
+    name: 'Drug-drug interactions'
+    description: 'Interaction among the drugs in the list'
+    involves_nodes:
+      - Drug
+    involves_rels:
+      - INTERACTS_WITH
+    query: >
+        MATCH (d1:Drug)-[r:INTERACTS_WITH]-(d2:Drug)
+        WHERE d1.ATTRIBUTE IN {query_list} AND d2.ATTRIBUTE IN {query_list}
+        RETURN DISTINCT d1.ATTRIBUTE AS source, LABELS(d1) AS source_type, d2.ATTRIBUTE AS target, LABELS(d2) AS target_type, r.score AS weight, type(r) AS rel_type;
+  disease:
+    name: 'disease indications'
+    description: 'Diseases the list of drug are indicated for'
+    involves_nodes:
+      - Drug
+      - Experimental_factor
+      - Disease
+    involves_rels:
+      - INDICATED_FOR
+      - MAPS_TO
+    query: >
+        MATCH (d:Drug)-[r:IS_INDICATED_FOR]-(ph:Phenotype)-[:MAPS_TO]-(ef:Experimental_factor)-[:MAPS_TO]-(doid:Disease)
+        WHERE d.ATTRIBUTE IN {query_list}
+        RETURN DISTINCT d.ATTRIBUTE AS source, LABELS(d) AS source_type, doid.name AS target, LABELS(doid) AS target_type, r.score AS weight, r.source, type(r) AS rel_type;
+  target:
+    name: 'protein targets'
+    description: 'Proteins targeted by the drugs in the list'
+    involves_nodes:
+      - Drug
+      - Protein
+    involves_rels:
+      - ACTS_ON
+    query: >
+        MATCH (d:Drug)-[r:ACTS_ON]-(p:Protein) 
+        WHERE d.ATTRIBUTE IN {query_list} AND r.score>0.7
+        RETURN DISTINCT d.ATTRIBUTE AS source, LABELS(d) AS source_type, p.name AS target, LABELS(p) AS target_type, r.score AS weight, r.source, r.action AS rel_type;
+  target_disease:
+    name: 'protein-disease associations'
+    description: 'Associations between targeted proteins and the disases the list of drugs are indicated for'
+    involves_nodes:
+      - Protein
+      - Disease
+    involves_rels:
+      - ASSOCIATED_WITH
+    query: >
+        MATCH (p:Protein)-[r:ASSOCIATED_WITH]-(d:Disease)
+        WHERE p.name IN TARGETS AND d.name IN DISEASES AND r.score > 3.0
+        RETURN DISTINCT p.name AS source, LABELS(p) AS source_type, d.name AS target, LABELS(d) AS target_type, r.score AS weight, type(r) AS rel_type;
+  complexes:
+    name: 'protein complexes'
+    description: 'Protein complexes among the targets'
+    involves_nodes:
+      - Protein
+      - Complex
+    involves_rels:
+      - BELONGS_TO
+    query: >
+        MATCH (p:Protein)-[r:IS_SUBUNIT_OF]-(c:Complex)
+        WHERE p.name IN TARGETS
+        RETURN DISTINCT p.name AS source, LABELS(p) AS source_type, c.name AS target, LABELS(c) AS target_type, r.score AS weight, type(r) AS rel_type;
+  pathway:
+    name: 'drug pathways'
+    description: 'Pathways annotated for the list of drugs'
+    involves_nodes:
+      - Drug
+      - Pathway
+    involves_rels:
+      - BELONGS_TO
+    query: >
+        MATCH (d:Drug)-[r]-(p:Pathway)
+        WHERE d.name IN {query_list}
+        RETURN DISTINCT d.name AS source, LABELS(d) AS source_type, p.name AS target, LABELS(p) AS target_type, r.score AS weight, type(r) AS rel_type;
+  target_pathway:
+    name: 'target pathways'
+    description: 'Pathways annotated for the list of targets'
+    involves_nodes:
+      - Protein
+      - Pathway
+    involves_rels:
+      - ANNOTATED_IN_PATHWAY
+    query: >
+        MATCH (p:Protein)-[r]-(c:Pathway)
+        WHERE p.name IN TARGETS AND r.source="SMPDB"
+        RETURN DISTINCT p.name AS source, LABELS(p) AS source_type, c.name AS target, LABELS(c) AS target_type, r.score AS weight, type(r) AS rel_type;
+  side_effects:
+    name: 'Drug side effects'
+    description: 'Side effects associated to the list of drugs'
+    involves_nodes:
+      - Drug
+      - Phenotype
+    involves_rels:
+      - HAS_SIDE_EFFECT
+    query: >
+        MATCH (d:Drug)-[r:HAS_SIDE_EFFECT]->(p:Phenotype)
+        WHERE d.ATTRIBUTE IN {query_list}
+        RETURN DISTINCT d.ATTRIBUTE AS source, LABELS(d) AS source_type, p.name AS target, LABELS(p) AS target_type, r.score AS weight, type(r) AS rel_type;
+  publication:
+    name: 'Publications'
+    description: 'Publications where the provided list of drugs are mentioned'
+    involves_nodes:
+      - Drug
+      - Disease
+      - Publication
+    involves_rels:
+      - MENTIONED_IN_PUBLICATION
+    query: >
+      MATCH (di:Disease)-[:MENTIONED_IN_PUBLICATION]->(pub:Publication)<-[r:MENTIONED_IN_PUBLICATION]-(d:Drug)
+      WHERE di.name IN DISEASES AND d.ATTRIBUTE IN {query_list}
+      WITH di, d, pub
+      MATCH (pub)-[r:MENTIONED_IN_PUBLICATION]-(p:Protein)
+      WHERE p.name IN TARGETS
+      RETURN DISTINCT d.ATTRIBUTE AS source, LABELS(d) AS source_type, "PMID:"+pub.id AS target, LABELS(pub) AS target_type, r.score AS weight, r.source, type(r) AS rel_type;

@@ -32,7 +32,7 @@ class Knowledge:
         self._graph = graph
         self._report = report
         self._default_color = '#636363'
-        self._entities = ["Protein", "Disease", "Drug", "Pathway", "Biological_process", "Complex", "Publication", "Tissue", "Metabolite"]
+        self._entities = ["Protein", "Disease", "Drug", "Pathway", "Biological_process", "Complex", "Publication", "Tissue", "Metabolite", "Phenotype"]
         self.remove_entity(self._focus_on)
         self._colors = colors
         self._keep_nodes = keep_nodes
@@ -46,6 +46,7 @@ class Knowledge:
                             'Publication': '#b35806',
                             'Biological_process': '#e6f598',
                             'Metabolite': '#f46d43',
+                            'Phenotype': '#ff7f00',
                             'Project': '#3288bd',
                             'Complex': '#31a354',
                             'upregulated': '#d53e4f',
@@ -434,6 +435,7 @@ class Knowledge:
 
         query_data = []
         drugs = []
+        targets = []
         q = 'NA'
         try:
             if len(query_list) > 1:
@@ -452,17 +454,19 @@ class Knowledge:
                                         matches = re.finditer(r'(\w+).ATTRIBUTE', q)
                                         for matchNum, match in enumerate(matches, start=1):
                                             var = match.group(1)
-                                            q = q.format(query_list=query_list).replace("ATTRIBUTE", 'name+"~"+{}.id'.format(var)).replace(replace_by[0], replace_by[1]).replace('DISEASES', str(diseases)).replace('DRUGS', str(drugs))
+                                            q = q.format(query_list=query_list).replace("ATTRIBUTE", 'name+"~"+{}.id'.format(var)).replace(replace_by[0], replace_by[1]).replace('DISEASES', str(diseases)).replace('DRUGS', str(drugs)).replace('TARGETS', str(targets))
                                         else:
-                                            q = q.format(query_list=query_list).replace(replace_by[0], replace_by[1]).replace('DISEASES', str(diseases)).replace('DRUGS', str(drugs))
+                                            q = q.format(query_list=query_list).replace(replace_by[0], replace_by[1]).replace('DISEASES', str(diseases)).replace('DRUGS', str(drugs)).replace('TARGETS', str(targets))
                                     else:
-                                        q = q.format(query_list=query_list).replace("ATTRIBUTE", attribute).replace(replace_by[0], replace_by[1]).replace('DISEASES', str(diseases)).replace('DRUGS', str(drugs))
+                                        q = q.format(query_list=query_list).replace("ATTRIBUTE", attribute).replace(replace_by[0], replace_by[1]).replace('DISEASES', str(diseases)).replace('DRUGS', str(drugs)).replace('TARGETS', str(targets))
                                     data = self.send_query(q)
                                     if not data.empty:
                                         if query_name == 'disease' and len(diseases) < 1:
                                             diseases = data['target'].unique().tolist()
-                                        if query_name == 'drug':
+                                        elif query_name == 'drug':
                                             drugs = data['target'].unique().tolist()
+                                        elif query_name == 'target':
+                                            targets = data['target'].dropna().unique().tolist()
                                         query_data.append(data)
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
