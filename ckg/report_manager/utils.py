@@ -1,5 +1,4 @@
 import os
-import re
 import pandas as pd
 import dash_html_components as html
 import dash_core_components as dcc
@@ -63,76 +62,6 @@ def compress_directory(name, directory, compression_format='zip'):
             print("The directory {} failed. Exists?{} Is dir?{}".format(directory, os.path.exists(directory) and os.path.isdir(directory)))
     except Exception as err:
         print("Could not compress file {} in directory {}. Error: {}".format(name, directory, err))
-
-def convert_ckg_to_sdrf(df):
-    out_mapping = {'tissue':'characteristics[organism part]',
-                   'disease': 'characteristics[disease]',
-                   'grouping1': 'characteristics[phenotype]',
-                   'analytical_sample': 'comment[data file]',
-                   'subject': 'characteristics[individual]',
-                   'biological_sample': 'source name'}
-    
-    if not df.empty:
-        df = pd.pivot_table(df, index=['subject','biological_sample', 'analytical_sample', 'grouping1', 'tissue'], columns=['exp_factor'], values=['exp_factor_value'])
-        df.columns = ["characteristics[{}]".format(c[1]) for c in df]
-        df = df.reset_index()
-        df = df.rename(out_mapping, axis=1)
-        
-    return df
-
-def convert_sdrf_to_ckg(df):
-    in_mapping = {'organism part': 'tissue',
-                  'disease': 'disease',
-                  'phenotype': 'grouping1',
-                  'data file': 'analytical_sample external_id',
-                  'individual':'subject external_id',
-                  'source name':'biological_sample external_id'}
-    cols = {}
-    for c in df.columns:
-        matches = re.search(r'\[(.+)\]', c)
-        if matches:
-            cols[c] = matches.group(1)
-    
-    driver = connector.getGraphDatabaseConnectionConfiguration()
-    query = '''MATCH (ef:Experimental_factor)-[r:MAPS_TO]-(c:Clinical_variable)
-                WHERE ef.name IN {} RETURN ef.name AS from, c.name+' ('+c.id+')' AS to, LABELS(c)'''
-    
-    mapping = connector.getCursorData(driver, query.format(list(cols.values())))
-    mapping = dict(zip(mapping['from'], mapping['to']))
-    mapping.update(in_mapping)
-    df = df.rename(cols, axis=1).rename(mapping, axis=1)
-    
-    return df
-
-def convert_ckg_clinical_to_sdrf(df):
-    out_mapping = {'tissue':'characteristics[organism part]',
-                   'disease': 'characteristics[disease]',
-                   'grouping1': 'characteristics[phenotype]',
-                   'analytical_sample': 'comment[data file]',
-                   'subject': 'characteristics[individual]',
-                   'biological_sample': 'source name'}
-    cols = []
-    for c in df.columns:
-        matches = re.search(r'(\d+)', c)
-        if matches:
-            cols.append(c)
-    
-    driver = connector.getGraphDatabaseConnectionConfiguration()
-    query = '''MATCH (ef:Experimental_factor)-[r:MAPS_TO]-(c:Clinical_variable)
-                WHERE c.name+' ('+c.id+')' IN {} RETURN c.name+' ('+c.id+')' AS from, "characteristic["+ef.name+"]" AS to, LABELS(c)'''
-    
-    mapping = connector.getCursorData(driver, query.format(cols))
-    mapping = dict(zip(mapping['from'], mapping['to']))
-    mapping.update(out_mapping)
-    df = df.rename(mapping, axis=1)
-    
-    return df
-
-def convert_sdrf_file_to_ckg(file_path):
-    sdrf_df = pd.read_csv(file_path, sep='\t')
-    df = convert_sdrf_to_ckg(sdrf_df)
-    
-    return df
 
 
 def get_markdown_date(extra_text):

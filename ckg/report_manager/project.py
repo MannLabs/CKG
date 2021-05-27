@@ -7,6 +7,7 @@ from collections import defaultdict
 from json import dumps
 import pandas as pd
 from ckg import ckg_utils
+from ckg.graphdb_builder import builder_utils
 from ckg.report_manager.dataset import Dataset, DNAseqDataset, ProteomicsDataset, InteractomicsDataset, PhosphoproteomicsDataset, ClinicalDataset, LongitudinalProteomicsDataset, MultiOmicsDataset
 from ckg.analytics_core.viz import viz
 from ckg.analytics_core import utils as acore_utils
@@ -190,7 +191,7 @@ class Project:
             project_cypher = query_utils.read_queries(query_path)
             query = query_utils.get_query(project_cypher, query_id="project_sdrf")
             df = connector.getCursorData(driver, query.replace("PROJECTID", self.identifier))
-            sdrf_df = utils.convert_ckg_to_sdrf(df)
+            sdrf_df = builder_utils.convert_ckg_to_sdrf(df)
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -685,6 +686,10 @@ class Project:
 
     def download_project_report(self):
         directory = self.get_downloads_directory()
+        project_sdrf = self.get_sdrf()
+        if not project_sdrf.empty():
+            project_sdrf.to_csv(os.path.join(directory, "{}.sdrf".format(self.identifier)), sep='\t', header=True, index=False, doublequote=None)
+
         for dataset in self.report:
             report = self.report[dataset]
             dataset_dir = os.path.join(directory, dataset)

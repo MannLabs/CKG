@@ -1,3 +1,4 @@
+from neo4j.meta import experimental
 import pandas as pd
 import csv
 import certifi
@@ -7,6 +8,7 @@ import wget
 import base64
 import glob
 import io
+import re
 import requests
 import ftplib
 import json
@@ -21,18 +23,20 @@ import datetime
 import logging
 import logging.config
 from ckg import ckg_utils
+from ckg.graphdb_connector import connector
 import zipfile
 import rarfile
 
 
 def readDataset(uri):
+    data = pd.DataFrame()
     if uri.endswith('.xlsx'):
         data = readDataFromExcel(uri)
-    elif uri.endswith(".csv") or uri.endswith(".tsv") or uri.endswith(".txt"):
-        if uri.endswith(".tsv") or uri.endswith(".txt"):
-            data = readDataFromTXT(uri)
-        else:
-            data = readDataFromCSV(uri)
+    elif uri.endswith(".tsv") or uri.endswith(".txt") or uri.endswith(".sdrf"):
+        data = readDataFromTXT(uri)
+    elif uri.endswith(".csv"):
+        data = readDataFromCSV(uri)
+
     data = data.dropna(how='all')
 
     return data
@@ -104,6 +108,8 @@ def parse_contents(contents, filename):
         df = pd.read_excel(io.BytesIO(decoded))
     elif file_format == 'mztab':
         df = parse_mztab_filehandler(io.StringIO(decoded.decode('utf-8')))
+    elif file_format == 'sdrf':
+        df = parse_sdrf_filehandler(io.StringIO(decoded.decode('utf-8')))
 
     return df
 
@@ -123,6 +129,14 @@ def export_contents(data, dataDir, filename):
     elif file_format == 'mztab':
         for dataset in data:
             data[dataset].to_csv(os.path.join(dataDir, dataset+'.tsv'), sep='\t', index=False, encoding='utf-8')
+    elif file_format == 'sdrf':
+        for dataset in data:
+            directory = dataDir
+            if dataset == "experimental_design":
+                directory = os.path.join(dataDir, "../experimental_design")
+                checkDirectory(directory)
+            
+            data[dataset].to_excel(os.path.join(directory, dataset+'.xlsx'), index=False, encoding='utf-8')
 
 
 def parse_mztab_filehandler(mztabf):
@@ -163,6 +177,96 @@ def parse_mztab_file(mztab_file):
         datasets = parse_mztab_filehandler(mztabf)
             
     return datasets
+
+def parse_sdrf_filehandler(sdrf_fh):
+    data = {}
+    datasets = {'experimental_design': ['subject external_id',
+                                    'biological_sample external_id',
+                                    'analytical_sample external_id',
+                                    'grouping1'], 
+            'clinical_data':[]}
+    
+    sdrf_df = pd.read_csv(sdrf_fh, sep='\t', low_memory=True)
+    df = convert_sdrf_to_ckg(sdrf_df)
+
+    for dataset in datasets:
+        cols = datasets[dataset]
+        if len(cols)>0:
+            data[dataset] = df[cols]
+        else:
+            data[dataset] = df.copy()
+        
+    return data
+
+def convert_ckg_to_sdrf(df):
+    out_mapping = {'tissue':'characteristics[organism part]',
+                   'disease': 'characteristics[disease]',
+                   'grouping1': 'characteristics[phenotype]',
+                   'analytical_sample': 'comment[data file]',
+                   'subject': 'characteristics[individual]',
+                   'biological_sample': 'source name'}
+    
+    if not df.empty:
+        df = pd.pivot_table(df, index=['subject','biological_sample', 'analytical_sample', 'grouping1', 'tissue'], columns=['exp_factor'], values=['exp_factor_value'])
+        df.columns = ["characteristics[{}]".format(c[1]) for c in df]
+        df = df.reset_index()
+        df = df.rename(out_mapping, axis=1)
+        
+    return df
+
+def convert_sdrf_to_ckg(df):
+    in_mapping = {'organism part': 'tissue',
+                  'disease': 'disease',
+                  'phenotype': 'grouping1',
+                  'data file': 'analytical_sample external_id',
+                  'individual':'subject external_id',
+                  'source name':'biological_sample external_id'}
+    cols = {}
+    for c in df.columns:
+        matches = re.search(r'\[(.+)\]', c)
+        if matches:
+            cols[c] = matches.group(1)
+    
+    driver = connector.getGraphDatabaseConnectionConfiguration()
+    query = '''MATCH (ef:Experimental_factor)-[r:MAPS_TO]-(c:Clinical_variable)
+                WHERE ef.name IN {} RETURN ef.name AS from, c.name+' ('+c.id+')' AS to, LABELS(c)'''
+    
+    mapping = connector.getCursorData(driver, query.format(list(cols.values())))
+    mapping = dict(zip(mapping['from'], mapping['to']))
+    mapping.update(in_mapping)
+    df = df.rename(cols, axis=1).rename(mapping, axis=1)
+    
+    return df
+
+def convert_ckg_clinical_to_sdrf(df):
+    out_mapping = {'tissue':'characteristics[organism part]',
+                   'disease': 'characteristics[disease]',
+                   'grouping1': 'characteristics[phenotype]',
+                   'analytical_sample': 'comment[data file]',
+                   'subject': 'characteristics[individual]',
+                   'biological_sample': 'source name'}
+    cols = []
+    for c in df.columns:
+        matches = re.search(r'(\d+)', c)
+        if matches:
+            cols.append(c)
+    
+    driver = connector.getGraphDatabaseConnectionConfiguration()
+    query = '''MATCH (ef:Experimental_factor)-[r:MAPS_TO]-(c:Clinical_variable)
+                WHERE c.name+' ('+c.id+')' IN {} RETURN c.name+' ('+c.id+')' AS from, "characteristic["+ef.name+"]" AS to, LABELS(c)'''
+    
+    mapping = connector.getCursorData(driver, query.format(cols))
+    mapping = dict(zip(mapping['from'], mapping['to']))
+    mapping.update(out_mapping)
+    df = df.rename(mapping, axis=1)
+    
+    return df
+
+def convert_sdrf_file_to_ckg(file_path):
+    sdrf_df = pd.read_csv(file_path, sep='\t')
+    df = convert_sdrf_to_ckg(sdrf_df)
+    
+    return df
 
 
 def write_relationships(relationships, header, outputfile):
