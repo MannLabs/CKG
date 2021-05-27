@@ -543,7 +543,6 @@ def activate_upload_form(projectid):
     style = {'pointer-events': 'none', 'opacity': 0.5}
     driver = connector.getGraphDatabaseConnectionConfiguration()
     if driver is not None:
-        
         if len(projectid) > 7:
             project = connector.find_node(driver, node_type='Project', parameters={'id': projectid})
             if len(project) == 0:
