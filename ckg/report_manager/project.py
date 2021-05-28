@@ -687,7 +687,7 @@ class Project:
     def download_project_report(self):
         directory = self.get_downloads_directory()
         project_sdrf = self.get_sdrf()
-        if not project_sdrf.empty():
+        if not project_sdrf.empty:
             project_sdrf.to_csv(os.path.join(directory, "{}.sdrf".format(self.identifier)), sep='\t', header=True, index=False, doublequote=None)
 
         for dataset in self.report:
