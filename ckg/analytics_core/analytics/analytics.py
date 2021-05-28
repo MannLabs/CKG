@@ -282,7 +282,7 @@ def imputation_KNN(data, drop_cols=['group', 'sample', 'subject'], group='group'
         value_cols = [c for c in df.columns if c not in drop_cols]
         for g in df[group].unique():
             missDf = df.loc[df[group] == g, value_cols]
-            missDf = missDf.loc[:, missDf.notnull().mean() >= cutoff]
+            missDf = missDf.loc[:, missDf.notnull().mean() >= cutoff].dropna(axis=1, how='all')
             if missDf.isnull().values.any():
                 X = np.array(missDf.values, dtype=np.float64)
                 X_trans = KNNImputer(n_neighbors=3).fit_transform(X)
@@ -1247,9 +1247,13 @@ def run_correlation(df, alpha=0.05, subject='subject', group='group', method='pe
         result = run_correlation(df, alpha=0.05, subject='subject', group='group', method='pearson', correction='fdr_bh')
     """
     correlation = pd.DataFrame()
+    #ToDo
+    #The Repeated measurements correlation calculation is too time consuming so it only runs if
+    #the number of features is less than 200
     if check_is_paired(df, subject, group):
         if len(df[subject].unique()) > 2:
-            correlation = run_rm_correlation(df, alpha=alpha, subject=subject, correction=correction)
+            if len(df.columns) < 200:
+                correlation = run_rm_correlation(df, alpha=alpha, subject=subject, correction=correction)
     else:
         df = df.dropna(axis=1)._get_numeric_data()
         if not df.empty:
