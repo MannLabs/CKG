@@ -97,18 +97,18 @@ RUN service neo4j start && \
     service neo4j stop
 
 # Load backup with Clinical Knowledge Graph
-# RUN mkdir -p /var/lib/neo4j/data/backup
-# RUN wget -O /var/lib/neo4j/data/backup/ckg_201020_neo4j_3.5.20.dump https://data.mendeley.com/public-files/datasets/mrcf7f4tc2/files/e454e520-2384-49ee-ac41-d4fbfa15c065/file_downloaded
-# COPY /resources/neo4j_db/ckg_201020_neo4j_3.5.20.dump /var/lib/neo4j/data/backup/.
-# RUN mkdir -p /var/lib/neo4j/data/databases/graph.db
-# RUN sudo -u neo4j neo4j-admin load --from=/var/lib/neo4j/data/backup/ckg_201020_neo4j_3.5.20.dump --database=graph.db --force
+RUN mkdir -p /var/lib/neo4j/data/backup
+#RUN wget -O /var/lib/neo4j/data/backup/latest.dump https://data.mendeley.com/public-files/datasets/mrcf7f4tc2/files/e454e520-2384-49ee-ac41-d4fbfa15c065/file_downloaded
+COPY /resources/neo4j_db/ckg_190521_neo4j_4.2.3.dump /var/lib/neo4j/data/backup/.
+RUN mkdir -p /var/lib/neo4j/data/databases/graph.db
+RUN sudo -u neo4j neo4j-admin load --from=/var/lib/neo4j/data/backup/ckg_190521_neo4j_4.2.3.dump --database=graph.db --force
 
 # # Remove dump file
-# RUN echo "Done with restoring backup, removing backup folder"
-# RUN rm -rf /var/lib/neo4j/data/backup
+RUN echo "Done with restoring backup, removing backup folder"
+RUN rm -rf /var/lib/neo4j/data/backup
 
-# RUN ls -lrth  /var/lib/neo4j/data/databases
-# RUN [ -e  /var/lib/neo4j/data/databases/store_lock ] && rm /var/lib/neo4j/data/databases/store_lock
+RUN ls -lrth  /var/lib/neo4j/data/databases
+RUN [ -e  /var/lib/neo4j/data/databases/store_lock ] && rm /var/lib/neo4j/data/databases/store_lock
 
 #R
 RUN apt-get update && \
@@ -120,9 +120,6 @@ RUN apt-get update && \
    r-recommended=${R_BASE_VERSION}* && \
    echo 'options(repos = c(CRAN = "https://cloud.r-project.org/"), download.file.method = "libcurl")' >> /etc/R/Rprofile.site
     
-# Install packages
-COPY /resources/R_packages.R /R_packages.R
-RUN Rscript R_packages.R
 
 # CKG Python library
 COPY ./requirements.txt .
