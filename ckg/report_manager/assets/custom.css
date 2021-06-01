@@ -8,6 +8,7 @@ button.button_link, a.button_link:link, a.button_link:visited {
   color: rgb(255, 255, 255);
   background-color: rgb(32, 92, 204);
   text-transform: uppercase;
+  text-align: center;
   font-weight: 700;
   font-size: .66rem;
   white-space: nowrap;
@@ -119,7 +120,7 @@ div.error_panel{
 }
 
 label{
-  idth: 400px;
+  width: 400px;
   line-height: 26px;
   margin-right: 3px;
   margin-bottom: 3px;
