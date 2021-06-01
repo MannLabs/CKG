@@ -16,11 +16,27 @@ The Clinical Knowledge Graph requires the installation of:
 
 - Python
 
-- Java
-
 - R
 
+- Java
+
+.. image:: ../_static/images/installation_tech.png
+	:width: 70%
+	:align: center
+
 The following instructions are optimised for operating systems MacOS and Linux. The installation on Windows systems is slightly different, please go to :ref:`Windows installation`.
+
+To avoid possible compatibility issues caused by different Operating systems, python and R versions, we recommend to follow the instructions to build and use the :ref:`CKG Docker Container` instead (https://www.docker.com/).
+By building the container and running it, you will get:
+
+- Neo4j
+- CKG
+- JupyterHub
+
+.. image:: ../_static/images/docker_container.png
+	:width: 70%
+	:align: center
+
 
 Initial Requirements
 --------------------------
@@ -41,33 +57,6 @@ To facillitate the installation of Python, we recommend to use the Miniconda ins
 5. Activate the environment by running in the terminal window: ``conda activate ckgenv``
 
 .. note:: To deactivate the environment run: ``conda deactivate``
-
-
-Java
-^^^^^^^^^^^
-
-Before starting setting up Neo4j and, later on, the Clinical Knowledge Graph, it is very important that you have *Java* installed in your machine, including **Java SE Runtime Environment**.
-
-Different versions of a Neo4j database can have different requirements. For example, Neo4j 3.5 versions require Oracle Java 8, while Neo4j 4.0 versions already require Oracle Java 11.
-When using a new version of Neo4j, always remember to read the respective Operations Manual, and check for the software requirements.
-
-To check if you already have **Java SE Development Kit** installed, run ``java -version`` in your terminal window. This should print out three lines similar to the following, with possible variation in the version:
-
-.. code-block:: python
-
-	java version "1.8.0_171"
-	Java(TM) SE Runtime Environment (build 1.8.0_171-b11)
-	Java HotSpot(TM) 64-Bit Server VM (build 25.171-b11, mixed mode)
-
-Running ``/usr/libexec/java_home`` in the terminal should print out a path like ``/Library/Java/JavaVirtualMachines/jdk1.8.0_171.jdk/Contents/Home``. Otherwise, please follow the steps below:
-
-1. Go to ``https://www.oracle.com/java/technologies/javase-downloads.html`` and download the version that fits your Neo4j version and OS requirements.
-
-#. Install the package.
-
-#. Run ``/usr/libexec/java_home`` in the terminal to make sure the *Java* package has been installed in ``/Library/Java/JavaVirtualMachines/``.
-
-.. note:: You can also install Java from OpenJDK. Follow the instructions here: https://openjdk.java.net/install/index.html (make sure to choose the right Java version for your Neo4j installation)
 
 
 R
@@ -101,6 +90,40 @@ To install the necessary R packages, simply initiate R (terminal or shell) and r
 
 .. note:: If you need to install R, follow `these <https://web.stanford.edu/~kjytay/courses/stats32-aut2018/Session%201/Installation%20for%20Mac.html>`__ tutorial.
 
+
+Java
+^^^^^^^^^^^
+
+Before starting setting up Neo4j and, later on, the Clinical Knowledge Graph, it is very important that you have *Java* installed in your machine, including **Java SE Runtime Environment**.
+
+Different versions of a Neo4j database can have different requirements. For example, Neo4j 3.5 versions require Oracle Java 8, while Neo4j 4.0 versions already require Oracle Java 11.
+When using a new version of Neo4j, always remember to read the respective Operations Manual, and check for the software requirements.
+
+To check if you already have **Java SE Development Kit** installed, run ``java -version`` in your terminal window. This should print out three lines similar to the following, with possible variation in the version:
+
+.. code-block:: python
+
+	java version "1.8.0_171"
+	Java(TM) SE Runtime Environment (build 1.8.0_171-b11)
+	Java HotSpot(TM) 64-Bit Server VM (build 25.171-b11, mixed mode)
+
+Running ``/usr/libexec/java_home`` in the terminal should print out a path like ``/Library/Java/JavaVirtualMachines/jdk1.8.0_171.jdk/Contents/Home``. Otherwise, please follow the steps below:
+
+1. Go to ``https://www.oracle.com/java/technologies/javase-downloads.html`` and download the version that fits your Neo4j version and OS requirements.
+
+#. Install the package.
+
+#. Run ``/usr/libexec/java_home`` in the terminal to make sure the *Java* package has been installed in ``/Library/Java/JavaVirtualMachines/``.
+
+.. note:: You can also install Java from OpenJDK. Follow the instructions here: https://openjdk.java.net/install/index.html (make sure to choose the right Java version for your Neo4j installation)
+
+
+
+
+
+
 .. warning:: In Mac OS, make sure you have **XQuartz** installed, as well as **Xcode**. For more information on how to install R on OS X, you can follow this `link <https://www.r-bloggers.com/installing-r-on-os-x/>`_.
 
 Now that you are all set, you can move on and start with Neo4j.
+
+
