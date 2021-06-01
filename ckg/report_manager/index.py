@@ -42,13 +42,10 @@ app.layout = dcc.Loading(children=[html.Div([dcc.Location(id='url', refresh=Fals
                                                       style={'padding-top': 10},
                                                       className='container-fluid')])],
                          style={'text-align': 'center',
-                                'margin-top': '70px',
-                                'margin-bottom': '-60px',
-                                'position': 'absolute',
                                 'top': '50%',
                                 'left': '50%',
-                                'height': '200px'},
-                         type='circle', color='#2b8cbe')
+                                'height': '250px'},
+                         type='cube', color='#2b8cbe')
 
 
 @app.callback([Output('page-content', 'children'),
@@ -536,11 +533,17 @@ def serve_static(value):
 
 ###Callbacks for data upload app
 @app.callback([Output('existing-project', 'children'),
-               Output('upload-form', 'style')],
-              [Input('project_id', 'value')])
-def activate_upload_form(projectid):
+               Output('upload-form', 'style'),
+               Output('link-project-report', 'children'),
+               Output('link-project-report', 'href')],
+              [Input('project_id', 'value')], 
+              [State('data_download_link', 'style')])
+def activate_upload_form(projectid, download_style):
     m = ''
     style = {'pointer-events': 'none', 'opacity': 0.5}
+    download_style.update({'display': 'none'})
+    report_title = ''
+    report_href = ''
     driver = connector.getGraphDatabaseConnectionConfiguration()
     if driver is not None:
         if len(projectid) > 7:
@@ -548,11 +551,15 @@ def activate_upload_form(projectid):
             if len(project) == 0:
                 m = 'ERROR: Project "{}" does not exist in the database.'.format(projectid)
             else:
+                if 'name' in project:
+                    report_title = 'Generate report: {}'.format(project['name'])
+                    report_href = '/apps/project?project_id={}&force=0'.format(projectid)
+                    m = 'Uploading data for Project: **{}** - id: **{}**'.format(project['name'], projectid)
                 style = {}
     else:
         m = 'ERROR: Database if temporarily offline. Contact your administrator or start the database.'
 
-    return m, style
+    return m, style, report_title, report_href
 
 
 @app.callback(Output('proteomics-tool', 'style'),
@@ -649,6 +656,7 @@ def save_files_in_tmp(content, dataset, prot_tool, prot_file, projectid, uploade
 
 @app.callback([Output('upload-result', 'children'),
                Output('data_download_link', 'style'),
+               Output('link-project-report', 'style'),
                Output('project_table', 'children')],
               [Input('submit_button', 'n_clicks'),
                Input('project_id', 'value')])
@@ -685,7 +693,7 @@ def run_processing(n_clicks, project_id):
                             res_n = dataUpload.check_samples_in_project(driver, project_id)
                             if (res_n > 0).any().values.sum() > 0:
                                 message = 'ERROR: There is already an experimental design loaded into the database and there was an error when trying to delete it. Contact your administrator.'
-                                return message, style, table
+                                return message, style, style, table
 
                         res_n = None
                         result = create_new_identifiers.apply_async(args=[project_id, designData.to_json(), directory, experimental_filename], task_id='data_upload_'+session_cookie+datetime.now().strftime('%Y%m-%d%H-%M%S-'), queue='creation')
@@ -696,7 +704,7 @@ def run_processing(n_clicks, project_id):
                         message = 'ERROR: The Experimental design file provided ({}) is missing some of the required fields: {}'.format(experimental_filename, ','.join(['subject external_id','biological_sample external_id','analytical_sample external_id']))
                         builder_utils.remove_directory(directory)
 
-                        return message, style, table
+                        return message, style, style, table
 
             if 'clinical' in datasets:
                 dataset = 'clinical'
@@ -719,7 +727,7 @@ def run_processing(n_clicks, project_id):
                             message = 'ERROR: No {} for project {} in the database. Please upload first the experimental design (ExperimentalDesign_{}.xlsx)'.format(samples, project_id, project_id)
                             builder_utils.remove_directory(directory)
 
-                            return message, style, table
+                            return message, style, style, table
                         else:
                             db_ids = dataUpload.check_external_ids_in_db(driver, project_id).to_dict()
                             message = ''
@@ -740,7 +748,7 @@ def run_processing(n_clicks, project_id):
                         message = 'ERROR: Format of the Clinical Data file is not correct. Check template in the documentation. Check columns: subject external_id, biological_sample external_id and analytical_sample external_id'
                         builder_utils.remove_directory(directory)
 
-                        return message, style, table
+                        return message, style, style, table
             try:
                 for dataset in datasets:
                     if dataset != "experimental_design":
@@ -753,19 +761,19 @@ def run_processing(n_clicks, project_id):
                 loader.partialUpdate(imports=['experiment'], specific=[project_id])
                 filename = os.path.join(ckg_config['tmp_directory'], 'Uploaded_files_'+project_id)
                 utils.compress_directory(filename, temporaryDirectory, compression_format='zip')
-                style = {'display':'block'}
+                style.update({'display':'inline-block'})
                 message = 'Files successfully uploaded.'
                 table = dataUpload.get_project_information(driver, project_id)
                 if table is None:
                     message = 'Error: No data was uploaded for project: {}. Review your experimental design and data files.'.format(project_id)
             except Exception as err:
-                style = {'display':'block'}
+                style.update({'display':'none'})
                 message = str(err)
         else:
-            style = {'display':'block'}
+            style.update({'display':'none'})
             message = "ERROR: Database is offline. Contact your administrator or start the database."
 
-    return message, style, table
+    return message, style, style, table
 
 @app.callback(Output('upload-result', 'style'),
               [Input('upload-result', 'children')])
