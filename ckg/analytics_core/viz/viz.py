@@ -602,11 +602,18 @@ def get_scatterplot(data, identifier, args):
     :param dict args: see below.
     :Arguments:
         * **title** (str) -- title of the figure.
+        * **x** (str) -- column in dataframe with values for x
+        * **y** (str) -- column in dataframe with values for y
+        * **group** (str) -- column in dataframe with the groups - translates into colors (default None)
+        * **hovering_cols** (list) -- list of columns in dataframe that will be shown when hovering over a dot
+        * **size**  (str) -- column in dataframe that contains the size of the dots (default None)
+        * **trendline** (bool) -- whether or not to draw a trendline
+        * **text** (str) -- column in dataframe that contains the values shown for each dot
         * **x_title** (str) -- plot x axis title.
         * **y_title** (str) -- plot y axis title.
         * **height** (int) -- plot height.
         * **width** (int) -- plot width.
-        * **colors** (dict) -- dictionary with colors to be used
+        * **colors** (dict) -- dictionary with colors to be used for each group
     :return: scatterplot figure within the <div id="_dash-app-content">.
 
     Example::
