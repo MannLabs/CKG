@@ -183,7 +183,7 @@ def get_boxplot_grid(data, identifier, args):
         else:
             fig = px.box(data, x=args["x"], y=args["y"], color=args['color'], color_discrete_map=color_map, points="all", facet_col=args["facet"], width=args['width'])
         fig.update_xaxes(type='category')
-        fig.update_layout(annotations=[dict(xref='paper', yref='paper', showarrow=False, text=None)], template='plotly_white')
+        fig.update_layout(annotations=[dict(xref='paper', yref='paper', showarrow=False, text='')], template='plotly_white')
     else:
         fig = get_markdown(text='Missing arguments. Please, provide: x, y, color')
 
