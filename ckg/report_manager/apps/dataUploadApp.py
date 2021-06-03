@@ -78,7 +78,7 @@ class DataUploadApp(basicApp.BasicApp):
                                                 n_clicks=0,
                                                 style={'display': 'none'},
                                                 className="button_link")]),
-                                html.Div(id='data-upload-result', children=[dcc.Markdown(id='upload-result')]),
+                                html.Div(id='data-upload-result', children=[dcc.Markdown(id='upload-result')], style={'width': '100%'}),
                                 html.Hr()]),
                   html.Div(id='project_table', children=[])]
 

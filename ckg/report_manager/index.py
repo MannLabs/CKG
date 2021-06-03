@@ -383,6 +383,7 @@ def route_full_update():
 
     return rep
 
+
 @app.callback(Output('download-zip', 'href'),
               [Input('download-zip', 'n_clicks')],
               [State('url', 'href')])
@@ -559,7 +560,7 @@ def activate_upload_form(projectid, download_style):
                 if 'name' in project:
                     report_title = 'Generate report: {}'.format(project['name'])
                     report_href = '/apps/project?project_id={}&force=0'.format(projectid)
-                    m = 'Uploading data for Project: **{}** - id: **{}**'.format(project['name'], projectid)
+                    m = 'Uploading data for Project: **{}**'.format(project['name'])
                 style = {}
     else:
         m = 'ERROR: Database if temporarily offline. Contact your administrator or start the database.'
