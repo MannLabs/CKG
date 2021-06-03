@@ -414,9 +414,11 @@ class ProteomicsDataset(Dataset):
                     index_cols = [c for c in args['index'] if c != batch_col]
                     
                 corrected_data = analytics.combat_batch_correction(data, batch_col=batch_col, index_cols=index_cols)
-        
+
         if not corrected_data.empty:
             self.update_data({"uncorrected_batch": data, "processed": corrected_data})
+        else:
+            self.update_data({"processed": data.drop(batch_col, axis=1)})
 
     def widen_metadata_dataset(self):
         data = self.get_dataframe("metadata")

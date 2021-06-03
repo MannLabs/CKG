@@ -40,7 +40,7 @@ def parse_from_directory(projectId, directory, configuration={}):
                         for f in dir_content[2]:
                             if dfile_regex.match(f):
                                 filepath = os.path.join(results_path, f)
-                                data.update(parser_from_file(file_path=filepath, configuration=dataset_configuration, data_type=dtype))
+                                data.update(parser_from_file(file_path=filepath, configuration=dataset_configuration, data_type=dtype, processing_tool=processing_tool))
                                 break
                 else:
                     raise Exception("Error when importing proteomics experiment.\n Missing configuration: {}".format(",".join(missing_conf)))
@@ -48,8 +48,11 @@ def parse_from_directory(projectId, directory, configuration={}):
     return data
 
 
-def parser_from_file(file_path, configuration, data_type):
+def parser_from_file(file_path, configuration, data_type, processing_tool):
     data = {}
+    
+    if len(configuration) == 0:
+        configuration = get_configuration(processing_tool=processing_tool, data_type=data_type)
     
     df = parse_dataset(file_path, configuration)
     if df is not None and not df.empty:
