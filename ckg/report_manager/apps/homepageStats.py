@@ -7,7 +7,6 @@ import dash_core_components as dcc
 import dash_html_components as html
 from ckg import ckg_utils
 from ckg.graphdb_connector import connector
-from ckg.graphdb_builder import builder_utils
 from ckg.analytics_core.viz import viz
 from ckg.analytics_core import utils
 

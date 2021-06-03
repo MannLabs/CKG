@@ -1,7 +1,7 @@
 import dash_core_components as dcc
 import dash_html_components as html
 from ckg.report_manager.apps import basicApp
-from ckg.graphdb_connector import connector
+from ckg import ckg_utils
 
 
 DataTypes = ['experimental_design', 'clinical', 'proteomics', 'interactomics', 'phosphoproteomics']
@@ -31,6 +31,12 @@ class DataUploadApp(basicApp.BasicApp):
                                      style={'width': '20%'}),
                             html.Br(),
                             html.Div(id='upload-form', children=[
+                                html.Div(children=[html.A("Download example files",
+                                                          id='example_files',
+                                                          href= '/example_files',
+                                                          n_clicks=0,
+                                                          className="button_link")],
+                                         style={'width':'100%', 'padding-left': '87%', 'padding-right': '0%'}),
                                 html.Div(children=[html.Label('Select upload data type:', style={'marginTop': 10})],
                                                style={'width': '49%', 'marginLeft': '0%', 'verticalAlign': 'top', 'fontSize': '18px'}),
                                 html.Div(children=[dcc.RadioItems(id='upload-data-type-picker', options=[{'label': i, 'value': i} for i in DataTypes], value=None,

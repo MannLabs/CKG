@@ -396,6 +396,11 @@ def route_report_url(value):
     uri = os.path.join(ckg_config['downloads_directory'], value + '.zip')
     return flask.send_file(uri, attachment_filename=value + '.zip', as_attachment=True, cache_timeout=-1)
 
+@application.route('/example_files')
+def route_example_files_url():
+    uri = os.path.join(ckg_config['data_directory'], 'example_files.zip')
+    return flask.send_file(uri, attachment_filename='example_files.zip', as_attachment=True, cache_timeout=-1)
+
 ###Callback regenerate project
 @app.callback(Output('regenerate', 'href'),
               [Input('regenerate', 'n_clicks'),
