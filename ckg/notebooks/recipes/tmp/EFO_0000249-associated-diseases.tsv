@@ -1,0 +1,173 @@
+symbol	overallAssociationScore	geneticAssociations	somaticMutations	drugs	pathwaysSystemsBiology	textMining	rnaExpression	animalModels	targetName
+APP	0.8248588821845724	0.780662389619232	No data	0.41714042417062674	0.3695798546847018	0.6015639361118637	No data	No data	amyloid beta precursor protein
+PSEN1	0.8235819134542025	0.7869152193091182	No data	0.3911188693542574	0.27718489101352634	0.5787127376959408	0.030324173691837996	0.5686934480352086	presenilin 1
+PSEN2	0.7756126639098723	0.7460595058073944	No data	0.3911188693542574	No data	0.5076491665638869	No data	No data	presenilin 2
+ACHE	0.6319749036661764	No data	No data	0.6056561749805431	No data	0.5263745737126652	No data	No data	acetylcholinesterase (Cartwright blood group)
+BCHE	0.6209597298138808	0.030500863423002397	No data	0.589964170095547	No data	0.5521314978711115	No data	No data	butyrylcholinesterase
+GRIN1	0.6143816088357765	No data	No data	0.5942908554084113	No data	0.401815068547306	No data	No data	glutamate ionotropic receptor NMDA type subunit 1
+GRIN2B	0.6045379283149795	0.001760928759219463	No data	0.5942908554084113	No data	0.19387966694193695	0.019936418040910495	No data	glutamate ionotropic receptor NMDA type subunit 2B
+GRIN3B	0.6018437464448045	0.02249145162549234	No data	0.5942908554084113	No data	0.0868512658509049	No data	No data	glutamate ionotropic receptor NMDA type subunit 3B
+GRIN2A	0.6006274029892589	No data	No data	0.5948240103271638	No data	0.11083164653698588	0.011781465086058764	No data	glutamate ionotropic receptor NMDA type subunit 2A
+GRIN3A	0.5969039389726383	No data	No data	0.5942908554084113	No data	0.0522616712845392	No data	No data	glutamate ionotropic receptor NMDA type subunit 3A
+GRIN2D	0.5966135621340339	No data	No data	0.5942908554084113	No data	0.0464541345124521	No data	No data	glutamate ionotropic receptor NMDA type subunit 2D
+GRIN2C	0.596047327716482	No data	No data	0.5942908554084113	No data	0.02587777610288133	0.020816257631699683	No data	glutamate ionotropic receptor NMDA type subunit 2C
+PTGS2	0.5537834536217607	No data	No data	0.527912825219423	No data	0.5174125680467555	No data	No data	prostaglandin-endoperoxide synthase 2
+PTGS1	0.5275476469012672	No data	No data	0.5206222072775718	No data	0.13850879247390682	No data	No data	prostaglandin-endoperoxide synthase 1
+HMGCR	0.5110725684417826	No data	No data	0.48910641256017745	No data	0.43679285037309123	0.005693101332774247	No data	3-hydroxy-3-methylglutaryl-CoA reductase
+SLC6A3	0.49384588800037993	No data	No data	0.4690994966656323	No data	0.4949278266949532	No data	No data	solute carrier family 6 member 3
+SCN1A	0.4796043482249968	No data	No data	0.4701877040155372	No data	0.18516139796302244	0.007135844008878965	No data	sodium voltage-gated channel alpha subunit 1
+SCN9A	0.4786284454063535	No data	No data	0.4701877040155372	No data	0.16881482781632617	No data	No data	sodium voltage-gated channel alpha subunit 9
+SCN8A	0.4765880058101103	No data	No data	0.4701877040155372	No data	0.1280060358914614	No data	No data	sodium voltage-gated channel alpha subunit 8
+SCN3A	0.47414575315325264	No data	No data	0.4701877040155372	No data	0.07391597093694036	0.011801276589076865	No data	sodium voltage-gated channel alpha subunit 3
+SCN10A	0.47342152774402835	No data	No data	0.4701877040155372	No data	0.06467647456982281	No data	No data	sodium voltage-gated channel alpha subunit 10
+SCN5A	0.4722665906981387	No data	No data	0.4701877040155372	No data	0.04157773365202895	No data	No data	sodium voltage-gated channel alpha subunit 5
+SCN2A	0.47201440059219324	No data	No data	0.4701877040155372	No data	0.025613937151064747	0.024569987359624353	No data	sodium voltage-gated channel alpha subunit 2
+SCN11A	0.4701877040155372	No data	No data	0.4701877040155372	No data	No data	No data	No data	sodium voltage-gated channel alpha subunit 11
+SCN7A	0.4701877040155372	No data	No data	0.4701877040155372	No data	No data	No data	No data	sodium voltage-gated channel alpha subunit 7
+SCN4A	0.4701877040155372	No data	No data	0.4701877040155372	No data	No data	No data	No data	sodium voltage-gated channel alpha subunit 4
+APH1B	0.4699148764562633	0.3049039704833945	No data	0.3911188693542574	No data	0.11565065165207547	No data	No data	aph-1 homolog B, gamma-secretase subunit
+GABBR1	0.46632351106729514	No data	No data	0.4619748183558772	No data	0.07319200203975124	0.031009167424365765	No data	gamma-aminobutyric acid type B receptor subunit 1
+GABBR2	0.4629855003408102	No data	No data	0.4619748183558772	No data	0.011087395640541052	0.015285908302863116	No data	gamma-aminobutyric acid type B receptor subunit 2
+SLC6A2	0.4621838557070229	No data	No data	0.45240392576702065	No data	0.19559859880004501	No data	No data	solute carrier family 6 member 2
+SLC6A4	0.45289985414019135	No data	No data	0.4431775763023303	No data	0.19444555675722178	No data	No data	solute carrier family 6 member 4
+HTR2A	0.4205702282826144	No data	No data	0.4073773783210956	No data	0.250574634815787	0.029885319932826747	No data	5-hydroxytryptamine receptor 2A
+CHRNB2	0.41754839032154906	No data	No data	0.41081622849718524	No data	0.13464323648727583	No data	No data	cholinergic receptor nicotinic beta 2 subunit
+CHRNA4	0.4149866291740899	No data	No data	0.41081622849718524	No data	0.08340801353809245	No data	No data	cholinergic receptor nicotinic alpha 4 subunit
+DRD2	0.41375134408686365	No data	No data	0.4077381899992643	No data	0.12026308175198637	No data	No data	dopamine receptor D2
+NCSTN	0.4071246998071308	No data	No data	0.3911188693542574	No data	0.3201166090574682	No data	No data	nicastrin
+HTR1A	0.4038897174133833	No data	No data	0.4013868436512878	No data	0.050057475241911155	No data	No data	5-hydroxytryptamine receptor 1A
+PPARG	0.4009637811286298	No data	No data	0.3864522110934151	No data	0.29023140070429393	No data	No data	peroxisome proliferator activated receptor gamma
+HTR6	0.3987959052743642	No data	No data	0.3931244451726677	No data	0.11342920203392967	No data	No data	5-hydroxytryptamine receptor 6
+PSENEN	0.3986202330453118	No data	No data	0.3911188693542574	No data	0.15002727382108785	No data	No data	presenilin enhancer, gamma-secretase subunit
+ADRB2	0.397192253995772	No data	No data	0.38805884741893687	No data	0.18266813153670328	No data	No data	adrenoceptor beta 2
+APH1A	0.39511944049606235	No data	No data	0.3911188693542574	No data	0.08001142283609987	No data	No data	aph-1 homolog A, gamma-secretase subunit
+TRPV1	0.39294161524747107	No data	No data	0.3695798546847018	No data	0.4672352112553859	No data	No data	transient receptor potential cation channel subfamily V member 1
+FAAH	0.38841432999356146	No data	No data	0.3695798546847018	No data	0.3766895061771943	No data	No data	fatty acid amide hydrolase
+HTR2C	0.3881471417997163	No data	No data	0.38583110218375405	No data	0.04234769168262208	0.008939476432401146	No data	5-hydroxytryptamine receptor 2C
+SIGMAR1	0.3864913303599428	No data	No data	0.3788193510518193	No data	0.15343958616246994	No data	No data	sigma non-opioid intracellular receptor 1
+MMP8	0.3849918479304076	No data	No data	0.3682965913003799	No data	0.3339051326005535	No data	No data	matrix metallopeptidase 8
+ADRB1	0.38037577643962556	No data	No data	0.3695798546847018	No data	0.201482009859681	0.032481956787286596	No data	adrenoceptor beta 1
+CHRNA7	0.37760759962782164	No data	No data	0.3682588319556308	No data	0.18697535344381677	No data	No data	cholinergic receptor nicotinic alpha 7 subunit
+MMP1	0.3748668001317154	0.021719078058794642	No data	0.3682965913003799	No data	0.051319769248660496	No data	No data	matrix metallopeptidase 1
+MMP13	0.3747745048644367	No data	No data	0.3682965913003799	No data	0.1295582712811371	No data	No data	matrix metallopeptidase 13
+ADRA1A	0.3706423967669203	No data	No data	0.3695798546847018	No data	0.02125084164437035	No data	No data	adrenoceptor alpha 1A
+PDE3A	0.3703058587755348	0.002904016363332086	No data	0.3695798546847018	No data	No data	No data	No data	phosphodiesterase 3A
+MMP7	0.37012267509626995	No data	No data	0.3682965913003799	No data	0.03652167591780074	No data	No data	matrix metallopeptidase 7
+ADRB3	0.3695798546847018	No data	No data	0.3695798546847018	No data	No data	No data	No data	adrenoceptor beta 3
+CACNA2D1	0.3695798546847018	No data	No data	0.3695798546847018	No data	No data	No data	No data	calcium voltage-gated channel auxiliary subunit alpha2delta 1
+ADRA1B	0.3695798546847018	No data	No data	0.3695798546847018	No data	No data	No data	No data	adrenoceptor alpha 1B
+ADRA1D	0.3695798546847018	No data	No data	0.3695798546847018	No data	No data	No data	No data	adrenoceptor alpha 1D
+ESR1	0.3672771624404156	0.002545547209437513	No data	0.33917164552981044	No data	0.5564535666355735	No data	No data	estrogen receptor 1
+BACE1	0.36708132812486216	No data	No data	0.3371643073281472	No data	0.5983404159343011	No data	No data	beta-secretase 1
+ACE	0.3645543799928405	0.3279818722737353	No data	0.07391597093694036	No data	0.5671924411889019	No data	No data	angiotensin I converting enzyme
+ESR2	0.35873151944349657	No data	No data	0.3425565800690677	No data	0.32349878748857736	No data	No data	estrogen receptor 2
+ALDH5A1	0.33882385342512467	No data	No data	0.3375454941691978	No data	No data	0.025567185118537582	No data	aldehyde dehydrogenase 5 family member A1
+PGR	0.30916776386568645	No data	No data	0.29001752485674515	No data	0.3830047801788262	No data	No data	progesterone receptor
+PDGFRB	0.30110101915222337	No data	No data	0.28129133384335636	No data	0.39619370617734023	No data	No data	platelet derived growth factor receptor beta
+DRD4	0.294979774241862	No data	No data	0.2877076507649658	No data	0.1454424695379251	No data	No data	dopamine receptor D4
+DRD3	0.2938996040289448	No data	No data	0.2877076507649658	No data	0.1238390652795814	No data	No data	dopamine receptor D3
+NR3C1	0.28407215625245474	No data	No data	0.27718489101352634	No data	0.13774530477856814	No data	No data	nuclear receptor subfamily 3 group C member 1
+KIT	0.28275682062825197	No data	No data	0.28129133384335636	No data	0.029309735697911763	No data	No data	KIT proto-oncogene, receptor tyrosine kinase
+PDGFRA	0.27943768554997106	No data	No data	0.27718489101352634	No data	0.04505589072889497	No data	No data	platelet derived growth factor receptor alpha
+FGFR3	0.2792417909868703	No data	No data	0.27718489101352634	No data	0.020326892007658595	0.032103825241253825	No data	fibroblast growth factor receptor 3
+ADORA1	0.2773503882717532	No data	No data	0.2720518374762388	No data	0.10597101591028793	No data	No data	adenosine A1 receptor
+ADORA2A	0.27641844583986036	No data	No data	0.2720518374762388	No data	0.08733216727243133	No data	No data	adenosine A2a receptor
+ADORA2B	0.27609991748734986	No data	No data	0.2720518374762388	No data	0.08096160022222121	No data	No data	adenosine A2b receptor
+CACNA1C	0.27245726150456956	No data	No data	0.25870589827929125	No data	0.27502726450556586	No data	No data	calcium voltage-gated channel subunit alpha1 C
+ADORA3	0.27233228403760223	No data	No data	0.2720518374762388	No data	No data	0.005608931227268952	No data	adenosine A3 receptor
+VDR	0.27133205982218656	No data	No data	0.25870589827929125	No data	0.25252323085790607	No data	No data	vitamin D receptor
+ADRA2C	0.27002428132901024	No data	No data	0.26794539464640876	No data	0.04157773365202895	No data	No data	adrenoceptor alpha 2C
+ADRA2A	0.2688693442831205	No data	No data	0.26794539464640876	No data	0.01847899273423509	No data	No data	adrenoceptor alpha 2A
+ADRA2B	0.26794539464640876	No data	No data	0.26794539464640876	No data	No data	No data	No data	adrenoceptor alpha 2B
+PDE5A	0.2666107052687646	No data	No data	0.25870589827929125	No data	0.15809613978946843	No data	No data	phosphodiesterase 5A
+CACNA1D	0.26089514561294436	No data	No data	0.25870589827929125	No data	0.04378494667306259	No data	No data	calcium voltage-gated channel subunit alpha1 D
+CACNA1F	0.25870589827929125	No data	No data	0.25870589827929125	No data	No data	No data	No data	calcium voltage-gated channel subunit alpha1 F
+CHRNA10	0.25870589827929125	No data	No data	0.25870589827929125	No data	No data	No data	No data	cholinergic receptor nicotinic alpha 10 subunit
+CHRNA9	0.25870589827929125	No data	No data	0.25870589827929125	No data	No data	No data	No data	cholinergic receptor nicotinic alpha 9 subunit
+CACNA1S	0.25870589827929125	No data	No data	0.25870589827929125	No data	No data	No data	No data	calcium voltage-gated channel subunit alpha1 S
+HCK	0.16197156521554928	No data	No data	0.03695798546847018	0.29858356459977053	0.15481289468459175	No data	No data	HCK proto-oncogene, Src family tyrosine kinase
+AGTR1	0.16082170106024904	No data	No data	0.0831554673040579	0.27718489101352634	0.06481749273621353	No data	No data	angiotensin II receptor type 1
+TNF	0.13278857008744718	No data	No data	0.0895717842256673	No data	0.5519781201551517	No data	No data	tumor necrosis factor
+MAOB	0.1247197382422986	No data	No data	0.08934079681648936	No data	0.5119226951908813	No data	No data	monoamine oxidase B
+MAPK14	0.12114076342395513	No data	No data	0.10522759751439426	No data	0.3116584208527965	0.014861019011447414	No data	mitogen-activated protein kinase 14
+GRIA1	0.11892212741860198	No data	No data	0.09239496367117545	No data	0.3713110475008049	0.028649746293841965	0.34215702946709686	glutamate ionotropic receptor AMPA type subunit 1
+SV2A	0.11836335698869946	No data	No data	0.10060784933083547	No data	0.3551101531572796	No data	No data	synaptic vesicle glycoprotein 2A
+FYN	0.11748760815431582	No data	No data	0.03695798546847018	No data	0.5412405589359913	No data	No data	FYN proto-oncogene, Src family tyrosine kinase
+GSK3B	0.1173743094070674	No data	No data	0.09650140650100547	No data	0.4128978029533545	0.010260574127739766	No data	glycogen synthase kinase 3 beta
+HRH3	0.11699102656675317	No data	No data	0.10542265354881117	No data	0.23136746035884004	No data	No data	histamine receptor H3
+HDAC6	0.11595386348706294	No data	No data	0.03695798546847018	No data	0.4736978459193903	No data	0.34215702946709686	histone deacetylase 6
+RXRA	0.11588557001461092	No data	No data	0.09650140650100547	No data	0.38768327027210914	No data	No data	retinoid X receptor alpha
+GNRHR	0.113907412232943	No data	No data	0.11023745776678687	No data	0.07339908932312242	No data	No data	gonadotropin releasing hormone receptor
+ABL1	0.11177198354356124	No data	No data	0.09881128059278485	No data	0.25921405901552785	No data	No data	ABL proto-oncogene 1, non-receptor tyrosine kinase
+GRIA4	0.10379502912552242	No data	No data	0.09239496367117545	No data	0.22086863761727063	0.01604851080675491	No data	glutamate ionotropic receptor AMPA type subunit 4
+CHRNA5	0.10297418701152503	No data	No data	0.10060784933083547	No data	0.047326753613790976	No data	No data	cholinergic receptor nicotinic alpha 5 subunit
+GRIA2	0.10201752556868517	No data	No data	0.09239496367117545	No data	0.19245123795019464	No data	No data	glutamate ionotropic receptor AMPA type subunit 2
+CHRNA6	0.10189624576869463	No data	No data	0.10060784933083547	No data	0.025767928757183374	No data	No data	cholinergic receptor nicotinic alpha 6 subunit
+MAOA	0.10086663290352252	No data	No data	0.03326218692162316	No data	0.46275543086558363	No data	No data	monoamine oxidase A
+CACNA1B	0.10060784933083547	No data	No data	0.10060784933083547	No data	No data	No data	No data	calcium voltage-gated channel subunit alpha1 B
+GRIA3	0.10035025934959828	No data	No data	0.09239496367117545	No data	0.15295267608267876	0.013844784343000575	No data	glutamate ionotropic receptor AMPA type subunit 3
+CYSLTR1	0.09965766854771069	No data	No data	0.09239496367117545	No data	0.14525409753070498	No data	No data	cysteinyl leukotriene receptor 1
+RARA	0.09932821746357157	No data	No data	0.09650140650100547	No data	0.056536219251322004	No data	No data	retinoic acid receptor alpha
+HDAC2	0.09842198627187682	No data	No data	0.03695798546847018	No data	0.4459124495237964	No data	No data	histone deacetylase 2
+SRC	0.09835709990702728	No data	No data	0.08726191013388793	No data	0.22190379546278696	No data	No data	SRC proto-oncogene, non-receptor tyrosine kinase
+GABRA2	0.09721688918024021	No data	No data	0.09105010364440612	No data	0.10907482315041367	0.032086997024104114	No data	gamma-aminobutyric acid type A receptor subunit alpha2
+RARB	0.09714817124670369	No data	No data	0.09650140650100547	No data	0.01293529491396456	No data	No data	retinoic acid receptor beta
+RXRG	0.09687098635569016	No data	No data	0.09650140650100547	No data	0.007391597093694037	No data	No data	retinoid X receptor gamma
+RXRB	0.09650140650100547	No data	No data	0.09650140650100547	No data	No data	No data	No data	retinoid X receptor beta
+GABRG1	0.09515602837904197	No data	No data	0.09105010364440612	No data	0.060364709598501286	0.048946016461985604	No data	gamma-aminobutyric acid type A receptor subunit gamma1
+GABRA1	0.09428538390046531	No data	No data	0.09105010364440612	No data	0.04819868248820296	0.03714057592420756	No data	gamma-aminobutyric acid type A receptor subunit alpha1
+GABRG2	0.09377203181405071	No data	No data	0.09105010364440612	No data	0.009239496367117545	0.05033212056306183	No data	gamma-aminobutyric acid type A receptor subunit gamma2
+CNR1	0.0934852104964183	No data	No data	0.0831554673040579	No data	0.19592180707565265	0.024014377735999817	No data	cannabinoid receptor 1
+GABRA5	0.0928254235670125	No data	No data	0.09105010364440612	No data	0.027615828030606884	0.017753783448421365	No data	gamma-aminobutyric acid type A receptor subunit alpha5
+GABRG3	0.09211264572662463	No data	No data	0.09105010364440612	No data	0.02125084164437035	No data	No data	gamma-aminobutyric acid type A receptor subunit gamma3
+GABRA3	0.0919272719906571	No data	No data	0.09105010364440612	No data	0.011087395640541052	0.012615635529223857	No data	gamma-aminobutyric acid type A receptor subunit alpha3
+INSR	0.09116659141157897	No data	No data	0.0831554673040579	No data	0.16022248215042154	No data	No data	insulin receptor
+HDAC3	0.09111745087832705	No data	No data	0.03695798546847018	No data	0.4093897725560476	No data	No data	histone deacetylase 3
+PPARD	0.09088183241778641	No data	No data	0.0831554673040579	No data	0.13032167388363014	0.054462663879615555	No data	peroxisome proliferator activated receptor delta
+PLA2G7	0.08653814958513037	No data	No data	0.0831554673040579	No data	0.06765364562144957	No data	No data	phospholipase A2 group VII
+GABRB3	0.0852466748291843	No data	No data	0.0831554673040579	No data	0.022944749311675235	0.0316264841417833	No data	gamma-aminobutyric acid type A receptor subunit beta3
+CD38	0.08452988586248741	No data	No data	0.07391597093694036	No data	0.21227829851094113	No data	No data	CD38 molecule
+RARG	0.0831554673040579	No data	No data	0.0831554673040579	No data	No data	No data	No data	retinoic acid receptor gamma
+GLP1R	0.0824793586773819	No data	No data	0.07391597093694036	No data	0.17126775480883089	No data	No data	glucagon like peptide 1 receptor
+HCRTR2	0.08158988597518521	No data	No data	0.07391597093694036	No data	0.153478300764897	No data	No data	hypocretin receptor 2
+HTR3B	0.0795661796181096	No data	No data	0.07391597093694036	No data	0.11300417362338487	No data	No data	5-hydroxytryptamine receptor 3B
+SERPINE1	0.07917263338353506	No data	No data	0.04619748183558772	No data	0.3363567696706739	0.015835904572650727	No data	serpin family E member 1
+GSK3A	0.07790180064528754	No data	No data	0.07391597093694036	No data	0.07971659416694375	No data	No data	glycogen synthase kinase 3 alpha
+IFNAR1	0.07652679595761092	No data	No data	0.07391597093694036	No data	0.05221650041341107	No data	No data	interferon alpha and beta receptor subunit 1
+HTR3A	0.07650174665634896	No data	No data	0.07391597093694036	No data	0.05171551438817181	No data	No data	5-hydroxytryptamine receptor 3A
+RBX1	0.07572257982331383	No data	No data	0.07391597093694036	No data	0.011087395640541052	0.031204446331673186	No data	ring-box 1
+IFNAR2	0.07521728144228683	No data	No data	0.07391597093694036	No data	0.01847899273423509	0.01698123908856189	No data	interferon alpha and beta receptor subunit 2
+HCRTR1	0.07502471050099448	No data	No data	0.07391597093694036	No data	0.022174791281082105	No data	No data	hypocretin receptor 1
+CSF2RA	0.07456273568263859	No data	No data	0.07391597093694036	No data	0.01293529491396456	No data	No data	colony stimulating factor 2 receptor subunit alpha
+CRBN	0.07456273568263859	No data	No data	0.07391597093694036	No data	0.01293529491396456	No data	No data	cereblon
+PAH	0.07428555079162506	No data	No data	0.07391597093694036	No data	0.007391597093694037	No data	No data	phenylalanine hydroxylase
+IMPA1	0.07391597093694036	No data	No data	0.07391597093694036	No data	No data	No data	No data	inositol monophosphatase 1
+HTR3D	0.07391597093694036	No data	No data	0.07391597093694036	No data	No data	No data	No data	5-hydroxytryptamine receptor 3D
+HTR3C	0.07391597093694036	No data	No data	0.07391597093694036	No data	No data	No data	No data	5-hydroxytryptamine receptor 3C
+DDB1	0.07391597093694036	No data	No data	0.07391597093694036	No data	No data	No data	No data	damage specific DNA binding protein 1
+HTR3E	0.07391597093694036	No data	No data	0.07391597093694036	No data	No data	No data	No data	5-hydroxytryptamine receptor 3E
+CUL4A	0.07391597093694036	No data	No data	0.07391597093694036	No data	No data	No data	No data	cullin 4A
+HDAC1	0.05698663867766953	No data	No data	0.03695798546847018	No data	0.23451759851055112	0.0379630173798792	No data	histone deacetylase 1
+VKORC1	0.055624597910049325	0.035326727456545005	No data	0.04619748183558772	No data	0.026794539464640877	No data	No data	vitamin K epoxide reductase complex subunit 1
+PPARA	0.05397498566551021	No data	No data	0.03326218692162316	No data	0.22713189045089993	0.01048773802159969	No data	peroxisome proliferator activated receptor alpha
+ATP4A	0.052292279674847314	No data	No data	0.04619748183558772	No data	0.1218959567851919	No data	No data	ATPase H+/K+ transporting subunit alpha
+YES1	0.04547118386724854	No data	No data	0.03695798546847018	No data	0.15784139627159138	0.02795078633394545	No data	YES proto-oncogene 1, Src family tyrosine kinase
+CHRM1	0.04485970299852348	No data	No data	0.03695798546847018	No data	0.1134725424973353	0.10026406823339416	No data	cholinergic receptor muscarinic 1
+GABRD	0.04198627536041677	No data	No data	0.03695798546847018	No data	0.07761176948378738	0.05164656379907459	No data	gamma-aminobutyric acid type A receptor subunit delta
+LYN	0.0412563427526378	No data	No data	0.03695798546847018	No data	0.08596714568335245	No data	No data	LYN proto-oncogene, Src family tyrosine kinase
+LCK	0.041000008476407244	No data	No data	0.03695798546847018	No data	0.08084046015874123	No data	No data	LCK proto-oncogene, Src family tyrosine kinase
+CSF3R	0.04069998149715279	No data	No data	0.03695798546847018	No data	0.07483992057365212	No data	No data	colony stimulating factor 3 receptor
+EPHA2	0.04037659912430368	No data	No data	0.03695798546847018	No data	0.06837227311666982	No data	No data	EPH receptor A2
+GABRB1	0.03999484646103349	No data	No data	0.03695798546847018	No data	0.05728487747612878	0.007767770344059203	No data	gamma-aminobutyric acid type A receptor subunit beta1
+GABRB2	0.039375579269427856	No data	No data	0.03695798546847018	No data	0.04342563292545246	0.01108404696082702	No data	gamma-aminobutyric acid type A receptor subunit beta2
+GABRA4	0.03879863152837827	No data	No data	0.03695798546847018	No data	0.01847899273423509	0.028600035538501854	No data	gamma-aminobutyric acid type A receptor subunit alpha4
+SLC5A2	0.038645476818853455	No data	No data	0.03695798546847018	No data	0.033749827007665475	No data	No data	solute carrier family 5 member 2
+GABRA6	0.03823421656944598	No data	No data	0.03695798546847018	No data	0.025524622019515945	No data	No data	gamma-aminobutyric acid type A receptor subunit alpha6
+FGR	0.038112922514359875	No data	No data	0.03695798546847018	No data	0.02309874091779386	No data	No data	FGR proto-oncogene, Src family tyrosine kinase
+FRK	0.038066725032524285	No data	No data	0.03695798546847018	No data	0.022174791281082105	No data	No data	fyn related Src family tyrosine kinase
+GABRE	0.03788193510518194	No data	No data	0.03695798546847018	No data	0.01847899273423509	No data	No data	gamma-aminobutyric acid type A receptor subunit epsilon
+HTR4	0.037830604569809065	No data	No data	0.03695798546847018	No data	0.017452382026777583	No data	No data	5-hydroxytryptamine receptor 4
+BLK	0.03751235525049724	No data	No data	0.03695798546847018	No data	0.011087395640541052	No data	No data	BLK proto-oncogene, Src family tyrosine kinase
+GABRQ	0.03751235525049724	No data	No data	0.03695798546847018	No data	0.011087395640541052	No data	No data	gamma-aminobutyric acid type A receptor subunit theta
+GABRP	0.03695798546847018	No data	No data	0.03695798546847018	No data	No data	No data	No data	gamma-aminobutyric acid type A receptor subunit pi
+SRMS	0.03695798546847018	No data	No data	0.03695798546847018	No data	No data	No data	No data	src-related kinase lacking C-terminal regulatory tyrosine and N-terminal myristylation sites

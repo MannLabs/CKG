@@ -1,0 +1,251 @@
+increment_subject_id:
+    name: create new subject id
+    description: 'Returns a new Subject identifier based on existing subjects in the database (sequential identifier).'
+    involved_nodes:
+        - Subject
+    involved_rels:
+    query: >
+        MATCH (s:Subject)
+        WITH max(toInteger(SPLIT(s.id, 'S')[1]))+1 as new_id
+        RETURN new_id AS result;
+create_subjects:
+    name: create subjects from file
+    description: 'Creates Subject nodes and links them to Project nodes, directly from projectCreationApp (web app).'
+    involved_nodes:
+        - Project
+        - Subject
+    involved_rels:
+    query: >
+        CREATE CONSTRAINT ON (s:Subject) ASSERT s.id IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_project.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (s:Subject {id:line.END_ID})
+        WITH s, line
+        MATCH (p:Project {id:line.START_ID})
+        MATCH (s)
+        MERGE (p)-[r:HAS_ENROLLED]->(s)
+        RETURN COUNT(s) AS PROJECTID_subject, COUNT(r) AS PROJECTID_project_has_enrolled_subject;
+increment_biosample_id:
+    name:  create new biosample internal identifier
+    description: 'Returns a new Biological_sample identifier based on the existing ones in the database (sequential identifier)'
+    involved_nodes:
+        - Biological_sample
+    involved_rels:
+    query: >
+        MATCH (b:Biological_sample)
+        WITH max(toInteger(SPLIT(b.id, 'BS')[1]))+1 as new_id
+        RETURN new_id AS result;
+create_biosample:
+    name: create biosamples from app
+    description: 'Creates Biological_sample nodes and links them to Subject nodes, directly from dataUploadApp (web app).'
+    involved_nodes:
+        - Subject
+        - Biological_sample
+    involved_rels:
+        - BELONGS_TO_SUBJECT
+    query: >
+        CREATE CONSTRAINT ON (b:Biological_sample) ASSERT b.id IS UNIQUE;
+        MERGE (b:Biological_sample {id:$biosample_id})
+        ON CREATE SET b.external_id=$external_id,b.quantity=$quantity,b.quantity_units=$quantity_units,b.source=$source,b.collection_date=$collection_date,b.conservation_conditions=$conservation_conditions,b.storage=$storage,b.status=$status
+        WITH b
+        MATCH (s:Subject {id:$subject_id})
+        SET s.external_id = $subject_external_id
+        WITH b, s
+        MATCH (b)
+        MERGE (b)-[r:BELONGS_TO_SUBJECT]->(s)
+        RETURN COUNT(b) AS PROJECTID_biosample, COUNT(r) AS PROJECTID_biosample_belongs_to_subject;
+increment_analytical_sample_id:
+    name:  create new analytical sample internal identifier
+    description: 'Returns a new Analytical_sample identifier based on the existing ones in the database (sequential identifier)'
+    involved_nodes:
+        - Analytical_sample
+    involved_rels:
+    query: >
+        MATCH (a:Analytical_sample)
+        WITH max(toInteger(SPLIT(a.id, 'AS')[1]))+1 as new_id
+        RETURN new_id AS result;
+extract_enrolled_subjects:
+    name: project subjects
+    description: 'Extracts subject ids from specific project id.'
+    involved_nodes:
+        - Project
+        - Subject
+    involved_rels:
+        - HAS_ENROLLED
+    query: >
+        MATCH (p:Project)-[r:HAS_ENROLLED]-(s:Subject)
+        WHERE p.id=$external_id
+        RETURN s.id;
+extract_samples_numbers:
+    name: extract number of subjects and samples
+    description: 'Returns the number of unique subjects, biological and analytical samples within a specific project.'
+    involved_nodes:
+        - Project
+        - Subject
+        - Biological_sample
+        - Analytical_sample
+    involved_rels:
+        - HAS_ENROLLED
+        - BELONGS_TO_SUBJECT
+        - SPLITTED_INTO
+    query: >
+        MATCH (p:Project {id:$external_id})-[:HAS_ENROLLED]-(s:Subject)-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)
+        RETURN COUNT(DISTINCT(s.id)) AS subjects, COUNT(DISTINCT(b.id)) AS biological_samples, COUNT(DISTINCT(a.id)) AS analytical_samples;
+extract_design:
+    name: extract experimental design
+    description: 'Returns the internal and external identifiers for subjects, biological and analytical samples within a specific project.'
+    involved_nodes:
+        - Project
+        - Subject
+        - Biological_sample
+        - Analytical_sample
+    involved_rels:
+        - HAS_ENROLLED
+        - BELONGS_TO_SUBJECT
+        - SPLITTED_INTO
+    query: >
+        MATCH (p:Project {id:$external_id})-[:HAS_ENROLLED]-(s:Subject)-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)
+        RETURN s.id AS subject_id, s.external_id AS subject_external_id, b.id AS biological_sample_id, b.external_id AS biological_sample_external_id, a.id AS analytical_sample_id, a.external_id AS analytical_sample_external_id;
+check_external_ids:
+    name:
+    description:
+    involved_nodes:
+        - Project
+        - Subject
+        - Biological_sample
+        - Analytical_sample
+    involved_rels:
+        - HAS_ENROLLED
+        - BELONGS_TO_SUBJECT
+        - SPLITTED_INTO
+    query: >
+        MATCH (project:Project)-[:HAS_ENROLLED]-(subject:Subject)-[:BELONGS_TO_SUBJECT]-(biological_sample:Biological_sample)-[:SPLITTED_INTO]-(analytical_sample:Analytical_sample)
+        WHERE project.id=$external_id
+        RETURN DISTINCT subject.external_id AS subjects, biological_sample.external_id AS biological_samples, analytical_sample.external_id AS analytical_samples;
+create_project_subject:
+    name: create a new subject in a project
+    description: 'Creates Subject node and links them to the Project node'
+    involved_nodes:
+        - Project
+        - Subject
+    involved_rels:
+        - HAS_ENROLLED
+    query: >
+        CREATE CONSTRAINT ON (s:Subject) ASSERT s.id IS UNIQUE;
+        MERGE (s:Subject {id:$subject_id})
+        ON CREATE SET s.external_id=$external_id
+        WITH s
+        MATCH (p:Project {id:$project_id})
+        MERGE (p)-[r:HAS_ENROLLED]->(s)
+        RETURN COUNT(s) AS PROJECTID_subject, COUNT(r) AS PROJECTID_project_has_enrolled_subject;
+create_subject_biosamples:
+    name: create a new biological samples from subjects
+    description: 'Creates Biological_sample node and links them to the Subject node'
+    involved_nodes:
+        - Subject
+        - Biological_sample
+    involved_rels:
+        - BELONGS_TO_SUBJECT
+    query: >
+        CREATE CONSTRAINT ON (bs:Biological_sample) ASSERT bs.id IS UNIQUE;
+        MERGE (bs:Biological_sample {id:$biosample_id})
+        ON CREATE SET bs.external_id=$external_id
+        WITH bs
+        MATCH (s:Subject {id:$subject_id})
+        MERGE (bs)-[r:BELONGS_TO_SUBJECT]->(s)
+        RETURN COUNT(bs) AS PROJECTID_biosamples, COUNT(r) AS PROJECTID_bisamples_belongs_to_subject;
+create_asamples_biosamples:
+    name: create a new analytical samples from biological samples
+    description: 'Creates Analytical_sample node and links them to the Biological_sample node'
+    involved_nodes:
+        - Biological_sample
+        - Analytical_sample
+    involved_rels:
+        - SPLITTED_INTO
+    query: >
+        CREATE CONSTRAINT ON (as:Analytical_sample) ASSERT as.id IS UNIQUE;
+        MERGE (as:Analytical_sample {id:$asample_id})
+        ON CREATE SET as.external_id=$external_id, as.group=$grouping1, as.group2=$grouping2, as.batch=$batch
+        WITH as
+        MATCH (bs:Biological_sample {id:$biosample_id})
+        MERGE (bs)-[r:SPLITTED_INTO]->(as)
+        RETURN COUNT(as) AS PROJECTID_asamples, COUNT(r) AS PROJECTID_bisamples_splitted_into_asample;
+
+project_clinical: &project_clinical
+    name: project proteins
+    description: full graph for a project with quantified clinical variables
+    involves_nodes:
+        - Project
+        - Biological_samples
+        - Anlytical_samples
+    involved_rels:
+        - HAS_ENROLLED
+        - BELONGS_TO_SUBJECT
+        - SPLITTED_INTO
+    query_type: post
+    query: >
+        MATCH (p:Project{id:"PROJECTID"})-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[r:HAS_QUANTIFIED_CLINICAL]->(n:Clinical_variable)
+        WITH COUNT(DISTINCT n.id) AS clinical_variables
+        MATCH (p:Project{id:"PROJECTID"})-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)
+        WITH p.id AS project_clinical, COUNT(DISTINCT s.id) AS subjects, COUNT(DISTINCT b.id) AS biological_samples, COUNT(DISTINCT a.id) AS analytical_samples, clinical_variables
+        RETURN project_clinical, subjects, biological_samples, analytical_samples, clinical_variables;
+project_proteins: &project_proteins
+    name: project proteins
+    description: full graph for a project with quantified proteins
+    involves_nodes:
+        - Project
+        - Biological_samples
+        - Anlytical_samples
+    involved_rels:
+        - HAS_ENROLLED
+        - BELONGS_TO_SUBJECT
+        - SPLITTED_INTO
+    query_type: post
+    query: >
+        MATCH (p:Project{id:"PROJECTID"})-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PROTEIN]->(n:Protein)
+        WITH COUNT(DISTINCT r.proteinGroup) AS protein_groups, COUNT(DISTINCT n.id) AS proteins
+        MATCH (p:Project{id:"PROJECTID"})-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]->(a:Analytical_sample)
+        WITH p.id AS project_proteins, COUNT(DISTINCT s.id) AS subjects, COUNT(DISTINCT b.id) AS biological_samples, COUNT(DISTINCT a.id) AS analytical_samples, protein_groups, proteins
+        RETURN project_proteins, subjects, biological_samples, analytical_samples, protein_groups, proteins;
+project_peptides: &project_peptides
+    name: project peptides
+    description: full graph for a project with quantified peptides
+    involves_nodes:
+        - Project
+        - Biological_samples
+        - Anlytical_samples
+    involved_rels:
+        - HAS_ENROLLED
+        - BELONGS_TO_SUBJECT
+        - SPLITTED_INTO
+    query_type: post
+    query: >
+        MATCH (p:Project{id:"PROJECTID"})-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_PEPTIDE]->(n:Peptide)
+        WITH COUNT(DISTINCT n.id) AS peptides
+        MATCH (p:Project{id:"PROJECTID"})-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)
+        WITH p.id AS project_peptides, COUNT(DISTINCT s.id) AS subjects, COUNT(DISTINCT b.id) AS biological_samples, COUNT(DISTINCT a.id) AS analytical_samples, peptides
+        RETURN project_peptides, subjects, biological_samples, analytical_samples, peptides;
+project_modified_proteins: &project_modified_proteins
+    name: project modified_proteins
+    description: full graph for a project with quantified modified proteins
+    involves_nodes:
+        - Project
+        - Biological_samples
+        - Anlytical_samples
+    involved_rels:
+        - HAS_ENROLLED
+        - BELONGS_TO_SUBJECT
+        - SPLITTED_INTO
+    query_type: post
+    query: >
+        MATCH (p:Project{id:"PROJECTID"})-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)-[r:HAS_QUANTIFIED_MODIFIED_PROTEIN]->(n:Modified_protein)
+        WITH COUNT(DISTINCT n.id) AS modified_proteins
+        MATCH (p:Project{id:"PROJECTID"})-[:HAS_ENROLLED]->(s:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample)-[:SPLITTED_INTO]-(a:Analytical_sample)
+        WITH p.id AS project_modified_proteins, COUNT(DISTINCT s.id) AS subjects, COUNT(DISTINCT b.id) AS biological_samples, COUNT(DISTINCT a.id) AS analytical_samples, modified_proteins
+        RETURN project_modified_proteins, subjects, biological_samples, analytical_samples, modified_proteins;
+project_graph:
+    - *project_clinical
+    - *project_proteins
+    - *project_peptides
+    - *project_modified_proteins

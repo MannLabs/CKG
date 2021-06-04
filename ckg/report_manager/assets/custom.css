@@ -1,0 +1,139 @@
+h1.error_msg {
+  color: rgb(209,122,108);
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+button.button_link, a.button_link:link, a.button_link:visited {
+  color: rgb(255, 255, 255);
+  background-color: rgb(32, 92, 204);
+  text-transform: uppercase;
+  text-align: center;
+  font-weight: 700;
+  font-size: .66rem;
+  white-space: nowrap;
+  border: 3px solid rgb(32, 92, 204);
+  border-radius: 2rem;
+  padding: .3rem .95rem .35rem;
+  text-decoration: none;
+}
+
+button.button_link:hover, button.button_link:active, a.button_link:hover, a.button_link:active {
+  color: rgb(32, 92, 204);
+  background-color: rgb(255, 255, 255);
+}
+
+a.nav_link:link, a.nav_link:visited {
+    color: rgb(32, 92, 204);
+    background-color: rgb(255, 255, 255);
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: .66rem;
+    white-space: nowrap;
+    border: 3px solid rgb(32, 92, 204);
+    border-radius: 2rem;
+    padding: .3rem .95rem .35rem;
+    text-decoration: none;
+}
+
+a.nav_link:hover, a.nav_link:active {
+  color: rgb(255, 255, 255);
+  background-color: rgb(32, 92, 204);
+}
+
+div {
+  margin-bottom: 10px;
+}
+
+.navbar {
+  overflow: hidden;
+  background-color: #333;
+}
+
+.dropdown {
+  float: left;
+  overflow: hidden;
+}
+
+.dropdown .dropbtn {
+  font-size: 10px;  
+  border: none;
+  outline: none;
+  color: black;
+  padding: 14px 16px;
+  background-color: inherit;
+  font-family: inherit;
+  margin: 0;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  text-transform: uppercase;
+  background-color: #c2bdbd;
+  min-width: 60px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  float: none;
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+.dropdown-content a:hover {
+  background-color: #ddd;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+p.description_p {
+  background-color: rgb(32, 92, 204);
+  color: lightblue;
+  width: 400px;
+  padding: 25px;
+}
+
+div.div_framed{
+  padding: 25px;
+  border: 1px solid navy;
+}
+
+div.info_panel{
+  color: #35978f;
+  padding: 5px;
+  border: 1px solid #35978f;
+  text-align: center;
+}
+
+div.error_panel{
+  color: rgb(209,122,108);
+  padding: 5px;
+  border: 1px solid rgb(209,122,108);
+  text-align: center;
+}
+
+label{
+  width: 400px;
+  line-height: 26px;
+  margin-right: 3px;
+  margin-bottom: 3px;
+}
+
+label.radioitem {
+  margin-bottom: 0px;
+  margin-right: 1px;
+}
+
+input{
+  height: 25px;
+  flex: 0 0 200px;
+  margin-left: 10px;
+  margin-right: 10px;
+}

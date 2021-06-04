@@ -18,7 +18,7 @@ In this module, the *Graph* class from ``Neo4j`` is used to represent the graph 
 
 .. code-block:: python
 
-	from graphdb_connector import connector
+	from ckg.graphdb_connector import connector
 	driver = connector.getGraphDatabaseConnectionConfiguration()
 
 Once the connection is established, the database can be queried. For example:

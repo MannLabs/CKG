@@ -23,9 +23,10 @@ umap-learn>=0.3.9
 pingouin>=0.3.10
 python-louvain==0.13
 snfpy==0.2.2
-fancyimpute==0.5.4
 kmapper==1.2.0
 natsort==6.0.0
+mpmath==1.2.1
+combat==0.2.0
 lifelines==0.23.1
 cvxpy==1.1.7
 wordcloud==1.8.1
@@ -35,9 +36,10 @@ networkx==2.5
 chart-studio==1.0.0
 xhtml2pdf==0.2.4
 lxml==4.3.4
-celery>=4.3.0
+celery==5.0.5
 cffi>=1.14.0
-rpy2==3.0.5
+rpy2==3.0.5; platform_system!="Windows"
+h5py==2.10.0
 jupyter>=1.0.0
 xlrd==1.2.0
 openpyxl==3.0.1
@@ -47,7 +49,10 @@ psutil>=5.6.6
 plotly==4.9.0
 kaleido==0.0.1
 gseapy==0.9.19
+numpy==1.19.5
 docutils==0.15.2
 sphinx==2.3.1
-nbsphinx==0.8.0
+rst2pdf==0.98
+nbsphinx>=0.8.0
+ipykernel>=5.4.3
 eventlet==0.25.1

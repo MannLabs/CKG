@@ -1,0 +1,1049 @@
+COUNT_RELATIONSHIPS:
+    'name': "count_relationships"
+    'description': "Counts the number of relationships of a given type"
+    'query': "MATCH (:ENTITY1)-[:RELATIONSHIP]->(:ENTITY2) return count(*) AS count;"
+
+REMOVE_RELATIONSHIPS:
+    'name': "remove_relationship"
+    'description': "Removes the specified relationship type between the specified entity types"
+
+    'query': "MATCH (:ENTITY1)-[r:RELATIONSHIP]->(:ENTITY2) delete r;"
+REMOVE_NODE:
+    'name': "remove_node"
+    'description': "Removes all the instances of the specified type of node"
+    'query': 'all apoc.periodic.iterate("MATCH (n:ENTITY) return n", "DETACH DELETE n", {batchSize:1000}) yield batches, total return batches, total'
+
+IMPORT_ONTOLOGY_DATA:
+    'name': "import ontology data"
+    'description': "Creates all the onotology nodes and has parent relationships"
+    'query': >
+        CREATE CONSTRAINT ON (e:ENTITY) ASSERT e.id IS UNIQUE;
+        CREATE INDEX ON :ENTITY(name);  
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/ENTITY.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (e:ENTITY {id:line.ID})
+        ON CREATE SET e.name=line.name,e.description=line.description,e.type=line.type,e.synonyms=SPLIT(line.synonyms,',')
+        RETURN COUNT(e) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/ENTITY_has_parent.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (e1:ENTITY{id:line.START_ID})
+        MATCH (e2:ENTITY{id:line.END_ID})
+        MERGE (e1)-[r:HAS_PARENT]->(e2)
+        RETURN COUNT(r) AS c;
+
+IMPORT_ONTOLOGY_MAPPING_DATA:
+    'name': "import ontology mappings"
+    'description': "Creates relationships between different onotologies (i.e (EFO)-[:MAPS_TO]->(Disease)"
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/ENTITY1_maps_to_ENTITY2.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (e1:ENTITY1{id:line.START_ID})
+        MATCH (e2:ENTITY2{id:line.END_ID})
+        MERGE (e1)-[r:MAPS_TO]->(e2)
+        RETURN COUNT(r) AS c;
+
+IMPORT_PROTEIN_DATA:
+    'name': "import protein data"
+    'description': "Creates Protein and Peptide nodes, their relationship and relationships to Gene and Transcript nodes"
+    'query': >
+        CREATE INDEX ON :Protein(name);
+        CREATE INDEX ON :Protein(accession);
+        CREATE CONSTRAINT ON (p:Protein) ASSERT p.id IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Protein.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (p:Protein {id:line.ID})
+        ON CREATE SET p.accession=line.accession,p.name=line.name,p.description=line.description,p.taxid=line.taxid,p.synonyms=SPLIT(line.synonyms,',');
+        CREATE CONSTRAINT ON (a:Amino_acid_sequence) ASSERT a.id IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Amino_acid_sequence.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (aa:Amino_acid_sequence {id:line.ID})
+        ON CREATE SET aa.header=line.header,aa.sequence=line.sequence,aa.size=line.size,aa.source=line.source;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Protein_HAS_Sequence_Amino_acid_sequence.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p:Protein {id:line.START_ID})
+        MATCH (aa:Amino_acid_sequence {id:line.END_ID})
+        MERGE (p)-[r:HAS_SEQUENCE{source:line.source}]->(aa)
+        RETURN COUNT(p) AS c;
+        CREATE CONSTRAINT ON (p:Peptide) ASSERT p.id IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Peptide.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (p:Peptide{id:line.ID})
+        ON CREATE SET p.type=line.type,p.unique=line.unique
+        RETURN COUNT(p) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Peptide_belongs_to_protein.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p1:Peptide {id:line.START_ID})
+        MATCH (p2:Protein {id:line.END_ID})
+        MERGE (p1)-[r:BELONGS_TO_PROTEIN{source:line.source}]->(p2)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Protein_gene_translated_into.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (g:Gene {id:line.START_ID})
+        MATCH (p:Protein {id:line.END_ID})
+        MERGE (g)-[r:TRANSLATED_INTO]->(p)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Protein_transcript_translated_into.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (t:Transcript {id:line.START_ID})
+        MATCH (p:Protein {id:line.END_ID})
+        MERGE (t)-[r:TRANSLATED_INTO]->(p)
+        RETURN COUNT(r) AS c;
+
+IMPORT_FUNCTIONAL_REGIONS:
+    'name': 'import funtional regions data'
+    'description': 'Creates Functional Regions nodes and their relationships to Protein and Publication nodes'
+    'query': >
+        CREATE CONSTRAINT ON (f:Functional_region) ASSERT f.id IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Functional_region.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (f:Functional_region {id:line.ID})
+        ON CREATE SET f.name=line.name,f.description=line.description,f.source=line.source
+        RETURN COUNT(f) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Functional_region_found_in_protein.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (f:Functional_region {id:line.START_ID})
+        MATCH (p:Protein {id:line.END_ID})
+        MERGE (f)-[r:FOUND_IN_PROTEIN{start:line.start,end:line.end,alignment:line.sequence,source:line.source}]->(p)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Functional_region_mentioned_in_publication.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (f:Functional_region {id:line.START_ID})
+        MATCH (p:Publication {id:line.END_ID})
+        MERGE (f)-[r:MENTIONED_IN_PUBLICATION{source:line.source}]-(p)
+        RETURN COUNT(r) AS c;
+
+IMPORT_MODIFIED_PROTEINS:
+    'name': 'import modified proteins'
+    'description': 'Creates Modified_protein nodes and loads the relationships to Modification, Protein and Peptide nodes'
+    'query': >
+        CREATE CONSTRAINT ON (m:Modified_protein) ASSERT m.id IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_Modified_protein.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (m:Modified_protein {id:line.ID})
+        ON CREATE SET m.protein=line.protein,m.position=line.position,m.residue=line.residue,m.sequence_window=line.sequence_window,m.source=line.source
+        RETURN COUNT(m) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_modified_protein_has_modification.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (mp:Modified_protein {id:line.START_ID})
+        MATCH (m:Modification {id:line.END_ID})
+        MERGE (mp)-[r:HAS_MODIFICATION{source:line.source}]->(m)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_protein_has_modified_site.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p:Protein {id:line.START_ID})
+        MATCH (mp:Modified_protein {id:line.END_ID})
+        MERGE (p)-[r:HAS_MODIFIED_SITE]->(mp)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_peptide_has_modified_site.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p:Peptide {id:line.START_ID})
+        MATCH (mp:Modified_protein {id:line.END_ID})
+        MERGE (p)-[r:HAS_MODIFIED_SITE]->(mp)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_substrate_is_substrate_of.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (m:Modified_protein {id:line.START_ID})
+        MATCH (p:Protein {id:line.END_ID})
+        MERGE (m)-[r:IS_SUBSTRATE_OF{score:toFloat(line.score),regulation:line.regulation,source:line.source,evidence_type:line.evidence_type}]->(p)
+        RETURN COUNT(r) AS c;
+
+IMPORT_PROTEIN_ANNOTATIONS:
+    'name': 'import protein annotations'
+    'description': 'Loads into the database all the Protein nodes annotations: Gene Ontology terms'
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Cellular_component_associated_with.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p:Protein {id:line.START_ID})
+        MATCH (c:Cellular_component {id:line.END_ID})
+        MERGE (p)-[r:ASSOCIATED_WITH{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type}]->(c)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Molecular_function_associated_with.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p:Protein {id:line.START_ID})
+        MATCH (f:Molecular_function {id:line.END_ID})
+        MERGE (p)-[r:ASSOCIATED_WITH{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type}]->(f)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Biological_process_associated_with.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p:Protein {id:line.START_ID})
+        MATCH (b:Biological_process {id:line.END_ID})
+        MERGE (p)-[r:ASSOCIATED_WITH{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type}]->(b)
+        RETURN COUNT(r) AS c;
+
+IMPORT_PATHOLOGY_EXPRESSION:
+    'name': 'import pathology expression'
+    'description': 'Loads into the database the realtionships between Protein and Disease nodes based on expression (IHC, RNA) where there was a positive or negative prognosis'
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_protein_detected_in_pathology_sample.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p:Protein {id:line.START_ID})
+        MATCH (d:Disease {id:line.END_ID})
+        MERGE (p)-[r:DETECTED_IN_PATHOLOGY_SAMPLE{expression_high:line.expression_high,expression_medium:line.expression_medium,expression_low:line.expression_low,not_detected:line.not_detected,positive_prognosis_logrank_pvalue:line.positive_prognosis_logrank_pvalue,negative_prognosis_logrank_pvalue:line.negative_prognosis_logrank_pvalue,linkout:line.linkout,source:line.source}]->(d)
+        RETURN COUNT(r) AS c;
+
+IMPORT_COMPLEXES:
+    'name': 'import protein complexes'
+    'description': 'Creates the Complex nodes and the relationship between Proten and Complex nodes (IS_SUBUNIT_OF)'
+    'query': >
+        CREATE CONSTRAINT ON (c:Complex) ASSERT c.id IS UNIQUE;
+        CREATE CONSTRAINT ON (c:Complex) ASSERT c.name IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Complex.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (c:Complex {id:line.ID})
+        ON CREATE SET c.name=line.name,c.organism=line.organism,c.source=line.source,c.synonyms=SPLIT(line.synonyms,',')
+        RETURN COUNT(c) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_protein_is_subunit_of.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p:Protein {id:line.START_ID})
+        MATCH (c:Complex {id:line.END_ID})
+        MERGE (p)-[r:IS_SUBUNIT_OF{cell_lines:SPLIT(line.cell_lines,','),evidences:SPLIT(line.evidences,','),publication:line.publication,source:line.source}]->(c)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_biological_process_associated_with.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (c:Complex {id:line.START_ID})
+        MATCH (b:Biological_process {id:line.END_ID})
+        MERGE (c)-[r:ASSOCIATED_WITH{evidence_type:line.evidence_type,score:toFloat(line.score),source:line.source}]->(b)
+        RETURN COUNT(r) AS c;
+
+IMPORT_MODIFIED_PROTEIN_ANNOTATIONS:
+    'name': 'import modified protein annotations'
+    'description': 'Loads into the database all the Modified_protein nodes annotations: relationship to Disease and to Biological_processes'
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_disease_associated_with.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (m:Modified_protein {id:line.START_ID})
+        MATCH (d:Disease {id:line.END_ID})
+        MERGE (m)-[r:ASSOCIATED_WITH{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type,publications:line.publications}]->(d)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_biological_process_associated_with.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (m:Modified_protein {id:line.START_ID})
+        MATCH (b:Biological_process {id:line.END_ID})
+        MERGE (m)-[r:ASSOCIATED_WITH{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type,publications:line.publications,action:line.action}]->(b)
+        RETURN COUNT(r) AS c;
+
+IMPORT_PROTEIN_STRUCTURES:
+    'name': 'import protein structure data'
+    'description': 'Creates Protein structure nodes and their relationships to Protein nodes'
+    'query': >
+        CREATE CONSTRAINT ON (p:Protein_structure) ASSERT p.id IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Protein_structures.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (s:Protein_structure {id:line.ID})
+        ON CREATE SET s.source=line.source,s.link=line.link
+        RETURN COUNT(s) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Protein_has_structure.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p:Protein {id:line.START_ID})
+        MATCH (s:Protein_structure {id:line.END_ID})
+        MERGE (p)-[r:HAS_STRUCTURE{source:line.source}]->(s)
+        RETURN COUNT(r) AS c;
+
+IMPORT_GENE_DATA:
+    'name': 'import gene data'
+    'description': 'Creates the Gene nodes'
+    'query': >
+        CREATE CONSTRAINT ON (g:Gene) ASSERT g.id IS UNIQUE;
+        CREATE CONSTRAINT ON (g:Gene) ASSERT g.name IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Gene.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (g:Gene {id:line.ID})
+        ON CREATE SET g.name=line.name,g.family=line.family,g.taxid=line.taxid,g.synonyms=SPLIT(line.synonyms,',')
+        RETURN COUNT(g) AS c;
+
+IMPORT_TRANSCRIPT_DATA:
+    'name': 'import transcript data'
+    'description': 'Creates the Transcript nodes and the relationships to Chromosome and Gene nodes'
+    'query': >
+        CREATE CONSTRAINT ON (t:Transcript) ASSERT t.id IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Transcript.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (t:Transcript {id:line.ID})
+        ON CREATE SET t.name=line.name,t.class=line.class,t.taxid=line.taxid,t.assembly=line.assembly
+        RETURN COUNT(t) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/refseq_located_in.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (t:Transcript {id:line.START_ID})
+        MATCH (c:Chromosome {id:line.END_ID})
+        MERGE (t)-[r:LOCATED_IN{start:line.start,end:line.end,strand:line.strand}]->(c)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/refseq_transcribed_into.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (g:Gene {id:line.START_ID})
+        MATCH (t:Transcript {id:line.END_ID})
+        MERGE (g)-[r:TRANSCRIBED_INTO]->(t)
+        RETURN COUNT(r) AS c;
+
+IMPORT_CHROMOSOME_DATA:
+    'name': 'import chromosome data'
+    'description': 'Creates the Chromosome nodes'
+    'query': >
+        CREATE CONSTRAINT ON (c:Chromosome) ASSERT c.id IS UNIQUE;
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Chromosome.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (c:Chromosome {id:line.ID})
+        ON CREATE SET c.name=line.name,c.taxid=line.taxid
+        RETURN COUNT(c) AS c;
+
+IMPORT_CURATED_PPI_DATA:
+    'name': 'import curated Protein-Protein interaction data'
+    'description': 'Loads into the database all the PPI from curated sources i.e. Intact database'
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_interacts_with.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p1:Protein {id:line.START_ID})
+        MATCH (p2:Protein {id:line.END_ID})
+        MERGE (p1)-[r:CURATED_INTERACTS_WITH{score:toFloat(line.score),interaction_type:line.interaction_type,method:SPLIT(line.method,','),source:SPLIT(line.source,','),evidence:SPLIT(line.publications,',')}]->(p2)
+        RETURN COUNT(r) AS c;
+
+IMPORT_COMPILED_PPI_DATA:
+    'name': 'import compiled Protein-Protein interaction data'
+    'description': 'Loads into the database all the PPI from sources that compile/aggregate evidence from different resources i.e. STRING database'
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_interacts_with.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p1:Protein {id:line.START_ID})
+        MATCH (p2:Protein {id:line.END_ID})
+        MERGE (p1)-[r:COMPILED_INTERACTS_WITH{score:toFloat(line.score),interaction_type:line.interaction_type,source:SPLIT(line.source,','),scores:SPLIT(line.scores,','),evidence:SPLIT(line.evidence,',')}]->(p2)
+        RETURN COUNT(r) AS c;
+
+IMPORT_JENSENLAB_DATA:
+    'name': 'import jensenlab data'
+    'description': 'Loads into the database all the associations from jenseblab.org: DISEASES, TISSUES, COMPARTMENTS'
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/ENTITY1_ENTITY2_associated_with_integrated.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p:ENTITY1 {id:line.START_ID})
+        MATCH (d:ENTITY2 {id:line.END_ID})
+        MERGE (p)-[r:ASSOCIATED_WITH{score:toFloat(line.score),source:line.source,evidence_type:line.evidence_type}]->(d)
+        RETURN COUNT(r) AS c;
+
+CREATE_PUBLICATIONS:
+    'name': 'create Publication node'
+    'description': 'Creates Publication nodes from Pubmed'
+    'query': >
+        CREATE CONSTRAINT ON (p:Publication) ASSERT p.id IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Publications.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (p:Publication{id:line.ID})
+        ON CREATE SET p.linkout=line.linkout,p.journal=line.journal_title,p.PMC_id=line.pmcid,p.year=toInteger(line.year),p.volume=line.volume,p.issue=line.issue,p.page=line.page,p.DOI=line.doi
+        RETURN COUNT(p) AS c;
+
+IMPORT_MENTIONS:
+    'name': 'import co-mentioned terms'
+    'description': 'Loads all the co-mentioned terms extracted from the text-mining pipeline developed in jensenlab.org: https://bitbucket.org/larsjuhljensen/tagger'
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/ENTITY_Publication_mentioned_in_publication.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p:Publication {id:line.START_ID})
+        MATCH (e:ENTITY {id:line.END_ID})
+        MERGE (e)-[r:MENTIONED_IN_PUBLICATION]->(p)
+        RETURN COUNT(r) AS c;
+
+IMPORT_PUBLISHED_IN:
+    'name': 'import published studies'
+    'description': 'Loads into the database all the studies/projects published in articles i.e. GWAS studies'
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/ENTITY_published_in_publication.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (g:ENTITY {id:line.START_ID})
+        MATCH (p:Publication {id:line.END_ID})
+        MERGE (g)-[r:PUBLISHED_IN]->(p)
+        RETURN COUNT(r) AS c;
+
+IMPORT_VARIANT_FOUND_IN_GWAS:
+    'name': 'import variants found in GWAS studies'
+    'description': 'Loads into the database all the variants found in GWAS studies'
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/GWAS_study_variant_found_in_gwas.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (v:Known_variant {external_id:line.START_ID})
+        MATCH (g:GWAS_study {id:line.END_ID})
+        MERGE (v)-[r:VARIANT_FOUND_IN_GWAS{frequency:coalesce(toFloat(line.frequency), "NR"),pvalue:coalesce(line.pvalue, "NR"),odds_ratio:coalesce(line.odds_ratio, "NR"),trait:coalesce(line.trait, "NR"),source:line.source}]->(g)
+        RETURN COUNT(r) AS c;
+
+IMPORT_GWAS_STUDIES_TRAIT:
+    'name': 'import traits studied by GWAS'
+    'description': 'Loads into the database all the links to traits (Experimental_factor) studied in a GWAS'
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/GWAS_study_studies_trait.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (g:GWAS_study {id:line.START_ID})
+        MATCH (e:Experimental_factor {id:line.END_ID})
+        MERGE (g)-[r:STUDIES_TRAIT{source:line.source}]->(e)
+        RETURN COUNT(r) AS c;
+
+
+IMPORT_DISEASE_DATA:
+    'name': 'import Disease nodes'
+    'description': 'Loads all the associations with Disease nodes extracted from several resources i.e. DisGeNET'
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/ENTITY_RESOURCE_associated_with.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (e:ENTITY {id:line.START_ID})
+        MATCH (d:Disease {id:line.END_ID})
+        MERGE (e)-[r:ASSOCIATED_WITH{score:toFloat(line.score),evidence_type:line.evidence_type,source:line.source}]->(d)
+        RETURN COUNT(r) AS c;
+
+IMPORT_DRUG_DATA:
+    'name': 'import drug data'
+    'description': 'Creates the Drug nodes'
+    'query': >
+        CREATE CONSTRAINT ON (d:Drug) ASSERT d.id IS UNIQUE;
+        CREATE CONSTRAINT ON (d:Drug) ASSERT d.name IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Drug.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (d:Drug {id:line.ID})
+        ON CREATE SET d.name=line.name,d.description=line.description,d.kingdom=line.kingdom,d.superclass=line.superclass,d.class=line.class,d.subclass=line.subclass,d.indication=line.indication,d.synonyms=line.synonyms,d.mechanism_of_action=line.mechanism_of_action,d.metabolism=line.metabolism,d.pharmacodynamics=line.pharmacodynamics,d.prices=line.prices,d.route_of_elimination=line.route_of_elimination,d.toxicity=line.toxicity,d.absorption=line.absorption,d.half_life=line.half_life,d.groups=line.groups,d.experimental_properties=line.experimental_properties,d.Melting_Point=line.Melting_Point,d.Hydrophobicity=line.Hydrophobicity,d.Isoelectric_Point=line.Isoelectric_Point,d.Molecular_Weight=line.Molecular_Weight,d.Molecular_Formula=line.Molecular_Formula,d.Water_Solubility=line.Water_Solubility,d.Monoisotopic_Weight=line.Monoisotopic_Weight,d.Polar_Surface_Area_PSA=line.Polar_Surface_Area_PSA,d.Refractivity=line.Refractivity,d.Polarizability=line.Polarizability,d.Rotatable_Bond_Count=line.Rotatable_Bond_Count,d.H_Bond_Acceptor_Count=line.H_Bond_Acceptor_Count,d.H_Bond_Donor_Count=line.H_Bond_Donor_Count,d.pKa_strongest_acidic=line.pKa_strongest_acidic,d.pKa_strongest_basic=line.pKa_strongest_basic,d.Physiological_Charge=line.Physiological_Charge,d.Number_of_Rings=line.Number_of_Rings,d.Bioavailability=line.Bioavailability,d.Rule_of_Five=line.Rule_of_Five,d.Ghose_Filter=line.Ghose_Filter,d.MDDR_Like_Rule=line.MDDR_Like_Rule,d.caco2_Permeability=line.caco2_Permeability,d.pKa=line.pKa,d.Boiling_Point=line.Boiling_Point
+        RETURN COUNT(d) AS c;
+
+IMPORT_DRUG_INTERACTION_DATA:
+    'name': 'import drug-drug interactions'
+    'description': 'Loads all the interactions between Drugs from different resources i.e. DrugBank'
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_interacts_with_drug.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (d1:Drug {id:line.START_ID})
+        MATCH (d2:Drug {id:line.END_ID})
+        MERGE (d1)-[r:INTERACTS_WITH{source:line.source,interaction_type:line.interaction_type}]->(d2)
+        RETURN COUNT(r) AS c;
+
+IMPORT_CURATED_DRUG_DATA:
+    'name': 'import curated drug targets'
+    'description': 'Loads all the relationships between Drug and Gene nodes targeted that have been curated, i.e. OncoKB'
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_targets.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (d:Drug {id:line.START_ID})
+        MATCH (g:Gene {id:line.END_ID})
+        MERGE (d)-[r:CURATED_TARGETS{source:line.source,interaction_type:line.type, evidence:line.evidence, response:line.response, disease:line.disease, score:line.type}]->(g)
+        RETURN COUNT(r) AS c;
+
+IMPORT_COMPILED_DRUG_DATA:
+    'name': 'import compiled drug targets'
+    'description': 'Loads al the relationships between Drug and Gene nodes targeted from resources that compile/aggregate different evidence from several sources, i.e. STITCH database'
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_associated_with.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (d:Drug {id:line.START_ID})
+        MATCH (p:Protein {id:line.END_ID})
+        MERGE (d)-[r:COMPILED_TARGETS{score:toFloat(line.score), source:line.source,interaction_type:line.interaction_type,scores:SPLIT(line.scores,','),evidences:SPLIT(line.evidence,',')}]->(p)
+        RETURN COUNT(r) AS c;
+
+IMPORT_PPI_ACTION:
+    'name': 'import Protein-Protein interaction action data'
+    'description': 'Loads all the PPI and the resulting activity of the interaction'
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_protein_acts_on_protein.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p1:Protein {id:line.START_ID})
+        MATCH (p2:Protein {id:line.END_ID})
+        MERGE (p1)-[r:ACTS_ON{source:line.source,action:line.action,score:toFloat(line.score),directionality:toBoolean(line.directionality)}]->(p2)
+        RETURN COUNT(r) AS c;
+
+IMPORT_DRUG_SIDE_EFFECTS:
+    'name': 'import side effects'
+    'description': 'Creates the relationship between Drug and Phenotype nodes both side effects and also indicated for'
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_has_side_effect.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (d:Drug {id:line.START_ID})
+        MATCH (p:Phenotype {id:line.END_ID})
+        MERGE (d)-[r:HAS_SIDE_EFFECT]->(p)
+        ON CREATE SET r.source=line.source,r.original_side_effect_code=line.original_side_effect,r.evidence_from=line.evidence_from
+        ON MATCH SET r.source=line.source,r.original_side_effect_code=line.original_side_effect,r.evidence_from=line.evidence_from
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_is_indicated_for.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (d:Drug {id:line.START_ID})
+        MATCH (p:Phenotype {id:line.END_ID})
+        MERGE (d)-[r:IS_INDICATED_FOR]->(p)
+        ON CREATE SET r.source=line.source,r.original_side_effect_code=line.original_side_effect,r.evidence=line.evidence
+        ON MATCH SET r.source=line.source,r.original_side_effect_code=line.original_side_effect,r.evidence=line.evidence
+        RETURN COUNT(r) AS c;
+
+IMPORT_DRUG_ACTS_ON:
+    'name': 'import drug actions'
+    'description': 'Loads all the Drug actions on Proteins, i.e. inhibition'
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_drug_acts_on_protein.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (d:Drug {id:line.START_ID})
+        MATCH (p:Protein {id:line.END_ID})
+        MERGE (d)-[r:ACTS_ON{source:line.source,action:line.action,score:toFloat(line.score),directionality:toBoolean(line.directionality)}]->(p)
+        RETURN COUNT(r) AS c;
+
+IMPORT_PATHWAY_DATA:
+    'name': 'import pathway data'
+    'description': 'Creates the Pathway nodes and all the relationships to Protein, Drug and Metabolite nodes'
+    'query': >
+        CREATE CONSTRAINT ON (p:Pathway) ASSERT p.id IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_Pathway.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (p:Pathway{id:line.ID})
+        ON CREATE SET p.name=line.name,p.description=line.description,p.organism=line.organism,p.linkout=line.linkout,p.source=line.source
+        RETURN COUNT(p) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_protein_annotated_to_pathway.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p:Protein{id:line.START_ID})
+        MATCH (a:Pathway{id:line.END_ID})
+        MERGE (p)-[r:ANNOTATED_IN_PATHWAY{evidence:line.evidence,organism:line.organism,cellular_component:line.cellular_component,source:line.source}]->(a)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_metabolite_annotated_to_pathway.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (m:Metabolite{id:line.START_ID})
+        MATCH (a:Pathway{id:line.END_ID})
+        MERGE (m)-[r:ANNOTATED_IN_PATHWAY{evidence:line.evidence,organism:line.organism,cellular_component:line.cellular_component,source:line.source}]->(a)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_drug_annotated_to_pathway.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (d:Drug{id:line.START_ID})
+        MATCH (a:Pathway{id:line.END_ID})
+        MERGE (d)-[r:ANNOTATED_IN_PATHWAY{evidence:line.evidence,organism:line.organism,cellular_component:line.cellular_component,source:line.source}]->(a)
+        RETURN COUNT(r) AS c;
+
+IMPORT_METABOLITE_DATA:
+    'name': 'import metabolite data'
+    'description': 'Creates Metabolite nodes and their associations to Protein, Disease and Tissue nodes'
+    'query': >
+        CREATE CONSTRAINT ON (m:Metabolite) ASSERT m.id IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Metabolite.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (m:Metabolite{id:line.ID})
+        ON CREATE SET m.name=line.name,m.synonyms=line.synonyms,m.description=line.description,m.direct_parent=line.direct_parent,m.kingdom=line.kingdom,m.class=line.class,m.super_class=line.super_class,m.sub_class=line.sub_class,m.chemical_formula=line.chemical_formula,m.average_molecular_weight=line.average_molecular_weight,m.monoisotopic_molecular_weight=line.monoisotopic_molecular_weight,m.chebi_id=line.chebi_id,m.pubchem_compound_id=line.pubchem_compound_id,m.food_id=line.food_id
+        RETURN COUNT(m) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_associated_with_protein.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (m:Metabolite{id:line.START_ID})
+        MATCH (p:Protein{id:line.END_ID})
+        MERGE (m)-[r:ASSOCIATED_WITH]->(p)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_associated_with_disease.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (m:Metabolite{id:line.START_ID})
+        MATCH (d:Disease{id:line.END_ID})
+        MERGE (m)-[r:ASSOCIATED_WITH]->(d)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_associated_with_tissue.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (m:Metabolite{id:line.START_ID})
+        MATCH (t:Tissue{id:line.END_ID})
+        MERGE (m)-[r:ASSOCIATED_WITH]->(t)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        #LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_food_has_content.tsv" AS line
+        #FIELDTERMINATOR '\t'
+        #MATCH (m:Metabolite{id:line.START_ID})
+        #MATCH (f:Food{id:line.END_ID})
+        #MERGE (f)-[r:HAS_CONTENT]->(m)
+        #RETURN COUNT(r) AS food_has_content;
+
+IMPORT_FOOD_DATA:
+    'name': 'import food data'
+    'description': 'Creates Food nodes and their relationship to Metabolite nodes'
+    'query': >
+        CREATE CONSTRAINT ON (f:Food) ASSERT f.id IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Food.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (f:Food{id:line.ID})
+        ON CREATE SET f.name=line.name,f.scientific_name=line.scientific_name,f.description=line.description,f.group=line.group,f.subgroup=line.subgroup,f.source=line.source
+        RETURN COUNT(f) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_food_has_content.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (f:Food{id:line.START_ID})
+        MATCH (m:Metabolite{id:line.END_ID})
+        MERGE (f)-[r:HAS_CONTENT{minimum:line.min,maximum:line.max,average:line.average,units:line.units,source:line.source}]->(m)
+        RETURN COUNT(r) AS c;
+
+IMPORT_BIOMARKERS:
+    'name': 'import protein biomarkers'
+    'description': 'Creates relationships is_biomarker_of (Disease, ...)'
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/protein_is_biomarker_of_disease.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p:Protein{id:line.START_ID})
+        MATCH (d:Disease{id:line.END_ID})
+        MERGE (p)-[r:IS_BIOMARKER_OF_DISEASE{is_used_in_clinic:toBoolean(line.used_in_clinic),assay:line.assay,is_routine:toBoolean(line.is_routine),reference:(line.reference),source:line.source,age_range:line.age_range,age_units:line.age_units,sex:line.sex,normal_range:line.normal_range,units:line.units,notes:line.notes}]->(d)
+        RETURN COUNT(r) AS c;
+
+IMPORT_QCMARKERS:
+    'name': 'import proteins used as quality marker in tissue'
+    'description': 'Creates relationships is_qcmarker_in Tissue'
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/protein_is_qcmarker_in_tissue.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p:Protein{id:line.START_ID})
+        MATCH (t:Tissue{id:line.END_ID})
+        MERGE (p)-[r:IS_QCMARKER_IN_TISSUE{class:line.class}]->(t)
+        RETURN COUNT(r) AS c;
+
+IMPORT_KNOWN_VARIANT_DATA:
+    'name': 'import known variant data'
+    'description': 'Creates Known_variant nodes and their relationships to Chromosome, Gene and Protein nodes. Known variants are protein variants that have been found in a population (or disease) and registered/curated previously'
+    'query': >
+        CREATE CONSTRAINT ON (k:Known_variant) ASSERT k.id IS UNIQUE;
+        CREATE INDEX ON :Known_variant(pvariant_id);
+        CREATE INDEX ON :Known_variant(external_id);
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Known_variant.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (k:Known_variant {id:line.ID})
+        ON CREATE SET k.pvariant_id=line.pvariant_id,k.external_id=line.external_id,k.alternative_names=line.alternative_names,k.effect=line.effect,k.clinical_relevance=line.clinical_relevance,k.disease=line.disease,k.original_source=line.original_source,k.source=line.source
+        RETURN COUNT(k) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Chromosome_known_variant_found_in_chromosome.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (k:Known_variant {id:line.START_ID})
+        MATCH (c:Chromosome {id:line.END_ID})
+        MERGE (k)-[r:VARIANT_FOUND_IN_CHROMOSOME]->(c)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Gene_known_variant_found_in_gene.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (k:Known_variant {id:line.START_ID})
+        MATCH (g:Gene {id:line.END_ID})
+        MERGE (k)-[r:VARIANT_FOUND_IN_GENE]->(g)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/Protein_known_variant_found_in_protein.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (k:Known_variant {id:line.START_ID})
+        MATCH (p:Protein {id:line.END_ID})
+        MERGE (k)-[r:VARIANT_FOUND_IN_PROTEIN]->(p)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/mutation_curated_affects_interaction_with.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (k:Known_variant {pvariant_id:line.START_ID})
+        MATCH (p:Protein {id:line.END_ID})
+        MERGE (k)-[r:CURATED_AFFECTS_INTERACTION_WITH{effect:line.effect,interaction:line.interaction,evidence:line.evidence,internal_id:line.internal_id,source:line.source}]->(p)
+        RETURN COUNT(r) AS c;
+
+IMPORT_CLINICALLY_RELEVANT_VARIANT_DATA:
+    'name': 'import clinically relevant variants'
+    'description': 'Creates Clinically_relevant_variant nodes and their association to Known_variants, Disease and if they are targeted by any Drug. Clinically relevant variants are known_variants that have been found to be relevant in disease, i.e. they are associated to drug resistance'
+    'query': >
+        CREATE CONSTRAINT ON (c:Clinically_relevant_variant) ASSERT c.id IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_Clinically_relevant_variant.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (k:Clinically_relevant_variant {id:line.ID})
+        ON CREATE SET k.alternative_names=line.alternative_names,k.chromosome=line.chromosome,k.position=toInteger(line.position),k.reference=line.reference,k.alternative=line.alternative,k.effect=line.effect,k.oncogeneicity=line.oncogeneicity,k.source=line.source
+        RETURN COUNT(k) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_known_variant_is_clinically_relevant.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (k:Known_variant {pvariant_id:line.START_ID})
+        MATCH (c:Clinically_relevant_variant {id:line.END_ID})
+        MERGE (k)-[r:VARIANT_IS_CLINICALLY_RELEVANT{source:line.source}]->(c)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_targets_clinically_relevant_variant.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (d:Drug {id:line.START_ID})
+        MATCH (k:Clinically_relevant_variant {id:line.END_ID})
+        MERGE (d)-[r:TARGETS_CLINICALLY_RELEVANT_VARIANT{evidence:line.evidence, disease:line.disease, type:line.type, source:line.source}]->(k)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/RESOURCE_associated_with.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (k:Clinically_relevant_variant {id:line.START_ID})
+        MATCH (d:Disease {id:line.END_ID})
+        MERGE (k)-[r:ASSOCIATED_WITH{score:line.score,evidence_type:line.evidence_type,source:line.source,number_publications:line.number_publications}]->(d)
+        RETURN COUNT(r) AS c;
+
+IMPORT_GWAS:
+    'name': 'import GWAS studies'
+    'description': 'Creates GWAS_study nodes'
+    'query': >
+        CREATE CONSTRAINT ON (g:GWAS_study) ASSERT g.id IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/GWAS_study.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (g:GWAS_study {id:line.ID})
+        ON CREATE SET g.title=line.title,g.date=line.date,g.sample_size=line.sample_size,g.replication_size=line.replication_size,g.trait=line.trait
+        RETURN COUNT(g) AS c;
+
+proteomics_class: &proteomics_class
+    'name': 'import proteomics dataset'
+    'description': 'Loads into the database all the Proteomic data obtained in a Project: identified Protein, Peptide and Modified_protein nodes'
+    'query': >
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_proteins.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (s:Analytical_sample {id:line.START_ID})
+        MATCH (p:Protein{id:line.END_ID})
+        MERGE (s)-[r:HAS_QUANTIFIED_PROTEIN]-(p)
+        ON CREATE SET r.value=toFloat(line.value),r.intensity=toFloat(line.Intensity),r.qvalue=toFloat(line.Qvalue),r.score=toFloat(line.Score),r.proteinGroup=line.id,r.is_razor=line.is_razor,r.NrOfStrippedSequencesMeasured=line.NrOfStrippedSequencesMeasured,r.NrOfStrippedSequencesIdentified=line.NrOfStrippedSequencesIdentified,r.NrOfPrecursorsIdentified=line.NrOfPrecursorsIdentified,r.IsSingleHit=line.IsSingleHit,r.NrOfStrippedSequencesUsedForQuantification=line.NrOfStrippedSequencesUsedForQuantification,r.PG.NrOfModifiedSequencesUsedForQuantification=line.PG.NrOfModifiedSequencesUsedForQuantification,r.NrOfPrecursorsUsedForQuantification=line.NrOfPrecursorsUsedForQuantification,r.MS1Quantity=line.MS1Quantity,r.MS2Quantity=line.MS2Quantity
+        ON MATCH SET r.value=toFloat(line.value),r.intensity=toFloat(line.Intensity),r.qvalue=toFloat(line.Qvalue),r.score=toFloat(line.Score),r.proteinGroup=line.id,r.is_razor=line.is_razor,r.NrOfStrippedSequencesMeasured=line.NrOfStrippedSequencesMeasured,r.NrOfStrippedSequencesIdentified=line.NrOfStrippedSequencesIdentified,r.NrOfPrecursorsIdentified=line.NrOfPrecursorsIdentified,r.IsSingleHit=line.IsSingleHit,r.NrOfStrippedSequencesUsedForQuantification=line.NrOfStrippedSequencesUsedForQuantification,r.PG.NrOfModifiedSequencesUsedForQuantification=line.PG.NrOfModifiedSequencesUsedForQuantification,r.NrOfPrecursorsUsedForQuantification=line.NrOfPrecursorsUsedForQuantification,r.MS1Quantity=line.MS1Quantity,r.MS2Quantity=line.MS2Quantity
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_subject_peptide.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (s:Analytical_sample {id:line.START_ID})
+        MATCH (p:Peptide {id:line.END_ID})
+        MERGE (s)-[r:HAS_QUANTIFIED_PEPTIDE{value:toFloat(line.value), score:toFloat(line.Score), proteinGroupId:line.Protein_group_IDs}]->(p)
+        RETURN COUNT(r) AS c;
+        CREATE CONSTRAINT ON (m:Modified_protein) ASSERT m.id IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_modifiedprotein.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (m:Modified_protein {id:line.ID})
+        ON CREATE SET m.protein=line.protein,m.position=line.position,m.residue=line.residue,m.sequence_window=line.sequence_window,m.source=line.source
+        RETURN COUNT(m) AS PROJECTID_modified_protein;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_modifiedprotein_modification.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (mp:Modified_protein {id:line.START_ID})
+        MATCH (p:Modification {id:line.END_ID})
+        MERGE (mp)-[r:HAS_MODIFICATION]->(p)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_modifiedprotein_protein.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p:Protein {id:line.START_ID})
+        MATCH (mp:Modified_protein {id:line.END_ID})
+        MERGE (p)-[r:HAS_MODIFIED_SITE]->(mp)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_modifiedprotein_peptide.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p:Peptide {id:line.START_ID})
+        MATCH (mp:Modified_protein {id:line.END_ID})
+        MERGE (p)-[r:HAS_MODIFIED_SITE]->(mp)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_modifiedprotein_subject.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (s:Analytical_sample{id:line.START_ID})
+        MATCH (mp:Modified_protein{id:line.END_ID})
+        MERGE (s)-[r:HAS_QUANTIFIED_MODIFIED_PROTEIN{value:toFloat(line.value),sequenceWindow:line.Sequence_window,score:line.Score,deltaScore:line.Delta_score,scoreLocalization:line.Score_for_localization,localizationProb:line.Localization_prob,is_razor:line.is_razor}]->(mp)
+        RETURN COUNT(r) AS c;
+
+IMPORT_DATASETS:
+    "proteomics": *proteomics_class
+    "interactomics": *proteomics_class
+    "phosphoproteomics": *proteomics_class
+    "clinical":
+        'name': 'import clinical data'
+        'description': 'Loads into the database all the clinical variables measured in a project'
+        'query': >
+            USING PERIODIC COMMIT 10000
+            LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_subject_had_intervention.tsv" AS line
+            FIELDTERMINATOR '\t'
+            MATCH (:Project {id:'PROJECTID'})-[:HAS_ENROLLED]->(subject:Subject {external_id:line.START_ID})
+            MATCH (intervention:Clinical_variable {id:line.END_ID})
+            MERGE (subject)-[r:HAD_INTERVENTION{type:line.type, in_combination:line.in_combination, response:line.response}]->(intervention)
+            RETURN COUNT(r) AS c;
+            USING PERIODIC COMMIT 10000
+            LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_clinical_state.tsv" AS line
+            FIELDTERMINATOR '\t'
+            MATCH (:Project {id:'PROJECTID'})-[:HAS_ENROLLED]->(:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample {external_id:line.START_ID})
+            MATCH (c:Clinical_variable{id:line.END_ID})
+            MERGE (b)-[r:HAS_CLINICAL_STATE{value:line.value}]->(c)
+            RETURN COUNT(r) AS c;
+            USING PERIODIC COMMIT 10000
+            LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_clinical_quant.tsv" AS line
+            FIELDTERMINATOR '\t'
+            MATCH (:Project {id:'PROJECTID'})-[:HAS_ENROLLED]->(:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample {external_id:line.START_ID})
+            MATCH (c:Clinical_variable{id:line.END_ID})
+            MERGE (b)-[r:HAS_QUANTIFIED_CLINICAL{value:toFloat(line.value)}]->(c)
+            RETURN COUNT(r) AS c;
+
+    "wes":
+        'name': 'import Whole-exome sequencing dataset'
+        'description': 'Loads into the database all the sequenced data obtained in a Project. Creates Somatic_mutation nodes and links them to Known_variant and Clinically_relevant nodes'
+        'query': >
+            CREATE CONSTRAINT ON (s:Somatic_mutation) ASSERT s.id IS UNIQUE;
+            USING PERIODIC COMMIT 10000
+            LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_somatic_mutation.tsv" AS line
+            FIELDTERMINATOR '\t'
+            MERGE (s:Somatic_mutation{id:line.ID})
+            ON CREATE SET s.chromosome=line.chromosome,s.reference=line.reference,s.alternative=line.alternative,s.position=line.position,s.effect=line.effect,s.impact=line.impact,s.gene=line.gene,s.feature_type=line.feature_type,s.biotype=line.biotype,s.alternative_names=line.alternative_names
+            RETURN COUNT(s) AS c;
+            USING PERIODIC COMMIT 10000
+            LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_somatic_mutation_known_variant.tsv" AS line
+            FIELDTERMINATOR '\t'
+            MATCH (s:Somatic_mutation {id:line.START_ID})
+            MATCH (k:Known_variant {id:line.END_ID})
+            MERGE (s)-[r:IS_A_KNOWN_VARIANT]->(k)
+            RETURN COUNT(r) AS c;
+            USING PERIODIC COMMIT 10000
+            LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_somatic_mutation_gene.tsv" AS line
+            FIELDTERMINATOR '\t'
+            MATCH (s:Somatic_mutation {id:line.START_ID})
+            MATCH (g:Gene {id:line.END_ID})
+            MERGE (s)-[r:VARIANT_FOUND_IN_GENE]->(g)
+            RETURN COUNT(r) AS c;
+            USING PERIODIC COMMIT 10000
+            LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_somatic_mutation_chromosome.tsv" AS line
+            FIELDTERMINATOR '\t'
+            MATCH (s:Somatic_mutation {id:line.START_ID})
+            MATCH (c:Chromosome {id:line.END_ID})
+            MERGE (s)-[r:VARIANT_FOUND_IN_CHROMOSOME]->(c)
+            RETURN COUNT(r) AS c;
+            USING PERIODIC COMMIT 10000
+            LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_somatic_mutation_sample.tsv" AS line
+            FIELDTERMINATOR '\t'
+            MATCH (a:Analytical_sample {id:line.START_ID})
+            MATCH (s:Somatic_mutation {id:line.END_ID})
+            MERGE (a)-[r:CONTAINS_MUTATION]->(s)
+            RETURN COUNT(r) AS c;
+
+CREATE_USER_NODE:
+    'name': ''
+    'description': ''
+    'query': >
+        CREATE CONSTRAINT ON (u:User) ASSERT u.id IS UNIQUE;
+        CREATE CONSTRAINT ON (u:User) ASSERT u.name IS UNIQUE;
+        CREATE CONSTRAINT ON (u:User) ASSERT u.username IS UNIQUE;
+        CREATE CONSTRAINT ON (u:User) ASSERT u.email IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/users.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (u:User {id:line.ID})
+        ON CREATE SET u.acronym=line.acronym,u.name=line.name,u.username=line.username,u.email=line.email,u.secondary_email=line.secondary_email,u.phone_number=line.phone_number,u.affiliation=line.affiliation,u.expiration_date=line.expiration_date,u.rolename=line.rolename,u.image=line.image
+        RETURN COUNT(u) AS c;
+
+CREATE_PROJECT: &create_project
+    'name': 'create project'
+    'description': 'Creates Project nodes'
+    'query': >
+        CREATE CONSTRAINT ON (p:Project) ASSERT p.id IS UNIQUE;
+        CREATE CONSTRAINT ON (p:Project) ASSERT p.name IS UNIQUE;
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_info.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (p:Project {id:line.external_id})
+        ON CREATE SET p.internal_id=line.internal_id,p.name=line.name,p.acronym=line.acronym,p.description=line.description, p.type=line.datatypes,p.timepoint=line.timepoints,p.disease=line.disease,p.tissue=line.tissue,p.intervention=line.intervention,p.responsible=line.responsible,p.participant=line.participant,p.start_date=line.start_date,p.end_date=line.end_date,p.status=line.status
+        RETURN COUNT(p) AS c;
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_studies_disease.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p:Project {id:line.START_ID})
+        MATCH (d:Disease {name:line.END_ID})
+        MERGE (p)-[r:STUDIES_DISEASE]->(d)
+        RETURN COUNT(r) AS c;
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_studies_intervention.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p:Project {id:line.START_ID})
+        MATCH (c:Clinical_variable {id:line.END_ID})
+        MERGE (p)-[r:STUDIES_INTERVENTION]->(c)
+        RETURN COUNT(r) AS c;
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_follows_up_project.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p1:Project {id:line.START_ID})
+        MATCH (p2:Project {id:line.END_ID})
+        MERGE (p1)-[r:FOLLOWS_UP_PROJECT]->(p2)
+        RETURN COUNT(r) AS c;
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_studies_tissue.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p:Project {id:line.START_ID})
+        MATCH (t:Tissue {name:line.END_ID})
+        MERGE (p)-[r:STUDIES_TISSUE]->(t)
+        RETURN COUNT(r) AS c;
+
+CREATE_RESPONSIBLE_USER: &create_responsible
+    'name': 'create responsible'
+    'description': 'Creates relationships between responsible User and Project nodes'
+    'query': >
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_responsibles.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (u:User {name:line.START_ID})
+        MATCH (p:Project {id:line.END_ID})
+        MERGE (u)-[r:IS_RESPONSIBLE]->(p)
+        RETURN COUNT(r) AS c;
+
+CREATE_PARTICIPANT_USER: &create_participant
+    'name': 'create participant'
+    'description': 'Creates relationships between participant User and Project nodes'
+    'query': >
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_participants.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (u:User {name:line.START_ID})
+        MATCH (p:Project {id:line.END_ID})
+        MERGE (u)-[r:PARTICIPATES_IN]->(p)
+        RETURN COUNT(r) AS c;
+
+CREATE_SUBJECTS: &create_subject
+    'name': 'create subjects'
+    'description': 'Creates Subject nodes and links them to Project nodes'
+    'query': >
+        CREATE CONSTRAINT ON (s:Subject) ASSERT s.id IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_subjects.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (s:Subject {id:line.ID})
+        ON CREATE SET s.external_id=line.external_id
+        RETURN COUNT(s) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_project.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (p:Project {id:line.START_ID})
+        MATCH (s:Subject {id:line.END_ID})
+        MERGE (p)-[r:HAS_ENROLLED]->(s)
+        RETURN COUNT(r) AS c;
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_disease.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (:Project {id:'PROJECTID'})-[:HAS_ENROLLED]->(s:Subject{external_id:line.START_ID})
+        MATCH (d:Disease {id:line.END_ID})
+        MERGE (s)-[r:HAS_DISEASE]->(d)
+        RETURN COUNT(r) AS c;
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_experimental_factor.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (:Project {id:'PROJECTID'})-[:HAS_ENROLLED]->(s:Subject{external_id:line.START_ID})
+        MATCH (e:Experimental_factor {id:line.END_ID})
+        MERGE (s)-[r:IS_A]->(e)
+        RETURN COUNT(r) AS c;
+
+CREATE_BIOSAMPLES: &create_bio
+    'name': 'create biological samples'
+    'description': 'Creates Biological_sample nodes and links them to the Subject nodes of origin. Biological samples are tissue or body fluid samples obtained from studied subjects.'
+    'query': >
+        CREATE CONSTRAINT ON (s:Biological_sample) ASSERT s.id IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_biological_samples.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (s:Biological_sample {id:line.ID})
+        ON CREATE SET s.external_id=line.external_id
+        RETURN COUNT(s) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_subject_biosample.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (b:Biological_sample {id:line.START_ID})
+        MATCH (s:Subject {id:line.END_ID})
+        MERGE (b)-[r:BELONGS_TO_SUBJECT]->(s)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_biosamples_info.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (:Project {id:'PROJECTID'})-[:HAS_ENROLLED]-(:Subject)-[:BELONGS_TO_SUBJECT]-(s:Biological_sample {external_id:toString(line.ID)})
+        SET s.quantity=line.quantity,s.quantity_units=line.quantity_units,s.source=line.source,s.collection_date=line.collection_date,s.conservation_conditions=line.conservation_conditions,s.storage=line.storage,s.status=line.status
+        RETURN COUNT(s) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_biosample_tissue.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (:Project {id:'PROJECTID'})-[:HAS_ENROLLED]->(:Subject)<-[:BELONGS_TO_SUBJECT]-(b:Biological_sample {external_id:line.START_ID})
+        MATCH (t:Tissue {id:line.END_ID})
+        MERGE (b)-[r:FROM_TISSUE]->(t)
+        RETURN COUNT(r) AS c;
+
+CREATE_ANALYTICALSAMPLES: &create_ana
+    'name': 'create analytical samples'
+    'description': 'Creates Analytical_sample nodes and links them to the Biological_sample nodes of origin. Analytical samples are material from biological samples used in experimental protocols, i.e. MS/MS'
+    'query': >
+        CREATE INDEX ON :Analytical_sample(group);
+        CREATE CONSTRAINT ON (a:Analytical_sample) ASSERT a.id IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_analytical_samples.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (s:Analytical_sample {id:line.ID})
+        ON CREATE SET s.external_id=line.external_id
+        RETURN COUNT(s) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_biosample_analytical.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (s1:Biological_sample {id:line.START_ID})
+        MATCH (s2:Analytical_sample {id:line.END_ID})
+        MERGE (s1)-[r:SPLITTED_INTO]->(s2)
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_biosample_analytical_attributes.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (:Project {id:'PROJECTID'})-[:HAS_ENROLLED]-(:Subject)-[:BELONGS_TO_SUBJECT]-(:Biological_sample {external_id:line.START_ID})-[r:SPLITTED_INTO]-(:Analytical_sample {external_id:line.END_ID})
+        SET r.quantity=line.quantity,r.quantity_units=line.quantity_units
+        RETURN COUNT(r) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_analytical_samples_info.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (:Project {id:'PROJECTID'})-[:HAS_ENROLLED]-(:Subject)-[:BELONGS_TO_SUBJECT]-(:Biological_sample)-[:SPLITTED_INTO]-(s:Analytical_sample {external_id:toString(line.ID)})
+        SET s.quantity=line.quantity,s.quantity_units=line.quantity_units,s.source=line.source,s.collection_date=line.collection_date,s.conservation_conditions=line.conservation_conditions,s.storage=line.storage,s.status=line.status,s.group=line.group,s.secondary_group=line.secondary_group,s.batch=line.batch
+        RETURN COUNT(s) AS c;
+
+CREATE_TIMEPOINT: &create_timepoint
+    'name': 'create timepoint'
+    'description': 'Creates Timepoint nodes and links them to the Biological_sample nodes of origin. Timepoints are defined by the users and a unit must be given (e.g. days, hours).'
+    'query': >
+        CREATE CONSTRAINT ON (t:Timepoint) ASSERT t.id IS UNIQUE;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_timepoint.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MERGE (t:Timepoint {id:line.ID})
+        ON CREATE SET t.units=line.units
+        RETURN COUNT(t) AS c;
+        USING PERIODIC COMMIT 10000
+        LOAD CSV WITH HEADERS FROM "file:///IMPORTDIR/PROJECTID_biological_sample_at_timepoint.tsv" AS line
+        FIELDTERMINATOR '\t'
+        MATCH (:Project {id:'PROJECTID'})-[:HAS_ENROLLED]-(:Subject)-[:BELONGS_TO_SUBJECT]-(b:Biological_sample {external_id:line.START_ID})
+        MATCH (t:Timepoint {id:line.END_ID})
+        MERGE (b)-[r:SAMPLED_AT_TIMEPOINT{units:line.timepoint_units,intervention:line.intervention}]->(t)
+        RETURN COUNT(r) AS c;
+
+IMPORT_PROJECT:
+    - *create_project
+    - *create_responsible
+    - *create_participant
+    - *create_subject
+    - *create_bio
+    - *create_ana
+    - *create_timepoint

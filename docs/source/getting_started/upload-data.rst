@@ -25,11 +25,13 @@ Experimental Design
 
     Experimental Design file example
 
-Open the Experimental Design excel file, automatically downloaded when the project was created, and fill in the columns for `subject external_id`, `biological_sample external_id`, `analytical_sample external_id`, `grouping1` and `grouping2`.
+Open the Experimental Design excel file, automatically downloaded when the project was created, and fill in the columns for `subject external_id`, `biological_sample external_id`, `analytical_sample external_id`, `grouping1`, `grouping2`* and `batch`*.
 
 - **grouping1**: Annotated grouping of each sample.
 
-- **grouping2**: If there are more than one grouping (two independent variables) use this column to add a second level.
+- **grouping2**: If there are more than one grouping (two independent variables) use this column to add a second level (*optional).
+
+- **batch**: You can add information about the batch were each sample was run in case you want to correct for possible batch effects (*optional)
 
 
 The identifiers provided in this file **must** correspond to the identifiers used in the *Clinical Data* file, and to the column names in the *Proteomics* files (see below).
@@ -67,11 +69,8 @@ Be aware that the following columns are mandatory to fill in:
 
 - **analytical_sample quantity_units**: Unit.
 
-Additional clinical information about your study subjects can be added in the subsequent columns (i.e. columns after "grouping2").
 Please use SNOMED terms as headers for every new column you add. This will be used to gather existing information about the type of data you have.
 To find an adequate SNOMED term for your clinical variables, please visit the `SNOMED browser <https://browser.ihtsdotools.org/?perspective=full&conceptId1=734000001&edition=MAIN/2019-07-31&release=&languages=en>`__.
-
-.. note:: Be aware, the two-independent-variable statistics is not yet implemented in the default analysis pipeline.
 
 .. note:: To add a column with "Age" search for "age" in the SNOMED browser. This gives multiple matches, with the first one being: "Age (qualifier value), SCTID:397669002". Please enter this information as your clinical variable column header with the SCTID in parenthesis: Age (qualifier value) (397669002)
 
@@ -106,6 +105,9 @@ For example:
 When running import and loading (graph database update) for ontologies, these new terms will be added to the graph (ask your admin for new updates).
 
 .. note:: This format is valid also for other ontologies when missing terms.
+
+.. note:: When you consider that an Onotology is missing relevant terms or relationships, we encourage you to contact the people behind the Ontology for them to include the missing information. This will help maintain the Ontology active and up to date. Ontologies and terminologies are generally open source projects and the participation of the community is important. For instance, `here <http://geneontology.org/docs/contributing-to-go-terms/>`__ GeneOntology describes how you can contribute to the GO terminology.
+
 
 **Additional columns:**
 

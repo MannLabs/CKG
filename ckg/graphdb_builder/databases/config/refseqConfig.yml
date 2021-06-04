@@ -1,0 +1,29 @@
+##### RefSeq #########
+refseq_url: 'https://ftp.ncbi.nlm.nih.gov/genomes/refseq/vertebrate_mammalian/Homo_sapiens/latest_assembly_versions/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_feature_table.txt.gz'
+refseq_ftp_dir: 'ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/vertebrate_mammalian/Homo_sapiens/latest_assembly_versions/'
+headerEntities: 
+    'Transcript':
+        - 'ID'
+        - ':LABEL'
+        - 'name'
+        - 'class'
+        - 'assembly'
+        - 'taxid'
+    'Chromosome':
+        - 'ID'
+        - ':LABEL'
+        - 'name'
+        - 'taxid'
+    'LOCATED_IN': 
+        - 'START_ID'
+        - 'END_ID'
+        - 'TYPE'
+        - 'start'
+        - 'end'
+        - 'strand'
+        - 'source'
+    'TRANSCRIBED_INTO': 
+        - 'START_ID'
+        - 'END_ID'
+        - 'TYPE'
+        - 'source'

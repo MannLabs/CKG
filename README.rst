@@ -1,7 +1,9 @@
-.. image:: ./src/report_manager/assets/banner.jpg
+.. image:: ./ckg/report_manager/assets/banner.jpg
+    :alt: banner
     :align: center
 
 .. image:: /_static/images/banner.jpg
+    :alt: banner
     :align: center
 
 
@@ -23,10 +25,12 @@ A Python project that allows you to analyse proteomics and clinical data, and in
 Abstract
 ------------
 
-.. image:: ./src/report_manager/assets/abstract.png
+.. image:: ./ckg/report_manager/assets/abstract.png
+    :alt: abstract
     :align: center
 
 .. image:: /_static/images/abstract_figure.png
+    :alt: abstract
     :align: center
 
 The promise of precision medicine is to deliver personalized treatment based on the unique physiology of each patient. This concept was fueled by the genomic revolution, but it is now evident that integrating other types of omics data, like proteomics, into the clinical decision-making process will be essential to accomplish precision medicine goals. However, quantity and diversity of biomedical data, and the spread of clinically relevant knowledge across myriad biomedical databases and publications makes this exceptionally difficult. To address this, we developed the Clinical Knowledge Graph (CKG), an open source platform currently comprised of more than 16 million nodes and 220 million relationships to represent relevant experimental data, public databases and the literature. The CKG also incorporates the latest statistical and machine learning algorithms, drastically accelerating analysis and interpretation of typical proteomics workflows. We use several biomarker studies to illustrate how the CKG may support, enrich and accelerate clinical decision-making.
@@ -37,7 +41,7 @@ Cloning and installing
 
 .. 
 
-	Installation requires >= 80 GB of disk space. See details `here <docs/source/system_requirements.rst>`_. 
+Installation requires >= 80 GB of disk space. See details `here <docs/source/system_requirements.rst>`_. 
 
 The setting up of the CKG includes several steps and might take a few hours (if you are building the database from scratch). However, we have prepared documentation and manuals that will guide through every step.
 To get a copy of the GitHub repository on your local machine, please open a terminal windown and run:

@@ -1,5 +1,7 @@
+.. _CKG Docker Container:
 
-Getting started with Docker
+
+CKG Docker Container
 ============================================
 
 In this section we describe how to set up the Clinical Knowledge Graph from a Docker container.
@@ -8,12 +10,16 @@ This container will install all the requirements needed, download source databas
 To run the Docker, simply:
 
 1. Clone CKG’s repository: https://github.com/MannLabs/CKG
+
 2. Get licensed databases: https://ckg.readthedocs.io/en/latest/intro/getting-started-with-build.html#build-neo4j-graph-database
+
 3. Download the database dump and data directory from Mendeley:
             https://data.mendeley.com/public-files/datasets/mrcf7f4tc2/files/
 	    
 4. Extract compressed data file into the CKG folder and copy licensed databases in the right directories: 
+
 - data/databases/{DrugBank|PhosphoSitePlus}
+
 - data/ontologies/SNOMED-CT
 
 5. Move the dump file to CKG/resources/neo4j_db
@@ -41,11 +47,15 @@ Once the docker is running:
 1. Access JupyterHub: http://localhost:8090/:
 
 - user:ckguser
+
 - password:ckguser
+
 2. Access Neo4j browser (connection may take several minutes): http://localhost:7474/
+
 3. Login using: 
 
 - user: neo4j
+
 - password: NeO4J
 
 When the database is running:
@@ -54,9 +64,13 @@ When the database is running:
 2. Login using the test user:
 
 - user: test_user
+
 - password: test_user
+  
 3. In the Home page navigate to the Admin page
+
 4. Run Minimal update (these can take a while but will run in the background. Follow progress in the docker dashboard logs)
+
 5. Explore options in CKG
 
 
