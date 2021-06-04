@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<!-- TEMPLATE FROM: https://www.w3schools.com/w3css/tryit.asp?filename=tryw3css_templates_architect&stacked=h-->
+<html>
+  <title>Clinical Knowledge Graph</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="assets/custom.css">
+  <link rel="icon" type="image/png" href="/assets/favicon.png"/>
+  <!-- Navbar (sit on top) -->
+  <div class="w3-top">
+    <div class="w3-bar w3-white w3-wide w3-padding w3-card">
+      <!-- Float links to the right. Hide them on small screens -->
+      <div class="w3-left w3-hide-small"> 
+        <img class="w3-image" src="/assets/logo_small.jpg" alt="logo" width="100">
+      </div>
+      <div class="w3-right w3-hide-small">
+        <div class="dropdown">
+            <button class="dropbtn"><img src="/assets/menu.png" alt="Menu" width="38">
+              <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="dropdown-content">
+              <a href="/">Home</a>
+              <a href="/apps/imports">Imports</a>
+              <a href="/apps/projectCreationApp">Project Creation</a>
+              <a href="/apps/dataUploadApp">Data Upload</a>
+              <a href="/apps/admin">Admin</a>
+            </div>
+          </div>
+        <a href="/" class="w3-bar-item w3-button">Home</a>
+        <!--Replace href with correct link when documentation is online -->
+        <a href="https://ckg.readthedocs.io/" class="w3-bar-item w3-button">Docs</a>
+        <a href="#about" class="w3-bar-item w3-button">About</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="w3-display-container w3-content w3-wide" style="max-width:800px;" id="project">
+    <img class="w3-image" src="/assets/banner.jpg" alt="technology" height="100" vspace="150">
+  </header>
+
+  <body>
+  
+    <!-- Page content -->
+    <div class="w3-content w3-padding" style="max-width:1564px">
+        <!-- Project Section -->
+      <div class="w3-container w3-padding-20" id="project">
+        {%metas%}
+        <title>{%title%}</title>
+        {%favicon%}
+        {%css%}
+        <div>
+            {%app_entry%}
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <!-- About Section -->
+  <div class="w3-container w3-padding-32" id="about">
+    <h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">About</h3>
+    <p>Several omics data types are already used as markers for diagnosis, prognosis and targeted therapy. Besides, advances in technology have paved the way for omics to move into the clinic by generating increasingly larger amounts of high-quality quantitative and qualitative data. Additionally, knowledge around these data has been collected in diverse public resources, which, to some extent, facilitated the understanding of these data. However, there are still several challenges that hinder the translation of high-throughput omics data into identifiable, interpretable and actionable clinical markers. One of the main challenges is the interpretation of the multiple “hits” identified in these experiments. Furthermore, a single omics dimension is often not sufficient to capture the full complexity of disease, which would be aided by integration of several omics types. To overcome these challenges, we propose a system capable of integrating multi-omics data and information spread across a myriad of biomedical databases into a Clinical Knowledge Graph (CKG). This graph focuses on the data points or entities not as silos but as related components of a graph. To illustrate, in our system an identified protein in a proteomics experiment encompasses also all its related components (e.g. other proteins, diseases, drugs, etc.) and their relationships. Thus, our CKG facilitates the interpretation of data and the inference of meaning by providing relevant biological context. Further, all data are collected and harmonized in a single platform assisting data analysis and providing an excellent ecosystem for machine learning. Here, we describe the current state of the system and depict its use by applying it to use cases such as identification of global correlation patterns in health and disease, and treatment decision-making using clinical proteomics data.
+    </p>
+  </div>
+
+  <div class="w3-row-padding w3-grayscale">
+    <div class="w3-col l3 m6 w3-margin-bottom">
+      <img src="/assets/alberto.png" alt="Alberto" style="width:10%">
+      <h3>Alberto Santos</h3>
+      <p class="w3-opacity">Postdoc</p>
+      <p><button class="w3-button w3-light-grey w3-block">Contact</button></p>
+    </div>
+    <div class="w3-col l3 m6 w3-margin-bottom">
+      <img src="/assets/anarita.png" alt="AnaRita" style="width:10%">
+      <h3>Ana Rita Colaço</h3>
+      <p class="w3-opacity">Postdoc</p>
+      <p><button class="w3-button w3-light-grey w3-block">Contact</button></p>
+    </div>
+    <div class="w3-col l3 m6 w3-margin-bottom">
+      <img src="/assets/annelaura.png" alt="Annelaura" style="width:10%">
+      <h3>Annelaura B. Nielsen</h3>
+      <p class="w3-opacity">Postdoc</p>
+      <p><button class="w3-button w3-light-grey w3-block">Contact</button></p>
+    </div>
+    <div class="w3-col l3 m6 w3-margin-bottom">
+      <img src="/assets/team.png" alt="Group" style="width:10%">
+      <h3>Clinical Proteomics</h3>
+      <p class="w3-opacity">Department at NNF Center for Protein Research</p>
+      <p><button class="w3-button w3-light-grey w3-block">Contact</button></p>
+    </div>
+  </div>
+
+  <div class="w3-container w3-padding-32" id="contact">
+    <div class="container">
+              <div class="row">
+                  <div class="col-lg-3 col-md-6 text-center">
+                      <div class="service-box">
+                          <i class="fa fa-4x fa-database text-primary sr-icons"></i>
+                          <h3>Data from</h3>
+                    <p class="text-muted"><a><img src="/assets/databases.jpg" target="_blank" alt="some_text" style="width:205px;"></img></a></p></br>
+            </div>
+                  </div>
+                  <div class="col-lg-3 col-md-6 text-center">
+                      <div class="service-box">
+                          <i class="fa fa-4x fa-laptop text-primary sr-icons"></i>
+                          <h3>Delveloped in</h3>
+                          <p class="text-muted"><a href="http://www.cpr.ku.dk/"><img src="/assets/cpr.png" target="_blank" alt="some_text" style="width:105px;"></img></a></p>
+                          <p class="text-muted"></p>
+                      </div>
+                  </div>
+
+      </div>
+
+
+  <!-- End page content -->
+  </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="w3-center w3-black w3-padding-16">
+              {%config%}
+              {%scripts%}
+              {%renderer%}
+              <p>
+                  <b>Disclaimer</b> This resource is intended for research purposes and it must not substitute a doctor's medical judgement or healthcare professional advice.
+              </p>
+  </footer>
+
+  <script>
+      var coll = document.getElementsByClassName("collapsible");
+      var i;
+      
+      for (i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function() {
+          this.classList.toggle("active");
+          var content = this.nextElementSibling;
+          if (content.style.display === "block") {
+            content.style.display = "none";
+          } else {
+            content.style.display = "block";
+          }
+        });
+      }
+  </script>
+
+
+</html>

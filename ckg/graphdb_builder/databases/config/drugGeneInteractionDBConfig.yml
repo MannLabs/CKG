@@ -1,0 +1,13 @@
+###### The Drug Gene Interaction Database (DGIdb) #########
+DGIdb_url: 'https://www.dgidb.org/data/monthly_tsvs/2020-Nov/interactions.tsv'
+header: 
+    - 'START_ID'
+    - 'END_ID'
+    - 'TYPE'
+    - 'evidence'
+    - 'response'
+    - 'disease'
+    - 'type'
+    - 'source'
+outputfileName: 'dgidb_targets.csv'
+

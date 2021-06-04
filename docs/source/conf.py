@@ -14,7 +14,12 @@ import os
 import sys
 import sphinx_rtd_theme
 
-sys.path.insert(0, os.path.abspath( '../..'))
+sys.path.insert(0, os.path.abspath( './../..'))
+sys.path.insert(0, os.path.abspath( './../../ckg'))
+sys.path.insert(0, os.path.abspath( './../../ckg/report_manager'))
+sys.path.insert(0, os.path.abspath( './../../ckg/graphdb_builder'))
+sys.path.insert(0, os.path.abspath( './../../ckg/graphdb_connector'))
+
 
 # -- Project information -----------------------------------------------------
 
@@ -23,10 +28,10 @@ copyright = '2019, Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen'
 author = 'Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen'
 
 # The short X.Y version
-version = '1.0b1 BETA'
+version = '1.0'
 
 # The full version, including alpha/beta/rc tags
-release = '1.0b1 BETA'
+release = '1.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -41,13 +46,23 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.autosummary',
     'sphinx.ext.todo',
+    'sphinx.ext.mathjax',
     'sphinx.ext.coverage',
     'sphinx.ext.imgmath',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
     'recommonmark',
-    'nbsphinx'
+    'nbsphinx',
+    'rst2pdf.pdfbuilder'
 ]
+
+autodoc_mock_imports = ['pandas', 'numpy', 'scipy', 'matplotlib', 'h5py', 'rpy2',
+                        'sklearn', 'lifelines', 'autograd', 'umap', 'numba', 'pingouin',
+                        'seaborn', 'fancyimpute', 'cvxpy', 'kmapper', 'statsmodels']
+
+# If true, the current module name will be prepended to all description
+# unit titles (such as .. function::).
+add_module_names = False
 
 autosectionlabel_prefix_document = True
 
@@ -55,7 +70,9 @@ autosectionlabel_prefix_document = True
 ## Default: alphabetically ('alphabetical')
 autodoc_member_order = 'bysource'
 ## Default flags used by autodoc directives
-autodoc_default_flags = ['members', 'show-inheritance']
+autodoc_default_options = {'members': True,
+                            'show-inheritance': True,
+                            'undoc-members': True}
 ## Generate autodoc stubs with summaries from code
 autosummary_generate = True
 
@@ -71,7 +88,7 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '**.ipynb_checkpoints']
 
 
 
@@ -148,9 +165,13 @@ latex_documents = [
    'Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen', 'manual'),
 ]
 
+
+pdf_documents = [(master_doc, 'ClinicalKnowledgeGraphdocs.pdf', 'Clinical Knowledge Graph Documentation',
+   'Alberto Santos, Ana Rita Colaço, Annelaura B. Nielsen', 'manual')]
+
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-#latex_logo = None
+#latex_logo = 'banner.jpg'
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
@@ -197,7 +218,7 @@ texinfo_documents = [
 # -- Options for intersphinx extension ---------------------------------------
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/3.6/': None}
+intersphinx_mapping = {'https://docs.python.org/3.7/': None}
 
 
 # A string of reStructuredText that will be included at the end of every source

@@ -1,0 +1,134 @@
+###### Drug bank ########
+'DrugBank_url': 'https://www.drugbank.ca/releases/5-1-1/downloads/drugbank_all_full_database.xml.zip' ## Manual download need to login
+'DrugBank_vocabulary_url': 'https://www.drugbank.ca/releases/5-1-1/downloads/drugbank_all_drugbank_vocabulary.csv.zip'
+'DrugBank_dictionary_file': 'mapping.tsv'
+'relationships_headers': 
+    'drugbank_annotated_in_pathway':
+        - 'START_ID'
+        - 'END_ID'
+        - 'TYPE'
+        - 'source'
+    'drugbank_targets_protein': 
+        - 'START_ID'
+        - 'END_ID'
+        - 'TYPE'
+        - 'source'
+    'drugbank_interacts_with_drug':
+        - 'START_ID'
+        - 'END_ID'
+        - 'interaction_type'
+        - 'TYPE'
+        - 'source'
+
+'DrugBank_fields': 
+    - 'drugbank-id'
+    - 'name'
+    - 'description'
+    - 'group'
+    - 'indication'
+    - 'price'
+    - 'pharmacodynamics'
+    - 'mechanism-of-action'
+    - 'toxicity'
+    - 'metabolism'
+    - 'absorption'
+    - 'half-life'
+    - 'route-of-elimination'
+
+'DrugBank_parentFields': 
+    - 'groups'
+    - 'classification'
+    - 'prices'
+    - 'pathways'
+    - 'articles'
+    - 'drug-interactions'
+    - 'experimental-properties'
+    - 'external-identifiers'
+    - 'targets'
+    - 'enzymes'
+    - 'snp-effects'
+    - 'snp-adverse-drug-reactions'
+
+'DrugBank_structures': 
+    'general-references': 
+        - 'pubmed-id'
+    'drug-interactions':
+        - 'drugbank-id'
+        - 'description'
+    'experimental-properties':
+        - 'kind'
+        - 'value'
+    'external-identifiers':
+        - 'identifier'
+    'pathways':
+        - 'smpdb-id'
+    'targets':
+        - 'resource'
+        - 'identifier'
+    'prices':
+        - 'cost'
+    'snp-effects':
+        - 'gene-symbol'
+        - 'rs-id'
+        - 'description'
+    'snp-adverse-drug-reactions':
+        - 'gene-symbol'
+        - 'rs-id'
+        - 'desciption'
+
+'DrugBank_attributes': 
+    - 'name'
+    - 'description'
+    - 'indication'
+    - 'mechanism-of-action'
+    - 'metabolism'
+    - 'pharmacodynamics'
+    - 'prices'
+    - 'route-of-elimination'
+    - 'toxicity'
+    - 'synonyms'
+    - 'absorption'
+    - 'kingdom'
+    - 'superclass'
+    - 'class'
+    - 'subclass'
+    - 'half-life'
+    - 'groups'
+    - 'experimental-properties'# NEEDS TO BE THE LAST ATTRIBUTE
+
+'DrugBank_exp_prop': 
+    - 'Melting Point'
+    - 'Hydrophobicity'
+    - 'Isoelectric Point'
+    - 'Molecular Weight'
+    - 'Molecular Formula'
+    - 'Water Solubility'
+    - 'Monoisotopic Weight'
+    - 'Polar Surface Area (PSA)'
+    - 'Refractivity'
+    - 'Polarizability'
+    - 'Rotatable Bond Count'
+    - 'H Bond Acceptor Count'
+    - 'H Bond Donor Count'
+    - 'pKa (strongest acidic)'
+    - 'pKa (strongest basic)' 
+    - 'Physiological Charge'
+    - 'Number of Rings'
+    - 'Bioavailability'
+    - 'Rule of Five'
+    - 'Ghose Filter'
+    - 'MDDR-Like Rule'
+    - 'caco2 Permeability'
+    - 'pKa'
+    - 'Boiling Point'
+
+'DrugBank_associations': 
+    'pathways': 
+        - 'ANNOTATED_IN_PATHWAY'
+        - 'drugbank_annotated_in_pathway'
+    'targets': 
+        - 'ASSOCIATED_WITH'
+        - 'drugbank_targets_protein'
+    'drug-interactions': 
+        - 'INTERACTS_WITH'
+        - 'drugbank_interacts_with_drug'

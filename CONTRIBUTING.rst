@@ -3,7 +3,7 @@ Contributing
 
 Contributions are welcome, and they are greatly appreciated! Every little bit helps, and credit will always be given.
 
-* Types of Contributions `Types of Contributions`_ 
+* Types of Contributions `Types of Contributions`_
 * Contributor Setup `Setting Up the Code for Local Development`_
 * Contributor Guidelines `Contributor Guidelines`_
 * Core Committer Guide `Core Committer Guide`_
@@ -49,10 +49,10 @@ The Clinical Knowledge Graph could always use more documentation, whether as par
 
 If you want to review your changes on the documentation locally, you can do:
 
-.. prompt:: bash $
-    
-    cd docs/
-    make servedocs
+.. code-block:: bash
+
+    $ cd docs/
+    $ make servedocs
 
 
 This will compile the documentation, open it in your browser and start watching the files for changes, recompiling as you save.
@@ -76,42 +76,29 @@ Here's how to set up ``CKG`` for local development.
 1. Fork the ``CKG`` repo on GitHub.
 2. Clone your fork locally:
 
-.. prompt:: bash $
+.. code-block:: bash
 
-    git clone git@github.com:MannLabs/CKG.git
+    $ git clone git@github.com:MannLabs/CKG.git
 
 
-3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development:
-
-.. prompt:: bash $
-
-    mkvirtualenv CKG
-    cd CKG/
-
-FINISH THIS PART!!!!!!
-
+3. Install your local copy according to the "Getting Started" tutorials.
 
 4. Create a branch for local development:
 
-.. prompt:: bash $
+.. code-block:: bash
 
-    git checkout -b name-of-your-bugfix-or-feature
+    $ git checkout -b name-of-your-bugfix-or-feature
 
 
 Now you can make your changes locally.
 
-5. When you're done making changes, check that your changes pass ......
+5. When you're done making changes, commit your changes and push your branch to GitHub:
 
+.. code-block:: bash
 
-
-
-6. Commit your changes and push your branch to GitHub:
-
-.. prompt:: bash $
-
-    git add .
-    git commit -m "Your detailed description of your changes."
-    git push origin name-of-your-bugfix-or-feature
+    $ git add .
+    $ git commit -m "Your detailed description of your changes."
+    $ git push origin name-of-your-bugfix-or-feature
 
 
 7. Submit a pull request through the GitHub website.
@@ -215,7 +202,7 @@ Ensure that each pull request meets all requirements in `checklist <https://gist
 Process: Issues
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If an issue is a bug that needs an urgent fix, mark it for the next patch release.  
+If an issue is a bug that needs an urgent fix, mark it for the next patch release.
 Then either fix it or mark as please-help.
 
 For other issues: encourage friendly discussion, moderate debate, offer your thoughts.
@@ -261,7 +248,7 @@ note: Adding features doesn't give authors credit.
 Process: Your own code changes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-All code changes, regardless of who does them, need to be reviewed and merged by someone else.  
+All code changes, regardless of who does them, need to be reviewed and merged by someone else.
 This rule applies to all the core committers.
 
 Exceptions:
@@ -278,4 +265,3 @@ Responsibilities
 * Create issues for any major changes and enhancements that you wish to make. Discuss things transparently and get community feedback.
 * Keep feature versions as small as possible, preferably one new feature per version.
 * Be welcoming to newcomers and encourage diverse new contributors from all backgrounds. Look at `Code of Conduct :ref:code-of-conduct`.
-

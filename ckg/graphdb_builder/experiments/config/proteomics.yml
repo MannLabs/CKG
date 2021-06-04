@@ -1,0 +1,358 @@
+directory : '../../../../data/experiments/PROJECTID/'
+
+ox : &var_ox
+    'columns':
+        - 'Proteins'
+        - 'Positions within proteins'
+        - 'id'
+        - 'Amino acid'
+        - 'Sequence window'
+        - 'Score'
+        - 'Intensity .*AS\d+_?-?\d*'
+        - 'Reverse'
+        - Potential contaminant
+        - 'Score'
+        - 'Delta score'
+        - 'Score for localization'
+        - 'Localization prob'
+        - 'is_razor'
+    'generated_columns':
+        - 'is_razor'
+    'filters':
+        - 'Reverse'
+        - Potential contaminant
+    'numeric filter':
+        - Localization prob: 0.75
+    'attributes':
+        'col':
+            - 'Sequence window'
+            - 'Score'
+            - 'Delta score'
+            - 'Score for localization'
+            - 'Localization prob'
+            - 'is_razor'
+    'proteinCol': 'Proteins'
+    'indexCol': 'Proteins'
+    'groupCol': 'id'
+    'valueCol': 'Intensity'
+    'contaminant_tag': 'CON__'
+    'multipositions': 'Positions within proteins'
+    'positionCols':
+        - 'Positions within proteins'
+        - 'Amino acid'
+    'sequenceCol': 'Sequence window'
+    'geneCol': 'Gene names'
+    'log': 'log2'
+    'modId': 'MOD:00256'
+    'mod_acronym': 'ox'
+    'file': 'Oxidation \(M\)Sites.txt'
+
+gly : &var_gly
+    'columns':
+        - 'Proteins'
+        - 'Positions within proteins'
+        - 'id'
+        - 'Amino acid'
+        - 'Sequence window'
+        - 'Score'
+        - 'Intensity .*AS\d+_?-?\d*'
+        - 'Reverse'
+        - Potential contaminant
+        - 'Score'
+        - 'Delta score'
+        - 'Score for localization'
+        - 'Localization prob'
+        - 'is_razor'
+    'generated_columns':
+        - 'is_razor'
+    'filters':
+        - 'Reverse'
+        - Potential contaminant
+    'numeric filter':
+        - Localization prob: 0.75
+    'attributes':
+        'col':
+            - 'Sequence window'
+            - 'Score'
+            - 'Delta score'
+            - 'Score for localization'
+            - 'Localization prob'
+            - 'is_razor'
+    'proteinCol': 'Proteins'
+    'indexCol': 'Proteins'
+    'groupCol': 'id'
+    'valueCol': 'Intensity'
+    'contaminant_tag': 'CON__'
+    'multipositions': 'Positions within proteins'
+    'positionCols':
+        - 'Positions within proteins'
+        - 'Amino acid'
+    'sequenceCol': 'Sequence window'
+    'geneCol': 'Gene names'
+    'log': 'log2'
+    'modId': 'MOD:00767'
+    'mod_acronym': 'gly'
+    'file': 'GlycationSites.txt'
+
+p : &var_p
+    'columns':
+        - 'Proteins'
+        - 'Positions within proteins'
+        - 'Amino acid'
+        - 'id'
+        - 'Sequence window'
+        - 'Score'
+        - 'Intensity .*AS\d+_?-?\d*'
+        - 'Reverse'
+        - Potential contaminant
+        - 'Score'
+        - 'Delta score'
+        - 'Score for localization'
+        - 'Localization prob'
+        - 'is_razor'
+    'generated_columns':
+        - 'is_razor'
+    'filters':
+        - 'Reverse'
+        - Potential contaminant
+    'numeric filter':
+        - Localization prob: 0.75
+    'attributes':
+        'col':
+            - 'Sequence window'
+            - 'Score'
+            - 'Delta score'
+            - 'Score for localization'
+            - 'Localization prob'
+            - 'is_razor'
+    'proteinCol': 'Proteins'
+    'indexCol': 'Proteins'
+    'groupCol': 'id'
+    'valueCol': 'Intensity'
+    'contaminant_tag': 'CON__'
+    'multipositions': 'Positions within proteins'
+    'positionCols':
+        - 'Positions within proteins'
+        - 'Amino acid'
+    'sequenceCol': 'Sequence window'
+    'geneCol': 'Gene names'
+    'log': 'log2'
+    'modId': 'MOD:00696'
+    'mod_acronym': 'p'
+    'file': 'Phospho \(STY\)Sites.txt'
+
+maxquant :
+    'proteins':
+        'columns':
+            - 'Majority protein IDs'
+            - 'Q-value'
+            - 'Score'
+            - 'Razor + unique peptides'
+            - 'id'
+            - 'LFQ intensity .*AS\d+_?-?\d*'  #analytical_sample_timepoint
+            - 'Intensity .*AS\d+_?-?\d*'
+            - 'Reverse'
+            - Potential contaminant
+            - 'Only identified by site'
+            - 'is_razor'
+        'generated_columns':
+            - 'is_razor'
+        'filters':
+            - 'Reverse'
+            - 'Only identified by site'
+            - 'Potential contaminant'
+        'proteinCol': 'Majority protein IDs'
+        'contaminant_tag': 'CON__'
+        'valueCol': 'LFQ intensity'
+        'groupCol': 'id'
+        'indexCol': 'Majority protein IDs'
+        'attributes':
+            'cols':
+                - 'Q-value'
+                - 'Score'
+                - 'id'
+                - 'is_razor'
+            'regex':
+                - 'Intensity'
+        'log': 'log2'
+        'file': 'proteinGroups.txt'
+    'peptides':
+        'columns':
+            - 'Sequence'
+            - 'Amino acid before'
+            - 'First amino acid'
+            - 'Second amino acid'
+            - 'Second last amino acid'
+            - 'Last amino acid'
+            - 'Amino acid after'
+            - 'Experiment .*AS\d+_?-?\d*'
+            - 'Proteins'
+            - 'id'
+            - 'Start position'
+            - 'End position'
+            - 'Score'
+            - 'Protein group IDs'
+            - 'Intensity .*AS\d+_?-?\d*'
+            - 'Reverse'
+        'filters':
+            - 'Reverse'
+        'attributes':
+            'col':
+                - 'Score'
+                - 'Protein group IDs'
+        'proteinCol': 'Proteins'
+        'contaminant_tag': 'CON__'
+        'valueCol': 'Intensity'
+        'groupCol': 'id'
+        'indexCol': 'Sequence'
+        'positionCols':
+            - 'Start position'
+            - 'End position'
+        'type': 'tryptic peptide'
+        'log': 'log2'
+        'file': 'peptides.txt'
+    'Oxydation(M)': *var_ox
+    'Glycation': *var_gly
+    'Phosphorylation': *var_p
+
+dia-nn :
+    'proteins':
+        'columns':
+            - 'Protein.Ids'
+            - 'Protein.Group'
+            - is_razor
+            - id
+            - 'AS\d+_?-?\d*'
+        'generated_columns':
+            - id
+            - 'is_razor'
+        'filters': []
+        'proteinCol': 'Protein.Ids'
+        'valueCol': 'AS\d+_?-?\d*'
+        'groupCol': 'id'
+        'indexCol': 'Protein.Ids'
+        'attributes':
+            'cols':
+                - 'id'
+                - 'is_razor'
+        'log': 'log2'
+        'file': 'proteomics_dia-nn_proteingroups.\w+'
+
+fragpipe :
+    'proteins':
+        'columns':
+            - 'Protein ID'
+            - 'Protein Group'
+            - is_razor
+            - id
+            - 'AS\d+_?-?\d* Razor Intensity'
+        'generated_columns':
+            - id
+            - 'is_razor'
+        'filters': []
+        'proteinCol': 'Protein ID'
+        'valueCol': 'Razor Intensity'
+        'groupCol': 'id'
+        'indexCol': 'Protein ID'
+        'attributes':
+            'cols':
+                - 'id'
+                - 'is_razor'
+            'regex':
+                - 'Razor Intensity'
+        'log': 'log2'
+        'file': 'proteomics_fragpipe_proteingroups.\w+'
+
+spectronaut :
+    'proteins':
+        'columns':
+            - 'PG.ProteinAccessions'
+            - 'PG.Qvalue'
+            - 'is_razor'
+            - 'id'
+            - '(.)+\.PG\.Quantity'  #replicate_analytical_sample_timepoint
+            - '(.)+\.PG\.NrOfStrippedSequencesMeasured'
+            - '(.)+\.PG\.NrOfStrippedSequencesIdentified'
+            - '(.)+\.PG\.NrOfPrecursorsIdentified'
+            - '(.)+\.PG\.IsSingleHit'
+            - '(.)+\.PG\.NrOfStrippedSequencesUsedForQuantification'
+            - '(.)+\.PG\.NrOfModifiedSequencesUsedForQuantification'
+            - '(.)+\.PG\.NrOfPrecursorsUsedForQuantification'
+            - '(.)+\.PG\.MS1Quantity'
+            - '(.)+\.PG\.MS2Quantity'
+        'generated_columns':
+            - 'is_razor'
+            - 'id'
+        'proteinCol': 'PG.ProteinAccessions'
+        'valueCol': 'PG.Quantity'
+        'groupCol': 'id'
+        'indexCol': 'PG.ProteinAccessions'
+        'attributes':
+            'col':
+                - id
+                - 'PG.Qvalue'
+                - 'is_razor'
+            'regex':
+                - 'PG.NrOfStrippedSequencesMeasured'
+                - 'PG.NrOfStrippedSequencesIdentified'
+                - 'PG.NrOfPrecursorsIdentified'
+                - 'PG.IsSingleHit'
+                - 'PG.NrOfStrippedSequencesUsedForQuantification'
+                - 'PG.NrOfModifiedSequencesUsedForQuantification'
+                - 'PG.NrOfPrecursorsUsedForQuantification'
+                - 'PG.MS1Quantity'
+                - 'PG.MS2Quantity'
+        'log': 'log2'
+        'file': 'proteomics_spectronaut_proteingroups.\w+'
+
+table:
+    proteins:
+        columns: []
+        generated_columns:
+            - is_razor
+            - id
+        proteinCol: ''
+        valueCol: ''
+        numeric filter: []
+        groupCol: id
+        indexCol: ''
+        attributes:
+            col:
+                - id
+                - is_razor
+            regex: []
+        log: log2
+
+
+mztab:
+    'proteins':
+        'columns':
+            - accession
+            - description
+            - taxid
+            - species
+            - database
+            - database_version
+            - search_engine
+            - ambiguity_members
+            - modifications
+            - protein_coverage
+            - is_razor
+            - id
+            - protein_abundance_AS\d+_?-?\d*
+        'generated_columns':
+            - id
+            - 'is_razor'
+        'filters': []
+        'proteinCol': 'accession'
+        'valueCol': 'protein_abundance_'
+        'groupCol': 'id'
+        'indexCol': 'accession'
+        'attributes':
+            'cols':
+                - 'id'
+                - 'is_razor'
+            'regex':
+                - 'protein_abundance_'
+        'log': 'log2'
+        'file': 'PRT.tsv'

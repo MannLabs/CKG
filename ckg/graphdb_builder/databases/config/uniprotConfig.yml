@@ -1,0 +1,104 @@
+###### UniProt Database ########
+ftp_url: &ftp_url 'ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/'
+uniprot_id_url: 'ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping.dat.gz'
+uniprot_variant_file: 'ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/variants/homo_sapiens_variation.txt.gz'
+uniprot_peptides_files: 
+    -  'ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/proteomics_mapping/UP000005640_9606_nonUniquePeptides.tsv'
+    -  'ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/proteomics_mapping/UP000005640_9606_uniquePeptides.tsv'
+uniprot_go_annotations: 'http://geneontology.org/gene-associations/goa_human.gaf.gz'
+uniprot_fasta_file: 'ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Eukaryota/UP000005640/UP000005640_9606.fasta.gz'
+release_notes: 'ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/relnotes.txt'
+
+species: 
+    - 9606
+
+amino_acids: 
+    'Ala': 'A'
+    'Cys': 'C'
+    'Asp': 'D'
+    'Glu': 'E'
+    'Phe': 'F'
+    'Gly': 'G'
+    'His': 'H'
+    'Ile': 'I'
+    'Lys': 'K'
+    'Leu': 'L'
+    'Met': 'M'
+    'Asn': 'N'
+    'Pro': 'P'
+    'Gln': 'Q'
+    'Arg': 'R'
+    'Ser': 'S'
+    'Thr': 'T'
+    'Val': 'V'
+    'Trp': 'W'
+    'Tyr': 'Y'
+    
+uniprot_ids: 
+    - 'UniProtKB-ID'
+    - 'NCBI_TaxID'
+    - 'Gene_Name'
+    - 'RefSeq'
+    - 'PDB'
+    - 'STRING'
+    - 'KEGG'
+    - 'Reactome'
+    - 'HPA'
+    - 'ChEMBL'
+    - 'Ensembl'
+
+uniprot_synonyms: 
+    - 'UniProtKB-ID'
+    - 'Gene_Name'
+    - 'STRING'
+    - 'HPA'
+    - 'Ensembl'
+    - 'ChEMBL'
+    - 'PDB'
+
+proteins_header: 
+    - 'ID'
+    - ':LABEL'
+    - 'accession'
+    - 'name'
+    - 'synonyms'
+    - 'description'
+    - 'taxid'
+
+pdb_header:
+    - 'ID'
+    - ':LABEL'
+    - 'source'
+    - 'link'
+
+variants_header: 
+    - 'ID'
+    - ':LABEL'
+    - 'pvariant_id'
+    - 'external_id'
+    - 'alternative_names'
+    - 'effect'
+    - 'clinical_relevance'
+    - 'disease'
+    - 'original_source'
+    - 'source'
+
+peptides_header: 
+    - 'ID'
+    - ':LABEL'
+    - 'type'
+    - 'unique'
+
+relationships_header: 
+    - 'START_ID'
+    - 'END_ID'
+    - 'TYPE'
+    - 'source'
+
+go_header: 
+    - 'START_ID'
+    - 'END_ID'
+    - 'TYPE'
+    - 'evidence_type'
+    - 'score'
+    - 'source'

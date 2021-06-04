@@ -3,8 +3,9 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ClinicalKnowledgeGraph's documentation!
-==================================================
+
+Clinical Knowledge Graph Documentation
+=======================================
 
 This web page contains the documentation for the Python code using **Sphinx**.
 
@@ -21,12 +22,11 @@ Are you new to the Clinical Knowledge Graph? Learn about how to use it and
 all the possibilities.
 
 * **Getting started**:
-  :doc:`With Requirements <intro/getting-started-with-requirements>` |
-  :doc:`With Neo4j <intro/getting-started-with-neo4j>` |
-  :doc:`With Clinical Knowledge Graph <intro/getting-started-with-build>` |
-  :doc:`With Windows <intro/getting-started-with-windows>` |
-  :doc:`With Docker <intro/getting-started-with-docker>`
-
+  :doc:`Installation <intro/getting-started-with-requirements>` |
+  :doc:`Windows Installation <intro/getting-started-with-windows>` |
+  :doc:`Installing Neo4j <intro/getting-started-with-neo4j>` |
+  :doc:`Installing CKG python library <intro/getting-started-with-build>` |
+  :doc:`CKG Docker Container <intro/getting-started-with-docker>`
 
 .. toctree::
    :maxdepth: 2
@@ -135,6 +135,7 @@ Advanced features
 * **Jupyter notebooks**:
   :doc:`Notebooks <advanced_features/ckg-notebooks>`
 
+ 
 * **Retrieving data from the CKG**:
   :doc:`DB Querying <advanced_features/ckg-queries>`
 
@@ -176,9 +177,9 @@ API Reference
 -------------
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 4
 
-   src
+   api/ckg
 
 
 Project Info

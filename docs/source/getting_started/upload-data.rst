@@ -3,6 +3,14 @@
 Upload project experimental data
 ==================================
 
+To upload data into CKG you will generally use 3 files:
+
+- Experimental design: identifiers used for subjects, biological samples and analytical samples
+- Clinical data: metadata associated to the subjects in the cohort
+- Experiment data (proteomics, phosphoproteomics, interactomics): output format from processing tools
+
+Example files are available in the data directory: https://github.com/MannLabs/CKG/blob/master/data/example_files.zip
+
 Prepare data for upload
 -----------------------
 
@@ -17,7 +25,15 @@ Experimental Design
 
     Experimental Design file example
 
-Open the Experimental Design excel file, automatically downloaded when the project was created, and fill in the columns for `subject external_id`, `biological_sample external_id` and `analytical_sample external_id`.
+Open the Experimental Design excel file, automatically downloaded when the project was created, and fill in the columns for `subject external_id`, `biological_sample external_id`, `analytical_sample external_id`, `grouping1`, `grouping2`* and `batch`*.
+
+- **grouping1**: Annotated grouping of each sample.
+
+- **grouping2**: If there are more than one grouping (two independent variables) use this column to add a second level (*optional).
+
+- **batch**: You can add information about the batch were each sample was run in case you want to correct for possible batch effects (*optional)
+
+
 The identifiers provided in this file **must** correspond to the identifiers used in the *Clinical Data* file, and to the column names in the *Proteomics* files (see below).
 
 .. warning:: Make sure, within each column, the identifiers are unique. This means, if you have a subject "KO1", no other subject can have the same identifier, but you can have a biological sample and/or analytical sample "KO1".
@@ -53,19 +69,44 @@ Be aware that the following columns are mandatory to fill in:
 
 - **analytical_sample quantity_units**: Unit.
 
-- **grouping1**: Annotated grouping of each sample.
-
-- **grouping2**: If there are more than one grouping (two independent variables) use this column to add a second level.
-
-Additional clinical information about your study subjects can be added in the subsequent columns (i.e. columns after "grouping2").
 Please use SNOMED terms as headers for every new column you add. This will be used to gather existing information about the type of data you have.
 To find an adequate SNOMED term for your clinical variables, please visit the `SNOMED browser <https://browser.ihtsdotools.org/?perspective=full&conceptId1=734000001&edition=MAIN/2019-07-31&release=&languages=en>`__.
 
-.. note:: Be aware, the two-independent-variable statistics is not yet implemented in the default analysis pipeline.
-
 .. note:: To add a column with "Age" search for "age" in the SNOMED browser. This gives multiple matches, with the first one being: "Age (qualifier value), SCTID:397669002". Please enter this information as your clinical variable column header with the SCTID in parenthesis: Age (qualifier value) (397669002)
 
-.. warning:: If an adequate SNOMED term is not available, please write an e-mail to annelaura.bach@cpr.ku.dk with the subject "Header Creation, CKG". In the email please provide your "missing" header and a description of what it is. Do this before uploading the Clinical Data.
+.. warning:: If an adequate SNOMED term is not available, you can define extra terms and relationships by defining two files in the data/ontologies/SNOMED-CT directory:
+
+- **extra_entities.tsv**: Tabulated file with additional terms. This file should have the following fields:
+
+	- identifier: identifier for the new term, created manually (recommended format: EXXXXXXXXX)
+	- type: Clinical_variable
+	- name: name of the variable
+	- description: description of the variable
+	- code number: -40
+	- synonyms: alternative names
+	
+For example:
+	
++------------+--------------------+--------------+----------------------------------------------+------+---------------------------------------------------------+
+| E000000000 | Clinical_variable  | NAFLD score  | Score used in the clinic to                  | -40  | Fibrosis score,Non-alcoholic Fatty Liver Disease score  |
+|            |                    |              | define the grade of fibrosis in the liver    |      |                                                         |
++------------+--------------------+--------------+----------------------------------------------+------+---------------------------------------------------------+
+
+- **extra_rels.tsv**: Tabulated file with relationships of the new terms. This file should have the following fields:
+
+	- identifier1: first node in the relationship
+	- identifier2: second node in the relationship
+	- type: type of relationship (generally for ontologies HAS_PARENT)
+
++------------+------------+-------------+
+| E000000000 | 273249006  | HAS_PARENT  |
++------------+------------+-------------+
+
+When running import and loading (graph database update) for ontologies, these new terms will be added to the graph (ask your admin for new updates).
+
+.. note:: This format is valid also for other ontologies when missing terms.
+
+.. note:: When you consider that an Onotology is missing relevant terms or relationships, we encourage you to contact the people behind the Ontology for them to include the missing information. This will help maintain the Ontology active and up to date. Ontologies and terminologies are generally open source projects and the participation of the community is important. For instance, `here <http://geneontology.org/docs/contributing-to-go-terms/>`__ GeneOntology describes how you can contribute to the GO terminology.
 
 
 **Additional columns:**
@@ -91,6 +132,8 @@ Proteomics data
 	- **MaxQuant**: Use "proteinGroups.txt", "peptides.txt" and "Oxidation (M)Sites.txt" files, and any other relevant MaxQuant output files.
 
 	- **Spectronaut**: Use "proteinGroupsReport.xlsx". When exporting the results table from Spectronaut, please select "PG.ProteinAccessions" and "PG.Qvalue" under `Row Labels`, and under `Cell Values` select "PG.Quantity", "PG.NrOfStrippedSequencesMeasured", "PG.NrOfStrippedSequencesIdentified", "PG.NrOfPrecursorsIdentified", "PG.IsSingleHit", "PG.NrOfStrippedSequencesUsedForQuantification", "PG.NrOfModifiedSequencesUsedForQuantification", "PG.NrOfPrecursorsUsedForQuantification", "PG.MS1Quantity" and "PG.MS2Quantity".
+	
+	- **FragPipe**: Use "combined_proteins".
 
 It is very important that all your column names have the following format: "LFQ intensity TechnicalReplicateNumber_AnalyticalSampleIdentifier" or "TechnicalReplicateNumber_AnalyticalSampleIdentifier.PG.Quantity". Where "TechnicalReplicateNumber_AnalyticalSampleIdentifier" should be replaced as shown in the example table below:
 
@@ -100,9 +143,9 @@ It is very important that all your column names have the following format: "LFQ 
 +===========+============+===========+================+
 |  1        | KO_plate1  |           | 1_KO_plate1    |
 +-----------+------------+-----------+----------------+
-|  1        | KO2_plate1 |          0| 1_KO_plate1_0  |
+|  1        | KO2_plate1 |          0| 1_KO2_plate1_0 |
 +-----------+------------+-----------+----------------+
-|  1        | KO3_plate1 |         30| 1_KO_plate1_30 |
+|  1        | KO3_plate1 |         30| 1_KO3_plate1_30|
 +-----------+------------+-----------+----------------+
 |  1        | KO4_plate2 |           | 1_KO4_plate2   |
 +-----------+------------+-----------+----------------+
@@ -136,7 +179,7 @@ Go to `dataUploadApp <http://localhost:5000/apps/dataUploadApp/>`__ or use the `
 
 #. Select the type of data you will upload first. **(2)**
 
-	- If ``proteomics``, ``interactomics`` or ``phosphoproteomics`` is selected, please also select the processing tool used (``MaxQuant`` or ``Spectronaut``) **(2a)**, as well as the type of file to be uploaded (``Protein groups``, ``Peptides`` or ``Phospho STY sites``) **(2b)**.
+	- If ``proteomics``, ``interactomics`` or ``phosphoproteomics`` is selected, please also select the processing tool used (``MaxQuant``, ``Spectronaut`` oor ``FragPipe``) **(2a)**, as well as the type of file to be uploaded (``Protein groups``, ``Peptides`` or ``Phospho STY sites``) **(2b)**.
 
 #. Drag and drop or select the file to upload to the selected data type and file type. **(3)**
 
