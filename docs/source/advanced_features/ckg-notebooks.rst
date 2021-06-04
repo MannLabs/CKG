@@ -88,6 +88,27 @@ Perform single sample Gene Set Enrichment Analysis (ssGSEA) using different gene
 - :doc:`**Annotate Proteins with CKG Knowledge** <../notebooks/recipes/Knowledge from list of proteins>`
 
 This notebook shows how to extract knowledge associated with a list of proteins and summarize it using different methods: centrality, pagerank.
+
+- :doc:`**Annotate drugs with CKG Knowledge** <../notebooks/recipes/Knowledge from list of drugs>`
+
+This notebook shows how to extract knowledge associated with a list of drugs and summarize it using different methods: centrality, pagerank.
+
+- :doc:`**Batch effect correction** <../notebooks/recipes/Batch_correction>`
+
+This notebook exemplifies how to correct batch effects in a proteomics experiment and how to add this correction in CKG's analytical pipeline (configuration).
+
+- :doc:`**Convert SDRF format to CKG** <../notebooks/recipes/Converting_sdrf_to_CKG>`
+
+This notebook shows CKG's functionality to convert SDRF format into CKG and viceversa.
+
+- :doc:`**Upload a SDRF file to CKG** <../notebooks/recipes/Uploading_sdrf_to_CKG>`
+
+How to upload programmatically a SDRF file into CKG.
+
+- :doc:`**Convert MzTab format to CKG** <../notebooks/recipes/Read mztab>`
+
+This notebook shows CKG's functionality to read MzTab format and convert it into CKG proteomics/metabolomics format (edge lists).
+
 	
 
 Reports notebooks
@@ -102,7 +123,14 @@ Reports notebooks
    ../../notebooks/reports/*.ipynb
 
 
-- :doc:`**Urachal Carcinoma Case Study** <../notebooks/recipes/Urachal Carcinoma Case Study>`
+
+- :doc:`**Plasma proteome profiling discovers novel proteins associated with non‐alcoholic fatty liver disease** <../notebooks/reports/Plasma proteome profiling discovers novel proteins associated with non‐alcoholic fatty liver disease>`
+
+A Jupyter notebook reanalyzing the study Plasma proteome profiling discovers novel proteins associated with non‐alcoholic fatty liver disease (https://www.embopress.org/doi/full/10.15252/msb.20188793).
+The analyses shown in the notebook reproduce CKG's default analytical pipeline from data processing to knowledge.
+
+
+- :doc:`**Urachal Carcinoma Case Study** <../notebooks/reports/Urachal Carcinoma Case Study>`
 
 
 Jupyter notebook depicting the use of the Clinical Knowledge Graph database and the analytics core as a decision support tool, proposing a drug candidate in a specific subject case.
@@ -114,7 +142,7 @@ We can prioritise drugs with side effects dissimilar to the ones that caused an 
 studied disease, further reducing the list of potential drugs candidates.
 
 
-- :doc:`**Proteomics-Based Comparative Mapping of the Secretomes of Human Brown and White Adipocytes** <../notebooks/recipes/Proteomics-Based Comparative Mapping of the Secretomes of Human Brown and White Adipocytes>`
+- :doc:`**Proteomics-Based Comparative Mapping of the Secretomes of Human Brown and White Adipocytes** <../notebooks/reports/Proteomics-Based Comparative Mapping of the Secretomes of Human Brown and White Adipocytes>`
 
 A Jupyter notebook that exemplifies how to analyse any external dataset deposited in EBI's PRIDE database, by simply using the respective PRIDE identifier for the project (PXD...)\
 and CKG's Analytics Core.
@@ -127,10 +155,23 @@ Additionally, we demonstrate how other publicly accessible biomedical databases 
 the Human Protein Atlas is downloaded and mined in order to filter for known or predicted secreted proteins.
 
 
-- :doc:`**Covid-19 Olink Analysis from Massachusetts General Hospital** <../notebooks/recipes/Olink analysis>`
+- :doc:`**Covid-19 Olink Analysis from Massachusetts General Hospital** <../notebooks/reports/Olink analysis>`
 
 A Jupyter notebook showing how CKG can be used to analyze a dataset generated with a different technology, in this case Olink.
 
 The analysis reproduces similar results to the ones described in this manuscript: https://www.biorxiv.org/content/10.1101/2020.11.02.365536v2
 and also extends these results by comparing different severity groups in this cohort based on WHO scores.
+
+
+- :doc:`**Meduloblastoma Data Proteomics Re-analysis** <../notebooks/reports/Meduloblastoma Data Proteomics Re-analysis>`
+- :doc:`**Meduloblastoma Data Analysis-SNF** <../notebooks/reports/Meduloblastoma Data Analysis-SNF>`
+
+These two Jupyter notebooks show:
+
+1) A re-analysis of this study: Proteomics, Post-translational Modifications, and Integrative Analyses Reveal Molecular Heterogeneity within Medulloblastoma Subgroups (https://www.sciencedirect.com/science/article/pii/S1535610818303581).
+   This analysis uses the proteomics data to compare the clinical Subgroups
+2) A multiomics approach integrating all the molecular data available: proteomics, RNA sequencing and PTMs. CKG uses Similarity Network Fusion (https://www.nature.com/articles/nmeth.2810) to integrate these datasets and to define Medulloblastoma subgroups. 
+   The results are further explained in this `presentation`_.
+
+.. _presentation: https://github.com/MannLabs/CKG/blob/master/ckg/notebooks/reports/Archer_et_al_2018/Medulloblastoma_presentation.pdf
 
