@@ -43,6 +43,10 @@ Further, it will create an executable file with CKG's app. To start the app, sim
 	$ ckg_app
 
 
+.. warning:: If you are using a Unix Operating System (i.e MacOS or Linux), you will need to start Redis server by running:
+			$ redis-server
+
+
 .. figure:: ../_static/images/snomed_folder.png
     :width: 240px
     :align: right
@@ -97,25 +101,38 @@ The last step is to build the database, which can be done using the ``builder.py
 From the provided dump file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A dump file of the database is also made available in this `link <https://data.mendeley.com/datasets/mrcf7f4tc2/1>`__ and alternatively, you can use it to load the graph database contained in it. To do so, download both files (``ckg_080520.dump`` and ``data.tar.gz``).
+A dump file of the database is also made available in this `link <https://data.mendeley.com/datasets/mrcf7f4tc2/1>`__ and alternatively, you can use it to load the graph database contained in it. To do so, download both files (``ckg_190521_neo4j_4.2.3.dump`` and ``data.tar.gz``).
 
 The ``.dump`` file will be used to load the Neo4j graph database:
+
+If you have Neo4j desktop installed, you can use Neo4j terminal to access the path where the database is installed.
+
+.. figure:: ../_static/images/neo4j_terminal_dump.png
+    :width: 50%
+
+	How to get the Neo4j terminal.
+
+
+.. figure:: ../_static/images/neo4j_terminal_window.png
+    :width: 50%
+
+	Neo4j terminal.
+
 
 1. Create ``backups`` and ``graph.db`` folders:
 
 .. code-block:: bash
 
-	$ cd /path/to/neo4jDatabases/database-identifier/installation-x.x.x/
 	$ mkdir backups
 	$ mkdir backups/graph.db
-	$ cp 2019-11-04.dump backups/graph.db/.
+	$ cp ckg_190521_neo4j_4.2.3.dump backups/graph.db/.
 
 
-2. After copying the dump file to backups/graph.db/, make sure the graph database is shutdown and run:
+1. After copying the dump file to backups/graph.db/, make sure the graph database is shutdown and run:
 
 .. code-block:: bash
 
-	$ bin/neo4j-admin load --from=backups/graph.db/ckg_080520.dump --database=graph.db --force
+	$ bin/neo4j-admin load --from=backups/graph.db/ckg_190521_neo4j_4.2.3.dump --database=graph.db --force
 
 
 In some systems you might have to run this as root:
@@ -129,17 +146,20 @@ In some systems you might have to run this as root:
 .. warning:: Make sure the dump file naming in the command above, matches the one provided to you.
 
 
+.. note:: More information about restoring a database dump at `Neo4j docs <https://neo4j.com/docs/operations-manual/current/backup-restore/restore-dump/>`_.
+
+
+
 3. Once you are done, start the database and you will have a functional graph database.
 
 
 Be aware the database contained in the dump file **does NOT** include the licensed databases (**PhosphoSitePlus**, **DrugBank** and **SNOMED-CT**).
 
 .. figure:: ../_static/images/data_folder.png
-	:alt: data_folder
-    :width: 240px
-    :align: right
+	:width: 240px
+	:align: right
 
-    Final CKG/data folder architecture.
+	Final CKG/data folder architecture.
 
 
 To add the missing ontology and databases, as well as their dependencies (relationships to other nodes), please manually download the files as explained in :ref:`Build Neo4j graph database`, unzip the downloaded file ``data.tar.gz`` and place its contents in ``CKG/data/``. The folder ``data`` should look like the figure depicted.
@@ -152,7 +172,7 @@ Once this is done, run the following commands:
 	$ python builder.py -b minimal -u username
 
 
-.. note:: Remember of replace the ``username`` in each command, with your own neo4j username.
+.. note:: Remember to replace the ``username`` in each command, with your own neo4j username.
 
 
 

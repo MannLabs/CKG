@@ -20,6 +20,8 @@ The Clinical Knowledge Graph requires the installation of:
 
 - Java
 
+- Redis (**Only Unix OS**)
+
 .. image:: ../_static/images/installation_tech.png
 	:width: 70%
 	:align: center
@@ -127,3 +129,41 @@ Running ``/usr/libexec/java_home`` in the terminal should print out a path like 
 Now that you are all set, you can move on and start with Neo4j.
 
 
+Redis
+^^^^^^^^^^^
+
+This installation is only necessary for Unix Operating Systems (i.e MacOS, Linux).
+
+edis is an open source (BSD licensed), in-memory data structure store, used as a database, cache, and message broker. CKG uses redis-server in combination with [Celery queues](https://docs.celeryproject.org/en/stable/getting-started/introduction.html) to run asynchronous tasks such as project creation or project report generation.
+
+For more details on how to install Redis you can follow the instructions [here](https://redis.io/topics/quickstart).
+
+The installation steps are:
+
+1) Download Redis
+   
+.. code-block:: bash
+
+	$ wget http://download.redis.io/redis-stable.tar.gz
+
+
+2) Untar the downloaded file
+
+.. code-block:: bash
+
+	$ tar xvzf redis-stable.tar.gz
+
+
+3) Install redis using `make`
+
+.. code-block:: bash
+
+	$ cd redis-stable
+	$ make
+
+When running CKG app, you will need to start first the Redis server with:
+
+.. code-block:: bash
+
+	$ redis-server
+	
