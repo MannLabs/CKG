@@ -8,25 +8,29 @@ Installation
 The installation of CKG is a two step process:
 
 1. **Installation of Neo4j**: The Neo4j graph database needs to be installed (https://neo4.com) and following the instructions here: :ref:`Installing Neo4j`
-
+   
 2. **Installation of CKG's python library**: installation of python and CKG's modules (:ref:`Installing CKG python library`)
 
+   - Python
 
-The Clinical Knowledge Graph requires the installation of:
+   - R (**Only Unix OS** *for now*)
 
-- Python
-
-- R
-
-- Java
-
-- Redis (**Only Unix OS**)
+   - Redis (**Only Unix OS**)
 
 .. image:: ../_static/images/installation_tech.png
-	:width: 70%
+	:width: 50%
 	:align: center
 
-The following instructions are optimised for operating systems MacOS and Linux. The installation on Windows systems is slightly different, please go to :ref:`Windows installation`.
+
+
+You can follow this flowchart to make sure you have everything you need:
+
+.. image:: ../_static/images/installation_flowchart.png
+	:width: 90%
+	:align: center
+
+
+The installation instructions are optimised for operating systems MacOS and Linux. The installation on Windows systems is slightly different, please go to :ref:`Windows installation`.
 
 To avoid possible compatibility issues caused by different Operating systems, python and R versions, we recommend to follow the instructions to build and use the :ref:`CKG Docker Container` instead (https://www.docker.com/).
 By building the container and running it, you will get:
@@ -36,7 +40,7 @@ By building the container and running it, you will get:
 - JupyterHub
 
 .. image:: ../_static/images/docker_container.png
-	:width: 70%
+	:width: 60%
 	:align: center
 
 
@@ -64,7 +68,7 @@ To facillitate the installation of Python, we recommend to use the Miniconda ins
 R
 ^^^^^^^^^^^
 
-Another essential package for the functioning of the Clinical Knowledge Graph is R.
+Some of the analysis in CKG use R libraries (i.e SAMR, WGCNA) so they require having R installed. For now, the compatibility with R is only available for Unix Operating Systems but we are working on making them available also for Windows. Hence, the installation of R is only required when installing CKG in a Unix OS.
 
 Make sure you have installed **R version >=** |r_version|:
 
@@ -93,34 +97,6 @@ To install the necessary R packages, simply initiate R (terminal or shell) and r
 .. note:: If you need to install R, follow `these <https://web.stanford.edu/~kjytay/courses/stats32-aut2018/Session%201/Installation%20for%20Mac.html>`__ tutorial.
 
 
-Java
-^^^^^^^^^^^
-
-Before starting setting up Neo4j and, later on, the Clinical Knowledge Graph, it is very important that you have *Java* installed in your machine, including **Java SE Runtime Environment**.
-
-Different versions of a Neo4j database can have different requirements. For example, Neo4j 3.5 versions require Oracle Java 8, while Neo4j 4.0 versions already require Oracle Java 11.
-When using a new version of Neo4j, always remember to read the respective Operations Manual, and check for the software requirements.
-
-To check if you already have **Java SE Development Kit** installed, run ``java -version`` in your terminal window. This should print out three lines similar to the following, with possible variation in the version:
-
-.. code-block:: python
-
-	java version "1.8.0_171"
-	Java(TM) SE Runtime Environment (build 1.8.0_171-b11)
-	Java HotSpot(TM) 64-Bit Server VM (build 25.171-b11, mixed mode)
-
-Running ``/usr/libexec/java_home`` in the terminal should print out a path like ``/Library/Java/JavaVirtualMachines/jdk1.8.0_171.jdk/Contents/Home``. Otherwise, please follow the steps below:
-
-1. Go to ``https://www.oracle.com/java/technologies/javase-downloads.html`` and download the version that fits your Neo4j version and OS requirements.
-
-#. Install the package.
-
-#. Run ``/usr/libexec/java_home`` in the terminal to make sure the *Java* package has been installed in ``/Library/Java/JavaVirtualMachines/``.
-
-.. note:: You can also install Java from OpenJDK. Follow the instructions here: https://openjdk.java.net/install/index.html (make sure to choose the right Java version for your Neo4j installation)
-
-
-
 
 
 
@@ -132,13 +108,13 @@ Now that you are all set, you can move on and start with Neo4j.
 Redis
 ^^^^^^^^^^^
 
-This installation is only necessary for Unix Operating Systems (i.e MacOS, Linux).
+This installation is only necessary for Unix Operating Systems (i.e MacOS, Linux) since Windows 10 already comes with Redis installed.
 
 edis is an open source (BSD licensed), in-memory data structure store, used as a database, cache, and message broker. CKG uses redis-server in combination with [Celery queues](https://docs.celeryproject.org/en/stable/getting-started/introduction.html) to run asynchronous tasks such as project creation or project report generation.
 
 For more details on how to install Redis you can follow the instructions [here](https://redis.io/topics/quickstart).
 
-The installation steps are:
+The installation steps are (check Ubuntu installation below):
 
 1) Download Redis
    
@@ -166,4 +142,8 @@ When running CKG app, you will need to start first the Redis server with:
 .. code-block:: bash
 
 	$ redis-server
-	
+
+
+.. warning:: In Ubuntu, the installation of Redis can be done just with:
+
+	$ apt install redis-server

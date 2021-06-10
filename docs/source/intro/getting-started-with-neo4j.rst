@@ -5,9 +5,12 @@
 Installing Neo4j
 ===================
 
-Getting started with Neo4j is easy.
+Getting started with Neo4j is easy, just install Neo4j desktop and you are ready.
 
-First download a copy of the Neo4j desktop version from the `Neo4j download page <https://neo4j.com/download/>`__.
+Neo4j Desktop
+^^^^^^^^^^^^^^
+
+You can download Neo4j Desktop from the `Neo4j download page <https://neo4j.com/download/>`__. Neo4j Desktop is bundled with a Java so you won't need to install Java separately. If you decide to install Neo4j directly, please check the requirements `here <https://neo4j.com/docs/operations-manual/current/installation/requirements/>`__.
 The Community Edition of the software is free but a sign up is required.
 Once the file has downloaded, you can install Neo4j by following the instructions automatically opened in the browser.
 
