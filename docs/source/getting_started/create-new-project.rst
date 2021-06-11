@@ -14,79 +14,37 @@ To create a project, please follow the steps below.
 
 1. In one terminal window:
 
-* Activate the virtual environment (if created beforehand)
-
-.. code-block:: bash
-
-	$ source /path/to/virtualenvironment/bin/activate;
-
-* Start a redis-server:
+* Start a redis-server (Unix only):
 
 .. code-block:: bash
 
 	$ redis-server
 
+2. In another terminal windows:
 
-.. warning:: If redis-server is not found, install with ``brew install redis`` (Mac) or ``sudo apt-get install redis-server`` (Linux).
-
-.. warning:: On Windows, redis-server should be installed by default (to check, go to start menu > services.msc > Redis). If that is not the case, go to ``https://github.com/microsoftarchive/redis/releases``, download the latest release installer (.msi file), and follow the installation instructions. Let all options as default but remember to select **Add the Redis installation folder to the PATH environment variable.**. To start a redis-server, make sure it is **not running in ``services.msc``**, and run in the command prompt: C:\"Program Files"\Redis\redis-server
-
-.. note:: ``C:\"Program Files"`` can be replaced with the correct path where you installed Redis from the installer (.msi file).
-
-
-2. In two separate terminal windows:
-
-* Navigate to ``report_manager`` in both of them
+* Activate the virtual environment (if created beforehand) and run `ckg_app`
 
 .. code-block:: bash
 
-	$ cd CKG/ckg/report_manager
+	$ conda activate ckgenv
+	$ ckg_app
 
-* Start a celery queue from the report_manager directory, in each window:
+The ckg_app will start the Dash app, and 3 Celery queues:
 
-**Default queue**
+**Creation queue**
 
-.. code-block:: bash
+Creates a queue to synchronize the project creation.
 
-	$ celery -A worker worker --loglevel=DEBUG --concurrency=3 -E
+**Update queue**
 
-In Windows, this corresponds to:
-
-.. code-block:: bash
-
-	> celery worker -A worker --pool=eventlet --loglevel=DEBUG --concurrency=3 -E
-
+This queue can be used to update the graph database in the background. Note: A full update will take longer than running through the command line.
 
 **Compute queue - Report generation**
 
-.. code-block:: bash
-
-	$ celery -A worker worker --loglevel=DEBUG --concurrency=3 -E -Q compute
-
-To start this queue on Windows, please run:
-
-.. code-block:: bash
-
-	> celery worker -A worker --pool=eventlet --loglevel=DEBUG --concurrency=3 -E -Q compute
-
-
-3. In a fourth terminal window:
-
-* Run the report manager index app:
-
-.. code-block:: bash
-
-	$ cd CKG/ckg/report_manager
-	$ python index.py
-
-This will print some warnings, which should be okay.
-
-
-.. warning:: Make sure that your virtual environment is always activated in each terminal window, before running any other command.
+Queue used for the generation of project reports.
 
 .. image:: ../_static/images/homepage_app.png
-	:alt: homepage
-    :width: 32%
+	:width: 32%
     :align: right
 
 **Browser**

@@ -126,6 +126,10 @@ When running import and loading (graph database update) for ontologies, these ne
 - **studies_intervention**: A medical intervention under study in the project. For example, study subjects before and after stomach bypass (SCTID:442338001). Use an appropriate SNOMED SCTID value.
 
 
+
+.. note:: CKG allows the upload of clinical data using the SDRF format (https://github.com/bigbio/proteomics-metadata-standard). CKG will transform this format into CKG experimental design and clinical data files converting the EFO ontology used in SDRF to SNOMED-CT terms.
+
+
 Proteomics data
 ^^^^^^^^^^^^^^^^^^
 
@@ -135,24 +139,13 @@ Proteomics data
 	
 	- **FragPipe**: Use "combined_proteins".
 
-It is very important that all your column names have the following format: "LFQ intensity TechnicalReplicateNumber_AnalyticalSampleIdentifier" or "TechnicalReplicateNumber_AnalyticalSampleIdentifier.PG.Quantity". Where "TechnicalReplicateNumber_AnalyticalSampleIdentifier" should be replaced as shown in the example table below:
+	- **Dia-NN**: Use "report_final.pg_matrix".
 
-+-----------+------------+-----------+----------------+
-| Technical | Analytical |           |                |
-| replicate | sample id  | Timepoint |       Result   |
-+===========+============+===========+================+
-|  1        | KO_plate1  |           | 1_KO_plate1    |
-+-----------+------------+-----------+----------------+
-|  1        | KO2_plate1 |          0| 1_KO2_plate1_0 |
-+-----------+------------+-----------+----------------+
-|  1        | KO3_plate1 |         30| 1_KO3_plate1_30|
-+-----------+------------+-----------+----------------+
-|  1        | KO4_plate2 |           | 1_KO4_plate2   |
-+-----------+------------+-----------+----------------+
-|  2        | KO4_plate2 |           | 2_KO4_plate2   |
-+-----------+------------+-----------+----------------+
+	- **MzTab**: CKG extracts the different matrices based on rows: PRT (proteins), PEP (peptides), PSM (modifications)  
 
-As shown in the example table, if your experimental design is a timecourse experiment, you should add "_" followed by the timepoint, right after the analytical sample identifier. Otherwise, you can omit it.
+As long as you provide a correct Experimental design where the analytical sample external ids correspond to the samples in your proteomics files, CKG will map those identifiers correctly. We suggest to use the following notation for analytical samples:
+
+**TechnicalReplicateNumber_AnalyticalSampleIdentifier**
 
 Do not perform any post-processing filtering, imputations or similar on your data before uploading it. This will be carried out by the CKG. In the case of Spectronaut outputs, the missing values are automatically replaced by the keyword "Filtered".
 
@@ -179,7 +172,7 @@ Go to `dataUploadApp <http://localhost:5000/apps/dataUploadApp/>`__ or use the `
 
 #. Select the type of data you will upload first. **(2)**
 
-	- If ``proteomics``, ``interactomics`` or ``phosphoproteomics`` is selected, please also select the processing tool used (``MaxQuant``, ``Spectronaut`` oor ``FragPipe``) **(2a)**, as well as the type of file to be uploaded (``Protein groups``, ``Peptides`` or ``Phospho STY sites``) **(2b)**.
+	- If ``proteomics``, ``interactomics`` or ``phosphoproteomics`` is selected, please also select the processing tool used (``MaxQuant``, ``Spectronaut``, ``FragPipe``, ``DIA-NN`` or ``MzTab``) **(2a)**, as well as the type of file to be uploaded (``Protein groups``, ``Peptides`` or ``Phospho STY sites``) **(2b)**.
 
 #. Drag and drop or select the file to upload to the selected data type and file type. **(3)**
 

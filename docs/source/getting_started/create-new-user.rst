@@ -36,4 +36,3 @@ For help on how to use ``create_user.py``, run:
 In CKG's app there is an Admin section that provides the option to create users in the database.
 
 .. image:: ../_static/images/Admin_create_user.png
-    :alt: Admin_create_user
