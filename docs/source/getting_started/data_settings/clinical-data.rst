@@ -10,6 +10,9 @@ Clinical data analysis parameters
     Clinical Data configuration file
 
 
+Currently, the clinical default analysis pipeline can be accessed `here <https://raw.githubusercontent.com/MannLabs/CKG/master/ckg/report_manager/config/clinical.yml>`__.
+
+
 The Clinical data configuration file contains two sections: ``args`` and ``overview``.
 The first section contains the parameters used for the processing of the raw clinical data. To obtain the raw clinical data, we query the CKG database for all the clinical variables connected to biological samples in a specific project. This results in a Pandas dataframe with all the relevant information. To process the raw data, a number of parameters are defined in the ``args`` section of the configuration file:
 	

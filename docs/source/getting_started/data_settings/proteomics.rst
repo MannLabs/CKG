@@ -11,6 +11,8 @@ Similarly to the :ref:`Clinical Data conf file`, the Proteomics configuration fi
 
     Proteomics configuration file
 
+The proteomics default analysis pipeline can be accessed `here <https://raw.githubusercontent.com/MannLabs/CKG/master/ckg/report_manager/config/proteomics.yml>`__.
+
 The ``args`` section contains the parameters used to process the proteomics data extracted from the CKG database, which includes the filtering of proteins according to the determined threshold, as well as the imputation of all missing values. These parameters include:
 
 	- **imputation**: boolean. Set to *True* if missing values shall be imputed.
