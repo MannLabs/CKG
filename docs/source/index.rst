@@ -3,11 +3,11 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+#######################################
+Clinical Knowledge Graph
+#######################################
 
-Clinical Knowledge Graph Documentation
-=======================================
-
-This web page contains the documentation for the Python code using **Sphinx**.
+This web page contains the documentation for the Clinical Knowledge Graph using **Sphinx**.
 
 .. toctree::
    :maxdepth: 2
@@ -15,11 +15,25 @@ This web page contains the documentation for the Python code using **Sphinx**.
    INTRO
 
 
+Requirements
+---------------------
+:doc:`System Requirements <system_requirements>`
+
+.. toctree::
+  :maxdepth: 2
+  :hidden:
+  :caption: Requirements
+
+  system_requirements
+
 First steps
 ------------
 
-Are you new to the Clinical Knowledge Graph? Learn about how to use it and
-all the possibilities.
+Follow this guide to get the Clinical Knowledge Graph installed. There are two options:
+
+1) Install each of the requirements
+
+2) Build the Docker image and run everything (Neo4j, CKG app and Jupyter Hub) into one single container *(Recommended)*
 
 * **Getting started**:
   :doc:`Installation <intro/getting-started-with-requirements>` |
@@ -43,25 +57,28 @@ all the possibilities.
 Getting started
 -------------------------------------------------
 
-* **Connecting to the CKG**:
+Are you new to the Clinical Knowledge Graph? Learn about how to use it and
+all the possibilities.
+
+* **Connecting to CKG Graph Database**:
   :doc:`Connect to DB <getting_started/connect-to-ckg>`
 
-* **Create a new user in the graph database**:
+* **Create A User in the Graph Database**:
   :doc:`Create new user <getting_started/create-new-user>`
 
-* **Create a project in the database**:
+* **Create A Project in Graph Database**:
   :doc:`Project Creation <getting_started/create-new-project>`
 
-* **Upload experimental data**:
+* **Upload Data**:
   :doc:`Data Upload <getting_started/upload-data>`
 
-* **Define data analysis settings**:
+* **Define an Analysis Pipeline**:
   :doc:`Configuration <getting_started/data-analysis-config>`
 
-* **Access the analysis report**:
+* **Access Project Report**:
   :doc:`Access report <getting_started/access-report>`
 
-* **Report notification**:
+* **Report Notification**:
   :doc:`Notifications <getting_started/notifications>`
 
 
@@ -79,7 +96,25 @@ Getting started
   getting_started/notifications
 
 
-The project report
+CKG Graph Database Builder
+-------------------------------------
+
+* **Building CKG's Graph Database**:
+  :doc:`Builder <ckg_builder/graphdb-builder>`
+
+  * **Adding New Resources**:
+  :doc:`Ontologies <ckg_builder/graphdb-contribute>`
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: CKG Graph Database Builder
+
+   ckg_builder/graphdb-builder
+   ckg_builder/graphdb-contribute
+
+
+Project Report
 ------------------
 
 * **Generate a project**:
@@ -90,40 +125,27 @@ The project report
 
 
 .. toctree::
-   :maxdepth: 2
-   :hidden:
-   :caption: Project Report
+  :maxdepth: 2
+  :hidden:
+  :caption: Project Report
 
-   project_report/project-report
-   project_report/project-tabs
+  project_report/project-report
+  project_report/project-tabs
 
 
-CKG Builder
------------
 
-* **Ontology sources and parsers**:
-  :doc:`Ontologies <ckg_builder/ontologies>`
+Notebooks
+--------------
 
-* **Biomedical databases and resources**:
-  :doc:`Databases <ckg_builder/databases>`
-
-* **Parsing experimental data**:
-  :doc:`Experiments <ckg_builder/experiments>`
-
-* **Building the graph database from one module**:
-  :doc:`Builder <ckg_builder/graphdb-builder>`
-
+* **Jupyter Notebooks**:
+  :doc:`Notebooks <advanced_features/ckg-notebooks>`
 
 .. toctree::
-   :maxdepth: 2
-   :hidden:
-   :caption: CKG Builder
+  :maxdepth: 2
+  :hidden:
+  :caption: Jupyter Notebooks
 
-   ckg_builder/ontologies
-   ckg_builder/databases
-   ckg_builder/experiments
-   ckg_builder/graphdb-builder
-
+  advanced_features/ckg-notebooks
 
 Advanced features
 ------------------
@@ -132,10 +154,6 @@ Advanced features
   :doc:`Imports stats <advanced_features/import-statistics>` |
   :doc:`Graph database stats <advanced_features/graphdb-statistics>`
 
-* **Jupyter notebooks**:
-  :doc:`Notebooks <advanced_features/ckg-notebooks>`
-
- 
 * **Retrieving data from the CKG**:
   :doc:`DB Querying <advanced_features/ckg-queries>`
 
@@ -163,30 +181,24 @@ Advanced features
    advanced_features/R-interface
 
 
-System Requirements
----------------------
-
-.. toctree::
-   :maxdepth: 2
-
-   system_requirements
-
-
-
 API Reference
 -------------
 
+Code available in `GitHub <https://github.com/MannLabs/CKG>`__.
+
 .. toctree::
    :maxdepth: 4
+   :caption: API docs
 
    api/ckg
 
 
-Project Info
+About CKG
 -------------
 
 .. toctree::
    :maxdepth: 2
+   :caption: About
 
    MANIFEST
 
