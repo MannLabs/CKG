@@ -1,3 +1,5 @@
+.. _analysis conf:
+
 Define data analysis parameters
 ===============================
 
