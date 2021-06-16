@@ -23,6 +23,8 @@ The ``args`` section contains the parameters used to process the proteomics data
 	- **min_valid**: minimum number of required valid values to keep a protein.
 	- **value_col**: column label containing expression values.
 	- **index**: column labels to be be kept as index identifiers.
+	- **batch_correction**: boolean. If *True*, CKG will use adjust for batch effect
+	- **batch_col**: column to be used as batch identifier (`batch` as default)
 
 The result is a Pandas dataframe, stored as "processed", where columns are protein identifiers (UniprotID~GeneName) and analytical samples are rows, group and subject identifier are kept as columns as well.
 
@@ -59,4 +61,3 @@ Likewise in the :ref:`Clinical Data conf file`, within each analysis, specific p
 	- **args**: all arguments necessary for **analyses** and **plots**.
 
 You can modify the analysis parameters just by changing the respective parameters within the configuration file. Remember to consult the modules ``analytics.py`` and ``viz.py``, to learn more about the arguments of each function.
-If you would like to add a specific analysis step to the default pipeline, remember to add a call to the function in ``analytics_factory.py``.
