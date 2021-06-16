@@ -120,9 +120,6 @@ Project Report
 * **Generate a project**:
   :doc:`Project <project_report/project-report>`
 
-* **The Tabs**:
-  :doc:`Project tabs <project_report/project-tabs>`
-
 
 .. toctree::
   :maxdepth: 2
@@ -130,9 +127,6 @@ Project Report
   :caption: Project Report
 
   project_report/project-report
-  project_report/project-tabs
-
-
 
 Notebooks
 --------------
@@ -147,39 +141,23 @@ Notebooks
 
   advanced_features/ckg-notebooks
 
-Advanced features
+More features
 ------------------
 
-* **CKG Statistics**:
-  :doc:`Imports stats <advanced_features/import-statistics>` |
-  :doc:`Graph database stats <advanced_features/graphdb-statistics>`
+* **CKG Import Statistics**:
+  :doc:`Imports stats <advanced_features/import-statistics>`
 
 * **Retrieving data from the CKG**:
   :doc:`DB Querying <advanced_features/ckg-queries>`
-
-* **Data Analysis**:
-  :doc:`Analysis <advanced_features/standard-analysis>`
-
-* **Visualization**:
-  :doc:`Plots <advanced_features/visualization-plots>`
-
-* **R interface**:
-  :doc:`R wrapper <advanced_features/R-interface>`
 
 
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Advanced Features
+   :caption: More
 
    advanced_features/import-statistics
-   advanced_features/graphdb-statistics
-   advanced_features/ckg-notebooks
    advanced_features/ckg-queries
-   advanced_features/standard-analysis
-   advanced_features/visualization-plots
-   advanced_features/R-interface
-
 
 API Reference
 -------------
