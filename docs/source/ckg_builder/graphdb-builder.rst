@@ -1,3 +1,5 @@
+
+
 ##############################
 Building CKG's Graph Database
 ##############################
@@ -33,6 +35,8 @@ Graph Database Builder
     :width: 100%
     :align: center
 
+
+.. _full:
 
 Full update
 ^^^^^^^^^^^^
@@ -109,6 +113,7 @@ In CKG's app, the `Admin page` provides as well the option to start a full updat
 
 .. warning:: This option takes longer than the command-line options because multi-processing is not possible.
 
+.. _partial:
 
 Partial update
 ^^^^^^^^^^^^^^^
