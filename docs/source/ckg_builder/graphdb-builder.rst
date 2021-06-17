@@ -137,3 +137,22 @@ To update a database:
         $ python builder.py --build_type import --import_types databases --data HMDB --download True --user ckg_user
         $ python builder.py --build_type load --load_entities metabolite --user ckg_user
 
+
+Text mining update
+^^^^^^^^^^^^^^^^^^^^
+
+The text mining results in CKG are collected from the `Jensen Lab download page <https://download.jensenlab.org/>`__ and are generated using the `tagger tool <https://github.com/larsjuhljensen/tagger>`__. 
+CKG collects the relevant `textmining_mentions files` (human, chemicals, diseases, tissues, etc) and parses them to obtain edgelists of protein-publication, drug-publication or disease-publication associations among other that can be loaded into the knowledge graph.
+These files are updated in a weekly basis, and given the number of open access publications made available in a week, it may be convinient to update the Knowledge Graph also with certain periodicity.
+For that, you can use the functionality ``ckg_update_textmining`` paired with a task scheduler to update the textmining results from the Jensen lab (https://jensenlab.org/).
+
+To run the text mining update:
+
+.. code-block:: bash
+
+    $ cd CKG
+    $ conda activate NAME_OF_YOUR_ENVIRONMENT
+    $ ckg_update_textmining
+
+This will start a partial update of the Publication nodes and their relationships to other entities: tissues, diseases, proteins, etc. The update takes a while but can run in the background.
+
