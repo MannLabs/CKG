@@ -14,6 +14,8 @@ R_wrapper.py
    :undoc-members:
    :show-inheritance:
 
+.. _analytics_factory:
+
 analytics_factory.py
 ----------------------
 

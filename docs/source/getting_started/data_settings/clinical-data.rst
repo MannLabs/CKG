@@ -48,4 +48,3 @@ Within each analysis, specific parameters are defined:
 	- **args**: all arguments necessary for **analyses** and **plots**.
 
 You can modify the analysis parameters just by changing the respective parameters within the configuration file. Remember to consult the modules ``analytics.py`` and ``viz.py``, to learn more about the arguments of each function.
-If you would like to add a specific analysis step to the default pipeline, remember to add a call to the function in ``analytics_factory.py``.

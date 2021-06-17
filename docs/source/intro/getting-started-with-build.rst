@@ -47,7 +47,7 @@ Further, it will create an executable file with CKG's app. To start the app, sim
 			$ redis-server
 
 
-.. figure:: ../_static/images/snomed_folder.png
+.. image:: ../_static/images/snomed_folder.png
     :width: 240px
     :align: right
 

@@ -2,10 +2,10 @@ Protein:
   pathway:
     name: 'pathway annotation'
     description: 'Pathways annotated to a list of proteins'
-    involves_nodes:
+    involved_nodes:
       - Protein
       - Pathway
-    involves_rels:
+    involved_rels:
       - ANNOTATED_IN_PATHWAY
     query: >
       MATCH (p:Protein)-[r:ANNOTATED_IN_PATHWAY]->(ph:Pathway)
@@ -14,10 +14,10 @@ Protein:
   biological_process:
     name: 'GO biological processes annotation'
     description: 'Gene Ontology Biological processes annotated to a list of proteins'
-    involves_nodes:
+    involved_nodes:
       - Protein
       - Biological_process
-    involves_rels:
+    involved_rels:
       - ASSOCIATED_WITH
     query: >
       MATCH (p:Protein)-[r:ASSOCIATED_WITH]->(ph:Biological_process) 
@@ -27,10 +27,10 @@ Protein:
   complex:
     name: 'Protein complexes within the list of proteins'
     description: 'Protein complexes represented in the provided list of proteins'
-    involves_nodes:
+    involved_nodes:
       - Protein
       - Complex
-    involves_rels:
+    involved_rels:
       - IS_SUBUNIT_OF
     query: >
       MATCH (p:Protein)-[r:IS_SUBUNIT_OF]->(ph:Complex) 
@@ -39,10 +39,10 @@ Protein:
   drug:
     name: 'Drugs targetting the list of proteins'
     description: 'Drugs targetting at least one of the proteins in the provided list of proteins and their interactions'
-    involves_nodes:
+    involved_nodes:
       - Protein
       - Drug
-    involves_rels:
+    involved_rels:
       - ACTS_ON
       - INTERACTS_WITH
     query: >
@@ -53,9 +53,9 @@ Protein:
   drug_interactions:
     name: 'Drugs interactions'
     description: 'Drugs that interact'
-    involves_nodes:
+    involved_nodes:
       - Drug
-    involves_rels:
+    involved_rels:
       - INTERACTS_WITH
     query: >
       MATCH (d1:Drug)-[r:INTERACTS_WITH]-(d2:Drug)
@@ -64,11 +64,11 @@ Protein:
   disease:
     name: 'Diseases associated with the list of proteins'
     description: 'Diseases associated to the list of proteins'
-    involves_nodes:
+    involved_nodes:
       - Protein
       - Disease
       - Drug
-    involves_rels:
+    involved_rels:
       - ASSOCIATED_WITH
       - IS_INDICATED_FOR
       - MAPS_TO
@@ -83,9 +83,9 @@ Protein:
   disease_ontology:
     name: 'Disease ontology relationships'
     description: 'Diseases associated to the same parent term in the ontology'
-    involves_nodes:
+    involved_nodes:
       - Disease
-    involves_rels:
+    involved_rels:
       - HAS_PARENT
     query: >
       MATCH (d1:Disease)-[r:HAS_PARENT]->(d2:Disease)<-[:HAS_PARENT]-(d3:Disease)
@@ -94,10 +94,10 @@ Protein:
   indications:
     name: 'Drug-diseases indications'
     description: 'If any of the drugs is indicated for any of the diseases'
-    involves_nodes:
+    involved_nodes:
       - Disease
       - Drug
-    involves_rels:
+    involved_rels:
       - IS_INDICATED_FOR
       - MAPS_TO
     query: >
@@ -110,9 +110,9 @@ Protein:
   protein:
     name: 'Protein-protein interactions'
     description: 'Protein-protein interactions within the provided list of proteins'
-    involves_nodes:
+    involved_nodes:
       - Protein
-    involves_rels:
+    involved_rels:
       - CURATED_INTERACTS_WITH
       - COMPILED_INTERACTS_WITH
       - ACTS_ON
@@ -123,11 +123,11 @@ Protein:
   publication:
     name: 'Publications'
     description: 'Publications where the provided list of proteins are mentioned'
-    involves_nodes:
+    involved_nodes:
       - Protein
       - Disease
       - Publication
-    involves_rels:
+    involved_rels:
       - MENTIONED_IN_PUBLICATION
     query: >
       MATCH (d:Disease)-[:MENTIONED_IN_PUBLICATION]->(pub:Publication)<-[r:MENTIONED_IN_PUBLICATION]-(p:Protein)
@@ -137,9 +137,9 @@ Drug:
   drug:
     name: 'Drug-drug interactions'
     description: 'Interaction among the drugs in the list'
-    involves_nodes:
+    involved_nodes:
       - Drug
-    involves_rels:
+    involved_rels:
       - INTERACTS_WITH
     query: >
         MATCH (d1:Drug)-[r:INTERACTS_WITH]-(d2:Drug)
@@ -148,11 +148,11 @@ Drug:
   disease:
     name: 'disease indications'
     description: 'Diseases the list of drug are indicated for'
-    involves_nodes:
+    involved_nodes:
       - Drug
       - Experimental_factor
       - Disease
-    involves_rels:
+    involved_rels:
       - INDICATED_FOR
       - MAPS_TO
     query: >
@@ -162,10 +162,10 @@ Drug:
   target:
     name: 'protein targets'
     description: 'Proteins targeted by the drugs in the list'
-    involves_nodes:
+    involved_nodes:
       - Drug
       - Protein
-    involves_rels:
+    involved_rels:
       - ACTS_ON
     query: >
         MATCH (d:Drug)-[r:ACTS_ON]-(p:Protein) 
@@ -174,10 +174,10 @@ Drug:
   target_disease:
     name: 'protein-disease associations'
     description: 'Associations between targeted proteins and the disases the list of drugs are indicated for'
-    involves_nodes:
+    involved_nodes:
       - Protein
       - Disease
-    involves_rels:
+    involved_rels:
       - ASSOCIATED_WITH
     query: >
         MATCH (p:Protein)-[r:ASSOCIATED_WITH]-(d:Disease)
@@ -186,10 +186,10 @@ Drug:
   complexes:
     name: 'protein complexes'
     description: 'Protein complexes among the targets'
-    involves_nodes:
+    involved_nodes:
       - Protein
       - Complex
-    involves_rels:
+    involved_rels:
       - BELONGS_TO
     query: >
         MATCH (p:Protein)-[r:IS_SUBUNIT_OF]-(c:Complex)
@@ -198,10 +198,10 @@ Drug:
   pathway:
     name: 'drug pathways'
     description: 'Pathways annotated for the list of drugs'
-    involves_nodes:
+    involved_nodes:
       - Drug
       - Pathway
-    involves_rels:
+    involved_rels:
       - BELONGS_TO
     query: >
         MATCH (d:Drug)-[r]-(p:Pathway)
@@ -210,10 +210,10 @@ Drug:
   target_pathway:
     name: 'target pathways'
     description: 'Pathways annotated for the list of targets'
-    involves_nodes:
+    involved_nodes:
       - Protein
       - Pathway
-    involves_rels:
+    involved_rels:
       - ANNOTATED_IN_PATHWAY
     query: >
         MATCH (p:Protein)-[r]-(c:Pathway)
@@ -222,10 +222,10 @@ Drug:
   side_effects:
     name: 'Drug side effects'
     description: 'Side effects associated to the list of drugs'
-    involves_nodes:
+    involved_nodes:
       - Drug
       - Phenotype
-    involves_rels:
+    involved_rels:
       - HAS_SIDE_EFFECT
     query: >
         MATCH (d:Drug)-[r:HAS_SIDE_EFFECT]->(p:Phenotype)
@@ -234,11 +234,11 @@ Drug:
   publication:
     name: 'Publications'
     description: 'Publications where the provided list of drugs are mentioned'
-    involves_nodes:
+    involved_nodes:
       - Drug
       - Disease
       - Publication
-    involves_rels:
+    involved_rels:
       - MENTIONED_IN_PUBLICATION
     query: >
       MATCH (di:Disease)-[:MENTIONED_IN_PUBLICATION]->(pub:Publication)<-[r:MENTIONED_IN_PUBLICATION]-(d:Drug)
