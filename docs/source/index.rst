@@ -98,7 +98,7 @@ CKG Graph Database Builder
   :doc:`Builder <ckg_builder/graphdb-builder>`
 
   * **Adding New Resources**:
-  :doc:`Ontologies <ckg_builder/graphdb-contribute>`
+  :doc:`Contributing <ckg_builder/graphdb-contribute>`
 
 .. toctree::
    :maxdepth: 2
