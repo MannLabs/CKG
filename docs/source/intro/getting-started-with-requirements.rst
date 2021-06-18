@@ -5,17 +5,32 @@
 Installation
 ===============
 
-The installation of CKG is a two step process:
+The installation of CKG can be done in two different ways:
+
+1. :ref:`ins_reqs`
+
+2. :ref:`docker`
+
+.. _ins_reqs:
+
+Installation of Requirements
+-----------------------------
+
+This installation is a two step process:
 
 1. **Installation of Neo4j**: The Neo4j graph database needs to be installed (https://neo4.com) and following the instructions here: :ref:`Installing Neo4j`
    
-2. **Installation of CKG's python library**: installation of python and CKG's modules (:ref:`Installing CKG python library`)
+2. **Installation of CKG's python library**: installation of python and CKG's modules:
 
    - Python
+   
+   - :ref:`Installing CKG python library` 	
 
-   - R (**Only Unix OS** *for now*)
+   - Optional:
 
-   - Redis (**Only Unix OS**)
+     - R (**Only Unix OS** *for now*)
+
+     - Redis (**Only Unix OS**)
 
 .. image:: ../_static/images/installation_tech.png
 	:width: 50%
@@ -32,23 +47,12 @@ You can follow this flowchart to make sure you have everything you need:
 
 The installation instructions are optimised for operating systems MacOS and Linux. The installation on Windows systems is slightly different, please go to :ref:`Windows installation`.
 
-To avoid possible compatibility issues caused by different Operating systems, python and R versions, we recommend to follow the instructions to build and use the :ref:`CKG Docker Container` instead (https://www.docker.com/).
-By building the container and running it, you will get:
 
-- Neo4j
-- CKG
-- JupyterHub
-
-.. image:: ../_static/images/docker_container.png
-	:width: 60%
-	:align: center
-
-
-Initial Requirements
---------------------------
+Requirements
+^^^^^^^^^^^^^
 
 Python
-^^^^^^^^^^^
+"""""""
 
 To facillitate the installation of Python, we recommend to use the Miniconda installer:
 
@@ -66,9 +70,9 @@ To facillitate the installation of Python, we recommend to use the Miniconda ins
 
 
 R
-^^^^^^^^^^^
+""""""
 
-Some of the analysis in CKG use R libraries (i.e SAMR, WGCNA) so they require having R installed. For now, the compatibility with R is only available for Unix Operating Systems but we are working on making them available also for Windows. Hence, the installation of R is only required when installing CKG in a Unix OS.
+Some of the analysis in CKG use R libraries (i.e SAMR, WGCNA) so they require having R installed. This installation is optional and for now compatible only for Unix Operating Systems but we are working on making them available also for Windows. Hence, the installation of R is only required when installing CKG in a Unix OS.
 
 Make sure you have installed **R version >=** |r_version|:
 
@@ -105,8 +109,8 @@ To install the necessary R packages, simply initiate R (terminal or shell) and r
 Now that you are all set, you can move on and start with Neo4j.
 
 
-Redis
-^^^^^^^^^^^
+Redis (**Only Unix OS**)
+"""""""""""""""""""""""""
 
 This installation is only necessary for Unix Operating Systems (i.e MacOS, Linux) since Windows 10 already comes with Redis installed.
 
@@ -146,4 +150,21 @@ When running CKG app, you will need to start first the Redis server with:
 
 .. warning:: In Ubuntu, the installation of Redis can be done just with:
 
-	$ apt install redis-server
+	$ apt-get install redis-server
+
+.. _docker:
+
+Docker Image
+--------------
+
+To avoid possible compatibility issues caused by different Operating systems, python and R versions, we recommend to follow the instructions to build and use the :ref:`CKG Docker Container` instead (https://www.docker.com/).
+By building the container and running it, you will get:
+
+- Neo4j
+- CKG
+- JupyterHub
+
+.. image:: ../_static/images/docker_container.png
+	:width: 60%
+	:align: center
+
