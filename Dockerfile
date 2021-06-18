@@ -120,7 +120,11 @@ RUN apt-get update && \
    r-base-dev=${R_BASE_VERSION}* \
    r-recommended=${R_BASE_VERSION}* && \
    echo 'options(repos = c(CRAN = "https://cloud.r-project.org/"), download.file.method = "libcurl")' >> /etc/R/Rprofile.site
-    
+
+## Install packages
+COPY /resources/R_packages.R /R_packages.R
+RUN Rscript R_packages.R
+
 
 # CKG Python library
 COPY ./requirements.txt .

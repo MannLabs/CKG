@@ -51,6 +51,9 @@ try:
 except ImportError:
     r_installation = False
     print("R functions will not work. Module Rpy2 not installed.")
+except Exception as e:
+    r_installation = False
+    print("Error loading R package.", e)
 
 
 def unit_vector(vector):
