@@ -7,6 +7,8 @@ CKG Docker Container
 In this section we describe how to set up the Clinical Knowledge Graph from a Docker container.
 This container will install all the requirements needed, download source databases and build the CKG graph database, and open 5 ports through which to interact with the CKG.
 
+.. warning:: This requires Docker to be previously installed.https://www.docker.com/products/docker-desktop
+
 To run the Docker, simply:
 
 1. Clone CKG’s repository: https://github.com/MannLabs/CKG
@@ -35,12 +37,25 @@ To run the Docker, simply:
 
 .. code-block:: bash
 
-	$ docker run -d --name ckgapp -p 7474:7474 -p 7687:7687 -p 8090:8090 -p 8050:8050 -v local_neo4j_logs_path:/var/log/neo4j -v local_ckg_directory_path:/CKG docker-ckg:latest
+	$ docker run -d --name ckgapp -p 7474:7474 -p 7687:7687 -p 8090:8090 -p 8050:8050 -v local_neo4j_logs_path:/var/log/neo4j -v local_ckg_log_path:/CKG/log -v local_uwsgi_logs_path:/var/log/uwsgi -v local_ckg_data_directory_path:/CKG/data docker-ckg:latest
 
 
 **local_neo4j_logs_path**: full path where you want to store the neo4j logs
 
 **local_ckg_directory_path**: full path where CKG is installed
+
+For instance:
+
+`Windows 10`:
+.. code-block:: bash
+
+	$ docker run -d --name ckgapp -p 7474:7474 -p 7687:7687 -p 8090:8090 -p 8050:8050 -v C:\Users\sande\CKG\log\neo4j:/var/log/neo4j -v C:\Users\sande\CKG\log:/CKG/log -v C:\Users\sande\CKG\log\uwsgi:/var/log/uwsgi -v C:\Users\sande\CKG\data:/CKG/data docker-ckg:latest
+
+`Unix`:
+.. code-block:: bash
+
+	$ docker run -d --name ckgapp -p 7474:7474 -p 7687:7687 -p 8090:8090 -p 8050:8050 -v /Users/sande/CKG/log/neo4j:/var/log/neo4j -v /Users/sande/CKG/log:/CKG/log -v /Users/sande/CKG/log/uwsgi:/var/log/uwsgi -v /Users/sande/CKG/data:/CKG/data docker-ckg:latest
+	
 
 Once the docker is running:
 
@@ -74,4 +89,5 @@ When the database is running:
 5. Explore options in CKG
 
 
-.. note:: Be aware, this requires Docker to be previously installed.
+.. note:: Remember that with Docker Desktop (https://www.docker.com/products/docker-desktop), you can check the logs of the running image.
+
