@@ -7,9 +7,10 @@ Installation
 
 The installation of CKG can be done in two different ways:
 
-1. :ref:`ins_reqs`
+1. :ref:`ins_reqs` --> This installation is recommended especially for admin users that want to customize and configure CKG app, Neo4j database, etc.
 
-2. :ref:`docker`
+2. :ref:`docker` --> This installation is the easiest to install and can be used to quickly set up a server version of CKG and its components (Neo4j, JupyterHub). Admin users can still customize these services by modifying how the container is built.
+
 
 .. _ins_reqs:
 

@@ -4,10 +4,18 @@
 CKG Docker Container
 ============================================
 
-In this section we describe how to set up the Clinical Knowledge Graph from a Docker container.
+In this section we describe how to set up the Clinical Knowledge Graph from a Docker container. 
+
+**What is Docker?**
+	Docker is an open platform for developing, shipping, and running applications. Docker enables you to separate your applications from your infrastructure so you can deliver software quickly.
+	With Docker, you can manage your infrastructure in the same ways you manage your applications. 
+	By taking advantage of Docker’s methodologies for shipping, testing, and deploying code quickly, you can significantly reduce the delay between writing code and running it in production (*source: https://docs.docker.com/get-started/overview/ *). 
+
+
+
 This container will install all the requirements needed, download source databases and build the CKG graph database, and open 5 ports through which to interact with the CKG.
 
-.. warning:: This requires Docker to be previously installed.https://www.docker.com/products/docker-desktop
+.. warning:: This requires Docker to be previously installed (https://www.docker.com/products/docker-desktop)
 
 To run the Docker, simply:
 
@@ -84,7 +92,7 @@ When the database is running:
   
 3. In the Home page navigate to the Admin page
 
-4. Run Minimal update (these can take a while but will run in the background. Follow progress in the docker dashboard logs)
+4. Run Minimal update (these can take a while but will run in the background. Follow progress in the docker dashboard logs) and create a user
 
 5. Explore options in CKG
 
