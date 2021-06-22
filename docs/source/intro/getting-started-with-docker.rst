@@ -55,11 +55,13 @@ To run the Docker, simply:
 For instance:
 
 `Windows 10`:
+
 .. code-block:: bash
 
 	$ docker run -d --name ckgapp -p 7474:7474 -p 7687:7687 -p 8090:8090 -p 8050:8050 -v C:\Users\sande\CKG\log\neo4j:/var/log/neo4j -v C:\Users\sande\CKG\log:/CKG/log -v C:\Users\sande\CKG\log\uwsgi:/var/log/uwsgi -v C:\Users\sande\CKG\data:/CKG/data docker-ckg:latest
 
 `Unix`:
+
 .. code-block:: bash
 
 	$ docker run -d --name ckgapp -p 7474:7474 -p 7687:7687 -p 8090:8090 -p 8050:8050 -v /Users/sande/CKG/log/neo4j:/var/log/neo4j -v /Users/sande/CKG/log:/CKG/log -v /Users/sande/CKG/log/uwsgi:/var/log/uwsgi -v /Users/sande/CKG/data:/CKG/data docker-ckg:latest
