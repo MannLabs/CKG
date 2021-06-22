@@ -43,9 +43,12 @@ This queue can be used to update the graph database in the background. Note: A f
 
 Queue used for the generation of project reports.
 
+
 .. image:: ../_static/images/homepage_app.png
-	:width: 32%
+    :width: 32%
     :align: right
+
+
 
 **Browser**
 
