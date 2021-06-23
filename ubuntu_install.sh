@@ -58,7 +58,7 @@ usermod -a -G ckg_group nginx
 echo "Python installation"
 wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz
 tar -xzf Python-${PYTHON_VERSION}.tgz
-cd /Python-${PYTHON_VERSION}
+cd Python-${PYTHON_VERSION}
 ./configure
 make altinstall
 make install
@@ -100,7 +100,7 @@ wget -P /var/lib/neo4j/plugins https://github.com/neo4j/graph-data-science/relea
 wget -P /var/lib/neo4j/plugins https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/4.2.0.4/apoc-4.2.0.4-all.jar
 
 ## Change configuration
-cp /resources/neo4j_db/neo4j.conf  /etc/neo4j/.
+cp resources/neo4j_db/neo4j.conf  /etc/neo4j/.
 dos2unix /etc/neo4j/neo4j.conf
 
 ## Test the service Neo4j
@@ -112,7 +112,7 @@ service neo4j start && \
 echo "Restoring CKG's Database dump file"
 # Load backup with Clinical Knowledge Graph
 mkdir -p /var/lib/neo4j/data/backup
-cp /resources/neo4j_db/ckg_190521_neo4j_4.2.3.dump /var/lib/neo4j/data/backup/.
+cp resources/neo4j_db/ckg_190521_neo4j_4.2.3.dump /var/lib/neo4j/data/backup/.
 mkdir -p /var/lib/neo4j/data/databases/graph.db
 sudo -u neo4j neo4j-admin load --from=/var/lib/neo4j/data/backup/ckg_190521_neo4j_4.2.3.dump --database=graph.db --force
 
@@ -160,9 +160,9 @@ apt-get -y install npm nodejs && \
 pip3 install jupyterhub
 
 mkdir /etc/jupyterhub
-cp /resources/jupyterhub.py /etc/jupyterhub/.
-cp -r /CKG/ckg/notebooks /home/adminhub/.
-cp -r /CKG/ckg/notebooks /home/ckguser/.
+cp resources/jupyterhub.py /etc/jupyterhub/.
+cp -r ckg/notebooks /home/adminhub/.
+cp -r ckg/notebooks /home/ckguser/.
 chown -R adminhub /home/adminhub/notebooks
 chgrp -R adminhub /home/adminhub/notebooks
 chown -R ckguser /home/ckguser/notebooks
@@ -175,7 +175,7 @@ ls -alrth /home/ckguser/notebooks
 echo "Installing and setting up NGINX and UWSGI"
 # NGINX and UWSGI
 ## Copy configuration file
-cp /resources/nginx.conf /etc/nginx/.
+cp resources/nginx.conf /etc/nginx/.
 
 chmod 777 /run/ -R && \
     chmod 777 /root/ -R
@@ -184,13 +184,7 @@ chmod 777 /run/ -R && \
 pip3 install uwsgi
 
 ## Copy the base uWSGI ini file
-cp /resources/uwsgi.ini /etc/uwsgi/apps-available/uwsgi.ini
-cp /resources/uwsgi.ini /etc/uwsgi/apps-enabled/uwsgi.ini
-
+cp resources/uwsgi.ini /etc/uwsgi/apps-available/uwsgi.ini
+cp resources/uwsgi.ini /etc/uwsgi/apps-enabled/uwsgi.ini
 ## Create log directory
 mkdir -p /var/log/uwsgi
-
-# Remove apt cache to make the image smaller
-rm -rf /var/lib/apt/lists/*
-chmod +x /CKG/docker_entrypoint.sh && ln -s /CKG/docker_entrypoint.sh
-dos2unix /CKG/docker_entrypoint.sh && apt-get --purge remove -y dos2unix && rm -rf /var/lib/apt/lists/*
