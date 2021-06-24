@@ -65,9 +65,11 @@ To facillitate the installation of Python, we recommend to use the Miniconda ins
 
 4. Run ``conda create -n ckgenv python=`` |qpython_version| (ckgenv is the name os the environment)
 
-5. Activate the environment by running in the terminal window: ``conda activate ckgenv``
+5. **Activate** the environment by running in the terminal window: ``conda activate ckgenv``
 
 .. note:: To deactivate the environment run: ``conda deactivate``
+
+.. warning:: Always activate ``ckgenv environment`` when starting CKG app or accessing Jupyter notebooks.
 
 
 R
