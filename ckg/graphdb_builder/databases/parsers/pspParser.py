@@ -27,13 +27,13 @@ def parser(databases_directory):
         with gzip.open(file_name, 'r') as f:
             if entity == "disease":
                 mapping = mp.getMappingFromOntology(ontology="Disease", source=None)
-                relationships[(entity, relationship_type)].update(parseDiseaseAnnotations(f, modifications, mapping))
+                relationships[(entity, relationship_type)].update(parseDiseaseAnnotations(f, mapping))
             elif entity == "biological_process":
                 mapping = mp.getMappingFromOntology(ontology="Gene_ontology", source=None)
-                relationships[(entity, relationship_type)].update(parseRegulationAnnotations(f, modifications, mapping))
+                relationships[(entity, relationship_type)].update(parseRegulationAnnotations(f, mapping))
             elif entity == "substrate":
-                relationships[(entity, relationship_type)] = parseKinaseSubstrates(f, modifications)
-
+                relationships[(entity, relationship_type)] = parseKinaseSubstrates(f)
+    
     return entities, relationships, entities_header, relationships_headers
 
 
@@ -65,7 +65,7 @@ def parseSites(fhandler, modifications):
     return entities, relationships
 
 
-def parseKinaseSubstrates(fhandler, modifications):
+def parseKinaseSubstrates(fhandler):
     relationships = set()
     i = 0
     for line in fhandler:
@@ -82,7 +82,7 @@ def parseKinaseSubstrates(fhandler, modifications):
     return relationships
 
 
-def parseRegulationAnnotations(fhandler, modifications, mapping):
+def parseRegulationAnnotations(fhandler, mapping):
     relationships = set()
     i = 0
     for line in fhandler:
@@ -110,7 +110,7 @@ def parseRegulationAnnotations(fhandler, modifications, mapping):
     return relationships
 
 
-def parseDiseaseAnnotations(fhandler, modifications, mapping):
+def parseDiseaseAnnotations(fhandler, mapping):
     relationships = set()
     i = 0
     for line in fhandler:
