@@ -42,7 +42,7 @@ def generate_project_report(project_id, config_files, force):
 
 @celery_app.task
 def run_minimal_update_task(username):
-    response = builder.run_minimal_update(user=username)
+    response = builder.run_minimal_update(user=username, n_jobs=1)
 
     return {'response': str(response)}
 

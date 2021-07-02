@@ -1,6 +1,3 @@
-#Database directory
-databasesDir : "../../../data/databases/"
-databasesImportDir : "databases"
 #Databases
 databases : 
     - "DrugBank"

@@ -1,4 +1,5 @@
 from ckg.graphdb_connector import connector
+from ckg import ckg_utils
 from ckg.graphdb_builder import builder_utils
 import os.path
 import time
@@ -7,6 +8,7 @@ import re
 import gzip
 
 try:
+    ckg_config = ckg_utils.read_ckg_config()
     oconfig = builder_utils.setup_config('ontologies')
     dbconfig = builder_utils.setup_config('databases')
 except Exception as err:
@@ -20,7 +22,7 @@ def reset_mapping(entity):
     :param str entity: entity label as defined in databases_config.yml
     """
     if entity in dbconfig["sources"]:
-        directory = os.path.join(dbconfig["databasesDir"], dbconfig["sources"][entity])
+        directory = os.path.join(ckg_config["databases_directory"], dbconfig["sources"][entity])
         mapping_file = os.path.join(directory, "complete_mapping.tsv")
         if os.path.exists(mapping_file):
             os.remove(mapping_file)
@@ -34,7 +36,7 @@ def mark_complete_mapping(entity):
     :param str entity: entity label as defined in databases_config.yml
     """
     if entity in dbconfig["sources"]:
-        directory = os.path.join(dbconfig["databasesDir"], dbconfig["sources"][entity])
+        directory = os.path.join(ckg_config["databases_directory"], dbconfig["sources"][entity])
         mapping_file = os.path.join(directory, "mapping.tsv")
         new_mapping_file = os.path.join(directory, "complete_mapping.tsv")
         if os.path.exists(mapping_file):
@@ -53,13 +55,12 @@ def getMappingFromOntology(ontology, source=None):
     """
     mapping = {}
     ont = oconfig["ontologies"][ontology]
-    dirFile = os.path.join(oconfig["ontologies_directory"], ont)
+    dirFile = os.path.join(ckg_config["ontologies_directory"], ont)
     mapping_file = os.path.join(dirFile, "complete_mapping.tsv")
     max_wait = 0
     while not os.path.isfile(mapping_file) and max_wait < 5000:
         time.sleep(5)
         max_wait += 1
-
     try:
         with open(mapping_file, 'r') as f:
             for line in f:
@@ -93,7 +94,7 @@ def getMappingForEntity(entity):
     """
     mapping = {}
     if entity in dbconfig["sources"]:
-        mapping_file = os.path.join(dbconfig["databasesDir"], os.path.join(dbconfig["sources"][entity], "complete_mapping.tsv"))
+        mapping_file = os.path.join(ckg_config["databases_directory"], os.path.join(dbconfig["sources"][entity], "complete_mapping.tsv"))
         max_wait = 0
         while not os.path.isfile(mapping_file) and max_wait < 5000:
             time.sleep(15)
@@ -123,7 +124,7 @@ def getMultipleMappingForEntity(entity):
     """
     mapping = defaultdict(set)
     if entity in dbconfig["sources"]:
-        mapping_file = os.path.join(dbconfig["databasesDir"], os.path.join(dbconfig["sources"][entity], "complete_mapping.tsv"))
+        mapping_file = os.path.join(ckg_config["databases_directory"], os.path.join(dbconfig["sources"][entity], "complete_mapping.tsv"))
         max_wait = 0
         while not os.path.isfile(mapping_file) and max_wait < 5000:
             time.sleep(5)
@@ -172,7 +173,7 @@ def getSTRINGMapping(source="BLAST_UniProt_AC", download=True, db="STRING"):
     """
     url = get_STRING_mapping_url(db=db)
     mapping = defaultdict(set)
-    directory = os.path.join(dbconfig["databasesDir"], db)
+    directory = os.path.join(ckg_config["databases_directory"], db)
     file_name = os.path.join(directory, url.split('/')[-1])
     builder_utils.checkDirectory(directory)
     if download:

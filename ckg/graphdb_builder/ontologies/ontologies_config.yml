@@ -1,7 +1,3 @@
-#Ontologies directory
-ontologies_directory: '../../../data/ontologies/'
-ontologies_importDir: 'ontologies'
-
 ontologies:
     'Disease': 'DO'
     'Tissue': 'BTO'

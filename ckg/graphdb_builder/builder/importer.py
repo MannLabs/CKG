@@ -119,7 +119,7 @@ def experimentImport(importDirectory, experimentsDirectory, project):
 
 
 
-def usersImport(importDirectory, import_type='partial'):
+def usersImport(import_type='partial'):
     """
     Generates User entities from excel file and grants access of new users to the database.
     This function also writes the relevant information to a tab-delimited file in the import \

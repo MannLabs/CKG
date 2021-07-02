@@ -20,7 +20,6 @@ try:
     log_config = ckg_config['graphdb_builder_log']
     logger = builder_utils.setup_logging(log_config, key="builder")
     config = builder_utils.setup_config('builder')
-    directories = builder_utils.get_full_path_directories()
     dbconfig = builder_utils.setup_config('databases')
     oconfig = builder_utils.setup_config('ontologies')
 except Exception as err:
@@ -97,7 +96,7 @@ def main():
                     if import_type.lower() == 'experiments' or import_type.lower() == 'experiment':
                         importer.experimentsImport(projects=args.data, n_jobs=1)
                     elif import_type.lower() == 'users' or import_type.lower() == 'user':
-                        importer.usersImport(importDirectory=directories['importDirectory'])
+                        importer.usersImport()
                     elif import_type.lower() == 'databases' or import_type.lower() == 'database':
                         databases = [d.lower() for d in dbconfig['databases']]
                         if args.data is not None:

@@ -32,7 +32,6 @@ try:
     log_config = ckg_config['graphdb_builder_log']
     logger = builder_utils.setup_logging(log_config, key="loader")
     config = builder_utils.setup_config('builder')
-    directories = builder_utils.get_full_path_directories()
 except Exception as err:
     logger.error("Reading configuration > {}.".format(err))
 
