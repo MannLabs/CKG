@@ -94,7 +94,7 @@ When the database is running:
   
 3. In the Home page navigate to the Admin page
 
-4. Run Minimal update (these can take a while but will run in the background. Follow progress in the docker dashboard logs) and create a user
+4. Run Minimal update (:ref:`minimal update`)(these can take a while but will run in the background. Follow progress in the docker dashboard logs) and create a user
 
 5. Explore options in CKG
 
