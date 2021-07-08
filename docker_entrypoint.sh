@@ -8,7 +8,7 @@ service neo4j status
 
 while ! [[ `wget -S --spider http://localhost:7474  2>&1 | grep 'HTTP/1.1 200 OK'` ]]; do
 echo "Database not ready"
-sleep 60
+sleep 45
 done
 
 echo "Database ready"
@@ -23,9 +23,9 @@ service redis-server start
 
 echo "Running celery queues"
 cd ckg/report_manager
-celery -A ckg.report_manager.worker worker --loglevel=INFO --concurrency=1 -E -Q creation &
-celery -A ckg.report_manager.worker worker --loglevel=INFO --concurrency=3 -E -Q compute &
-celery -A ckg.report_manager.worker worker --loglevel=INFO --concurrency=1 -E -Q update &
+celery -A ckg.report_manager.worker worker --loglevel=INFO --concurrency=1 -E -Q creation --uid 1500 --gid nginx &
+celery -A ckg.report_manager.worker worker --loglevel=INFO --concurrency=3 -E -Q compute --uid 1500 --gid nginx &
+celery -A ckg.report_manager.worker worker --loglevel=INFO --concurrency=1 -E -Q update --uid 1500 --gid nginx &
 
 echo "Initiating CKG app"
 cd /CKG

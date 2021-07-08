@@ -143,12 +143,15 @@ RUN python3 ckg/init.py
 RUN chown -R nginx .
 RUN chgrp -R ckg_group .
 
+RUN ls -alrth .
+RUN ls -alrth data
+
+
 WORKDIR /
 
 # JupyterHub
 RUN apt-get -y install npm nodejs && \
     npm install -g configurable-http-proxy
-    
 RUN pip3 install jupyterhub
 
 RUN mkdir /etc/jupyterhub
@@ -159,9 +162,6 @@ RUN chown -R adminhub /home/adminhub/notebooks
 RUN chgrp -R adminhub /home/adminhub/notebooks
 RUN chown -R ckguser /home/ckguser/notebooks
 RUN chgrp -R ckguser /home/ckguser/notebooks
-
-RUN ls -alrth /home/ckguser
-RUN ls -alrth /home/ckguser/notebooks
 
 # NGINX and UWSGI
 ## Copy configuration file
@@ -186,10 +186,6 @@ RUN rm -rf /var/lib/apt/lists/*
 RUN chmod +x /CKG/docker_entrypoint.sh && ln -s /CKG/docker_entrypoint.sh
 RUN dos2unix /CKG/docker_entrypoint.sh && apt-get --purge remove -y dos2unix && rm -rf /var/lib/apt/lists/*
 
-RUN ls -alrth /
-RUN ls -alrth /CKG
-RUN ls -alrth /CKG/ckg/notebooks
-RUN pip3 freeze
 # Expose ports (HTTP Neo4j, Bolt Neo4j, jupyterHub, CKG prod, CKG dev, Redis)
 EXPOSE 7474 7687 8090 8050 5000 6379
 
