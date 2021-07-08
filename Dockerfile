@@ -57,11 +57,11 @@ WORKDIR /
 RUN locale-gen en_US.UTF-8
 
 # gpg key for cran updates
-RUN gpg --keyserver keyserver.ubuntu.com --recv-keys E084DAB9 && \
+RUN gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E084DAB9 && \
     gpg -a --export E084DAB9 > cran.asc && \
     apt-key add cran.asc
 
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 51716619E084DAB9   
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 51716619E084DAB9   
 
 RUN echo "deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/" > /etc/apt/sources.list.d/cran.list
 
