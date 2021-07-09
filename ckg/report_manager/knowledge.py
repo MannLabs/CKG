@@ -445,7 +445,7 @@ class Knowledge:
                     if entity_type.capitalize() in cypher_queries:
                         queries = cypher_queries[entity_type.capitalize()]
                         for query_name in queries:
-                            involved_nodes = queries[query_name]['involves_nodes']
+                            involved_nodes = queries[query_name]['involved_nodes']
                             if len(set(involved_nodes).intersection(entities)) > 0 or query_name.capitalize() == entity_type.capitalize():
                                 query = queries[query_name]['query']
                                 q = 'NA'
