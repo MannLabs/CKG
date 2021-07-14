@@ -45,27 +45,24 @@ To run the Docker, simply:
 
 .. code-block:: bash
 
-	$ docker run -d --name ckgapp -p 7474:7474 -p 7687:7687 -p 8090:8090 -p 8050:8050 -v local_neo4j_logs_path:/var/log/neo4j -v local_ckg_log_path:/CKG/log -v local_uwsgi_logs_path:/var/log/uwsgi -v local_ckg_data_directory_path:/CKG/data docker-ckg:latest
+	$ docker run -d --name ckgapp -p 7474:7474 -p 7687:7687 -p 8090:8090 -p 8050:8050 docker-ckg:latest
 
 
-**local_neo4j_logs_path**: full path where you want to store the neo4j logs
-
-**local_ckg_directory_path**: full path where CKG is installed
-
-For instance:
-
-`Windows 10`:
+Once the container is running, you can open an interactive bash session using:
 
 .. code-block:: bash
 
-	$ docker run -d --name ckgapp -p 7474:7474 -p 7687:7687 -p 8090:8090 -p 8050:8050 -v C:\Users\sande\CKG\log\neo4j:/var/log/neo4j -v C:\Users\sande\CKG\log:/CKG/log -v C:\Users\sande\CKG\log\uwsgi:/var/log/uwsgi -v C:\Users\sande\CKG\data:/CKG/data docker-ckg:latest
+	$ docker exec -it ckgapp bash
 
-`Unix`:
 
-.. code-block:: bash
+You will have access to the logs within the container at:
 
-	$ docker run -d --name ckgapp -p 7474:7474 -p 7687:7687 -p 8090:8090 -p 8050:8050 -v /Users/sande/CKG/log/neo4j:/var/log/neo4j -v /Users/sande/CKG/log:/CKG/log -v /Users/sande/CKG/log/uwsgi:/var/log/uwsgi -v /Users/sande/CKG/data:/CKG/data docker-ckg:latest
-	
+- **Neo4j**: ``/var/log/neo4j``
+
+- **CKG**: ``/CKG/log``
+
+- **uwsgi**: ``/var/log/uwsgi``
+
 
 Once the docker is running:
 

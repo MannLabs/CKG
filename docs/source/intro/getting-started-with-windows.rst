@@ -9,27 +9,16 @@ Windows Installation
 In this section we describe how to install all the necessary requirements and set up the Clinical Knowledge Graph on a Windows operating system.
 
 
-Java
--------
-
-Similarly to MacOS and Linux, Windows will also need a **Java** installation (Java SE Runtime Environment and Java SE Development Kit).
-
-Be aware that different versions of a Neo4j database can have different requirements. For example, Neo4j 3.5 versions require Oracle Java 8, while Neo4j 4.0 versions already require Oracle Java 11.
-When using a new version of Neo4j, always remember to read the respective Operations Manual, and check for the software requirements.
-
-By default Java should be installed on the Windows 10. If this is not your case, please follow this `tutorial <https://docs.oracle.com/javase/8/docs/technotes/guides/install/windows_jdk_install.html#A1097936>`__ to install it.
-
-
 Neo4j
 -------
 
-The installation of Neo4j on Windows follows the same steps as in :ref:`Installing Neo4j`:
+The installation of Neo4j on Windows follows the same steps as in :ref:`Installing Neo4j`
 
 
 Python
 ----------
 
-The installation of Python on Windows follows the same steps as in :ref:`Installation`:
+The installation of Python on Windows follows the same steps as in :ref:`Installation`
 
 Microsoft Visual C++ Build Tools
 ----------------------------------
@@ -54,7 +43,7 @@ The build tools allow Python packages to be built in Windows, from the command l
 R
 -------
 
-Another essential package for the functioning of the Clinical Knowledge Graph is R.
+Another essential package for the functioning of the Clinical Knowledge Graph is R. R packages (SAMR and WGCNA) are not available for Windows yet due to library incompatibilities (Rpy2). We are however working to solve this to provide the full functionality also in Windows.
 
 You can check if an **R version >=** |r_version| is already installed by running:
 

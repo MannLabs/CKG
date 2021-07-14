@@ -191,13 +191,13 @@ def set_arguments():
     """
     parser = argparse.ArgumentParser('Use an excel file (multiple new users) or the function arguments (one new user at a time) to create new users in the database')
     parser.add_argument('-f', '--file', help='define path to file with users creation information', type=str, required=False)
-    parser.add_argument('-u', '--username', help='define the username to be created', type=str, required=False)
+    parser.add_argument('-u', '--username', help='define the username to be created', type=str, required=True)
     parser.add_argument('-d', '--password', help='define the user password', type=str, required=False)
-    parser.add_argument('-n', '--name', help='define the name of the user', type=str, required=False)
+    parser.add_argument('-n', '--name', help='define the name of the user', type=str, required=True)
     parser.add_argument('-e', '--email', help='define the email of the user being created', type=str, required=False)
     parser.add_argument('-s', '--secondary_email', help='define an alternative email for the user', type=str, required=False)
-    parser.add_argument('-p', '--phone_number', help='define a phone number where the user can be reached', type=str, required=False)
-    parser.add_argument('-a', '--affiliation', help="define the user's affiliation (University, Group)", type=str, required=False)
+    parser.add_argument('-p', '--phone_number', help='define a phone number where the user can be reached', type=str, required=True)
+    parser.add_argument('-a', '--affiliation', help="define the user's affiliation (University, Group)", type=str, required=True)
     parser.add_argument('-i', '--image', help='define path to a picture of the user', type=str, default='', required=False)
 
     return parser
