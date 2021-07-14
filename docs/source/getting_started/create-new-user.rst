@@ -1,6 +1,8 @@
 Create a new user in the graph database
 =======================================
 
+.. warning:: CKG has implemented a simple authentication and user management method, but industry-accepted platforms, vendors, or libraries should be used in a production setup.
+
 The creation of a new user includes two steps:
 
 1. The user who is currently logged-in in the database and invoking the commands, has to add the new user to the system and attribute it a role, by default ``reader``.
