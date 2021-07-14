@@ -133,15 +133,19 @@ RUN python3 -m pip install --ignore-installed -r requirements.txt
 ###Creating CKG directory and setting up CKG
 RUN mkdir /CKG
 COPY --chown=nginx ckg /CKG/ckg
+COPY --chown=nginx data /CKG/data
 COPY docker_entrypoint.sh /CKG/.
 ENV PYTHONPATH "${PYTHONPATH}:/CKG"
 RUN ls -lrth /CKG
 ### Installation
 WORKDIR /CKG
 RUN python3 ckg/init.py
-#### Directory ownership 
+
+RUN touch log/graphdb_builder.log log/graphdb_connector.log log/report_manager.log log/analytics_factory.log
+#### Directory ownership
 RUN chown -R nginx .
 RUN chgrp -R ckg_group .
+RUN chmod 777 log/ -R
 
 RUN ls -alrth .
 RUN ls -alrth data
