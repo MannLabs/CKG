@@ -15,7 +15,7 @@ In this section we describe how to set up the Clinical Knowledge Graph from a Do
 
 This container will install all the requirements needed, download source databases and build the CKG graph database, and open 5 ports through which to interact with the CKG.
 
-.. warning:: This requires Docker to be previously installed (https://docs.docker.com/engine/install/)
+.. warning:: This requires Docker to be previously installed (https://docs.docker.com/engine/install/). Notice that the installation in Unix systems is a bit different than in Windows or MacOS, check the instructions for your specific distribution (https://docs.docker.com/engine/install/#server).
 
 To run the Docker, simply:
 
