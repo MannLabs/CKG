@@ -13,7 +13,7 @@ done
 
 echo "Database ready"
 echo "Creating Test user in the database"
-python3 ckg/graphdb_builder/builder/create_user.py -u test_user -d test_user -n test -e test@ckg.com -a test
+python3 ckg/graphdb_builder/builder/create_user.py -u test_user -d test_user -n test -e test@ckg.com -a test -p 12345678
 
 echo "Running jupyterHub"
 jupyterhub -f /etc/jupyterhub/jupyterhub.py --no-ssl &
