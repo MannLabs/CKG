@@ -82,15 +82,15 @@ class Analysis:
             if self.analysis_type == "wide_format":
                 r = analytics.transform_into_wide_format(self.data, self.args['index'], self.args['columns'], self.args['values'], extra=[self.args['extra']])
                 self.result[self.analysis_type] = r
-            if self.analysis_type == "summary":
+            elif self.analysis_type == "summary":
                 r = analytics.get_summary_data_matrix(self.data)
                 self.result[self.analysis_type] = r
-            if self.analysis_type == "normalization":
+            elif self.analysis_type == "normalization":
                 method = 'median_polish'
                 if 'method' in self.args:
                     method = self.args['method']
                 self.result[self.analysis_type] = analytics.normalize_data(self.data, method=method)
-            if self.analysis_type == "pca":
+            elif self.analysis_type == "pca":
                 components = 2
                 drop_cols = []
                 group = 'group'
@@ -106,7 +106,7 @@ class Analysis:
                 r, nargs = analytics.run_pca(self.data, components=components, drop_cols=drop_cols, group=group, annotation_cols=annotation_cols)
                 self.result[self.analysis_type] = r
                 self.args.update(nargs)
-            if self.analysis_type == 'functional_pca':
+            elif self.analysis_type == 'functional_pca':
                 dfid = 'processed'
                 annotid = 'go annotation'
                 key = 'nes'
