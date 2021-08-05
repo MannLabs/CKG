@@ -1673,7 +1673,7 @@ def get_table(data, identifier, args):
         list_cols = list_cols.index[list_cols].tolist()
 
         for c in list_cols:
-            data[c] = data[c].apply(lambda x: ";".join(x))
+            data[c] = data[c].apply(lambda x: ";".join([str(i) for i in x]))
 
         data_trace = dash_table.DataTable(id='table_'+identifier,
                                             data=data.astype(str).to_dict("rows"),
