@@ -1260,100 +1260,101 @@ def get_network(data, identifier, args):
                 else:
                     data = data[data[args['values']] >= args['cutoff']]
 
-            data[args["source"]] = [str(n).replace("'","") for n in data[args["source"]]]
-            data[args["target"]] = [str(n).replace("'","") for n in data[args["target"]]]
+            if not data.empty:
+                data[args["source"]] = [str(n).replace("'","") for n in data[args["source"]]]
+                data[args["target"]] = [str(n).replace("'","") for n in data[args["target"]]]
 
 
-            data = data.rename(index=str, columns={args['values']: "width"})
-            data['width'] = data['width'].fillna(1.0)
-            data = data.fillna('null')
-            data.columns = [c.replace('_', '') for c in data.columns]
-            data['edgewidth'] = data['width'].apply(np.abs)
-            min_edge_value = data['edgewidth'].min()
-            max_edge_value = data['edgewidth'].max()
-            if min_edge_value == max_edge_value:
-                min_edge_value = 0.
-            graph = nx.from_pandas_edgelist(data, args['source'], args['target'], edge_attr=True)
+                data = data.rename(index=str, columns={args['values']: "width"})
+                data['width'] = data['width'].fillna(1.0)
+                data = data.fillna('null')
+                data.columns = [c.replace('_', '') for c in data.columns]
+                data['edgewidth'] = data['width'].apply(np.abs)
+                min_edge_value = data['edgewidth'].min()
+                max_edge_value = data['edgewidth'].max()
+                if min_edge_value == max_edge_value:
+                    min_edge_value = 0.
+                graph = nx.from_pandas_edgelist(data, args['source'], args['target'], edge_attr=True)
 
-            degrees = dict(graph.degree())
-            nx.set_node_attributes(graph, degrees, 'degree')
-            betweenness = None
-            ev_centrality = None
-            if data.shape[0] < 150 and data.shape[0] > 5:
-                try:
-                    betweenness = nx.betweenness_centrality(graph, weight='width')
-                    ev_centrality = nx.eigenvector_centrality_numpy(graph)
-                    ev_centrality = {k:"%.3f" % round(v, 3) for k,v in ev_centrality.items()}
-                    nx.set_node_attributes(graph, betweenness, 'betweenness')
-                    nx.set_node_attributes(graph, ev_centrality, 'eigenvector')
-                except Exception as e:
-                    print("There was an exception when calculating centralities: {}".format(e))
+                degrees = dict(graph.degree())
+                nx.set_node_attributes(graph, degrees, 'degree')
+                betweenness = None
+                ev_centrality = None
+                if data.shape[0] < 150 and data.shape[0] > 5:
+                    try:
+                        betweenness = nx.betweenness_centrality(graph, weight='width')
+                        ev_centrality = nx.eigenvector_centrality_numpy(graph)
+                        ev_centrality = {k:"%.3f" % round(v, 3) for k,v in ev_centrality.items()}
+                        nx.set_node_attributes(graph, betweenness, 'betweenness')
+                        nx.set_node_attributes(graph, ev_centrality, 'eigenvector')
+                    except Exception as e:
+                        print("There was an exception when calculating centralities: {}".format(e))
 
-            min_node_size = 0
-            max_node_size = 0
-            if 'node_size' not in args:
-                args['node_size'] = 'degree'
+                min_node_size = 0
+                max_node_size = 0
+                if 'node_size' not in args:
+                    args['node_size'] = 'degree'
 
-            if args['node_size'] == 'betweenness' and betweenness is not None:
-                min_node_size = min(betweenness.values())
-                max_node_size = max(betweenness.values())
-                nx.set_node_attributes(graph, betweenness, 'radius')
-            elif args['node_size'] == 'ev_centrality' and ev_centrality is not None:
-                min_node_size = min(ev_centrality.values())
-                max_node_size = max(ev_centrality.values())
-                nx.set_node_attributes(graph, ev_centrality, 'radius')
-            elif args['node_size'] == 'degree':
-                min_node_size = min(degrees.values())
-                max_node_size = max(degrees.values())
-                nx.set_node_attributes(graph, degrees, 'radius')
+                if args['node_size'] == 'betweenness' and betweenness is not None:
+                    min_node_size = min(betweenness.values())
+                    max_node_size = max(betweenness.values())
+                    nx.set_node_attributes(graph, betweenness, 'radius')
+                elif args['node_size'] == 'ev_centrality' and ev_centrality is not None:
+                    min_node_size = min(ev_centrality.values())
+                    max_node_size = max(ev_centrality.values())
+                    nx.set_node_attributes(graph, ev_centrality, 'radius')
+                elif args['node_size'] == 'degree' and len(degrees) > 0:
+                        min_node_size = min(degrees.values())
+                        max_node_size = max(degrees.values())
+                        nx.set_node_attributes(graph, degrees, 'radius')
 
-            clusters = analytics.get_network_communities(graph, args)
-            col = utils.get_hex_colors(len(set(clusters.values())))
-            colors = {n:col[clusters[n]] for n in clusters}
-            nx.set_node_attributes(graph, colors, 'color')
-            nx.set_node_attributes(graph, clusters, 'cluster')
+                clusters = analytics.get_network_communities(graph, args)
+                col = utils.get_hex_colors(len(set(clusters.values())))
+                colors = {n:col[clusters[n]] for n in clusters}
+                nx.set_node_attributes(graph, colors, 'color')
+                nx.set_node_attributes(graph, clusters, 'cluster')
 
-            vis_graph = graph
-            limit=500
-            if 'limit' in args:
-                limit = args['limit']
-            if limit is not None:
-                if len(vis_graph.edges()) > 500:
-                    max_nodes = 150
-                    cluster_members = defaultdict(list)
-                    cluster_nums = {}
-                    for n in clusters:
-                        if clusters[n] not in cluster_nums:
-                            cluster_nums[clusters[n]] = 0
-                        cluster_members[clusters[n]].append(n)
-                        cluster_nums[clusters[n]] += 1
-                    valid_clusters = [c for c,n in sorted(cluster_nums.items() ,  key=lambda x: x[1])]
-                    valid_nodes = []
-                    for c in valid_clusters:
-                        valid_nodes.extend(cluster_members[c])
-                        if len(valid_nodes) >= max_nodes:
-                            valid_nodes = valid_nodes[0:max_nodes]
-                            break
-                    vis_graph = vis_graph.subgraph(valid_nodes)
+                vis_graph = graph
+                limit=500
+                if 'limit' in args:
+                    limit = args['limit']
+                if limit is not None:
+                    if len(vis_graph.edges()) > 500:
+                        max_nodes = 150
+                        cluster_members = defaultdict(list)
+                        cluster_nums = {}
+                        for n in clusters:
+                            if clusters[n] not in cluster_nums:
+                                cluster_nums[clusters[n]] = 0
+                            cluster_members[clusters[n]].append(n)
+                            cluster_nums[clusters[n]] += 1
+                        valid_clusters = [c for c,n in sorted(cluster_nums.items() ,  key=lambda x: x[1])]
+                        valid_nodes = []
+                        for c in valid_clusters:
+                            valid_nodes.extend(cluster_members[c])
+                            if len(valid_nodes) >= max_nodes:
+                                valid_nodes = valid_nodes[0:max_nodes]
+                                break
+                        vis_graph = vis_graph.subgraph(valid_nodes)
 
-            nodes_table, edges_table = network_to_tables(graph, source=args["source"], target=args["target"])
-            nodes_fig_table = get_table(nodes_table, identifier=identifier+"_nodes_table", args={'title':args['title']+" nodes table"})
-            edges_fig_table = get_table(edges_table, identifier=identifier+"_edges_table", args={'title':args['title']+" edges table"})
+                nodes_table, edges_table = network_to_tables(graph, source=args["source"], target=args["target"])
+                nodes_fig_table = get_table(nodes_table, identifier=identifier+"_nodes_table", args={'title':args['title']+" nodes table"})
+                edges_fig_table = get_table(edges_table, identifier=identifier+"_edges_table", args={'title':args['title']+" edges table"})
 
-            stylesheet, layout = get_network_style(colors, args['color_weight'])
-            stylesheet.append({'selector':'edge','style':{'width':'mapData(edgewidth,'+ str(min_edge_value) +','+ str(max_edge_value) +', .5, 8)'}})
-            if min_node_size > 0 and max_node_size > 0:
-                mapper = 'mapData(radius,'+ str(min_node_size) +','+ str(max_node_size) +', 15, 50)'
-                stylesheet.append({'selector':'node','style':{'width':mapper, 'height':mapper}})
-            args['stylesheet'] = stylesheet
-            args['layout'] = layout
+                stylesheet, layout = get_network_style(colors, args['color_weight'])
+                stylesheet.append({'selector':'edge','style':{'width':'mapData(edgewidth,'+ str(min_edge_value) +','+ str(max_edge_value) +', .5, 8)'}})
+                if min_node_size > 0 and max_node_size > 0:
+                    mapper = 'mapData(radius,'+ str(min_node_size) +','+ str(max_node_size) +', 15, 50)'
+                    stylesheet.append({'selector':'node','style':{'width':mapper, 'height':mapper}})
+                args['stylesheet'] = stylesheet
+                args['layout'] = layout
 
-            cy_elements, mouseover_node = utils.networkx_to_cytoscape(vis_graph)
+                cy_elements, mouseover_node = utils.networkx_to_cytoscape(vis_graph)
 
-            app_net = get_cytoscape_network(cy_elements, identifier, args)
-            #args['mouseover_node'] = mouseover_node
+                app_net = get_cytoscape_network(cy_elements, identifier, args)
+                #args['mouseover_node'] = mouseover_node
 
-            net = {"notebook":[cy_elements, stylesheet, layout], "app": app_net, "net_tables": (nodes_table, edges_table), "net_tables_viz":(nodes_fig_table, edges_fig_table), "net_json":json_graph.node_link_data(graph)}
+                net = {"notebook":[cy_elements, stylesheet, layout], "app": app_net, "net_tables": (nodes_table, edges_table), "net_tables_viz":(nodes_fig_table, edges_fig_table), "net_json":json_graph.node_link_data(graph)}
     return net
 
 def get_network_style(node_colors, color_edges):
