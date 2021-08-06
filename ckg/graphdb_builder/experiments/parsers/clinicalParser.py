@@ -346,10 +346,11 @@ def extract_subject_intervention_rels(clinical_data, separator='|'):
             types = clinical_data.set_index('subject external_id')['had_intervention_type'].astype(str).str.split(separator, expand=True).stack().str.strip().reset_index(level=1, drop=True)
             combi = clinical_data.set_index('subject external_id')['had_intervention_in_combination'].astype(str).str.split(separator, expand=True).stack().str.strip().reset_index(level=1, drop=True)
             response = clinical_data.set_index('subject external_id')['had_intervention_response'].astype(str).str.split(separator, expand=True).stack().str.strip().reset_index(level=1, drop=True)
-            df = pd.concat([interventions, types, combi, response], axis=1).reset_index()
+            df = pd.concat([interventions, types, combi, response], axis=1,  join='inner')
+            df = df.reset_index()
             df.columns = ['START_ID', 'END_ID', 'type', 'in_combination', 'response']
             df.insert(loc=2, column='TYPE', value='HAD_INTERVENTION')
-
+            
     return df
 
 
