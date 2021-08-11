@@ -421,6 +421,7 @@ def extract_peptide_protein_rels(data, configuration):
 
 
 def extract_protein_subject_rels(data, configuration):
+    aux = pd.DataFrame()
     regex = None
     attributes = configuration["attributes"]
     if 'regex' in configuration:
