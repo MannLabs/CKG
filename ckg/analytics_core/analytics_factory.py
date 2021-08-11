@@ -277,17 +277,12 @@ class Analysis:
                     correction = self.args['correction_method']
                 if "covariates" in self.args:
                     covariates = self.args["covariates"]
-                print("About to start")
-                print(self.data.keys())
                 if 'processed' in self.data and 'metadata' in self.data:
-                    print("IN")
                     metadata = self.data['metadata']
                     processed = self.data['processed']
                     df = processed.set_index([subject, group]).join(metadata.set_index([subject, group])[covariates]).reset_index()
-                    print("ANCOVA", df.head())
                     ancova_result = analytics.run_ancova(df, covariates=covariates, drop_cols=drop_cols, subject=subject, group=group, alpha=alpha, permutations=permutations, is_logged=is_logged, correction=correction)
                     self.result[self.analysis_type] = ancova_result
-                    print("Result", ancova_result)
             elif self.analysis_type == 'qcmarkers':
                 sample_col = 'sample'
                 group_col = 'group'
@@ -355,7 +350,7 @@ class Analysis:
                 start = time.time()
                 alpha = 0.05
                 drop_cols = []
-                group = 'group'
+                within = 'group'
                 subject = 'subject'
                 permutations = 50
                 correction = 'fdr_bh'
@@ -364,16 +359,47 @@ class Analysis:
                 if "drop_cols" in self.args:
                     drop_cols = self.args['drop_cols']
                 if "group" in self.args:
-                    group = self.args["group"]
+                    within = self.args["within"]
                 if "subject" in self.args:
                     subject = self.args["subject"]
                 if "permutations" in self.args:
                     permutations = self.args["permutations"]
                 if 'correction_method' in self.args:
                     correction = self.args['correction_method']
-                anova_result = analytics.run_repeated_measurements_anova(self.data, drop_cols=drop_cols, subject=subject, group=group, alpha=alpha, permutations=permutations, correction=correction)
+                anova_result = analytics.run_repeated_measurements_anova(self.data, drop_cols=drop_cols, subject=subject, within=within, alpha=alpha, permutations=permutations, correction=correction)
                 self.result[self.analysis_type] = anova_result
-                print('repeated-ANOVA', time.time() - start)
+            elif self.analysis_type == "mixed_anova":
+                start = time.time()
+                alpha = 0.05
+                drop_cols = []
+                within = 'group'
+                between = 'group2'
+                subject = 'subject'
+                permutations = 50
+                correction = 'fdr_bh'
+                is_logged = True
+                if "alpha" in self.args:
+                    alpha = self.args["alpha"]
+                if "drop_cols" in self.args:
+                    drop_cols = self.args['drop_cols']
+                if "within" in self.args:
+                    within = self.args["within"]
+                if "subject" in self.args:
+                    subject = self.args["subject"]
+                if "permutations" in self.args:
+                    permutations = self.args["permutations"]
+                if 'correction_method' in self.args:
+                    correction = self.args['correction_method']
+                if "between" in self.args:
+                    between = self.args["between"]
+                if 'is_logged' in self.args:
+                    is_logged = self.args['is_logged']
+                if 'processed' in self.data and 'metadata' in self.data:
+                    metadata = self.data['metadata']
+                    processed = self.data['processed']
+                    df = processed.set_index([subject, within]).join(metadata.set_index([subject, within])[between]).reset_index()
+                    anova_result = analytics.run_mixed_anova(df, between=between, drop_cols=drop_cols, subject=subject, within=within, alpha=alpha, permutations=permutations, is_logged=is_logged, correction=correction)
+                    self.result[self.analysis_type] = anova_result
             elif self.analysis_type == "dabest":
                 drop_cols = []
                 group = 'group'

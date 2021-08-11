@@ -105,7 +105,7 @@ proteomics:
             WITH subject, bs, clinvar, r1
             WHERE project.id="PROJECTID"
             MATCH (bs)-[r2:SPLITTED_INTO]-(an:Analytical_sample)
-            RETURN subject.external_id AS subject, bs.external_id AS biological_sample, an.group AS group, clinvar.name AS clinical_variable, r1.value AS value, type(r1) AS rel_type ORDER BY subject
+            RETURN subject.external_id AS subject, bs.external_id AS biological_sample, an.group AS group, an.group2 AS group2, clinvar.name AS clinical_variable, r1.value AS value, type(r1) AS rel_type ORDER BY subject
     PROTEIN_PATHWAY_ANNOTATION:
         name: 'get pathway annotations for the proteins identified'
         description: 'Get all the pathway annotations for the all the proteins identified in a project'
@@ -422,7 +422,7 @@ clinical:
             WITH subject, bs, clinvar, r1
             WHERE project.id="PROJECTID"
             MATCH (bs)-[r2:SPLITTED_INTO]-(an:Analytical_sample)
-            RETURN subject.external_id AS subject, bs.external_id AS biological_sample, an.group AS group, clinvar.name AS clinical_variable, r1.value AS value, type(r1) AS rel_type ORDER BY subject
+            RETURN subject.external_id AS subject, bs.external_id AS biological_sample, an.group AS group, an.group AS group2, clinvar.name AS clinical_variable, r1.value AS value, type(r1) AS rel_type ORDER BY subject
 wes:
     NUMBER_SOMATIC_MUTATIONS:
         name: 'number somatic mutations'

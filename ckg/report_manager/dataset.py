@@ -231,16 +231,22 @@ class Dataset:
                                     report_step[section][subsection]['args'] = result.args
                                     report_pipeline.update(report_step)
                                     if store_analysis:
-                                        if analysis_type.lower() in ["anova", "samr", "ttest", "ancova"]:
+                                        if analysis_type.lower() in ["anova", "samr", "ttest", "ancova", "mixed_anova"]:
                                             reg_data = result.result[analysis_type]
                                             if not reg_data.empty:
                                                 if isinstance(data, dict):
                                                     data = data['processed']
-                                                cols = ['group']
+                                                cols = []
+                                                if 'group' in data.columns:
+                                                    cols.append('group')
                                                 if 'sample' in data.columns:
                                                     cols.append('sample')
                                                 if 'subject' in data.columns:
                                                     cols.append('subject')
+                                                if 'within' in data.columns:
+                                                    cols.append('within')
+                                                if 'between' in data.columns:
+                                                    cols.append('between')
                                                 sig_hits = list(set(reg_data.loc[reg_data.rejected,"identifier"])) + cols
                                                 sig_data = data[sig_hits]
                                                 self.update_data({"regulated": sig_data, "regulation table": reg_data})
@@ -422,7 +428,7 @@ class ProteomicsDataset(Dataset):
 
     def widen_metadata_dataset(self):
         data = self.get_dataframe("metadata")
-        wdata = analytics.transform_into_wide_format(data, index=['subject', 'biological_sample'], columns='clinical_variable', values='value', extra=['group'])
+        wdata = analytics.transform_into_wide_format(data, index=['subject', 'biological_sample'], columns='clinical_variable', values='value', extra=['group', 'group2'])
         self.update_data({"metadata": wdata})
 
     def processing(self):
@@ -551,7 +557,7 @@ class ClinicalDataset(Dataset):
 
     def widen_original_dataset(self):
         data = self.get_dataframe("original")
-        wdata = analytics.transform_into_wide_format(data, index=['subject', 'biological_sample'], columns='clinical_variable', values='value', extra=['group'])
+        wdata = analytics.transform_into_wide_format(data, index=['subject', 'biological_sample'], columns='clinical_variable', values='value', extra=['group', 'group2'])
         self.update_data({"original": wdata})
 
     def processing(self):

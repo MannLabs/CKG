@@ -1634,32 +1634,59 @@ def calculate_ancova(data, column, group='group', covariates=[]):
 
     return (column, df, df, t, pvalue)
 
-def calculate_repeated_measures_anova(df, column, subject='subject', group='group'):
+def calculate_repeated_measures_anova(df, column, subject='subject', within='group'):
     """
     One-way and two-way repeated measures ANOVA using pingouin stats.
 
     :param df: pandas dataframe with samples as rows and protein identifier as column. Data must be in long-format for two-way repeated measures.
     :param str column: column label containing the dependant variable
     :param str subject: column label containing subject identifiers
-    :param str group: column label containing the within factor
+    :param str within: column label containing the within factor
     :return: Tuple with protein identifier, t-statistics and p-value.
 
     Example::
 
-        result = calculate_repeated_measures_anova(df, 'protein a', subject='subject', group='group')
+        result = calculate_repeated_measures_anova(df, 'protein a', subject='subject', within='group')
     """
     df1 = np.nan
     df2 = np.nan
     t = np.nan
     pvalue = np.nan
     try:
-        aov_result = pg.rm_anova(data=df, dv=column, within=group, subject=subject, detailed=True, correction=True)
+        aov_result = pg.rm_anova(data=df, dv=column, within=within, subject=subject, detailed=True, correction=True)
         t, pvalue = aov_result.loc[0, ['F', 'p-unc']].values.tolist()
         df1, df2 = aov_result['DF']
     except Exception as e:
-        print("Repeated measurements Anova for column: {} could not be calculated".format(column))
+        print("Repeated measurements Anova for column: {} could not be calculated. Error {}".format(column, e))
 
     return (column, df1, df2, t, pvalue)
+
+def calculate_mixed_anova(df, column, subject='subject', within='group', between='group2'):
+    """
+    One-way and two-way repeated measures ANOVA using pingouin stats.
+
+    :param df: pandas dataframe with samples as rows and protein identifier as column. Data must be in long-format for two-way repeated measures.
+    :param str column: column label containing the dependant variable
+    :param str subject: column label containing subject identifiers
+    :param str within: column label containing the within factor
+    :param str within: column label containing the between factor
+    :return: Tuple with protein identifier, t-statistics and p-value.
+
+    Example::
+
+        result = calculate_mixed_anova(df, 'protein a', subject='subject', within='group', between='group2')
+    """
+    df1 = np.nan
+    df2 = np.nan
+    t = np.nan
+    pvalue = np.nan
+    try:
+        aov_result = pg.mixed_anova(data=df, dv=column, within=within, between=between, subject=subject, correction=True)
+        aov_result['identifier'] = column
+    except Exception as e:
+        print("Mixed Anova for column: {} could not be calculated. Error {}".format(column, e))
+
+    return aov_result[['identifier', 'DF1', 'DF2', 'F', 'p-unc', 'Source']]
 
 
 def get_max_permutations(df, group='group'):
@@ -1722,7 +1749,7 @@ def run_anova(df, alpha=0.05, drop_cols=["sample",'subject'], subject='subject',
         if len(groups) == 2:
             res = run_ttest(df, groups[0], groups[1], alpha = alpha, drop_cols=drop_cols, subject=subject, group=group, paired=True, correction=correction, permutations=permutations, is_logged=is_logged, non_par=non_par)
         elif len(groups) > 2:
-            res = run_repeated_measurements_anova(df, alpha=alpha, drop_cols=drop_cols, subject=subject, group=group, permutations=0, is_logged=is_logged)
+            res = run_repeated_measurements_anova(df, alpha=alpha, drop_cols=drop_cols, subject=subject, within=group, permutations=0, is_logged=is_logged)
     elif len(df[group].unique()) == 2:
         groups = df[group].unique()
         drop_cols = [d for d in drop_cols if d != subject]
@@ -1830,13 +1857,13 @@ def correct_pairwise_ttest(df, alpha, correction='fdr_bh'):
 
     return df
 
-def run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subject='subject', group='group', permutations=50, correction='fdr_bh', is_logged=True):
+def run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subject='subject', within='group', permutations=50, correction='fdr_bh', is_logged=True):
     """
     Performs repeated measurements anova and pairwise posthoc tests for each protein in dataframe.
 
     :param df: pandas dataframe with samples as rows and protein identifiers as columns (with additional columns 'group', 'sample' and 'subject').
     :param str subject: column with subject identifiers
-    :param srt group: column with group identifiers
+    :param srt within: column with within factor identifiers
     :param list drop_cols: column labels to be dropped from the dataframe
     :param float alpha: error rate for multiple hypothesis correction
     :param int permutations: number of permutations used to estimate false discovery rates
@@ -1844,23 +1871,70 @@ def run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subjec
 
     Example::
 
-        result = run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subject='subject', group='group', permutations=50)
+        result = run_repeated_measurements_anova(df, alpha=0.05, drop_cols=['sample'], subject='subject', within='group', permutations=50)
     """
     df = df.drop(drop_cols, axis=1).dropna(axis=1)
     aov_results = []
     pairwise_results = []
-    for col in df.columns.drop([group, subject]).tolist():
-        aov = calculate_repeated_measures_anova(df[[group, subject, col]], column=col, subject=subject, group=group)
+    index = [within, subject]
+    for col in df.columns.drop(index).tolist():
+        cols = index + [col]
+        aov = calculate_repeated_measures_anova(df[cols], column=col, subject=subject, within=within)
         aov_results.append(aov)
-        pairwise_result = calculate_pairwise_ttest(df[[group, subject, col]], subject=subject, column=col, group=group, is_logged=is_logged)
+        pairwise_result = calculate_pairwise_ttest(df[[within, subject, col]], subject=subject, column=col, group=within, is_logged=is_logged)
         pairwise_cols = pairwise_result.columns
         pairwise_results.extend(pairwise_result.values.tolist())
 
-    df = df.set_index([subject,group])
-    res = format_anova_table(df, aov_results, pairwise_results, pairwise_cols, group, permutations, alpha, correction)
+    df = df.set_index([subject, within])
+    res = format_anova_table(df, aov_results, pairwise_results, pairwise_cols, within, permutations, alpha, correction)
     res['Method'] = 'Repeated measurements anova'
     res = correct_pairwise_ttest(res, alpha, correction=correction)
 
+    return res
+
+
+def run_mixed_anova(df, alpha=0.05, drop_cols=['sample'], subject='subject', within='group', between='group2', permutations=50, correction='fdr_bh', is_logged=True):
+    """
+    In statistics, a mixed-design analysis of variance model, also known as a split-plot ANOVA, is used to test 
+    for differences between two or more independent groups whilst subjecting participants to repeated measures.
+    Thus, in a mixed-design ANOVA model, one factor (a fixed effects factor) is a between-subjects variable and the other
+    (a random effects factor) is a within-subjects variable. Thus, overall, the model is a type of mixed-effects model.
+    [source:https://en.wikipedia.org/wiki/Mixed-design_analysis_of_variance]
+
+    :param df: pandas dataframe with samples as rows and protein identifiers as columns (with additional columns 'group', 'sample' and 'subject').
+    :param str subject: column with subject identifiers
+    :param srt within: column with within factor identifiers
+    :param srt between: column with between factor identifiers
+    :param list drop_cols: column labels to be dropped from the dataframe
+    :param float alpha: error rate for multiple hypothesis correction
+    :param int permutations: number of permutations used to estimate false discovery rates
+    :return: Pandas dataframe
+
+    Example::
+
+        result = run_mixed_anova(df, alpha=0.05, drop_cols=['sample'], subject='subject', within='group', between='group2', permutations=50)
+    """
+    df = df.drop(drop_cols, axis=1).dropna(axis=1)
+    aov_results = []
+    pairwise_results = []
+    index = [within, subject, between]
+    for col in df.columns.drop(index).tolist():
+        cols = index + [col]
+        aov = calculate_mixed_anova(df[cols], column=col, subject=subject, within=within, between=between)
+        aov_results.append(aov)
+        
+    res = pd.concat(aov_results)
+    res = res[res['Source'] == 'Interaction']
+    res = res[['identifier', 'DF1', 'DF2', 'F', 'p-unc']]
+    res.columns = ['identifier', 'dfk', 'dfn', 'F-statistics', 'pvalue']
+    rejected, padj = apply_pvalue_correction(res['pvalue'].tolist(), alpha=alpha, method=correction)
+    res['correction'] = 'FDR correction BH'
+    res['padj'] = padj
+    res['rejected'] = res['padj'] < alpha
+    res['testing'] = 'Interaction'
+    res['within'] = ','.join(df[within].unique().tolist())
+    res['between'] = ','.join(df[between].unique().tolist())
+    
     return res
 
 
