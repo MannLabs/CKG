@@ -1,3 +1,5 @@
+.. _notebooks:
+
 The Clinical Knowledge Graph Notebooks
 =======================================
 

@@ -17,6 +17,8 @@ This container will install all the requirements needed, download source databas
 
 .. warning:: This requires Docker to be previously installed (https://docs.docker.com/engine/install/). Notice that the installation in Unix systems is a bit different than in Windows or MacOS, check the instructions for your specific distribution (https://docs.docker.com/engine/install/#server).
 
+.. warning:: Building the container requires **~280Gb of disk space**. The image takes ~120Gb but during the building process you will need around 280Gb of disk space available (loading the database dump takes quite a bit of disk temporarily).
+
 To run the Docker, simply:
 
 1. Clone CKG’s repository: https://github.com/MannLabs/CKG

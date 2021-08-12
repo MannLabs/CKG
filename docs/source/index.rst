@@ -21,8 +21,8 @@ Requirements
 
   system_requirements
 
-First steps
-------------
+Installation
+-----------------
 
 Follow this guide to get the Clinical Knowledge Graph installed. There are two options:
 
@@ -30,23 +30,18 @@ Follow this guide to get the Clinical Knowledge Graph installed. There are two o
 
 2) Build the Docker image and run everything (Neo4j, CKG app and Jupyter Hub) into one single container *(Recommended)*
 
-* **Getting started**:
-  :doc:`Installation <intro/getting-started-with-requirements>` |
-  :doc:`Windows Installation <intro/getting-started-with-windows>` |
-  :doc:`Installing Neo4j <intro/getting-started-with-neo4j>` |
-  :doc:`Installing CKG python library <intro/getting-started-with-build>` |
-  :doc:`CKG Docker Container <intro/getting-started-with-docker>`
+* :doc:`Installation <intro/getting-started-with-requirements>`
+
+* :doc:`Create new user <intro/create-new-user>`
+
 
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: First steps
+   :caption: Installation
 
    intro/getting-started-with-requirements
-   intro/getting-started-with-neo4j
-   intro/getting-started-with-build
-   intro/getting-started-with-windows
-   intro/getting-started-with-docker
+   intro/create-new-user
 
 
 Getting started
@@ -55,23 +50,14 @@ Getting started
 Are you new to the Clinical Knowledge Graph? Learn about how to use it and
 all the possibilities.
 
+* **Creating a project and getting a report out (default configuration)**
+  :doc:`Getting Started with CKG <getting_started/getting_started_steps>`
+
 * **Connecting to CKG Graph Database**:
   :doc:`Connect to DB <getting_started/connect-to-ckg>`
 
-* **Create A User in the Graph Database**:
-  :doc:`Create new user <getting_started/create-new-user>`
-
-* **Create A Project in Graph Database**:
-  :doc:`Project Creation <getting_started/create-new-project>`
-
-* **Upload Data**:
-  :doc:`Data Upload <getting_started/upload-data>`
-
-* **Define an Analysis Pipeline**:
+* **Define a different Analysis Pipeline**:
   :doc:`Configuration <getting_started/data-analysis-config>`
-
-* **Access Project Report**:
-  :doc:`Access report <getting_started/access-report>`
 
 * **Report Notification**:
   :doc:`Notifications <getting_started/notifications>`
@@ -82,12 +68,9 @@ all the possibilities.
   :hidden:
   :caption: Getting started
 
+  getting_started/getting_started_steps
   getting_started/connect-to-ckg
-  getting_started/create-new-user
-  getting_started/create-new-project
-  getting_started/upload-data
   getting_started/data-analysis-config
-  getting_started/access-report
   getting_started/notifications
 
 
@@ -97,7 +80,7 @@ CKG Graph Database Builder
 * **Building CKG's Graph Database**:
   :doc:`Builder <ckg_builder/graphdb-builder>`
 
-  * **Adding New Resources**:
+* **Adding New Resources**:
   :doc:`Contributing <ckg_builder/graphdb-contribute>`
 
 .. toctree::

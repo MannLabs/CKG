@@ -1,3 +1,4 @@
+.. _Project report:
 
 #######################
 CKG Project Report
