@@ -19,24 +19,32 @@ This container will install all the requirements needed, download source databas
 
 .. warning:: Building the container requires **~280Gb of disk space**. The image takes ~120Gb but during the building process you will need around 280Gb of disk space available (loading the database dump takes quite a bit of disk temporarily).
 
+
+
 To run the Docker, simply:
 
 1. Clone CKG’s repository: https://github.com/MannLabs/CKG
 
-2. Get licensed databases: https://ckg.readthedocs.io/en/latest/intro/getting-started-with-build.html#build-neo4j-graph-database
+2. Get licensed databases: :ref:`licenced databases`
 
-3. Download the database dump and data directory from Mendeley:
-            https://data.mendeley.com/public-files/datasets/mrcf7f4tc2/files/
+3. Download the database dump from `here <https://datashare.biochem.mpg.de/s/kCW7uKZYTfN8mwg/download>`__ and place it into CKG/resources/neo4j_db
 	    
-4. Extract compressed data file into the CKG folder and copy licensed databases in the right directories: 
+4. Download the data folder from `here <https://datashare.biochem.mpg.de/s/fP6MKhLRfceWwxC/download>`__ and extract the compressed data into CKG/ folder and c
+   
+5. Copy the licensed databases in the right directories: 
 
-- data/databases/{DrugBank|PhosphoSitePlus}
+- CKG/data/databases/{DrugBank|PhosphoSitePlus}
 
-- data/ontologies/SNOMED-CT
+- CKG/data/ontologies/SNOMED-CT
 
-5. Move the dump file to CKG/resources/neo4j_db
+The data folder will look like this afterwards:
 
-6. Build  thecontainer: 
+.. image:: ../_static/images/extracted_data_folder.PNG
+	:width: 35%
+	:align: center
+
+
+1. Build  thecontainer: 
 
 .. code-block:: bash
 	
@@ -96,6 +104,12 @@ When the database is running:
 4. Run Minimal update (:ref:`minimal update`)(these can take a while but will run in the background. Follow progress in the docker dashboard logs) and create a user
 
 5. Explore options in CKG
+
+
+
+.. image:: ../_static/images/docker_ports.png
+  :width: 200%
+  :align: center
 
 
 .. note:: Remember that with Docker Desktop (https://www.docker.com/products/docker-desktop), you can check the logs of the running image.

@@ -142,6 +142,12 @@ API Reference
 
 Code available in `GitHub <https://github.com/MannLabs/CKG>`__.
 
+.. image:: _static/images/ckg_code_structure.png
+  :width: 200%
+  :align: center
+
+
+
 .. toctree::
    :maxdepth: 4
    :caption: API docs
