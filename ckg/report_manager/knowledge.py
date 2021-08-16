@@ -432,6 +432,7 @@ class Knowledge:
             replace_by = ('DISEASE_COND', '')
         else:
             replace_by = ('DISEASE_COND', 'OR d.name IN {} AND r.score > 1.5'.format(diseases))
+            self.keep_nodes.extend(diseases)
 
         query_data = []
         drugs = []
