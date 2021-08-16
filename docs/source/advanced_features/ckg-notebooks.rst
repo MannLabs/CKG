@@ -173,7 +173,15 @@ These two Jupyter notebooks show:
 1) A re-analysis of this study: Proteomics, Post-translational Modifications, and Integrative Analyses Reveal Molecular Heterogeneity within Medulloblastoma Subgroups (https://www.sciencedirect.com/science/article/pii/S1535610818303581).
    This analysis uses the proteomics data to compare the clinical Subgroups
 2) A multiomics approach integrating all the molecular data available: proteomics, RNA sequencing and PTMs. CKG uses Similarity Network Fusion (https://www.nature.com/articles/nmeth.2810) to integrate these datasets and to define Medulloblastoma subgroups. 
-   The results are further explained in this `presentation`_.
+   The results are further explained in this `presentation_meduloblastoma`_.
 
-.. _presentation: https://github.com/MannLabs/CKG/blob/master/ckg/notebooks/reports/Archer_et_al_2018/Medulloblastoma_presentation.pdf
+.. _presentation_meduloblastoma: https://github.com/MannLabs/CKG/blob/master/ckg/notebooks/reports/Archer_et_al_2018/Medulloblastoma_presentation.pdf
+
+
+
+- :doc:`**CPTAC Glioblastoma Discovery Study Proteomics Re-analysis** <../notebooks/reports/CPTAC_Glioblastoma_Discovery_Study>`
+
+A re-analysis of the CPTAC Discovery Study using the Proteomics data of 100 brain tumor samples and 10 normal samples (https://cptac-data-portal.georgetown.edu/study-summary/S048). More details on the results available in this `presentation_gbm`_.
+
+.. _presentation_gbm: https://github.com/MannLabs/CKG/blob/master/ckg/notebooks/reports/CPTAC_GBM_discovery_strudy/GBM_results.pdf
 
