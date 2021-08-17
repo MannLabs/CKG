@@ -41,6 +41,9 @@ Follow this guide to get the Clinical Knowledge Graph installed. There are two o
    :caption: Installation
 
    intro/getting-started-with-requirements
+   intro/getting-started-with-docker
+   intro/getting-started-with-neo4j
+   intro/getting-started-with-build
    intro/create-new-user
 
 
