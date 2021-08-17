@@ -26,17 +26,18 @@ These files will be later used in :ref:`Build Neo4j graph database`.
 Software
 -------------------
 
-- Java, version compatible with chosen Neo4j version (check Neo4j requirements)
-- R >= 3.5.2
-- Python 3.7
+- Python 3.7.9
 - Redis server
 - Neo4j Desktop
-- Neo4j database == 3.5.20
+- Neo4j database == 4.2.3
 
 
 Hardware
 --------------------
 
 - Memory: 16Gb
-- Disk space: >= 80Gb
+- Disk space: >= 200Gb
 - Stable internet connection
+
+
+.. note:: When building the Docker image further disk space is needed. We recomend allocating 300Gb, although the final CKG image will be around 150Gb.

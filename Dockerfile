@@ -98,7 +98,7 @@ RUN service neo4j start && \
 
 # Load backup with Clinical Knowledge Graph
 RUN mkdir -p /var/lib/neo4j/data/backup
-COPY /resources/neo4j_db/ckg_latest_4.2.3.dump /var/lib/neo4j/data/backup/.
+RUN wget -O /var/lib/neo4j/data/backup/ckg_latest.4.2.3.dump https://datashare.biochem.mpg.de/s/kCW7uKZYTfN8mwg/download
 RUN mkdir -p /var/lib/neo4j/data/databases/graph.db
 RUN sudo -u neo4j neo4j-admin load --from=/var/lib/neo4j/data/backup/ckg_latest_4.2.3.dump --database=graph.db --force
 
@@ -130,7 +130,10 @@ RUN python3 -m pip install --ignore-installed -r requirements.txt
 ###Creating CKG directory and setting up CKG
 RUN mkdir /CKG
 COPY --chown=nginx ckg /CKG/ckg
-COPY --chown=nginx data /CKG/data
+COPY data /CKG/data
+RUN wget -O /CKG/data.zip https://datashare.biochem.mpg.de/s/fP6MKhLRfceWwxC/download
+RUN unzip /CKG/data.zip -d /CKG/.
+RUN chown -R nginx /CKG/data
 COPY docker_entrypoint.sh /CKG/.
 ENV PYTHONPATH "${PYTHONPATH}:/CKG"
 RUN ls -lrth /CKG
