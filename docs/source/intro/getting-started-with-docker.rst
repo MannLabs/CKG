@@ -17,7 +17,12 @@ This container will install all the requirements needed, download source databas
 
 .. warning:: This requires Docker to be previously installed (https://docs.docker.com/engine/install/). Notice that the installation in Unix systems is a bit different than in Windows or MacOS, check the instructions for your specific distribution (https://docs.docker.com/engine/install/#server).
 
-.. warning:: Building the container requires **~280Gb of disk space**. The image takes ~150Gb but during the building process you will need around 280Gb of disk space available (loading the database dump takes quite a bit of disk temporarily).
+.. warning:: Building the container requires **~200Gb of disk space**. The image takes ~150Gb but during the building process you will need around 200Gb of disk space available (loading the database dump takes quite a bit of disk temporarily).
+
+.. warning:: In MacOS, you will need to allocate more resources to Docker to adapt to CKG's requirements. You can do this in Docker desktop -> Preferences. We recommend (at least) the following configuration:
+	
+	.. image:: ../_static/images/docker_reqs_macos_min.png
+		:align: center
 
 
 
