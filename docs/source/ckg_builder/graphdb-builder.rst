@@ -250,8 +250,8 @@ This will start a partial update of the Publication nodes and their relationship
 Building CKG's Graph Database from a Dump File
 =================================================
 
-A dump file of the database is also made available in this `link <https://data.mendeley.com/datasets/mrcf7f4tc2/1>`__ and alternatively, you can use it to load the graph database contained in it. 
-To do so, download both files (``ckg_190521_neo4j_4.2.3.dump`` and ``data.tar.gz``).
+A dump file of the database is also made available in this `link <https://datashare.biochem.mpg.de/s/kCW7uKZYTfN8mwg/download>`__ and alternatively, you can use it to load the graph database contained in it. 
+To do so, download the dump file ``ckg_latest_4.2.3.dump`` and also ``data.zip`` from this `link <https://datashare.biochem.mpg.de/s/fP6MKhLRfceWwxC/download>, which contains some nodes and relationships associated to the licensed databases.
 
 The ``.dump`` file will be used to load the Neo4j graph database:
 
@@ -275,14 +275,14 @@ If you have Neo4j desktop installed, you can use Neo4j terminal to access the pa
 
 	$ mkdir backups
 	$ mkdir backups/graph.db
-	$ cp ckg_190521_neo4j_4.2.3.dump backups/graph.db/.
+	$ cp ckg_latest_4.2.3.dump backups/graph.db/.
 
 
 1. After copying the dump file to backups/graph.db/, make sure the graph database is shutdown and run:
 
 .. code-block:: bash
 
-	$ bin/neo4j-admin load --from=backups/graph.db/ckg_190521_neo4j_4.2.3.dump --database=graph.db --force
+	$ bin/neo4j-admin load --from=backups/graph.db/ckg_latest_4.2.3.dump --database=graph.db --force
 
 
 In some systems you might have to run this as root:
