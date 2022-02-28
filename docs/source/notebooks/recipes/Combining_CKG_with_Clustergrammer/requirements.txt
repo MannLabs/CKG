@@ -10,7 +10,7 @@ decorator==4.4.2
 defusedxml==0.6.0
 entrypoints==0.3
 ipython-genutils==0.2.0
-Jinja2==2.11.2
+Jinja2==2.11.3
 joblib==0.17.0
 json5==0.9.5
 jupyter-core==4.6.3
