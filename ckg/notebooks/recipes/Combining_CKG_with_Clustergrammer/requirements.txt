@@ -11,7 +11,7 @@ defusedxml==0.6.0
 entrypoints==0.3
 ipython-genutils==0.2.0
 Jinja2==2.11.2
-joblib==0.17.0
+joblib==1.2.0
 json5==0.9.5
 jupyter-core==4.6.3
 jupyterlab==2.2.6
