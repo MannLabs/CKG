@@ -5,7 +5,7 @@ import pandas as pd
 import io
 import base64
 import bs4 as bs
-import dash_html_components as html
+from dash import html
 import requests
 import networkx as nx
 from networkx.readwrite import json_graph
