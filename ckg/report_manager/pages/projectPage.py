@@ -12,7 +12,7 @@ from ckg.report_manager import project
 from ckg.report_manager.worker import generate_project_report
 
 title = "Project details"
-subtitle = "You are successfully authorized"
+subtitle = ""
 description = ""
 
 dash.register_page(__name__, path='/apps/project', title=f"{title} - {subtitle}", description=description)
@@ -61,17 +61,15 @@ def build_page(project_id, force, session_id):
 
     print("Get project")
 
-    # TODO: fix this
     if p.name is not None:
         title = "Project: {}".format(p.name)
-    else:
-        title = ''
+
     plots = p.show_report("app")
     print("Plots:")
     print(plots)
     p = None
     tabs = []
-    buttons = build_header(project_id, session_id)
+    buttons = build_header(project_id, session_id, title)
     print("build header")
 
     layout = []
@@ -87,8 +85,11 @@ def build_page(project_id, force, session_id):
     return layout
 
 
-def build_header(project_id, session_id):
-    buttons = html.Div([html.Div([html.A('Download Project Report',
+def build_header(project_id, session_id, title):
+    buttons = html.Div([html.H1(children=title),
+                        html.H2(children=subtitle),
+                        html.Div(children=description),
+                        html.Div([html.A('Download Project Report',
                                          id='download-zip',
                                          href=f"/downloads/{project_id}",
                                          target="_blank",
@@ -98,8 +99,6 @@ def build_header(project_id, session_id):
                         html.Div([html.A("Regenerate Project Report",
                                          id='regenerate',
                                          title=project_id,
-                                         # TODO: {basic_path}?
-                                         # basic_path = '/'.join(pathname.split('/')[0:3])
                                          href=f"/apps/project?project_id={project_id}&force=1&session={session_id}",
                                          target='',
                                          n_clicks=0,

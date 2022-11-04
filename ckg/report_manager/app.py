@@ -19,7 +19,7 @@ server = flask.Flask('app')
 cwd = os.path.dirname(os.path.abspath(__file__))
 assets_path = os.path.join(cwd, 'assets')
 os.chdir(cwd)
-pages_path = "./pages" # os.path.join(cwd, 'pages')
+pages_path = "./pages"
 app = dash.Dash("app", server=server, assets_folder=assets_path, external_stylesheets=[assets_path + "custom.css"],
                 meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}], use_pages=True,
                 pages_folder=pages_path)

@@ -3,7 +3,6 @@ import numpy as np
 import yaml
 import json
 import logging
-from pathlib import Path
 
 
 def read_ckg_config(key=None):
