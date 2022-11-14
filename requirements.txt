@@ -23,7 +23,6 @@ certifi==2022.9.24
 cffi==1.15.1
 chardet==3.0.4
 chart-studio==1.0.0
-CKG==1.0.0
 click==8.1.3
 click-didyoumean==0.3.0
 click-plugins==1.1.1
@@ -36,7 +35,7 @@ cycler==0.11.0
 cyjupyter==0.2.0
 dash==2.7.0
 dash-core-components==2.0.0
-dash-cytoscape==0.3.0
+dash-cytoscape==0.2.0
 dash-html-components==2.0.0
 dash-table==5.0.0
 debugpy==1.6.3

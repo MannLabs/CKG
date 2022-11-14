@@ -11,6 +11,10 @@ from ckg import ckg_utils
 from ckg.report_manager import project
 from ckg.report_manager.worker import generate_project_report
 
+ckg_config = ckg_utils.read_ckg_config()
+log_config = ckg_config['report_manager_log']
+logger = ckg_utils.setup_logging(log_config, key="project")
+
 title = "Project details"
 subtitle = ""
 description = ""
@@ -19,14 +23,7 @@ dash.register_page(__name__, path='/apps/project', title=f"{title} - {subtitle}"
 
 
 def layout(project_id="P0000001", force=0):
-    print(project_id)
-    print(force)
-
     session_id = project_id + datetime.now().strftime('%Y%m-%d%H-%M%S-') + str(uuid4())
-
-    # inital_layout = [html.H1(children=title),
-    #                 html.H2(children=subtitle),
-    #                 html.Div(children=description)]
     project_layout = build_page(project_id, force, session_id)
     return project_layout
 
@@ -38,7 +35,6 @@ def build_page(project_id, force, session_id):
     creates a designated tab.
     A button to download the entire project and report is added.
     """
-    print("Build page")
     config_files = {}
     tmp_dir = ckg_utils.read_ckg_config(key='tmp_directory')
     if os.path.exists(tmp_dir):
@@ -47,30 +43,20 @@ def build_page(project_id, force, session_id):
             config_files = {f.split('.')[0]: os.path.join(directory, f) for f in os.listdir(directory) if
                             os.path.isfile(os.path.join(directory, f))}
 
-    print("Finished zip")
-
     result = generate_project_report.apply_async(args=[project_id, config_files, force],
                                                  task_id='generate_report' + session_id, queue='compute')
     result_output = result.get()
-    print("Project result")
-    print(result_output == None)
-    print(result_output)
 
     p = project.Project(project_id, datasets={}, knowledge=None, report={}, configuration_files=config_files)
     p.build_project(False)
-
-    print("Get project")
 
     if p.name is not None:
         title = "Project: {}".format(p.name)
 
     plots = p.show_report("app")
-    print("Plots:")
-    print(plots)
     p = None
     tabs = []
     buttons = build_header(project_id, session_id, title)
-    print("build header")
 
     layout = []
     layout.append(buttons)
@@ -81,7 +67,6 @@ def build_page(project_id, force, session_id):
             tabs.append(tab)
     lc = dcc.Tabs(tabs)
     layout.append(lc)
-    print(layout)
     return layout
 
 

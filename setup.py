@@ -14,7 +14,6 @@ class PreInstallCommand(install):
     """Pre-installation for install mode."""
 
     def run(self):
-        # check_call("pip install -r requirements.txt".split())
         check_call("pip install -r requirements.txt".split())
         ckg.init.installer_script()
         install.run(self)
@@ -24,7 +23,6 @@ class PreDevelopCommand(develop):
     """Pre-installation for install mode."""
 
     def run(self):
-        # check_call("pip install -r requirements.txt".split())
         check_call("pip install -r requirements.txt".split())
         ckg.init.installer_script()
         develop.run(self)
@@ -45,7 +43,7 @@ setuptools.setup(
         'install': PreInstallCommand,
     },
     entry_points={'console_scripts': [
-        'ckg_app=ckg.report_manager.app:main',
+        'ckg_app=ckg.report_manager.index:main',
         'ckg_debug=ckg.debug:main',
         'ckg_build=ckg.graphdb_builder.builder.builder:run_full_update',
         'ckg_update_textmining=ckg.graphdb_builder.builder.builder:update_textmining']},

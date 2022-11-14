@@ -3,7 +3,12 @@ import flask
 import pandas as pd
 from dash import html, dcc, Output, Input
 
+from ckg import ckg_utils
 from ckg.report_manager.apps import homepageStats as hpstats
+
+ckg_config = ckg_utils.read_ckg_config()
+log_config = ckg_config['report_manager_log']
+logger = ckg_utils.setup_logging(log_config, key="homePage")
 
 title = "CKG homepage"
 subtitle = "Database Stats"
@@ -13,10 +18,9 @@ dash.register_page(__name__, path='/', title=f"{title} - {subtitle}", descriptio
 
 
 def layout():
+    logger.info("Load home page")
     session_cookie = flask.request.cookies.get('custom-auth-session')
     logged_in = session_cookie is not None
-
-    print(logged_in)
 
     if logged_in == False:
         return html.Div(["Please ", dcc.Link("login", href="/apps/loginPage"), " to continue"])
@@ -86,7 +90,6 @@ def update_db_date(df):
                 ],
                [Input("db_stats_df", "data")])
 def number_panel_update(df):
-    print("Update func")
     updates = []
     if 'projects' in df:
         projects = pd.read_json(df['projects'], orient='records')

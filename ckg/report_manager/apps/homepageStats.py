@@ -253,9 +253,8 @@ def quick_numbers_panel():
                 project_ids.append((project['n']['name'], project['n']['id']))
             project_links = [html.H4('Available Projects:')]
 
-        print("Connected successfully")
     except Exception:
-        print("Error connecting to Database")  # pass
+        print("Error connecting to Database")
 
     for project_name, project_id in project_ids:
         project_links.append(html.A(project_name.title(),
@@ -323,7 +322,7 @@ def quick_numbers_panel():
 def update_project_url(value):
     if value is not None and len(value) > 1:
         return html.A(value[0].title(),
-                      href='/apps/project?project_id={}&force=0'.format(value[1]),
+                      href=f"/apps/project?project_id={value}&force=0",
                       target='',
                       n_clicks=0,
                       className="button_link")
