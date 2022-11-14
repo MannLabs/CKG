@@ -11,7 +11,7 @@ import ckg.report_manager.user as user
 from ckg import ckg_utils
 from ckg.graphdb_builder import builder_utils
 from ckg.report_manager import utils
-from ckg.report_manager.app import application, server
+from ckg.report_manager.app import server as application
 from ckg.report_manager.worker import run_minimal_update_task, \
     run_full_update_task
 
@@ -72,7 +72,7 @@ def update_authentication_status(_):
                               style={'position': 'absolute', 'right': '0px'}, id='login'), href="/apps/loginPage")
 
 
-@server.route('/apps/login', methods=['POST', 'GET'])
+@application.route('/apps/login', methods=['POST', 'GET'])
 def route_login():
     data = flask.request.form
     username = data.get('username')
@@ -88,7 +88,7 @@ def route_login():
         return rep
 
 
-@server.route('/apps/logout', methods=['POST'])
+@application.route('/apps/logout', methods=['POST'])
 def route_logout():
     # Redirect back to the index and remove the session cookie.
     rep = flask.redirect('/')
@@ -96,7 +96,7 @@ def route_logout():
     return rep
 
 
-@server.route('/create_user', methods=['POST', 'GET'])
+@application.route('/create_user', methods=['POST', 'GET'])
 def route_create_user():
     data = flask.request.form
     name = data.get('name')
@@ -130,7 +130,7 @@ def route_create_user():
     return rep
 
 
-@server.route('/update_minimal', methods=['POST', 'GET'])
+@application.route('/update_minimal', methods=['POST', 'GET'])
 def route_minimal_update():
     session_cookie = flask.request.cookies.get('custom-auth-session')
     username = session_cookie.split('_')[0]
@@ -143,7 +143,7 @@ def route_minimal_update():
     return rep
 
 
-@server.route('/update_full', methods=['POST', 'GET'])
+@application.route('/update_full', methods=['POST', 'GET'])
 def route_full_update():
     session_cookie = flask.request.cookies.get('custom-auth-session')
     data = flask.request.form
@@ -158,19 +158,19 @@ def route_full_update():
     return rep
 
 
-@server.route('/downloads/<value>')
+@application.route('/downloads/<value>')
 def route_report_url(value):
     uri = os.path.join(ckg_config['downloads_directory'], value + '.zip')
     return flask.send_file(uri, download_name=value + '.zip', as_attachment=True, max_age=-1)
 
 
-@server.route('/example_files')
+@application.route('/example_files')
 def route_example_files_url():
     uri = os.path.join(ckg_config['data_directory'], 'example_files.zip')
     return flask.send_file(uri, download_name='example_files.zip', as_attachment=True, max_age=-1)
 
 
-@server.route('/apps/templates<value>')
+@application.route('/apps/templates<value>')
 def serve_static(value):
     cwd = os.path.dirname(os.path.abspath(__file__))
     directory = os.path.join(cwd, 'apps/templates/')
@@ -182,7 +182,7 @@ def serve_static(value):
     return flask.send_file(url, download_name=f"{value}.zip", as_attachment=True, max_age=-1)
 
 
-@server.route('/tmp/<value>')
+@application.route('/tmp/<value>')
 def route_upload_url(value):
     page_id, project_id = value.split('_')
     directory = ckg_config['tmp_directory']
