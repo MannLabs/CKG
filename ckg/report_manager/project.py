@@ -33,6 +33,7 @@ class Project:
     """
 
     def __init__(self, identifier, configuration_files={}, datasets={}, knowledge=None, report={}):
+        logger.info(f"Instantiate project with identifier {identifier}")
         self._identifier = identifier
         self._queries_file = 'queries/project_cypher.yml'
         self.configuration_files = configuration_files
@@ -385,13 +386,16 @@ class Project:
                     self.update_dataset({data_type: dataset})
 
     def build_project(self, force=False):
+        logger.info(f"Build project with id={self._identifier} and force={force} started")
         if self.check_report_exists() and not force:
+            logger.info("load existing project report")
             self.load_project_report()
         elif force:
             self.report = {}
             self.datasets = {}
 
         if len(self.report) == 0 or len(self.datasets) == 0:
+            logger.info("recreate project report")
             project_info = self.query_data()
             if len(project_info) > 0:
                 self.set_attributes(project_info)
@@ -441,6 +445,7 @@ class Project:
             else:
                 logger.error("Project {} could not be built. Error retrieving information for this project or no information associated to this project".format(self.identifier))
                 print("Project {} could not be built. Error retrieving information for this project or no information associated to this project".format(self.identifier))
+        logger.info(f"Build project with id={self._identifier} finished")
 
     def get_projects_overlap(self, project_info):
         if 'overlap' in project_info:
@@ -626,7 +631,7 @@ class Project:
 
         self.save_project_datasets_reports()
         self.knowledge.save_report(directory)
-        print('save report', time.time() - start)
+        logger.info(f"Saving project report finished in {time.time() - start}")
 
     def save_project_datasets_reports(self):
         start = time.time()
@@ -637,7 +642,7 @@ class Project:
             if isinstance(dataset, Dataset):
                 dataset.save_report(dataset_directory)
                 dataset = None
-        print('save dataset report', time.time() - start)
+        logger.info(f"Saving project datasets reports finished in {time.time() - start}")
 
     def save_project(self):
         directory = os.path.join(self.get_report_directory(), "Project information")

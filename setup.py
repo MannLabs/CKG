@@ -1,23 +1,27 @@
+from subprocess import check_call
+
 import setuptools
-from setuptools import setup
 from setuptools.command.develop import develop
 from setuptools.command.install import install
-from subprocess import check_call
-import ckg.init
 
+import ckg.init
 
 with open("README.rst", "r") as fh:
     long_description = fh.read()
 
+
 class PreInstallCommand(install):
     """Pre-installation for install mode."""
+
     def run(self):
         check_call("pip install -r requirements.txt".split())
         ckg.init.installer_script()
         install.run(self)
-        
+
+
 class PreDevelopCommand(develop):
     """Pre-installation for install mode."""
+
     def run(self):
         check_call("pip install -r requirements.txt".split())
         ckg.init.installer_script()
@@ -25,7 +29,7 @@ class PreDevelopCommand(develop):
 
 
 setuptools.setup(
-    name="CKG", # Replace with your own username
+    name="CKG",  # Replace with your own username
     version="1.0.0",
     author="Alberto Santos Delgado",
     author_email="alberto.santos@sund.ku.dk",
@@ -39,7 +43,7 @@ setuptools.setup(
         'install': PreInstallCommand,
     },
     entry_points={'console_scripts': [
-        'ckg_app=ckg.report_manager.index:main',
+        'ckg_app=ckg.report_manager.app:main',
         'ckg_debug=ckg.debug:main',
         'ckg_build=ckg.graphdb_builder.builder.builder:run_full_update',
         'ckg_update_textmining=ckg.graphdb_builder.builder.builder:update_textmining']},
