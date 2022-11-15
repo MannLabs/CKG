@@ -1,4 +1,5 @@
 import os
+import subprocess
 from datetime import datetime
 from uuid import uuid4
 
@@ -72,7 +73,7 @@ def update_authentication_status(_):
     if logged_in:
         return dcc.Link([html.Form([html.Button('Logout', type='submit')], action='/apps/logout', method='post',
                                    style={'position': 'absolute', 'right': '0px'}, id='logout')],
-                        href="apps/logoutPage")
+                        href="/apps/logoutPage")
     return dcc.Link(html.Form([html.Button('Login', type='submit')],
                               style={'position': 'absolute', 'right': '0px'}, id='login'), href="/apps/loginPage")
 
@@ -143,7 +144,7 @@ def route_minimal_update():
     result = run_minimal_update_task.apply_async(args=[username], task_id='run_minimal_' + session_cookie + internal_id,
                                                  queue='update')
 
-    rep = flask.redirect('/dashs/admin?running=minimal')
+    rep = flask.redirect('/apps/admin/running=minimal')
 
     return rep
 
@@ -198,5 +199,21 @@ def route_upload_url(value):
                            max_age=-1)
 
 
-def start_app():
-    app.run_server(debug=False, host='0.0.0.0', port="8051")
+def main():
+    logger.info("Starting CKG App")
+    celery_working_dir = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(celery_working_dir)
+    queues = [('creation', 1, 'INFO'), ('compute', 3, 'INFO'), ('update', 1, 'INFO')]
+    print(type(ckg_config))
+    print(ckg_config["log_directory"] + "/celery.log")
+    for queue, processes, log_level in queues:
+        celery_cmdline = 'celery -A ckg.report_manager.worker worker --loglevel={} --logfile={} --concurrency={} -E -Q {}'.format(
+            log_level, ckg_config["log_directory"] + "/celery.log", processes, queue).split(" ")
+        logger.info("Ready to call {} ".format(celery_cmdline))
+        subprocess.Popen(celery_cmdline)
+        logger.info("Done calling {} ".format(celery_cmdline))
+    app.run_server(debug=False, host='0.0.0.0')
+
+
+if __name__ == '__main__':
+    main()

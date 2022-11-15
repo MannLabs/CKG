@@ -33,6 +33,7 @@ class Project:
     """
 
     def __init__(self, identifier, configuration_files={}, datasets={}, knowledge=None, report={}):
+        logger.info(f"Instantiate project with identifier {identifier}")
         self._identifier = identifier
         self._queries_file = 'queries/project_cypher.yml'
         self.configuration_files = configuration_files
