@@ -30,7 +30,7 @@ combat==0.2.0
 lifelines==0.23.1
 cvxpy==1.1.7
 wordcloud==1.8.1
-nltk==3.5
+nltk==3.6.6
 dash_cytoscape>=0.1.1
 networkx==2.5
 chart-studio==1.0.0
