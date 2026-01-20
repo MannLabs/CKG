@@ -1,17 +1,18 @@
+import json
 import os.path
+from collections import defaultdict
+
+import h5py as h5
+import natsort
 import pandas as pd
 import plotly.io as pio
-import h5py as h5
-import json
-import natsort
-import dash_html_components as html
+from dash import html
 from plotly.offline import iplot
-from collections import defaultdict
-from cyjupyter import Cytoscape
-from ckg.report_manager import utils
+
 from ckg import ckg_utils
-from ckg.analytics_core.viz import viz
 from ckg.analytics_core import utils as acore_utils
+from ckg.analytics_core.viz import viz
+from ckg.report_manager import utils
 
 
 class Report:
@@ -89,7 +90,7 @@ class Report:
                             json_str_edges = ckg_utils.convert_dash_to_json(plot['net_tables_viz'][1])
                             figure_json["net_tables_viz"] = (json_str_nodes, json_str_edges)
                         figure_json = json.dumps(figure_json, cls=ckg_utils.NumpyEncoder)
-                        figure_id = str(i)+'_net'
+                        figure_id = str(i) + '_net'
                     else:
                         json_str = ckg_utils.convert_dash_to_json(plot)
                         figure_json = json.dumps(json_str, cls=ckg_utils.NumpyEncoder)
@@ -110,8 +111,8 @@ class Report:
                 for name in f:
                     plot_id = name.split('~')
                     for figure_id in f[name]:
-                        figure_json = f[name+"/"+figure_id][0]
-                        identifier = f[name+"/"+figure_id].attrs["identifier"]
+                        figure_json = f[name + "/" + figure_id][0]
+                        identifier = f[name + "/" + figure_id].attrs["identifier"]
                         if 'net' in identifier:
                             figure = {}
                             net_json = json.loads(figure_json)
@@ -200,25 +201,29 @@ class Report:
                         figure_name = name + "_" + str(i)
                         i += 1
                     if "net_json" in plot:
-                        with open(os.path.join(directory, name+'.json'), 'w') as out:
+                        with open(os.path.join(directory, name + '.json'), 'w') as out:
                             out.write(json.dumps(plot["net_json"], cls=ckg_utils.NumpyEncoder))
                         try:
-                            acore_utils.json_network_to_gml(plot["net_json"], os.path.join(directory, name+".gml"))
+                            acore_utils.json_network_to_gml(plot["net_json"], os.path.join(directory, name + ".gml"))
                         except Exception:
                             pass
                         if "net_tables" in plot:
                             nodes_table, edges_table = plot['net_tables']
                             if isinstance(nodes_table, pd.DataFrame):
-                                nodes_table.to_csv(os.path.join(directory, name+'_node_table.tsv'), sep='\t', header=True, index=False, doublequote=False)
+                                nodes_table.to_csv(os.path.join(directory, name + '_node_table.tsv'), sep='\t',
+                                                   header=True, index=False, doublequote=False)
                             if isinstance(edges_table, pd.DataFrame):
-                                edges_table.to_csv(os.path.join(directory, name+'_edges_table.tsv'), sep='\t', header=True, index=False, doublequote=False)
+                                edges_table.to_csv(os.path.join(directory, name + '_edges_table.tsv'), sep='\t',
+                                                   header=True, index=False, doublequote=False)
                         if "app" in plot:
                             plot = plot["app"]
                     if 'props' in plot:
                         if 'figure' in plot['props']:
                             try:
-                                viz.save_DASH_plot(plot['props']['figure'], name=figure_name, plot_format='svg', directory=directory)
-                                viz.save_DASH_plot(plot['props']['figure'], name=figure_name, plot_format='png', directory=directory)
+                                viz.save_DASH_plot(plot['props']['figure'], name=figure_name, plot_format='svg',
+                                                   directory=directory)
+                                viz.save_DASH_plot(plot['props']['figure'], name=figure_name, plot_format='png',
+                                                   directory=directory)
                                 saved.add(figure_name)
                             except Exception:
                                 pass

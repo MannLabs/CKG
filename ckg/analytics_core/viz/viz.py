@@ -3,8 +3,8 @@ import numpy as np
 import pandas as pd
 import ast
 from collections import defaultdict
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
 import matplotlib
 import matplotlib.pyplot as plt
 import plotly
@@ -13,7 +13,7 @@ import plotly.graph_objs as go
 import plotly.figure_factory as FF
 import plotly.express as px
 import math
-import dash_table
+from dash import dash_table
 import plotly.subplots as tools
 import plotly.io as pio
 from scipy.spatial.distance import pdist, squareform

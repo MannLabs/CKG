@@ -1,12 +1,14 @@
-from ckg.analytics_core.viz import viz
-import dash_core_components as dcc
+from collections import defaultdict
+from itertools import chain
+
+import numpy as np
+import pandas as pd
 import plotly.graph_objs as go
 import plotly.subplots as tools
-import pandas as pd
-import numpy as np
-from itertools import chain
-from collections import defaultdict
+from dash import dcc
 from natsort import natsorted
+
+from ckg.analytics_core.viz import viz
 
 
 def get_stats_data(filename, n=3):
@@ -27,11 +29,11 @@ def get_stats_data(filename, n=3):
                 df['Import_flag'] = k
             else:
                 aux = store[key]
-                aux['Import_flag']= k
+                aux['Import_flag'] = k
                 df = df.append(aux)
-    
+
     if not df.empty:
-        df['datetime'] = pd.to_datetime(df['date']+' '+df['time'])
+        df['datetime'] = pd.to_datetime(df['date'] + ' ' + df['time'])
         imp = select_last_n_imports(df, n=n)
         df = df[df['import_id'].isin(imp)].reset_index(drop=True)
 
@@ -48,15 +50,16 @@ def select_last_n_imports(stats_file, n=3):
     """
     partial = []
     full = []
-    if 'datetime' in  stats_file and 'import_id' in stats_file and 'Import_flag' in stats_file:
-        df = stats_file[['datetime', 'import_id', 'Import_flag']].sort_values('datetime', ascending=False).drop_duplicates(['import_id'], keep = 'first', inplace = False)
+    if 'datetime' in stats_file and 'import_id' in stats_file and 'Import_flag' in stats_file:
+        df = stats_file[['datetime', 'import_id', 'Import_flag']].sort_values('datetime',
+                                                                              ascending=False).drop_duplicates(
+            ['import_id'], keep='first', inplace=False)
         full = df[df['Import_flag'] == 'full']
         full = full.iloc[:n, 1].tolist()
         partial = df[df['Import_flag'] == 'partial']
         partial = partial.iloc[:n, 1].tolist()
-    
-    return partial + full
 
+    return partial + full
 
 
 def remove_legend_duplicates(figure):
@@ -67,7 +70,7 @@ def remove_legend_duplicates(figure):
     """
     seen = []
     if 'data' in figure:
-        for n,i in enumerate(figure['data']):
+        for n, i in enumerate(figure['data']):
             name = figure['data'][n]['name']
             if name in seen:
                 figure.data[n].update(showlegend=False)
@@ -104,10 +107,10 @@ def get_databases_entities_relationships(stats_file, key='full', options='databa
             stats = stats_file
     if not stats.empty:
         if 'Import_type' in stats:
-            mask = (stats['Import_type']=='entity')
-            mask2 = (stats['Import_type']=='relationships')
-            ent = list(set(list(zip(stats.loc[mask,'filename'], stats.loc[mask,'dataset']))))
-            rel = list(set(list(zip(stats.loc[mask2,'filename'], stats.loc[mask2,'dataset']))))
+            mask = (stats['Import_type'] == 'entity')
+            mask2 = (stats['Import_type'] == 'relationships')
+            ent = list(set(list(zip(stats.loc[mask, 'filename'], stats.loc[mask, 'dataset']))))
+            rel = list(set(list(zip(stats.loc[mask2, 'filename'], stats.loc[mask2, 'dataset']))))
 
         if 'import_id' in stats and 'datetime in stats':
             dat = []
@@ -200,29 +203,29 @@ def get_dropdown_menu(fig, options_dict, add_button=True, equal_traces=True, num
                 visible[start:end] = [True] * number_traces
                 start += number_traces
             else:
-                number_traces = len([element for tupl in options_dict[i] for element in tupl])*2
+                number_traces = len([element for tupl in options_dict[i] for element in tupl]) * 2
                 visible = [False] * len(fig['data'])
                 end = start + number_traces
                 visible[start:end] = [True] * number_traces
                 start += number_traces
             temp_dict = dict(label=str(i),
-                            method='update',
-                            args=[{'visible': visible},
-                                    {'title': 'Date: '+i}])
+                             method='update',
+                             args=[{'visible': visible},
+                                   {'title': 'Date: ' + i}])
             list_updatemenus.append(temp_dict)
 
         if add_button:
             button = [dict(label='All',
-                            method='update',
-                            args=[{'visible': [True] * len(fig['data'])}, {'title': 'All'}])]
+                           method='update',
+                           args=[{'visible': [True] * len(fig['data'])}, {'title': 'All'}])]
             list_updatemenus = list_updatemenus + button
         else:
             pass
 
-        updatemenus = list([dict(active=len(list_updatemenus)-1,
-                                buttons=list_updatemenus,
-                                direction='down',
-                                showactive=True, x=-0.17, xanchor='left', y=1.1, yanchor='top'), ])
+        updatemenus = list([dict(active=len(list_updatemenus) - 1,
+                                 buttons=list_updatemenus,
+                                 direction='down',
+                                 showactive=True, x=-0.17, xanchor='left', y=1.1, yanchor='top'), ])
 
     return updatemenus
 
@@ -317,11 +320,12 @@ def plot_total_number_imported(stats_file, plot_title):
     if len(traces) > 0:
         if type(traces[0]) == list:
             traces = list(chain.from_iterable(traces))
-    
+
     layout = go.Layout(title='', xaxis=dict(title=''), yaxis={'title': 'Number of imports'},
                        legend={'font': {'size': 11}}, margin=go.layout.Margin(l=80, r=40, t=100, b=50),
                        annotations=[dict(text='<b>{}<b>'.format(plot_title), font=dict(family='Arial', size=18),
-                       showarrow=False, xref='paper', x=-0.06, xanchor='left', yref='paper', y=1.15, yanchor='top')])
+                                         showarrow=False, xref='paper', x=-0.06, xanchor='left', yref='paper', y=1.15,
+                                         yanchor='top')])
 
     fig = go.Figure(data=traces, layout=layout)
     fig['layout']['template'] = 'plotly_white'
@@ -340,8 +344,8 @@ def plot_total_numbers_per_date(stats_file, plot_title):
     df_full = get_totals_per_date(stats_file, key='full', import_types=True)
     df_partial = get_totals_per_date(stats_file, key='partial', import_types=True)
 
-    traces_f = viz.getPlotTraces(df_full, key='full', type='scaled markers', div_factor=float(10^1000))
-    traces_p = viz.getPlotTraces(df_partial, key='partial', type='scaled markers', div_factor=float(10^1000))
+    traces_f = viz.getPlotTraces(df_full, key='full', type='scaled markers', div_factor=float(10 ^ 1000))
+    traces_p = viz.getPlotTraces(df_partial, key='partial', type='scaled markers', div_factor=float(10 ^ 1000))
     traces = traces_f + traces_p
 
     if type(traces[0]) == list:
@@ -350,13 +354,14 @@ def plot_total_numbers_per_date(stats_file, plot_title):
         pass
 
     layout = go.Layout(title='',
-                    xaxis={'showgrid': True},
-                    yaxis={'title': 'Imported entities/relationships'},
-                    legend={'font': {'size':11}},
-                    height=550,
-                    margin=go.layout.Margin(l=80, r=40, t=100, b=100),
-                    annotations=[dict(text='<b>{}<b>'.format(plot_title), font=dict(family='Arial', size=18),
-                    showarrow=False, xref='paper', x=-0.06, xanchor='left', yref='paper', y=1.15, yanchor='top')])
+                       xaxis={'showgrid': True},
+                       yaxis={'title': 'Imported entities/relationships'},
+                       legend={'font': {'size': 11}},
+                       height=550,
+                       margin=go.layout.Margin(l=80, r=40, t=100, b=100),
+                       annotations=[dict(text='<b>{}<b>'.format(plot_title), font=dict(family='Arial', size=18),
+                                         showarrow=False, xref='paper', x=-0.06, xanchor='left', yref='paper', y=1.15,
+                                         yanchor='top')])
 
     fig = go.Figure(data=traces, layout=layout)
     fig['layout']['template'] = 'plotly_white'
@@ -381,7 +386,7 @@ def plot_databases_numbers_per_date(stats_file, plot_title, key='full', dropdown
     elif key == 'partial':
         stats = stats_file[stats_file['Import_flag'] == 'partial']
     else:
-        
+
         ('Syntax error')
 
     dropdown_options = get_databases_entities_relationships(stats_file, key=key, options=dropdown_options)
@@ -396,19 +401,20 @@ def plot_databases_numbers_per_date(stats_file, plot_title, key='full', dropdown
         if type(traces[0]) == list:
             traces = list(chain.from_iterable(traces))
 
-    layout = go.Layout(title='', xaxis = {'showgrid':True, 'type':'log','title':'Imported entities/relationships'},
-                        legend={'font':{'size':11}}, height=600, margin=go.layout.Margin(l=40,r=40,t=80,b=100),
-                        annotations=[dict(text='<b>{}<b>'.format(plot_title), font = dict(family='Arial', size = 18),
-                        showarrow=False, xref = 'paper', x=-0.17, xanchor='left', yref = 'paper', y=1.2, yanchor='top')])
+    layout = go.Layout(title='', xaxis={'showgrid': True, 'type': 'log', 'title': 'Imported entities/relationships'},
+                       legend={'font': {'size': 11}}, height=600, margin=go.layout.Margin(l=40, r=40, t=80, b=100),
+                       annotations=[dict(text='<b>{}<b>'.format(plot_title), font=dict(family='Arial', size=18),
+                                         showarrow=False, xref='paper', x=-0.17, xanchor='left', yref='paper', y=1.2,
+                                         yanchor='top')])
 
     fig = go.Figure(data=traces, layout=layout)
     fig['layout']['template'] = 'plotly_white'
 
     if dropdown:
         updatemenus = get_dropdown_menu(fig, dropdown_options, add_button=True, equal_traces=True, number_traces=2)
-        fig.layout.update(go.Layout(updatemenus = updatemenus))
+        fig.layout.update(go.Layout(updatemenus=updatemenus))
 
-    names = set([fig['data'][n]['name'] for n,i in enumerate(fig['data'])])
+    names = set([fig['data'][n]['name'] for n, i in enumerate(fig['data'])])
     colors = dict(zip(names, ['red', 'blue', 'green', 'yellow', 'orange']))
 
     for name in names:
@@ -416,10 +422,12 @@ def plot_databases_numbers_per_date(stats_file, plot_title, key='full', dropdown
 
     # remove_legend_duplicates(fig) #Removes legend from individual plots.
 
-    return dcc.Graph(id = 'databases imports {}'.format(key), figure = fig)
+    return dcc.Graph(id='databases imports {}'.format(key), figure=fig)
 
 
-def plot_import_numbers_per_database(stats_file, plot_title, key='full', subplot_titles = ('',''), colors=True, plots_1='entities', plots_2='relationships', dropdown=True, dropdown_options='databases'):
+def plot_import_numbers_per_database(stats_file, plot_title, key='full', subplot_titles=('', ''), colors=True,
+                                     plots_1='entities', plots_2='relationships', dropdown=True,
+                                     dropdown_options='databases'):
     """
     Creates plotly multiplot figure with breakdown of imported numbers and size of the respective files, per database and \
     import type (entities or relationships).
@@ -451,61 +459,69 @@ def plot_import_numbers_per_database(stats_file, plot_title, key='full', subplot
         ent_colors = set_colors(ent)
         rel_colors = set_colors(rel)
 
-    fig = tools.make_subplots(2, 2, subplot_titles = subplot_titles, vertical_spacing = 0.18, horizontal_spacing = 0.2)
+    fig = tools.make_subplots(2, 2, subplot_titles=subplot_titles, vertical_spacing=0.18, horizontal_spacing=0.2)
 
     for i, j in stats.groupby(['dataset', 'filename']):
         date = pd.Series(str(j['datetime'].sort_values().reset_index(drop=True)[0]))
-        j = j.sort_values(['import_id', 'datetime']).drop_duplicates(['dataset', 'import_id', 'filename'], keep='first', inplace=False)
+        j = j.sort_values(['import_id', 'datetime']).drop_duplicates(['dataset', 'import_id', 'filename'], keep='first',
+                                                                     inplace=False)
         entities_df = j[j['Import_type'] == 'entity']
         relationships_df = j[j['Import_type'] == 'relationships']
 
         if not entities_df['Imported_number'].empty:
             fig.append_trace(go.Scattergl(visible=True,
-                                                  x=entities_df['datetime'],
-                                                  y=entities_df['Imported_number'],
-                                                  mode='markers+lines',
-                                                  marker = dict(color = ent_colors[i[1]]),
-                                                  name=i[1].split('.')[0]),1,1)
+                                          x=entities_df['datetime'],
+                                          y=entities_df['Imported_number'],
+                                          mode='markers+lines',
+                                          marker=dict(color=ent_colors[i[1]]),
+                                          name=i[1].split('.')[0]), 1, 1)
             fig.append_trace(go.Scattergl(visible=True,
-                                                  x=entities_df['datetime'],
-                                                  y=entities_df['file_size'],
-                                                  mode='markers+lines',
-                                                  marker = dict(color = ent_colors[i[1]]),
-                                                  name=i[1].split('.')[0],
-                                                  showlegend=False),2,1)
+                                          x=entities_df['datetime'],
+                                          y=entities_df['file_size'],
+                                          mode='markers+lines',
+                                          marker=dict(color=ent_colors[i[1]]),
+                                          name=i[1].split('.')[0],
+                                          showlegend=False), 2, 1)
 
         if not relationships_df['Imported_number'].empty:
             fig.append_trace(go.Scattergl(visible=True,
-                                                  x=relationships_df['datetime'],
-                                                  y=relationships_df['Imported_number'],
-                                                  mode='markers+lines',
-                                                  marker = dict(color = rel_colors[i[1]]),
-                                                  name=i[1].split('.')[0]),1,2)
+                                          x=relationships_df['datetime'],
+                                          y=relationships_df['Imported_number'],
+                                          mode='markers+lines',
+                                          marker=dict(color=rel_colors[i[1]]),
+                                          name=i[1].split('.')[0]), 1, 2)
             fig.append_trace(go.Scattergl(visible=True,
-                                                  x=relationships_df['datetime'],
-                                                  y=relationships_df['file_size'],
-                                                  mode='markers+lines',
-                                                  marker = dict(color = rel_colors[i[1]]),
-                                                  name=i[1].split('.')[0],
-                                                  showlegend=False),2,2)
+                                          x=relationships_df['datetime'],
+                                          y=relationships_df['file_size'],
+                                          mode='markers+lines',
+                                          marker=dict(color=rel_colors[i[1]]),
+                                          name=i[1].split('.')[0],
+                                          showlegend=False), 2, 2)
 
-    fig.layout.update(go.Layout(legend={'orientation':'v', 'font':{'size':11}},
-                                height=700, margin=go.layout.Margin(l=20,r=20,t=150,b=60)))
+    fig.layout.update(go.Layout(legend={'orientation': 'v', 'font': {'size': 11}},
+                                height=700, margin=go.layout.Margin(l=20, r=20, t=150, b=60)))
 
     annotations = []
-    annotations.append(dict(text='<b>{}<b>'.format(plot_title), font = dict(family='Arial', size = 18),
-                            showarrow=False, xref = 'paper', x=-0.07, xanchor='left', yref = 'paper', y=1.3, yanchor='top'))
-    annotations.append({'font':{'size': 14},'showarrow':False,'text':subplot_titles[0],'x':0.23,'xanchor':'center','xref':'paper','y':1.0,'yanchor':'bottom','yref':'paper'})
-    annotations.append({'font':{'size': 14},'showarrow':False,'text':subplot_titles[1],'x':0.78,'xanchor':'center','xref':'paper','y':1.0,'yanchor':'bottom','yref':'paper'})
-    annotations.append({'font':{'size': 14},'showarrow':False,'text':subplot_titles[2],'x':0.23,'xanchor':'center','xref':'paper','y':0.44,'yanchor':'bottom','yref':'paper'})
-    annotations.append({'font':{'size': 14},'showarrow':False,'text':subplot_titles[3],'x':0.78,'xanchor':'center','xref':'paper','y':0.44,'yanchor':'bottom','yref':'paper'})
+    annotations.append(dict(text='<b>{}<b>'.format(plot_title), font=dict(family='Arial', size=18),
+                            showarrow=False, xref='paper', x=-0.07, xanchor='left', yref='paper', y=1.3, yanchor='top'))
+    annotations.append(
+        {'font': {'size': 14}, 'showarrow': False, 'text': subplot_titles[0], 'x': 0.23, 'xanchor': 'center',
+         'xref': 'paper', 'y': 1.0, 'yanchor': 'bottom', 'yref': 'paper'})
+    annotations.append(
+        {'font': {'size': 14}, 'showarrow': False, 'text': subplot_titles[1], 'x': 0.78, 'xanchor': 'center',
+         'xref': 'paper', 'y': 1.0, 'yanchor': 'bottom', 'yref': 'paper'})
+    annotations.append(
+        {'font': {'size': 14}, 'showarrow': False, 'text': subplot_titles[2], 'x': 0.23, 'xanchor': 'center',
+         'xref': 'paper', 'y': 0.44, 'yanchor': 'bottom', 'yref': 'paper'})
+    annotations.append(
+        {'font': {'size': 14}, 'showarrow': False, 'text': subplot_titles[3], 'x': 0.78, 'xanchor': 'center',
+         'xref': 'paper', 'y': 0.44, 'yanchor': 'bottom', 'yref': 'paper'})
 
     fig.layout['annotations'] = annotations
     fig['layout']['template'] = 'plotly_white'
 
     if dropdown:
         updatemenus = get_dropdown_menu(fig, dropdown_options, add_button=True, equal_traces=False)
-        fig.layout.update(go.Layout(updatemenus = updatemenus))
+        fig.layout.update(go.Layout(updatemenus=updatemenus))
 
-
-    return dcc.Graph(id = 'imports-breakdown per database {}'.format(key), figure = fig)
+    return dcc.Graph(id='imports-breakdown per database {}'.format(key), figure=fig)

@@ -1,14 +1,18 @@
 import os
 import sys
-import pandas as pd
+
+import dash
 import numpy as np
+import pandas as pd
 import plotly.graph_objs as go
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc, Output, Input
+from dash import html
+
 from ckg import ckg_utils
-from ckg.graphdb_connector import connector
-from ckg.analytics_core.viz import viz
 from ckg.analytics_core import utils
+from ckg.analytics_core.viz import viz
+from ckg.graphdb_connector import connector
+
 
 def size_converter(value):
     """
@@ -18,14 +22,14 @@ def size_converter(value):
     :return: String with converted value and units.
     """
     unit = 'KB'
-    val = np.round(value*0.001, 2)
+    val = np.round(value * 0.001, 2)
     if len(str(val).split('.')[0]) > 3:
         unit = 'MB'
-        val = np.round(val*0.001, 2)
+        val = np.round(val * 0.001, 2)
         if len(str(val).split('.')[0]) > 3:
             unit = 'GB'
-            val = np.round(val*0.001, 2)
-    return str(val)+' '+unit
+            val = np.round(val * 0.001, 2)
+    return str(val) + ' ' + unit
 
 
 def get_query():
@@ -42,7 +46,9 @@ def get_query():
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        raise Exception("Erro: {}. Reading queries from file {}: {}, file: {},line: {}".format(err, queries_path, sys.exc_info(), fname, exc_tb.tb_lineno))
+        raise Exception(
+            "Erro: {}. Reading queries from file {}: {}, file: {},line: {}".format(err, queries_path, sys.exc_info(),
+                                                                                   fname, exc_tb.tb_lineno))
     return data_upload_cypher
 
 
@@ -53,22 +59,22 @@ def get_db_schema():
     :return: network with all the database nodes and how they are related
     """
     style = [{'selector': 'node',
-            'style': {'label': 'data(name)',
-                      'background-color': 'data(color)',
-                      'text-valign': 'center',
-                      'text-halign': 'center',
-                      'border-color': 'gray',
-                      'border-width': '1px',
-                      'width': 55,
-                      'height': 55,
-                      'opacity': 0.8,
-                      'font-size': '14'}},
-           {'selector': 'edge',
-            'style': {'label': 'data(label)',
-                     'curve-style': 'bezier',
-                     'opacity': 0.7,
-                     'width': 0.4,
-                     'font-size': '5'}}]
+              'style': {'label': 'data(name)',
+                        'background-color': 'data(color)',
+                        'text-valign': 'center',
+                        'text-halign': 'center',
+                        'border-color': 'gray',
+                        'border-width': '1px',
+                        'width': 55,
+                        'height': 55,
+                        'opacity': 0.8,
+                        'font-size': '14'}},
+             {'selector': 'edge',
+              'style': {'label': 'data(label)',
+                        'curve-style': 'bezier',
+                        'opacity': 0.7,
+                        'width': 0.4,
+                        'font-size': '5'}}]
     layout = {'name': 'cose',
               'idealEdgeLength': 100,
               'nodeOverlap': 20,
@@ -87,7 +93,7 @@ def get_db_schema():
     query_name = 'db_schema'
     cypher = get_query()
     driver = connector.getGraphDatabaseConnectionConfiguration()
-    
+
     if driver is not None:
         if query_name in cypher:
             if 'query' in cypher[query_name]:
@@ -104,7 +110,9 @@ def get_db_schema():
                 except Exception as err:
                     plot = html.Div(children=html.H1("Error accessing the database statistics", className='error_msg'))
         else:
-            plot = html.Div(children=html.H1("Error: Cypher query {} for accessing the database statistics does not exist".format(query_name), className='error_msg'))
+            plot = html.Div(children=html.H1(
+                "Error: Cypher query {} for accessing the database statistics does not exist".format(query_name),
+                className='error_msg'))
     else:
         plot = html.Div(children=html.H1("Database is offline", className='error_msg'))
 
@@ -125,7 +133,7 @@ def get_db_stats_data():
     dfs = {}
     cypher = get_query()
     driver = connector.getGraphDatabaseConnectionConfiguration()
-    
+
     if driver is not None:
         for i, j in zip(df_names, query_names):
             query = cypher[j]['query']
@@ -159,7 +167,7 @@ def plot_store_size_components(dfs, title, args):
         if 'store_size' in dfs:
             data = pd.read_json(dfs['store_size'], orient='records')
             data.index = ['Array store', 'Logical Log', 'Node store', 'Property store',
-                        'Relationship store', 'String store', 'Total store size']
+                          'Relationship store', 'String store', 'Total store size']
             data.columns = ['value', 'size']
             data = data.iloc[:-1]
             fig = viz.get_pieplot(data, identifier='store_size_pie', args=args)
@@ -184,22 +192,22 @@ def plot_node_rel_per_label(dfs, title, args, focus='nodes'):
             data = pd.read_json(dfs['meta_stats'], orient='records')
             if focus == 'nodes':
                 data = pd.DataFrame.from_dict(data['labels'][0], orient='index', columns=[
-                                            'number']).reset_index()
+                    'number']).reset_index()
             elif focus == 'relationships':
                 data = pd.DataFrame.from_dict(
                     data['relTypesCount'][0], orient='index', columns=['number']).reset_index()
 
             data = data.sort_values('number')
-            
+
             if not data.empty:
                 fig = viz.get_barplot(data, identifier='node_rel_per_label_{}'.format(focus), args=args)
                 fig.figure['layout'] = go.Layout(barmode='relative',
-                                                height=args['height'],
-                                                xaxis={'type': 'log', 'range': [0, np.log10(data['number'].iloc[-1])]},
-                                                yaxis={'showline': True, 'linewidth': 1, 'linecolor': 'black'},
-                                                font={'family': 'MyriadPro-Regular', 'size': 12},
-                                                template='plotly_white',
-                                                bargap=0.2)
+                                                 height=args['height'],
+                                                 xaxis={'type': 'log', 'range': [0, np.log10(data['number'].iloc[-1])]},
+                                                 yaxis={'showline': True, 'linewidth': 1, 'linecolor': 'black'},
+                                                 font={'family': 'MyriadPro-Regular', 'size': 12},
+                                                 template='plotly_white',
+                                                 bargap=0.2)
 
     return html.Div([html.H3(title), fig], style={'margin': '0%', 'padding': '0%'})
 
@@ -214,18 +222,18 @@ def indicator(color, text, id_value):
     :return: Dash div containing title and an html.P element.
     """
     return html.Div([html.H4(id=id_value),
-                     html.P(text)], style={'border-radius': '5px',
-                                           'background-color': '#f9f9f9',
-                                                            'margin': '0.3%',
-                                                            'padding': '1%',
-                                                            'position': 'relative',
-                                                            'box-shadow': '2px 2px 2px lightgrey',
-                                                            'width': '19%',
-                                                            # 'height': '15%',
-                                                            # 'width':'230px',
-                                                            'height': '140px',
-                                                            'display': 'inline-block',
-                                                            'vertical-align': 'middle'})
+                     html.P(text)], style={'borderRadius': '5px',
+                                           'backgroundColor': '#f9f9f9',
+                                           'margin': '0.3%',
+                                           'padding': '1%',
+                                           'position': 'relative',
+                                           'boxShadow': '2px 2px 2px lightgrey',
+                                           'width': '19%',
+                                           # 'height': '15%',
+                                           # 'width':'230px',
+                                           'height': '140px',
+                                           'display': 'inline-block',
+                                           'verticalAlign': 'middle'})
 
 
 def quick_numbers_panel():
@@ -238,18 +246,19 @@ def quick_numbers_panel():
     project_links = [html.H4('No available Projects')]
     try:
         driver = connector.getGraphDatabaseConnectionConfiguration()
-    
+
         if driver is not None:
             projects = connector.find_nodes(driver, node_type='Project', parameters={})
             for project in projects:
                 project_ids.append((project['n']['name'], project['n']['id']))
             project_links = [html.H4('Available Projects:')]
+
     except Exception:
-        pass
+        print("Error connecting to Database")
 
     for project_name, project_id in project_ids:
         project_links.append(html.A(project_name.title(),
-                                    id='link-internal',
+                                    id=f'link-internal-{project_id}',
                                     href='/apps/project?project_id={}&force=0'.format(project_id),
                                     target='',
                                     n_clicks=0,
@@ -257,7 +266,7 @@ def quick_numbers_panel():
 
     project_dropdown = [html.H6('Project finder:'),
                         dcc.Dropdown(id='project_option',
-                                     options=[{'label': name, 'value': (name, value)} for name, value in project_ids],
+                                     options=[{'label': name, 'value': value} for name, value in project_ids],
                                      value='',
                                      multi=False,
                                      clearable=True,
@@ -306,3 +315,16 @@ def quick_numbers_panel():
               ]
 
     return layout
+
+
+@dash.callback(Output("project_url", "children"),
+               [Input("project_option", "value")])
+def update_project_url(value):
+    if value is not None and len(value) > 1:
+        return html.A(value[0].title(),
+                      href=f"/apps/project?project_id={value}&force=0",
+                      target='',
+                      n_clicks=0,
+                      className="button_link")
+    else:
+        return ''

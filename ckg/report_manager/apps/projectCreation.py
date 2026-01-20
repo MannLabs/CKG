@@ -1,10 +1,11 @@
 import os
 import sys
+
 from ckg import ckg_utils
-from ckg.graphdb_connector import connector
 from ckg.graphdb_builder import builder_utils
 from ckg.graphdb_builder.builder import loader
 from ckg.graphdb_builder.experiments import experiments_controller as eh
+from ckg.graphdb_connector import connector
 
 try:
     ckg_config = ckg_utils.read_ckg_config()
@@ -28,7 +29,9 @@ def get_project_creation_queries():
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        logger.error("Reading queries from file {}: {}, file: {},line: {}, err: {}".format(queries_path, sys.exc_info(), fname, exc_tb.tb_lineno, err))
+        logger.error(
+            "Reading queries from file {}: {}, file: {},line: {}, err: {}".format(queries_path, sys.exc_info(), fname,
+                                                                                  exc_tb.tb_lineno, err))
     return project_creation_cypher
 
 
@@ -50,13 +53,14 @@ def check_if_node_exists(driver, node, node_property, value):
         query = cypher[query_name]['query'].replace('NODE', node).replace('PROPERTY', node_property)
         for q in query.split(';')[0:-1]:
             if '$' in q:
-                result = connector.getCursorData(driver, q+';', parameters={'value': value})
+                result = connector.getCursorData(driver, q + ';', parameters={'value': value})
             else:
-                result = connector.getCursorData(driver, q+';')
+                result = connector.getCursorData(driver, q + ';')
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        logger.error("Reading query {}: {}, file: {},line: {}, error: {}".format(query_name, sys.exc_info(), fname, exc_tb.tb_lineno, err))
+        logger.error("Reading query {}: {}, file: {},line: {}, error: {}".format(query_name, sys.exc_info(), fname,
+                                                                                 exc_tb.tb_lineno, err))
 
     return result
 
@@ -81,12 +85,13 @@ def get_new_project_identifier(driver, projectId):
         else:
             length = len(last_project.split('P')[-1])
             new_length = len(str(new_id))
-            external_identifier = 'P'+'0'*(length-new_length)+str(new_id)
+            external_identifier = 'P' + '0' * (length - new_length) + str(new_id)
     except Exception as err:
         external_identifier = None
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        logger.error("Reading query {}: {}, file: {},line: {}, err: {}".format(query_name, sys.exc_info(), fname, exc_tb.tb_lineno, err))
+        logger.error("Reading query {}: {}, file: {},line: {}, err: {}".format(query_name, sys.exc_info(), fname,
+                                                                               exc_tb.tb_lineno, err))
 
     return external_identifier
 
@@ -108,7 +113,8 @@ def get_subject_number_in_project(driver, projectId):
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        logger.error("Error: {}. Reading query {}: {}, file: {},line: {}".format(err, query_name, sys.exc_info(), fname, exc_tb.tb_lineno))
+        logger.error("Error: {}. Reading query {}: {}, file: {},line: {}".format(err, query_name, sys.exc_info(), fname,
+                                                                                 exc_tb.tb_lineno))
     return result
 
 
@@ -141,9 +147,11 @@ def create_new_project(driver, projectId, data, separator='|'):
 
             projectDir = os.path.join(ckg_config['experiments_directory'], os.path.join(external_identifier, 'project'))
             ckg_utils.checkDirectory(projectDir)
-            data.to_excel(os.path.join(projectDir, 'ProjectData_{}.xlsx'.format(external_identifier)), index=False, encoding='utf-8')
+            data.to_excel(os.path.join(projectDir, 'ProjectData_{}.xlsx'.format(external_identifier)), index=False,
+                          encoding='utf-8')
 
-            datasetPath = os.path.join(os.path.join(ckg_config['imports_experiments_directory'], external_identifier), 'project')
+            datasetPath = os.path.join(os.path.join(ckg_config['imports_experiments_directory'], external_identifier),
+                                       'project')
             ckg_utils.checkDirectory(datasetPath)
             eh.generate_dataset_imports(external_identifier, 'project', datasetPath)
             loader.partialUpdate(imports=['project'], specific=[external_identifier])
@@ -154,5 +162,6 @@ def create_new_project(driver, projectId, data, separator='|'):
     except Exception as err:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        logger.error("Reading query {}: {}, file: {},line: {}, err: {}".format(query_name, sys.exc_info(), fname, exc_tb.tb_lineno, err))
+        logger.error("Reading query {}: {}, file: {},line: {}, err: {}".format(query_name, sys.exc_info(), fname,
+                                                                               exc_tb.tb_lineno, err))
     return done, external_identifier
