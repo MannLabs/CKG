@@ -14,7 +14,7 @@ Jinja2==2.11.2
 joblib==0.17.0
 json5==0.9.5
 jupyter-core==4.6.3
-jupyterlab==2.2.6
+jupyterlab==2.2.10
 kiwisolver==1.2.0
 MarkupSafe==1.1.1
 mistune==0.8.4
